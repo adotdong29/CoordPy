@@ -1,4 +1,4 @@
-# context-zero
+# Context Zero
 
 **CASR — Causal-Abstraction Scale-Renormalized Routing.**
 O(log N) coordination for multi-agent teams.
@@ -7,14 +7,19 @@ O(log N) coordination for multi-agent teams.
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](#)
 
+> **Naming.** `Context Zero` is the research programme. `Wevra` is the
+> first usable product/substrate shipped from that programme. This repository
+> is the programme repo; the current product surface lives under
+> `vision_mvp/product/` and is referred to in docs as **Wevra**.
+>
 > Most multi-agent AI frameworks (AutoGen, CrewAI, LangGraph, …) cap out at
 > around 10-100 agents because every agent has to read every other agent's
-> output each round — context grows like O(N²). **context-zero** ships a
+> output each round — context grows like O(N²). **Context Zero** ships a
 > coordination layer whose per-agent context grows like **O(log N)**, so the
 > same team design scales to 10 000, 100 000, or more agents without
 > collapsing under its own context.
 
-> **What this project is — and what it is not.** context-zero is a *context
+> **What this project is — and what it is not.** Context Zero is a *context
 > substrate for teams of agents collaborating on a task*. It is NOT a repo
 > knowledge-graph tool (Graphify-style or otherwise); those tools represent
 > a corpus for a single assistant to traverse, and their object of study is

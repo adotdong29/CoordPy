@@ -12,6 +12,11 @@
 > and (b) an emerging tool/substrate for real agent teams. The
 > code is evidence for the research, and the research is what makes
 > the tool principled. Neither identity subsumes the other.
+>
+> **Naming.** `Context Zero` is the research programme. `Wevra` is the
+> first usable product produced by the programme: the operator-facing
+> surface that wraps the already-settled substrate, parser/matcher/sandbox
+> stack, readiness gate, reporting, and deployment boundary.
 
 ## 0. How to read this document
 
@@ -27,10 +32,12 @@ numbers live in the `RESULTS_PHASE*.md` notes alongside the code.
 
 Three pieces of discipline this plan imposes on itself:
 
-1. **No product framing.** The research is not a framework, a
-   library, or a product. It is a set of claims about information
-   flow in systems of LLM agents and about the shape of the contract
-   between symbolic machinery and a model.
+1. **No product-first framing.** The research is not reducible to a
+   framework, a library, or a product. It is a set of claims about
+   information flow in systems of LLM agents and about the shape of
+   the contract between symbolic machinery and a model. The current
+   product surface (`Wevra`) is an output of the programme, not the
+   programme's boundary.
 2. **No hype.** Every empirical number in this document is traceable
    to a result note and to a test or experiment. Any claim that is
    not traceable is marked as a conjecture.

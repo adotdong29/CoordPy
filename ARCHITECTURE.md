@@ -2,6 +2,12 @@
 
 This document specifies the reference implementation of CASR (Causal-Abstraction Scale-Renormalized Routing). It is a design specification, not code — the MVP implementation follows this spec.
 
+> **Naming.** `Context Zero` is the research programme. `Wevra` is the
+> first product surface built from it: the operator-facing runner, profiles,
+> reporting, readiness gate, and deployment boundary now living under
+> `vision_mvp/product/`. This document covers the full programme architecture;
+> references to the product surface refer to **Wevra**.
+
 > **Architecture as of Phase 27: five substrate layers + a render
 > mode + a snippet-scale runtime-calibration observer (Phase 26) +
 > a *corpus-scale* runtime-calibration observer (Phase 27). Conservative
