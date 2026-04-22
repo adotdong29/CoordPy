@@ -1,0 +1,50 @@
+{
+  "schema": "phase45.product_report.v1",
+  "profile": "bundled_57",
+  "profile_description": "Full bundled-bank release-candidate readiness. 57 rows, subprocess sandbox. Saturation gate: 57/57 on all five checks.",
+  "readiness": {
+    "ready": true,
+    "jsonl_path": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/product/../tasks/data/swe_lite_style_bank.jsonl",
+    "n": 57,
+    "n_passed_all": 57,
+    "wall_seconds": 4.94,
+    "sandbox": "subprocess",
+    "checks": {
+      "schema": {
+        "passed": 57,
+        "failed": 0,
+        "failures": []
+      },
+      "adapter": {
+        "passed": 57,
+        "failed": 0,
+        "failures": []
+      },
+      "parser": {
+        "passed": 57,
+        "failed": 0,
+        "failures": []
+      },
+      "matcher": {
+        "passed": 57,
+        "failed": 0,
+        "failures": []
+      },
+      "test_runner": {
+        "passed": 57,
+        "failed": 0,
+        "failures": []
+      }
+    },
+    "blockers": [],
+    "schema": "phase44.readiness.v1"
+  },
+  "sweep": null,
+  "wall_seconds": 4.94,
+  "out_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/artifacts/phase45_rc_bundled",
+  "artifacts": [
+    "product_report.json",
+    "product_summary.txt",
+    "readiness_verdict.json"
+  ]
+}

@@ -1,0 +1,16 @@
+=== context-zero product report ===
+profile     : bundled_57
+description : Full bundled-bank release-candidate readiness. 57 rows, subprocess sandbox. Saturation gate: 57/57 on all five checks.
+out_dir     : /Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/artifacts/phase45_rc_bundled
+wall_seconds: 4.94
+
+readiness   : READY  (n=57, passed=57, wall=4.94s)
+  - schema       passed= 57  failed=  0
+  - adapter      passed= 57  failed=  0
+  - parser       passed= 57  failed=  0
+  - matcher      passed= 57  failed=  0
+  - test_runner  passed= 57  failed=  0
+
+sweep       : not configured in this profile
+
+artifacts   : ['product_report.json', 'product_summary.txt', 'readiness_verdict.json']

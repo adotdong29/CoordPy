@@ -1,0 +1,19 @@
+=== context-zero product report ===
+profile     : aspen_mac1_coder
+description : ASPEN macbook-1 (192.168.12.191) qwen2.5-coder:14b real-LLM sweep, 57 instances, strict+robust parser, raw capture on. Canonical coder-class cell (Phase 44).
+out_dir     : /Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/artifacts/phase45_mac1_recorded
+wall_seconds: 5.19
+
+readiness   : READY  (n=57, passed=57, wall=5.18s)
+  - schema       passed= 57  failed=  0
+  - adapter      passed= 57  failed=  0
+  - parser       passed= 57  failed=  0
+  - matcher      passed= 57  failed=  0
+  - test_runner  passed= 57  failed=  0
+
+sweep       : real-LLM launch recorded (operator-run on ASPEN cluster)
+  launch_cmd: /usr/local/opt/python@3.14/bin/python3.14 -m vision_mvp.experiments.phase42_parser_sweep --mode real --model qwen2.5-coder:14b --ollama-url http://192.168.12.191:11434 --jsonl /Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/product/../tasks/data/swe_lite_style_bank.jsonl --parser-modes strict robust --apply-modes strict --n-distractors 6 --sandbox subprocess
+  capture   : /usr/local/opt/python@3.14/bin/python3.14 -m vision_mvp.experiments.phase44_semantic_residue --mode real --model qwen2.5-coder:14b --ollama-url http://192.168.12.191:11434 --jsonl /Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/product/../tasks/data/swe_lite_style_bank.jsonl --parser-modes strict robust --apply-modes strict --n-distractors 6 --sandbox subprocess
+  note      : Heavy real-model runs are launched via the existing phase42/phase44 CLI. The product runner records the resolved command line so the operator can kick it off on the correct cluster node.
+
+artifacts   : ['product_report.json', 'product_summary.txt', 'readiness_verdict.json', 'sweep_launch.json']

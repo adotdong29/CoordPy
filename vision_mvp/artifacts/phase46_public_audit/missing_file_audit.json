@@ -1,0 +1,12 @@
+{
+  "schema": "phase46.import_audit.v1",
+  "jsonl_path": "/nonexistent/public_swe_bench_lite.jsonl",
+  "ok": false,
+  "error_kind": "file_not_found",
+  "error_detail": "no such file: /nonexistent/public_swe_bench_lite.jsonl",
+  "rows": [],
+  "readiness": null,
+  "blockers": [
+    "file_not_found"
+  ]
+}

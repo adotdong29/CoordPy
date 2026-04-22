@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "context-zero"
+version = "0.1.0"
+description = "CASR — Causal-Abstraction Scale-Renormalized Routing: O(log N) coordination for multi-agent teams."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Context-Zero Contributors" },
+]
+keywords = ["multi-agent", "coordination", "llm", "context", "routing"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.23",
+]
+
+[project.optional-dependencies]
+llm = [
+    # no runtime deps — the LLM agent talks HTTP to a local Ollama instance
+]
+scientific = [
+    "scipy>=1.10",
+    "networkx>=3.0",
+]
+crypto = [
+    "cryptography>=41.0",
+    # galois is optional — the repo ships an inline prime-field GF(p)
+    # fallback (core/gf.py); install galois for better performance.
+]
+dl = [
+    "torch>=2.1",
+    "peft>=0.7",
+]
+heavy = [
+    "hnswlib>=0.8",
+    "transformers>=4.35",
+    "RestrictedPython>=7.0",
+]
+dev = [
+    "black",
+    "ruff",
+    "mypy",
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/context-zero"
+Documentation = "https://github.com/your-org/context-zero#readme"
+Issues = "https://github.com/your-org/context-zero/issues"
+
+[project.scripts]
+casr = "vision_mvp.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["vision_mvp*"]
+exclude = ["vision_mvp.tests*"]
+
+[tool.setuptools.package-data]
+vision_mvp = ["*.md"]

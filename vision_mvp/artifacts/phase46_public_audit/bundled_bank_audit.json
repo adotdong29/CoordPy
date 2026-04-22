@@ -1,0 +1,394 @@
+{
+  "schema": "phase46.import_audit.v1",
+  "jsonl_path": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/tasks/data/swe_lite_style_bank.jsonl",
+  "ok": true,
+  "n_rows": 57,
+  "shape_counts": {
+    "ambiguous": 57
+  },
+  "decode_errors": 0,
+  "non_object_rows": 0,
+  "duplicate_instance_ids": [],
+  "rows": [
+    {
+      "idx": 0,
+      "instance_id": "ext-calc-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 1,
+      "instance_id": "ext-strings-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 2,
+      "instance_id": "ext-list-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 3,
+      "instance_id": "ext-dict-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 4,
+      "instance_id": "ext-text-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 5,
+      "instance_id": "ext-math-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 6,
+      "instance_id": "ext-cmp-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 7,
+      "instance_id": "ext-range-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 8,
+      "instance_id": "ext-guard-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 9,
+      "instance_id": "ext-neg-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 10,
+      "instance_id": "ext-empty-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 11,
+      "instance_id": "ext-strip-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 12,
+      "instance_id": "ext-branch-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 13,
+      "instance_id": "ext-mut-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 14,
+      "instance_id": "ext-multi-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 15,
+      "instance_id": "ext-order-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 16,
+      "instance_id": "ext-uni-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 17,
+      "instance_id": "ext-bool-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 18,
+      "instance_id": "ext-agg-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 19,
+      "instance_id": "ext-slice-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 20,
+      "instance_id": "ext-path-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 21,
+      "instance_id": "ext-type-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 22,
+      "instance_id": "ext-eq-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 23,
+      "instance_id": "ext-hist-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 24,
+      "instance_id": "ext-allany-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 25,
+      "instance_id": "ext-cumsum-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 26,
+      "instance_id": "ext-key-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 27,
+      "instance_id": "ext-idx-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 28,
+      "instance_id": "ext-pad-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 29,
+      "instance_id": "ext-join-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 30,
+      "instance_id": "ext-repl-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 31,
+      "instance_id": "ext-abs-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 32,
+      "instance_id": "ext-pow-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 33,
+      "instance_id": "ext-mod-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 34,
+      "instance_id": "ext-reverse-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 35,
+      "instance_id": "ext-zip-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 36,
+      "instance_id": "ext-invert-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 37,
+      "instance_id": "ext-getdef-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 38,
+      "instance_id": "ext-fib-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 39,
+      "instance_id": "ext-gcd-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 40,
+      "instance_id": "ext-multi-002",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 41,
+      "instance_id": "ext-boolop-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 42,
+      "instance_id": "ext-try-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 43,
+      "instance_id": "ext-flat-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 44,
+      "instance_id": "ext-repr-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 45,
+      "instance_id": "ext-sent-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 46,
+      "instance_id": "ext-base-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 47,
+      "instance_id": "ext-count-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 48,
+      "instance_id": "ext-prec-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 49,
+      "instance_id": "ext-class-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 50,
+      "instance_id": "ext-setx-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 51,
+      "instance_id": "ext-maxx-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 52,
+      "instance_id": "ext-defarg-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 53,
+      "instance_id": "ext-sortkey-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 54,
+      "instance_id": "ext-contain-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 55,
+      "instance_id": "ext-graph-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    },
+    {
+      "idx": 56,
+      "instance_id": "ext-bsearch-001",
+      "shape": "ambiguous",
+      "missing_keys": []
+    }
+  ],
+  "readiness": {
+    "ready": true,
+    "jsonl_path": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/tasks/data/swe_lite_style_bank.jsonl",
+    "n": 57,
+    "n_passed_all": 57,
+    "wall_seconds": 4.8,
+    "sandbox": "subprocess",
+    "checks": {
+      "schema": {
+        "passed": 57,
+        "failed": 0,
+        "failures": []
+      },
+      "adapter": {
+        "passed": 57,
+        "failed": 0,
+        "failures": []
+      },
+      "parser": {
+        "passed": 57,
+        "failed": 0,
+        "failures": []
+      },
+      "matcher": {
+        "passed": 57,
+        "failed": 0,
+        "failures": []
+      },
+      "test_runner": {
+        "passed": 57,
+        "failed": 0,
+        "failures": []
+      }
+    },
+    "blockers": [],
+    "schema": "phase44.readiness.v1"
+  },
+  "blockers": []
+}
