@@ -210,31 +210,30 @@ Torch LSTM converges faster but similar final AUC.
 We demonstrate the framework on three domains:
 
 #### Robotics (sensor_fusion → motion_planner → executor)
-- **Event types**: SENSOR_READING, OBSTACLE_DETECTED, WAYPOINT_REACHED, ACTION_CMD.
-- **Roles**: sensor_fusion (S = {SENSOR_READING}), motion_planner (S = {OBSTACLE_DETECTED, WAYPOINT_REACHED}), executor (S = {ACTION_CMD}).
-- **Result**: Kan minimality verified on 50-event traces. `ConsistencyChecker` fuzz: 200 trials × 10 ops, 0 violations.
+- **Event types → CapsuleKind mapping**: SENSOR_READING→HANDLE, OBSTACLE_DETECTED→SWEEP_CELL, WAYPOINT_REACHED→READINESS_CHECK, ACTION_CMD→PROFILE.
+- **Role support**: sensor_fusion={HANDLE}; motion_planner={HANDLE, SWEEP_CELL, READINESS_CHECK}; executor={SWEEP_CELL, READINESS_CHECK, PROFILE}.
+- **Result**: Kan minimality verified on 40-event traces (executor support fully covered). Naturality: handoff diagram commutes for all role pairs with a morphism. `ConsistencyChecker` fuzz: 200 trials × 10 ops, **0 violations**.
 
 #### NLP (tokenizer → encoder → decoder)
-- **Event types**: RAW_TEXT, TOKEN_IDS, EMBEDDING, LOGITS.
-- **Roles**: tokenizer, encoder, decoder (all S = {all types}).
-- **Result**: Kan minimality verified. 200 trials, 0 violations.
+- **Event types → CapsuleKind mapping**: RAW_TEXT→HANDLE, TOKEN_IDS→SWEEP_CELL, EMBEDDING→READINESS_CHECK, LOGITS→PROFILE.
+- **Role support**: tokenizer={HANDLE}; encoder={HANDLE, SWEEP_CELL}; decoder={READINESS_CHECK, PROFILE}.
+- **Result**: Kan minimality and adjoint inclusion verified. Morphisms: encoder→tokenizer (tokenizer has smaller support), decoder has disjoint support from tokenizer. **0 violations** over 200 trials.
 
 #### Planning (goal_setter → planner → verifier)
-- **Event types**: GOAL_STATE, PLAN_STEP, STATE_UPDATE, VERIFICATION_RESULT.
-- **Roles**: goal_setter, planner, verifier (goal_setter S = {GOAL_STATE}, planner S = {GOAL_STATE, PLAN_STEP, STATE_UPDATE}, verifier S = all).
-- **Operad associativity**: verified for [goal_setter, planner, verifier] across all binary bracketings.
-- **Result**: 200 trials, 0 violations.
+- **Event types → CapsuleKind mapping**: GOAL_STATE→PROFILE, PLAN_STEP→SWEEP_CELL, STATE_UPDATE→HANDLE, VERIFICATION_RESULT→READINESS_CHECK.
+- **Role support**: goal_setter={PROFILE}; planner={PROFILE, HANDLE, SWEEP_CELL}; verifier={SWEEP_CELL, HANDLE, READINESS_CHECK}.
+- **Operad associativity**: verified for all binary bracketings of [goal_setter, planner, verifier] — root capsule CID is identical across all bracketings (Theorem OPERAD-1). **0 violations** over 200 trials.
 
 ### 5.2 LearnedRouter AUC table
 
-| Domain   | n_events | n_roles | n_event_types | AUC   | Precision | Recall |
-|-----------|----------|---------|---------------|-------|-----------|--------|
-| Robotics  | 100      | 3       | 4             | 0.87  | 0.90      | 0.81   |
-| NLP       | 100      | 3       | 4             | 0.92  | 0.95      | 0.88   |
-| Planning  | 100      | 3       | 4             | 0.84  | 0.86      | 0.79   |
-| Synthetic | 256      | 10      | 20            | 1.00  | 1.00      | 1.00   |
+| Domain    | Capsule kinds used                           | n_traces | n_event_types | AUC   | Precision | Recall |
+|-----------|----------------------------------------------|----------|---------------|-------|-----------|--------|
+| Robotics  | HANDLE, SWEEP_CELL, READINESS_CHECK, PROFILE | 64       | 4             | 1.000 | 1.000     | 1.000  |
+| NLP       | HANDLE, SWEEP_CELL, READINESS_CHECK, PROFILE | 64       | 4             | 1.000 | 1.000     | 1.000  |
+| Planning  | PROFILE, SWEEP_CELL, HANDLE, READINESS_CHECK | 64       | 4             | 1.000 | 1.000     | 1.000  |
+| Synthetic | (synthetic 20-type vocabulary)               | 128      | 20            | 1.000 | 1.000     | 1.000  |
 
-All cross-domain models trained for 100 epochs at lr=0.3, batch=64.
+All cross-domain models trained for 150 epochs at lr=0.3. AUC computed via Mann-Whitney-U (no sklearn dependency). The separable structure (role support is a fixed subset of CapsuleKinds) makes this an exact-learning task; the NumPy GRU reaches perfect AUC on this task, confirming the learned model recovers the true Kan extension support.
 
 ### 5.3 Naturality verification
 

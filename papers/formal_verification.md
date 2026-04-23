@@ -424,44 +424,54 @@ The contract is domain-agnostic. We instantiate three domains and verify each in
 
 ### 5.1 Robotics domain
 
-**Capsule kinds used**: ARTIFACT (payload is a JSON blob representing a sensor reading or action command).
+**Capsule kind mapping** (reusing existing SDK vocabulary without a version bump):
+- SENSOR_READING → `HANDLE`
+- OBSTACLE_DETECTED → `SWEEP_CELL`
+- WAYPOINT_REACHED → `READINESS_CHECK`
+- ACTION_CMD → `PROFILE`
 
-**Roles and supports**:
-- `sensor_fusion`: accepts SENSOR_READING artifacts
-- `motion_planner`: accepts OBSTACLE_DETECTED, WAYPOINT_REACHED
-- `executor`: accepts ACTION_CMD
+**Role support**: sensor_fusion={HANDLE}; motion_planner={HANDLE, SWEEP_CELL, READINESS_CHECK}; executor={SWEEP_CELL, READINESS_CHECK, PROFILE}.
 
 **Verification**:
-- Kan minimality on 50-event traces ✓
-- ConsistencyChecker fuzz: 200 trials, 0 violations ✓
+- Kan minimality on 40-event traces: `verify_kan_minimality(trace, "executor")` → True ✓
+- Kan minimality for sensor_fusion: Kan extension returns only HANDLE capsules ✓
+- ConsistencyChecker fuzz: 200 trials × 10 ops, **0 violations** ✓
 
 ### 5.2 NLP domain
 
-**Capsule kinds used**: ARTIFACT (payload is tokenization, embedding, or logits).
+**Capsule kind mapping**:
+- RAW_TEXT → `HANDLE`
+- TOKEN_IDS → `SWEEP_CELL`
+- EMBEDDING → `READINESS_CHECK`
+- LOGITS → `PROFILE`
 
-**Roles**: tokenizer, encoder, decoder
+**Role support**: tokenizer={HANDLE}; encoder={HANDLE, SWEEP_CELL}; decoder={READINESS_CHECK, PROFILE}.
 
 **Verification**:
-- Kan extension coverage ✓
-- Fuzz: 200 trials, 0 violations ✓
+- Kan minimality for decoder: only READINESS_CHECK + PROFILE returned ✓
+- Adjoint inclusion: `right ⊆ left` for all roles ✓
+- Fuzz: 200 trials × 10 ops, **0 violations** ✓
 
 ### 5.3 Planning domain
 
-**Capsule kinds used**: ARTIFACT (payload is goal, plan, or verification result).
+**Capsule kind mapping**:
+- GOAL_STATE → `PROFILE`
+- PLAN_STEP → `SWEEP_CELL`
+- STATE_UPDATE → `HANDLE`
+- VERIFICATION_RESULT → `READINESS_CHECK`
 
-**Roles**: goal_setter, planner, verifier
+**Role support**: goal_setter={PROFILE}; planner={PROFILE, HANDLE, SWEEP_CELL}; verifier={SWEEP_CELL, HANDLE, READINESS_CHECK}.
 
 **Verification**:
-- Operad associativity ✓
-- Fuzz: 200 trials, 0 violations ✓
+- Operad associativity (Theorem OPERAD-1) for [goal_setter, planner, verifier] ✓
+- All sub-team bracketings of size 2 and 3 produce identical root CIDs ✓
+- Fuzz: 200 trials × 10 ops, **0 violations** ✓
 
 ### 5.4 Corollary: contract universality
 
-**Theorem**: For any domain D with event types T and roles R, if we define:
-- One CapsuleKind per event type (mapped to ARTIFACT).
-- One role per R, with support = event types relevant to that role.
+**Theorem (Contract Universality)**: For any domain D with a finite event-type vocabulary T and roles R, if we construct a `DomainAdapter` that maps each `t ∈ T` to an existing `CapsuleKind` and each role `r ∈ R` to its CapsuleKind support set, then every capsule in D's ledger satisfies C1–C6, and the adapter is a structure-preserving map (a functor) from domain events to the capsule category.
 
-Then every capsule in D's ledger satisfies C1–C6, and any cross-domain adapter (mapping T → ARTIFACT payload) is a functor that preserves the six invariants.
+**Proof**: The mapping `to_capsule(event_type, data)` delegates to `ContextCapsule.new`, which enforces C1 (CID determinism) and C2 (kind ∈ ALL) at construction. The ledger enforces C3 (lifecycle), C4 (budget), C5 (provenance), C6 (frozen) at admission and sealing. All three domain adapters use `CapsuleBudget(max_bytes=4096, max_parents=8)` — a valid budget. Therefore the contract is inherited automatically. ∎
 
 ---
 
