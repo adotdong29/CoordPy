@@ -153,10 +153,139 @@ class PlanningDomainAdapter(DomainAdapter):
     }
 
 
+class BiologyDomainAdapter(DomainAdapter):
+    """Protein simulator -> data integrator -> validator -> report generator.
+
+    Kind mapping:
+      PROTEIN_BINDING    -> HANDLE
+      ENZYME_REACTION    -> SWEEP_CELL
+      CELL_DIVISION      -> READINESS_CHECK
+      APOPTOSIS          -> PROFILE
+    """
+    DOMAIN_NAME = "biology"
+    _KIND_MAP: dict[str, str] = {
+        "PROTEIN_BINDING": CapsuleKind.HANDLE,
+        "ENZYME_REACTION": CapsuleKind.SWEEP_CELL,
+        "CELL_DIVISION": CapsuleKind.READINESS_CHECK,
+        "APOPTOSIS": CapsuleKind.PROFILE,
+    }
+    _ROLE_SUPPORT: dict[str, list[str]] = {
+        "simulator": [CapsuleKind.HANDLE],
+        "data_integrator": [CapsuleKind.HANDLE, CapsuleKind.SWEEP_CELL],
+        "validator": [CapsuleKind.SWEEP_CELL, CapsuleKind.READINESS_CHECK],
+        "report_generator": [CapsuleKind.READINESS_CHECK, CapsuleKind.PROFILE],
+    }
+
+
+class SupplyChainDomainAdapter(DomainAdapter):
+    """Demand forecaster -> inventory planner -> logistics router -> compliance checker.
+
+    Kind mapping:
+      ORDER_RECEIVED       -> HANDLE
+      INVENTORY_UPDATED    -> SWEEP_CELL
+      SHIPMENT_DISPATCHED  -> READINESS_CHECK
+      DELIVERY_CONFIRMED   -> PROFILE
+    """
+    DOMAIN_NAME = "supply_chain"
+    _KIND_MAP: dict[str, str] = {
+        "ORDER_RECEIVED": CapsuleKind.HANDLE,
+        "INVENTORY_UPDATED": CapsuleKind.SWEEP_CELL,
+        "SHIPMENT_DISPATCHED": CapsuleKind.READINESS_CHECK,
+        "DELIVERY_CONFIRMED": CapsuleKind.PROFILE,
+    }
+    _ROLE_SUPPORT: dict[str, list[str]] = {
+        "demand_forecaster": [CapsuleKind.HANDLE],
+        "inventory_planner": [CapsuleKind.HANDLE, CapsuleKind.SWEEP_CELL],
+        "logistics_router": [CapsuleKind.SWEEP_CELL, CapsuleKind.READINESS_CHECK],
+        "compliance_checker": [CapsuleKind.READINESS_CHECK, CapsuleKind.PROFILE],
+    }
+
+
+class FinanceDomainAdapter(DomainAdapter):
+    """Transaction processor -> risk assessor -> fraud detector -> auditor.
+
+    Kind mapping:
+      DEPOSIT              -> HANDLE
+      WITHDRAWAL           -> SWEEP_CELL
+      TRANSFER             -> READINESS_CHECK
+      INTEREST_ACCRUAL     -> PROFILE
+      AUDIT_REQUEST        -> HANDOFF
+    """
+    DOMAIN_NAME = "finance"
+    _KIND_MAP: dict[str, str] = {
+        "DEPOSIT": CapsuleKind.HANDLE,
+        "WITHDRAWAL": CapsuleKind.SWEEP_CELL,
+        "TRANSFER": CapsuleKind.READINESS_CHECK,
+        "INTEREST_ACCRUAL": CapsuleKind.PROFILE,
+        "AUDIT_REQUEST": CapsuleKind.HANDOFF,
+    }
+    _ROLE_SUPPORT: dict[str, list[str]] = {
+        "transaction_processor": [CapsuleKind.HANDLE, CapsuleKind.HANDOFF],
+        "risk_assessor": [CapsuleKind.HANDLE, CapsuleKind.SWEEP_CELL],
+        "fraud_detector": [CapsuleKind.SWEEP_CELL, CapsuleKind.READINESS_CHECK],
+        "auditor": [CapsuleKind.HANDOFF, CapsuleKind.PROFILE],
+    }
+
+
+class ScienceDomainAdapter(DomainAdapter):
+    """Experiment runner -> data analyzer -> statistician -> publication reviewer.
+
+    Kind mapping:
+      EXPERIMENT_START     -> PROFILE
+      DATA_COLLECTION      -> HANDLE
+      ANALYSIS_COMPLETE    -> SWEEP_CELL
+      RESULT_VALIDATED     -> READINESS_CHECK
+    """
+    DOMAIN_NAME = "science"
+    _KIND_MAP: dict[str, str] = {
+        "EXPERIMENT_START": CapsuleKind.PROFILE,
+        "DATA_COLLECTION": CapsuleKind.HANDLE,
+        "ANALYSIS_COMPLETE": CapsuleKind.SWEEP_CELL,
+        "RESULT_VALIDATED": CapsuleKind.READINESS_CHECK,
+    }
+    _ROLE_SUPPORT: dict[str, list[str]] = {
+        "experiment_runner": [CapsuleKind.PROFILE, CapsuleKind.HANDLE],
+        "data_analyzer": [CapsuleKind.HANDLE, CapsuleKind.SWEEP_CELL],
+        "statistician": [CapsuleKind.SWEEP_CELL, CapsuleKind.READINESS_CHECK],
+        "publication_reviewer": [CapsuleKind.READINESS_CHECK, CapsuleKind.PROFILE],
+    }
+
+
+class ConsensusDomainAdapter(DomainAdapter):
+    """Leader -> replica -> monitor -> recovery manager (Byzantine consensus).
+
+    Kind mapping:
+      PROPOSE              -> PROFILE
+      VOTE                 -> HANDLE
+      PREPARE              -> SWEEP_CELL
+      COMMIT               -> READINESS_CHECK
+      SUSPECT_BYZANTINE   -> HANDOFF
+    """
+    DOMAIN_NAME = "consensus"
+    _KIND_MAP: dict[str, str] = {
+        "PROPOSE": CapsuleKind.PROFILE,
+        "VOTE": CapsuleKind.HANDLE,
+        "PREPARE": CapsuleKind.SWEEP_CELL,
+        "COMMIT": CapsuleKind.READINESS_CHECK,
+        "SUSPECT_BYZANTINE": CapsuleKind.HANDOFF,
+    }
+    _ROLE_SUPPORT: dict[str, list[str]] = {
+        "leader": [CapsuleKind.PROFILE, CapsuleKind.HANDLE],
+        "replica": [CapsuleKind.HANDLE, CapsuleKind.SWEEP_CELL, CapsuleKind.READINESS_CHECK],
+        "monitor": [CapsuleKind.SWEEP_CELL, CapsuleKind.READINESS_CHECK, CapsuleKind.HANDOFF],
+        "recovery_manager": [CapsuleKind.HANDOFF, CapsuleKind.PROFILE],
+    }
+
+
 ADAPTERS: dict[str, type[DomainAdapter]] = {
     "robotics": RoboticsDomainAdapter,
     "nlp": NLPDomainAdapter,
     "planning": PlanningDomainAdapter,
+    "biology": BiologyDomainAdapter,
+    "supply_chain": SupplyChainDomainAdapter,
+    "finance": FinanceDomainAdapter,
+    "science": ScienceDomainAdapter,
+    "consensus": ConsensusDomainAdapter,
 }
 
 
@@ -167,5 +296,7 @@ def get_adapter(name: str) -> type[DomainAdapter]:
 __all__ = [
     "DomainEvent", "DomainAdapter",
     "RoboticsDomainAdapter", "NLPDomainAdapter", "PlanningDomainAdapter",
+    "BiologyDomainAdapter", "SupplyChainDomainAdapter", "FinanceDomainAdapter",
+    "ScienceDomainAdapter", "ConsensusDomainAdapter",
     "ADAPTERS", "get_adapter",
 ]

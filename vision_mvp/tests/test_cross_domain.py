@@ -20,6 +20,11 @@ from vision_mvp.core.cross_domain import (
     NLPDomainAdapter,
     PlanningDomainAdapter,
     RoboticsDomainAdapter,
+    BiologyDomainAdapter,
+    SupplyChainDomainAdapter,
+    FinanceDomainAdapter,
+    ScienceDomainAdapter,
+    ConsensusDomainAdapter,
 )
 from vision_mvp.core.learned_routing import LearnedRouter, RoutingTrainer
 from vision_mvp.formal.consistency_checker import ConsistencyChecker
@@ -112,9 +117,14 @@ def test_planning_operad_all_subsets():
 
 
 @pytest.mark.parametrize("adapter,seed", [
-    (RoboticsDomainAdapter, 10),
-    (NLPDomainAdapter,      20),
-    (PlanningDomainAdapter, 30),
+    (RoboticsDomainAdapter,  10),
+    (NLPDomainAdapter,       20),
+    (PlanningDomainAdapter,  30),
+    (BiologyDomainAdapter,   40),
+    (SupplyChainDomainAdapter, 50),
+    (FinanceDomainAdapter,   60),
+    (ScienceDomainAdapter,   70),
+    (ConsensusDomainAdapter, 80),
 ])
 def test_domain_zero_violations(adapter, seed):
     """ConsistencyChecker finds 0 violations over 200 domain trace trials."""
@@ -154,9 +164,14 @@ def _build_dataset(adapter, role: str, n_traces: int = 30, seq_len: int = 32,
 
 
 @pytest.mark.parametrize("adapter,role", [
-    (RoboticsDomainAdapter, "executor"),
-    (NLPDomainAdapter,      "decoder"),
-    (PlanningDomainAdapter, "verifier"),
+    (RoboticsDomainAdapter,    "executor"),
+    (NLPDomainAdapter,         "decoder"),
+    (PlanningDomainAdapter,    "verifier"),
+    (BiologyDomainAdapter,     "validator"),
+    (SupplyChainDomainAdapter, "compliance_checker"),
+    (FinanceDomainAdapter,     "auditor"),
+    (ScienceDomainAdapter,     "publication_reviewer"),
+    (ConsensusDomainAdapter,   "recovery_manager"),
 ])
 def test_learned_router_domain_auc(adapter, role):
     """LearnedRouter reaches AUC > 0.80 on each domain after training."""

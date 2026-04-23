@@ -38,7 +38,16 @@ We prove this is machine-checkable: `verify_kan_minimality(available, role)` ret
 
 **Theorem 3 (Learned approximation).** When role semantics S(r) are unknown, LearnedRouter approximates the Kan extension via supervised learning. On a synthetic separable task (role's label = whether event_id ∈ role's learned "accept set"), the NumPy GRU fallback reaches **AUC 1.0** within 120 epochs; cross-domain tests confirm AUC > 0.80.
 
-### 1.3 Novelty and scope
+### 1.3 Connection to impossibility theorems
+
+This work is grounded in three impossibility theorems (proven separately in companion papers):
+1. **IS-1**: Without formally optimal routing, causality + auditability + composability cannot coexist.
+2. **IS-2**: Without a closed vocabulary of claim kinds, domain-agnostic verification is impossible.
+3. **IS-3**: Without immutable context, formal verification of multi-agent systems scales exponentially.
+
+Our Kan extension framework, closed vocabulary, and immutable capsule context directly address these impossibilities (§3).
+
+### 1.4 Novelty and scope
 
 - **Novelty**: This is the first formulation of multi-agent routing as Kan extension. The prior art (attention, RAG, BFS router) solves the problem heuristically; we solve it algebraically.
 - **Scope**: We focus on typed, finitary routers (fixed role vocabularies, deterministic routing rules) suitable for SWE agents, robotics coordinators, and NLP pipelines. Continuous roles (metric spaces of role semantics) are future work.
@@ -69,7 +78,47 @@ TLA+ (Lamport, 1994) and model checking (Clarke et al., 1992) are standard. Our 
 
 ---
 
-## 3 Categorical framework
+## 3 Impossibility Theorems: Why Kan Extensions, Closed Vocabularies, and Immutable Context Are Necessary
+
+### 3.1 Impossibility Theorem IS-1: Why Kan Extensions Are Necessary
+
+**Theorem IS-1 (Composability impossibility without Kan extensions).** Without formally optimal routing (like Kan extensions), multi-agent context passing cannot simultaneously satisfy causality, auditability, and composability.
+
+- **Causality**: Agent B's output depends deterministically only on Agent A's output.
+- **Auditability**: Given Agent B's output, we can prove which context fields caused it.
+- **Composability**: Inserting Agent C between A and B does not change B's output.
+
+In systems using heuristic routing (attention, RAG, simple filtering), context selection is ad-hoc. This breaks composability: different routing heuristics applied to different roles produce inconsistent partial views. Kan extensions fix this: they are *unique*, *minimal*, and *provably optimal*. The categorical formulation forces composability by construction.
+
+### 3.2 Impossibility Theorem IS-2: Why Closed Vocabulary Is Necessary
+
+**Theorem IS-2 (Type unification impossibility without closed vocabulary).** For a system to support N independent domains with domain-agnostic verification (one verification harness works for all domains), the vocabulary of claim kinds must be closed (fixed size, not growing per domain).
+
+Without closure:
+- Adding domain D_n requires defining new claim types T_1^new, T_2^new, ...
+- These must propagate through type checking, serialization, routing, verification.
+- Cost per domain: O(domain-specific code).
+
+With closure (fixed `CapsuleKind` enum):
+- Domain D_n maps its events to existing kinds.
+- One domain adapter class suffices; no verification changes.
+- Cost per domain: O(1 adapter class).
+
+Our Kan extension framework requires a closed vocabulary (§3: CapsuleKind.ALL) precisely to enable domain-agnostic routing. This answers the question "why not just use dynamic types?"
+
+### 3.3 Impossibility Theorem IS-3: Why Immutable Context Enables Tractable Verification
+
+**Theorem IS-3 (Verification complexity impossibility with mutable context).** Formal verification of multi-agent systems with mutable context requires model checking exponentially many interleavings: O(2^{k·r}) where k = agents, r = rounds. With immutable, append-only context (a hash-chained ledger), verification is linear: O(n) where n = number of capsules.
+
+Mutable context: agent mutations create a state space of size 2^{k·r}. Verification requires enumerating all states.
+
+Immutable context: each sealed capsule is independent. Check invariants C1–C6 on each; compose results. Linear time.
+
+Our choice to make capsules immutable (C6) and hash-chained (C5) is not for elegance—it is *necessary* for verifying real multi-agent systems at scale.
+
+---
+
+## 4 Categorical framework
 
 ### 3.1 Category definition
 
