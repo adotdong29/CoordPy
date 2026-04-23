@@ -89,6 +89,12 @@ from .capsule import (
     capsule_from_cohort, capsule_from_adaptive_sub_table,
 )
 
+# Layered API — three-tier ergonomic surfaces over the same substrate
+# (end-user / developer / researcher). Purely additive.
+from .api_layers import (
+    WevraSimpleAPI, WevraBuilderAPI, WevraAdvancedAPI, BuilderSpec,
+)
+
 # Capsule admission policies (Phase 46 research milestone). The
 # SDK contract is unchanged — `CapsuleLedger.admit_and_seal` is
 # byte-for-byte the same — but external callers can now opt into
@@ -187,6 +193,8 @@ __all__ = [
     "MLPBundleDecoder", "train_mlp_bundle_decoder",
     "DeepSetBundleDecoder", "train_deep_set_bundle_decoder",
     "MultitaskBundleDecoder", "train_multitask_bundle_decoder",
+    # Layered API (end-user / developer / researcher ergonomics)
+    "WevraSimpleAPI", "WevraBuilderAPI", "WevraAdvancedAPI", "BuilderSpec",
     # Config
     "WevraConfig",
     # Provenance
