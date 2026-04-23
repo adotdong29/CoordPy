@@ -1,0 +1,231 @@
+{
+  "schema": "phase45.product_report.v2",
+  "profile": "aspen_mac1_coder",
+  "profile_description": "ASPEN macbook-1 (192.168.12.191) qwen2.5-coder:14b real-LLM sweep, 57 instances, strict+robust parser, raw capture on. Canonical coder-class cell (Phase 44).",
+  "readiness": {
+    "ready": true,
+    "jsonl_path": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/product/../tasks/data/swe_lite_style_bank.jsonl",
+    "n": 4,
+    "n_passed_all": 4,
+    "wall_seconds": 0.3,
+    "sandbox": "subprocess",
+    "checks": {
+      "schema": {
+        "passed": 4,
+        "failed": 0,
+        "failures": []
+      },
+      "adapter": {
+        "passed": 4,
+        "failed": 0,
+        "failures": []
+      },
+      "parser": {
+        "passed": 4,
+        "failed": 0,
+        "failures": []
+      },
+      "matcher": {
+        "passed": 4,
+        "failed": 0,
+        "failures": []
+      },
+      "test_runner": {
+        "passed": 4,
+        "failed": 0,
+        "failures": []
+      }
+    },
+    "blockers": [],
+    "schema": "phase44.readiness.v1"
+  },
+  "sweep": {
+    "schema": "wevra.sweep.v2",
+    "mode": "real",
+    "executed_in_process": true,
+    "requires_acknowledgement": false,
+    "sandbox": "subprocess",
+    "jsonl": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/product/../tasks/data/swe_lite_style_bank.jsonl",
+    "cells": [
+      {
+        "parser_mode": "strict",
+        "apply_mode": "strict",
+        "n_distractors": 6,
+        "pooled": {
+          "naive": {
+            "n": 4,
+            "pass_at_1": 0.0,
+            "patch_applied_rate": 0.0,
+            "mean_patch_gen_prompt_chars": 1169.2,
+            "mean_patch_gen_prompt_tokens_approx": 292.3,
+            "mean_events_to_patch_gen": 10.0,
+            "mean_handoffs": 0.0
+          },
+          "routing": {
+            "n": 4,
+            "pass_at_1": 0.0,
+            "patch_applied_rate": 0.0,
+            "mean_patch_gen_prompt_chars": 694.5,
+            "mean_patch_gen_prompt_tokens_approx": 173.6,
+            "mean_events_to_patch_gen": 6.0,
+            "mean_handoffs": 0.0
+          },
+          "substrate": {
+            "n": 4,
+            "pass_at_1": 0.0,
+            "patch_applied_rate": 0.0,
+            "mean_patch_gen_prompt_chars": 944.8,
+            "mean_patch_gen_prompt_tokens_approx": 236.2,
+            "mean_events_to_patch_gen": 0.0,
+            "mean_handoffs": 3.0
+          }
+        },
+        "parser_compliance": {
+          "n_calls": 12,
+          "n_raw_ok": 12,
+          "n_recovered_ok": 0,
+          "compliance_rate": 1.0,
+          "raw_compliance_rate": 1.0,
+          "recovery_lift": 0.0,
+          "kind_counts": {
+            "ok": 12
+          },
+          "recovery_counts": {
+            "": 12
+          }
+        },
+        "n_instances": 4,
+        "cell_wall_s": 112.67
+      },
+      {
+        "parser_mode": "robust",
+        "apply_mode": "strict",
+        "n_distractors": 6,
+        "pooled": {
+          "naive": {
+            "n": 4,
+            "pass_at_1": 1.0,
+            "patch_applied_rate": 1.0,
+            "mean_patch_gen_prompt_chars": 1169.2,
+            "mean_patch_gen_prompt_tokens_approx": 292.3,
+            "mean_events_to_patch_gen": 10.0,
+            "mean_handoffs": 2.0
+          },
+          "routing": {
+            "n": 4,
+            "pass_at_1": 1.0,
+            "patch_applied_rate": 1.0,
+            "mean_patch_gen_prompt_chars": 694.5,
+            "mean_patch_gen_prompt_tokens_approx": 173.6,
+            "mean_events_to_patch_gen": 6.0,
+            "mean_handoffs": 2.0
+          },
+          "substrate": {
+            "n": 4,
+            "pass_at_1": 1.0,
+            "patch_applied_rate": 1.0,
+            "mean_patch_gen_prompt_chars": 944.8,
+            "mean_patch_gen_prompt_tokens_approx": 236.2,
+            "mean_events_to_patch_gen": 0.0,
+            "mean_handoffs": 5.0
+          }
+        },
+        "parser_compliance": {
+          "n_calls": 12,
+          "n_raw_ok": 0,
+          "n_recovered_ok": 12,
+          "compliance_rate": 1.0,
+          "raw_compliance_rate": 0.0,
+          "recovery_lift": 1.0,
+          "kind_counts": {
+            "ok": 12
+          },
+          "recovery_counts": {
+            "fence_wrapped_payload": 12
+          }
+        },
+        "n_instances": 4,
+        "cell_wall_s": 1.05
+      }
+    ],
+    "launch_cmd": null,
+    "wall_seconds": 113.723,
+    "model": "qwen2.5-coder:14b",
+    "endpoint": "http://192.168.12.191:11434",
+    "model_metadata": {
+      "model": "qwen2.5-coder:14b",
+      "availability": "assumed_resident",
+      "tags": [
+        "parser_dominant",
+        "serious",
+        "canonical_coder"
+      ]
+    }
+  },
+  "wall_seconds": 114.03,
+  "out_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/artifacts/wevra_slice2_g1",
+  "provenance": {
+    "schema": "wevra.provenance.v1",
+    "timestamp_utc": "2026-04-22T20:00:43.118863+00:00",
+    "code": {
+      "git_sha": "85f03f73bb0e69b3e1e4468b0ca34686dcf8ba4d",
+      "git_dirty": true,
+      "package": "vision_mvp",
+      "package_version": "0.5.0",
+      "repo_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero"
+    },
+    "runtime": {
+      "python_version": "3.14.4",
+      "python_implementation": "CPython",
+      "platform": "macOS-14.8.2-x86_64-i386-64bit-Mach-O",
+      "machine": "x86_64",
+      "system": "Darwin"
+    },
+    "profile": {
+      "name": "aspen_mac1_coder",
+      "schema": "phase45.profile.v1"
+    },
+    "model": {
+      "tag": "qwen2.5-coder:14b",
+      "endpoint": "http://192.168.12.191:11434"
+    },
+    "sandbox": "subprocess",
+    "input": {
+      "jsonl_path": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/tasks/data/swe_lite_style_bank.jsonl",
+      "jsonl_sha256": "82723d0bb6bd8ca6414d56d4b3202f76cf9a9d3e605e3d5aa0435108b09e5b31",
+      "jsonl_bytes": 53849
+    },
+    "invocation": {
+      "argv": [
+        "-c"
+      ],
+      "cwd": "/Users/qdong/Desktop/Desktop1/Andy/context-zero",
+      "user": "qdong",
+      "hostname": "Qunfengs-MBP.lan"
+    },
+    "output": {
+      "out_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/artifacts/wevra_slice2_g1",
+      "artifacts": [
+        "product_report.json",
+        "product_summary.txt",
+        "provenance.json",
+        "readiness_verdict.json",
+        "sweep_result.json"
+      ]
+    },
+    "extra": {
+      "invocation_kwargs": {
+        "skip_sweep": false,
+        "force_sweep": false,
+        "jsonl_override": null
+      }
+    }
+  },
+  "artifacts": [
+    "product_report.json",
+    "product_summary.txt",
+    "provenance.json",
+    "readiness_verdict.json",
+    "sweep_result.json"
+  ]
+}

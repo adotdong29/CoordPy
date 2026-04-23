@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wevra-markdown-sink"
+version = "0.1.0"
+description = "Example out-of-tree Wevra ReportSink that emits a Markdown digest of a product report."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Context Zero Contributors" },
+]
+# Intentionally no hard dependency on `wevra`: this package only needs
+# `wevra` at runtime, and pinning it here would make the exemplar
+# brittle across Wevra versions. The entry_point discovery path works
+# as long as both packages are in the same environment.
+dependencies = []
+
+[project.entry-points."wevra.report_sinks"]
+# Wevra calls the registered function once, with no arguments, at
+# sink-resolution time. The function must register a factory under a
+# stable name via `wevra.extensions.register_report_sink`.
+markdown = "wevra_markdown_sink.sink:register"
+
+[tool.setuptools.packages.find]
+include = ["wevra_markdown_sink*"]
