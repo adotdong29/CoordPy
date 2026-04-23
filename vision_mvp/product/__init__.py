@@ -1,16 +1,17 @@
-"""Phase-45 product-grade orchestration surface.
+"""Legacy product modules (pre-Wevra import path).
 
-This subpackage is the one-command product entrypoint for the
-context-zero SWE-style evaluation pipeline. It is a thin
-orchestrator over the already-validated Phase-40..44 primitives:
+This subpackage is the original orchestration surface for the
+profile-driven SWE-bench-Lite-shape evaluation pipeline. It is
+kept importable for backwards compatibility, but the **stable
+public contract is** ``vision_mvp.wevra`` — which re-exports the
+modules here under their durable names.
 
-  * ``phase44_public_readiness.run_readiness``
-  * ``phase42_parser_sweep`` (parser-mode axis)
-  * ``phase44_semantic_residue`` (raw capture + refined residue)
-
-It does not replace the per-phase experiment scripts; it wires
-them together behind a stable profile-driven CLI and emits a
-single machine-readable report.
+New code should import from ``vision_mvp.wevra`` (e.g.
+``from vision_mvp.wevra import profiles, report, ci_gate,
+import_data, run, RunSpec``). The modules below are thin
+orchestrators over the research primitives in
+``vision_mvp.experiments.*``; they do not replace the per-phase
+experiment scripts.
 """
 
 from __future__ import annotations

@@ -27,6 +27,14 @@ from typing import Any
 
 SCHEMA_VERSION = "phase45.profile.v1"
 
+# Trust tags. "trusted" = operator-owned inputs (bundled bank, ASPEN
+# cluster). "untrusted" = arbitrary third-party JSONL / LLM output.
+# Untrusted profiles are Docker-first by default and refuse weaker
+# sandboxes unless the operator explicitly opts in via
+# ``allow_unsafe_sandbox=True``.
+TRUST_TRUSTED = "trusted"
+TRUST_UNTRUSTED = "untrusted"
+
 _BUNDLED_BANK = os.path.join(
     os.path.dirname(__file__), "..", "tasks", "data",
     "swe_lite_style_bank.jsonl")
@@ -138,12 +146,16 @@ _PROFILES: dict[str, dict[str, Any]] = {
     "public_jsonl": {
         "description": (
             "Template for a public SWE-bench-Lite drop-in JSONL. "
-            "Runs readiness only by default; operator supplies "
-            "--jsonl to override the bundled path."),
+            "UNTRUSTED input by default: executes inside Docker "
+            "(--network=none, read-only rootfs). Operator supplies "
+            "--jsonl to override the bundled path. Use "
+            "--allow-unsafe-sandbox only when running a JSONL "
+            "you authored or audited yourself."),
+        "trust": TRUST_UNTRUSTED,
         "readiness": {
             "jsonl": None,
             "limit": None,
-            "sandbox_name": "subprocess",
+            "sandbox_name": "docker",
         },
         "sweep": None,
     },
@@ -223,7 +235,19 @@ def get_profile(name: str) -> dict[str, Any]:
     if name not in _PROFILES:
         raise KeyError(
             f"unknown profile: {name!r}; known: {list_profiles()}")
-    return copy.deepcopy(_PROFILES[name])
+    prof = copy.deepcopy(_PROFILES[name])
+    prof.setdefault("trust", TRUST_TRUSTED)
+    return prof
+
+
+def is_untrusted(profile_name: str) -> bool:
+    """Return True iff the profile's trust tag is ``untrusted``.
+
+    Untrusted profiles execute arbitrary third-party code (e.g. a
+    public SWE-bench-Lite drop-in) and must run inside Docker unless
+    the operator explicitly opts out.
+    """
+    return get_profile(profile_name).get("trust") == TRUST_UNTRUSTED
 
 
 def model_capability_table() -> dict[str, tuple[str, ...]]:

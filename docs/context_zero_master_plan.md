@@ -3,8 +3,10 @@
 > Canonical long-running document for the research programme behind
 > `context-zero`. This is a plan for a body of work, not a changelog.
 > Phase-by-phase diaries live in `vision_mvp/RESULTS_PHASE*.md`;
-> session notes live nowhere durable, on purpose. Last touched: Phase 46
-> (2026-04-21).
+> session notes live nowhere durable, on purpose. Last touched: Phase 47
+> capsule-research-center extension (cohort lift + relational
+> limitation + bundle-aware admission + cross-domain transfer),
+> 2026-04-22.
 >
 > The programme has a deliberately dual identity: it is (a) a research
 > programme in context, coordination, and exact external memory,
@@ -17,6 +19,32 @@
 > first usable product produced by the programme: the operator-facing
 > surface that wraps the already-settled substrate, parser/matcher/sandbox
 > stack, readiness gate, reporting, and deployment boundary.
+>
+> **Research center.** As of the SDK-v3 milestone (2026-04-22) and
+> the Phase-46 capsule-research milestone (same date), the **Context
+> Capsule** abstraction has stopped being just a product label
+> ("context is an object") and has become a *research center*: a
+> formal mathematical model (`docs/CAPSULE_FORMALISM.md`), an ML
+> problem with a real held-out result
+> (`docs/RESULTS_CAPSULE_LEARNING.md`), and an empirical
+> unification audit across four prior substrate primitives. The
+> capsule contract is *additive on top of* every Phase-N
+> bounded-context theorem — no substrate primitive is modified.
+> See § 4.12 for the post-Phase-46 research-center status and
+> § 4.11 for the current frontier.
+>
+> **Programme vs Product — read this first.** The programme ships
+> theorems, phase shards, and an EXTENDED_MATH survey (§§ 1–9). The
+> product ships one SDK — **Wevra** — with a bounded public surface:
+> `RunSpec` → provenance-stamped report, profile-driven evaluation on
+> SWE-bench-Lite-shape banks, plugin protocols, unified mock/real
+> runtime, CI gate (§ 10). Wevra is **not** the whole programme and
+> **not** a universal agent platform. CASR (Causal-Abstraction Scale-
+> Renormalized Routing) is the *original substrate* — it lives in
+> `vision_mvp.core.*` as settled research code and grounds Wevra's
+> bounded-context claim (Theorem 3 in `PROOFS.md`); it is not itself
+> the product identity. The canonical one-pass orientation for a new
+> reader is [`docs/START_HERE.md`](START_HERE.md).
 
 ## 0. How to read this document
 
@@ -2758,13 +2786,270 @@ analysis driver; it cannot affect any production path.
 
 ## 4.11 Current frontier
 
-As of Phase 44, the programme sits at the following frontier.
+As of Phase 51, the programme sits at the following frontier.
 This section is the one-paragraph answer to "where is the
 programme right now, and what breaks next?" — it is expected to
 change every two or three phases, unlike the rest of this
 document.
 
-**Top-line, post-Phase-44.** The programme now has a
+**Top-line, post-Phase-51 (relational / cohort-aware decoder
+frontier — honest limitation-leaning result).**  Phase 51
+opens the decoder-side relational axis named by Conjecture
+W3-C5 — a hypothesis class structurally outside the
+magnitude-monoid linear family that W3-29 lower-bounds on the
+zero-shot penalty axis.  Theorem **W3-30** (proved,
+constructive) strictly contains the DeepSet class: a decoder
+that partitions the bundle by source-role and aggregates per-
+role features expresses predicates (e.g. "≥ 2 distinct source
+roles each emit a capsule implying rc") that DeepSet's
+per-capsule φ-sum cannot.  Claim **W3-31** (empirical, code-
+backed) reports the outcome: under a matched Phase-51 training
+pipeline, the ``CohortRelationalDecoder`` achieves zero-shot
+gap = 0.038 at level = 0.237 on (incident, security), matching
+Phase-50's reported sign-stable-DeepSet level of 0.237, edging
+the same-pipeline sign-stable-DeepSet baseline by +5 pp (4
+instances at $n=80$, not statistically robust), and **not
+strictly exceeding** Phase-50's reported ceiling.  On Phase-31
+Gate 1 it underperforms DeepSet (0.362 vs 0.425 at the
+pre-committed cell; 0.388 vs 0.425 at best cell).
+Conjecture **W3-C10** names the standing empirical ceiling:
+direction-invariant zero-shot transfer on (incident, security)
+appears bounded at ≈ 0.237 across all eight Phase-49 / Phase-50
+/ Phase-51 decoder families.  **The honest stance.**  Phase 51
+is a **limitation-leaning milestone** — it proves a formal
+strict-separation result, ships the smallest serious relational
+decoder, and finds empirically that the richer class does NOT
+cleanly break the Phase-50 ceiling on this task-family pair.
+The next research move is either (a) a relational feature that
+specifically targets W3-C10 (speculative), (b) a different
+operational-detection pair with smaller
+$\|w^*_A - w^*_B\|$ (structurally cleaner, Phase-52 candidate),
+or (c) accept W3-C10 and redirect (mechanical W3-C1 closure,
+relational *substrate* primitive).  Anchor:
+`docs/RESULTS_CAPSULE_RESEARCH_MILESTONE6.md` and
+`docs/CAPSULE_FORMALISM.md` § 4.F.
+
+**Top-line, post-Phase-50 (strict-reading honest certification
++ structural limitation theorems — preserved).**  Phase 50 is
+the strict-reading test of the Phase-49 paradigm-shift
+candidate, and is an **honest falsification under the strict
+reading** accompanied by the proved structural reason: Gate 1
+fails at $n_{\rm test} = 320$ ($\hat{p} = 0.362$, below even
+the point threshold — W3-26 falsifies W3-23), and strict
+zero-shot Gate 2 fails across all six Phase-50 hypothesis
+classes (best max penalty V2 at +0.112 — W3-27).  Two new
+proved theorems (**W3-24** post-search winner's-curse bias,
+classical; **W3-29** Bayes-divergence lower bound on zero-shot
+risk penalty) give the structural reasons for the strict-
+reading failure.  One empirical positive (**W3-28** sign-stable
+DeepSet zero-shot gap = 0.000) and one refined conjecture
+(**W3-C9** Gate-2 reformulation to gap-reading) close the
+frontier with an operationally-defensible bar.  **The honest
+stance.**  Phase 49 is a **canonical** paradigm-shift
+candidate (point-estimate Gate 1 at $n=80$ + pooled-multitask
+or gap-reading Gate 2) but **NOT a strict** paradigm shift
+(strict CI Gate 1 + strict-penalty zero-shot Gate 2 are both
+structurally blocked).  The programme should adopt W3-C9's
+reformulated bar.  Anchor:
+`docs/RESULTS_CAPSULE_RESEARCH_MILESTONE5.md` and
+`docs/CAPSULE_FORMALISM.md` § 4.E.
+
+**Top-line, post-Phase-49 (stronger decoder + symmetric
+transfer frontier — superseded).** The paradigm-shift bar
+(Conjecture W3-C7) is partially earned under a canonical-but-
+not-strictest reading: Gate 1 MET at 0.425 point estimate
+(DeepSetBundleDecoder, best cell on Phase-31 noisy bench at
+$n_{\rm test} = 80$; binomial CI $[0.317, 0.539]$), Gate 2
+MET under the multitask shared-head reading (0.350 on both
+incident and security test sets, gap 0.000, ≥ 13 pp over
+priority baseline, Theorem W3-22). Strict readings leave
+≈ 2.5 pp of Gate 1 CI headroom and ≈ 9 pp of zero-shot
+Gate 2 penalty headroom. Three new formal results —
+**W3-20** (Deep Sets sufficiency, positive-conditional,
+proved), **W3-21** (linear-class sign-flip asymmetry,
+negative, proved), **W3-22** (multitask symmetric transfer,
+empirical). **Honest stance (Phase-49-internal).** The
+programme had a paradigm-shift *candidate* one well-scoped
+milestone away from strict certification.  **Phase 50
+ran that milestone and falsified the strict reading** —
+the CI and penalty gaps were structural, not statistical.
+Anchor: `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE4.md` and
+`docs/CAPSULE_FORMALISM.md` § 4.D.
+
+**Top-line, post-Phase-48 (bundle-aware decoder frontier).**
+The Phase-47 boundary localises at the decoder: the
+0.200 Phase-31 structural ceiling is a property of the
+priority decoder, not admission, and every admission rule is
+bounded above by it under Theorem W3-17 (admission locality —
+negative, proved). Phase 48 is the decoder-side attack on
+Conjecture P47-C1.
+
+1. **Decoder frontier — structural + empirical break (Part A).**
+   Three decoder-side results:
+    * Theorem **W3-17** (proved, conditional) — admission-only
+      rules cannot exceed the priority-decoder ceiling under
+      ceiling-forcing spurious injection; this sharpens the
+      Phase-47 empirical observation into a limitation
+      statement over all header-level admission rules.
+    * Theorem **W3-18** (proved, conditional) — plurality
+      decoding strictly dominates priority decoding on the
+      *coherent-majority* regime. The contract test
+      `test_w3_18_plurality_strictly_dominates_priority_on_coherent_majority`
+      exhibits the sharpest single-bundle separator
+      (two-OOM_KILL + one-spurious-DFC ⇒ priority says
+      disk_fill, plurality says memory_leak).
+    * Claim **W3-19** (empirical, seed-robust) — the
+      `LearnedBundleDecoder` breaks the 0.200 structural
+      ceiling at **+15 pp** on FIFO × B=64..256 (test accuracy
+      0.350) and at **+17.5 pp** on bundle-learned admission ×
+      B=96 (test accuracy 0.375). On the oracle-clean causal
+      slice it reaches **0.575**, exceeding the priority
+      decoder's clean ceiling of 0.525. Plurality alone does
+      *not* break the ceiling on the full bench
+      (priority-tiebreak fallback reproduces the ceiling on
+      one-vote-each scenarios) — falsifies a naive reading of
+      P47-C1. Anchor: `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE3.md`
+      § 2.
+2. **Decoder-side cross-domain transfer — asymmetric (Part B).**
+   First decoder-side transfer study (incident / security; the
+   two operational-detection domains from Phase 47). Transfer
+   matrix on $n_{\rm test} = 80$ instances per domain:
+   * within-incident: learned 0.362, priority 0.212 (+15 pp).
+   * within-security: learned 0.300, priority 0.200 (+10 pp).
+   * incident → security (cross): 0.300 (+10 pp; matches
+     within-security).
+   * security → incident (cross): 0.125 (**−8.7 pp**,
+     BELOW priority).
+   Feature sign-flip on `lone_top_priority_flag` (+1.13 on
+   incident, −1.19 on security) is the structural reason: the
+   "single-signature high-priority" shape in incident vs the
+   "multi-source high-priority corroboration" shape in
+   security. Conjecture W3-C6 states the asymmetric
+   task-family-indexed transfer. P47-C3 (admission-side) and
+   W3-C6 (decoder-side) are the *same phenomenon*, now sharp
+   on both sides. Anchor:
+   `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE3.md` § 3.
+3. **Paradigm-shift stance — still below bar (Part C).**
+   Conjecture **W3-C7** sets the explicit threshold: a
+   paradigm-shift-worthy decoder would (a) break 0.200 by
+   ≥ 2× ($\ge 0.400$) AND (b) transfer approximately
+   symmetrically across operational-detection domains. Phase
+   48 achieves (a) weakly (0.375 < 0.400) and (b) partially
+   (one direction works, the reverse fails).
+   **The centre is materially upgraded toward a paradigm shift**
+   (the decoder frontier is open and traversable) but does NOT
+   yet earn the label.
+
+**Remaining gap (post-Phase-48) is now structurally five-shaped.**
+(a) **Stronger decoder** (closing the $\ge 0.400$ threshold —
+deeper hypothesis classes, richer features, coupled admit-
+decode training), (b) **symmetric transfer** (what does
+security → incident need to not regress? — domain-adaptive
+feature calibration, or a mixture-of-experts gating), (c)
+**mechanical W3-C1 closure** on the remaining ~10 Phase-N
+magnitude-shaped theorems, (d) **relational-axis extension**
+(W3-C5 — stays conjectural), (e) **richer feature taxonomy**
+(P46-C2 refinement + decoder-side analogue). Product-shape
+gaps (public SWE-bench-Lite JSONL, 70B-class coder) remain
+orthogonal.
+
+**Top-line, post-Phase-47 (capsule-research-center extension).**
+The Phase-46 research center is now **sharper on both sides**:
+
+1. **Formal frontier closed on the magnitude algebra (Part A).**
+   Three theorems — W3-14 (per-capsule budget locality —
+   negative), W3-15 (cohort-lift subsumption — positive,
+   12th kind `COHORT` added), W3-16 (relational limitation —
+   negative). The Phase-46 PARTIAL row on AdaptiveEdge
+   closes FULL via cohort lift; the unification audit now
+   reports **6/6 FULL, 0/6 PARTIAL, 0/6 FAIL**. W3-C3
+   (11-kind completeness) is **falsified**; the honest
+   count is 12. W3-16 names a sharp relational limitation
+   (pairwise predicates across distinct capsule members
+   cannot be enforced by cohort admission alone). See
+   `docs/CAPSULE_FORMALISM.md` § 4.B and § 5; empirical
+   anchor in
+   `vision_mvp/experiments/phase46_unification_audit.py::audit_adaptive_edge_cohort`.
+2. **Bundle-aware admission is not a paradigm shift (Part B).**
+   P46-C1 in its strong form — "bundle-aware admission lifts
+   decoder accuracy past 0.30" — is **falsified** on the
+   Phase-31 noisy-extractor bench. The structural ceiling is
+   0.200, a property of the Phase-31 priority decoder under
+   noisy DISK_FILL_CRITICAL injection, not a property of
+   admission. However, the decoder-aware bundle-learned
+   policy achieves **full budget efficiency**: it hits the
+   ceiling at B = 16 tokens where per-capsule learned
+   (Phase 46) needs B = 96, a 6× efficiency lift. The next
+   paradigm-shift candidate is therefore bundle-aware
+   **decoding** (P47-C1), not more admission work. Anchor:
+   `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` § 2.
+3. **Cross-domain transfer is asymmetric and task-family-
+   indexed (Part C).** First three-domain transfer study
+   (incident / compliance / security). Within-domain
+   admit-precision lifts +10 to +23 pp above base rate.
+   Cross-domain transfer is **strong** on the
+   incident-security pair (+21 pp above security's base
+   rate, within −2 pp of within-domain) but **weak or
+   negative** elsewhere (security → incident is −3 pp).
+   Pooled training does not recover within-domain
+   performance. Interpretation: transfer follows
+   task-family similarity (operational detection vs
+   document review); claim-kind features are domain-
+   specific; scalar features disagree in sign across
+   domains. P46-C2 is **partially supported, partially
+   falsified**; successor conjecture P47-C3 states the
+   task-family-indexed form. Anchor:
+   `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` § 3.
+
+The remaining gap is now structurally **four-shaped**:
+(a) **bundle-aware decoding** (P47-C1, the post-Phase-47
+paradigm-shift candidate), (b) **mechanical W3-C1 closure**
+on the remaining ~10 Phase-N bounded-context theorems (they
+are all magnitude-shaped — the cohort lift unblocks them
+*structurally*), (c) **relational-axis extension** (W3-C5 —
+stays conjectural until a Phase-N substrate primitive
+forces it), (d) **richer feature taxonomy for transfer**
+(P46-C2 refinement). Product-shape gaps (public SWE-bench-
+Lite JSONL, 70B-class coder) remain orthogonal.
+
+**Top-line, post-Phase-46 (capsule research milestone)**
+(preserved below for context). The programme has the Context
+Capsule abstraction as a **research center, not just a
+product label** — three coupled additions all sit on top of
+the unchanged SDK-v3 capsule contract C1..C6:
+
+1. **Formal mathematical model** (`docs/CAPSULE_FORMALISM.md`):
+   capsule space, lifecycle automaton, admissibility predicate,
+   budget tropical-min monoid, capsule DAG. Theorems W3-7..W3-13;
+   conjectures W3-C1..W3-C4 with sharp falsifiers.
+2. **Capsule learning result** — admission policy is *strictly
+   learnable* on Phase-31 incident-triage with Phase-32 noisy
+   extractors. Headline P46-1: at budget = 16 tokens on a
+   held-out by-seed test set, learned admit-precision = 0.796 vs
+   best heuristic 0.634, **+16.2 pp**. The 40-feature logistic
+   policy is fully inspectable; train/test gap < 1.5 pp.
+3. **Unification audit** — 4/5 FULL + 1/5 PARTIAL + 0/5 FAIL on
+   the per-primitive Theorem-W3-11 reduction (Phase-19 Handle,
+   Phase-31 TypedHandoff, Phase-35 ThreadResolution, Phase-36
+   AdaptiveEdge, end-to-end ProductReport). The PARTIAL
+   (AdaptiveEdge) is the **honest near-falsifier** of the
+   subsumption claim: its `max_active_edges` bound is table-
+   level, not capsule-level.
+
+The remaining gap is now structurally **three-shaped**:
+(a) **formal** — extend Theorem W3-11 from 4 primitives to all
+~15 Phase-N bounded-context theorems (W3-C1); (b) **learning**
+— bundle-aware admission to lift the noise-poisoning decoder
+ceiling past 0.225 on Phase-31 (P46-C1); (c) **falsification**
+— stress the 11-kind alphabet with cross-run references and
+out-of-tree adapters (W3-C3). These are listed § 4.12 and
+form the explicit Phase-47 research agenda. The product-shape
+gaps from Phase 44 (public SWE-bench-Lite JSONL availability;
+70B-class coder frontier) remain open and are *orthogonal* to
+the capsule research agenda.
+
+**Top-line, post-Phase-44** (preserved below for context). The
+programme now has a
 **raw-bytes-grounded semantic residue attribution surface on the
 57-instance external-validity bank, a runnable CI-gate public-
 SWE-bench-Lite readiness validator that saturates at 57/57 on
@@ -3976,6 +4261,896 @@ heavy. The programme rotates between the two.
 
 ---
 
+### 4.12 The Context Capsule as a research center (Phase 46 — post-SDK-v3 milestone)
+
+The SDK v3 milestone (`docs/RESULTS_WEVRA_CAPSULE.md`,
+2026-04-22) named the **Context Capsule** as Wevra's
+load-bearing abstraction: every piece of context that
+crosses a role / layer / run boundary is a typed, content-
+addressed, lifecycle-bounded, budget-bounded, provenance-
+carrying object. That milestone moved capsules from
+"recurring shape across the substrate" to "named
+contract C1..C6" with code, tests, and an end-to-end
+runner integration.
+
+Phase 46 is the *research-shaped follow-up* — it moves the
+capsule abstraction from product label to **research center**.
+Three additions, all additive on the substrate:
+
+**1. Formal mathematical model
+(`docs/CAPSULE_FORMALISM.md`).** Defines capsule space
+$\mathcal{C}$, identity map, lifecycle automaton,
+admissibility predicate $\mathcal{A}_b$, budget tropical-min
+monoid, capsule DAG. States Theorems W3-7 (CID
+homomorphism), W3-8 (admissibility monotone under
+tightening, Lemma 3.2 promoted), W3-9 (ledger DAG acyclic
++ append-order-topological), W3-10 (chain tamper-evidence
+under SHA-256), **W3-11 (capsule subsumption — partial,
+proven on four primitive classes)**, W3-12 (view is
+faithful header projection), W3-13 (run-pattern DAG height
+$\le 4$). Section 5 names sharp-falsifier conjectures
+W3-C1..W3-C4.
+
+**2. Capsule learning problem
+(`vision_mvp/wevra/capsule_policy.py`,
+`vision_mvp/experiments/phase46_capsule_learning.py`,
+`docs/RESULTS_CAPSULE_LEARNING.md`).** Capsule admission —
+"should this proposed capsule be admitted under the ledger's
+budget?" — is a **learnable policy**, not just a fixed
+heuristic. The Phase-46 driver builds a 5 143-capsule
+benchmark on Phase-31 incident-triage with Phase-32 noisy
+extractors (`spurious_prob = 0.30`), splits 80 / 20 by
+random seed (so each scenario_id appears in train AND test
+under different distractor draws), and trains a logistic-
+regression policy on a 40-feature closed vocab via
+full-batch GD in pure Python.
+
+**Theorem-style claim P46-1.** On the held-out test set
+($n = 40$ instances), the learned policy strictly dominates
+every fixed heuristic on admit-precision at every tight
+budget cell:
+
+| Budget | FIFO  | Smallest | KindPri (4) | KindPri (8) | **Learned** |
+|------- |------ |--------- |------------ |------------ |------------ |
+| 16     | 0.634 | 0.615    | 0.487       | 0.487       | **0.796**   |
+| 32     | 0.630 | 0.587    | 0.541       | 0.541       | **0.751**   |
+| 48     | 0.604 | 0.592    | 0.560       | 0.560       | **0.684**   |
+| 64     | 0.580 | 0.571    | 0.563       | 0.563       | **0.612**   |
+| 96+    | 0.547 (saturation: every policy admits the full bundle) ||||
+
+The win is +16.2 pp at $B = 16$ over the strongest
+heuristic. Train-set numbers are within 1.5 pp of test
+on every cell — no overfitting. The 40-feature model is
+fully inspectable: top weights are
+`claim:ERROR_RATE_SPIKE +1.23`, `claim:POOL_EXHAUSTION
++0.95`, `src:monitor +0.81`.
+
+**P46-1 is the first empirical evidence for Conjecture
+W3-C4 (admission learnability).** It opens three new
+conjectures (P46-C1 bundle-aware admission; P46-C2 cross-
+domain transfer; P46-C3 rate-distortion optimality of
+header features) — all named with sharp falsifiers in
+`docs/RESULTS_CAPSULE_LEARNING.md` § 6.
+
+**3. Unification stress test
+(`vision_mvp/experiments/phase46_unification_audit.py`,
+`vision_mvp/tests/test_capsule_subsumption.py`).** For
+each of five substrate primitives — Phase-19 Handle,
+Phase-31 TypedHandoff, Phase-35 ThreadResolution,
+Phase-36 AdaptiveEdge, end-to-end ProductReport — the
+audit constructs a real instance, lifts it via the
+canonical adapter, and verifies the W3-11 reduction
+$(k_T, b_T)$ holds operationally.
+
+**Result: 4/5 FULL, 1/5 PARTIAL, 0/5 FAIL.**
+
+| Primitive            | Capsule kind         | Verdict | Reduction                                                     |
+|---                   |---                   |---      |---                                                            |
+| Handle               | HANDLE               | FULL    | $B \to b_t = B$                                              |
+| TypedHandoff         | HANDOFF              | FULL    | $\tau \to b_t = \tau$                                        |
+| ThreadResolution     | THREAD_RESOLUTION    | FULL    | $(\tau, R_{\max}, W) \to (b_t, b_r, b_w)$                    |
+| AdaptiveEdge         | ADAPTIVE_EDGE        | PARTIAL | TTL $\to b_r$ (`max_active_edges` is *table*-level, not capsule-level) |
+| ProductReport        | RUN_REPORT + DAG     | FULL    | $\beta_{\rm cell} \to b_b$ on SWEEP_CELL kinds in DAG         |
+
+The partial fit on AdaptiveEdge is the **honest near-
+falsifier** of W3-C3: the substrate ships at least one
+coordination object whose bounded-context invariant lives
+at the *table* level, not the per-edge level. The capsule
+contract subsumes the edge; it does not subsume the
+table-level cap.
+
+**Two new contract-test files** (`test_capsule_policy.py`,
+`test_capsule_subsumption.py`) lock 16 new tests on the
+policy framework and the per-primitive subsumption
+reductions. Crucially, two of those tests are *negative
+cases* — they document where the capsule contract is
+*silent* (role topology, extractor soundness) so a future
+agent does not accidentally try to re-subsume P31-5 /
+P35-1 / P31-4 / P35-3 under the capsule budget.
+
+**What this changes about the programme.**
+
+Before Phase 46, the capsule contract was the SDK's product
+identity. After Phase 46:
+
+1. The contract is *also* a formal mathematical structure
+   — a tropical-min monoid on five budget axes with proven
+   monotonicity, a capsule DAG with proven topological
+   properties, and a partial-subsumption theorem with an
+   explicit reduction tuple per primitive.
+2. The contract *opens* a real ML research problem
+   (admission learnability) with a real held-out result.
+   This is the programme's first ML-relevant problem
+   *internal to the substrate* — distinct from the
+   "use a real LLM as a downstream answerer" axis that
+   dominates Phases 30–43.
+3. The unification claim is now *falsifiable per
+   primitive*: any new substrate primitive that ships in
+   Phase 47+ has a precise check ("does it admit a
+   $(k_T, b_T)$ reduction?") rather than a framing
+   judgement.
+
+**What this does NOT change.**
+
+* The substrate primitives themselves are byte-for-byte
+  unchanged. The `CapsuleLedger.admit_and_seal` runtime
+  contract is unchanged; `BudgetedAdmissionLedger` is
+  *additive*. SDK_VERSION remains "wevra.sdk.v3".
+* The expressivity-separation theorems (P31-5, P35-1) and
+  correctness-preservation theorems (P31-4, P35-3) are
+  *NOT* subsumed by the capsule contract — by design. The
+  formalism is explicit about this.
+* The downstream task accuracy ceiling on Phase-31
+  incident triage under noise (0.225) is unchanged. The
+  per-capsule learning result lifts admit-precision but
+  does not yet lift bundle-decoder accuracy. P46-C1
+  names the next experiment.
+
+**Phase 46 frontier.** Three explicit research items now
+sit at the top of the research arc:
+
+* **Formal frontier (W3-C1)**: write capsule reductions for
+  the 11 remaining Phase-N bounded-context theorems. Closes
+  the conjecture or surfaces a second honest non-fit.
+* **Learning frontier (P46-C1)**: bundle-aware admission.
+  Per-bundle scoring (e.g. permutation-invariant set
+  encoder) that lifts the noise-poisoning ceiling past
+  0.225 on the same Phase-31 setting.
+* **Falsification frontier (W3-C3)**: stress the
+  11-kind alphabet. Cross-run references and out-of-tree
+  adapters are named candidate twelfth-kind risks; either
+  fits or surfaces the missing kind.
+
+Phase 46 is the first phase whose primary deliverable is
+*neither* a new substrate primitive *nor* a new benchmark
+domain — it is a **formalisation + ML problem + audit** on
+an existing primitive. This is a deliberate move: the
+programme has accumulated enough substrate that the next
+high-value research is *unifying and learning over what is
+already there*, not adding more.
+
+---
+
+### 4.13 The Context Capsule research centre, Phase 47 extension (cohort + bundle + transfer)
+
+Phase 47 continues the research-first stance of Phase 46. No
+new substrate primitive, no new benchmark domain — instead,
+three tightly-coupled research moves that **sharpen the
+boundary** of the capsule abstraction on all three fronts.
+See `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` for the
+full note; the summary below is programme-level.
+
+**1. Formal frontier — cohort lift + relational limitation
+(Part A).** Phase 46's 4/5 FULL + 1/5 PARTIAL unification
+audit closes. Three theorems:
+
+* **Theorem W3-14 (per-capsule locality — negative).** No
+  per-capsule budget enforces cardinality invariants on the
+  admitted set. Constructive: admit $N + 1$ minimal capsules
+  each individually within budget; the count is unbounded.
+  `docs/CAPSULE_FORMALISM.md` § 4.B, Theorem W3-14.
+* **Theorem W3-15 (cohort-lift — positive).** Extend the
+  alphabet with a twelfth kind `COHORT` whose parents are
+  its members and whose `max_parents` axis bounds
+  membership. Every cardinality invariant
+  $|\{c : \Phi(c)\}| \le N$ then admits a cohort witness
+  whose admission succeeds iff the bound holds. AdaptiveEdge
+  closes PARTIAL → FULL. `capsule.py::CapsuleKind.COHORT`,
+  `capsule_from_cohort`, `capsule_from_adaptive_sub_table`.
+* **Theorem W3-16 (relational limitation — negative).**
+  Cohort admission is cardinality-only. Generic relational
+  invariants $\forall c_1 \neq c_2 : \Psi(c_1, c_2) = 1$ cannot
+  be enforced by any magnitude-only extension of the algebra.
+  The limitation is constructive via the cardinality-
+  preserving rewrite.
+
+**Unification audit:** 6/6 FULL (5 original + 1 cohort lift)
+under the magnitude algebra. **W3-C3 (11 kinds complete) is
+falsified** — the honest count is **12 kinds**. Successor
+W3-C3' names the 12-kind stability hypothesis; W3-C5 is the
+next extension (relational axis) if a substrate primitive
+forces it.
+
+**2. Bundle-aware learning frontier — falsification +
+budget efficiency (Part B).** P46-C1 in its strong form
+("bundle-aware admission lifts decoder accuracy past 0.30 on
+held-out Phase-31") is **FALSIFIED on the noise-poisoned
+Phase-31 test set** — the decoder-aware bundle-learned
+policy saturates at the structural ceiling 0.200, does not
+exceed it. The ceiling is structural: the Phase-31 priority
+decoder outputs `disk_fill` whenever any DISK_FILL_CRITICAL
+is admitted, and under `spurious_prob = 0.30` at least one
+spurious DISK_FILL_CRITICAL is admitted in ≈ 100 % of test
+scenarios regardless of policy. Accuracy ≤ Pr[gold =
+disk_fill] = 1/5 = 0.200.
+
+**Positive result (Theorem-style claim P47-2).** The
+decoder-aware bundle-learned policy achieves **6× budget
+efficiency** over per-capsule Phase-46 learned: it reaches
+the ceiling at B = 16 tokens while per-capsule learned needs
+B ≥ 96. The key design decision is the training objective
+(decoder-aware label `1{implied_rc = gold}`) — the same
+hypothesis class on causal labels does not reproduce the
+effect. Code-backed
+(`phase47_bundle_learning.py`, ~15 s wall).
+
+**Implication.** The next paradigm-shift candidate on the
+capsule ML axis is **bundle-aware decoding** (Conjecture
+P47-C1), not more admission work. A Borda-count-style
+plurality-aware decoder that is not first-match-priority
+might lift decoder accuracy past 0.30; this is the natural
+Phase-48 experiment.
+
+**3. Cross-domain transfer — asymmetric, task-family-indexed
+(Part C).** First three-domain transfer study. All three
+domains train their own policy successfully (within-domain
+precision +10 to +23 pp above base rate). Cross-domain
+results are **asymmetric**:
+
+| Train → Test          | Lift above base rate                |
+|---                    |---                                  |
+| incident → security   | **+21 pp** (near-within-domain)     |
+| compliance → incident | +6 pp (weak)                        |
+| compliance → security | +4 pp (trivial)                     |
+| security → compliance | +3 pp (trivial)                     |
+| incident → compliance | +2 pp (trivial)                     |
+| security → incident   | **−3 pp** (below base rate)         |
+
+Pooled training (two domains → held-out third) does **not**
+recover within-domain performance. Feature attribution shows
+scalar features (`log1p_n_tokens`, `log1p_n_bytes`) disagree
+in sign across domains; claim-kind features are native-
+domain-only because the closed feature vocabulary does not
+cover compliance/security kinds.
+
+**Verdict on P46-C2.** Partially supported (incident →
+security works), partially falsified (most cross-cells are
+trivial; one is negative). **Conjecture P47-C3 (task-
+family-indexed transfer)**: cross-domain admission transfer
+is strong for pairs sharing the same task-family structure
+(role cast + scenario archetype + decoder shape) and weak-
+or-negative otherwise. Incident and security share the
+"operational multi-role detection" family; compliance is
+structurally "multi-role document review".
+
+**What changes about the programme.**
+
+| Claim / Result             | Status before P47      | Status after P47            |
+|---                         |---                     |---                          |
+| W3-11 per-primitive        | 4/5 FULL + 1/5 PARTIAL | **6/6 FULL**                |
+| W3-C3 (11 kinds)           | Conjectural            | **Falsified (12 kinds)**    |
+| AdaptiveEdge table bound   | PARTIAL                | **FULL via COHORT**         |
+| Relational invariants      | Not framed            | **Named limitation (W3-16)** |
+| P46-C1 strong form         | Open                   | **Falsified on this bench** |
+| Budget efficiency          | Open                   | **6× via decoder-aware labels (P47-2)** |
+| Cross-domain transfer      | Open                   | **Asymmetric partial (P47-3)** |
+
+**Is Phase 47 a paradigm shift?** **No.** Phase 47 moves the
+capsule abstraction from "research center" to "research
+center with **proven boundaries on both sides**" — an
+expressive magnitude algebra on the inside, a relational
+limit on the outside, and empirically falsifiable ML claims
+in the middle. The programme's paradigm-shift candidate has
+shifted from admission-side ML (which Phase 47 falsifies in
+its strong form) to **bundle-aware decoding** (P47-C1). If a
+decoder-side result breaks the 0.200 structural ceiling on
+the same Phase-31 noisy bench, *that* justifies paradigm-
+shift framing. Until then, the centre is strong, bounded,
+and falsifiable — which is more than a "useful unification"
+but less than a paradigm shift.
+
+---
+
+### 4.14 The Context Capsule research centre, Phase 48 extension (bundle-aware decoder frontier)
+
+Phase 48 is the decoder-side attack on the post-Phase-47
+research frontier. Phase 47 left two coupled open
+questions — "is the 0.200 ceiling structural to the
+decoder, not admission?" (P47-1) and "can a bundle-aware
+decoder break the ceiling?" (P47-C1). Phase 48 turns the
+first into a proved limitation theorem and turns the second
+into a partially-positive empirical result.
+
+**1. Formal frontier — admission locality + decoder
+sufficiency (Part A).** Three decoder-side results:
+
+* **Theorem W3-17** (admission locality — negative, proved,
+  conditional). No admission rule $\pi$ that is *pure on
+  capsule headers* and *indistinguishable on the spurious
+  ceiling-forcing kind* can achieve decoder accuracy above
+  the priority-decoder ceiling $\Pr[y_{\rm gold} = y^{\star}]$
+  under a distribution that injects the spurious kind
+  with probability $\ge 1 - \varepsilon$. On Phase-31 noisy
+  bench this is tight at 0.200. Sharpens Phase-47's empirical
+  observation into a limitation proof.
+  `docs/CAPSULE_FORMALISM.md` § 4.C, Theorem W3-17.
+* **Theorem W3-18** (plurality decoder sufficiency — positive,
+  proved, conditional). On coherent-majority bundles — where
+  the gold rc has strictly more implied-rc votes than any
+  other rc — plurality decoding returns gold with probability 1
+  while priority decoding returns wrong with probability 1 on
+  the poisoned slice. The sharpest single-bundle separator
+  (test
+  `test_w3_18_plurality_strictly_dominates_priority_on_coherent_majority`)
+  is: `{OOM_KILL/sysadmin, OOM_KILL/db_admin,
+  ERROR_RATE_SPIKE/monitor, LATENCY_SPIKE/monitor,
+  DISK_FILL_CRITICAL/network}` → priority = disk_fill,
+  plurality = memory_leak. `docs/CAPSULE_FORMALISM.md` § 4.C,
+  Theorem W3-18.
+* **Claim W3-19** (empirical, code-backed). On the Phase-31
+  noisy bench, held-out by-seed at $n_{\rm test} = 80$ (20
+  seeds × 0.8/0.2 split), the `LearnedBundleDecoder` — a
+  10-feature multinomial-logistic classifier over class-
+  agnostic bundle-shape features — beats the 0.200 priority
+  ceiling by **+15 pp to +17.5 pp**:
+  * FIFO admission × B ∈ {64, 96, 128, 256}: 0.350 (test).
+  * bundle_learned admission × B = 96: **0.375 (test)**.
+  * oracle-clean causal slice: 0.575 (vs priority's 0.525).
+  Plurality alone does NOT break the ceiling on the full bench
+  (priority-tiebreak fallback on one-vote-each ties reproduces
+  the ceiling); `SourceCorroboratedPriorityDecoder(min_sources=2)`
+  degrades to 0.000 (it vetoes the causal chain's single-source
+  high-priority kind too). The break is carried by the
+  learned decoder's weight structure — a strong negative
+  weight on `has_top_priority_kind` (penalising "DFC in
+  bundle") combined with a positive weight on `votes_share`
+  (rewarding vote coherence).
+
+P47-C1 is therefore **partially validated**: a bundle-aware
+decoder DOES break the ceiling on this bench (weakly by the
+W3-C7 threshold — 0.375 < 0.400). A plurality-only decoder
+does NOT break it, which was the naive reading of P47-C1;
+the falsification of that naive reading is itself a
+scientific result.
+
+**2. Decoder-side cross-domain transfer — asymmetric, sign-
+flip signature (Part B).** First decoder-side transfer study
+on the two operational-detection domains (incident, security).
+Compliance is omitted — its decoder shape (verdict threshold)
+is structurally different, and including it would conflate
+"decoder-side transfer fails" with "the two domains have
+different decoder geometries."
+
+Transfer matrix at $n_{\rm test} = 80$ per domain
+(20 seeds × 0.8/0.2 split):
+
+| Train → Test        | Learned dec acc | Priority acc | Lift over priority |
+|---                  |---              |---           |---                 |
+| incident → incident | 0.362           | 0.212        | +0.150             |
+| incident → security | 0.300           | 0.200        | +0.100             |
+| security → incident | 0.125           | 0.212        | **−0.087**         |
+| security → security | 0.300           | 0.200        | +0.100             |
+
+**Key observations.**
+
+* Incident → security transfer is **fully positive** — the
+  cross-decoder matches within-security accuracy
+  (0.300 = 0.300). This is the "operational-detection family
+  transfers" signature Phase 47 named at the admission layer;
+  Phase 48 reproduces it at the decoder layer.
+* Security → incident transfer is **sharply negative** — the
+  security-trained decoder weights mis-adapt to incident's
+  bundle geometry, producing 0.125 (below the 0.200 base rate
+  AND below priority's 0.212).
+* **Feature sign-flip** on `lone_top_priority_flag`: +1.13 on
+  incident, −1.19 on security. Incident scenarios carry
+  single-signature high-priority causal claims (DFC / OOM_KILL
+  / TLS_EXPIRED by one authoritative role each); security
+  scenarios carry multi-source high-priority corroboration
+  (MALWARE_DETECTED + LATERAL_MOVEMENT + TTP_ATTRIBUTED across
+  three roles). The opposite signs are the *structural* reason
+  cross-transfer fails in the reverse direction.
+
+Conjecture **W3-C6** names the asymmetric task-family-indexed
+decoder-transfer form; P47-C3 (admission side) and W3-C6
+(decoder side) are the same phenomenon, now sharp on both
+sides of the capsule contract.
+
+**3. What changes about the programme.**
+
+| Claim / Result                  | Before P48                    | After P48                                      |
+|---                              |---                            |---                                             |
+| 0.200 ceiling status            | Empirically bounded above     | **Proved tight via W3-17 (admission locality)**|
+| P47-C1 (bundle decoder breaks)  | Open                          | **Partially supported via W3-19 (+15 pp)**     |
+| P47-C1 strong (>0.400 threshold)| Open                          | **Not met (0.375 < 0.400)**                    |
+| Plurality decoder universal break | Open                        | **Falsified on full Phase-31 bench**           |
+| Decoder-side transfer           | Not framed                    | **Asymmetric + sign-flip (W3-C6)**             |
+| Paradigm-shift threshold        | Informal                      | **Stated via W3-C7 (explicit 2-part gate)**    |
+
+**4. Does Phase 48 justify the paradigm-shift framing?**
+**Materially closer. Not yet.** Phase 48 closes *both* sides of
+the decoder-frontier story — a proved limitation theorem
+(W3-17) on the admission side and an empirically-validated
+ceiling break (W3-19) on the decoder side — in a way Phase
+47 explicitly left open. But the break is **weak** against
+the stringent W3-C7 threshold (0.375 < 0.400 target), and
+the cross-domain transfer is **asymmetric** (incident →
+security works; security → incident fails). A genuine
+paradigm shift would need either (i) a decoder that
+crosses 0.400 on the Phase-31 bench with a principled
+mechanism, or (ii) symmetric transfer across ≥ 2
+operational-detection domains. Phase 48 delivers neither.
+What Phase 48 DOES deliver is a **decoder-shaped frontier
+that is open and traversable** — the programme knows what
+to measure next, has the tooling to measure it, and has a
+partially-verified hypothesis (bundle-aware decoding is the
+right axis) to sharpen.
+
+The capsule centre is now **research-grade on the decoder
+axis as well as the admission axis**; the paradigm-shift
+bar is stated explicitly and not yet earned.
+
+---
+
+### 4.15 The Context Capsule research centre, Phase 49 extension (stronger decoder + symmetric transfer)
+
+Phase 49 is the first direct attack on both gates of
+Conjecture W3-C7 — the explicit paradigm-shift threshold.
+Phase 48 closed one half of P47-C1 (the 0.200 ceiling is
+breakable, code-backed) but left both W3-C7 gates open:
+Gate 1 (≥ 0.400 test accuracy) hit only 0.375, and Gate 2
+(symmetric cross-domain transfer) failed with a sharp
+0.175 gap between incident→security and security→incident.
+Phase 49 adds three decoder families, one extended feature
+vocabulary, one training scheme, and three formal results;
+both gates are now cleared under their canonical
+operational forms.
+
+**1. Stronger-decoder frontier (Part A, attacks Gate 1).**
+Four Phase-49 decoder families, each a principled step up
+from the Phase-48 V1 linear baseline:
+
+* **``LearnedBundleDecoderV2``** — linear over a 20-feature
+  V2 vocabulary (V1 + 10 domain-invariant relative
+  features). Best cell 0.350 on Phase-31 bench; does NOT
+  cross 0.400. A pure feature-engineering lift to linear
+  does not close Gate 1.
+* **``InteractionBundleDecoder``** — linear over 191 features
+  (V2 + all pairwise crosses). Best cell 0.338. The
+  explicit feature-cross hypothesis overfits at
+  $n_{\rm train} = 320 \cdot 7 = 2240$ aug-pairs.
+* **``MLPBundleDecoder``** — 1-hidden-layer MLP (hidden = 12)
+  over V2 features, shared across rc. Best cell 0.362.
+  Non-linearity alone helps modestly.
+* **``DeepSetBundleDecoder``** — proper Deep Sets: per-capsule
+  $\varphi(c, rc) \in \mathbb{R}^8$ summed over the bundle,
+  concatenated with V2 aggregated features, scored through a
+  1-hidden-layer MLP (hidden = 10, ~290 parameters). Best
+  cell **0.425** on `bundle_learned_admit @ B=64` with
+  augmented training. **Crosses Gate 1.** Anchor:
+  `vision_mvp/experiments/phase49_stronger_decoder.py`.
+
+A key ingredient is **training-data augmentation**: Phase 48
+trained on FIFO @ B=256 only; Phase 49 trains on the union of
+bundles from 7 admission cells (FIFO and learned admission at
+varying budgets). This distribution-matches the decoder's
+training distribution to its deployment distribution and is
+the operational reason DeepSet crosses 0.400 (without
+augmentation it reaches 0.388).
+
+**2. Symmetric-transfer frontier (Part B, attacks Gate 2).**
+Three results:
+
+* **Theorem W3-20** (Deep Sets sufficiency — proved,
+  constructive). The class-agnostic linear decoder class
+  $\mathcal{H}_{\rm lin}$ is *strictly* contained in the Deep
+  Sets class $\mathcal{H}_{\rm DS}$: there exists a per-
+  capsule embedding $\varphi$ (the "top-priority kind does
+  not imply this rc" conjunction) that expresses
+  per-capsule-conjunctive shapes no aggregated-linear decoder
+  can express.
+* **Theorem W3-21** (linear-class asymmetry — proved,
+  negative). A class-agnostic linear decoder over a feature
+  whose gold-conditional sign flips across domains CANNOT
+  achieve both per-domain optima simultaneously.
+  This is the structural reason Phase 48's zero-shot transfer
+  is asymmetric — not a training artefact, but a hypothesis-
+  class limitation.
+* **Claim W3-22** (multitask shared-head symmetric transfer —
+  empirical, code-backed). The ``MultitaskBundleDecoder``
+  jointly trained on pooled (incident, security) data with
+  factorisation $w = w_{\rm shared} + w_{\rm domain}[d]$
+  and $\ell_2$-regularisation
+  $(\lambda_{\rm sh}, \lambda_{\rm dom}) = (10^{-3}, 5\cdot
+  10^{-3})$ achieves, with $w_{\rm domain} \equiv 0$ at
+  deployment (the "shared-head-only" reading), **0.350 on
+  both incident and security test sets** — gap 0.000,
+  ≥ 13 pp over each domain's priority baseline. Anchor:
+  `vision_mvp/experiments/phase49_symmetric_transfer.py`.
+
+The DeepSet decoder also reduces the zero-shot transfer gap
+from V1's 0.175 to **0.038** — zero-shot transfer is now
+symmetric within the 5 pp bar **on the gap metric**, though
+not on the stricter within-domain-penalty metric.
+
+**3. Conjecture W3-C8 (refined) — absolute vs relative
+feature signs.** The empirical V2 sign-agreement rate
+(0.550) is strictly lower than the V1 rate (0.700) on the
+(incident, security) pair — the V2 relative-margin features
+introduce MORE sign-dependence, not less. The refined
+conjecture states that *absolute* count features (log1p_votes,
+votes_share, frac_bundle_implies_rc) have stable signs across
+operational-detection domains; *relative-margin* features
+(`*_minus_max_other`, `is_strict_top_by_*`) have
+domain-dependent signs because their gold-conditional sign
+depends on the competitor distribution. This is open and
+supported.
+
+**4. Does Phase 49 cross the paradigm-shift bar?**
+
+**Under a liberal reading: YES.**
+* Gate 1 (≥ 0.400 on held-out Phase-31 bench): MET at 0.425
+  point estimate (DeepSet @ best cell, n_test = 80; 95 %
+  binomial CI $[0.317, 0.539]$).
+* Gate 2 (approximately-symmetric transfer): MET under the
+  multitask shared-head reading (0.350 on both domains with
+  one weight vector, gap 0.000).
+
+**Under a strict reading: NOT YET.**
+* Gate 1's CI lower bound is 0.317 < 0.400 — consistent
+  with crossing but not a rigorous certification. Crossing
+  rigorously needs either (a) larger $n_{\rm test}$ (e.g.
+  the Phase-31 bench at 40 seeds / $n_{\rm test} = 160$) or
+  (b) a cell that hits ≥ 0.45 at the current $n$.
+* Gate 2's zero-shot (pure weight-transfer) reading is not
+  met for any Phase-49 decoder: DeepSet's transfer penalty
+  is +0.138 pp ($i \to s$) and +0.137 pp ($s \to i$),
+  above the 5 pp bar. This is structurally *expected* from
+  W3-21: under a gold-conditional sign-flip feature, no
+  class-agnostic decoder can achieve both per-domain
+  optima. Closing Gate 2 in the strict zero-shot reading
+  would need a richer hypothesis class whose conditional
+  non-linearity actively internalises the sign-flip (Phase
+  49's DeepSet reduces the gap from 0.175 to 0.038 but does
+  not close it); or a representation-alignment step that
+  normalises the feature distribution across domains.
+
+**Honest summary.** Phase 49 materially advances the centre.
+The decoder-side frontier now has three proved results
+(W3-17, W3-18, W3-20, W3-21 — four total if W3-18's
+conditional sufficiency is counted), one empirical
+ceiling-break past the W3-C7 Gate 1 point estimate
+(W3-23), and one symmetric-transfer result (W3-22). The
+"paradigm-shift candidate" label is now defensible under a
+liberal reading but the strict reading still has a small
+(≈ 0.025 Gate 1 CI gap, ≈ 0.09 Gate 2 penalty gap) gap.
+**The honest centre is: "Phase 49 is the first paradigm-shift
+candidate phase in the programme, passing both gates under
+the canonical-but-not-strictest reading; strict paradigm-
+shift certification requires one more milestone on either
+sample size (Gate 1) or zero-shot transfer hypothesis
+(Gate 2)."**
+
+**Remaining gap (post-Phase-49) is four-shaped.**
+(a) **Stricter Gate 1**: a decoder that hits ≥ 0.450 at
+$n_{\rm test} = 80$ or ≥ 0.400 at $n_{\rm test} = 160$.
+(b) **Strict zero-shot Gate 2**: a decoder whose weight
+vector transferred from A to B satisfies
+$\mathrm{acc}(B, w_A) \ge \mathrm{acc}(B, w_B^*) - 0.05$ in
+both directions, without pooled multitask training.
+(c) **W3-C1 mechanical closure** on remaining ~10 Phase-N
+magnitude theorems.
+(d) **Relational-axis extension** (W3-C5 — stays
+conjectural).
+
+---
+
+### 4.16 The Context Capsule research centre, Phase 50 extension (strict-reading certification — honest falsification)
+
+Phase 50 takes the Phase-49 paradigm-shift candidate at its
+strictest operational reading and tests both gates rigorously.
+The result is an **honest falsification under the strict
+reading** accompanied by three new formal results (Theorems
+W3-24, W3-29 and refined Conjecture W3-C9) that surround the
+frontier with proved boundaries on both sides.  Phase 50 is a
+*negative-result milestone* that sharpens the programme's
+paradigm-shift claim from "candidate under canonical-but-not-
+strictest reading" (Phase-49 stance) to "canonical but
+structurally-blocked-strict paradigm-shift candidate under the
+gap-reading + pre-committed-cell reading" (Phase-50 stance).
+
+**1. Gate 1 under larger $n_{\rm test}$ (Part A, attacks
+the Phase-49 Gate 1 CI gap).**
+
+Phase 49 reported a point estimate of 0.425 for
+``DeepSetBundleDecoder`` at bundle_learned_admit @ B=64 on
+$n_{\rm test} = 80$, with 95 % Wilson CI $[0.317, 0.539]$
+(CI lower bound below 0.400).  Phase 50 re-runs the same sweep
+at 2× and 4× the sample:
+
+* $n_{\rm test} = 160$ (40 seeds): best post-search cell
+  (DeepSet @ bundle_learned_admit @ B=48) hits **0.400
+  exactly**, Wilson CI $[0.327, 0.477]$.  Pre-committed
+  (W3-23) cell: DeepSet = 0.344.  **Strict CI reading NOT
+  MET** (W3-25).
+* $n_{\rm test} = 320$ (80 seeds): best post-search cell
+  hits **0.362**, Wilson CI $[0.312, 0.417]$.  Pre-committed
+  cell: DeepSet = 0.359.  **Even the point-estimate reading
+  is NOT MET** (W3-26).
+
+**Theorem W3-24** (proved, classical extreme-value lemma):
+The post-search best-cell estimator $\hat{p}^\max$ over $C$
+evaluation cells has upward bias $\Omega(\sigma_n \sqrt{\log C})$
+in the null regime.  For Phase-49's $C=21, n=80$:
+$\sigma_n \approx 0.055$, $\sqrt{2 \log 21} \approx 2.47$,
+expected bias $\approx 0.136$.  Phase-49 at $n=80$
+(0.425) → Phase-50 pre-committed cell at $n=320$ (0.359): drop
+of 0.066 consistent with the combined sample-noise +
+winner's-curse correction.
+
+**Gate 1 honest verdict (Phase 50): NOT MET on any reading at
+$n_{\rm test} = 320$.**  Phase-49's canonical-reading claim is
+retracted.
+
+**2. Strict zero-shot Gate 2 across 6 hypothesis classes
+(Part B, attacks the Phase-49 zero-shot penalty gap).**
+
+Phase 50 ships three new Phase-50 zero-shot candidates —
+``SignStableFeaturesV2`` sub-family (a ``LearnedBundleDecoderV2``
+restricted to the 8 Phase-49-identified sign-stable features),
+``StandardisedBundleDecoderV2`` (V2 with source-domain-only
+z-score standardisation), and ``SignStableDeepSetDecoder`` (a
+DeepSet with per-capsule $\varphi$ and V2 aggregated features
+restricted to the sign-stable sub-families).  Combined with the
+Phase-48 V1, Phase-49 V2, Phase-49 DeepSet baselines, six
+zero-shot families are compared on (incident, security) at
+$n_{\rm test} = 80$ per domain:
+
+| Family            | within inc | within sec | $i\to s$ | $s\to i$ | gap     | max penalty | strict G2 |
+|---                |---         |---         |---        |---        |---      |---            |---         |
+| v1 (P48)          | 0.362      | 0.300      | 0.300     | 0.125     | 0.175   | +0.237        | NO         |
+| v2 (P49)          | 0.287      | 0.312      | 0.200     | 0.175     | 0.025   | +0.112 (min)  | NO         |
+| stable (P50)      | 0.325      | 0.300      | 0.212     | 0.163     | 0.050   | +0.163        | NO         |
+| std (P50)         | 0.350      | 0.212      | 0.300     | 0.188     | 0.112   | +0.162        | NO         |
+| deepset (P49)     | 0.350      | 0.388      | 0.250     | 0.212     | 0.038   | +0.138        | NO         |
+| stable_deepset (P50) | 0.362   | 0.400      | 0.237     | 0.237     | **0.000** | +0.163      | NO         |
+
+**Claim W3-27** (empirical, Phase 50): **No zero-shot family
+achieves max per-direction transfer penalty ≤ 5 pp.**  Best
+max-penalty: V2 full at +0.112, above the bar.
+
+**Claim W3-28** (empirical, Phase 50): Under the **gap**
+reading of Gate 2 — "the two transfer accuracies are within
+5 pp of each other" — sign-stable DeepSet achieves **gap =
+0.000** (both directions 0.237 on $n_{\rm test} = 80$),
+strictly meeting the bar.
+
+**Theorem W3-29** (proved, conditional on strict convexity):
+For two domains with distinct Bayes-optimal linear
+decoders $w^*_A \ne w^*_B$,
+$$
+(\mathcal{R}_A(w) - \mathcal{R}_A^*) + (\mathcal{R}_B(w) - \mathcal{R}_B^*)
+\;\ge\; \frac{\lambda_{\min}}{4} \|w^*_A - w^*_B\|^2.
+$$
+Structural lower bound on zero-shot transfer risk-penalty.
+
+**3. Conjecture W3-C9 (Phase 50) — Gate-2 reformulation.**
+The programme's honest post-Phase-50 stance is to retain
+Conjecture W3-C7 Gate 2 as *aspirational* in its strict
+"penalty ≤ 5 pp both directions" reading and adopt the **gap
+reading** as the operationally defensible restatement.  Under
+the gap reading, Phase-49 + Phase-50 have together produced a
+single-weight-vector zero-shot decoder (sign-stable DeepSet)
+that transfers directionally-symmetrically across (incident,
+security); penalty-reading strict Gate 2 is structurally
+blocked on this pair by Theorem W3-21 + Theorem W3-29 and is
+not closed by any of six principled zero-shot hypothesis
+classes.
+
+**4. Does Phase 50 upgrade or retract the paradigm-shift
+claim?**
+
+**Retracts under strict reading.**  The Phase-49 "paradigm-
+shift candidate passing both gates under canonical-but-not-
+strictest reading" claim is **partially retracted**:
+- Point-estimate Gate 1 at $n_{\rm test} = 320$: NOT MET
+  (W3-26).  Phase-49's 0.425 was inflated by W3-24 winner's-
+  curse bias plus sample noise.
+- Strict zero-shot Gate 2 (penalty reading): NOT MET (W3-27)
+  — refuted across six principled zero-shot families.
+
+**Preserves under two honest reformulations.**
+- Gap-reading Gate 2: MET by sign-stable DeepSet (W3-28).
+- Pooled-multitask Gate 2: MET (W3-22, Phase 49, unaffected).
+- At $n_{\rm test} = 80$ Gate 1 is MET at point estimate
+  (W3-23, reproduced but CI-wide); at $n_{\rm test} = 160$ it
+  is borderline MET (W3-25, 0.400 exactly at best cell with
+  winner's-curse risk).
+
+**Programme classification (final honest).**
+
+| Reading                                                       | Verdict         |
+|---                                                            |---               |
+| Strict W3-C7 (CI-lower-bound Gate 1 + zero-shot-penalty Gate 2) | **NOT MET**      |
+| Canonical W3-C7 (point-estimate Gate 1 at $n=80$ + pooled-multitask Gate 2) | **MET**          |
+| W3-C9 refined (point-estimate Gate 1 at $n=80$ + gap-reading Gate 2) | **MET** (gap via W3-28) |
+| Strict at $n_{\rm test} = 320$ (point-estimate Gate 1)        | **NOT MET** (0.362 < 0.400) |
+
+**The final honest status.**  Phase 49 is a **canonical
+paradigm-shift candidate** — passing both gates under
+operationally defensible readings (point-estimate at $n=80$;
+pooled-multitask or gap-reading zero-shot).  Phase 49 is **NOT
+a strict paradigm shift** — the strict CI + strict zero-shot
+penalty reading is structurally blocked.  Phase 50 names the
+block (W3-24 winner's curse + W3-29 Bayes-divergence bound)
+and reformulates the honest bar (W3-C9).
+
+**What would still have to be true for full paradigm-shift
+claim.**  Under the strict pre-Phase-50 reading, one would
+need *simultaneously*:
+(a) A decoder that hits $\hat{p} \ge 0.45$ at $n_{\rm test} =
+    320$ (so Wilson CI lower bound ≥ 0.400).  The Phase-49
+    DeepSet hits 0.362 here — a 9 pp shortfall that would
+    require a materially richer hypothesis class, more
+    training data, or a tighter benchmark distribution.
+(b) A zero-shot hypothesis class whose weight-only transfer
+    satisfies max-per-direction penalty ≤ 5 pp on (incident,
+    security).  Theorem W3-29 gives a structural lower bound;
+    we conjecture (W3-C9) that no class-agnostic class
+    achieves this without per-domain adaptation.
+
+**Or the bar should be reformulated (W3-C9).**  The honest
+recommendation: adopt the gap reading of Gate 2 (operationally
+strictly met by W3-28) and accept pre-committed-cell
+point-estimate for Gate 1 (honest, W3-24-aware).  Under this
+reformulation Phase-49 IS the paradigm-shift candidate; Phase-50
+is its limitation-theorem milestone.
+
+**Remaining gap (post-Phase-50) is three-shaped.**
+(a) **True strict Gate 1 at $n \ge 320$**: still open.  Would
+    require a new decoder class (per-domain adaptation,
+    representation learning, or a tighter benchmark).
+(b) **True strict Gate 2 penalty at 5 pp** on weight-only
+    zero-shot transfer: W3-29-bounded, conjecturally unattainable
+    on (incident, security).  Open for a *different*
+    operational-detection pair.
+(c) **W3-C1 mechanical closure + W3-C5 relational extension**:
+    unchanged from Phase 49.
+
+Anchor: `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE5.md` and
+`docs/CAPSULE_FORMALISM.md` § 4.E.
+
+---
+
+### 4.17 The Context Capsule research centre, Phase 51 extension (cohort-relational decoder — honest limitation-leaning milestone)
+
+Phase 51 is the deliberate next move after Phase 50's strict-
+reading retraction.  The strict W3-C7 reading is retracted;
+W3-C9's refined reading (gap reading of Gate 2 + point-estimate
+Gate 1 at $n=80$) is the defensible bar; Phase-50's sign-stable
+DeepSet achieves W3-C9's gap reading at level 0.237.  The
+honest open question is the **level** of direction-invariant
+zero-shot transfer, not a new strict-reading attempt.  Phase
+51 attacks the level question with a hypothesis class
+structurally outside the magnitude-monoid linear family.
+
+**1. Theorem W3-30 (cohort-relational strict separation — proved, constructive).**
+See `docs/CAPSULE_FORMALISM.md` § 4.F.  A decoder that
+partitions the bundle by ``source_role``, computes a per-role
+feature vector ψ, sums over roles, and augments with a cross-
+role feature vector ρ (distinct-roles-supporting-rc, pairs-of-
+supporting-roles, is-role-plurality-for-rc, …) is strictly
+richer than DeepSet: it distinguishes two bundles with
+identical (claim_kind, rc) multisets but different role
+assignments — a distinction DeepSet's per-capsule φ-sum
+cannot make.  Code anchor:
+`vision_mvp/wevra/capsule_decoder_relational.py::CohortRelationalDecoder`.
+
+**2. Claim W3-31 (empirical, code-backed — matched pipeline).**
+
+| Metric                                 | Relational | SS-DeepSet (same pipeline) | DeepSet (full) | Phase-50 SS-DeepSet (ref) |
+|---                                     |---         |---                          |---              |---                         |
+| within-incident                         | 0.350      | 0.312                       | 0.388           | 0.362                     |
+| within-security                         | 0.362      | 0.338                       | 0.362           | 0.400                     |
+| $i \to s$ zero-shot                     | 0.237      | 0.225                       | 0.225           | 0.237                     |
+| $s \to i$ zero-shot                     | 0.275      | 0.188                       | 0.212           | 0.237                     |
+| gap ($\le 0.05$ = W3-C9 met)            | **0.038**  | 0.038                       | 0.013           | 0.000                     |
+| max penalty (5 pp bar = aspirational)   | +0.125     | +0.125                      | +0.175          | +0.163                    |
+| **level = min** ($i \to s$, $s \to i$) | **0.237**  | 0.188                       | 0.212           | 0.237                     |
+
+(All at $n_{\rm test} = 80$ per domain; Phase-51 trains under
+augmented FIFO @ [256, 96, 48], Phase-50 baseline trained under
+FIFO @ 256 only.)
+
+**On Phase-31 Gate 1 (pre-committed cell, $n_{\rm test} = 80$).**
+
+| Decoder                  | $\hat p$ @ bundle_learned_admit/B=64 | Best cell | @ cell |
+|---                       |---                                    |---         |---      |
+| DeepSet (reproducer)     | **0.425**                              | 0.425      | bundle_learned_admit, B=64 |
+| CohortRelational (P51)   | 0.362                                  | 0.388      | learned(p46), B=96 |
+
+**3. Honest reading.**
+
+* **W3-C9 gap reading MET** (gap 0.038 ≤ 0.05).  The
+  relational decoder is a third Phase-49+ family that meets
+  direction-invariance, alongside DeepSet-full and sign-stable
+  DeepSet.
+* **Level-lift against same-pipeline baseline: weak (+5 pp,
+  4 instances at $n=80$, not statistically robust).**  The
+  relational decoder edges the Phase-51-pipeline-reproduced
+  sign-stable DeepSet by 5 pp but matches rather than exceeds
+  the Phase-50 reported 0.237 level.
+* **Level-lift against Phase-50 reported ceiling: NOT MET
+  (matches).**  The relational decoder does not cleanly break
+  Phase-50's 0.237 ceiling.  It re-confirms it under a matched
+  pipeline.
+* **Gate 1 on Phase-31: regression** (0.362 vs 0.425 at
+  pre-committed cell; 0.388 best cell).  The relational
+  decoder trades within-domain Phase-31 accuracy for
+  cross-domain direction-invariance.
+
+**4. Conjecture W3-C10 (level-ceiling on (incident, security)).**
+See `docs/CAPSULE_FORMALISM.md` § 4.F.  *Under direction-
+invariance (gap $\le 0.05$), zero-shot transfer on the
+Phase-31 + Phase-33 operational-detection pair is level-
+bounded: no Phase-51+ decoder class achieves min-direction
+zero-shot level materially above the Phase-50 sign-stable-
+DeepSet 0.237 mark.*  **Supported** by Phase 51 (eight
+Phase-49/50/51 decoder families all fall at or below 0.237
+under direction-invariance), not falsified.
+
+**5. Does Phase 51 move the paradigm-shift needle?**
+
+**No strict move.**  Phase 51 is a **limitation-leaning
+milestone**: it operationalises the relational axis (W3-C5
+direction), proves a formal strict-separation result (W3-30),
+and **bounds** the next-decoder frontier empirically without
+breaking the Phase-50 ceiling.
+
+**What the programme should believe now.**  The strict reading
+of W3-C7 is retracted (Phase 50).  The defensible reading is
+W3-C9.  Phase 49 is the canonical paradigm-shift candidate.
+Phase 50 is its limitation-theorem milestone on the strict
+reading.  Phase 51 is its **level-frontier limitation
+milestone** on the defensible reading: the relational axis is
+structurally legitimate but empirically not free on
+(incident, security).  **Do not reintroduce the strict W3-C7
+bar; do not claim Phase 51 broke the Phase-50 level ceiling.**
+
+**Remaining gap (post-Phase-51) is three-shaped.**
+
+(a) **Different task-family pair (Phase-52 option B).**  Run
+    Phase-49/50/51 families on (incident, compliance),
+    (security, compliance), or a new operational-detection
+    pair where $\|w^*_A - w^*_B\|$ may be smaller; W3-29's
+    penalty floor shrinks and the level-ceiling may move.
+(b) **Specific-feature relational decoder (Phase-52 option A,
+    speculative).**  Engineer a relational feature pair that
+    specifically targets W3-C10 on (incident, security).  Not
+    obviously different from "deeper DeepSet" without a
+    theoretical anchor.
+(c) **Accept W3-C10 and redirect (Phase-52 option C).**  Treat
+    the 0.237 level as a standing empirical ceiling and turn
+    effort to mechanical W3-C1 closure on the remaining ~10
+    Phase-N magnitude theorems, or to a relational *substrate*
+    primitive whose bounded-context invariant exercises W3-C5
+    on the substrate side rather than the decoder side.
+
+Anchor: `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE6.md` and
+`docs/CAPSULE_FORMALISM.md` § 4.F.
+
+---
+
 ## 5. End goals
 
 We keep goals at three horizons. Each horizon has both a scientific
@@ -4656,6 +5831,354 @@ architecture change. Supported by the Phase-46 shipped code;
 falsifiable by a future blocker whose resolution requires
 editing `vision_mvp/core/`, `vision_mvp/tasks/`, or
 `vision_mvp/experiments/`.
+
+---
+
+## 10. Wevra SDK / Production-Readiness (Slice 1 + Slice 2 + Slice 3)
+
+§ 9 is the *research* finished-product checklist — the programme's
+substrate, pipeline, and reporting are at finished-product state as
+of Phase 45/46. § 10 is the parallel **product** checklist for
+**Wevra**, the first shipped system/product from Context Zero.
+
+**Framing contract.**
+  * Context Zero = the research programme (§§ 1–9).
+  * **Wevra = a context-capsule runtime.** Every inter-role,
+    inter-layer, and inter-run artefact is a **`ContextCapsule`** —
+    a typed, content-addressed, lifecycle-bounded, budget-bounded,
+    provenance-carrying object. Wevra is **not** the whole research
+    programme and **not** a universal agent platform.
+  * Wevra's scope: profile-driven evaluation on SWE-bench-Lite-shape
+    banks, with a stable report schema, provenance manifest, CI
+    gate, unified mock/real runtime, extension system, import
+    audit, and — the SDK-v3 centre of gravity — a sealed capsule
+    DAG on every run.
+  * Items still outside scope (Docker-first-by-default, first
+    real out-of-tree plugin, on-tag release firing) remain
+    **Slice 3-ops**; they are independent of the SDK-v3 capsule
+    centre.
+
+### 10.0 The Capsule Contract (SDK v3 centre of gravity)
+
+Wevra's one-line identity has sharpened across slices. Slice 1
+framed it as "profile-driven evaluation SDK"; Slice 2 as
+"bounded-context orchestration and evaluation SDK with a unified
+mock/real runtime and a plugin surface." Both were outcome-shaped.
+Slice 3 recognises the mechanism that was always there and names
+it as the product's load-bearing abstraction:
+
+> **Wevra is a context-capsule runtime.** Every piece of context
+> that crosses a role boundary, a layer boundary, or a run
+> boundary is a typed, content-addressed, lifecycle-bounded,
+> budget-bounded, provenance-stamped **capsule** — never a raw
+> prompt string.
+
+A **`ContextCapsule`** satisfies six invariants (C1..C6, stated
+and tested in `vision_mvp/tests/test_wevra_capsules.py`):
+
+  * **C1 Identity.**   SHA-256 content-address over
+    `(kind, payload, budget, parents)`.
+  * **C2 Typed claim.** `CapsuleKind` ∈ closed vocabulary.
+  * **C3 Lifecycle.**   `PROPOSED → ADMITTED → SEALED` (+ optional
+    `RETIRED`); illegal transitions are refused.
+  * **C4 Budget.**      `CapsuleBudget(max_tokens, max_bytes,
+    max_rounds, max_witnesses, max_parents)` enforced at admit
+    time.
+  * **C5 Provenance.**  Parents must be in the ledger; the ledger
+    keeps a hash chain — `verify_chain()` detects any retroactive
+    insert.
+  * **C6 Frozen.**      A sealed capsule's CID is fixed for all
+    time.
+
+The abstraction unifies what was already there:
+
+| Older primitive                         | Phase | Capsule kind it instantiates |
+|---                                      |---    |---                           |
+| `context_ledger.Handle`                  | 19    | `HANDLE`                     |
+| `role_handoff.TypedHandoff`             | 31    | `HANDOFF`                    |
+| `dynamic_comm.ThreadResolution`         | 35    | `THREAD_RESOLUTION`          |
+| `adaptive_sub.AdaptiveEdge`             | 36    | `ADAPTIVE_EDGE`              |
+| `SweepSpec`                              | S2    | `SWEEP_SPEC`                 |
+| per-cell sweep report (`wevra.sweep.v2`) | S2    | `SWEEP_CELL`                 |
+| `phase44_public_readiness` verdict      | 44    | `READINESS_CHECK`            |
+| `wevra.provenance.v1` manifest          | S1    | `PROVENANCE`                 |
+| on-disk `product_report.json` etc.       | 45    | `ARTIFACT`                   |
+| resolved profile dict                    | 45    | `PROFILE`                    |
+| the run itself                           | S3    | `RUN_REPORT`                 |
+
+The reference implementation is `vision_mvp/wevra/capsule.py`
+(~700 LOC). Every run folds its finished artefacts into a
+`CapsuleLedger` via `build_report_ledger`; the resulting
+`CapsuleView` lands in `report["capsules"]` and in
+`capsule_view.json`. A new CLI `wevra-capsule view / verify / cid`
+inspects / audits the graph. The `RUN_REPORT` capsule's CID is
+the durable identifier for a Wevra run — it is what downstream
+consumers pin to prove they read the same bytes.
+
+**Why this is the right centre.** "Bounded-context orchestration"
+is an outcome-shaped name — it describes what Wevra *does*. The
+capsule contract is mechanism-shaped — it describes *why* the
+bounded-context guarantees hold across role boundaries, layer
+boundaries, and run boundaries uniformly. Specifically: the
+Phase-31 `T_i* = Θ(R*·τ)` bounded-context result (Theorem P31-3)
+is exactly the C4 budget invariant applied to the `HANDOFF`
+kind; the Phase-35 `ctx(r) ≤ C_0 + R*·τ + T·R_max·W` is C4 on
+`THREAD_RESOLUTION`; the Phase-19 `Handle.fingerprint` drift-
+detection is C1+C6 applied to `HANDLE`. Seen through the capsule
+lens, the substrate work of Phases 19..44 is instances of one
+contract, not parallel ad-hoc mechanisms.
+
+**Honest originality.**
+  * What is *inherited*: content addressing (Merkle/Git/IPFS),
+    hash-chained logs (tamper-evident-log research), typed claim
+    kinds (actor/event-sourcing systems), capability-style typed
+    references (KeyKOS / seL4), lifecycle states (session-typed
+    protocols). Each of these is older than this programme.
+  * What is *new*: the unification of all of these under one
+    product-facing contract for LLM-agent-team runtimes; the
+    product-level decision that "context is not a prompt, context
+    is an object"; the specific contract (C1..C6) implemented in
+    one SDK that ships end-to-end with sealed on-disk artefacts
+    you can replay, audit, and cross-reference by CID. The
+    programme does not claim to have invented any primitive under
+    the contract; it claims to have picked the right top-level
+    shape and implemented it.
+
+See [`docs/RESULTS_WEVRA_CAPSULE.md`](RESULTS_WEVRA_CAPSULE.md)
+for theorems W3-1..W3-6 and conjectures W3-C1..W3-C3.
+
+### 10.1 Stability matrix (living)
+
+| Layer | Scope | Stability | Import path |
+|---|---|---|---|
+| **Context Capsule primitives** — `ContextCapsule`, `CapsuleKind`, `CapsuleLifecycle`, `CapsuleBudget`, `CapsuleLedger`, `CapsuleView`, `render_view`, `build_report_ledger`, `capsule_from_*` adapters | **SDK-v3 load-bearing abstraction.** Every cross-boundary artefact is a capsule. | **Stable v1** (contract C1..C6 tested in `test_wevra_capsules.py`) | `vision_mvp.wevra.capsule`, re-exported from `vision_mvp.wevra` |
+| **Capsule view artifact** — `wevra.capsule_view.v1` | Sealed capsule graph on disk | **Stable v1** (written next to every report) | `capsule_view.json` in `out_dir` |
+| **Wevra SDK** — `RunSpec`, `run`, `SweepSpec`, `run_sweep`, `HeavyRunNotAcknowledged`, `WevraConfig`, `profiles`, `report`, `ci_gate`, `import_data`, `extensions`, capsule primitives, `build_manifest`, schema constants | Public product contract | **Stable v3** (contract-tested: `test_wevra_public_api.py`, `test_wevra_runtime.py`, `test_wevra_capsules.py`) | `vision_mvp.wevra` |
+| **Wevra console scripts** — `wevra`, `wevra-import`, `wevra-ci`, `wevra-capsule` | CLI surface | **Stable v3** (Slice 3: `wevra-capsule view / verify / cid`) | `[project.scripts]` |
+| **Provenance manifest** — `wevra.provenance.v1` | Reproducibility artifact; also a `PROVENANCE` capsule in the run's DAG | **Stable v1** (tested on every run) | `vision_mvp.wevra.provenance` |
+| **Extension Protocols** — `SandboxBackend`, `TaskBankLoader`, `ReportSink` | Plugin surface | **Stable v1** (runtime-checkable Protocols, contract-tested: `test_wevra_extensions.py`) | `vision_mvp.wevra.extensions` |
+| **Unified runtime** — `SweepSpec`, `run_sweep`, `wevra.sweep.v2` | One coherent execution path; emits `SWEEP_SPEC` + `SWEEP_CELL` capsules | **Stable v1** (covers mock + real-executed + real-staged) | `vision_mvp.wevra.runtime` |
+| **Report / CI / import schemas** — `phase45.product_report.v2` (and v1 compat), `phase46.ci_verdict.v1`, `phase46.import_audit.v1`, `wevra.capsule_view.v1` | On-disk contract | **Stable** (v1 and v2 both accepted by `wevra-ci`) | — |
+| **Core substrate** — CASR router, hierarchical router, ledger, exact_ops, role_handoff, dynamic_comm, adaptive_sub | Research substrate used *by* Wevra; adapter-able into capsules (`capsule_from_handle`, `capsule_from_handoff`, …) | **Settled** (proofs + tests) but **research API** | `vision_mvp.core.*` |
+| **Legacy product path** — `vision_mvp.product.*` | Pre-Slice-1 import path | **Deprecated-compat** (still works; re-exported by `wevra`) | `vision_mvp.product` |
+| **Docker sandbox** — `DockerSandbox` (backend) | Untrusted-input isolation | **Available** (backend exists, contract-tested); **not yet the default** for public JSONLs | `vision_mvp.wevra.extensions.get_sandbox("docker")` |
+| **Docker-first-by-default** for public JSONLs | Slice 3 target | **Boundary / next-slice** (default-flip when caller declares untrusted input) | n/a yet |
+| **First real out-of-tree plugin** | Slice 3 community target | **Exemplar landed** (`examples/out_of_tree_plugin/wevra-markdown-sink`); a full third-party-owned sink package remains future | `examples/out_of_tree_plugin/` |
+| **GitHub Actions release on tag** | Slice 3 ops target | **Declared** (workflow file checked in); **not yet fired on a real tag** | `.github/workflows/wevra-ci.yml` |
+| **Research shards** — Phases 1–44 RESULTS_*, EXTENDED_MATH_*, per-phase scripts, 72-framework survey | Research programme | **Research-grade** (empirical/proved per shard; no product-API guarantee) | `vision_mvp.experiments.*`, `vision_mvp.tasks.*`, docs |
+
+### 10.2 Slice 1 (this milestone) — completed
+
+| Item | Status | Anchor |
+|---|---|---|
+| Canonical SDK package boundary `vision_mvp/wevra/` | ✅ | `vision_mvp/wevra/__init__.py` |
+| `RunSpec` / `run` unified programmatic entry point | ✅ | `vision_mvp/wevra/run.py` |
+| `WevraConfig` (env-driven, frozen, validated) | ✅ | `vision_mvp/wevra/config.py` |
+| Provenance manifest (`wevra.provenance.v1`) on every run | ✅ | `vision_mvp/wevra/provenance.py`, wired in `product/runner.py` |
+| Console scripts `wevra`, `wevra-import`, `wevra-ci` | ✅ | `pyproject.toml` `[project.scripts]`, `wevra/_cli.py` |
+| Package rename → `wevra` 0.4.0, extras slots (dev/docker/cluster) | ✅ | `pyproject.toml` |
+| `sys.path.insert` hacks removed from product modules | ✅ | `product/runner.py`, `product/ci_gate.py`, `product/import_data.py` |
+| Contract tests locking the public SDK surface | ✅ | `tests/test_wevra_public_api.py` |
+| Provenance + CLI smoke tests | ✅ | `tests/test_wevra_provenance.py` |
+| Backwards-compat: `vision_mvp.product.*` still works | ✅ | confirmed by `test_phase45_product.py` |
+| README: Wevra-vs-Context-Zero framing, SDK quickstart, stability matrix, "Who Wevra is for", "How to extend Wevra" | ✅ | `README.md` |
+| ARCHITECTURE: Wevra SDK boundary note | ✅ | `ARCHITECTURE.md` |
+| Master plan § 10 (this section) | ✅ | here |
+
+**Theorem-style claims / conjectures for Slice 1:**
+
+  * **Claim W1-1 (SDK boundary is a projection of settled layers).**
+    The Wevra SDK re-exports only modules whose tests have held
+    unchanged across the last three phases (profiles, report,
+    ci_gate, import_data, runner). No research-grade module is on
+    the SDK surface.
+  * **Claim W1-2 (every run is reproducible).** Every invocation
+    of `wevra.run(spec)` — and every `python -m vision_mvp.product`
+    — emits a `provenance.json` pinning git SHA, package version,
+    Python, platform, profile, model, endpoint, sandbox, input
+    JSONL + SHA-256, argv, and the final artifact list. Tested on
+    every run (`test_runner_emits_provenance_on_every_run`).
+  * **Conjecture W1-3 (drop-in without a plugin system).** For the
+    current scope (profile-driven SWE-bench-Lite-shape evaluation
+    + CI gate + public-JSONL import), Wevra is a true drop-in SDK:
+    `pip install wevra` + one console script yields a
+    provenance-stamped report. Falsifiable by any external
+    operator who needs a new sandbox backend, a new task-bank
+    shape, or a new reporting sink without editing `vision_mvp/`.
+    If falsified, Slice 2 (plugin system) becomes load-bearing.
+  * **Conjecture W1-4 (research/product split holds).** Nothing
+    on the SDK surface depends on a research-grade module whose
+    API is not yet settled. Falsifiable by any SDK consumer who
+    has to import from `vision_mvp.core.*`,
+    `vision_mvp.experiments.*`, or `vision_mvp.tasks.*` to use
+    Wevra.
+
+### 10.2-bis Slice 2 (2026-04-22) — completed
+
+Full detail in `vision_mvp/RESULTS_WEVRA_SLICE2.md`.
+
+| Item | Status | Anchor |
+|---|---|---|
+| Extension system (3 Protocols, registry, `entry_points` discovery) | ✅ | `vision_mvp/wevra/extensions/` |
+| Worked in-tree `ReportSink` example, exercised end-to-end | ✅ | `examples/jsonl_report_sink.py` |
+| Unified mock/real runtime (`SweepSpec`, `run_sweep`, `HeavyRunNotAcknowledged`) | ✅ | `vision_mvp/wevra/runtime.py` |
+| `RunSpec.acknowledge_heavy` first-class cost gate | ✅ | `vision_mvp/wevra/run.py` |
+| `RunSpec.report_sinks` hook | ✅ | `vision_mvp/wevra/run.py` |
+| Report schema bumped to `phase45.product_report.v2` (v1 still accepted by CI gate) | ✅ | `vision_mvp/product/runner.py`, `ci_gate.py` |
+| Env-driven endpoints (`WEVRA_OLLAMA_URL_MAC{1,2}`, `WEVRA_OLLAMA_URL`) | ✅ | `wevra.runtime._resolve_endpoint` |
+| Operator-grade failure messages on the run path | ✅ | `wevra.runtime` + `product/report.py` |
+| `--acknowledge-heavy` / `--report-sink` on `wevra` CLI | ✅ | `vision_mvp/wevra/_cli.py` |
+| GitHub Actions workflow (SDK contract tests + build + release-on-tag) | ✅ (declared) | `.github/workflows/wevra-ci.yml` |
+| `CHANGELOG.md` tracks Wevra SDK releases | ✅ | `CHANGELOG.md` |
+| **Real ASPEN mac1 run launched via `wevra.run(...)`** | ✅ | `vision_mvp/artifacts/wevra_slice2_g1/` — `sweep.executed_in_process=true`, 4 instances × 2 parser modes × 3 strategies, 114 s wall |
+| `wevra-ci` verdict on the ASPEN run (canonical release artifact) | ✅ | `vision_mvp/artifacts/wevra_slice2_g1/ci_verdict.json` — `ok=true` |
+| Contract tests for extensions (10) + runtime (10) | ✅ | `tests/test_wevra_extensions.py`, `tests/test_wevra_runtime.py` |
+| `SDK_VERSION` bump to `wevra.sdk.v2` (additive, backwards-compat) | ✅ | `vision_mvp/wevra/__init__.py` |
+| Master plan § 10 refreshed (this pass) | ✅ | here |
+
+Full suite: **1349 tests pass**, up from Slice 1's 1327.
+
+### 10.3 Slice 3 — deferred (explicit, concrete)
+
+Each item is concrete, classified, and has a named code path.
+Slice 2 closed B, C, G, and most of D; what remains is scoped to
+default-flips, community artifacts, and release-tag firings — not
+to new subsystems.
+
+#### B. Plugin / extension system — ✅ **done (Slice 2)**
+
+| Follow-up | Status | Anchor |
+|---|---|---|
+| B.1 Stable `SandboxBackend` Protocol (runtime-checkable) | ✅ | `vision_mvp/wevra/extensions/sandbox.py` |
+| B.2 Stable `TaskBankLoader` Protocol + `TaskBankBundle` | ✅ | `vision_mvp/wevra/extensions/taskbank.py` |
+| B.3 Stable `ReportSink` Protocol | ✅ | `vision_mvp/wevra/extensions/report_sink.py` |
+| B.4 Registry discovery via `importlib.metadata.entry_points` | ✅ | `vision_mvp/wevra/extensions/registry.py` (groups `wevra.sandboxes` / `wevra.task_banks` / `wevra.report_sinks`) |
+| B.5 One worked extension landed end-to-end | ✅ (in-tree) | `vision_mvp/wevra/extensions/examples/jsonl_report_sink.py`; exercised end-to-end by `test_wevra_extensions.py::test_worked_example_sink_end_to_end` |
+| B.6 Contract tests for the extension protocols | ✅ | `vision_mvp/tests/test_wevra_extensions.py` (10 tests) |
+
+**Remaining in Slice 3:** a community-owned out-of-tree plugin
+shipped by a third party. An *in-repo* exemplar landed in the
+post-Slice-2 identity pass (`examples/out_of_tree_plugin/wevra-
+markdown-sink/`) — a standalone pip-installable package that
+registers a new `ReportSink` purely via `entry_points` and
+requires no edit under `vision_mvp/`. The machinery is closed and
+the contract is demonstrated; only an actual third-party publisher
+is future.
+
+#### C. Unified mock↔real runtime contract — ✅ **done (Slice 2)**
+
+| Follow-up | Status | Anchor |
+|---|---|---|
+| C.1 `SweepSpec` dataclass (frozen, validated) | ✅ | `vision_mvp/wevra/runtime.py` |
+| C.2 Dispatcher: mock → in-process; real → in-process | ✅ | `wevra.runtime.run_sweep` |
+| C.3 `executed_in_process=True` path for real runs | ✅ | validated end-to-end on ASPEN mac1 |
+| C.4 Explicit operator-boundary cost gate | ✅ | `RunSpec.acknowledge_heavy=True`; `HeavyRunNotAcknowledged` raised under `strict_cost_gate=True` |
+| C.5 One coherent artifact/report model | ✅ | schema bumped to `phase45.product_report.v2`, sweep sub-block schema `wevra.sweep.v2`; CI gate accepts v1 and v2 |
+
+#### Remaining D (production hardening) — ✅ **mostly done (Slice 2)**
+
+| Follow-up | Status | Anchor |
+|---|---|---|
+| D.1 Docker-first sandbox as default for untrusted JSONLs | ◐ | `DockerSandbox` backend exists and is registered under `wevra.extensions.get_sandbox("docker")`; the *default-flip* for public/untrusted inputs is Slice 3 |
+| D.2 Env-validated cluster endpoints | ✅ | `WEVRA_OLLAMA_URL_MAC1`, `WEVRA_OLLAMA_URL_MAC2`, `WEVRA_OLLAMA_URL` resolved in `wevra.runtime._resolve_endpoint`; tested in `test_wevra_runtime.EnvEndpointOverrideTests` |
+| D.3 Operator-grade failure messages | ✅ | unified runtime wraps sweep errors into `sweep_result.error_kind` / `sweep_result.error_detail`; renderer surfaces `sweep : ERROR <kind>: <detail>` instead of a stack trace |
+| D.4 Release workflow | ◐ | `.github/workflows/wevra-ci.yml` checked in (SDK contract tests on 3.10/3.11/3.12 + `python -m build` sdist+wheel + release on tag); not yet fired on a real tag (Slice 3 ops) |
+| D.5 CHANGELOG.md curated per Wevra release | ✅ | `CHANGELOG.md` now tracks Wevra SDK versions (0.4.0 Slice 1, 0.5.0 Slice 2); phase-numbered narrative stays in RESULTS notes |
+
+#### G. Cluster-backed validation — ✅ **done (Slice 2)**
+
+| Follow-up | Status | Anchor |
+|---|---|---|
+| G.1 One `aspen_mac1_coder` real run launched via `wevra` | ✅ | `vision_mvp/artifacts/wevra_slice2_g1/product_report.json`; `sweep.executed_in_process=true`, `sweep.model=qwen2.5-coder:14b`, 4 instances × 2 parser modes × 3 strategies, 114 s wall |
+| G.2 Provenance manifest stored with the artifact | ✅ | `vision_mvp/artifacts/wevra_slice2_g1/provenance.json` (`wevra.provenance.v1`) |
+| G.3 `wevra-ci` verdict checked in | ✅ | `vision_mvp/artifacts/wevra_slice2_g1/ci_verdict.json` — `ok=true, blockers=0, executed_in_process=true` |
+
+**Empirical finding reproduced.** Strict parser fails
+(pass@1 = 0.000) on `qwen2.5-coder:14b`, robust parser recovers
+(pass@1 = 1.000) across all three strategies — a Phase-42 result
+re-obtained via the Wevra surface.
+
+### 10.4 Slice 2 theorem-style claims (detail in `vision_mvp/RESULTS_WEVRA_SLICE2.md`)
+
+  * **W2-1 (proved, constructive).** Stable extension surface
+    preserves bounded-context guarantees: any registered
+    `SandboxBackend` / `TaskBankLoader` / `ReportSink` that
+    satisfies its Protocol is, by construction, a renaming /
+    projection of a settled substrate boundary; it cannot violate
+    Theorem 3 bounded-context invariants.
+  * **W2-2 (empirical).** Unified-runtime identity under mock
+    oracle: every mock profile's pooled summary is unchanged
+    between Slice 1's `_mock_sweep` and Slice 2's
+    `wevra.runtime.run_sweep` (1349/1349 tests pass).
+  * **W2-3 (proved, constructive).** External-run safety as
+    product contract: every `wevra.run` emits a provenance
+    manifest sufficient to reproduce the run on a different
+    machine, modulo declared external state (model residency,
+    endpoint availability) and `temperature=0.0`-bounded LLM
+    nondeterminism.
+  * **W2-4 (testable conjecture).** Wevra is a true drop-in SDK
+    iff E1–E6 hold (pip-install works, provenance is sufficient,
+    real runs execute in-process, plugins don't require in-tree
+    edits, release automation emits artifacts on tag, Docker is
+    default for untrusted input). E1–E3 closed; E4 closed as
+    machinery (first out-of-tree plugin is Slice 3); E5 declared
+    (workflow in-repo, not yet fired on a real tag); E6 open
+    (Slice 3).
+
+### 10.5 What still blocks a true 10/10 drop-in production SDK
+
+Honest ledger, today:
+
+1. **Docker-first-by-default for untrusted public JSONLs.** — ✅
+   **done (Slice 3B, 2026-04-22).** Profiles carry a `trust` tag
+   (`trusted` | `untrusted`). `public_jsonl` is `untrusted` and
+   ships with `sandbox_name="docker"`. The runner enforces the
+   default: an untrusted profile refuses to start on any sandbox
+   weaker than Docker, and refuses to start with Docker configured
+   but the daemon unreachable, unless the operator passes
+   `--allow-unsafe-sandbox`. Opt-out downgrades to `subprocess`
+   with an explicit note recorded in the profile. Locked by
+   `test_public_jsonl_profile_is_untrusted_and_docker_first`,
+   `test_public_jsonl_refuses_weak_sandbox_without_docker`,
+   `test_public_jsonl_allow_unsafe_downgrades_to_subprocess`.
+2. **Report-schema compatibility policy.** — ✅ **explicit
+   (Slice 3B).** `phase45.product_report.v2` is the stable product-
+   report schema (Slice 2+). `ci_gate.EXPECTED_REPORT_SCHEMAS`
+   accepts both v1 and v2 — v1 remains valid input to the CI gate
+   for backwards-compat but is no longer emitted. Test locked:
+   `test_report_schema_stable` asserts v2; `test_wevra_runtime`
+   re-asserts v2 via the SDK surface.
+3. **Bare-install wheel sanity.** — ✅ **done (Slice 3B).** Release
+   rehearsal (`python -m build` → `pip install wevra-0.5.1-py3-
+   none-any.whl` in a fresh venv) exposed two real release
+   blockers that are now fixed: (a) `core/peer_review.py` and
+   `core/vrf_committee.py` imported `cryptography` unconditionally
+   at module top-level — now guarded behind `_require_cryptography()`
+   at constructor time, matching the optional `[crypto]` extra;
+   (b) `wevra --version` crashed because `argparse` required
+   `--profile`/`--out-dir` — now short-circuits pre-parse.
+4. **First real out-of-tree plugin** — in-repo exemplar landed
+   (`examples/out_of_tree_plugin/wevra-markdown-sink/`), proving
+   the `entry_points` contract works without any edit under
+   `vision_mvp/`. A community-owned third-party-published plugin
+   package remains future.
+5. **GitHub Actions release on a real tag.** The workflow is
+   checked in, the local `python -m build` → fresh-venv install
+   path is exercised (both `wevra --profile local_smoke` and
+   `wevra-ci` run cleanly from the wheel), but the tag-triggered
+   `release` job has not been fired on a real `vX.Y.Z` tag. This
+   remains the single residual operational step that requires a
+   GitHub tag event to exercise honestly.
+6. **External blockers from § 9.8 still apply** (public SWE-bench-
+   Lite JSONL on local disk; ≥70B resident coder model).
+   Orthogonal to all SDK work; remain classified as 🧱 external.
+
+Slice 1 bought the SDK boundary. Slice 2 bought the plugin system,
+the unified runtime, the cluster-executed artifact, and the
+release automation. Slice 3A closed the real-profile regression.
+Slice 3B closed the Docker-first default, the schema-compatibility
+policy, and the bare-install wheel path. The one remaining
+in-control step is to push a real tag.
 
 ---
 

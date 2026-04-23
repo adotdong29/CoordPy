@@ -1,23 +1,31 @@
-"""vision_mvp — CASR coordination layer for multi-agent teams.
+"""vision_mvp — Context Zero research programme top-level package.
 
-The main public object is `CASRRouter`: feed it batched observations,
-get back consensus estimates with O(log N) peak per-agent context.
+**If you are looking for the shipped product**, you want Wevra:
 
-Example
--------
->>> from vision_mvp import CASRRouter
->>> import numpy as np
->>> router = CASRRouter(n_agents=1000, state_dim=64, task_rank=10)
->>> obs = np.random.randn(1000, 64)
->>> estimates = router.step(obs)
->>> router.stats["peak_context_per_agent"]
-10
+    from vision_mvp import wevra
+    report = wevra.run(wevra.RunSpec(profile="local_smoke",
+                                     out_dir="/tmp/wevra"))
 
-See also
---------
-- `FINAL_RESULTS.md` for measured scaling across N = 10 to 100 000.
-- `PROOFS.md` for the formal theorems.
-- `EXTENDED_MATH_[1-7].md` for the 72-framework theoretical survey.
+**If you are looking at research substrate**, the original routing-layer
+primitive is ``CASRRouter`` (Causal-Abstraction Scale-Renormalized
+Routing), kept here as research-grade code. It is the substrate that
+grounds Wevra's bounded-context guarantees; it is not itself part of
+the Wevra SDK contract.
+
+    >>> from vision_mvp import CASRRouter
+    >>> import numpy as np
+    >>> router = CASRRouter(n_agents=1000, state_dim=64, task_rank=10)
+    >>> estimates = router.step(np.random.randn(1000, 64))
+    >>> router.stats["peak_context_per_agent"]
+    10
+
+Orientation
+-----------
+- ``docs/START_HERE.md``   — one-pass orientation for new readers.
+- ``vision_mvp.wevra``     — stable product SDK surface.
+- ``PROOFS.md``            — formal theorems.
+- ``FINAL_RESULTS.md``     — measured scaling (N = 10 … 100 000).
+- ``EXTENDED_MATH_[1-7]``  — 72-framework theoretical survey.
 """
 
 from .api import CASRRouter
@@ -39,4 +47,4 @@ __all__ = [
     "AdversarialCASRRouter",
     "DynamicCASRRouter",
 ]
-__version__ = "0.3.0"
+__version__ = "0.5.1"

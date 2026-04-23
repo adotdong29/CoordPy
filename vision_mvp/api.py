@@ -1,4 +1,9 @@
-"""Public API — the one class most users will ever touch.
+"""CASR research-substrate router (research-grade API).
+
+``CASRRouter`` is the original routing-layer primitive from the
+Context Zero research programme. It is research code, not part of
+the Wevra SDK contract — for the shipped product surface use
+``from vision_mvp import wevra``.
 
 Usage
 -----
@@ -14,10 +19,11 @@ Usage
 
     print(router.stats)
 
-Behind the scenes this runs the Phase-3 hierarchical protocol with streaming
-PCA, a vectorized neural predictor, and a Global-Workspace admission
-mechanism — giving O(log N) peak per-agent context and bounded writes per
-round.
+Under the hood: a hierarchical consensus protocol with streaming PCA, a
+vectorized neural predictor, and a Global-Workspace admission mechanism —
+giving O(log N) peak per-agent context and bounded writes per round. The
+formal bound and its matching lower-bound argument are Theorem 3 in
+``PROOFS.md``.
 """
 
 from __future__ import annotations
@@ -43,7 +49,8 @@ class CASRRouter:
         Dimensionality d of each agent's state vector.
     task_rank : int | None
         Expected rank of the task-relevant subspace. If None, defaults to
-        ⌈log₂ N⌉ (the CASR-theoretic optimum for consensus tasks).
+        ⌈log₂ N⌉ — the information-theoretic bound proved in Theorem 3
+        (`PROOFS.md`) for low-intrinsic-rank consensus tasks.
     observation_noise : float
         Standard deviation σ of per-observation noise — used for Bayesian
         weighting.

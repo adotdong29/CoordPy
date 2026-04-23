@@ -1,12 +1,110 @@
-# Context-Zero: Reference Architecture
+# Context Zero — Reference Architecture
 
-This document specifies the reference implementation of CASR (Causal-Abstraction Scale-Renormalized Routing). It is a design specification, not code — the MVP implementation follows this spec.
+**Wevra** is the shipped **context-capsule runtime** produced by the
+**Context Zero** research programme. Every piece of context that
+crosses a role boundary, a layer boundary, or a run boundary in Wevra
+is a typed, content-addressed, lifecycle-bounded, budget-bounded,
+provenance-carrying **capsule** — never a raw prompt string. This
+document is the programme's architectural reference: it covers the
+full substrate (routing, exact memory, retrieval, planner, runtime
+calibration, typed handoffs) and the Wevra product surface built on
+top of it, now *centred* on the Capsule Contract. For a one-pass
+orientation, start with [`docs/START_HERE.md`](docs/START_HERE.md).
 
-> **Naming.** `Context Zero` is the research programme. `Wevra` is the
-> first product surface built from it: the operator-facing runner, profiles,
-> reporting, readiness gate, and deployment boundary now living under
-> `vision_mvp/product/`. This document covers the full programme architecture;
-> references to the product surface refer to **Wevra**.
+## The Capsule Contract (SDK v3 centre of gravity)
+
+Wevra's durable top-level description is:
+
+> **Wevra is a context-capsule runtime.** Every inter-role,
+> inter-layer, and inter-run artefact satisfies a six-invariant
+> contract:
+>
+>   **C1  Identity.**     Stable content-address (SHA-256) over
+>                          `(kind, payload, budget, parents)`.
+>   **C2  Typed claim.**   Closed vocabulary of `CapsuleKind`.
+>   **C3  Lifecycle.**     `PROPOSED → ADMITTED → SEALED` (+ optional
+>                          `RETIRED`); illegal transitions are refused.
+>   **C4  Budget.**        Explicit `CapsuleBudget` checked at admit
+>                          time.
+>   **C5  Provenance.**    Parents must be in the ledger; the ledger
+>                          keeps a hash chain so any retroactive
+>                          insert breaks `verify_chain()`.
+>   **C6  Frozen.**        A sealed capsule's CID is fixed for all
+>                          time.
+
+The Phase-19 `Handle`, Phase-31 `TypedHandoff`, Phase-35
+`ThreadResolution`, Phase-36 `AdaptiveEdge`, every `SweepSpec` /
+sweep-cell, every `ARTIFACT` on disk, and the `RUN_REPORT` itself
+are all capsule-shaped. The `CapsuleLedger` is their shared
+append-only, hash-chained container. The `RUN_REPORT` capsule's CID
+is the durable identifier for a Wevra run — send someone that CID
+plus `product_report.json` and they can reproduce every upstream
+capsule, verify the chain end-to-end, and know the bytes haven't
+drifted.
+
+Reference implementation: `vision_mvp/wevra/capsule.py`. Theory note:
+[`docs/RESULTS_WEVRA_CAPSULE.md`](docs/RESULTS_WEVRA_CAPSULE.md).
+Contract tests: `vision_mvp/tests/test_wevra_capsules.py`
+(invariants C1..C6 individually + end-to-end).
+
+### How capsules relate to the older CASR / substrate / handoff work
+
+| Older primitive                         | Phase | Capsule kind it instantiates |
+|---                                      |---    |---                           |
+| `context_ledger.Handle`                  | 19    | `HANDLE`                     |
+| `role_handoff.TypedHandoff`             | 31    | `HANDOFF`                    |
+| `dynamic_comm.ThreadResolution`         | 35    | `THREAD_RESOLUTION`          |
+| `adaptive_sub.AdaptiveEdge`             | 36    | `ADAPTIVE_EDGE`              |
+| `wevra.runtime.SweepSpec`               | —     | `SWEEP_SPEC`                 |
+| per-cell sweep report (`wevra.sweep.v2`) | —     | `SWEEP_CELL`                 |
+| `phase44_public_readiness` verdict      | 44    | `READINESS_CHECK`            |
+| `wevra.provenance.v1` manifest          | —     | `PROVENANCE`                 |
+| on-disk `product_report.json` etc.       | —     | `ARTIFACT`                   |
+| resolved profile dict                    | —     | `PROFILE`                    |
+| the run itself                           | —     | `RUN_REPORT`                 |
+
+The older primitives are **byte-for-byte unchanged**. The capsule
+layer names the contract they already satisfied, lifts them under
+one ledger, and makes that ledger the SDK's new public centre. None
+of this is retrofitted cryptography: the hash-chaining that
+`HandoffLog` already did (Phase 31), the content-addressing that
+`MerkleDAG` / `ContextLedger.put` already did (Phase 19), and the
+provenance manifest that every run already carried are the existing
+evidence; SDK v3 recognises that they were instances of one shared
+thing.
+
+> **Naming.** `Context Zero` is the research programme; `Wevra` is the first
+> finished product produced by it. The original substrate proposal — **CASR**
+> (Causal-Abstraction Scale-Renormalized Routing) — lives in
+> `vision_mvp.core.*` as research-grade code and grounds Wevra's O(log N)
+> bounded-context claim (Theorem 3 in `PROOFS.md`). The programme's phase-by-
+> phase diary lives in `vision_mvp/RESULTS_PHASE*.md`; the Wevra SDK boundary
+> lives under `vision_mvp/wevra/` and is the stable public contract.
+>
+> **Wevra SDK boundary (Slice 1).** The stable public surface is:
+> `RunSpec`, `run`, `WevraConfig`, `profiles`, `report`, `ci_gate`,
+> `import_data`, `build_manifest`, and the schema constants
+> (`wevra.provenance.v1`, `phase45.product_report.v1`,
+> `phase46.ci_verdict.v1`, `phase46.import_audit.v1`). See the
+> **Stability matrix** in `README.md` and in
+> `docs/context_zero_master_plan.md` for the durable classification of
+> every layer (Wevra SDK · core substrate · legacy product path ·
+> plugin/extension system · unified runtime · Docker sandbox ·
+> research shards). Anything not on the SDK surface is research-grade
+> or boundary/next-slice and may change without notice.
+
+> **How to read the rest of this file.** The phase-by-phase
+> callouts immediately below (Phases 26 → 44) are a *historical
+> incremental record* of how the substrate was built up. They are
+> kept verbatim for provenance; each claim is anchored to a
+> `RESULTS_PHASE*.md` note and to tests. If you want the durable
+> architecture, skip the phase callouts and read the layered
+> substrate diagram further down (five substrate layers + render
+> mode + runtime calibration + typed-handoff team layer), then § 3
+> ("Architecture of the solution") in
+> [`docs/context_zero_master_plan.md`](docs/context_zero_master_plan.md).
+> For the Wevra product surface specifically, see § 10 of the master
+> plan and [`docs/START_HERE.md`](docs/START_HERE.md).
 
 > **Architecture as of Phase 27: five substrate layers + a render
 > mode + a snippet-scale runtime-calibration observer (Phase 26) +

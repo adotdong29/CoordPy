@@ -3,21 +3,30 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "context-zero"
-version = "0.1.0"
-description = "CASR — Causal-Abstraction Scale-Renormalized Routing: O(log N) coordination for multi-agent teams."
+name = "wevra"
+version = "0.5.1"
+description = "Wevra — bounded-context orchestration and evaluation SDK (first shipped product from the Context Zero research programme)."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
-    { name = "Context-Zero Contributors" },
+    { name = "Context Zero Contributors" },
 ]
-keywords = ["multi-agent", "coordination", "llm", "context", "routing"]
+keywords = [
+    "multi-agent",
+    "coordination",
+    "llm",
+    "context",
+    "evaluation",
+    "swe-bench",
+    "bounded-context",
+]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -25,15 +34,16 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Testing",
 ]
 dependencies = [
     "numpy>=1.23",
 ]
 
 [project.optional-dependencies]
-llm = [
-    # no runtime deps — the LLM agent talks HTTP to a local Ollama instance
-]
+# Real-LLM path — talks HTTP to a local Ollama instance; no runtime deps.
+llm = []
 scientific = [
     "scipy>=1.10",
     "networkx>=3.0",
@@ -52,18 +62,38 @@ heavy = [
     "transformers>=4.35",
     "RestrictedPython>=7.0",
 ]
+# Docker-first sandbox backend (Slice 2 target — declared here so
+# `pip install wevra[docker]` resolves once the backend lands).
+docker = [
+    "docker>=6.0",
+]
+# Multi-node cluster (ASPEN) tooling. Declared as a slot; the
+# cluster client itself lives outside this repo.
+cluster = []
 dev = [
     "black",
     "ruff",
     "mypy",
+    "pytest",
 ]
 
 [project.urls]
 Homepage = "https://github.com/your-org/context-zero"
 Documentation = "https://github.com/your-org/context-zero#readme"
 Issues = "https://github.com/your-org/context-zero/issues"
+Changelog = "https://github.com/your-org/context-zero/blob/main/CHANGELOG.md"
 
 [project.scripts]
+# Wevra SDK surface — these are the stable, contract-tested entry points.
+wevra = "vision_mvp.wevra._cli:main_run"
+wevra-import = "vision_mvp.wevra._cli:main_import"
+wevra-ci = "vision_mvp.wevra._cli:main_ci"
+# Inspect / audit the capsule graph of a finished report (SDK v3).
+wevra-capsule = "vision_mvp.wevra._cli:main_capsule"
+# Research-programme legacy entry point — runs CASR research demos
+# (scale/phase/test/info). Retained for continuity with Phase-1..44
+# scripts and kept out of the Wevra SDK contract on purpose. The
+# public product CLI is `wevra`.
 casr = "vision_mvp.__main__:main"
 
 [tool.setuptools.packages.find]
@@ -71,4 +101,4 @@ include = ["vision_mvp*"]
 exclude = ["vision_mvp.tests*"]
 
 [tool.setuptools.package-data]
-vision_mvp = ["*.md"]
+vision_mvp = ["*.md", "tasks/data/*.jsonl"]

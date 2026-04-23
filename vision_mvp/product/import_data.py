@@ -48,9 +48,6 @@ import os
 import sys
 from typing import Any
 
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..")))
-
 from vision_mvp.experiments.phase44_public_readiness import run_readiness
 
 

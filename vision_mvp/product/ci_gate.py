@@ -47,14 +47,18 @@ import os
 import sys
 from typing import Any
 
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..")))
-
 from vision_mvp.product import profiles as _profiles
 
 
 CI_SCHEMA = "phase46.ci_verdict.v1"
-EXPECTED_REPORT_SCHEMA = "phase45.product_report.v1"
+# The CI gate accepts both v1 (Slice 1 legacy) and v2 (Slice 2
+# unified runtime). Both schemas share the load-bearing keys
+# (readiness, sweep.cells, artifacts).
+EXPECTED_REPORT_SCHEMAS = (
+    "phase45.product_report.v1",
+    "phase45.product_report.v2",
+)
+EXPECTED_REPORT_SCHEMA = EXPECTED_REPORT_SCHEMAS[-1]  # latest, for display
 
 
 def evaluate_report(report_path: str,
@@ -80,8 +84,9 @@ def evaluate_report(report_path: str,
 
     # 1. Schema.
     got_schema = report.get("schema")
-    schema_ok = got_schema == EXPECTED_REPORT_SCHEMA
-    checks["schema"] = {"ok": schema_ok, "expected": EXPECTED_REPORT_SCHEMA,
+    schema_ok = got_schema in EXPECTED_REPORT_SCHEMAS
+    checks["schema"] = {"ok": schema_ok,
+                        "expected": list(EXPECTED_REPORT_SCHEMAS),
                         "got": got_schema}
     if not schema_ok:
         blockers.append(f"schema_mismatch:{got_schema!r}")
@@ -139,14 +144,15 @@ def evaluate_report(report_path: str,
         if require_sweep_executed:
             sweep_info["ok"] = False
             blockers.append(f"sweep_skipped:{sw.get('reason')}")
-    elif sw.get("mode") == "real":
+    elif sw.get("mode") == "real" and not sw.get("executed_in_process"):
         sweep_info["mode"] = "real"
-        sweep_info["executed_in_process"] = sw.get("executed_in_process",
-                                                     False)
-        if require_sweep_executed and not sw.get("executed_in_process"):
+        sweep_info["executed_in_process"] = False
+        sweep_info["requires_acknowledgement"] = sw.get(
+            "requires_acknowledgement", True)
+        if require_sweep_executed:
             sweep_info["ok"] = False
             blockers.append("sweep_recorded_not_executed")
-    elif sw.get("mode") == "mock":
+    elif sw.get("mode") in ("mock", "real") and sw.get("cells") is not None:
         cells = sw.get("cells", [])
         min_cell_pass_at_1 = 1.0
         bad_cells: list[str] = []
@@ -163,7 +169,9 @@ def evaluate_report(report_path: str,
                         f"nd={c.get('n_distractors')}/"
                         f"strategy={strat}:pass@1={v:.3f}")
         sweep_info.update({
-            "mode": "mock", "n_cells": len(cells),
+            "mode": sw.get("mode", "mock"),
+            "executed_in_process": bool(sw.get("executed_in_process", True)),
+            "n_cells": len(cells),
             "min_pass_at_1": min_cell_pass_at_1,
             "required_min_pass_at_1": min_pass_at_1,
             "bad_cells": bad_cells,

@@ -41,10 +41,6 @@ import sys
 import time
 from typing import Any
 
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..")))
-
-
 from vision_mvp.product import profiles as _profiles
 from vision_mvp.product import report as _report
 from vision_mvp.experiments.phase44_public_readiness import run_readiness
@@ -61,7 +57,56 @@ from vision_mvp.tasks.swe_sandbox import (
 )
 
 
-RUNNER_SCHEMA = "phase45.product_report.v1"
+RUNNER_SCHEMA = "phase45.product_report.v2"
+RUNNER_SCHEMA_V1 = "phase45.product_report.v1"
+
+
+def _enforce_trust(prof: dict, profile_name: str,
+                    *, allow_unsafe_sandbox: bool) -> None:
+    """Enforce the Docker-first default for untrusted profiles.
+
+    Rules:
+      * Untrusted + readiness/sweep sandbox != "docker"
+        → refuse, unless ``allow_unsafe_sandbox=True``.
+      * Untrusted + sandbox == "docker" but Docker unavailable
+        → refuse, unless ``allow_unsafe_sandbox=True`` (in which
+          case downgrade to "subprocess" with an explicit note).
+
+    Trusted profiles are unaffected — they retain whatever sandbox
+    they declared (subprocess / in_process / docker).
+    """
+    if prof.get("trust") != _profiles.TRUST_UNTRUSTED:
+        return
+    rd = prof.get("readiness") or {}
+    sw = prof.get("sweep") or {}
+    sandboxes = {rd.get("sandbox_name"), sw.get("sandbox")} - {None}
+    non_docker = [s for s in sandboxes if s != "docker"]
+    if non_docker and not allow_unsafe_sandbox:
+        raise SystemExit(
+            f"profile {profile_name!r} is UNTRUSTED and must run "
+            f"inside Docker; declared sandbox(es): {sorted(sandboxes)}. "
+            f"Re-run with --allow-unsafe-sandbox only if you have "
+            f"audited the JSONL yourself.")
+    # Docker availability probe (only if we're actually going to use it).
+    if "docker" in sandboxes:
+        from vision_mvp.tasks.swe_sandbox import DockerSandbox
+        if not DockerSandbox().is_available():
+            if not allow_unsafe_sandbox:
+                raise SystemExit(
+                    f"profile {profile_name!r} requires Docker but no "
+                    f"Docker daemon is reachable. Install / start "
+                    f"Docker, or re-run with --allow-unsafe-sandbox "
+                    f"to fall back to the subprocess sandbox (weaker: "
+                    f"no network isolation, no read-only rootfs).")
+            # Explicit opt-out: downgrade to subprocess.
+            prof["_sandbox_downgrade"] = {
+                "from": "docker", "to": "subprocess",
+                "reason": "docker_unavailable_with_allow_unsafe",
+            }
+            if rd.get("sandbox_name") == "docker":
+                rd["sandbox_name"] = "subprocess"
+            if sw.get("sandbox") == "docker":
+                sw["sandbox"] = "subprocess"
 
 
 def _mock_sweep(sweep_cfg: dict) -> dict:
@@ -149,6 +194,8 @@ def run_profile(profile_name: str, *,
                  jsonl_override: str | None = None,
                  force_sweep: bool = False,
                  skip_sweep: bool = False,
+                 acknowledge_heavy: bool = False,
+                 allow_unsafe_sandbox: bool = False,
                  ) -> dict:
     t0 = time.time()
     prof = _profiles.get_profile(profile_name)
@@ -159,6 +206,10 @@ def run_profile(profile_name: str, *,
     if not prof["readiness"]["jsonl"]:
         raise SystemExit(
             f"profile {profile_name!r} requires --jsonl <path>")
+
+    # Trust enforcement — untrusted profiles are Docker-first.
+    _enforce_trust(prof, profile_name,
+                    allow_unsafe_sandbox=allow_unsafe_sandbox)
 
     os.makedirs(out_dir, exist_ok=True)
 
@@ -180,16 +231,34 @@ def run_profile(profile_name: str, *,
                 "blockers": readiness_verdict["blockers"],
             }
         else:
-            if sweep_cfg["mode"] == "mock":
-                sweep_result = _mock_sweep(sweep_cfg)
-                with open(os.path.join(out_dir,
-                                          "sweep_result.json"),
-                           "w", encoding="utf-8") as fh:
-                    json.dump(sweep_result, fh, indent=2, default=str)
-            else:
-                sweep_result = _real_sweep_stub(sweep_cfg)
-                with open(os.path.join(out_dir,
-                                          "sweep_launch.json"),
+            # Slice 2 — unified runtime path.
+            from vision_mvp.wevra.runtime import (
+                sweep_spec_from_profile, run_sweep,
+            )
+            spec = sweep_spec_from_profile(
+                profile_name,
+                acknowledge_heavy=acknowledge_heavy,
+                jsonl_override=jsonl_override)
+            if spec is not None:
+                try:
+                    sweep_result = run_sweep(spec)
+                except Exception as ex:
+                    sweep_result = {
+                        "schema": "wevra.sweep.v2",
+                        "mode": sweep_cfg["mode"],
+                        "executed_in_process": False,
+                        "requires_acknowledgement": False,
+                        "error_kind": type(ex).__name__,
+                        "error_detail": str(ex)[:400],
+                    }
+                sweep_result.update({
+                    "model_metadata": _profiles.model_availability(
+                        sweep_cfg.get("model")),
+                })
+                artifact_name = (
+                    "sweep_result.json" if sweep_result.get(
+                        "executed_in_process") else "sweep_launch.json")
+                with open(os.path.join(out_dir, artifact_name),
                            "w", encoding="utf-8") as fh:
                     json.dump(sweep_result, fh, indent=2, default=str)
 
@@ -202,16 +271,72 @@ def run_profile(profile_name: str, *,
         "wall_seconds": round(time.time() - t0, 2),
         "out_dir": os.path.abspath(out_dir),
     }
-    # Write product_report.json + product_summary.txt first so the
-    # declared artifact list reflects the final on-disk state.
+
+    # Build provenance manifest — every run carries one. Kept in the
+    # core runner (not just wevra.run) so legacy invocations of
+    # `python -m vision_mvp.product` also get a reproducible stamp.
+    from vision_mvp.wevra.provenance import build_manifest
+    rd_cfg = prof.get("readiness") or {}
+    sw_cfg = prof.get("sweep") or {}
+    jsonl_path = (
+        jsonl_override or sw_cfg.get("jsonl") or rd_cfg.get("jsonl"))
+    manifest = build_manifest(
+        profile_name=profile_name,
+        profile_schema=_profiles.SCHEMA_VERSION,
+        jsonl_path=jsonl_path,
+        model=sw_cfg.get("model"),
+        endpoint=sw_cfg.get("ollama_url"),
+        sandbox=(sw_cfg.get("sandbox") or rd_cfg.get("sandbox_name")),
+        out_dir=out_dir,
+        artifacts=None,  # filled in below after artifact list settles
+        argv=sys.argv,
+        extra={
+            "invocation_kwargs": {
+                "skip_sweep": skip_sweep,
+                "force_sweep": force_sweep,
+                "jsonl_override": jsonl_override,
+            },
+        },
+    )
+    prov_path = os.path.join(out_dir, "provenance.json")
+    with open(prov_path, "w", encoding="utf-8") as fh:
+        json.dump(manifest, fh, indent=2, default=str)
+    product_report["provenance"] = manifest
+
+    # Write product_report.json + product_summary.txt after provenance
+    # lands on disk, so the declared artifact list reflects the final
+    # on-disk state (including provenance.json). capsule_view.json
+    # is the SDK-v3 capsule graph — it lands alongside the report so
+    # its CID is self-contained.
     report_path = os.path.join(out_dir, "product_report.json")
     summary_path = os.path.join(out_dir, "product_summary.txt")
-    # Snapshot present + upcoming artifacts.
+    view_path = os.path.join(out_dir, "capsule_view.json")
     existing = set(os.listdir(out_dir))
-    upcoming = {"product_report.json", "product_summary.txt"}
-    product_report["artifacts"] = sorted(existing | upcoming)
+    upcoming = {"product_report.json", "product_summary.txt",
+                "capsule_view.json"}
+    artifacts = sorted(existing | upcoming)
+    product_report["artifacts"] = artifacts
+    manifest["output"]["artifacts"] = artifacts
+
+    # Fold the finished report into a Capsule DAG. This is the
+    # SDK-v3 load-bearing product surface: every boundary-crossing
+    # artefact from the run becomes a sealed, content-addressed,
+    # typed capsule, and the RUN_REPORT capsule's CID is the
+    # durable identifier for the run.
+    from vision_mvp.wevra.capsule import (
+        build_report_ledger, render_view,
+    )
+    ledger, run_cid = build_report_ledger(
+        product_report, profile_dict=prof)
+    view = render_view(ledger, root_cid=run_cid).as_dict()
+    product_report["capsules"] = view
+
+    with open(prov_path, "w", encoding="utf-8") as fh:
+        json.dump(manifest, fh, indent=2, default=str)
     with open(report_path, "w", encoding="utf-8") as fh:
         json.dump(product_report, fh, indent=2, default=str)
+    with open(view_path, "w", encoding="utf-8") as fh:
+        json.dump(view, fh, indent=2, default=str)
     summary_text = _report.render_summary(product_report)
     with open(summary_path, "w", encoding="utf-8") as fh:
         fh.write(summary_text)
@@ -232,13 +357,25 @@ def main() -> int:
                      help="run readiness only; skip the sweep block")
     ap.add_argument("--force-sweep", action="store_true",
                      help="run the sweep even if readiness is not ready")
+    ap.add_argument("--acknowledge-heavy", action="store_true",
+                     help=("acknowledge the cost of a real-LLM sweep and "
+                            "run it in-process. Without this flag, real "
+                            "sweeps stage a launch command instead."))
+    ap.add_argument("--allow-unsafe-sandbox", action="store_true",
+                     help=("opt out of the Docker-first default for "
+                            "untrusted/public JSONL profiles. Only use "
+                            "this when you have audited the JSONL "
+                            "yourself — weaker sandbox has no network "
+                            "isolation and no read-only rootfs."))
     args = ap.parse_args()
 
     report = run_profile(
         args.profile, out_dir=args.out_dir,
         jsonl_override=args.jsonl,
         force_sweep=args.force_sweep,
-        skip_sweep=args.skip_sweep)
+        skip_sweep=args.skip_sweep,
+        acknowledge_heavy=args.acknowledge_heavy,
+        allow_unsafe_sandbox=args.allow_unsafe_sandbox)
     print(report["summary_text"])
     return 0 if report["readiness"]["ready"] else 1
 

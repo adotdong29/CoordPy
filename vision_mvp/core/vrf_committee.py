@@ -27,10 +27,25 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 
-from cryptography.hazmat.primitives.asymmetric.ed25519 import (
-    Ed25519PrivateKey, Ed25519PublicKey,
-)
-from cryptography.hazmat.primitives import serialization
+# Guarded — see vision_mvp/core/peer_review.py for rationale.
+try:
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+        Ed25519PrivateKey, Ed25519PublicKey,
+    )
+    from cryptography.hazmat.primitives import serialization
+    _CRYPTOGRAPHY_AVAILABLE = True
+except ImportError:  # pragma: no cover
+    Ed25519PrivateKey = None  # type: ignore[assignment,misc]
+    Ed25519PublicKey = None  # type: ignore[assignment,misc]
+    serialization = None  # type: ignore[assignment]
+    _CRYPTOGRAPHY_AVAILABLE = False
+
+
+def _require_cryptography() -> None:
+    if not _CRYPTOGRAPHY_AVAILABLE:
+        raise RuntimeError(
+            "vrf_committee requires the 'cryptography' extra. "
+            "Install with: pip install 'wevra[crypto]'")
 
 
 @dataclass
@@ -46,6 +61,7 @@ class VRFKey:
     """VRF wrapper around Ed25519."""
 
     def __init__(self, seed: bytes | None = None):
+        _require_cryptography()
         if seed is not None:
             if len(seed) != 32:
                 raise ValueError("seed must be 32 bytes")

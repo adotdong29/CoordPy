@@ -96,13 +96,68 @@ def test_public_jsonl_profile_requires_override():
 
 
 def test_public_jsonl_profile_accepts_override():
+    # Untrusted profile — require explicit --allow-unsafe-sandbox
+    # on machines without Docker (test env is not required to have
+    # a Docker daemon).
     bundled = os.path.join(
         os.path.dirname(__file__), "..", "tasks", "data",
         "swe_lite_style_bank.jsonl")
     with tempfile.TemporaryDirectory() as td:
         rep = run_profile(
-            "public_jsonl", out_dir=td, jsonl_override=bundled)
+            "public_jsonl", out_dir=td, jsonl_override=bundled,
+            allow_unsafe_sandbox=True)
         assert rep["readiness"]["ready"] is True
+
+
+def test_public_jsonl_profile_is_untrusted_and_docker_first():
+    from vision_mvp.product import profiles as _pf
+    prof = _pf.get_profile("public_jsonl")
+    assert prof["trust"] == _pf.TRUST_UNTRUSTED
+    assert prof["readiness"]["sandbox_name"] == "docker"
+    assert _pf.is_untrusted("public_jsonl") is True
+    assert _pf.is_untrusted("local_smoke") is False
+
+
+def test_public_jsonl_refuses_weak_sandbox_without_docker():
+    # Simulate "Docker unavailable" by patching DockerSandbox.is_available.
+    from vision_mvp.tasks import swe_sandbox
+    bundled = os.path.join(
+        os.path.dirname(__file__), "..", "tasks", "data",
+        "swe_lite_style_bank.jsonl")
+    orig = swe_sandbox.DockerSandbox.is_available
+    swe_sandbox.DockerSandbox.is_available = lambda self: False
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            try:
+                run_profile("public_jsonl", out_dir=td,
+                             jsonl_override=bundled)
+            except SystemExit as ex:
+                msg = str(ex)
+                assert "Docker" in msg or "docker" in msg
+                assert "allow-unsafe-sandbox" in msg
+                return
+        raise AssertionError(
+            "expected SystemExit when Docker unavailable and "
+            "allow_unsafe_sandbox=False")
+    finally:
+        swe_sandbox.DockerSandbox.is_available = orig
+
+
+def test_public_jsonl_allow_unsafe_downgrades_to_subprocess():
+    from vision_mvp.tasks import swe_sandbox
+    bundled = os.path.join(
+        os.path.dirname(__file__), "..", "tasks", "data",
+        "swe_lite_style_bank.jsonl")
+    orig = swe_sandbox.DockerSandbox.is_available
+    swe_sandbox.DockerSandbox.is_available = lambda self: False
+    try:
+        with tempfile.TemporaryDirectory() as td:
+            rep = run_profile(
+                "public_jsonl", out_dir=td, jsonl_override=bundled,
+                allow_unsafe_sandbox=True)
+            assert rep["readiness"]["ready"] is True
+    finally:
+        swe_sandbox.DockerSandbox.is_available = orig
 
 
 def test_render_summary_has_required_fields():
@@ -123,12 +178,15 @@ def test_model_capability_table_lists_canonical_models():
 
 
 def test_report_schema_stable():
+    # v2 is the current stable product-report schema (Slice 2+).
+    # v1 is still accepted by the CI gate for backwards-compat —
+    # see ``vision_mvp/product/ci_gate.py::EXPECTED_REPORT_SCHEMAS``.
     with tempfile.TemporaryDirectory() as td:
         rep = run_profile("local_smoke", out_dir=td)
         with open(os.path.join(td, "product_report.json"),
                     "r", encoding="utf-8") as fh:
             on_disk = json.load(fh)
-        assert on_disk["schema"] == "phase45.product_report.v1"
+        assert on_disk["schema"] == "phase45.product_report.v2"
         assert on_disk["profile"] == "local_smoke"
         assert "readiness" in on_disk
         assert "sweep" in on_disk

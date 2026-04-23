@@ -1,17 +1,59 @@
-# Context Zero
+# Context Zero — Wevra
 
-**CASR — Causal-Abstraction Scale-Renormalized Routing.**
-O(log N) coordination for multi-agent teams.
+**Wevra is a context-capsule runtime.** Every piece of context that
+crosses a role boundary, a layer boundary, or a run boundary is a
+typed, content-addressed, lifecycle-bounded, budget-bounded,
+provenance-stamped **capsule** — never a raw prompt string. One
+`RunSpec` in, one reproducible report out, and that report is the
+root of a sealed capsule graph you can audit, replay, and trust.
 
-[![status](https://img.shields.io/badge/status-alpha-orange.svg)](#)
+Wevra is the first shipped product from the **Context Zero** research
+programme on per-agent minimum-sufficient context.
+
+> ### The one-line mental model
+>
+> Traditional eval harnesses and agent frameworks pass *strings*
+> between roles — prompts, JSON dicts, log lines. Wevra doesn't.
+> Every unit of coordination that crosses a boundary in Wevra is a
+> **`ContextCapsule`**: it has a SHA-256 content-address (`cid`), a
+> typed `claim_kind` from a closed vocabulary, an explicit
+> `lifecycle` (PROPOSED → ADMITTED → SEALED), an explicit
+> `CapsuleBudget` (tokens / bytes / rounds / witnesses / parents),
+> a parent-CID DAG, and a hash-chained audit history. "Context" in
+> Wevra is not text — it is an object with identity, type,
+> lifecycle, budget, and proof. See
+> [`docs/RESULTS_WEVRA_CAPSULE.md`](docs/RESULTS_WEVRA_CAPSULE.md)
+> for the theorem-style statement of the contract and why it
+> subsumes "bounded-context orchestration" as a framing.
+
+[![status](https://img.shields.io/badge/status-beta-blue.svg)](#)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](#)
 
-> **Naming.** `Context Zero` is the research programme. `Wevra` is the
-> first usable product/substrate shipped from that programme. This repository
-> is the programme repo; the current product surface lives under
-> `vision_mvp/product/` and is referred to in docs as **Wevra**.
+> **New to this repo?** Read [`docs/START_HERE.md`](docs/START_HERE.md) first —
+> it is the canonical one-pass orientation: what Context Zero is, what Wevra
+> is, what is core substrate, what is product surface, what is boundary, and
+> what is research-grade.
 >
+> **Naming.** `Context Zero` is the research programme — theorems, phase
+> shards, and the 72-framework theoretical survey (see `PROOFS.md`,
+> `EXTENDED_MATH_[1-7].md`, `vision_mvp/RESULTS_PHASE*.md`). `Wevra` is the
+> shipped SDK/runtime under `vision_mvp/wevra/`, imported as
+> `from vision_mvp import wevra`. The older `vision_mvp/product/` modules
+> remain importable for backwards compatibility but are **not** the public
+> contract; see the [Stability matrix](#stability-matrix).
+>
+> Wevra is **not** the whole research programme and **not** a universal
+> agent platform. It is a context-capsule runtime with a narrow, stable
+> product surface: profile-driven SWE-bench-Lite-shape evaluation runs
+> with a stable report schema, a CI gate, a provenance manifest, and a
+> capsule graph on every run.
+>
+> **CASR** (Causal-Abstraction Scale-Renormalized Routing) is the original
+> substrate proposal from the programme; it lives in `vision_mvp.core.*` as
+> research-grade code and informs Wevra's bounded-context guarantees, but
+> it is not itself the product identity.
+
 > Most multi-agent AI frameworks (AutoGen, CrewAI, LangGraph, …) cap out at
 > around 10-100 agents because every agent has to read every other agent's
 > output each round — context grows like O(N²). **Context Zero** ships a
@@ -54,6 +96,152 @@ pip install -e .
 
 Only dependency is NumPy. The optional LLM-agent demo talks HTTP to a local
 Ollama instance (no Python binding required).
+
+Installing the package also registers three console scripts:
+
+```bash
+wevra --profile local_smoke --out-dir /tmp/cz-smoke
+wevra-import --jsonl /path/to/swe_bench_lite.jsonl --out /tmp/audit.json
+wevra-ci --report /tmp/cz-smoke/product_report.json --min-pass-at-1 1.0
+```
+
+Optional extras: `wevra[scientific]`, `wevra[dl]`, `wevra[heavy]`,
+`wevra[docker]` (Docker-first sandbox — Slice 2), `wevra[dev]`.
+
+---
+
+## Wevra SDK — quick start
+
+Wevra is a context-capsule runtime. One `RunSpec` in, one
+reproducible, provenance-stamped **capsule graph** out.
+
+```python
+from vision_mvp.wevra import RunSpec, run
+
+report = run(RunSpec(profile="local_smoke", out_dir="/tmp/cz-smoke"))
+assert report["readiness"]["ready"]
+assert report["provenance"]["schema"] == "wevra.provenance.v1"
+# SDK v3 — every run ships a sealed capsule graph.
+cv = report["capsules"]
+assert cv["schema"] == "wevra.capsule_view.v1"
+assert cv["chain_ok"]
+print(f"RUN_REPORT CID = {cv['root_cid']}")
+print(report["summary_text"])
+```
+
+### Every run is a sealed capsule DAG
+
+```python
+from vision_mvp.wevra import build_report_ledger, CapsuleKind
+
+ledger, run_cid = build_report_ledger(report)
+# Types you'll see in a smoke run:
+#   PROFILE           (root of the DAG)
+#   READINESS_CHECK   (parent: PROFILE)
+#   SWEEP_SPEC        (parent: PROFILE)
+#   SWEEP_CELL × N    (parent: SWEEP_SPEC)
+#   PROVENANCE        (parent: PROFILE)
+#   ARTIFACT × K      (parent: PROFILE)
+#   RUN_REPORT        (parents: ALL of the above)
+print(ledger.stats()["by_kind"])
+assert ledger.verify_chain()
+```
+
+The RUN_REPORT capsule's CID is the durable identifier for the run —
+send someone that CID plus `product_report.json` and they can
+reproduce every upstream capsule, verify the hash chain end-to-end,
+and know the bytes haven't drifted.
+
+### Every run emits five artifacts
+
+  * `product_report.json` — schema `phase45.product_report.v2`,
+    includes the `capsules` block (`wevra.capsule_view.v1`)
+  * `capsule_view.json` — the sealed capsule graph, on disk
+  * `product_summary.txt` — human-readable summary with a
+    `capsules` line (kind histogram + chain_ok + root CID)
+  * `readiness_verdict.json` — per-row readiness verdicts
+  * `provenance.json` — git SHA, package version, Python, platform,
+    profile, model, endpoint, sandbox, input JSONL + SHA-256, argv,
+    timestamp, artifact list (schema `wevra.provenance.v1`)
+
+### CLIs
+
+```bash
+wevra --profile local_smoke --out-dir /tmp/cz-smoke
+wevra-ci --report /tmp/cz-smoke/product_report.json --min-pass-at-1 1.0
+# Capsule-graph inspection (new in SDK v3):
+wevra-capsule view   --report /tmp/cz-smoke/product_report.json
+wevra-capsule verify --report /tmp/cz-smoke/product_report.json
+wevra-capsule cid    --report /tmp/cz-smoke/product_report.json
+```
+
+The SDK public surface is contract-tested in
+`vision_mvp/tests/test_wevra_public_api.py` and the Capsule Contract
+(invariants C1..C6) is tested in
+`vision_mvp/tests/test_wevra_capsules.py` — any rename or removal is a
+breaking change and requires bumping `wevra.SDK_VERSION` (currently
+`wevra.sdk.v3`).
+
+### Who Wevra is for
+
+  * Research engineers running **profile-driven evaluations** on
+    SWE-bench-Lite-shape banks who need a reproducible, provenance-
+    stamped, capsule-graph artifact trail instead of ad-hoc scripts.
+  * Teams wiring **CI gates** over evaluation quality (`wevra-ci`
+    consumes the report and emits a pass/fail verdict with explicit
+    blocker strings; `wevra-capsule verify` re-hashes the capsule
+    chain so a third party can confirm the report bytes haven't
+    drifted).
+  * Operators who want to swap **profiles** (`local_smoke`,
+    `bundled_57`, `aspen_mac1_coder`, `aspen_mac2_frontier`,
+    `public_jsonl`, …) without editing core code.
+  * Downstream framework authors who want to **lift their own
+    substrate into capsules** — the `capsule_from_handle`,
+    `capsule_from_handoff`, `capsule_from_sweep_cell` adapters
+    let you expose your own typed objects under the same
+    Contract, and `CapsuleLedger.admit_and_seal()` makes your
+    artefacts composable with Wevra's.
+
+Wevra is **not** (yet) for: arbitrary multi-agent orchestration,
+agent-platform building, or non-SWE evaluation shapes. Those are
+Context Zero research-programme territory, not Wevra product
+territory.
+
+### How to extend Wevra (current state, honest)
+
+  * **New profiles**: add a declarative entry to
+    `vision_mvp/product/profiles.py`. The `profiles` module is part
+    of the SDK contract; a profile is a frozen dict with stable keys.
+  * **New sandbox backends, new task banks, new reporting sinks**:
+    the extension surface for these is *not yet stable*. The planned
+    entry-point / registry-based plugin system is Slice 2 (see
+    `docs/context_zero_master_plan.md` § Wevra SDK follow-ups).
+    Today, extending these requires editing core modules; this is
+    a known limitation marked **boundary** in the stability matrix.
+
+---
+
+## Stability matrix
+
+| Layer | Scope | Stability | Import path |
+|---|---|---|---|
+| **Wevra SDK** — `RunSpec`, `run`, `SweepSpec`, `run_sweep`, `HeavyRunNotAcknowledged`, `WevraConfig`, `build_manifest`, `profiles`, `report`, `ci_gate`, `import_data`, `extensions`, schema constants | The public product contract | **Stable v3** (contract-tested) | `vision_mvp.wevra` |
+| **Context Capsule primitives** — `ContextCapsule`, `CapsuleKind`, `CapsuleLifecycle`, `CapsuleBudget`, `CapsuleLedger`, `CapsuleView`, `render_view`, `build_report_ledger`, `capsule_from_*` adapters | The **load-bearing SDK abstraction**: every cross-boundary artefact is a capsule | **Stable v1** (contract-tested: invariants C1..C6) | `vision_mvp.wevra.capsule` (re-exported from `vision_mvp.wevra`) |
+| **Wevra console scripts** — `wevra`, `wevra-import`, `wevra-ci`, `wevra-capsule` | CLI surface | **Stable v3** (Slice 3: `wevra-capsule view / verify / cid`) | `[project.scripts]` |
+| **Provenance manifest** — `wevra.provenance.v1` | Reproducibility artifact | **Stable v1** | `vision_mvp.wevra.provenance` |
+| **Capsule view artifact** — `wevra.capsule_view.v1` | Sealed capsule graph on disk | **Stable v1** | `capsule_view.json` next to every report |
+| **Extension Protocols** — `SandboxBackend`, `TaskBankLoader`, `ReportSink` | Plugin surface | **Stable v1** (runtime-checkable Protocols, `entry_points` discovery) | `vision_mvp.wevra.extensions` |
+| **Unified runtime** — `SweepSpec`, `run_sweep`, `wevra.sweep.v2` | One execution path for mock + real-executed + real-staged | **Stable v1** | `vision_mvp.wevra.runtime` |
+| **Report / CI-gate schemas** — `phase45.product_report.v2` (v1 accepted), `phase46.ci_verdict.v1`, `phase46.import_audit.v1` | On-disk contract | **Stable** | — |
+| **Core substrate** — CASR router, hierarchical router, ledger, exact_ops, role_handoff | Research substrate used *by* Wevra | **Settled** (proofs + tests) but **research API** | `vision_mvp.core.*` |
+| **Legacy product path** — `vision_mvp.product.*` | Pre-Slice-1 import path | **Deprecated-compat** (still works; re-exported by `wevra`) | `vision_mvp.product` |
+| **Docker sandbox** | Untrusted-input isolation | **Available** (backend registered as `wevra.extensions.get_sandbox("docker")`); **not yet the default** | `vision_mvp.wevra.extensions` |
+| **Docker-first-by-default** for public JSONLs | Slice 3 target | **Boundary / next-slice** (default-flip) | n/a yet |
+| **First real out-of-tree plugin** | Slice 3 community target | **Boundary / next-slice** | n/a yet |
+| **Research shards** — Phases 1–44 RESULTS_*.md, EXTENDED_MATH_*.md, per-phase experiment scripts, 72-framework survey | The Context Zero research programme | **Research-grade** (empirical or proved per shard; no product-API guarantee) | `vision_mvp.experiments.*`, `vision_mvp.tasks.*`, docs |
+
+See `docs/context_zero_master_plan.md` for the living version of this
+matrix and the concrete next-slice follow-ups.
 
 ---
 

@@ -19,10 +19,29 @@ import json
 from dataclasses import dataclass, field
 from typing import Any
 
-from cryptography.hazmat.primitives.asymmetric.ed25519 import (
-    Ed25519PrivateKey, Ed25519PublicKey,
-)
-from cryptography.hazmat.primitives import serialization
+# ``cryptography`` is declared as an optional extra (``pip install
+# wevra[crypto]``). Guarded so the bare Wevra install (which transitively
+# imports this module via ``vision_mvp/__init__.py`` →
+# ``composed_routers``) does not fail when the extra is absent; the
+# signing surface raises a clear error at use time instead.
+try:
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+        Ed25519PrivateKey, Ed25519PublicKey,
+    )
+    from cryptography.hazmat.primitives import serialization
+    _CRYPTOGRAPHY_AVAILABLE = True
+except ImportError:  # pragma: no cover
+    Ed25519PrivateKey = None  # type: ignore[assignment,misc]
+    Ed25519PublicKey = None  # type: ignore[assignment,misc]
+    serialization = None  # type: ignore[assignment]
+    _CRYPTOGRAPHY_AVAILABLE = False
+
+
+def _require_cryptography() -> None:
+    if not _CRYPTOGRAPHY_AVAILABLE:
+        raise RuntimeError(
+            "peer_review signing requires the 'cryptography' extra. "
+            "Install with: pip install 'wevra[crypto]'")
 
 
 def _canonical(obj: Any) -> bytes:
@@ -51,6 +70,7 @@ class HashChainLog:
     """Per-agent append-only log, signed with Ed25519."""
 
     def __init__(self, agent_id: str, seed: bytes | None = None):
+        _require_cryptography()
         self.agent_id = agent_id
         if seed is not None:
             if len(seed) != 32:
