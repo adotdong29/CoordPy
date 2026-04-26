@@ -569,6 +569,8 @@ def run_swe_loop_sandboxed(*,
                             strategies=None,
                             timeout_s: float = 30.0,
                             apply_mode: str = APPLY_MODE_STRICT,
+                            on_patch_proposed=None,
+                            on_test_completed=None,
                             ):
     """Phase-40 alternative to ``run_swe_loop`` that routes the
     workspace test through ``sandbox`` instead of the in-process
@@ -584,6 +586,28 @@ def run_swe_loop_sandboxed(*,
     Kept in this module rather than reaching back into
     ``swe_bench_bridge`` so the bridge remains untouched if a
     caller wants the Phase-39 in-process semantics exactly.
+
+    Intra-cell capsule-native hooks (SDK v3.2 — additive,
+    default-None preserves byte-for-byte behaviour):
+
+      * ``on_patch_proposed(task, strategy, proposed) -> handle``
+        is called once per (task, strategy) immediately after the
+        ``generator(...)`` call, with the ``ProposedPatch`` that
+        the generator returned. The hook may return a handle
+        (typically a CID string) which is later passed to
+        ``on_test_completed``. If the hook raises (e.g. a capsule
+        admission failure), the loop propagates — a typed failure
+        is observable, not silently swallowed.
+
+      * ``on_test_completed(task, strategy, workspace_result, handle)``
+        is called once per (task, strategy) after ``sandbox.run``
+        returns, with the same ``handle`` ``on_patch_proposed``
+        produced. Used to seal a TEST_VERDICT capsule whose parent
+        is the PATCH_PROPOSAL handle.
+
+    The hooks are deliberately small. The substrate keeps its old
+    behaviour byte-for-byte when both are None — all existing
+    callers and tests pass unchanged.
     """
     from .swe_bench_bridge import (
         ALL_SWE_STRATEGIES, ALL_SWE_ROLES,
@@ -638,11 +662,24 @@ def run_swe_loop_sandboxed(*,
             except Exception as ex:
                 proposed = ProposedPatch(
                     patch=(), rationale=f"gen_error:{type(ex).__name__}")
+            # Intra-cell capsule-native hook: seal the
+            # PATCH_PROPOSAL capsule before the patch even reaches
+            # the sandbox. A failure to seal raises here (typed
+            # observation), so the in-flight register sees the
+            # failed proposal and downstream stages refuse to run.
+            patch_handle = None
+            if on_patch_proposed is not None:
+                patch_handle = on_patch_proposed(task, strat, proposed)
             wr = sandbox.run(
                 buggy_source=buggy_source, patch=proposed.patch,
                 test_source=task.test_source,
                 module_name=f"patched_{task.instance_id}",
                 timeout_s=timeout_s, apply_mode=apply_mode)
+            # Intra-cell capsule-native hook: seal the TEST_VERDICT
+            # capsule with parent = PATCH_PROPOSAL handle. The
+            # apply+test transition is now a typed lifecycle step.
+            if on_test_completed is not None:
+                on_test_completed(task, strat, wr, patch_handle)
             if wr.patch_applied:
                 router.emit(
                     source_role=ROLE_PATCH_GENERATOR,

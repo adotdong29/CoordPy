@@ -202,27 +202,96 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
         return 0
 
     if args.sub == "verify":
-        # The embedded ``capsules`` block carries only header-
-        # dicts by default, but we can verify the chain from the
-        # on-disk ``capsule_view.json`` artifact by rebuilding a
-        # ledger from it. For SDK-v3 runs the two should agree;
-        # we match the embedded chain_head against the on-disk
-        # one as a cross-check.
-        view_path = os.path.join(
-            os.path.dirname(os.path.abspath(args.report)),
-            "capsule_view.json")
+        # SDK v3.2: stronger verify. Four independent on-disk
+        # checks, each printed with its own verdict:
+        #
+        #   1. Chain-from-headers recompute. The embedded view's
+        #      chain_head is recomputed from the headers on disk
+        #      via ``verify_chain_from_view_dict`` — a tamper
+        #      that flips a CID, a kind, or the order of capsules,
+        #      or that rewrites chain_head, is detected.
+        #   2. View on-disk vs embedded agreement. The on-disk
+        #      ``capsule_view.json`` chain_head must match the
+        #      report's embedded chain_head.
+        #   3. ARTIFACT capsule on-disk re-hash. For each ARTIFACT
+        #      capsule with a real sha256 in its payload, the
+        #      on-disk file is re-read and re-hashed; any drift is
+        #      reported as a mismatch.
+        #   4. META_MANIFEST verification. If
+        #      ``meta_manifest.json`` exists, each meta-artefact
+        #      named in the manifest is re-read and re-hashed.
+        #
+        # Overall verdict is OK iff all four checks pass.
+        from .capsule import verify_chain_from_view_dict
+        from .capsule_runtime import (
+            verify_artifacts_on_disk, verify_meta_manifest_on_disk,
+        )
+        out_dir = os.path.dirname(os.path.abspath(args.report))
+        view_path = os.path.join(out_dir, "capsule_view.json")
         embedded_head = cv.get("chain_head")
         ok_embedded = bool(cv.get("chain_ok"))
+
+        # Check 1: chain from headers (embedded).
+        chain_recompute_ok = verify_chain_from_view_dict(cv)
+
+        # Check 2: on-disk view agreement.
         agree = True
+        disk_chain_recompute_ok = True
         if os.path.exists(view_path):
             with open(view_path, "r", encoding="utf-8") as fh:
-                disk = json.load(fh)
-            agree = disk.get("chain_head") == embedded_head
-        verdict = ok_embedded and agree
-        print(f"chain_ok={ok_embedded}  "
-              f"agrees_with_disk_artifact={agree}  "
-              f"verdict={'OK' if verdict else 'BAD'}")
-        return 0 if verdict else 3
+                disk_view = json.load(fh)
+            agree = disk_view.get("chain_head") == embedded_head
+            disk_chain_recompute_ok = verify_chain_from_view_dict(
+                disk_view)
+        else:
+            disk_view = cv
+
+        # Check 3: ARTIFACT bytes on disk.
+        artifact_check = verify_artifacts_on_disk(
+            disk_view, base_dir=out_dir)
+
+        # Check 4: META_MANIFEST.
+        manifest_path = os.path.join(out_dir, "meta_manifest.json")
+        manifest_check = None
+        if os.path.exists(manifest_path):
+            with open(manifest_path, "r", encoding="utf-8") as fh:
+                manifest = json.load(fh)
+            manifest_check = verify_meta_manifest_on_disk(
+                manifest, base_dir=out_dir)
+
+        all_checks_ok = (
+            ok_embedded
+            and chain_recompute_ok
+            and disk_chain_recompute_ok
+            and agree
+            and artifact_check["verdict"] in ("OK", "EMPTY")
+            and (manifest_check is None
+                 or manifest_check["verdict"] in ("OK", "EMPTY"))
+        )
+        print(f"chain_ok_embedded         = {ok_embedded}")
+        print(f"chain_recompute_embedded  = {chain_recompute_ok}")
+        print(f"chain_recompute_on_disk   = {disk_chain_recompute_ok}")
+        print(f"on_disk_view_agrees       = {agree}")
+        print(f"artifacts_on_disk         = {artifact_check['verdict']}"
+               f"  ({artifact_check['ok']}/{artifact_check['checked']}"
+               f" matched, {len(artifact_check['mismatch'])} drifts,"
+               f" {len(artifact_check['missing'])} missing)")
+        if manifest_check is not None:
+            print(f"meta_manifest_on_disk     = "
+                   f"{manifest_check['verdict']}"
+                   f"  ({manifest_check['ok']}/{manifest_check['checked']}"
+                   f" matched, {len(manifest_check['mismatch'])} drifts,"
+                   f" {len(manifest_check['missing'])} missing)")
+        else:
+            print("meta_manifest_on_disk     = ABSENT")
+        print(f"verdict                   = "
+               f"{'OK' if all_checks_ok else 'BAD'}")
+        if artifact_check["mismatch"]:
+            for d in artifact_check["mismatch"][:8]:
+                print(f"  drift: {d['path']!r} "
+                       f"sealed={d['sealed_sha256'][:16]}… "
+                       f"on_disk={d['on_disk_sha256'][:16]}…")
+        return 0 if all_checks_ok else 3
 
     # view
     stats = cv.get("stats") or {}

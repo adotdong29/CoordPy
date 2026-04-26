@@ -89,12 +89,28 @@ class TestIS2CrossDomainUnification:
     """Tests for IS-2: Cross-Domain Type Unification."""
 
     def test_is2_capsule_vocabulary_is_closed(self):
-        """Verify that CapsuleKind vocabulary is fixed and closed."""
+        """Verify that CapsuleKind vocabulary is fixed and closed.
+
+        SDK v3.2 (April 2026) extends the closed vocabulary with
+        three intra-cell + detached-witness kinds:
+        ``PATCH_PROPOSAL`` and ``TEST_VERDICT`` (intra-cell
+        capsule-native slice — Theorem W3-32-extended) and
+        ``META_MANIFEST`` (detached witness for meta-artefacts —
+        Theorem W3-36). The closed-vocabulary contract is
+        preserved (each addition is an explicit SDK version bump);
+        the assertion is updated to lock the new size.
+        """
         result = domain_unification.demonstrate_closed_vocabulary()
 
         assert result["closed"] is True
-        assert len(result["vocabulary"]) == 12  # HANDOFF, HANDLE, ...
-        # Vocabulary does not grow when we add domains
+        # SDK v3 baseline: 12 kinds (HANDOFF, HANDLE,
+        # THREAD_RESOLUTION, ADAPTIVE_EDGE, SWEEP_CELL, SWEEP_SPEC,
+        # READINESS_CHECK, PROVENANCE, RUN_REPORT, PROFILE, ARTIFACT,
+        # COHORT). SDK v3.2 adds 3: PATCH_PROPOSAL, TEST_VERDICT,
+        # META_MANIFEST.
+        assert len(result["vocabulary"]) == 15
+        # Vocabulary does not grow when we add domains; it grows only
+        # when the SDK explicitly bumps to admit a new kind.
 
     def test_is2_domain_adapter_pattern_universal(self):
         """Verify that all domain adapters follow the same pattern.

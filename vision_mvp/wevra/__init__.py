@@ -75,6 +75,7 @@ from .runtime import SweepSpec, run_sweep, HeavyRunNotAcknowledged
 from .capsule import (
     ContextCapsule, CapsuleKind, CapsuleLifecycle, CapsuleBudget,
     CapsuleLedger, CapsuleView, CAPSULE_VIEW_SCHEMA, render_view,
+    verify_chain_from_view_dict,
     CapsuleAdmissionError, CapsuleLifecycleError,
     build_report_ledger,
     # Adapters — make the SDK-v3 "everything is a capsule" claim
@@ -87,6 +88,19 @@ from .capsule import (
     capsule_from_report,
     # Phase-47 cohort subsumption — additive on top of SDK v3.
     capsule_from_cohort, capsule_from_adaptive_sub_table,
+    # SDK v3.2 — intra-cell + detached-witness adapters.
+    capsule_from_patch_proposal, capsule_from_test_verdict,
+    capsule_from_meta_manifest,
+)
+
+# Capsule-native runtime (SDK v3.1). The first execution-first
+# capsule layer: capsules drive runtime, not just describe it.
+from .capsule_runtime import (
+    CapsuleNativeRunContext, ContentAddressMismatch,
+    seal_and_write_artifact,
+    CONSTRUCTION_IN_FLIGHT, CONSTRUCTION_POST_HOC,
+    # SDK v3.2 — strong on-disk verification helpers.
+    verify_artifacts_on_disk, verify_meta_manifest_on_disk,
 )
 
 # Layered API — three-tier ergonomic surfaces over the same substrate
@@ -144,7 +158,16 @@ from .capsule_decoder_v2 import (
     MultitaskBundleDecoder, train_multitask_bundle_decoder,
 )
 
-SDK_VERSION = "wevra.sdk.v3"
+# SDK v3.2: intra-cell capsule-native + detached-witness manifest +
+# strong on-disk verification. Strictly additive on v3.1: the
+# run-boundary slice is unchanged; the new surface is two intra-cell
+# capsule kinds (PATCH_PROPOSAL, TEST_VERDICT) sealed inside each
+# sweep cell, a META_MANIFEST detached witness for meta-artefacts
+# (Theorem W3-36), and stronger on-disk verification by
+# ``wevra-capsule verify`` (Theorem W3-37). Every v3.1 contract test
+# still passes; the schema name ``wevra.capsule_view.v1`` is
+# unchanged because the new payloads are additive.
+SDK_VERSION = "wevra.sdk.v3.2"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -161,6 +184,7 @@ __all__ = [
     "ContextCapsule", "CapsuleKind", "CapsuleLifecycle",
     "CapsuleBudget", "CapsuleLedger", "CapsuleView",
     "CAPSULE_VIEW_SCHEMA", "render_view",
+    "verify_chain_from_view_dict",
     "CapsuleAdmissionError", "CapsuleLifecycleError",
     "build_report_ledger",
     "capsule_from_handle", "capsule_from_handoff",
@@ -170,6 +194,15 @@ __all__ = [
     "capsule_from_report",
     # Phase-47 cohort subsumption (additive).
     "capsule_from_cohort", "capsule_from_adaptive_sub_table",
+    # SDK v3.2 — intra-cell + detached-witness adapters.
+    "capsule_from_patch_proposal", "capsule_from_test_verdict",
+    "capsule_from_meta_manifest",
+    # Capsule-native runtime (SDK v3.1) — capsules drive execution.
+    "CapsuleNativeRunContext", "ContentAddressMismatch",
+    "seal_and_write_artifact",
+    "CONSTRUCTION_IN_FLIGHT", "CONSTRUCTION_POST_HOC",
+    # SDK v3.2 — strong on-disk verification.
+    "verify_artifacts_on_disk", "verify_meta_manifest_on_disk",
     # Capsule admission policies (Phase 46 research milestone)
     "AdmissionPolicy", "FIFOPolicy", "KindPriorityPolicy",
     "SmallestFirstPolicy", "LearnedAdmissionPolicy",

@@ -24,6 +24,15 @@ class WevraSurfaceTests(unittest.TestCase):
         "CapsuleBudget", "CapsuleLedger", "CapsuleView",
         "CapsuleAdmissionError", "CapsuleLifecycleError",
         "CAPSULE_VIEW_SCHEMA", "render_view", "build_report_ledger",
+        # Capsule-native runtime (SDK v3.1 — capsules drive execution).
+        "CapsuleNativeRunContext", "ContentAddressMismatch",
+        "seal_and_write_artifact",
+        "CONSTRUCTION_IN_FLIGHT", "CONSTRUCTION_POST_HOC",
+        # SDK v3.2 — intra-cell capsule-native + detached witness.
+        "capsule_from_patch_proposal", "capsule_from_test_verdict",
+        "capsule_from_meta_manifest",
+        "verify_chain_from_view_dict",
+        "verify_artifacts_on_disk", "verify_meta_manifest_on_disk",
         "WevraConfig",
         "PROVENANCE_SCHEMA", "build_manifest",
         "profiles", "report", "ci_gate", "import_data", "extensions",
@@ -52,14 +61,18 @@ class WevraSurfaceTests(unittest.TestCase):
             self.assertIsInstance(v, str)
             self.assertTrue(len(v) > 0)
 
-    def test_sdk_version_is_v3(self):
+    def test_sdk_version_is_v3_2(self):
         from vision_mvp.wevra import SDK_VERSION
-        # Slice 3 bump: the Context Capsule primitive becomes the
-        # load-bearing abstraction. Additive on the v2 surface
-        # (RunSpec / SweepSpec / run_sweep / extensions all
-        # unchanged); the new surface is capsule.* + a ``capsules``
-        # block on the product report.
-        self.assertEqual(SDK_VERSION, "wevra.sdk.v3")
+        # SDK v3.2 bump: capsule-native runtime extended into the
+        # inner sweep loop (PATCH_PROPOSAL / TEST_VERDICT capsules),
+        # detached META_MANIFEST witness sealing the meta-artifact
+        # boundary (Theorem W3-36), and stronger on-disk
+        # verification by ``wevra-capsule verify`` (Theorem W3-37).
+        # Strictly additive over v3.1 — every v3.1 contract test
+        # still passes byte-for-byte. Capsule view schema unchanged
+        # (``wevra.capsule_view.v1``) because the new payloads are
+        # additive.
+        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.2")
 
     def test_runspec_is_frozen_dataclass(self):
         from vision_mvp.wevra import RunSpec
@@ -73,6 +86,8 @@ class WevraSurfaceTests(unittest.TestCase):
             "skip_sweep", "force_sweep",
             "acknowledge_heavy", "allow_unsafe_sandbox",
             "report_sinks", "config",
+            # SDK v3.1: capsule-native runtime is the default.
+            "capsule_native",
         })
 
     def test_wevra_config_frozen_and_env_overridable(self):

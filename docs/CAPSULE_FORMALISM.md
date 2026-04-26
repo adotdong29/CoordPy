@@ -2033,6 +2033,334 @@ Three honest disclaimers:
 
 ---
 
+## 4.G SDK v3.1 extension — capsule-native runtime
+
+Phase ≤ 4.F is the *decoder* frontier (research center on top of
+the capsule substrate). The SDK v3.1 extension below is on a
+different axis entirely: the **runtime** axis. Capsules stop being
+purely a post-hoc audit fold and (partially) become the runtime's
+typed execution contract. The four theorems in this section are
+proved by inspection of the new ``CapsuleNativeRunContext`` plus
+contract tests; the proofs are short because the construction is
+conservative.
+
+### Theorem W3-32 (Lifecycle ↔ execution-state correspondence)
+
+Let $\mathcal{S}$ be the canonical Wevra-run stage set
+$\{\mathrm{profile}, \mathrm{readiness}, \mathrm{sweep\_spec},
+\mathrm{sweep\_cell}_1, \dots, \mathrm{sweep\_cell}_n,
+\mathrm{provenance}, \mathrm{artifact}_1, \dots, \mathrm{artifact}_k,
+\mathrm{run\_report}\}$ and let $\mathcal{C}_\mathcal{R}$ be the
+in-flight register attached to a ``CapsuleNativeRunContext`` with
+ledger $\mathcal{L}$. For every stage $S_i \in \mathcal{S}$ there
+is a unique capsule $c_i \in \mathcal{C}_\mathcal{R}$ such that:
+
+- $S_i$ is **in progress** at time $t$ iff $c_i \in \mathcal{C}_\mathcal{R}$
+  and $\mathit{cid}(c_i) \notin I(\mathcal{L})$ at $t$;
+- $S_i$ has **completed** at $t$ iff $\mathit{cid}(c_i) \in
+  I(\mathcal{L})$ and $\ell(c_i) = \mathtt{SEALED}$ at $t$;
+- $S_i$ has **failed** at $t$ iff $c_i.\mathrm{failure} \neq \bot$
+  and $\mathit{cid}(c_i) \notin I(\mathcal{L})$.
+
+**Proof.** ``CapsuleNativeRunContext._propose`` pushes a
+``_InFlightEntry`` with ``failure=None``, ``sealed_cid=None``;
+``CapsuleNativeRunContext._admit_and_seal`` calls
+``ledger.admit_and_seal`` and either sets ``sealed_cid`` (success)
+or sets ``failure`` and re-raises (failure). ``admit_and_seal``
+is total exactly on $\mathcal{A}_\mathcal{L}$ (§ 2.3). The three
+conditions are mutually exclusive and exhaustive on the runtime's
+finite stage transitions. $\square$
+
+**Code anchor.** ``vision_mvp/wevra/capsule_runtime.py``;
+contract tests in
+``vision_mvp/tests/test_wevra_capsule_native.py``
+(``test_w3_32_lifecycle_correspondence_clean_run``,
+``test_failed_admission_leaves_in_flight_entry``).
+
+### Theorem W3-33 (Content-addressing at artifact creation time)
+
+Let $\sigma : (\mathcal{L}, p, d, \pi) \to c_A$ be the function
+``seal_and_write_artifact``. Suppose $\sigma$ returns normally.
+Then
+
+$$
+\mathrm{SHA\text{-}256}(\mathrm{read}(p)) \;=\;
+c_A.\mathit{payload}[\texttt{"sha256"}] \;=\;
+\mathrm{SHA\text{-}256}(d).
+$$
+
+**Proof.** $\sigma$'s order of operations: (1) $h := \mathrm{SHA\text{-}256}(d)$;
+(2) build $c_A$ with payload $\{\texttt{path}: p, \texttt{sha256}: h\}$
+and admit + seal — if admission fails, $\sigma$ raises before any
+write; (3) write $d$ to $p$; (4)
+$h' := \mathrm{SHA\text{-}256}(\mathrm{read}(p))$; (5) if
+$h' \neq h$, raise ``ContentAddressMismatch``. The "returns
+normally" precondition implies step 5's check passed, so
+$h' = h$, which is the claim. $\square$
+
+**Failure mode.** ``ContentAddressMismatch`` (a subtype of
+``CapsuleAdmissionError``) detects honest-writer / racing-writer
+TOCTOU drift; it is not a defence against adversarial concurrent
+writes (the trust unit is the same as Wevra's sandbox boundary).
+
+**Code anchor.**
+``vision_mvp/wevra/capsule_runtime.py::seal_and_write_artifact``;
+contract tests
+``test_w3_33_seal_then_write_then_verify`` and
+``test_w3_33_mismatch_detector``.
+
+### Theorem W3-34 (In-flight ↔ post-hoc CID equivalence on
+non-ARTIFACT kinds)
+
+Let $r$ be a ``product_report`` dict produced by a
+capsule-native run. Let $\mathcal{L}_{\rm in}$ be the in-flight
+ledger embedded in $r[\texttt{capsules}]$ and let
+$\mathcal{L}_{\rm post}$ be the result of
+$\mathrm{build\_report\_ledger}(r)$. Then for every kind
+$k \in \mathbb{K}_{\mathrm{eq}} := \{\mathtt{PROFILE},
+\mathtt{READINESS\_CHECK}, \mathtt{SWEEP\_SPEC},
+\mathtt{SWEEP\_CELL}, \mathtt{PROVENANCE}\}$,
+
+$$
+\{\mathit{cid}(c) : c \in \mathcal{L}_{\rm in},\, k(c) = k\}
+\;=\;
+\{\mathit{cid}(c) : c \in \mathcal{L}_{\rm post},\, k(c) = k\}.
+$$
+
+**Proof.** Both paths invoke the same adapter for each kind
+(``capsule_from_*`` in ``vision_mvp/wevra/capsule.py``) on the
+same canonical payload (the in-flight runner stores the payload
+into $r$ before the adapter call; the post-hoc fold reads the
+same payload back from $r$). C1 makes $\mathit{cid}(c)$ a pure
+function of the canonical payload + parents + budget. The parent
+sets agree across paths by inspection of the adapter call sites
+in both ``CapsuleNativeRunContext`` and
+``build_report_ledger``. $\square$
+
+**Intentional divergence.** $\mathbb{K}_{\mathrm{eq}}$
+*excludes* ARTIFACT and RUN_REPORT. The in-flight path's ARTIFACT
+capsules carry real ``payload["sha256"]`` hashes; the post-hoc
+fold's carry ``None``. The CIDs therefore differ — a *useful*
+signal: an ARTIFACT capsule with a non-null SHA was sealed by
+the runtime; one with a null SHA was folded post-hoc. The
+RUN_REPORT capsule's parent set transitively includes the ARTIFACT
+CIDs, so its CID also differs across paths. This is **not** a
+weakness; it is the formal statement of "content-addressing at
+write time strengthens the ARTIFACT capsule with information the
+post-hoc fold never had access to."
+
+**Code anchor.**
+``test_w3_34_smoke_run_kind_cid_match`` (set-equality on the five
+kinds);
+``test_w3_34_artifact_kind_intentional_divergence``
+(disjointness witness).
+
+### Theorem W3-35 (Parent-CID gating is the execution contract)
+
+Let $T_S$ be the precondition of stage $S$ — a parent-capsule
+sealing requirement (e.g. ``seal_sweep_cell`` requires
+``ctx.spec_cap`` to be sealed; ``seal_readiness`` requires
+``ctx.profile_cap`` to be sealed). Calling the corresponding
+``ctx.seal_*`` method when $T_S$ is unsatisfied raises a typed
+exception (``CapsuleLifecycleError`` for runtime preconditions,
+``CapsuleAdmissionError`` for parent-CID preconditions in the
+ledger), and $\mathcal{L}$ does not contain the requested
+capsule.
+
+**Proof.** Each ``seal_*`` method's first check is the
+precondition (``self._require_profile()`` or
+``if self.spec_cap is None: raise CapsuleLifecycleError``). On
+violation, the method raises before calling ``_propose``. The
+ledger's ``admit`` step rejects unknown parent CIDs (§ 2.3).
+$\square$
+
+**Interpretation.** W3-35 is the formal statement of the
+"capsules-as-execution-contract" claim. The runtime's ordering
+constraint (cells require their spec; readiness requires its
+profile) is no longer a Python sequential-ordering convention; it
+is a *typed* check enforced at the capsule layer. A misordered
+caller is observable as a typed failure at the offending method,
+not as an obscure downstream KeyError or assertion.
+
+**Code anchor.**
+``vision_mvp/wevra/capsule_runtime.py``;
+contract tests
+``test_w3_35_cell_refuses_without_spec``,
+``test_w3_35_readiness_refuses_without_profile``.
+
+---
+
+## 4.H SDK v3.2 extension — intra-cell capsule-native + detached witness
+
+The 4.G theorems closed the *run-boundary* slice: every
+cross-run-boundary artefact was a sealed capsule sealed in flight.
+The intra-cell objects (the patch a generator emits, the verdict
+a sandbox returns) still passed as plain Python dataclasses, and
+the meta-artefacts ``product_report.json`` /
+``capsule_view.json`` / ``product_summary.txt`` were unauthenticated
+post-view renderings. SDK v3.2 makes the next two moves: (i) it
+extends capsule-native lifecycle into the inner sweep loop with
+two new kinds (PATCH_PROPOSAL / TEST_VERDICT), and (ii) it
+formalises the meta-artefact boundary as a sharp circularity
+theorem with a detached-witness corollary.
+
+### Theorem W3-32-extended (Intra-cell lifecycle correspondence)
+
+Let one sweep cell admit a sequence of (task, strategy) pairs
+$\{(\tau_i, \sigma_i)\}_{i=1}^N$. For each pair, the runtime
+produces a ``ProposedPatch`` $p_i$ (from ``generator(...)``) and
+a ``WorkspaceResult`` $w_i$ (from ``sandbox.run(...)``). Two
+unique capsules per pair exist in $\mathcal{C}_\mathcal{R}$:
+
+- $c_{{\rm patch},i}$ of kind PATCH_PROPOSAL, parent =
+  $\mathit{cid}(\mathrm{spec\_cap})$, payload = (task /
+  strategy / parser_mode / apply_mode / n_distractors
+  coordinates) plus ``substitutions_sha256`` and bounded
+  rationale;
+- $c_{{\rm verdict},i}$ of kind TEST_VERDICT, parent =
+  $\mathit{cid}(c_{{\rm patch},i})$, payload = the same
+  coordinates plus the WorkspaceResult fields.
+
+The lifecycle ``patch → verdict`` is enforced at the capsule
+layer: ``ctx.seal_test_verdict`` raises ``CapsuleLifecycleError``
+when its named ``patch_proposal_cid`` is not in the ledger. The
+three-state correspondence (in_progress / sealed / failed) of
+W3-32 lifts unchanged to the two new kinds.
+
+**Proof.** ``seal_patch_proposal``'s first check is the
+SWEEP_SPEC sealing precondition (identical in shape to
+``seal_sweep_cell``'s spec gate). On success it goes through
+``_propose`` → ``_admit_and_seal``. ``seal_test_verdict``'s
+first check is ``patch_proposal_cid in self.ledger``; ledger
+membership is the same parent-CID admissibility predicate
+(§ 2.3, C5). The chain ``patch sealed → verdict admissible →
+verdict sealed`` is an instance of W3-35 with intra-cell
+parents. $\square$
+
+**Code anchor.**
+``vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_patch_proposal``,
+``seal_test_verdict``;
+hooks plumbed through
+``vision_mvp/tasks/swe_sandbox.py::run_swe_loop_sandboxed``
+(``on_patch_proposed`` / ``on_test_completed`` parameters,
+default None preserves byte-for-byte Phase-40 behaviour).
+
+**Empirical anchor.**
+``vision_mvp/tests/test_wevra_capsule_native_intra_cell.py``:
+``test_patch_proposal_seals_under_spec``,
+``test_patch_proposal_refuses_without_spec``,
+``test_test_verdict_seals_under_patch_proposal``,
+``test_test_verdict_refuses_without_patch``,
+``test_smoke_run_emits_intra_cell_capsules`` (48 PATCH_PROPOSAL
+and 48 TEST_VERDICT capsules sealed in flight on local_smoke).
+
+### Theorem W3-36 (Meta-artefact circularity is sharp; detached-witness corollary)
+
+Let $R \in \mathcal{L}$ be the RUN_REPORT capsule of a Wevra
+run, $V$ be the rendered view of $\mathcal{L}$ at $R$'s seal
+time, $M = \{m_1, \dots, m_k\}$ the meta-artefact set whose
+bytes are a structural function of $V$
+(``product_report.json``, ``capsule_view.json``,
+``product_summary.txt``).
+
+**Theorem (negative).** There is no extension $\mathcal{L}'$ of
+$\mathcal{L}$ that admits an ARTIFACT capsule $a_i$ with
+payload SHA-256 $\mathrm{SHA\text{-}256}(m_i)$ for $m_i \in M$
+such that $V' = V$ where $V'$ is the rendered view of
+$\mathcal{L}'$.
+
+**Proof.** Suppose toward contradiction $\mathcal{L}', a_i$
+exist. Then $\mathcal{L}' \supsetneq \mathcal{L}$ contains
+$a_i$, so the rendered view's ``capsules`` list contains $a_i$
+as a header AND the chain-head computation depends on $a_i$'s
+CID and kind through the chain step. Hence $V' \neq V$,
+contradicting the assumption. $\square$
+
+**Corollary (positive — detached witness).** The strongest
+authentication of $M$ achievable is a META_MANIFEST capsule
+sealed in a *secondary* ledger $\mathcal{L}_{\rm meta}$
+disjoint from $\mathcal{L}$, whose payload is a function only
+of $(R.\mathrm{cid},\,\mathcal{L}.\mathrm{chain\_head},\,
+\{(m_i, \mathrm{SHA\text{-}256}(m_i), |m_i|)\}_i)$. The
+META_MANIFEST cross-references $\mathcal{L}$ via its payload's
+``root_cid`` field but is *not* a capsule of $\mathcal{L}$; the
+trust unit for meta-artefact authentication is the manifest
+itself, one explicit hop beyond the primary view.
+
+**Trust model.** Tampering with $m_i$ on disk is detected by
+re-hashing under the manifest's claim. Tampering with the
+manifest itself is detected only with an out-of-band copy of
+$R.\mathrm{cid}$; a self-witnessing solution is impossible
+(W3-36 negative).
+
+**Code anchor.**
+``vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_meta_manifest``
+and ``render_meta_manifest_view``;
+``vision_mvp/wevra/capsule.py::capsule_from_meta_manifest``;
+``vision_mvp/product/runner.py`` Stage 8 writes
+``meta_manifest.json``.
+
+**Empirical anchor.**
+``test_meta_manifest_seals_in_secondary_ledger``,
+``test_meta_manifest_refuses_without_run_report``,
+``test_meta_manifest_shas_match_on_disk``,
+``test_w3_38_meta_manifest_drift_detected``.
+
+### Theorem W3-37 (Chain-from-headers verification)
+
+Let ``view_dict`` be a serialised capsule view (from
+``capsule_view.json`` or ``product_report["capsules"]``). Define
+``recompute(view_dict)`` to fold the chain step
+$h \leftarrow \mathrm{SHA\text{-}256}(\mathrm{prev}, \mathit{cid},
+\mathrm{kind}, \mathtt{SEALED})$ over each header in
+``view_dict["capsules"]`` starting from $\mathrm{prev} =
+\mathtt{GENESIS}$. Then ``verify_chain_from_view_dict(view_dict)
+= True`` iff $\mathrm{recompute}(\mathit{view\_dict}) =
+\mathit{view\_dict}[\mathtt{chain\_head}]$.
+
+**Proof.** The chain step is a pure function of (prev, cid,
+kind, SEALED). All three load-bearing fields are JSON-serialised
+in the on-disk header dict; the recompute reproduces the
+runtime's exact ``_chain_step`` over the on-disk bytes. Equality
+of the recomputed head and the on-disk head is the verification
+predicate. $\square$
+
+**Tamper-detection coverage.** Any of (i) flipping a CID,
+(ii) flipping a kind, (iii) reordering the capsules list,
+(iv) rewriting ``chain_head``, (v) inserting / deleting a
+header — flips the verdict to False. Witnessed by
+``test_w3_37_tamper_detected`` and
+``test_w3_37_tamper_capsule_order_detected``.
+
+**Code anchor.**
+``vision_mvp/wevra/capsule.py::verify_chain_from_view_dict``.
+
+### Theorem W3-38 (ARTIFACT audit-time on-disk re-hash)
+
+Let ``view_dict`` carry ARTIFACT capsules with payload
+``{path, sha256}``. Define
+``verify_artifacts_on_disk(view_dict, base_dir)`` to read each
+``payload["path"]`` under ``base_dir`` and re-hash. The verdict
+is OK iff every ARTIFACT capsule with a non-null sealed SHA
+hashes its on-disk file to that SHA.
+
+**Proof.** W3-33 establishes the runtime *return-time*
+post-condition $\mathrm{SHA\text{-}256}(\mathrm{read}(p)) =
+c_A.\mathit{payload}[\texttt{"sha256"}]$. W3-38 is the
+*audit-time* form: at any later time, the on-disk SHA may
+differ (post-runtime tamper, FS corruption, accidental
+overwrite); the audit truthfully reflects the current bytes.
+The verdict is OK iff equality still holds. $\square$
+
+**Failure mode.** ``verify_artifacts_on_disk`` returns BAD with
+a mismatch entry naming the path, the sealed SHA, and the
+on-disk SHA. Witnessed by ``test_w3_38_artifact_drift_detected``.
+
+**Code anchor.**
+``vision_mvp/wevra/capsule_runtime.py::verify_artifacts_on_disk``.
+
+---
+
 ## 7. Reading order
 
 For a reader who wants the *proof obligations*:
@@ -2097,3 +2425,8 @@ research milestone).
 | `StandardisedBundleDecoderV2` | `vision_mvp/experiments/phase50_zero_shot_transfer.py` |
 | `SignStableDeepSetDecoder`    | `vision_mvp/experiments/phase50_zero_shot_transfer.py` |
 | Phase 50 contract tests  | `vision_mvp/tests/test_phase50_ci_and_zero_shot.py` (14 tests) |
+| W3-32 lifecycle correspondence | `vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext` |
+| W3-33 content-addressing at write | `vision_mvp/wevra/capsule_runtime.py::seal_and_write_artifact` |
+| W3-34 in-flight ↔ post-hoc CID equivalence | `vision_mvp/tests/test_wevra_capsule_native.py::InFlightVsPostHocEquivalenceTests` |
+| W3-35 parent-CID gating | `vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext` (precondition checks in each `seal_*` method) |
+| Capsule-native runtime tests | `vision_mvp/tests/test_wevra_capsule_native.py` (16 tests) |

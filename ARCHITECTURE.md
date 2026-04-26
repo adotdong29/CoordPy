@@ -4,12 +4,19 @@
 **Context Zero** research programme. Every piece of context that
 crosses a role boundary, a layer boundary, or a run boundary in Wevra
 is a typed, content-addressed, lifecycle-bounded, budget-bounded,
-provenance-carrying **capsule** — never a raw prompt string. This
-document is the programme's architectural reference: it covers the
-full substrate (routing, exact memory, retrieval, planner, runtime
-calibration, typed handoffs) and the Wevra product surface built on
-top of it, now *centred* on the Capsule Contract. For a one-pass
-orientation, start with [`docs/START_HERE.md`](docs/START_HERE.md).
+provenance-carrying **capsule** — never a raw prompt string. As of
+SDK v3.2 (April 2026), capsules drive execution at the run boundary
+*and* inside the inner sweep loop, and meta-artefacts have a
+formally-defined detached-witness boundary. The runtime's stage
+transitions *are* capsule lifecycle transitions; substantive
+on-disk artifacts are content-addressed at write time and
+re-verifiable at audit time. This document is the
+programme's architectural reference: it covers the full substrate
+(routing, exact memory, retrieval, planner, runtime calibration,
+typed handoffs) and the Wevra product surface built on top of it,
+now *centred* on the Capsule Contract and *driven* by it. For a
+one-pass orientation, start with
+[`docs/START_HERE.md`](docs/START_HERE.md).
 
 ## The Capsule Contract (SDK v3 centre of gravity)
 
@@ -47,6 +54,90 @@ Reference implementation: `vision_mvp/wevra/capsule.py`. Theory note:
 Contract tests: `vision_mvp/tests/test_wevra_capsules.py`
 (invariants C1..C6 individually + end-to-end).
 
+### Capsule-native execution (SDK v3.1)
+
+The Capsule Contract above (C1..C6) describes *what a capsule is*.
+SDK v3.1 adds the **execution-contract** layer: capsules drive
+runtime, not just describe it.
+
+```
+                                                       (sealed in flight)
+   start_run    seal_readiness  seal_sweep_spec  seal_sweep_cell  seal_provenance  seal_run_report
+       │              │                │                │                │                │
+       ▼              ▼                ▼                ▼                ▼                ▼
+   PROFILE  →  READINESS_CHECK   →  SWEEP_SPEC  →   SWEEP_CELL    →  PROVENANCE   →   RUN_REPORT
+                                          ↑                                ↑
+                                          │                                │
+                              seal_and_write_artifact            seal_and_write_artifact
+                              (sweep_result.json)               (provenance.json,
+                                                                 readiness_verdict.json)
+                                       (every substantive artefact gets an
+                                        ARTIFACT capsule whose payload SHA-256
+                                        is verified against the on-disk file's
+                                        bytes by re-read.)
+```
+
+A stage that fails leaves a typed entry in the runtime's *in-flight
+register* that never reaches the ledger. Downstream stages refuse
+to seal because the parent CID is missing (Capsule Contract C5).
+The capsule layer is therefore the runtime's typed execution
+contract for the run-boundary stages (W3-32, W3-35).
+
+### Intra-cell capsule-native + detached witness (SDK v3.2)
+
+SDK v3.2 extends the capsule-native slice past the cell boundary.
+Inside every sweep cell, each (task, strategy) parse→apply→test
+transition seals two more capsules in flight:
+
+```
+                              SWEEP_SPEC
+                              ├── SWEEP_CELL_1   ··· SWEEP_CELL_n
+                              ├── PATCH_PROPOSAL_1   (parent: SWEEP_SPEC)
+                              │       └── TEST_VERDICT_1   (parent: PATCH_PROPOSAL_1)
+                              ├── PATCH_PROPOSAL_2
+                              │       └── TEST_VERDICT_2
+                              └── ...
+
+                                         (post-fixed-point, secondary ledger)
+                              RUN_REPORT
+                                  └── (cross-ref) META_MANIFEST
+                                                   meta_artifacts:
+                                                     product_report.json    SHA
+                                                     capsule_view.json      SHA
+                                                     product_summary.txt    SHA
+```
+
+The lifecycle ordering ``patch → verdict`` is enforced at the
+type level (Theorem W3-32-extended). The meta-artefact set is
+formally a *circularity slice* (Theorem W3-36 — no extension of
+the primary ledger can authenticate a file whose bytes encode
+the rendered view), so the META_MANIFEST sits in a *secondary*
+ledger and is the one-hop trust unit beyond the primary view.
+``wevra-capsule verify`` (v3.2) recomputes the chain from
+on-disk header bytes (Theorem W3-37) and re-hashes every
+ARTIFACT and meta-artefact at audit time (Theorem W3-38).
+
+Reference implementation:
+`vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext`
+(``seal_patch_proposal`` / ``seal_test_verdict`` /
+``seal_meta_manifest``); hooks plumbed through
+`vision_mvp/tasks/swe_sandbox.py::run_swe_loop_sandboxed`. Theory
+notes:
+[`docs/RESULTS_WEVRA_CAPSULE_NATIVE.md`](docs/RESULTS_WEVRA_CAPSULE_NATIVE.md)
+(W3-32..W3-35) and
+[`docs/RESULTS_WEVRA_INTRA_CELL.md`](docs/RESULTS_WEVRA_INTRA_CELL.md)
+(W3-32-extended / W3-36 / W3-37 / W3-38). Contract tests:
+`vision_mvp/tests/test_wevra_capsule_native.py` (16 tests, v3.1)
+and `vision_mvp/tests/test_wevra_capsule_native_intra_cell.py`
+(16 tests, v3.2).
+
+The post-hoc `build_report_ledger` adapter is retained for third
+parties who fold finished `product_report` dicts (no runtime
+context available); the two paths produce CID-equivalent ledgers
+for the spine kinds (Theorem W3-34, preserved under the v3.2
+intra-cell extension because intra-cell capsules are siblings of
+the spine, not modifications of it).
+
 ### How capsules relate to the older CASR / substrate / handoff work
 
 | Older primitive                         | Phase | Capsule kind it instantiates |
@@ -81,17 +172,25 @@ thing.
 > phase diary lives in `vision_mvp/RESULTS_PHASE*.md`; the Wevra SDK boundary
 > lives under `vision_mvp/wevra/` and is the stable public contract.
 >
-> **Wevra SDK boundary (Slice 1).** The stable public surface is:
-> `RunSpec`, `run`, `WevraConfig`, `profiles`, `report`, `ci_gate`,
-> `import_data`, `build_manifest`, and the schema constants
-> (`wevra.provenance.v1`, `phase45.product_report.v1`,
-> `phase46.ci_verdict.v1`, `phase46.import_audit.v1`). See the
-> **Stability matrix** in `README.md` and in
-> `docs/context_zero_master_plan.md` for the durable classification of
-> every layer (Wevra SDK · core substrate · legacy product path ·
-> plugin/extension system · unified runtime · Docker sandbox ·
-> research shards). Anything not on the SDK surface is research-grade
-> or boundary/next-slice and may change without notice.
+> **Wevra SDK boundary (Slice 1 + v3 + v3.1).** The stable public
+> surface is: `RunSpec` (with `capsule_native: bool = True`),
+> `run`, `WevraConfig`, `profiles`, `report`, `ci_gate`,
+> `import_data`, `build_manifest`, the capsule primitives
+> (`ContextCapsule`, `CapsuleLedger`, `CapsuleView`,
+> `build_report_ledger`, every `capsule_from_*` adapter),
+> the capsule-native runtime symbols (`CapsuleNativeRunContext`,
+> `seal_and_write_artifact`, `ContentAddressMismatch`,
+> `CONSTRUCTION_IN_FLIGHT`, `CONSTRUCTION_POST_HOC`), and the schema
+> constants (`wevra.provenance.v1`, `phase45.product_report.v2`,
+> `wevra.capsule_view.v1`, `phase46.ci_verdict.v1`,
+> `phase46.import_audit.v1`). See the **Stability matrix** in
+> `README.md` and in `docs/context_zero_master_plan.md` for the
+> durable classification of every layer (Wevra SDK · capsule
+> primitives · capsule-native runtime · core substrate · legacy
+> product path · plugin/extension system · unified runtime ·
+> Docker sandbox · research shards). Anything not on the SDK
+> surface is research-grade or boundary/next-slice and may change
+> without notice.
 
 > **How to read the rest of this file.** The phase-by-phase
 > callouts immediately below (Phases 26 → 44) are a *historical

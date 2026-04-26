@@ -3,10 +3,10 @@
 > Canonical long-running document for the research programme behind
 > `context-zero`. This is a plan for a body of work, not a changelog.
 > Phase-by-phase diaries live in `vision_mvp/RESULTS_PHASE*.md`;
-> session notes live nowhere durable, on purpose. Last touched: Phase 47
-> capsule-research-center extension (cohort lift + relational
-> limitation + bundle-aware admission + cross-domain transfer),
-> 2026-04-22.
+> session notes live nowhere durable, on purpose. Last touched: SDK
+> v3.1 capsule-native runtime — capsules now (partially) drive
+> Wevra execution rather than only describing it (W3-32 / W3-33 /
+> W3-34 / W3-35), 2026-04-26.
 >
 > The programme has a deliberately dual identity: it is (a) a research
 > programme in context, coordination, and exact external memory,
@@ -32,6 +32,40 @@
 > bounded-context theorem — no substrate primitive is modified.
 > See § 4.12 for the post-Phase-46 research-center status and
 > § 4.11 for the current frontier.
+>
+> **Execution contract (SDK v3.1, 2026-04-26).** Capsules have
+> stopped being purely a post-hoc audit fold and (partially) become
+> the runtime's typed execution contract. The
+> ``CapsuleNativeRunContext`` runtime context drives a Wevra run
+> through capsule lifecycle transitions: each stage seals a typed
+> capsule before the next stage can read its result. Substantive
+> on-disk artifacts are content-addressed at write time
+> (Theorem W3-33). The post-hoc ``build_report_ledger`` is
+> retained as a third-party adapter; the two paths are
+> CID-equivalent on non-ARTIFACT kinds (Theorem W3-34). The
+> capsule layer has therefore moved from *"capsules as audit
+> graph"* toward *"capsules as execution contract"*. See § 4.18
+> for the v3.1 runtime extension and `docs/RESULTS_WEVRA_CAPSULE_NATIVE.md`
+> for the milestone note.
+>
+> **Intra-cell + detached witness (SDK v3.2, 2026-04-26).**
+> The capsule-native slice has been extended past the cell
+> boundary into the inner sweep loop. Each (task, strategy)
+> parse→apply→test transition seals a pair of capsules in
+> flight: a PATCH_PROPOSAL (parent: SWEEP_SPEC) and a
+> TEST_VERDICT (parent: PATCH_PROPOSAL). The lifecycle ordering
+> ``patch → verdict`` is enforced at the type level
+> (Theorem W3-32-extended). The meta-artefact boundary is now
+> formally a sharp circularity (Theorem W3-36 — the rendering
+> of the RUN_REPORT-rooted view cannot be authenticated within
+> the primary ledger) with a positive corollary: a detached
+> META_MANIFEST in a secondary ledger is the strongest
+> authentication achievable, one trust hop beyond the primary
+> view. ``wevra-capsule verify`` now recomputes the chain from
+> on-disk header bytes (Theorem W3-37) and re-hashes every
+> ARTIFACT against the on-disk file at audit time
+> (Theorem W3-38). See § 4.19 for the v3.2 runtime extension and
+> `docs/RESULTS_WEVRA_INTRA_CELL.md` for the milestone note.
 >
 > **Programme vs Product — read this first.** The programme ships
 > theorems, phase shards, and an EXTENDED_MATH survey (§§ 1–9). The
@@ -5148,6 +5182,271 @@ bar; do not claim Phase 51 broke the Phase-50 level ceiling.**
 
 Anchor: `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE6.md` and
 `docs/CAPSULE_FORMALISM.md` § 4.F.
+
+---
+
+### 4.18 SDK v3.1 — capsule-native runtime (capsules drive execution, not just describe it)
+
+The Phase-46..51 work above is on the *decoder* / research-center
+axis: capsules as the substrate over which admission, bundling,
+and zero-shot decoding are studied. The SDK v3.1 milestone is on a
+**different axis entirely** — the **runtime** axis. Up to v3.0 the
+capsule layer was a post-hoc fold: a Wevra run executed end-to-end
+as ordinary Python and a sealed capsule DAG was synthesised from
+the finished ``product_report`` dict afterwards. Capsules
+*described* the run; they did not gate it. SDK v3.1 makes capsules
+(partially) drive execution.
+
+**1. The new contract.** ``CapsuleNativeRunContext`` is a runtime
+context that owns a ``CapsuleLedger`` and exposes one ``seal_*``
+method per Wevra-run stage (profile / readiness / sweep_spec /
+sweep_cell / provenance / artifact / run_report). Each stage
+seals a typed capsule before the next stage can read its result;
+parent-CID gating (Capsule Contract C5) refuses to admit a
+capsule whose declared parents are not yet in the ledger. A stage
+that fails leaves a typed in-flight register entry that never
+reaches the ledger — observable via ``ctx.in_flight_failures()``.
+``run_sweep`` accepts an optional ``ctx`` parameter; when
+provided, each cell is sealed in flight via
+``ctx.seal_sweep_cell``.
+
+**2. Content-addressing at write time.** Substantive on-disk
+artifacts (``readiness_verdict.json``, ``sweep_result.json``,
+``provenance.json``) are written via
+``ctx.seal_and_write_artifact``: the capsule's payload SHA-256
+is computed from the in-memory bytes *before* writing; the
+capsule is sealed under that hash; the bytes are committed; the
+on-disk file is re-read and re-hashed; any drift raises
+``ContentAddressMismatch``. The on-disk file is then authenticated
+by its capsule's CID — a third party with the capsule view + the
+file can verify locally. Meta-artefacts (``product_report.json``,
+``capsule_view.json``, ``product_summary.txt``) are post-view
+renderings of the canonical view; naming them under their own
+ARTIFACT capsules would require the view to include capsules
+hashing its own bytes (circular), so they remain renderings.
+
+**3. Four theorems (proved, code-backed).**
+
+* **Theorem W3-32** (lifecycle ↔ execution-state correspondence,
+  proved by inspection): each runtime stage maps to a capsule
+  lifecycle state (in-progress / sealed / failed) bijectively.
+* **Theorem W3-33** (content-addressing at artifact creation,
+  proved by inspection + cross-validation test): the on-disk
+  SHA-256 of any substantive artifact equals the SHA-256 in its
+  ARTIFACT capsule's payload at ``seal_and_write_artifact``
+  return.
+* **Theorem W3-34** (in-flight ↔ post-hoc CID equivalence on
+  non-ARTIFACT kinds, proved by per-kind set-equality test): the
+  in-flight builder and the post-hoc ``build_report_ledger`` fold
+  produce CID-equivalent ledgers for PROFILE / READINESS_CHECK /
+  SWEEP_SPEC / SWEEP_CELL / PROVENANCE. ARTIFACT and RUN_REPORT
+  CIDs **intentionally** diverge (in-flight carries real SHAs;
+  post-hoc carries None).
+* **Theorem W3-35** (parent-CID gating is the execution
+  contract, proved by inspection): a stage that misorders the
+  capsule lifecycle (e.g. a SWEEP_CELL before SWEEP_SPEC) raises
+  a typed exception at the offending method, not an obscure
+  downstream KeyError. The capsule layer enforces ordering at the
+  type level.
+
+**4. What this changes about Wevra's originality claim.** The
+older positioning — *"every cross-boundary artefact is a typed,
+content-addressed, lifecycle-bounded capsule"* — was true at the
+Capsule Contract level (C1..C6) but operationally was a post-hoc
+description of a run that had already happened. SDK v3.1 makes
+the operational claim *"capsules drive execution"* honest on a
+real slice: the entire Wevra run lifecycle (profile → readiness →
+sweep → provenance → artifacts → run-report) is now a sequence of
+capsule lifecycle transitions enforced at the type level, not a
+sequence of Python calls audited post hoc. This is the move from
+*capsules as audit graph* to *capsules as execution contract*.
+
+**5. What remains legacy / post-hoc / out-of-scope.**
+
+* Intra-cell objects (the LLM prompt sent during a real-mode
+  sweep, the parsed patch, the per-instance test verdict)
+  are not yet capsule-tracked. The capsule layer captures
+  *run-boundary* objects only; intra-cell objects pass as plain
+  Python. The next slice would name those with new kinds
+  (``PROMPT``, ``GENERATED_PATCH``, ``TEST_VERDICT``).
+* Meta-artefacts are not capsule-tracked (circular-dependency
+  obstacle).
+* Adversarial concurrent writers are not detected (the
+  re-hash check is a TOCTOU detector for honest writers).
+* The decoder / bundle-policy / cross-domain-transfer research
+  centre (§§ 4.12–4.17) is unaffected. Decoder results live on
+  the substrate; runtime results live above the substrate.
+  v3.1 is strictly additive on the substrate.
+
+**6. SDK surface delta.** Strictly additive on v3.0:
+
+* New: ``CapsuleNativeRunContext``, ``ContentAddressMismatch``,
+  ``seal_and_write_artifact``, ``CONSTRUCTION_IN_FLIGHT`` /
+  ``CONSTRUCTION_POST_HOC`` (re-exported from ``vision_mvp.wevra``).
+* New: ``RunSpec.capsule_native: bool = True`` (default flips
+  onto the new path).
+* Bumped: ``SDK_VERSION = "wevra.sdk.v3.1"``.
+* Unchanged: ``ContextCapsule``, ``CapsuleLedger``,
+  ``CapsuleView``, ``CAPSULE_VIEW_SCHEMA``, ``build_report_ledger``,
+  every ``capsule_from_*`` adapter, every v3.0 contract test.
+
+**7. Empirical anchor.** ``vision_mvp/tests/test_wevra_capsule_native.py``
+ships 16 contract tests that lock the four theorems plus the
+substantive-artifact content-addressing claim. The full
+``vision_mvp.tests`` suite is **1406 / 1406 green** under the
+new path; the legacy ``capsule_native=False`` path remains
+green (back-compat guarantee).
+
+Anchor: `docs/RESULTS_WEVRA_CAPSULE_NATIVE.md` (milestone note);
+`docs/CAPSULE_FORMALISM.md` § 4.G (theorems); test suite
+`vision_mvp/tests/test_wevra_capsule_native.py`.
+
+### 4.19 SDK v3.2 — intra-cell capsule-native + detached META_MANIFEST + strong on-disk verification
+
+The v3.1 milestone (§ 4.18) closed the *run-boundary* slice but
+deliberately stopped at the cell boundary. SDK v3.2 takes three
+coupled moves: (i) extend capsule-native lifecycle into the
+inner sweep loop with two new kinds; (ii) formalise the
+meta-artefact boundary as a sharp circularity theorem with a
+detached-witness corollary; (iii) strengthen on-disk verification
+beyond the embedded ``chain_ok`` boolean.
+
+**1. The intra-cell extension.** Inside every sweep cell, the
+inner ``run_swe_loop_sandboxed`` loop calls ``generator(...)``
+once per (task, strategy) and then ``sandbox.run(...)``. SDK
+v3.2 routes both calls through hooks
+(``on_patch_proposed`` / ``on_test_completed``) the runtime
+wires up when a ``CapsuleNativeRunContext`` is active. The hooks
+seal one PATCH_PROPOSAL capsule per generator call (parent:
+SWEEP_SPEC; payload: task / strategy / parser_mode / apply_mode
+/ n_distractors coordinates plus a SHA over the substitution
+sequence and a bounded rationale), and one TEST_VERDICT capsule
+per sandbox return (parent: the PATCH_PROPOSAL; payload: the
+WorkspaceResult fields). The chain ``patch → verdict`` is
+enforced at the type level (Theorem W3-32-extended): a verdict
+cannot be sealed before its patch. Default-None hooks preserve
+byte-for-byte Phase-40 behaviour for callers who do not want
+the intra-cell extension.
+
+**2. The detached-witness boundary.** Theorem W3-36
+formalises an *impossibility*: there is no extension of the
+primary ledger that admits an ARTIFACT capsule for any
+meta-artefact (``product_report.json`` / ``capsule_view.json``
+/ ``product_summary.txt``) without changing the rendered view
+those meta-artefacts encode. The proof is a one-line
+contradiction (the new capsule changes the rendered view
+through both the headers list and the chain step). The
+positive corollary is constructive: a META_MANIFEST capsule
+sealed in a *secondary* ledger after the RUN_REPORT, whose
+payload carries the on-disk SHAs of the meta-artefacts plus
+the primary ``root_cid`` and ``chain_head``, is the strongest
+authentication achievable. The trust unit is one explicit hop
+beyond the primary view; cryptographic signing is orthogonal
+and out of scope.
+
+**3. Strong on-disk verification.**
+``wevra-capsule verify`` now runs four independent checks:
+(i) chain-from-headers recompute on the embedded view
+(Theorem W3-37); (ii) chain-from-headers recompute on the
+on-disk ``capsule_view.json`` (W3-37 again, against the
+detached file); (iii) every ARTIFACT capsule's on-disk file
+re-hashed and compared to the sealed payload SHA
+(Theorem W3-38); (iv) the META_MANIFEST's meta-artefact SHAs
+re-hashed against the on-disk meta-artefact bytes. Any failure
+prints the specific drift and returns exit code 3. The view's
+ARTIFACT and META_MANIFEST headers now ALWAYS carry their
+payloads (an invariant strengthening of v3.1's
+``include_payload=False`` default) so the verification claims
+are recoverable from disk alone.
+
+**4. Five new theorems / extensions.**
+
+* **Theorem W3-32-extended** (intra-cell lifecycle correspondence,
+  proved by inspection): the lifecycle correspondence of W3-32
+  lifts to PATCH_PROPOSAL and TEST_VERDICT, with patch→verdict
+  ordering enforced at the parent-CID gate.
+* **Theorem W3-36** (meta-artefact circularity is sharp; detached-
+  witness corollary, proved by structural argument + ledger-extension
+  contradiction): meta-artefacts cannot be authenticated within the
+  primary ledger; a META_MANIFEST in a secondary ledger is the
+  strongest authentication.
+* **Theorem W3-37** (chain-from-headers verification, proved by
+  inspection): the runtime's chain step is a pure function of
+  on-disk header fields, so verification recomputes the chain head
+  from disk bytes.
+* **Theorem W3-38** (ARTIFACT audit-time on-disk re-hash, proved
+  by inspection): W3-33's *return-time* post-condition lifts to
+  *audit-time* re-hashing — the audit-time on-disk SHA equals
+  the sealed payload SHA iff the bytes have not drifted.
+* **Spine equivalence preserved (Theorem W3-34 carry-over):**
+  intra-cell capsules are siblings of SWEEP_CELL via SWEEP_SPEC,
+  not modifications of the spine. The post-hoc fold's spine CIDs
+  remain byte-equal to the in-flight builder's spine CIDs on
+  PROFILE / READINESS_CHECK / SWEEP_SPEC / SWEEP_CELL /
+  PROVENANCE.
+
+**5. What this changes about Wevra's originality claim.** The v3.1
+positioning was *"capsules drive execution at the run boundary"*.
+With v3.2, capsules also drive execution **past the cell boundary**:
+inside every sweep cell the inner parse→apply→test transition is
+two sealed capsules with parent-CID gating, not a function-call
+sequence. The meta-artefact circularity is no longer a vague TODO
+or an asymmetric apology in the milestone note — it is a sharp
+limitation theorem with a constructive boundary witness. ``wevra-capsule
+verify`` is no longer a header-trust check — it recomputes from
+disk bytes and re-hashes. Three classes of "operational claim that
+was ahead of code" have become "operational claim that the code
+honestly earns."
+
+**6. What remains legacy / post-hoc / out-of-scope.**
+
+* Generator prompts, raw LLM responses, and the parser's
+  ``ParseOutcome`` (kind / recovery label / detail) are not yet
+  capsule-tracked. The next intra-cell slice would name them as
+  ``PROMPT`` / ``LLM_RESPONSE`` / ``PARSE_OUTCOME`` capsules.
+* META_MANIFEST itself is not authenticated by the primary ledger.
+  Theorem W3-36 establishes this is *impossible* without
+  cryptographic signing; it is a sharp limitation, not a TODO.
+* Adversarial concurrent writers remain out of scope (the trust
+  boundary is the same as Wevra's sandbox boundary).
+* Cross-run determinism on the full DAG remains open.
+
+**7. SDK surface delta.** Strictly additive on v3.1:
+
+* New: ``capsule_from_patch_proposal``, ``capsule_from_test_verdict``,
+  ``capsule_from_meta_manifest``,
+  ``verify_chain_from_view_dict``,
+  ``verify_artifacts_on_disk``,
+  ``verify_meta_manifest_on_disk`` (re-exported from
+  ``vision_mvp.wevra``).
+* New: ``CapsuleNativeRunContext.seal_patch_proposal``,
+  ``.seal_test_verdict``, ``.seal_meta_manifest``,
+  ``.render_meta_manifest_view``.
+* New: ``CapsuleKind.PATCH_PROPOSAL``, ``.TEST_VERDICT``,
+  ``.META_MANIFEST`` (closed-vocabulary additions).
+* New: ``meta_manifest.json`` artefact written on every run.
+* Bumped: ``SDK_VERSION = "wevra.sdk.v3.2"``.
+* Unchanged: ``RunSpec`` fields; ``CAPSULE_VIEW_SCHEMA``
+  (``wevra.capsule_view.v1`` — the new payloads are additive
+  on the same schema); the entire v3.1 surface; the post-hoc
+  ``build_report_ledger`` adapter; every existing
+  ``capsule_from_*`` adapter.
+
+**8. Empirical anchor.**
+``vision_mvp/tests/test_wevra_capsule_native_intra_cell.py`` ships
+16 contract tests that lock the four new theorems plus the
+W3-34 spine-equivalence preservation. Combined with v3.1's
+``test_wevra_capsule_native.py`` (16 tests still green) and the
+public-surface lock (``test_wevra_public_api.py`` 10 tests),
+the capsule-native runtime contract is now witnessed by 42
+contract tests. Full ``vision_mvp.tests/test_wevra_*`` suite
+**101 / 101 green**; the substrate's ``run_swe_loop_sandboxed``
+hook addition does not regress any phase-40, phase-42, phase-45,
+or phase-47 substrate tests (98 / 98 green on the targeted run).
+
+Anchor: `docs/RESULTS_WEVRA_INTRA_CELL.md` (milestone note);
+`docs/CAPSULE_FORMALISM.md` § 4.H (theorems); test suite
+`vision_mvp/tests/test_wevra_capsule_native_intra_cell.py`.
 
 ---
 

@@ -59,6 +59,11 @@ class RunSpec:
     allow_unsafe_sandbox: bool = False
     report_sinks: tuple[str, ...] = ()
     config: WevraConfig | None = None
+    # SDK v3.1 — capsule-native runtime is the default. Setting this
+    # to False reverts to the legacy post-hoc fold path (capsules
+    # describe the run, but do not gate it). The two paths produce
+    # CID-equivalent ledgers for non-ARTIFACT kinds (Theorem W3-34).
+    capsule_native: bool = True
 
 
 def run(spec: RunSpec) -> dict[str, Any]:
@@ -84,6 +89,7 @@ def run(spec: RunSpec) -> dict[str, Any]:
         skip_sweep=spec.skip_sweep,
         acknowledge_heavy=spec.acknowledge_heavy,
         allow_unsafe_sandbox=spec.allow_unsafe_sandbox,
+        capsule_native=spec.capsule_native,
     )
 
     if spec.report_sinks:

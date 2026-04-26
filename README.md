@@ -7,6 +7,27 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
+**As of SDK v3.2 (April 2026), capsules drive execution past the cell
+boundary into the inner sweep loop.** Run-boundary stages (profile /
+readiness / sweep_spec / sweep_cell / provenance / artifact /
+run_report) seal capsules in flight as before (W3-32..W3-35).
+Inside every cell, each (task, strategy) parse→apply→test transition
+seals two more capsules: a `PATCH_PROPOSAL` (parent: SWEEP_SPEC) and
+a `TEST_VERDICT` (parent: PATCH_PROPOSAL); the lifecycle ordering
+``patch → verdict`` is enforced at the type level
+(W3-32-extended). The meta-artefact boundary
+(`product_report.json` / `capsule_view.json` / `product_summary.txt`)
+is now a sharp circularity theorem (W3-36) with a constructive
+boundary witness: a *detached* `META_MANIFEST` capsule sealed in a
+secondary ledger, written to `meta_manifest.json`, is the strongest
+authentication achievable. `wevra-capsule verify` now recomputes the
+chain from on-disk header bytes (W3-37) and re-hashes every artefact
+at audit time (W3-38). See
+[`docs/RESULTS_WEVRA_INTRA_CELL.md`](docs/RESULTS_WEVRA_INTRA_CELL.md)
+for the SDK v3.2 milestone note and
+[`docs/RESULTS_WEVRA_CAPSULE_NATIVE.md`](docs/RESULTS_WEVRA_CAPSULE_NATIVE.md)
+for the SDK v3.1 run-boundary slice.
+
 Wevra is the first shipped product from the **Context Zero** research
 programme on per-agent minimum-sufficient context.
 
@@ -21,10 +42,19 @@ programme on per-agent minimum-sufficient context.
 > `CapsuleBudget` (tokens / bytes / rounds / witnesses / parents),
 > a parent-CID DAG, and a hash-chained audit history. "Context" in
 > Wevra is not text — it is an object with identity, type,
-> lifecycle, budget, and proof. See
+> lifecycle, budget, and proof. SDK v3.1 lifted that contract from
+> *audit description* to *runtime gate* on the run-boundary spine;
+> SDK v3.2 extends the gate past the cell boundary into the inner
+> parse→apply→test loop and formalises the meta-artefact circularity
+> as a sharp limitation theorem with a constructive detached-witness
+> boundary. See
 > [`docs/RESULTS_WEVRA_CAPSULE.md`](docs/RESULTS_WEVRA_CAPSULE.md)
-> for the theorem-style statement of the contract and why it
-> subsumes "bounded-context orchestration" as a framing.
+> for the contract (C1..C6),
+> [`docs/RESULTS_WEVRA_CAPSULE_NATIVE.md`](docs/RESULTS_WEVRA_CAPSULE_NATIVE.md)
+> for the v3.1 run-boundary slice (W3-32..W3-35), and
+> [`docs/RESULTS_WEVRA_INTRA_CELL.md`](docs/RESULTS_WEVRA_INTRA_CELL.md)
+> for the v3.2 intra-cell + detached witness milestone
+> (W3-32-extended / W3-36 / W3-37 / W3-38).
 
 [![status](https://img.shields.io/badge/status-beta-blue.svg)](#)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
@@ -129,30 +159,49 @@ print(f"RUN_REPORT CID = {cv['root_cid']}")
 print(report["summary_text"])
 ```
 
-### Every run is a sealed capsule DAG
+### Every run is a sealed capsule DAG, built in flight
 
 ```python
-from vision_mvp.wevra import build_report_ledger, CapsuleKind
+from vision_mvp.wevra import (
+    RunSpec, run, CONSTRUCTION_IN_FLIGHT, CapsuleKind,
+)
 
-ledger, run_cid = build_report_ledger(report)
+report = run(RunSpec(profile="local_smoke", out_dir="/tmp/cz-smoke"))
+# Capsule view tagged with its construction mode:
+assert report["capsules"]["construction"] == CONSTRUCTION_IN_FLIGHT
+# Every proposed capsule sealed; no failures.
+assert report["capsules"]["in_flight_stats"]["n_failed"] == 0
+
 # Types you'll see in a smoke run:
 #   PROFILE           (root of the DAG)
 #   READINESS_CHECK   (parent: PROFILE)
 #   SWEEP_SPEC        (parent: PROFILE)
 #   SWEEP_CELL × N    (parent: SWEEP_SPEC)
 #   PROVENANCE        (parent: PROFILE)
-#   ARTIFACT × K      (parent: PROFILE)
+#   ARTIFACT × K      (content-addressed at write time, parent: source capsule)
 #   RUN_REPORT        (parents: ALL of the above)
-print(ledger.stats()["by_kind"])
+```
+
+For third parties who have a `product_report` dict from outside the
+runtime, the post-hoc fold is still available:
+
+```python
+from vision_mvp.wevra import build_report_ledger
+ledger, run_cid = build_report_ledger(report)
 assert ledger.verify_chain()
 ```
+
+The two paths produce CID-equivalent ledgers on non-ARTIFACT kinds
+(Theorem W3-34); ARTIFACT capsules from a capsule-native run carry
+real SHA-256 hashes, while the post-hoc fold's ARTIFACT capsules
+carry `None`.
 
 The RUN_REPORT capsule's CID is the durable identifier for the run —
 send someone that CID plus `product_report.json` and they can
 reproduce every upstream capsule, verify the hash chain end-to-end,
 and know the bytes haven't drifted.
 
-### Every run emits five artifacts
+### Every run emits seven artifacts
 
   * `product_report.json` — schema `phase45.product_report.v2`,
     includes the `capsules` block (`wevra.capsule_view.v1`)
@@ -163,24 +212,51 @@ and know the bytes haven't drifted.
   * `provenance.json` — git SHA, package version, Python, platform,
     profile, model, endpoint, sandbox, input JSONL + SHA-256, argv,
     timestamp, artifact list (schema `wevra.provenance.v1`)
+  * `sweep_result.json` — the executed-sweep block when the
+    profile's sweep ran in-process (mock or real-LLM acknowledged)
+  * `meta_manifest.json` — **new in SDK v3.2** — the detached
+    META_MANIFEST witness for the meta-artefacts above, in a
+    secondary ledger; carries on-disk SHA-256 of
+    `product_report.json` / `capsule_view.json` /
+    `product_summary.txt` plus the primary `root_cid` and
+    `chain_head` (Theorem W3-36 — meta-artefact circularity is
+    sharp; the manifest is the strongest authentication achievable
+    one trust hop beyond the primary view)
 
 ### CLIs
 
 ```bash
 wevra --profile local_smoke --out-dir /tmp/cz-smoke
 wevra-ci --report /tmp/cz-smoke/product_report.json --min-pass-at-1 1.0
-# Capsule-graph inspection (new in SDK v3):
+# Capsule-graph inspection (new in SDK v3, strengthened in v3.2):
 wevra-capsule view   --report /tmp/cz-smoke/product_report.json
 wevra-capsule verify --report /tmp/cz-smoke/product_report.json
 wevra-capsule cid    --report /tmp/cz-smoke/product_report.json
 ```
+
+`wevra-capsule verify` (v3.2) runs four independent on-disk
+checks and prints each verdict line plus a final `verdict = OK / BAD`:
+
+```
+chain_ok_embedded         = True    # writer's self-report
+chain_recompute_embedded  = True    # we recompute the chain
+chain_recompute_on_disk   = True    # ...from on-disk view bytes
+on_disk_view_agrees       = True    # cross-check
+artifacts_on_disk         = OK  (3/3 matched, 0 drifts, 0 missing)
+meta_manifest_on_disk     = OK  (3/3 matched, 0 drifts, 0 missing)
+verdict                   = OK
+```
+
+A drift in any check fails the verify (exit code 3) and prints the
+specific path / sealed SHA / on-disk SHA tuple — the audit knows
+exactly which file lied.
 
 The SDK public surface is contract-tested in
 `vision_mvp/tests/test_wevra_public_api.py` and the Capsule Contract
 (invariants C1..C6) is tested in
 `vision_mvp/tests/test_wevra_capsules.py` — any rename or removal is a
 breaking change and requires bumping `wevra.SDK_VERSION` (currently
-`wevra.sdk.v3`).
+`wevra.sdk.v3.2`).
 
 ### Who Wevra is for
 
@@ -225,8 +301,9 @@ territory.
 
 | Layer | Scope | Stability | Import path |
 |---|---|---|---|
-| **Wevra SDK** — `RunSpec`, `run`, `SweepSpec`, `run_sweep`, `HeavyRunNotAcknowledged`, `WevraConfig`, `build_manifest`, `profiles`, `report`, `ci_gate`, `import_data`, `extensions`, schema constants | The public product contract | **Stable v3** (contract-tested) | `vision_mvp.wevra` |
+| **Wevra SDK** — `RunSpec`, `run`, `SweepSpec`, `run_sweep`, `HeavyRunNotAcknowledged`, `WevraConfig`, `build_manifest`, `profiles`, `report`, `ci_gate`, `import_data`, `extensions`, schema constants | The public product contract | **Stable v3.1** (contract-tested) | `vision_mvp.wevra` |
 | **Context Capsule primitives** — `ContextCapsule`, `CapsuleKind`, `CapsuleLifecycle`, `CapsuleBudget`, `CapsuleLedger`, `CapsuleView`, `render_view`, `build_report_ledger`, `capsule_from_*` adapters | The **load-bearing SDK abstraction**: every cross-boundary artefact is a capsule | **Stable v1** (contract-tested: invariants C1..C6) | `vision_mvp.wevra.capsule` (re-exported from `vision_mvp.wevra`) |
+| **Capsule-native runtime** — `CapsuleNativeRunContext`, `seal_and_write_artifact`, `ContentAddressMismatch`, `CONSTRUCTION_IN_FLIGHT`/`CONSTRUCTION_POST_HOC`, `RunSpec.capsule_native` + intra-cell `seal_patch_proposal` / `seal_test_verdict` + detached `seal_meta_manifest` + on-disk `verify_chain_from_view_dict` / `verify_artifacts_on_disk` / `verify_meta_manifest_on_disk` | Capsules drive runtime stage transitions at the run boundary AND inside the inner sweep loop; substantive artifacts are content-addressed at write time and re-verifiable at audit time; meta-artefacts are authenticated by a detached META_MANIFEST | **Stable v2** (contract-tested: theorems W3-32 / W3-33 / W3-34 / W3-35 + intra-cell W3-32-extended / W3-36 / W3-37 / W3-38) | `vision_mvp.wevra.capsule_runtime` (re-exported from `vision_mvp.wevra`) |
 | **Wevra console scripts** — `wevra`, `wevra-import`, `wevra-ci`, `wevra-capsule` | CLI surface | **Stable v3** (Slice 3: `wevra-capsule view / verify / cid`) | `[project.scripts]` |
 | **Provenance manifest** — `wevra.provenance.v1` | Reproducibility artifact | **Stable v1** | `vision_mvp.wevra.provenance` |
 | **Capsule view artifact** — `wevra.capsule_view.v1` | Sealed capsule graph on disk | **Stable v1** | `capsule_view.json` next to every report |

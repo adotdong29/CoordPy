@@ -192,10 +192,46 @@ class CapsuleKind:
     W3-16) for the formal statement and the honest relational
     limitation that cohort lifting still does NOT close."""
 
+    PATCH_PROPOSAL = "PATCH_PROPOSAL"
+    """An intra-cell capsule: one (task, strategy) patch produced
+    by the generator inside a sweep cell. Payload carries the
+    instance / strategy / parser_mode / apply_mode / n_distractors
+    coordinates plus a SHA-256 over the substitution sequence and a
+    bounded rationale string. Parent: the SWEEP_SPEC capsule (the
+    spec under which the cell ran). SDK v3.2 addition — the first
+    intra-cell capsule, naming a transition that previously passed
+    as a plain ``ProposedPatch`` Python dataclass between
+    ``generator(...)`` and ``sandbox.run(...)``."""
+
+    TEST_VERDICT = "TEST_VERDICT"
+    """An intra-cell capsule: the sandbox-attributed verdict on one
+    (task, strategy) patch. Payload carries the
+    instance / strategy / parser_mode / apply_mode / n_distractors
+    coordinates plus the WorkspaceResult fields (patch_applied,
+    syntax_ok, test_passed, error_kind, error_detail). Parent: the
+    PATCH_PROPOSAL capsule whose patch was tested. SDK v3.2
+    addition — the second intra-cell capsule, witnessing the
+    apply+test transition that previously passed as a plain
+    ``WorkspaceResult`` dataclass."""
+
+    META_MANIFEST = "META_MANIFEST"
+    """A *detached* witness for meta-artifacts (SDK v3.2). Sealed
+    AFTER the RUN_REPORT in a secondary, post-fixed-point ledger;
+    its payload carries the SHA-256 of every meta-artifact whose
+    bytes are a structural function of the rendered RUN_REPORT
+    view (``product_report.json``, ``capsule_view.json``,
+    ``product_summary.txt``). META_MANIFEST cannot be a child of
+    RUN_REPORT in the primary ledger because that would change
+    the rendered view (which the meta-artifacts already encode) —
+    the structural circularity formalised as Theorem W3-36
+    (``docs/CAPSULE_FORMALISM.md`` § 4.H). The manifest is the
+    one-hop trust unit beyond the primary view."""
+
     ALL = frozenset({
         HANDOFF, HANDLE, THREAD_RESOLUTION, ADAPTIVE_EDGE,
         SWEEP_CELL, SWEEP_SPEC, READINESS_CHECK, PROVENANCE,
         RUN_REPORT, PROFILE, ARTIFACT, COHORT,
+        PATCH_PROPOSAL, TEST_VERDICT, META_MANIFEST,
     })
 
 
@@ -319,7 +355,12 @@ def _default_budget_for(kind: str) -> CapsuleBudget:
     if kind == CapsuleKind.PROVENANCE:
         return CapsuleBudget(max_bytes=1 << 16, max_parents=4)
     if kind == CapsuleKind.RUN_REPORT:
-        return CapsuleBudget(max_bytes=1 << 22, max_parents=1024)
+        # Bumped from 1024 to 1<<16 in SDK v3.2 to accommodate
+        # large sweeps whose intra-cell capsules (PATCH_PROPOSAL /
+        # TEST_VERDICT) are *not* direct parents of RUN_REPORT
+        # (filtering is the primary defence) but the budget
+        # generously absorbs spine growth either way.
+        return CapsuleBudget(max_bytes=1 << 22, max_parents=1 << 16)
     if kind == CapsuleKind.PROFILE:
         return CapsuleBudget(max_bytes=1 << 14, max_parents=0)
     if kind == CapsuleKind.ARTIFACT:
@@ -331,6 +372,18 @@ def _default_budget_for(kind: str) -> CapsuleBudget:
         # sets it explicitly and a 64 default means an unconfigured
         # cohort is loud but usable.
         return CapsuleBudget(max_parents=64, max_bytes=1 << 17)
+    if kind == CapsuleKind.PATCH_PROPOSAL:
+        # Intra-cell: payload is small (coordinates + rationale snippet
+        # + substitutions hash), parent is exactly the SWEEP_SPEC.
+        return CapsuleBudget(max_bytes=1 << 14, max_parents=4)
+    if kind == CapsuleKind.TEST_VERDICT:
+        # Intra-cell: payload is small (coordinates + workspace result
+        # fields), parent is exactly the upstream PATCH_PROPOSAL.
+        return CapsuleBudget(max_bytes=1 << 13, max_parents=4)
+    if kind == CapsuleKind.META_MANIFEST:
+        # Detached witness: payload is a list of meta-artifact SHAs +
+        # the run's root_cid + chain_head. Parent: RUN_REPORT.
+        return CapsuleBudget(max_bytes=1 << 16, max_parents=4)
     raise ValueError(f"no default budget for kind {kind!r}")
 
 
@@ -775,16 +828,30 @@ def render_view(ledger: CapsuleLedger,
     """Render a ``CapsuleView`` from a ledger.
 
     ``include_payload=False`` is the default because payloads for
-    ``ARTIFACT`` / ``RUN_REPORT`` / ``SWEEP_CELL`` can dominate the
-    view's footprint; they are still recoverable from the ledger
-    object if the SDK is used in-process. When the view is the only
-    thing serialised to disk, consumers fetch payloads by CID from
+    ``RUN_REPORT`` / ``SWEEP_CELL`` can dominate the view's
+    footprint; they are still recoverable from the ledger object
+    if the SDK is used in-process. When the view is the only thing
+    serialised to disk, consumers fetch payloads by CID from
     whichever other artifact (``sweep_result.json``,
     ``provenance.json``) still carries the full shape.
+
+    Even under ``include_payload=False``, the view ALWAYS includes
+    payloads for ``ARTIFACT`` and ``META_MANIFEST`` capsules. Both
+    kinds carry the verification claim *as their payload*
+    (``{path, sha256, ...}``); without the payload, downstream
+    consumers cannot re-hash on-disk bytes and verify the
+    content-address. The payloads are tiny (a few hundred bytes
+    each) so always-including them is cheap and load-bearing for
+    the runtime-truth claim. SDK v3.2 strengthened this from a
+    convention to an invariant.
     """
     caps = []
+    payload_kinds_always = (
+        CapsuleKind.ARTIFACT, CapsuleKind.META_MANIFEST,
+        CapsuleKind.PATCH_PROPOSAL, CapsuleKind.TEST_VERDICT,
+    )
     for cap in ledger.all_capsules():
-        if include_payload:
+        if include_payload or cap.kind in payload_kinds_always:
             caps.append(cap.as_dict())
         else:
             caps.append(cap.as_header_dict())
@@ -796,6 +863,46 @@ def render_view(ledger: CapsuleLedger,
         capsules=caps,
         root_cid=root_cid,
     )
+
+
+def verify_chain_from_view_dict(view: dict[str, Any]) -> bool:
+    """Recompute the hash chain from a view's ``capsules`` headers
+    and verify the chain-head matches the view's claim.
+
+    This is the *strong* on-disk verification the SDK v3.2
+    ``wevra-capsule verify`` runs: instead of trusting the
+    embedded ``chain_ok`` boolean (which the writer self-reports),
+    we recompute every chain step from the on-disk capsule headers
+    and compare to the on-disk ``chain_head`` claim. Any tamper
+    that changes a CID, a kind, or the order of capsules — or
+    that rewrites ``chain_head`` — is detected.
+
+    Returns True iff the recomputed chain head equals
+    ``view["chain_head"]``.
+
+    Theorem W3-37 (Chain-from-headers verification, proved by
+    inspection): the chain step depends only on (prev,
+    capsule.cid, capsule.kind, ``"SEALED"``) — every term is a
+    field of the on-disk header. The chain-from-headers recompute
+    is therefore a faithful re-derivation of the runtime's chain
+    semantics from disk bytes.
+    """
+    prev = CapsuleLedger.GENESIS
+    for cap in view.get("capsules", []):
+        cid = cap.get("cid")
+        kind = cap.get("kind")
+        if not isinstance(cid, str) or not isinstance(kind, str):
+            return False
+        # Reproduce ``_chain_step`` over the durable fields. Lifecycle
+        # is forced to SEALED to match the runtime's chain semantics
+        # (RETIRED is an audit overlay; the chain hash is computed
+        # over the sealed state — see ``CapsuleLedger.verify_chain``).
+        blob = _canonical({
+            "prev": prev, "cid": cid,
+            "kind": kind, "lifecycle": CapsuleLifecycle.SEALED,
+        })
+        prev = hashlib.sha256(blob).hexdigest()
+    return prev == view.get("chain_head")
 
 
 # =============================================================================
@@ -1121,6 +1228,182 @@ def capsule_from_adaptive_sub_table(table: Any,
     )
 
 
+def _substitutions_sha256(
+        substitutions: Iterable[tuple[str, str]]) -> str:
+    """Canonical SHA-256 over a patch's substitutions sequence.
+
+    Used by ``capsule_from_patch_proposal`` so two identical patches
+    (same byte-for-byte ``(old, new)`` pairs in the same order)
+    collapse to the same content-address. The serialisation is
+    JSON-canonical (sorted keys, no whitespace) over a list of
+    ``[old, new]`` pairs — so the order *is* significant (the
+    matcher applies left-to-right).
+    """
+    blob = _canonical([list(p) for p in substitutions])
+    return hashlib.sha256(blob).hexdigest()
+
+
+def capsule_from_patch_proposal(*,
+                                  instance_id: str,
+                                  strategy: str,
+                                  parser_mode: str,
+                                  apply_mode: str,
+                                  n_distractors: int,
+                                  substitutions: Iterable[tuple[str, str]],
+                                  rationale: str = "",
+                                  parents: Iterable[str] = (),
+                                  ) -> ContextCapsule:
+    """Build a ``PATCH_PROPOSAL`` capsule from a generator's output.
+
+    Payload is *coordinates + content hash*, not the patch's full
+    bytes. The full substitutions are out-of-band; the capsule's
+    payload carries:
+
+      * ``instance_id`` / ``strategy`` / ``parser_mode`` /
+        ``apply_mode`` / ``n_distractors`` — the cell + task
+        coordinates, so a downstream analyst can recover which
+        cell this proposal belongs to without an extra index.
+      * ``n_substitutions`` — number of ``(old, new)`` pairs.
+      * ``rationale`` — bounded string (≤500 chars) the
+        generator emitted alongside the patch (parser recovery
+        label / parse_failed taxonomy / ``llm_proposed`` etc.).
+      * ``substitutions_sha256`` — the canonical SHA-256 over
+        the ordered substitutions sequence; the capsule's
+        identity is therefore content-addressed by the patch
+        bytes (modulo coordinates and rationale).
+
+    The capsule's *own* CID is a hash over kind+payload+budget+
+    parents (Contract C1); not the same as
+    ``substitutions_sha256``. The latter is the patch-level
+    identity exposed in the payload so two identical patch
+    proposals from different runs (same coordinates) collapse to
+    the same ``substitutions_sha256``.
+    """
+    sha = _substitutions_sha256(substitutions)
+    rationale_cap = (rationale or "")
+    if len(rationale_cap) > 500:
+        rationale_cap = rationale_cap[:500]
+    payload: dict[str, Any] = {
+        "instance_id": instance_id,
+        "strategy": strategy,
+        "parser_mode": parser_mode,
+        "apply_mode": apply_mode,
+        "n_distractors": int(n_distractors),
+        "n_substitutions": int(sum(1 for _ in substitutions)
+                                 if hasattr(substitutions, "__len__")
+                                 else len(list(substitutions))),
+        "rationale": rationale_cap,
+        "substitutions_sha256": sha,
+    }
+    # Make ``n_substitutions`` truly stable: re-derive from a list
+    # snapshot so callers can pass a generator without surprise.
+    subs_list = list(substitutions) if not isinstance(
+        substitutions, (list, tuple)) else list(substitutions)
+    payload["n_substitutions"] = len(subs_list)
+    return ContextCapsule.new(
+        kind=CapsuleKind.PATCH_PROPOSAL,
+        payload=payload,
+        parents=parents,
+        metadata={
+            "instance_id": instance_id,
+            "strategy": strategy,
+            "parser_mode": parser_mode,
+            "n_substitutions": len(subs_list),
+            "substitutions_sha256": sha,
+        },
+    )
+
+
+def capsule_from_test_verdict(*,
+                                instance_id: str,
+                                strategy: str,
+                                parser_mode: str,
+                                apply_mode: str,
+                                n_distractors: int,
+                                patch_applied: bool,
+                                syntax_ok: bool,
+                                test_passed: bool,
+                                error_kind: str = "",
+                                error_detail: str = "",
+                                parents: Iterable[str] = (),
+                                ) -> ContextCapsule:
+    """Build a ``TEST_VERDICT`` capsule from a sandbox's
+    ``WorkspaceResult``.
+
+    Payload carries the same coordinates as the upstream
+    ``PATCH_PROPOSAL`` capsule plus the four boolean / string
+    fields that summarise the apply+test outcome. The
+    ``error_detail`` is bounded to 300 characters (matching
+    ``WorkspaceResult.as_dict()``).
+
+    The expected parent is the PATCH_PROPOSAL capsule whose
+    patch was tested; admission fails (Contract C5) if the
+    parent CID is not yet in the ledger.
+    """
+    detail = (error_detail or "")
+    if len(detail) > 300:
+        detail = detail[:300]
+    payload = {
+        "instance_id": instance_id,
+        "strategy": strategy,
+        "parser_mode": parser_mode,
+        "apply_mode": apply_mode,
+        "n_distractors": int(n_distractors),
+        "patch_applied": bool(patch_applied),
+        "syntax_ok": bool(syntax_ok),
+        "test_passed": bool(test_passed),
+        "error_kind": error_kind or "",
+        "error_detail": detail,
+    }
+    return ContextCapsule.new(
+        kind=CapsuleKind.TEST_VERDICT,
+        payload=payload,
+        parents=parents,
+        metadata={
+            "instance_id": instance_id,
+            "strategy": strategy,
+            "test_passed": bool(test_passed),
+            "error_kind": error_kind or "",
+        },
+    )
+
+
+def capsule_from_meta_manifest(*,
+                                  root_cid: str,
+                                  chain_head: str,
+                                  meta_artifacts: list[dict[str, Any]],
+                                  parents: Iterable[str] = (),
+                                  ) -> ContextCapsule:
+    """Build a ``META_MANIFEST`` capsule — the detached witness for
+    meta-artifacts.
+
+    ``meta_artifacts`` is a list of dicts each carrying
+    ``{"path": str, "sha256": str, "n_bytes": int}`` describing one
+    on-disk meta-artifact. ``root_cid`` is the CID of the run's
+    RUN_REPORT capsule (the rendering's fixed point). ``chain_head``
+    is the primary ledger's chain-head at RUN_REPORT seal time.
+
+    ``parents`` should typically be ``(root_cid,)`` so the manifest
+    is a child of RUN_REPORT *in a secondary ledger* (see Theorem
+    W3-36 for why it cannot be in the primary ledger).
+    """
+    payload: dict[str, Any] = {
+        "schema": "wevra.meta_manifest.v1",
+        "root_cid": root_cid,
+        "chain_head": chain_head,
+        "meta_artifacts": list(meta_artifacts),
+    }
+    return ContextCapsule.new(
+        kind=CapsuleKind.META_MANIFEST,
+        payload=payload,
+        parents=parents,
+        metadata={
+            "root_cid": root_cid,
+            "n_meta_artifacts": len(meta_artifacts),
+        },
+    )
+
+
 def capsule_from_report(report_headers: dict[str, Any],
                          *,
                          parents: Iterable[str],
@@ -1261,6 +1544,7 @@ __all__ = [
     "CapsuleLedger", "CapsuleAdmissionError", "CapsuleLifecycleError",
     # View
     "CapsuleView", "CAPSULE_VIEW_SCHEMA", "render_view",
+    "verify_chain_from_view_dict",
     # Adapters
     "capsule_from_handle", "capsule_from_handoff",
     "capsule_from_provenance", "capsule_from_sweep_cell",
@@ -1269,4 +1553,7 @@ __all__ = [
     "capsule_from_report", "build_report_ledger",
     # Phase-47 cohort subsumption
     "capsule_from_cohort", "capsule_from_adaptive_sub_table",
+    # SDK v3.2 — intra-cell capsule-native + detached-witness
+    "capsule_from_patch_proposal", "capsule_from_test_verdict",
+    "capsule_from_meta_manifest",
 ]

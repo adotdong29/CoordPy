@@ -107,7 +107,64 @@ def _select_sandbox(spec: SweepSpec):
     return get_sandbox(spec.sandbox)
 
 
-def _mock_cells(spec: SweepSpec) -> list[dict[str, Any]]:
+def _make_intra_cell_hooks(ctx: "Any",
+                              *,
+                              parser_mode: str,
+                              apply_mode: str,
+                              n_distractors: int,
+                              ):
+    """Build the (on_patch_proposed, on_test_completed) hook pair
+    that routes intra-cell transitions into capsule lifecycle
+    transitions on ``ctx``.
+
+    Returns ``(None, None)`` when ``ctx`` is None — the substrate
+    loop runs byte-for-byte unchanged. Returns concrete closures
+    otherwise. The closures capture the cell coordinates so the
+    sealed PATCH_PROPOSAL / TEST_VERDICT capsules carry the
+    full (parser_mode, apply_mode, n_distractors, instance_id,
+    strategy) tuple needed to navigate the DAG without an
+    external index.
+    """
+    if ctx is None:
+        return None, None
+
+    def on_patch(task, strat, proposed):
+        cap = ctx.seal_patch_proposal(
+            instance_id=task.instance_id,
+            strategy=strat,
+            parser_mode=parser_mode,
+            apply_mode=apply_mode,
+            n_distractors=int(n_distractors),
+            substitutions=tuple(proposed.patch),
+            rationale=proposed.rationale or "",
+        )
+        return cap.cid
+
+    def on_verdict(task, strat, wr, patch_cid):
+        if patch_cid is None:
+            # Should not happen in normal flow — on_patch raises
+            # rather than returning None.
+            return
+        ctx.seal_test_verdict(
+            instance_id=task.instance_id,
+            strategy=strat,
+            parser_mode=parser_mode,
+            apply_mode=apply_mode,
+            n_distractors=int(n_distractors),
+            patch_proposal_cid=patch_cid,
+            patch_applied=bool(wr.patch_applied),
+            syntax_ok=bool(wr.syntax_ok),
+            test_passed=bool(wr.test_passed),
+            error_kind=wr.error_kind or "",
+            error_detail=(wr.error_detail or "")[:300],
+        )
+
+    return on_patch, on_verdict
+
+
+def _mock_cells(spec: SweepSpec,
+                 *, ctx: "Any" = None,
+                 ) -> list[dict[str, Any]]:
     from vision_mvp.tasks.swe_bench_bridge import (
         ALL_SWE_STRATEGIES, ParserComplianceCounter,
         deterministic_oracle_generator,
@@ -121,24 +178,42 @@ def _mock_cells(spec: SweepSpec) -> list[dict[str, Any]]:
             for nd in spec.n_distractors:
                 tasks, repo_files = _load_bank(spec, nd)
                 counter = ParserComplianceCounter()
+                on_patch, on_verdict = _make_intra_cell_hooks(
+                    ctx,
+                    parser_mode=parser_mode,
+                    apply_mode=apply_mode,
+                    n_distractors=int(nd))
                 rep = run_swe_loop_sandboxed(
                     bank=tasks, repo_files=repo_files,
                     generator=deterministic_oracle_generator,
                     sandbox=sandbox,
                     strategies=tuple(ALL_SWE_STRATEGIES),
-                    timeout_s=spec.timeout_s, apply_mode=apply_mode)
-                cells.append({
+                    timeout_s=spec.timeout_s, apply_mode=apply_mode,
+                    on_patch_proposed=on_patch,
+                    on_test_completed=on_verdict)
+                cell = {
                     "parser_mode": parser_mode,
                     "apply_mode": apply_mode,
                     "n_distractors": nd,
                     "pooled": rep.pooled_summary(),
                     "parser_compliance": counter.as_dict(),
                     "n_instances": len(tasks),
-                })
+                }
+                cells.append(cell)
+                # In-flight capsule: seal the SWEEP_CELL as soon as
+                # its results land. If the ctx is provided, the
+                # ledger learns about each cell during the sweep,
+                # not after. A cell that fails to seal (over budget,
+                # parent missing) raises here and the remaining
+                # cells of this sweep do not run.
+                if ctx is not None:
+                    ctx.seal_sweep_cell(cell)
     return cells
 
 
-def _real_cells(spec: SweepSpec) -> list[dict[str, Any]]:
+def _real_cells(spec: SweepSpec,
+                 *, ctx: "Any" = None,
+                 ) -> list[dict[str, Any]]:
     """Execute a real-LLM sweep in-process.
 
     Lives here in ``wevra.runtime`` (not in `experiments/phase42`)
@@ -209,15 +284,22 @@ def _real_cells(spec: SweepSpec) -> list[dict[str, Any]]:
                     return ProposedPatch(
                         patch=outcome.substitutions, rationale=rat)
 
+                on_patch, on_verdict = _make_intra_cell_hooks(
+                    ctx,
+                    parser_mode=parser_mode,
+                    apply_mode=apply_mode,
+                    n_distractors=int(nd))
                 t0 = time.time()
                 rep = run_swe_loop_sandboxed(
                     bank=tasks, repo_files=repo_files,
                     generator=_gen, sandbox=sandbox,
                     strategies=tuple(ALL_SWE_STRATEGIES),
                     timeout_s=spec.timeout_s,
-                    apply_mode=apply_mode)
+                    apply_mode=apply_mode,
+                    on_patch_proposed=on_patch,
+                    on_test_completed=on_verdict)
                 wall = time.time() - t0
-                cells.append({
+                cell = {
                     "parser_mode": parser_mode,
                     "apply_mode": apply_mode,
                     "n_distractors": nd,
@@ -225,7 +307,10 @@ def _real_cells(spec: SweepSpec) -> list[dict[str, Any]]:
                     "parser_compliance": counter.as_dict(),
                     "n_instances": len(tasks),
                     "cell_wall_s": round(wall, 2),
-                })
+                }
+                cells.append(cell)
+                if ctx is not None:
+                    ctx.seal_sweep_cell(cell)
     return cells
 
 
@@ -252,7 +337,9 @@ def _resolve_launch_cmd(spec: SweepSpec) -> list[str]:
 
 
 def run_sweep(spec: SweepSpec,
-              *, strict_cost_gate: bool = False) -> dict[str, Any]:
+              *, strict_cost_gate: bool = False,
+              ctx: "Any" = None,
+              ) -> dict[str, Any]:
     """Execute ``spec`` and return a unified sweep block.
 
     Contract (``phase45.product_report.v2`` sweep sub-block):
@@ -273,10 +360,32 @@ def run_sweep(spec: SweepSpec,
 
     ``strict_cost_gate=True`` makes a not-acknowledged real run raise
     ``HeavyRunNotAcknowledged`` instead of staging.
+
+    ``ctx`` (optional) is a ``CapsuleNativeRunContext`` from
+    ``vision_mvp.wevra.capsule_runtime``. When provided, the runtime
+    seals each cell as a ``SWEEP_CELL`` capsule *in flight*: the
+    SWEEP_SPEC capsule is sealed before any cell runs, and each cell
+    is sealed as soon as its results land. Mid-run failure leaves an
+    in-flight register entry that never reaches the ledger — the
+    typed witness of which cell never completed. When ``ctx`` is
+    None, the legacy behaviour is preserved (cells accumulate in
+    memory; the post-hoc ``build_report_ledger`` folds them into
+    capsules afterwards).
     """
     t0 = time.time()
+    spec_payload = _spec_payload(spec)
+    if ctx is not None and ctx.spec_cap is None:
+        # Seal the SWEEP_SPEC before any cell runs. The capsule
+        # contract makes "no cells before spec" a typed gate, not a
+        # Python ordering convention.
+        ctx.seal_sweep_spec({
+            **spec_payload,
+            # Filled in below once we know which path executed.
+            "executed_in_process": (spec.mode == "mock"
+                                     or spec.acknowledge_heavy),
+        })
     if spec.mode == "mock":
-        cells = _mock_cells(spec)
+        cells = _mock_cells(spec, ctx=ctx)
         return {
             "schema": "wevra.sweep.v2",
             "mode": "mock", "executed_in_process": True,
@@ -317,7 +426,7 @@ def run_sweep(spec: SweepSpec,
                 "command instead. Re-run with "
                 "RunSpec(acknowledge_heavy=True) to execute in-process."),
         }
-    cells = _real_cells(spec)
+    cells = _real_cells(spec, ctx=ctx)
     return {
         "schema": "wevra.sweep.v2",
         "mode": "real", "executed_in_process": True,
@@ -326,6 +435,20 @@ def run_sweep(spec: SweepSpec,
         "cells": cells, "launch_cmd": None,
         "wall_seconds": round(time.time() - t0, 3),
         "model": spec.model, "endpoint": spec.endpoint,
+    }
+
+
+def _spec_payload(spec: SweepSpec) -> dict[str, Any]:
+    """Canonical payload for the SWEEP_SPEC capsule. Matches the
+    shape ``build_report_ledger`` uses for its own post-hoc fold so
+    in-flight and post-hoc ledgers stay CID-equivalent on the
+    SWEEP_SPEC kind (Theorem W3-34)."""
+    return {
+        "mode": spec.mode,
+        "sandbox": spec.sandbox,
+        "jsonl": spec.jsonl,
+        "model": spec.model,
+        "endpoint": spec.endpoint,
     }
 
 

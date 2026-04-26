@@ -320,12 +320,21 @@ class CapsuleCLITests(unittest.TestCase):
             self.assertEqual(rc, 0)
             self.assertIn("capsule graph", buf.getvalue())
             self.assertIn("chain_ok", buf.getvalue())
-            # verify subcommand — returns 0 when the chain is good.
+            # verify subcommand — returns 0 when every check passes.
+            # SDK v3.2 strengthened verify to four independent
+            # on-disk checks; the output prints each line plus a
+            # final ``verdict = OK / BAD`` summary.
             buf = io.StringIO()
             with contextlib.redirect_stdout(buf):
                 rc = _cmd_capsule(["verify", "--report", report_path])
             self.assertEqual(rc, 0)
-            self.assertIn("verdict=OK", buf.getvalue())
+            output = buf.getvalue()
+            # Final overall verdict is OK.
+            self.assertRegex(output, r"verdict\s*=\s*OK")
+            # Each named check is present.
+            self.assertIn("chain_recompute_embedded", output)
+            self.assertIn("chain_recompute_on_disk", output)
+            self.assertIn("artifacts_on_disk", output)
 
 
 if __name__ == "__main__":
