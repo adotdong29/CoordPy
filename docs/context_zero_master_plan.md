@@ -6746,6 +6746,212 @@ Anchor: `docs/RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md`;
 `vision_mvp/wevra/team_coord.py`
 (`CrossRoleCorroborationAdmissionPolicy`).
 
+### 4.27 SDK v3.10 — multi-service top-K cross-role corroboration multi-agent coordination (deterministic Phase-56 benchmark + W9 family)
+
+The v3.9 milestone (§ 4.26) cleared the strong success bar by
+strictly separating cross-role corroboration (W8) from single-tag
+plurality (W7-2) on a harder *decoy-plurality* regime. But the W8
+result has a named falsifier of its own: it picks the top-1
+corroborated tag and only the top-1. On any *multi-service-gold*
+regime where the gold answer requires ``services = {A, B}`` (the
+canonical realistic incident shape), W8 admits only candidates
+carrying the single highest-scoring tag and the decoder's
+set-equality ``services_correct`` check fails. SDK v3.10 directly
+attacks this falsifier and clears the **strong success bar** of
+`docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` § 1.1 (R-56
+anchor) — a strict gain ≥ 0.20 on a harder regime *vs the SDK
+v3.9 strongest method*, stable across ≥ 3 seeds, no regression on
+Phase 53 / Phase 54 / Phase 55, audit T-1..T-7 preserved on every
+cell, and a *named falsifier regime* where the win correctly does
+not hold.
+
+**1. Pre-committed success criterion (PART A — updated R-56 anchor).**
+`docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` extends the bar
+to four named regimes (R-53 / R-54 / R-55 / R-56). The strong bar
+now requires: code anchor, strict gain ≥ 0.20 on **R-56** vs both
+substrate FIFO and the SDK v3.9 strongest method
+(``CrossRoleCorroborationAdmissionPolicy``, W8), cross-bank
+stability ≥ 3 seeds, no regression > 0.05 on R-53 / R-54 / R-55,
+audit preserved, and a *named falsifier regime*. The falsifying-
+failure list now also gates the W8-1 contract test.
+
+**2. Phase-56 deterministic multi-service-gold + cross-role-
+corroborated benchmark (PART B).**
+`vision_mvp/experiments/phase56_multi_service_corroboration.py`
+materialises the smallest deterministic regime where:
+
+* Every scenario has ``gold_services`` of size **2** (multi-
+  service incident — pool exhaustion across api+db, deadlock
+  across orders+payments, slow-query cascade across web+db, error
+  spike across api+mobile, disk fill across storage+logs).
+* **Both** gold services are corroborated by ≥ 2 distinct producer
+  roles each (the cross-role corroboration signal *for both gold
+  tags simultaneously*).
+* At least one decoy service has raw plurality but is corroborated
+  by **exactly 1** producer role (so substrate FIFO and W7-2
+  buffered cohort fail by admitting the decoy).
+* `|candidates_to_auditor| > K_auditor` on every scenario at K=4.
+
+Bench properties are *named and mechanically verified* by
+`Phase56BankShapeTests`: 10/10 default scenarios satisfy
+multi-service-gold (size 2), both-gold-corroborated (≥2 roles each),
+single-role-decoy (≤1 role), and surplus. A *named falsifier
+regime* (`build_phase56_falsifier_bank`) promotes a decoy to ≥ 2
+distinct producer roles so 10/10 falsifier scenarios satisfy
+`decoy_corroboration_holds`; on the falsifier the new policy
+correctly ties FIFO at 0.000.
+
+**3. `MultiServiceCorroborationAdmissionPolicy` (new, SDK v3.10 — PART C).**
+`vision_mvp/wevra/team_coord.py`. A deterministic, training-free,
+interpretable cross-role admission rule that admits the **top-K
+cross-role-corroborated tier** rather than the single highest-
+scoring tag. Selection rule:
+
+```
+1. Drop tags with |distinct_roles(tag)| < min_corroborated_roles
+2. Argmax-by-role-count tier: keep tags with the maximum
+   |distinct_roles| among the eligible set
+3. Top-K by score (lex tie-break) among the argmax tier
+```
+
+with default ``top_k = 2, min_corroborated_roles = 2,
+role_weight = 100``. The argmax-by-role-count gate is
+**load-bearing**: it ensures W9 collapses to W8 when only one tag
+has the maximum role count (W9-3 backward-compat) — so W9 is a
+*strict generalisation* of W8 by construction.
+
+**4. Empirical headline (Phase-56 default, n=10, K=4 — PART D).**
+
+| Strategy                  | accuracy_full | accuracy_services | mean_n_admitted_auditor |
+| ------------------------- | ------------- | ----------------- | ----------------------- |
+| substrate / capsule_fifo / capsule_priority / capsule_coverage | 0.000  | 0.000  | 4.00 |
+| capsule_cohort_buffered (W7-2) | 0.000    | 0.000             | ~3                      |
+| capsule_corroboration (W8) | 0.000        | 0.000             | ~2                      |
+| **capsule_multi_service** | **1.000**     | **1.000**         | **4.00**                |
+
+Headline gaps:
+* `multi_service − fifo accuracy_full = +1.000`
+* `multi_service − cohort_buffered accuracy_full = +1.000`
+* `multi_service − corroboration accuracy_full = +1.000` ← strict separation from W8
+
+Stable across 5/5 alternate `bank_seed` values (11, 17, 23, 29, 31).
+On the named W9-4 falsifier regime, all strategies (including
+multi_service) tie at 0.000 — confirming the conditional nature
+of the win. On Phase 55 default, multi_service ties W8 at 1.000
+(W9-3 backward-compat via the argmax-by-role-count gate). On
+Phase 54 default, multi_service ties W7-2 at 1.000. On Phase 53
+synthetic, all admission strategies tie FIFO at 0.800 — no
+regression (W7-1 low-surplus regime).
+
+**5. The W9 theorem family (PART E).**
+
+* **W9-1 (proved-empirical, n=50 saturated).** Multi-service
+  corroboration strict separation from W8 on Phase-56 default.
+  Headline gap +1.000 vs substrate FIFO, W7-2, **and W8**. Stable
+  across 5/5 bank seeds. Named falsifier: Phase-56 falsifier bank
+  (W9-4).
+* **W9-2 (proved, structural).** ``_dominant_tag_set`` selection
+  rule has three structural properties: (a) single-role exclusion,
+  (b) argmax-tier collapse to size 1 → W9 ≡ W8, (c) argmax-tier
+  multi-tag admission within ``top_k`` cap.
+* **W9-3 (proved-empirical, n=10).** Backward-compat: on Phase-55
+  default, W9 admits identical set to W8; on Phase-54 default,
+  W9 ties W7-2 at 1.000.
+* **W9-4 (proved-empirical, n=10 saturated).** Decoy-corroboration
+  falsifier: when a decoy is also corroborated by ≥
+  ``min_corroborated_roles`` distinct producer roles, the W9
+  dominant set includes the decoy (argmax tier expands), the
+  decoder's `services` set picks up the decoy, and `services_correct`
+  fails on 10/10 falsifier scenarios. Sharper observation: this
+  is the structural limit of any service-blind admission policy
+  under set-equality decoder grading; the only escape is a
+  bundle-aware decoder companion (W9-C1).
+
+The W9-C family makes the bundle-aware decoder / |gold|≥3 /
+real-LLM extensions falsifiable. SDK v3.9's W8-C1 conjecture
+(top-K corroboration improves multi-service scenarios) is now
+**discharged-empirical** by W9-1.
+
+**6. PART F (product/runtime honesty).** The Wevra single-run
+product runtime contract is **byte-for-byte unchanged from SDK
+v3.9**. The new admission policy is a research-slice addition to
+`vision_mvp.wevra.team_coord` (additive surface). The lifecycle
+audit (T-1..T-7) holds on every cell of every regime, including
+Phase 56 default and falsifier.
+
+**7. Files / tests / artefacts (this milestone).**
+
+* `vision_mvp/wevra/team_coord.py` (extended) —
+  `MultiServiceCorroborationAdmissionPolicy` added; streaming +
+  `from_candidate_stream` buffered factory; `_dominant_tag_set`
+  helper; `ALL_FIXED_POLICY_NAMES` updated.
+* `vision_mvp/wevra/__init__.py` — re-exports
+  `TeamMultiServiceCorroborationAdmissionPolicy`; `SDK_VERSION`
+  bumped to `wevra.sdk.v3.10`.
+* `vision_mvp/experiments/phase56_multi_service_corroboration.py`
+  (new) — driver; 5 base scenario builders; default + falsifier
+  bank constructors; `run_phase56`,
+  `run_phase56_seed_stability_sweep`, `run_cross_regime_summary`.
+* `vision_mvp/tests/test_wevra_multi_service_corroboration.py`
+  (new) — 36 contract tests covering policy unit tests, bank
+  shape, default config win, seed stability, falsifier behaviour,
+  W9-3 backward-compat with Phase 55, audit-grid invariance,
+  cross-regime contract, public-API contract.
+* `vision_mvp/tests/test_wevra_public_api.py` (updated) —
+  `test_sdk_version_is_v3_10` (renamed from v3_9).
+* `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` (updated) —
+  R-56 named regime added; bar anchor advanced to R-56;
+  falsifying-failure list extended to gate W8-1 contract test.
+* `docs/RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md` (new —
+  milestone results note).
+* `docs/data/phase56_multi_service_K4_n10.json` (frozen default).
+* `docs/data/phase56_falsifier_K4_n10.json` (frozen falsifier).
+* `docs/data/phase56_seed_sweep.json` (frozen 5-seed sweep).
+* `docs/data/phase56_cross_regime.json` (frozen
+  Phase 54+55+56 + falsifier bundle).
+* `docs/data/phase53_synthetic_w9_regression_check.json` (frozen
+  Phase-53 synthetic regression check).
+* `docs/THEOREM_REGISTRY.md` — W9-1/W9-2/W9-3/W9-4/W9-C1/W9-C2/
+  W9-C3 added; W8-C1 marked DISCHARGED; date stamp v3.10.
+* `docs/RESEARCH_STATUS.md` — ninth research axis added; SDK
+  v3.10 frontier section.
+* `docs/START_HERE.md` — SDK v3.10 paragraph + W9 family summary.
+
+Anchor: `docs/RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md`;
+`docs/data/phase56_multi_service_K4_n10.json`;
+`docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`;
+`vision_mvp/experiments/phase56_multi_service_corroboration.py`;
+`vision_mvp/wevra/team_coord.py`
+(`MultiServiceCorroborationAdmissionPolicy`).
+
+**Master-plan post-v3.10 reading.** After SDK v3.10:
+
+1. **Post-v3.9 success bar.** R-56 (multi-service-gold +
+   cross-role-corroborated; both gold services 2-role corroborated;
+   single-role decoy storm). Bar: strict gain ≥ 0.20 vs both FIFO
+   and SDK v3.9 W8, stable across ≥ 3 seeds, no regression on
+   R-53/R-54/R-55, audit preserved, named falsifier regime.
+2. **Harder regime fairness.** Phase 56 is fair because every
+   property (multi-service gold, both-gold corroboration, single-
+   role decoy, budget pressure, realistic claim_kinds) is mechanically
+   verified by `Phase56BankShapeTests` and pre-committed in code
+   *before* any seed sweep was run.
+3. **Did the new method broaden the structural win?** **Yes.**
+   The structural win now spans **four** named regimes (Phase 53
+   no-regression, Phase 54 backward-compat, Phase 55 backward-compat,
+   Phase 56 strict win) and is the first programme result whose
+   *strict-gain* regime is *not solvable by the previous SDK's
+   strongest method*. W9-1 is the first strict separation from W8.
+4. **Original thesis status.** *Per-agent minimum-sufficient
+   context for multi-agent teams* is now **stronger but still
+   conditional**. The capsule layer's audit contribution is
+   preserved; the coordination-performance contribution now spans
+   four named regimes; the W9-4 falsifier (decoy corroboration) is
+   the named structural limit of service-blind admission. The next
+   axis of structural improvement is the **bundle-aware decoder
+   companion** (W9-C1), which would attack the W9-4 falsifier from
+   the decoder side rather than the admission side.
+
 ---
 
 ## 5. End goals

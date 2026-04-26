@@ -5,6 +5,98 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.10] — 2026-04-26 — SDK v3.10 — multi-service top-K cross-role corroboration multi-agent coordination + W9 family
+
+*Strictly additive on SDK v3.9. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The new
+``MultiServiceCorroborationAdmissionPolicy`` is a research-slice
+addition to the multi-agent coordination layer
+(``vision_mvp.wevra.team_coord``), not part of the run-boundary
+product runtime. **Second consecutive SDK milestone to clear the
+strong success bar of `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`
+§ 1.1 (R-56 anchor)** — strict separation from W8 on Phase 56
+(+1.000 multi_service − corroboration on accuracy_full,
++1.000 vs FIFO and W7-2 too), backward-compat on Phase 55
+(W9 ties W8 at 1.000 via the argmax-by-role-count gate),
+backward-compat on Phase 54 (W9 ties W7-2 at 1.000),
+no regression on Phase 53 synthetic (0.800), cross-bank stability
+across 5/5 seeds, named falsifier regime (W9-4) correctly ties
+FIFO at 0.000.  **First programme result whose strict-gain regime
+is not solvable by the previous SDK's strongest method.***
+
+### Added
+
+- **Phase-56 multi-service-gold + cross-role-corroborated benchmark**
+  (new): `vision_mvp/experiments/phase56_multi_service_corroboration.py`.
+  Smallest deterministic regime where (a) every scenario has
+  `gold_services` of size 2 (multi-service incident), (b) both gold
+  services are corroborated by ≥ 2 distinct producer roles, (c) at
+  least one decoy service has raw plurality but is corroborated by
+  exactly 1 producer role. 5 base scenario builders × 2 replicates
+  → 10-scenario default bank; named falsifier bank promotes a
+  decoy to ≥ 2 distinct producer roles (W9-4 anchor).
+- **`MultiServiceCorroborationAdmissionPolicy`** (new): in
+  `vision_mvp/wevra/team_coord.py`. Deterministic, training-free
+  admission rule that admits the **top-K cross-role-corroborated
+  tier** (default `top_k=2, min_corroborated_roles=2`) via the
+  argmax-by-role-count gate. Strictly generalises the SDK v3.9
+  W8 single-tag corroboration policy (W9-3 backward-compat).
+  Buffered factory `from_candidate_stream` is the W9-1 anchor.
+  Re-exported as `TeamMultiServiceCorroborationAdmissionPolicy`.
+- **`_dominant_tag_set`** helper (new): pure function with three
+  structural properties (W9-2): single-role exclusion;
+  argmax-tier collapse; argmax-tier multi-tag admission within
+  `top_k` cap.
+- **W9 theorem family** (new): W9-1 strict separation, W9-2
+  argmax-tier strict-ordering, W9-3 backward-compat with W8
+  + W7-2, W9-4 decoy-corroboration falsifier — all proved or
+  proved-empirical on the pre-committed Phase-56 default. W9-C1
+  / W9-C2 / W9-C3 conjectures (bundle-aware decoder, |gold|≥3,
+  real-LLM transfer).
+- **36 contract tests** in `test_wevra_multi_service_corroboration.py`:
+  policy unit tests, bank shape, default config win, seed stability,
+  falsifier behaviour, W9-3 backward-compat with Phase 55, audit
+  invariance, cross-regime contract, public-API contract.
+- **`docs/RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md`** (new):
+  milestone results note with W9 family theorem statements.
+- **Frozen artefacts** in `docs/data/`: `phase56_multi_service_K4_n10.json`,
+  `phase56_falsifier_K4_n10.json`, `phase56_seed_sweep.json`,
+  `phase56_cross_regime.json`,
+  `phase53_synthetic_w9_regression_check.json`.
+
+### Changed
+
+- **`SDK_VERSION`** bumped from `wevra.sdk.v3.9` to `wevra.sdk.v3.10`.
+- **`docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`** — bar anchor
+  advanced to R-56; R-56 named regime added with mechanical-witness
+  ingredient list; falsifying-failure list extended to gate W8-1
+  contract test; canonical phrasing for SDK v3.10 added.
+- **`docs/THEOREM_REGISTRY.md`** — W9-1/W9-2/W9-3/W9-4 + W9-C1/C2/C3
+  added; W8-C1 marked DISCHARGED; date stamp v3.10.
+- **`docs/RESEARCH_STATUS.md`** — ninth research axis (multi-service
+  top-K corroboration) added; SDK v3.10 frontier section.
+- **`docs/HOW_NOT_TO_OVERSTATE.md`** — W9 overstatement guards
+  added (W9-1 conditionality, W8 multi-service-gold falsifier
+  named, "we solved multi-agent context" still forbidden).
+- **`docs/context_zero_master_plan.md`** — § 4.27 added (SDK v3.10
+  milestone summary + post-v3.10 reading).
+- **`docs/START_HERE.md`** — SDK v3.10 paragraph + W9 family summary;
+  links to milestone result + success bar updated.
+
+### Preserved
+
+- **Wevra single-run product runtime contract.** Byte-for-byte
+  unchanged from SDK v3.9. The Phase-45 product report schema
+  (`PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"`) is
+  unchanged.
+- **SDK v3.5–v3.9 multi-agent surface.** Every fixed admission
+  policy from previous SDKs (FIFO, priority, coverage,
+  cohort_coherence, cross_role_corroboration) is unchanged; W7-2
+  and W8-1 contract tests still pass byte-for-byte. The new W9
+  policy is purely additive.
+- **Lifecycle audit (T-1..T-7).** Holds on every cell of every
+  regime (R-53 / R-54 / R-55 / R-56 default / R-56 falsifier).
+
 ## [3.9] — 2026-04-26 — SDK v3.9 — cross-role corroboration multi-agent coordination + W8 family
 
 *Strictly additive on SDK v3.8. The Wevra single-run product

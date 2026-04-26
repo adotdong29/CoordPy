@@ -949,11 +949,318 @@ class CrossRoleCorroborationAdmissionPolicy:
                                   score=0.0)
 
 
+# =============================================================================
+# Multi-service cross-role corroboration (SDK v3.10 — W9 family)
+# =============================================================================
+
+
+@dataclasses.dataclass
+class MultiServiceCorroborationAdmissionPolicy:
+    """Top-K cross-role corroboration with min-role threshold
+    (SDK v3.10 / W9 family).
+
+    A strict generalisation of
+    :class:`CrossRoleCorroborationAdmissionPolicy` (SDK v3.9 / W8) that
+    admits candidates whose ``service=<tag>`` belongs to the **set of
+    top-K corroborated tags** rather than only the single highest-scoring
+    tag. This is the smallest mechanical move that captures
+    *multi-service incidents* — the case where the gold answer requires
+    aggregating evidence across **two or more** distinct services
+    (e.g. a "db pool exhaustion + api latency" incident with
+    ``gold_services = ("api", "db")``).
+
+    Why W8 (single-tag corroboration) is *not* enough
+    -------------------------------------------------
+    The decoder ``_decoder_from_handoffs`` (Phase-31) computes
+    ``services = ⋃ {service tags in admitted handoffs}`` and grades
+    ``services_correct`` by **set equality** with ``gold_services``.
+    On a multi-service-gold scenario, the W8 policy admits only
+    candidates carrying the top-1 corroboration tag; the auditor's
+    ``services`` is therefore a singleton, and ``services_correct``
+    fails *even when* the gold tag is the W8 winner. W9 admits the
+    top-K corroboration tags and recovers ``services`` set equality.
+
+    The threshold ``min_corroborated_roles``
+    ----------------------------------------
+    Top-K alone is not enough either: a decoy with raw plurality and
+    ``|distinct_roles| = 1`` would slip into the top-K set (in the
+    K=2 case if the second gold service is corroborated by only 2
+    roles, the decoy's score = ``W_role · 1 + 100 = W_role + 100``
+    might exceed the gold-B's ``W_role · 2 + 4 = 2 W_role + 4``
+    only when ``W_role < 96``; with the default ``W_role=100``, the
+    decoy is dominated). To make the policy robust under arbitrary
+    raw counts, we additionally require **every admitted dominant
+    tag to satisfy** ``|distinct_roles(tag)| ≥ min_corroborated_roles``
+    (default ``2``). This is the **min-role threshold** — a tag with
+    only one role's support cannot enter the dominant set even if its
+    raw count is large. It is the structural separator between
+    cross-role-corroborated gold and single-role decoy storms.
+
+    Two sub-modes
+    -------------
+    * **Streaming** (``fixed_dominant_tags=None``, default) —
+      recompute the top-K corroborated tags from currently-admitted
+      candidates each ``decide`` call. Arrival-order-sensitive in the
+      same sense as W8 / W7-1-aux streaming.
+    * **Buffered** (``fixed_dominant_tags=frozenset(...)``) — pre-fit
+      the dominant tag set on the full ``(source_role, payload)``
+      candidate list. Construct via :meth:`from_candidate_stream`.
+      **Arrival-order-stable** by construction. The buffered variant
+      is the W9-1 anchor.
+
+    Scoring (re-uses the W8 score function)
+    ---------------------------------------
+    For each ``service=<tag>`` in the candidate stream:
+
+    .. math::
+
+        \\text{score}(\\text{tag}) =
+        W_\\text{role} \\cdot |\\{ \\text{distinct roles emitting tag}
+        \\}| + |\\{ \\text{total mentions of tag}\\}|
+
+    Then:
+
+    1. Drop tags with ``|distinct_roles(tag)| < min_corroborated_roles``.
+    2. Of the remaining tags, take the ``top_k`` by score (ties broken
+       lex on the tag name).
+    3. The buffered policy admits a candidate iff its tag is in this
+       dominant set, OR the candidate has no tag.
+
+    This is **provable** (W9-2): with default ``W_role=100`` and
+    ``min_corroborated_roles=2``, no tag with one-role support can
+    enter the dominant set regardless of raw count, and any tag with
+    ``≥ min_corroborated_roles`` distinct roles strictly dominates any
+    ``min_corroborated_roles - 1``-roles tag with raw-count advantage
+    ``< W_role``. See docstring of :func:`_dominant_tag_set` and
+    Theorem W9-2 in :file:`docs/RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md`.
+
+    Backward compatibility (W9-3)
+    -----------------------------
+    On a single-service-gold candidate stream where exactly one tag
+    has ``≥ min_corroborated_roles`` distinct-role support, the
+    dominant set has size 1 and W9 admits exactly the same set as
+    W8 (``CrossRoleCorroborationAdmissionPolicy``). The Phase-55
+    default has this property by construction; W9 ties W8 at
+    ``accuracy_full = 1.000`` there.
+
+    Falsifier (W9-4)
+    ----------------
+    If a *decoy* service is also cross-role-corroborated above the
+    threshold (e.g. ``decoy_storm`` mentioned by ≥ 2 distinct roles)
+    AND the decoy's score equals or exceeds gold-B's score, the
+    decoy slips into the top-K dominant set, the auditor's
+    ``services`` becomes ``{gold_A, gold_B, decoy}`` ≠
+    ``{gold_A, gold_B}``, and the W9-1 win does *not* hold. The
+    Phase-56 *decoy-corroborated* falsifier bank instantiates this
+    regime.
+
+    Lifecycle invariants
+    --------------------
+    The policy preserves T-1..T-7 by construction: it returns standard
+    ``AdmissionDecision`` records via the existing ``TeamCoordinator``
+    admission path. No new lifecycle states; W6-1 generalisation to
+    Phase-56 holds.
+
+    Theorem cross-reference (W9 family)
+    -----------------------------------
+    * **W9-1** (proved-empirical) — strict separation on Phase-56
+      multi-service-gold + corroborated-decoy regime.
+    * **W9-2** (proved, structural) — the min-role threshold and
+      W_role > Δr_max constants jointly bound the decoy below any
+      gold tag with ≥ min_corroborated_roles support.
+    * **W9-3** (proved-empirical) — backward-compat with W8 on
+      Phase-55 default.
+    * **W9-4** (proved-empirical) — Phase-56 decoy-corroborated
+      falsifier ties FIFO at 0.000.
+    """
+
+    name: str = "multi_service_corroboration"
+    role_weight: int = 100
+    top_k: int = 2
+    min_corroborated_roles: int = 2
+    fixed_dominant_tags: frozenset[str] | None = None
+
+    @classmethod
+    def from_candidate_stream(
+            cls,
+            stream: "Iterable[tuple[str, str]]",
+            *,
+            role_weight: int = 100,
+            top_k: int = 2,
+            min_corroborated_roles: int = 2,
+            ) -> "MultiServiceCorroborationAdmissionPolicy":
+        """Construct a *buffered* policy by pre-fitting the
+        top-K cross-role-corroborated dominant tag set on a candidate
+        stream.
+
+        Parameters
+        ----------
+        stream
+            Iterable of ``(source_role, payload)`` pairs.
+        role_weight
+            Constant ``W_role`` in the score function (default 100).
+        top_k
+            Maximum size of the dominant tag set (default 2 — the
+            multi-service-gold case ``gold_services = (A, B)``).
+        min_corroborated_roles
+            Minimum distinct producer roles a tag must have to enter
+            the dominant set (default 2). Tags with fewer distinct-
+            role support are filtered out *before* the top-K cut.
+            Default ``2`` is the smallest-but-still-defending threshold:
+            it filters single-role decoy storms while admitting any
+            tag with cross-role evidence.
+
+        Score function (re-stated for clarity):
+
+            score(tag) = role_weight * |distinct_roles(tag)|
+                       + raw_mentions(tag)
+
+        Selection:
+
+            dominant_tags = top_k tags by score among
+                              {tag : |distinct_roles(tag)| >=
+                                       min_corroborated_roles}
+
+        Ties break by lex order on the tag (deterministic).
+        If no tag passes the threshold, the buffered policy admits
+        nothing tagged (consistent with W7-2 / W8 fall-through to
+        FIFO-on-untagged).
+        """
+        role_per_tag: dict[str, set[str]] = {}
+        count_per_tag: dict[str, int] = {}
+        for (src_role, payload) in stream:
+            if not payload:
+                continue
+            m = _SERVICE_TAG_RE.search(str(payload))
+            if not m:
+                continue
+            tag = m.group(1)
+            count_per_tag[tag] = count_per_tag.get(tag, 0) + 1
+            role_per_tag.setdefault(tag, set()).add(str(src_role))
+        if not count_per_tag:
+            return cls(role_weight=role_weight, top_k=top_k,
+                        min_corroborated_roles=min_corroborated_roles)
+        dominant = _dominant_tag_set(
+            count_per_tag=count_per_tag,
+            role_per_tag=role_per_tag,
+            role_weight=role_weight,
+            top_k=top_k,
+            min_corroborated_roles=min_corroborated_roles)
+        return cls(role_weight=role_weight, top_k=top_k,
+                    min_corroborated_roles=min_corroborated_roles,
+                    fixed_dominant_tags=frozenset(dominant))
+
+    def decide(self, *, candidate, role, budget,
+               current_admitted, current_n_tokens):
+        denial = _enforce_budget(
+            candidate=candidate, role=role, budget=budget,
+            current_admitted=current_admitted,
+            current_n_tokens=current_n_tokens)
+        if denial is not None:
+            return denial
+        cand_tag = _candidate_service_tag(candidate)
+        if not cand_tag:
+            return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+        if self.fixed_dominant_tags is not None:
+            if cand_tag in self.fixed_dominant_tags:
+                return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+            return AdmissionDecision(admit=False, reason=REASON_SCORE_LOW,
+                                      score=0.0)
+        # Streaming mode: recompute the dominant set over admitted set.
+        role_per_tag: dict[str, set[str]] = {}
+        count_per_tag: dict[str, int] = {}
+        for c in current_admitted:
+            t = _candidate_service_tag(c)
+            if not t:
+                continue
+            r = _candidate_source_role(c)
+            count_per_tag[t] = count_per_tag.get(t, 0) + 1
+            role_per_tag.setdefault(t, set()).add(r)
+        if not count_per_tag:
+            return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+        dominant = _dominant_tag_set(
+            count_per_tag=count_per_tag,
+            role_per_tag=role_per_tag,
+            role_weight=self.role_weight,
+            top_k=self.top_k,
+            min_corroborated_roles=self.min_corroborated_roles)
+        if cand_tag in dominant:
+            return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+        return AdmissionDecision(admit=False, reason=REASON_SCORE_LOW,
+                                  score=0.0)
+
+
+def _dominant_tag_set(*,
+                       count_per_tag: dict[str, int],
+                       role_per_tag: dict[str, set[str]],
+                       role_weight: int,
+                       top_k: int,
+                       min_corroborated_roles: int) -> tuple[str, ...]:
+    """Compute the top-K cross-role-corroborated dominant tag set.
+
+    Selection rule (argmax-by-role-count tier with top-K cap):
+
+      1. Drop tags with ``|distinct_roles(tag)| < min_corroborated_roles``
+         (filters single-role storms).
+      2. Of the remaining tags, take the ``argmax-by-role-count``
+         tier: every tag whose distinct-role count equals the
+         maximum distinct-role count across the eligible set. This
+         is the **structural** cross-role-corroboration tier — a
+         decoy with strictly fewer distinct producer roles than the
+         strongest cross-role-corroborated tag is excluded by
+         construction, regardless of raw count.
+      3. Among the argmax tier, take the ``top_k`` by score
+         (``score(tag) = role_weight · |distinct_roles(tag)|
+         + raw_mentions(tag)``); lex tie-break.
+
+    Why the argmax tier (and not score-sorted top-K alone)
+    -------------------------------------------------------
+    Without the argmax tier, on a Phase-55-style single-service-gold
+    regime where the gold tag has strictly more distinct producer
+    roles than every decoy, a *second* tag (a decoy) with sub-max
+    role count but high raw count could enter the top-K dominant
+    set, breaking backward-compat with W8 single-tag corroboration.
+    The argmax-by-role-count gate ensures W9 *collapses* to W8 when
+    only one tag has the maximum role count — i.e. W9 is a strict
+    generalisation of W8 (W9-3 backward-compat).
+
+    Phase-56 multi-service-gold regime:
+    *both* gold tags have role count = 2 (the max among eligible);
+    the (single-role) decoy storm is below ``min_corroborated_roles``
+    and excluded; the argmax tier = {gold_A, gold_B}; W9 admits both
+    and ``services = {A, B}`` matches gold (W9-1 win).
+
+    Phase-56 falsifier regime:
+    a decoy is promoted to 2 distinct producer roles, so the argmax
+    tier = {gold_A, gold_B, decoy}; the top-K cap (default 2) lets
+    score break the tie, and a high-raw-count decoy enters the
+    dominant set, displacing one gold tag (W9-4 falsifier).
+
+    Returns a tuple of tag names in lex order (deterministic).
+    """
+    eligible = [t for t, _c in count_per_tag.items()
+                  if len(role_per_tag.get(t, set())) >=
+                     min_corroborated_roles]
+    if not eligible:
+        return ()
+    role_count = {t: len(role_per_tag.get(t, set())) for t in eligible}
+    max_roles = max(role_count.values())
+    argmax_tier = [t for t in eligible if role_count[t] == max_roles]
+    scored: list[tuple[int, str]] = []
+    for t in argmax_tier:
+        scored.append((role_weight * role_count[t] + count_per_tag[t], t))
+    # Sort by (-score, tag) — highest score first, lex tie-break.
+    scored.sort(key=lambda x: (-x[0], x[1]))
+    chosen = [t for (_s, t) in scored[:top_k]]
+    return tuple(sorted(chosen))
+
+
 # Closed-vocabulary handle for "policies named in TEAM_DECISION
 # audit logs". Keeps the per-policy diagnostics scannable.
 ALL_FIXED_POLICY_NAMES = ("fifo", "claim_priority", "coverage_guided",
                             "cohort_coherence",
-                            "cross_role_corroboration")
+                            "cross_role_corroboration",
+                            "multi_service_corroboration")
 
 
 # =============================================================================
@@ -1425,6 +1732,7 @@ __all__ = [
     "CoverageGuidedAdmissionPolicy",
     "CohortCoherenceAdmissionPolicy",
     "CrossRoleCorroborationAdmissionPolicy",
+    "MultiServiceCorroborationAdmissionPolicy",
     "ALL_FIXED_POLICY_NAMES",
     # Coordinator
     "TeamCoordinator",

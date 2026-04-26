@@ -206,6 +206,8 @@ from .team_coord import (
     CohortCoherenceAdmissionPolicy as TeamCohortCoherenceAdmissionPolicy,
     CrossRoleCorroborationAdmissionPolicy
         as TeamCrossRoleCorroborationAdmissionPolicy,
+    MultiServiceCorroborationAdmissionPolicy
+        as TeamMultiServiceCorroborationAdmissionPolicy,
     TeamCoordinator, audit_team_lifecycle,
     TeamLifecycleAuditReport, T_INVARIANTS,
 )
@@ -221,7 +223,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.9"
+SDK_VERSION = "wevra.sdk.v3.10"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -304,6 +306,7 @@ __all__ = [
     "TeamCoverageGuidedAdmissionPolicy",
     "TeamCohortCoherenceAdmissionPolicy",
     "TeamCrossRoleCorroborationAdmissionPolicy",
+    "TeamMultiServiceCorroborationAdmissionPolicy",
     "TeamCoordinator", "audit_team_lifecycle",
     "TeamLifecycleAuditReport", "T_INVARIANTS",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",

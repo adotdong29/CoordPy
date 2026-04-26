@@ -61,7 +61,7 @@ class WevraSurfaceTests(unittest.TestCase):
             self.assertIsInstance(v, str)
             self.assertTrue(len(v) > 0)
 
-    def test_sdk_version_is_v3_9(self):
+    def test_sdk_version_is_v3_10(self):
         from vision_mvp.wevra import SDK_VERSION
         # SDK v3.9 bump: cross-role corroboration multi-agent
         # coordination (Phase-55 + W8 family). Strictly additive on
@@ -72,7 +72,7 @@ class WevraSurfaceTests(unittest.TestCase):
         # ``CrossRoleCorroborationAdmissionPolicy`` in
         # ``vision_mvp.wevra.team_coord`` (multi-agent coordination
         # research slice; not part of the run-boundary product runtime).
-        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.9")
+        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.10")
 
     def test_cohort_coherence_admission_policy_is_exported(self):
         # The SDK v3.8 cross-role admission policy must be importable

@@ -392,6 +392,90 @@ via ``from_candidate_payloads``) is the SDK v3.8 win."
   ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` § 1.1; "the
   three-regime win is universal" without naming the W8-4
   falsifier regime.
+- **2026-04-26 (SDK v3.10).** Adds W9 rules: forbidden phrases
+  "multi-service corroboration beats W8" without the
+  bench-property conditions (multi-service-gold + both gold
+  services 2-role corroborated + single-role decoy storm);
+  "we solved multi-agent context" still forbidden after the
+  Phase-56 result — it now spans **four** named regimes, not
+  all of multi-agent reality; "the four-regime win is universal"
+  without naming the W9-4 falsifier regime (decoy-corroborated
+  decoy); "W8 was wrong" — W8 is *unchanged* and still wins on
+  Phase 55, W9 is a strict generalisation that adds Phase 56,
+  not a refutation.
+
+### Labelling the W8-1 win "the W8 multi-service-gold falsifier" (named for SDK v3.10)
+
+> *"On multi-service-gold benches, single-tag corroboration is
+> sufficient."*
+
+Forbidden. The **W8 multi-service-gold falsifier** is named in the
+v3.10 milestone: when ``gold_services`` has size > 1, the W8 buffered
+policy admits only the top-1 corroborated tag and the decoder's
+``services`` set is a singleton, so ``services_correct`` fails by
+set equality regardless of the corroboration signal's quality. The
+SDK v3.10 ``MultiServiceCorroborationAdmissionPolicy`` (W9) was
+built specifically to address this falsifier; the SDK v3.10
+contract tests
+(``Phase56DefaultConfigTests::test_w8_falsifies_on_phase56``) gate
+the falsifier mechanically.
+
+The defensible reading: "W8 is sufficient on single-service-gold
+benches; W9 is required for multi-service gold."
+
+### Labelling the W9-1 multi-service win as unconditional
+
+> *"Multi-service corroboration beats W8 on multi-agent benchmarks."*
+
+Forbidden without the conditions. The defensible W9-1 reading
+names the bench properties:
+
+* **Surplus.** ``|candidates(scenario)| > K_auditor`` — without
+  budget pressure, FIFO ≡ admit-all and structure_gain = 0
+  identically (W7-1).
+* **Multi-service gold.** ``|gold_services| ≥ 2``. On
+  single-service-gold benches, W9 collapses to W8 (W9-3) and
+  beats nothing W8 doesn't.
+* **Both gold services cross-role corroborated.** Each gold
+  service has ≥ ``min_corroborated_roles`` distinct producer
+  roles. Without this, the gold tag is below the role threshold
+  and W9 admits nothing tagged.
+* **Single-role decoy storm only.** Every decoy service has
+  ≤ 1 distinct producer role. If a decoy is also corroborated by
+  ≥ ``min_corroborated_roles`` distinct roles, W9 admits the
+  decoy (the W9-4 falsifier).
+
+If any of these fails, the W9-1 win does not necessarily hold.
+
+### Labelling the SDK v3.10 result "we solved multi-agent context"
+
+> *"SDK v3.10 solves multi-agent context."*
+
+Still **forbidden** after the Phase-56 result. The defensible
+reading is that SDK v3.10 ships the **second consecutive
+strong-bar conditional structural win** (this time on R-56
+multi-service gold), the structural win now spans **four** named
+regimes (R-53 / R-54 / R-55 / R-56), and is the **first programme
+result whose strict-gain regime is not solvable by the previous
+SDK's strongest method** — but real multi-agent reality has more
+axes than four pre-committed regimes (heterogeneous producers,
+time-varying budgets, multi-round handoffs, multi-service
+incidents with `|gold| ≥ 3`, decoder-side coordination).
+
+Defensible phrasings:
+
+* "SDK v3.10 clears the strong success bar of
+  `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` § 1.1 (R-56
+  anchor) on the Phase-56 multi-service-gold + cross-role-
+  corroborated bench."
+* "SDK v3.10 is the first programme result to strictly separate
+  multi-service top-K corroboration from single-tag corroboration
+  (W9-1 vs W8); the win is conditional on the multi-service-gold
+  + single-role-decoy property; the W9-4 falsifier regime is the
+  named structural limit."
+* "Four regimes anchored, the W9-1 conditional win is sharp; the
+  W9-4 falsifier (decoy corroboration) is the next axis to attack
+  — by the W9-C1 bundle-aware decoder companion."
 
 ### Labelling the W8-1 corroboration win as unconditional
 

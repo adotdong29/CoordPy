@@ -17,8 +17,9 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.9)          | [`RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md`](RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md) |
-> | Pre-committed success bar (SDK v3.9) | [`SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`](SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md) |
+> | Latest milestone (SDK v3.10)         | [`RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md`](RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md) |
+> | Pre-committed success bar (SDK v3.10)| [`SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`](SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md) |
+> | Previous milestone (SDK v3.9)        | [`RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md`](RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md) |
 > | Previous milestone (SDK v3.8)        | [`RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md`](RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md) |
 > | Previous milestone (SDK v3.7)        | [`RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](RESULTS_WEVRA_SCALE_VS_STRUCTURE.md) |
 > | Repo top-level                       | [`../README.md`](../README.md), [`../ARCHITECTURE.md`](../ARCHITECTURE.md), [`../CHANGELOG.md`](../CHANGELOG.md) |
@@ -32,7 +33,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.9 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.10 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
@@ -48,8 +49,36 @@ substrate FIFO** (W7 family, SDK v3.8), and — most sharply —
 **across a strict separation between W7-2 single-tag plurality
 cohort and W8 cross-role corroboration on a harder
 decoy-plurality benchmark, with cross-bank stability and a named
-falsifier regime** (W8 family, SDK v3.9).
-SDK v3.9's headline result is a **strong-bar conditional
+falsifier regime** (W8 family, SDK v3.9), and — most sharply —
+**across a strict separation between W8 single-tag corroboration
+and W9 multi-service top-K corroboration on a harder
+multi-service-gold benchmark, where every gold answer requires
+admitting handoffs from two distinct gold services simultaneously,
+again with cross-bank stability and a named falsifier regime**
+(W9 family, SDK v3.10).
+SDK v3.10's headline result is the **second consecutive
+strong-bar conditional structural win** in the programme: on the
+Phase-56 deterministic benchmark (multi-service-gold property +
+both gold services corroborated by ≥ 2 distinct producer roles +
+single-role decoy storm + ``|candidates| > K_auditor``), the new
+``MultiServiceCorroborationAdmissionPolicy`` (buffered mode,
+``top_k=2, min_corroborated_roles=2``) achieves ``accuracy_full
+= 1.000`` while substrate FIFO, ``capsule_fifo``,
+``capsule_priority``, ``capsule_coverage``, the SDK v3.8
+``capsule_cohort_buffered`` (W7-2), **AND** the SDK v3.9
+``capsule_corroboration`` (W8) all produce 0.000 — a +1.000
+strict separation **from W8 itself**, stable across 5/5
+alternate ``bank_seed`` values. The win is **conditional** on the
+named bench property; under the named W9-4 falsifier regime
+(decoy-corroborated decoy with ≥ 2 distinct producer roles), the
+new policy correctly ties FIFO at 0.000. Backward-compat
+preserved (W9-3): on Phase-55 the new policy ties W8 at 1.000 (via
+the argmax-by-role-count gate); on Phase-54 it ties W7-2 at 1.000.
+No regression on Phase-53 synthetic. The milestone is the
+**first SDK release whose strict-gain regime is not solvable by
+the previous SDK's strongest method** — a real generalisation,
+not just another conditional win on the same axis.
+SDK v3.9's headline result was a **strong-bar conditional
 structural win** (`docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`
 § 1.1): on the Phase-55 deterministic benchmark (decoy-plurality
 + cross-role-corroborated-gold property + ``|candidates| >
@@ -203,6 +232,45 @@ just describe it. Specifically:
     ``"construction": "in_flight"`` so a downstream consumer can
     tell whether the ledger was built during the run (capsule-
     native) or folded after the fact (legacy post-hoc).
+
+## What changed in SDK v3.10 (multi-service top-K cross-role corroboration — research slice)
+
+SDK v3.10 mints the **W9 theorem family**:
+
+* **W9-1** (proved-empirical, n=50 saturated). On Phase-56
+  (multi-service-gold + cross-role-corroborated, single-role
+  decoy storm), the buffered
+  ``MultiServiceCorroborationAdmissionPolicy``
+  (``top_k=2, min_corroborated_roles=2``) achieves
+  ``accuracy_full = 1.000`` while substrate FIFO, all fixed
+  capsule baselines, the SDK v3.8 W7-2 buffered cohort, AND the
+  SDK v3.9 W8 corroboration policy all produce 0.000.
+  +1.000 strict separation, stable across 5/5 alternate
+  ``bank_seed`` values.
+* **W9-2** (proved, structural). The dominant-set fitter
+  (``_dominant_tag_set``) has three structural properties:
+  (a) any tag with ``|distinct_roles| < min_corroborated_roles``
+  is excluded; (b) if the argmax-by-role-count tier has size 1,
+  W9 collapses to W8 (backward-compat); (c) if the argmax tier
+  has size ≤ ``top_k``, W9 admits the entire tier.
+* **W9-3** (proved-empirical, n=10). Backward-compat: on
+  Phase-55 default and Phase-54 default, W9 admits the same set
+  as W8 / W7-2 respectively, and achieves ``accuracy_full =
+  1.000`` on both.
+* **W9-4** (proved-empirical, n=10 falsifier saturated). When
+  a decoy is also corroborated by ≥ ``min_corroborated_roles``
+  distinct producer roles, W9 admits the decoy and ``services_correct``
+  fails; W9 ties FIFO at 0.000. The W9-1 win does NOT hold —
+  by construction.
+
+The new admission policy
+(``MultiServiceCorroborationAdmissionPolicy``) is exported under
+the canonical alias
+``vision_mvp.wevra.TeamMultiServiceCorroborationAdmissionPolicy``.
+The Wevra single-run product runtime contract is **byte-for-byte
+unchanged from SDK v3.9**; the new surface is purely additive
+(multi-agent coordination research slice). The lifecycle audit
+(T-1..T-7) holds on every cell of every regime.
 
 ## What changed in SDK v3.2 (intra-cell + detached witness)
 

@@ -5,7 +5,7 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.9,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.10,
 > 2026-04-26.
 
 ## TL;DR
@@ -96,6 +96,46 @@ sharp status:
    recover claims the producer never emitted (the Phase-53
    ``deadlock_pool_exhaustion`` failure case).
 
+9. **Multi-service top-K cross-role corroboration multi-agent
+   coordination** — *active, new (SDK v3.10)*. **Phase-56**
+   benchmark
+   (`vision_mvp/experiments/phase56_multi_service_corroboration.py`)
+   directly attacks the W8 *multi-service-gold* falsifier by
+   building the smallest deterministic regime where (i) every
+   scenario has ``gold_services`` of size 2 (multi-service incident),
+   (ii) both gold services are corroborated by ≥ 2 distinct producer
+   roles each, AND (iii) a decoy service has raw plurality but is
+   corroborated by exactly 1 producer role. 10/10 default scenarios
+   satisfy all three properties; mechanically verified by
+   ``Phase56BankShapeTests``. The new admission policy
+   ``MultiServiceCorroborationAdmissionPolicy`` admits the **top-K
+   cross-role-corroborated tier** (default ``top_k=2,
+   min_corroborated_roles=2``) via the argmax-by-role-count gate —
+   strictly generalising W8 single-tag corroboration. Headline: at
+   the pre-committed default (``K_auditor=4``, ``T_auditor=128``,
+   ``n_eval=10``, ``bank_seed=11``), ``capsule_multi_service``
+   achieves ``accuracy_full = 1.000`` while substrate FIFO,
+   ``capsule_fifo``, ``capsule_priority``, ``capsule_coverage``,
+   ``capsule_cohort_buffered`` (W7-2), AND
+   ``capsule_corroboration`` (W8) all produce 0.000 — the **first
+   strict separation between multi-service top-K corroboration and
+   single-tag corroboration**, **+1.000** vs the SDK v3.9 strongest
+   method, stable across **5/5** alternate bank seeds. The W9
+   family (W9-1 / W9-2 / W9-3 / W9-4 — proved or proved-empirical)
+   anchors the milestone formally; the W9-C family makes the
+   bundle-aware decoder / |gold|≥3 / real-LLM extensions
+   falsifiable. **Honest scope:** the win is *conditional* on the
+   named bench property (multi-service-gold + single-role-decoy);
+   W9-4 is the named falsifier regime where the decoy is also
+   corroborated and W9 ties FIFO at 0.000; W9-3 backward-compat
+   preserves W8 on Phase 55 and W7-2 on Phase 54; no regression on
+   Phase 53 synthetic. The milestone clears the **strong success
+   bar** of `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` § 1.1
+   (R-56 anchor) — a strict gain ≥ 0.20 on Phase 56 vs both
+   substrate FIFO and SDK v3.9 W8, stable across ≥ 3 seeds, no
+   regression on R-53 / R-54 / R-55, audit T-1..T-7 preserved on
+   every cell, named bench property + named falsifier regime.
+
 8. **Cross-role corroboration multi-agent coordination**
    — *active, new (SDK v3.9)*. **Phase-55** benchmark
    (`vision_mvp/experiments/phase55_decoy_plurality.py`) directly
@@ -161,7 +201,76 @@ sharp status:
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.9, 2026-04-26)
+## Current frontier (SDK v3.10, 2026-04-26)
+
+### Active moves (SDK v3.10 — multi-service top-K cross-role corroboration multi-agent benchmark + W9 family)
+
+- **Phase-56 multi-service-gold + cross-role-corroborated benchmark.**
+  ``vision_mvp.experiments.phase56_multi_service_corroboration`` runs
+  7 admission strategies (substrate, capsule_fifo, capsule_priority,
+  capsule_coverage, capsule_cohort_buffered (W7-2),
+  capsule_corroboration (W8), capsule_multi_service (W9)) on a
+  deterministic 10-scenario bank with the **multi-service-gold +
+  both-gold-cross-role-corroborated + single-role-decoy-storm**
+  properties (10/10 scenarios). Pre-committed default:
+  ``K_auditor=4``, ``T_auditor=128``, ``n_eval=10``,
+  ``bank_seed=11``, ``ms_top_k=2``, ``ms_min_corroborated_roles=2``.
+  Headline: ``multi_service − fifo accuracy_full = +1.000``,
+  ``multi_service − cohort_buffered = +1.000``, AND
+  ``multi_service − corroboration = +1.000``, stable across 5/5
+  alternate bank seeds. The **first strict separation between
+  multi-service top-K corroboration and single-tag corroboration**
+  in the programme.
+- **``MultiServiceCorroborationAdmissionPolicy`` (new).**
+  ``vision_mvp/wevra/team_coord.py``. Two sub-modes (streaming /
+  buffered). Buffered factory ``from_candidate_stream`` is the W9-1
+  anchor — pre-fits a top-K dominant tag set via the
+  argmax-by-role-count tier of the corroboration score function.
+  Selection rule: ``min_corroborated_roles`` floor → argmax-by-role-
+  count tier → top-K by score (lex tie-break). Deterministic,
+  training-free, one regex + two counters + the ``_dominant_tag_set``
+  helper. Re-exported as
+  ``TeamMultiServiceCorroborationAdmissionPolicy``.
+- **Theorem family W9.** W9-1 (strict separation, proved-empirical
+  n=50 saturated), W9-2 (argmax-tier strict-ordering, proved
+  structural), W9-3 (backward-compat with W8 + W7-2 on Phase 55 +
+  Phase 54, proved-empirical), W9-4 (decoy-corroboration falsifier,
+  proved-empirical n=10 saturated). The W9-C family (W9-C1/C2/C3)
+  makes the bundle-aware decoder / |gold|≥3 / real-LLM extensions
+  falsifiable.
+- **Pre-committed success criterion** in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-56 anchor).
+  The SDK v3.10 result clears the **strong success bar** § 1.1
+  (strict gain ≥ 0.20 on R-56 vs both substrate FIFO and SDK v3.9
+  W8, stable across ≥ 3 seeds, no regression on R-53 / R-54 / R-55,
+  audit T-1..T-7 preserved on every cell, named bench property +
+  named falsifier regime).
+- **Honest scope.** The W9-1 win is *conditional* on the named
+  bench property; the W9-4 falsifier regime is the explicit
+  counterexample. W9-3 preserves the SDK v3.9 W8-1 win
+  byte-for-byte on Phase 55 (via the argmax-by-role-count gate).
+
+### Active conjectures (SDK v3.10)
+
+- **W9-C1** (new SDK v3.10): bundle-aware decoder companion that
+  filters service tags at decode time by the dominant
+  *(claim_kind, role)* signature strictly improves accuracy_full on
+  the Phase-56 falsifier regime. **Conjectural**; reframes W8-C3 as
+  the natural attack on the W9-4 falsifier — pushes the structural
+  axis from admission to decoding.
+- **W9-C2** (new SDK v3.10): top-K extension to ``|gold| ≥ 3``.
+  Conjectural; Phase-57 candidate; the policy already supports
+  arbitrary ``top_k``.
+- **W9-C3** (new SDK v3.10): real-LLM transfer of W9-1.
+  Conjectural; SDK v3.10 confirms no-regression in low-surplus
+  synthetic regime.
+
+### Discharged conjectures (SDK v3.10)
+
+- **W8-C1** (SDK v3.9): top-k corroboration improves multi-service
+  scenarios. **DISCHARGED-empirical** by W9-1 on Phase 56 (+1.000).
+
+## Previous frontier (SDK v3.9, 2026-04-26)
 
 ### Active moves (SDK v3.9 — cross-role corroboration multi-agent benchmark + W8 family)
 

@@ -1,0 +1,715 @@
+{
+  "K_auditor": 4,
+  "T_auditor": 128,
+  "n_eval": 10,
+  "per_seed": {
+    "11": {
+      "audit_ok_grid": {
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "substrate": false
+      },
+      "bench_summary": {
+        "K_auditor": 4,
+        "n_scenarios": 10,
+        "scenarios_with_decoy_corroboration": 0,
+        "scenarios_with_multi_service_gold_corroboration": 10,
+        "scenarios_with_surplus": 10
+      },
+      "headline_gap": {
+        "corroboration_minus_fifo_accuracy_full": 0.0,
+        "multi_service_minus_cohort_buffered_accuracy_full": 1.0,
+        "multi_service_minus_corroboration_accuracy_full": 1.0,
+        "multi_service_minus_fifo_accuracy_full": 1.0,
+        "multi_service_minus_substrate_accuracy_full": 1.0
+      },
+      "pooled": {
+        "capsule_cohort_buffered": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.0,
+          "accuracy_root_cause": 0.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 3.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 6.6,
+          "n": 10,
+          "strategy": "capsule_cohort_buffered"
+        },
+        "capsule_corroboration": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 2,
+            "missing_handoff": 8
+          },
+          "mean_n_admitted_auditor": 2.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 5.4,
+          "n": 10,
+          "strategy": "capsule_corroboration"
+        },
+        "capsule_coverage": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 10
+          },
+          "mean_n_admitted_auditor": 3.8,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 10.0,
+          "n": 10,
+          "strategy": "capsule_coverage"
+        },
+        "capsule_fifo": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "capsule_fifo"
+        },
+        "capsule_multi_service": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 10.8,
+          "n": 10,
+          "strategy": "capsule_multi_service"
+        },
+        "capsule_priority": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "capsule_priority"
+        },
+        "substrate": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 0.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 0.0,
+          "mean_n_team_handoff": 0.0,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "substrate"
+        }
+      }
+    },
+    "17": {
+      "audit_ok_grid": {
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "substrate": false
+      },
+      "bench_summary": {
+        "K_auditor": 4,
+        "n_scenarios": 10,
+        "scenarios_with_decoy_corroboration": 0,
+        "scenarios_with_multi_service_gold_corroboration": 10,
+        "scenarios_with_surplus": 10
+      },
+      "headline_gap": {
+        "corroboration_minus_fifo_accuracy_full": 0.0,
+        "multi_service_minus_cohort_buffered_accuracy_full": 1.0,
+        "multi_service_minus_corroboration_accuracy_full": 1.0,
+        "multi_service_minus_fifo_accuracy_full": 1.0,
+        "multi_service_minus_substrate_accuracy_full": 1.0
+      },
+      "pooled": {
+        "capsule_cohort_buffered": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.0,
+          "accuracy_root_cause": 0.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 3.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 6.6,
+          "n": 10,
+          "strategy": "capsule_cohort_buffered"
+        },
+        "capsule_corroboration": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 2,
+            "missing_handoff": 8
+          },
+          "mean_n_admitted_auditor": 2.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 5.4,
+          "n": 10,
+          "strategy": "capsule_corroboration"
+        },
+        "capsule_coverage": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 10
+          },
+          "mean_n_admitted_auditor": 3.8,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 10.0,
+          "n": 10,
+          "strategy": "capsule_coverage"
+        },
+        "capsule_fifo": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "capsule_fifo"
+        },
+        "capsule_multi_service": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 10.8,
+          "n": 10,
+          "strategy": "capsule_multi_service"
+        },
+        "capsule_priority": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "capsule_priority"
+        },
+        "substrate": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 0.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 0.0,
+          "mean_n_team_handoff": 0.0,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "substrate"
+        }
+      }
+    },
+    "23": {
+      "audit_ok_grid": {
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "substrate": false
+      },
+      "bench_summary": {
+        "K_auditor": 4,
+        "n_scenarios": 10,
+        "scenarios_with_decoy_corroboration": 0,
+        "scenarios_with_multi_service_gold_corroboration": 10,
+        "scenarios_with_surplus": 10
+      },
+      "headline_gap": {
+        "corroboration_minus_fifo_accuracy_full": 0.0,
+        "multi_service_minus_cohort_buffered_accuracy_full": 1.0,
+        "multi_service_minus_corroboration_accuracy_full": 1.0,
+        "multi_service_minus_fifo_accuracy_full": 1.0,
+        "multi_service_minus_substrate_accuracy_full": 1.0
+      },
+      "pooled": {
+        "capsule_cohort_buffered": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.0,
+          "accuracy_root_cause": 0.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 3.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 6.6,
+          "n": 10,
+          "strategy": "capsule_cohort_buffered"
+        },
+        "capsule_corroboration": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 2,
+            "missing_handoff": 8
+          },
+          "mean_n_admitted_auditor": 2.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 5.4,
+          "n": 10,
+          "strategy": "capsule_corroboration"
+        },
+        "capsule_coverage": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 10
+          },
+          "mean_n_admitted_auditor": 3.8,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 10.0,
+          "n": 10,
+          "strategy": "capsule_coverage"
+        },
+        "capsule_fifo": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "capsule_fifo"
+        },
+        "capsule_multi_service": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 10.8,
+          "n": 10,
+          "strategy": "capsule_multi_service"
+        },
+        "capsule_priority": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "capsule_priority"
+        },
+        "substrate": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 0.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 0.0,
+          "mean_n_team_handoff": 0.0,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "substrate"
+        }
+      }
+    },
+    "29": {
+      "audit_ok_grid": {
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "substrate": false
+      },
+      "bench_summary": {
+        "K_auditor": 4,
+        "n_scenarios": 10,
+        "scenarios_with_decoy_corroboration": 0,
+        "scenarios_with_multi_service_gold_corroboration": 10,
+        "scenarios_with_surplus": 10
+      },
+      "headline_gap": {
+        "corroboration_minus_fifo_accuracy_full": 0.0,
+        "multi_service_minus_cohort_buffered_accuracy_full": 1.0,
+        "multi_service_minus_corroboration_accuracy_full": 1.0,
+        "multi_service_minus_fifo_accuracy_full": 1.0,
+        "multi_service_minus_substrate_accuracy_full": 1.0
+      },
+      "pooled": {
+        "capsule_cohort_buffered": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.0,
+          "accuracy_root_cause": 0.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 3.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 6.6,
+          "n": 10,
+          "strategy": "capsule_cohort_buffered"
+        },
+        "capsule_corroboration": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 2,
+            "missing_handoff": 8
+          },
+          "mean_n_admitted_auditor": 2.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 5.4,
+          "n": 10,
+          "strategy": "capsule_corroboration"
+        },
+        "capsule_coverage": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 10
+          },
+          "mean_n_admitted_auditor": 3.8,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 10.0,
+          "n": 10,
+          "strategy": "capsule_coverage"
+        },
+        "capsule_fifo": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "capsule_fifo"
+        },
+        "capsule_multi_service": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 10.8,
+          "n": 10,
+          "strategy": "capsule_multi_service"
+        },
+        "capsule_priority": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "capsule_priority"
+        },
+        "substrate": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 0.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 0.0,
+          "mean_n_team_handoff": 0.0,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "substrate"
+        }
+      }
+    },
+    "31": {
+      "audit_ok_grid": {
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "substrate": false
+      },
+      "bench_summary": {
+        "K_auditor": 4,
+        "n_scenarios": 10,
+        "scenarios_with_decoy_corroboration": 0,
+        "scenarios_with_multi_service_gold_corroboration": 10,
+        "scenarios_with_surplus": 10
+      },
+      "headline_gap": {
+        "corroboration_minus_fifo_accuracy_full": 0.0,
+        "multi_service_minus_cohort_buffered_accuracy_full": 1.0,
+        "multi_service_minus_corroboration_accuracy_full": 1.0,
+        "multi_service_minus_fifo_accuracy_full": 1.0,
+        "multi_service_minus_substrate_accuracy_full": 1.0
+      },
+      "pooled": {
+        "capsule_cohort_buffered": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.0,
+          "accuracy_root_cause": 0.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 3.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 6.6,
+          "n": 10,
+          "strategy": "capsule_cohort_buffered"
+        },
+        "capsule_corroboration": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 2,
+            "missing_handoff": 8
+          },
+          "mean_n_admitted_auditor": 2.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 5.4,
+          "n": 10,
+          "strategy": "capsule_corroboration"
+        },
+        "capsule_coverage": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 10
+          },
+          "mean_n_admitted_auditor": 3.8,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 10.0,
+          "n": 10,
+          "strategy": "capsule_coverage"
+        },
+        "capsule_fifo": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "capsule_fifo"
+        },
+        "capsule_multi_service": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 10.8,
+          "n": 10,
+          "strategy": "capsule_multi_service"
+        },
+        "capsule_priority": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 5.0,
+          "mean_n_team_handoff": 7.4,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "capsule_priority"
+        },
+        "substrate": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.2,
+          "accuracy_root_cause": 0.2,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 0.0,
+          "failure_hist": {
+            "missing_handoff": 10
+          },
+          "mean_n_admitted_auditor": 4.0,
+          "mean_n_role_view": 0.0,
+          "mean_n_team_handoff": 0.0,
+          "mean_tokens_admitted": 8.4,
+          "n": 10,
+          "strategy": "substrate"
+        }
+      }
+    }
+  },
+  "schema": "phase56.multi_service_corroboration_seed_sweep.v1",
+  "seeds": [
+    11,
+    17,
+    23,
+    29,
+    31
+  ]
+}

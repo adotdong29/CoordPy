@@ -1,0 +1,25 @@
+{
+  "schema": "phase53.synthetic_w9_regression_check.v1",
+  "config": {
+    "regime": "phase53_synthetic_low_surplus",
+    "n_eval": 5,
+    "K_auditor": 4,
+    "T_auditor": 128,
+    "seeds": [31, 32, 33],
+    "distractors_per_role": 8,
+    "ms_top_k": 2,
+    "ms_min_corroborated_roles": 2
+  },
+  "pooled": {
+    "substrate":              {"accuracy_full": 0.800, "accuracy_root_cause": 0.800, "accuracy_services": 1.000},
+    "capsule_fifo":           {"accuracy_full": 0.800, "accuracy_root_cause": 0.800, "accuracy_services": 1.000},
+    "capsule_cohort_buffered":{"accuracy_full": 0.800, "accuracy_root_cause": 1.000, "accuracy_services": 0.800},
+    "capsule_corroboration":  {"accuracy_full": 0.800, "accuracy_root_cause": 1.000, "accuracy_services": 0.800},
+    "capsule_multi_service":  {"accuracy_full": 0.800, "accuracy_root_cause": 1.000, "accuracy_services": 0.800}
+  },
+  "headline": {
+    "multi_service_minus_fifo_accuracy_full": 0.000,
+    "multi_service_minus_corroboration_accuracy_full": 0.000,
+    "interpretation": "On the Phase 53 synthetic low-surplus regime, W9 ties FIFO at 0.800. The W7-1 extraction-floor result holds: no admission policy beats FIFO when |candidates_to_auditor| <= K_auditor on most scenarios. W9 is no-regression vs SDK v3.9 (capsule_corroboration also 0.800) and vs SDK v3.5 (capsule_fifo 0.800)."
+  }
+}
