@@ -64,6 +64,16 @@ class RunSpec:
     # describe the run, but do not gate it). The two paths produce
     # CID-equivalent ledgers for non-ARTIFACT kinds (Theorem W3-34).
     capsule_native: bool = True
+    # SDK v3.3 — deterministic-mode replay. When True, the runtime
+    # strips per-run timestamps (PROVENANCE.timestamp_utc,
+    # RUN_REPORT.wall_seconds, JSONL absolute paths) from the
+    # capsules' payloads so two runs of the same deterministic
+    # profile (mock mode, ``in_process``/``subprocess`` sandbox,
+    # frozen JSONL) produce identical full-DAG CIDs (Theorem
+    # W3-41). Default False preserves the legacy timestamp-bearing
+    # CIDs for normal operations. Determinism is on the capsule
+    # graph, not on wall clock.
+    deterministic: bool = False
 
 
 def run(spec: RunSpec) -> dict[str, Any]:
@@ -90,6 +100,7 @@ def run(spec: RunSpec) -> dict[str, Any]:
         acknowledge_heavy=spec.acknowledge_heavy,
         allow_unsafe_sandbox=spec.allow_unsafe_sandbox,
         capsule_native=spec.capsule_native,
+        deterministic=spec.deterministic,
     )
 
     if spec.report_sinks:

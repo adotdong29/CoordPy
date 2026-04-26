@@ -197,6 +197,7 @@ def run_profile(profile_name: str, *,
                  acknowledge_heavy: bool = False,
                  allow_unsafe_sandbox: bool = False,
                  capsule_native: bool = True,
+                 deterministic: bool = False,
                  ) -> dict:
     """Execute one Wevra run.
 
@@ -219,6 +220,13 @@ def run_profile(profile_name: str, *,
     ARTIFACT kind, where the in-flight path emits content-addressed
     capsules with real SHA-256 hashes and the post-hoc path emits
     capsules with ``sha256=None``.
+
+    ``deterministic`` (default False, SDK v3.3): strip per-run
+    timestamps from PROVENANCE / RUN_REPORT capsule payloads so
+    two runs of the same deterministic profile produce identical
+    full-DAG CIDs (Theorem W3-41). The legacy
+    timestamp-bearing-CIDs path is the default for normal
+    operations; deterministic mode is the audit / replay opt-in.
     """
     if capsule_native:
         return _run_profile_capsule_native(
@@ -229,6 +237,7 @@ def run_profile(profile_name: str, *,
             skip_sweep=skip_sweep,
             acknowledge_heavy=acknowledge_heavy,
             allow_unsafe_sandbox=allow_unsafe_sandbox,
+            deterministic=deterministic,
         )
     return _run_profile_post_hoc(
         profile_name,
@@ -238,6 +247,7 @@ def run_profile(profile_name: str, *,
         skip_sweep=skip_sweep,
         acknowledge_heavy=acknowledge_heavy,
         allow_unsafe_sandbox=allow_unsafe_sandbox,
+        deterministic=deterministic,
     )
 
 
@@ -262,6 +272,115 @@ def _resolve_profile_and_setup(profile_name: str, *,
     return prof
 
 
+_DETERMINISTIC_TIMESTAMP_UTC = "1970-01-01T00:00:00+00:00"
+_DETERMINISTIC_WALL = 0.0
+_DETERMINISTIC_HOST = "deterministic"
+_DETERMINISTIC_USER = "deterministic"
+_DETERMINISTIC_OUT_DIR = "/deterministic/out_dir"
+
+
+def _canonicalise_for_determinism(manifest: dict, *,
+                                    profile_name: str,
+                                    jsonl_path: str | None,
+                                    ) -> dict:
+    """Strip per-run, host-local, and wall-clock fields from a
+    provenance manifest so two runs of the same deterministic
+    profile produce byte-identical PROVENANCE capsule payloads.
+
+    Theorem W3-41 (deterministic-mode CID determinism): the set of
+    fields stripped here is exactly the set of fields whose values
+    are not a deterministic function of (profile, JSONL bytes,
+    parser/apply mode, n_distractors, sandbox name). After
+    stripping, the PROVENANCE capsule's CID is a deterministic
+    function of the run's logical inputs.
+    """
+    out = dict(manifest)
+    out["timestamp_utc"] = _DETERMINISTIC_TIMESTAMP_UTC
+    code = dict(out.get("code", {}))
+    code["git_sha"] = "deterministic"
+    code["git_dirty"] = False
+    code["repo_dir"] = "/deterministic/repo"
+    out["code"] = code
+    runtime_block = dict(out.get("runtime", {}))
+    runtime_block["python_version"] = "deterministic"
+    runtime_block["python_implementation"] = "deterministic"
+    runtime_block["platform"] = "deterministic"
+    runtime_block["machine"] = "deterministic"
+    runtime_block["system"] = "deterministic"
+    out["runtime"] = runtime_block
+    invocation = dict(out.get("invocation", {}))
+    invocation["argv"] = ["deterministic"]
+    invocation["cwd"] = "/deterministic"
+    invocation["user"] = _DETERMINISTIC_USER
+    invocation["hostname"] = _DETERMINISTIC_HOST
+    out["invocation"] = invocation
+    output_block = dict(out.get("output", {}))
+    output_block["out_dir"] = _DETERMINISTIC_OUT_DIR
+    out["output"] = output_block
+    # Input — strip the absolute path while preserving the SHA
+    # (which IS a deterministic function of the JSONL bytes).
+    input_block = dict(out.get("input", {}))
+    if input_block.get("jsonl_path") and jsonl_path:
+        input_block["jsonl_path"] = os.path.basename(jsonl_path)
+    out["input"] = input_block
+    return out
+
+
+def _canonicalise_run_report_headers(headers: dict) -> dict:
+    """Strip ``wall_seconds`` from RUN_REPORT headers so two runs
+    of the same profile produce byte-identical RUN_REPORT capsule
+    payloads."""
+    out = dict(headers)
+    out["wall_seconds"] = _DETERMINISTIC_WALL
+    return out
+
+
+def _canonicalise_readiness_verdict(verdict: dict) -> dict:
+    """Strip per-run wall-clock and absolute-path fields from a
+    readiness verdict so two runs produce byte-identical verdict
+    payloads (and therefore byte-identical READINESS_CHECK
+    capsules)."""
+    out = dict(verdict)
+    out["wall_seconds"] = _DETERMINISTIC_WALL
+    if isinstance(out.get("jsonl_path"), str):
+        out["jsonl_path"] = os.path.basename(out["jsonl_path"])
+    return out
+
+
+def _canonicalise_sweep_result(sweep_result: dict) -> dict:
+    """Strip per-run wall-clock fields from a unified-runtime sweep
+    block so two runs of the same deterministic profile produce
+    byte-identical sweep payloads.
+
+    Wall-clock fields stripped (set to ``_DETERMINISTIC_WALL``):
+
+      * top-level ``wall_seconds``
+      * each cell's ``cell_wall_s`` (real-mode only)
+
+    The ``jsonl`` field is reduced to its basename to remove
+    host-local layout dependence; the JSONL's SHA-256 is recorded
+    in the PROVENANCE manifest, so the basename is enough to
+    cross-reference back.
+    """
+    out = dict(sweep_result)
+    out["wall_seconds"] = _DETERMINISTIC_WALL
+    if isinstance(out.get("jsonl"), str):
+        out["jsonl"] = os.path.basename(out["jsonl"])
+    cells = out.get("cells")
+    if isinstance(cells, list):
+        new_cells = []
+        for cell in cells:
+            if not isinstance(cell, dict):
+                new_cells.append(cell)
+                continue
+            cc = dict(cell)
+            if "cell_wall_s" in cc:
+                cc["cell_wall_s"] = _DETERMINISTIC_WALL
+            new_cells.append(cc)
+        out["cells"] = new_cells
+    return out
+
+
 def _run_profile_capsule_native(profile_name: str, *,
                                  out_dir: str,
                                  jsonl_override: str | None,
@@ -269,6 +388,7 @@ def _run_profile_capsule_native(profile_name: str, *,
                                  skip_sweep: bool,
                                  acknowledge_heavy: bool,
                                  allow_unsafe_sandbox: bool,
+                                 deterministic: bool = False,
                                  ) -> dict:
     """Capsule-native run path.
 
@@ -302,6 +422,9 @@ def _run_profile_capsule_native(profile_name: str, *,
         prof["readiness"]["jsonl"],
         limit=prof["readiness"]["limit"],
         sandbox_name=prof["readiness"]["sandbox_name"])
+    if deterministic:
+        readiness_verdict = _canonicalise_readiness_verdict(
+            readiness_verdict)
     rd_cap = ctx.seal_readiness(readiness_verdict)
     # Substantive artefact: the readiness verdict on disk is
     # content-addressed at write time. Its parent is the
@@ -311,9 +434,18 @@ def _run_profile_capsule_native(profile_name: str, *,
     readiness_path = os.path.join(out_dir, "readiness_verdict.json")
     readiness_data = json.dumps(
         readiness_verdict, indent=2, default=str).encode("utf-8")
+    # In deterministic mode, the ARTIFACT capsule's payload uses
+    # the basename only, so two runs with different ``out_dir``
+    # values produce byte-identical ARTIFACT payloads. The on-disk
+    # bytes still land at the full path; the capsule just records
+    # the path-anchor independently of host-local layout.
+    artifact_path_for_capsule = (
+        os.path.basename(readiness_path) if deterministic
+        else readiness_path)
     ctx.seal_and_write_artifact(
         path=readiness_path, data=readiness_data,
-        parents=(rd_cap.cid,))
+        parents=(rd_cap.cid,),
+        recorded_path=artifact_path_for_capsule)
 
     # Stage 3: sweep — runs through the unified runtime which
     # seals each cell in flight via ctx.
@@ -354,14 +486,20 @@ def _run_profile_capsule_native(profile_name: str, *,
                     "sweep_result.json" if sweep_result.get(
                         "executed_in_process") else "sweep_launch.json")
                 sweep_path = os.path.join(out_dir, artifact_name)
+                sweep_for_disk = (
+                    _canonicalise_sweep_result(sweep_result)
+                    if deterministic else sweep_result)
                 sweep_data = json.dumps(
-                    sweep_result, indent=2, default=str).encode("utf-8")
+                    sweep_for_disk, indent=2, default=str).encode("utf-8")
                 sweep_parent = (
                     (ctx.spec_cap.cid,) if ctx.spec_cap is not None
                     else (ctx.profile_cap.cid,))
+                sweep_recorded = (
+                    artifact_name if deterministic else sweep_path)
                 ctx.seal_and_write_artifact(
                     path=sweep_path, data=sweep_data,
-                    parents=sweep_parent)
+                    parents=sweep_parent,
+                    recorded_path=sweep_recorded)
 
     # Stage 4: provenance manifest.
     #
@@ -397,13 +535,27 @@ def _run_profile_capsule_native(profile_name: str, *,
             },
         },
     )
+    if deterministic:
+        # SDK v3.3 — strip per-run / host-local / wall-clock fields
+        # from the manifest used to seal the PROVENANCE capsule so
+        # two runs of the same deterministic profile produce
+        # byte-identical PROVENANCE payloads (Theorem W3-41). The
+        # on-disk ``provenance.json`` carries the canonicalised
+        # manifest too, so the on-disk artefact's SHA is also
+        # deterministic.
+        manifest = _canonicalise_for_determinism(
+            manifest, profile_name=profile_name,
+            jsonl_path=jsonl_path)
     prov_cap = ctx.seal_provenance(manifest)
     prov_path = os.path.join(out_dir, "provenance.json")
     prov_data = json.dumps(
         manifest, indent=2, default=str).encode("utf-8")
+    prov_recorded = (
+        "provenance.json" if deterministic else prov_path)
     ctx.seal_and_write_artifact(
         path=prov_path, data=prov_data,
-        parents=(prov_cap.cid,))
+        parents=(prov_cap.cid,),
+        recorded_path=prov_recorded)
 
     # Now build the in-memory product report.
     product_report = {
@@ -432,6 +584,8 @@ def _run_profile_capsule_native(profile_name: str, *,
             (product_report.get("sweep") or {})
             .get("executed_in_process")),
     }
+    if deterministic:
+        headers = _canonicalise_run_report_headers(headers)
     ctx.seal_run_report(headers)
 
     # Stage 6: render the in-flight capsule view ONCE. Both the
@@ -514,6 +668,7 @@ def _run_profile_post_hoc(profile_name: str, *,
                            skip_sweep: bool,
                            acknowledge_heavy: bool,
                            allow_unsafe_sandbox: bool,
+                           deterministic: bool = False,
                            ) -> dict:
     """Legacy post-hoc fold path. Retained so the SDK can still
     emit a v3-shape capsule view from a finished run dict (third
@@ -610,6 +765,10 @@ def _run_profile_post_hoc(profile_name: str, *,
             },
         },
     )
+    if deterministic:
+        manifest = _canonicalise_for_determinism(
+            manifest, profile_name=profile_name,
+            jsonl_path=jsonl_path)
     prov_path = os.path.join(out_dir, "provenance.json")
     with open(prov_path, "w", encoding="utf-8") as fh:
         json.dump(manifest, fh, indent=2, default=str)
@@ -628,6 +787,11 @@ def _run_profile_post_hoc(profile_name: str, *,
     from vision_mvp.wevra.capsule import (
         build_report_ledger, render_view,
     )
+    if deterministic:
+        # Strip wall_seconds from the report before the post-hoc
+        # fold so the synthesised RUN_REPORT capsule's headers
+        # match the in-flight builder's deterministic output.
+        product_report["wall_seconds"] = _DETERMINISTIC_WALL
     ledger, run_cid = build_report_ledger(
         product_report, profile_dict=prof)
     view = render_view(ledger, root_cid=run_cid).as_dict()
@@ -680,6 +844,15 @@ def main() -> int:
                             "the legacy path is retained only for "
                             "third parties whose product_report dicts "
                             "are constructed outside the runtime."))
+    ap.add_argument("--deterministic", action="store_true",
+                     help=("strip per-run / host-local / wall-clock "
+                            "fields from the PROVENANCE / RUN_REPORT "
+                            "capsule payloads so two runs of the same "
+                            "deterministic profile produce identical "
+                            "full-DAG CIDs (Theorem W3-41). The "
+                            "default mode preserves wall-clock-bearing "
+                            "CIDs for normal operations; use this for "
+                            "audit / replay / CI."))
     args = ap.parse_args()
 
     report = run_profile(
@@ -689,7 +862,8 @@ def main() -> int:
         skip_sweep=args.skip_sweep,
         acknowledge_heavy=args.acknowledge_heavy,
         allow_unsafe_sandbox=args.allow_unsafe_sandbox,
-        capsule_native=not args.legacy_post_hoc_capsules)
+        capsule_native=not args.legacy_post_hoc_capsules,
+        deterministic=args.deterministic)
     print(report["summary_text"])
     return 0 if report["readiness"]["ready"] else 1
 

@@ -97,9 +97,11 @@ from .capsule import (
     CapsuleLifecycleError,
     CapsuleView,
     ContextCapsule,
+    PARSE_OUTCOME_ORACLE,
     _default_budget_for,
     capsule_from_artifact,
     capsule_from_meta_manifest,
+    capsule_from_parse_outcome,
     capsule_from_patch_proposal,
     capsule_from_profile,
     capsule_from_provenance,
@@ -228,6 +230,13 @@ class CapsuleNativeRunContext:
         # cell ran.
         self.patch_caps: list[ContextCapsule] = []
         self.verdict_caps: list[ContextCapsule] = []
+        # SDK v3.3 — sub-intra-cell parse-outcome slice. One
+        # PARSE_OUTCOME capsule per (task, strategy) when the runtime
+        # observes a parser-axis transition (LLM patch path) or
+        # deterministic_oracle path. Parent: SWEEP_SPEC. The
+        # downstream PATCH_PROPOSAL is parented on this capsule too,
+        # giving the parse → patch → verdict chain a typed witness.
+        self.parse_outcome_caps: list[ContextCapsule] = []
         # SDK v3.2 — detached witness (Theorem W3-36). The
         # META_MANIFEST is sealed in a SECONDARY ledger after the
         # primary RUN_REPORT is sealed; it carries SHAs of the
@@ -356,6 +365,58 @@ class CapsuleNativeRunContext:
     # Stage 4b: intra-cell capsules (SDK v3.2)
     # ------------------------------------------------------------
 
+    def seal_parse_outcome(self,
+                              *,
+                              instance_id: str,
+                              strategy: str,
+                              parser_mode: str,
+                              apply_mode: str,
+                              n_distractors: int,
+                              ok: bool,
+                              failure_kind: str,
+                              recovery: str = "",
+                              substitutions_count: int = 0,
+                              detail: str = "",
+                              ) -> ContextCapsule:
+        """Seal one ``PARSE_OUTCOME`` capsule for a single (task,
+        strategy) pair, BEFORE the corresponding PATCH_PROPOSAL.
+
+        Parent: the sealed ``SWEEP_SPEC`` capsule. The lifecycle gate
+        is the same that protects SWEEP_CELL (W3-35) and the
+        intra-cell pair (W3-32-extended): a parse outcome outside a
+        sealed spec is meaningless. Theorem W3-39 (parser-axis
+        lifecycle correspondence): the parser-axis transition is now
+        a typed lifecycle step. Sealing this capsule before the
+        PATCH_PROPOSAL gives the parse → patch → verdict chain a
+        typed witness on the capsule DAG.
+
+        The capsule's payload is *coordinates + structured parse
+        outcome*: the parser's ``ok`` boolean, closed-vocabulary
+        ``failure_kind``, ``recovery`` label, and a bounded
+        ``detail`` string. NEVER carries patch content or LLM
+        response bytes — only the typed taxonomy.
+        """
+        if self.spec_cap is None:
+            raise CapsuleLifecycleError(
+                "no SWEEP_SPEC capsule sealed; call "
+                "seal_sweep_spec() before seal_parse_outcome() — "
+                "sub-intra-cell transitions cannot precede their "
+                "cell spec (Theorem W3-39, parser-axis lifecycle "
+                "gate)")
+        cap = capsule_from_parse_outcome(
+            instance_id=instance_id, strategy=strategy,
+            parser_mode=parser_mode, apply_mode=apply_mode,
+            n_distractors=n_distractors,
+            ok=ok, failure_kind=failure_kind,
+            recovery=recovery,
+            substitutions_count=substitutions_count,
+            detail=detail,
+            parents=(self.spec_cap.cid,))
+        entry = self._propose(cap)
+        sealed = self._admit_and_seal(entry)
+        self.parse_outcome_caps.append(sealed)
+        return sealed
+
     def seal_patch_proposal(self,
                               *,
                               instance_id: str,
@@ -365,14 +426,22 @@ class CapsuleNativeRunContext:
                               n_distractors: int,
                               substitutions,
                               rationale: str = "",
+                              parse_outcome_cid: str | None = None,
                               ) -> ContextCapsule:
         """Seal one ``PATCH_PROPOSAL`` capsule for a single (task,
         strategy) pair in the currently-running sweep cell.
 
-        Parent: the sealed ``SWEEP_SPEC`` capsule. Refusing to seal
-        without a SWEEP_SPEC is the same lifecycle gate that protects
+        Parent: the sealed ``SWEEP_SPEC`` capsule plus, optionally,
+        the upstream PARSE_OUTCOME capsule's CID
+        (``parse_outcome_cid``). Refusing to seal without a
+        SWEEP_SPEC is the same lifecycle gate that protects
         SWEEP_CELL (W3-35) — a patch proposal outside a sealed spec
-        is meaningless.
+        is meaningless. When ``parse_outcome_cid`` is provided, it
+        must already be sealed in the ledger (Capsule Contract C5);
+        admission fails otherwise. The two-parent shape gives the
+        parse → patch → verdict chain a typed DAG witness without
+        breaking Theorem W3-34's spine equivalence (PATCH_PROPOSAL
+        is not a spine kind).
 
         The capsule's payload is *coordinates + content hash* (see
         ``capsule_from_patch_proposal``); the full substitution
@@ -386,12 +455,21 @@ class CapsuleNativeRunContext:
                 "seal_sweep_spec() before seal_patch_proposal() — "
                 "intra-cell transitions cannot precede their cell "
                 "spec (Theorem W3-35 extended to intra-cell kinds)")
+        parents = [self.spec_cap.cid]
+        if parse_outcome_cid is not None:
+            if parse_outcome_cid not in self.ledger:
+                raise CapsuleLifecycleError(
+                    f"declared parse_outcome_cid "
+                    f"{parse_outcome_cid[:12]}… is not sealed; "
+                    f"cannot parent a PATCH_PROPOSAL on a "
+                    f"non-sealed PARSE_OUTCOME (Capsule Contract C5)")
+            parents.append(parse_outcome_cid)
         cap = capsule_from_patch_proposal(
             instance_id=instance_id, strategy=strategy,
             parser_mode=parser_mode, apply_mode=apply_mode,
             n_distractors=n_distractors,
             substitutions=substitutions, rationale=rationale,
-            parents=(self.spec_cap.cid,))
+            parents=tuple(parents))
         entry = self._propose(cap)
         sealed = self._admit_and_seal(entry)
         self.patch_caps.append(sealed)
@@ -466,6 +544,7 @@ class CapsuleNativeRunContext:
                                  path: str,
                                  data: bytes,
                                  parents: Iterable[str] | None = None,
+                                 recorded_path: str | None = None,
                                  ) -> ContextCapsule:
         """Content-addressed artifact emission.
 
@@ -492,6 +571,15 @@ class CapsuleNativeRunContext:
         ARTIFACT structure. Callers may override with a tighter
         parent set (e.g. the readiness capsule's CID for the
         readiness_verdict.json artifact).
+
+        ``recorded_path`` (SDK v3.3, optional): when provided, the
+        ARTIFACT capsule's payload records THIS string as the
+        ``path`` field instead of the on-disk ``path``. The on-disk
+        bytes still land at ``path``; the capsule's payload uses
+        ``recorded_path`` for its content-address. Used by
+        deterministic-mode runs to record a path-anchor (e.g. a
+        basename) that does not depend on host-local tempdir
+        layout.
         """
         if not isinstance(data, (bytes, bytearray)):
             raise TypeError(
@@ -501,8 +589,10 @@ class CapsuleNativeRunContext:
         if parents is None:
             parents = ((self.profile_cap.cid,)
                        if self.profile_cap else ())
+        capsule_path = (
+            recorded_path if recorded_path is not None else path)
         cap = capsule_from_artifact(
-            path, sha256=sha, parents=tuple(parents))
+            capsule_path, sha256=sha, parents=tuple(parents))
         entry = self._propose(cap)
         sealed = self._admit_and_seal(entry)
         # Only AFTER the capsule is sealed do we commit bytes to

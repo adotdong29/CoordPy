@@ -91,14 +91,14 @@ class TestIS2CrossDomainUnification:
     def test_is2_capsule_vocabulary_is_closed(self):
         """Verify that CapsuleKind vocabulary is fixed and closed.
 
-        SDK v3.2 (April 2026) extends the closed vocabulary with
-        three intra-cell + detached-witness kinds:
-        ``PATCH_PROPOSAL`` and ``TEST_VERDICT`` (intra-cell
-        capsule-native slice — Theorem W3-32-extended) and
-        ``META_MANIFEST`` (detached witness for meta-artefacts —
-        Theorem W3-36). The closed-vocabulary contract is
-        preserved (each addition is an explicit SDK version bump);
-        the assertion is updated to lock the new size.
+        SDK v3.3 (April 2026) extends the closed vocabulary with
+        one further sub-intra-cell kind: ``PARSE_OUTCOME`` (the
+        parser-axis lifecycle gate — Theorem W3-39). Combined with
+        SDK v3.2's three intra-cell + detached-witness additions
+        (``PATCH_PROPOSAL``, ``TEST_VERDICT``, ``META_MANIFEST``),
+        the closed vocabulary now has 16 kinds. The closed-vocabulary
+        contract is preserved (each addition is an explicit SDK
+        version bump); the assertion is updated to lock the new size.
         """
         result = domain_unification.demonstrate_closed_vocabulary()
 
@@ -107,8 +107,8 @@ class TestIS2CrossDomainUnification:
         # THREAD_RESOLUTION, ADAPTIVE_EDGE, SWEEP_CELL, SWEEP_SPEC,
         # READINESS_CHECK, PROVENANCE, RUN_REPORT, PROFILE, ARTIFACT,
         # COHORT). SDK v3.2 adds 3: PATCH_PROPOSAL, TEST_VERDICT,
-        # META_MANIFEST.
-        assert len(result["vocabulary"]) == 15
+        # META_MANIFEST. SDK v3.3 adds 1: PARSE_OUTCOME.
+        assert len(result["vocabulary"]) == 16
         # Vocabulary does not grow when we add domains; it grows only
         # when the SDK explicitly bumps to admit a new kind.
 
@@ -231,11 +231,15 @@ class TestIS2Demonstrations:
     """Functional tests running the full IS-2 demonstrations."""
 
     def test_demonstrate_closed_vocabulary(self):
-        """Run the full closed-vocabulary demonstration."""
+        """Run the full closed-vocabulary demonstration.
+
+        SDK v3 baseline was 12 kinds; SDK v3.2 added 3
+        (PATCH_PROPOSAL, TEST_VERDICT, META_MANIFEST) and SDK v3.3
+        added 1 (PARSE_OUTCOME), bringing the total to 16."""
         result = domain_unification.demonstrate_closed_vocabulary()
 
         assert result["closed"] is True
-        assert len(result["vocabulary"]) == 12
+        assert len(result["vocabulary"]) == 16
 
     def test_demonstrate_is2_necessity(self):
         """Run the full IS-2 necessity proof."""

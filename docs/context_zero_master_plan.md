@@ -4,9 +4,14 @@
 > `context-zero`. This is a plan for a body of work, not a changelog.
 > Phase-by-phase diaries live in `vision_mvp/RESULTS_PHASE*.md`;
 > session notes live nowhere durable, on purpose. Last touched: SDK
-> v3.1 capsule-native runtime — capsules now (partially) drive
-> Wevra execution rather than only describing it (W3-32 / W3-33 /
-> W3-34 / W3-35), 2026-04-26.
+> v3.3 capsule-native runtime extended to the parser axis
+> (PARSE_OUTCOME), runtime-checkable lifecycle audit (W3-40), and
+> deterministic-mode CID determinism (W3-41), 2026-04-26.
+> Canonical research-status pointer:
+> [`docs/RESEARCH_STATUS.md`](RESEARCH_STATUS.md). Canonical
+> theorem registry: [`docs/THEOREM_REGISTRY.md`](THEOREM_REGISTRY.md).
+> Do-not-overstate rules:
+> [`docs/HOW_NOT_TO_OVERSTATE.md`](HOW_NOT_TO_OVERSTATE.md).
 >
 > The programme has a deliberately dual identity: it is (a) a research
 > programme in context, coordination, and exact external memory,
@@ -5447,6 +5452,169 @@ or phase-47 substrate tests (98 / 98 green on the targeted run).
 Anchor: `docs/RESULTS_WEVRA_INTRA_CELL.md` (milestone note);
 `docs/CAPSULE_FORMALISM.md` § 4.H (theorems); test suite
 `vision_mvp/tests/test_wevra_capsule_native_intra_cell.py`.
+
+### 4.20 SDK v3.3 — sub-intra-cell parser-axis + lifecycle audit + deterministic-mode replay
+
+The v3.2 milestone (§ 4.19) closed the *intra-cell* slice on the
+patch / verdict pair. SDK v3.3 takes three coupled moves: (i) extend
+capsule-native lifecycle one further structural layer to the
+parser axis with a new PARSE_OUTCOME kind; (ii) add a
+runtime-checkable `CapsuleLifecycleAudit` that mechanically
+verifies the lifecycle correspondence on every finished run;
+(iii) add an opt-in deterministic-mode replay flag that strips
+per-run timestamps from PROVENANCE / RUN_REPORT / READINESS_CHECK
+capsule payloads so two runs of the same logical input collapse
+to byte-identical full-DAG CIDs.
+
+**1. The sub-intra-cell extension.** Inside every sweep cell, the
+inner `run_swe_loop_sandboxed` loop calls `generator(...)` once
+per (task, strategy) and then `sandbox.run(...)`. SDK v3.3 wraps
+the generator return path with a ratiomale-to-failure-kind mapping
+(`_parse_outcome_from_rationale`) that recovers the parser's
+structured outcome from the substrate's `ProposedPatch.rationale`
+without coupling the capsule layer to substrate string formats.
+The runtime then seals one PARSE_OUTCOME capsule per (task,
+strategy) — parent: SWEEP_SPEC; payload: coordinates + parser
+`ok` boolean + closed-vocabulary `failure_kind` from
+`swe_patch_parser.ALL_PARSE_KINDS ∪ {"oracle", "gen_error"}` +
+`recovery` label + `substitutions_count` integer + bounded
+`detail` string. The downstream PATCH_PROPOSAL is parented on
+*both* SWEEP_SPEC and the upstream PARSE_OUTCOME (admission
+fails if the parse-outcome CID is not yet sealed — Capsule
+Contract C5). The chain `parse → patch → verdict` is enforced at
+the type level (Theorem W3-39).
+
+**2. The lifecycle audit.** A finished `CapsuleNativeRunContext`
+has a `audit_capsule_lifecycle(ctx)` method that mechanically
+verifies eight invariants:
+
+  - **L-1** No orphan capsules (every PROPOSED-but-not-sealed
+    in-flight entry has a non-empty failure string AND is not in
+    the ledger).
+  - **L-2** PATCH_PROPOSAL parent set includes SWEEP_SPEC.
+  - **L-3** TEST_VERDICT parent is exactly one sealed
+    PATCH_PROPOSAL.
+  - **L-4** PARSE_OUTCOME parent is exactly SWEEP_SPEC.
+  - **L-5** SWEEP_CELL parent is exactly SWEEP_SPEC.
+  - **L-6** PARSE_OUTCOME ↔ PATCH_PROPOSAL ↔ TEST_VERDICT
+    coordinate multisets are equal.
+  - **L-7** PATCH_PROPOSAL coordinates match its PARSE_OUTCOME
+    parent's.
+  - **L-8** TEST_VERDICT is sealed strictly after its
+    PATCH_PROPOSAL in the ledger's append order.
+
+Returns OK / BAD / EMPTY plus typed `{rule, capsule_cid,
+capsule_kind, detail}` violations. The audit also has a
+`audit_capsule_lifecycle_from_view(view)` form that runs from a
+forensic `capsule_view.json` alone — auditors do not need the
+runtime ctx that produced it. Theorem W3-40 anchors the audit's
+soundness (proof-by-inspection of the eight `_check_l*` methods).
+
+**3. Deterministic-mode replay.** `RunSpec(deterministic=True)`
+strips per-run / host-local / wall-clock fields from the
+PROVENANCE / READINESS_CHECK / RUN_REPORT capsule payloads
+(timestamps, absolute paths, hostnames, wall-clock seconds, output
+directories) and the ARTIFACT capsule paths (basename only). After
+canonicalisation, every payload is a deterministic function of
+the profile, JSONL bytes, and the closed code path; therefore
+every CID is deterministic; therefore every parent set is
+deterministic; therefore every transitive chain (including chain
+head and root CID) is deterministic (Theorem W3-41). On-disk
+`product_report.json` still records wall-clock fields for
+forensic context — the determinism is on the capsule graph, not
+on wall clock.
+
+**4. Three new theorems.**
+
+* **Theorem W3-39** (PARSE_OUTCOME lifecycle gate + parse → patch
+  → verdict DAG chain, proved by inspection): every PARSE_OUTCOME
+  has parent SWEEP_SPEC; every PATCH_PROPOSAL admitted with a
+  `parse_outcome_cid` argument has that CID in its parent set;
+  admission fails if the parse-outcome CID is not yet sealed.
+* **Theorem W3-40** (Lifecycle-audit soundness, proved by
+  inspection + mechanically-checked on every run): a finished
+  ledger whose audit returns `verdict == "OK"` satisfies the
+  eight invariants L-1..L-8.
+* **Theorem W3-41** (Deterministic-mode CID determinism on full
+  DAG, proved by inspection of the canonicalisation set + empirical
+  cross-run set-equality test): two runs of the same deterministic
+  profile under `deterministic=True` produce byte-identical CIDs
+  on every kind, identical chain head, identical root CID.
+
+**5. What this changes about Wevra's originality claim.** The v3.2
+positioning was *"capsules drive execution at the run boundary
+and the inner sweep loop pair (patch, verdict)"*. The v3.3
+positioning is sharper:
+
+> *Capsules drive execution at the run boundary, the inner sweep
+> loop pair, AND the parser axis. The lifecycle correspondence is
+> mechanically checkable on every finished run. The full capsule
+> DAG is reproducible byte-for-byte across machines under a
+> stated determinism flag.*
+
+Three classes of "operational claim that was ahead of code" have
+been promoted to "operational claim the code honestly earns":
+
+1. The parser-axis taxonomy (`failure_kind`, `recovery`) was
+   previously buried in rationale strings; it is now a typed
+   capsule on the DAG.
+2. The lifecycle correspondence (W3-32, W3-32-extended) was
+   previously a paper-grade theorem; it is now a runtime audit
+   that runs on every finished run.
+3. Cross-run capsule DAG comparison was previously only on the
+   spine kinds (W3-34); it is now full-DAG under the
+   determinism flag.
+
+**6. What remains legacy / post-hoc / out-of-scope.**
+
+* LLM prompt bytes and raw LLM response bytes remain plain Python.
+  The next sub-intra-cell slice would name them as `PROMPT` and
+  `LLM_RESPONSE` capsules (Conjecture W3-C5).
+* Sandbox stdout / stderr / test trace remain plain bytes.
+* Adversarial concurrent writers remain out of scope (the trust
+  boundary is the same as Wevra's sandbox boundary).
+* Real-LLM mode is non-deterministic by construction; the
+  determinism flag does not change that.
+* Cryptographic signing of META_MANIFEST remains orthogonal and
+  out of scope.
+
+**7. SDK surface delta.** Strictly additive on v3.2:
+
+* New: `CapsuleKind.PARSE_OUTCOME`, `capsule_from_parse_outcome`,
+  `PARSE_OUTCOME_ORACLE` sentinel.
+* New: `CapsuleNativeRunContext.seal_parse_outcome`,
+  `seal_patch_proposal(parse_outcome_cid=...)` argument,
+  `seal_and_write_artifact(recorded_path=...)` argument.
+* New: `CapsuleLifecycleAudit`, `LifecycleAuditReport`,
+  `audit_capsule_lifecycle`, `audit_capsule_lifecycle_from_view`
+  (re-exported from `vision_mvp.wevra`).
+* New: `RunSpec.deterministic: bool = False`.
+* New: `--deterministic` CLI flag on `vision_mvp.product`.
+* Bumped: `SDK_VERSION = "wevra.sdk.v3.3"`.
+* Unchanged: every v3.2 contract test (101) still passes
+  byte-for-byte; capsule view schema name `wevra.capsule_view.v1`;
+  the post-hoc `build_report_ledger` adapter; the META_MANIFEST
+  detached-witness boundary.
+
+**8. Empirical anchor.**
+`vision_mvp/tests/test_wevra_capsule_native_deeper.py` ships 18
+contract tests covering the W3-39 / W3-40 / W3-41 claims plus the
+PARSE_OUTCOME ↔ PATCH_PROPOSAL coordinate-matching invariant and
+the rationale-to-failure-kind mapping. Combined with v3.1's
+`test_wevra_capsule_native.py` (16 tests) and v3.2's
+`test_wevra_capsule_native_intra_cell.py` (16 tests), the
+capsule-native runtime contract is now witnessed by 50 contract
+tests. Full `vision_mvp.tests.test_wevra_*` + `test_capsule_*`
+suite **165 / 165 green**; the substrate's
+`run_swe_loop_sandboxed` hook addition does not regress any
+phase-40, phase-42, phase-45, phase-47, or phase-50 substrate
+tests.
+
+Anchor: `docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md` (this milestone
+note); `docs/THEOREM_REGISTRY.md` (canonical theorem registry);
+`docs/RESEARCH_STATUS.md` (canonical research-status); paper
+draft: `papers/wevra_capsule_native_runtime.md` (claim taxonomy +
+flagship write-up).
 
 ---
 

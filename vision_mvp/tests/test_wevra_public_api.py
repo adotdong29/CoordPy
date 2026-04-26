@@ -61,18 +61,19 @@ class WevraSurfaceTests(unittest.TestCase):
             self.assertIsInstance(v, str)
             self.assertTrue(len(v) > 0)
 
-    def test_sdk_version_is_v3_2(self):
+    def test_sdk_version_is_v3_3(self):
         from vision_mvp.wevra import SDK_VERSION
-        # SDK v3.2 bump: capsule-native runtime extended into the
-        # inner sweep loop (PATCH_PROPOSAL / TEST_VERDICT capsules),
-        # detached META_MANIFEST witness sealing the meta-artifact
-        # boundary (Theorem W3-36), and stronger on-disk
-        # verification by ``wevra-capsule verify`` (Theorem W3-37).
-        # Strictly additive over v3.1 — every v3.1 contract test
-        # still passes byte-for-byte. Capsule view schema unchanged
-        # (``wevra.capsule_view.v1``) because the new payloads are
-        # additive.
-        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.2")
+        # SDK v3.3 bump: capsule-native runtime extended one further
+        # structural layer (PARSE_OUTCOME capsule per parser-axis
+        # transition, sealed BEFORE every PATCH_PROPOSAL), plus a
+        # deterministic-mode opt-in flag on ``RunSpec`` that strips
+        # per-run timestamps from PROVENANCE / RUN_REPORT capsules
+        # (Theorem W3-41), plus a runtime-checkable
+        # ``CapsuleLifecycleAudit`` (Theorem W3-40). Strictly
+        # additive over v3.2 — every v3.2 contract test still passes
+        # byte-for-byte. Capsule view schema unchanged
+        # (``wevra.capsule_view.v1``).
+        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.3")
 
     def test_runspec_is_frozen_dataclass(self):
         from vision_mvp.wevra import RunSpec
@@ -88,6 +89,8 @@ class WevraSurfaceTests(unittest.TestCase):
             "report_sinks", "config",
             # SDK v3.1: capsule-native runtime is the default.
             "capsule_native",
+            # SDK v3.3: deterministic-mode opt-in.
+            "deterministic",
         })
 
     def test_wevra_config_frozen_and_env_overridable(self):

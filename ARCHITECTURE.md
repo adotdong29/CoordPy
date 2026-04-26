@@ -5,18 +5,28 @@
 crosses a role boundary, a layer boundary, or a run boundary in Wevra
 is a typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-carrying **capsule** — never a raw prompt string. As of
-SDK v3.2 (April 2026), capsules drive execution at the run boundary
-*and* inside the inner sweep loop, and meta-artefacts have a
-formally-defined detached-witness boundary. The runtime's stage
-transitions *are* capsule lifecycle transitions; substantive
-on-disk artifacts are content-addressed at write time and
-re-verifiable at audit time. This document is the
-programme's architectural reference: it covers the full substrate
-(routing, exact memory, retrieval, planner, runtime calibration,
-typed handoffs) and the Wevra product surface built on top of it,
-now *centred* on the Capsule Contract and *driven* by it. For a
-one-pass orientation, start with
-[`docs/START_HERE.md`](docs/START_HERE.md).
+SDK v3.3 (April 2026), capsules drive execution at the run boundary,
+inside the inner sweep loop, AND on the parser axis (PARSE_OUTCOME
+capsule sealed before every PATCH_PROPOSAL — Theorem W3-39). A
+runtime-checkable lifecycle audit mechanically verifies eight
+invariants L-1..L-8 over every finished run (Theorem W3-40), and
+deterministic-mode replay opt-in (`RunSpec(deterministic=True)`)
+collapses the full capsule DAG byte-for-byte across runs of the same
+logical input (Theorem W3-41). Meta-artefacts have a formally-defined
+detached-witness boundary (Theorem W3-36). Substantive on-disk
+artifacts are content-addressed at write time and re-verifiable at
+audit time. This document is the programme's architectural
+reference: it covers the full substrate (routing, exact memory,
+retrieval, planner, runtime calibration, typed handoffs) and the
+Wevra product surface built on top of it, now *centred* on the
+Capsule Contract and *driven* by it. For a one-pass orientation,
+start with [`docs/START_HERE.md`](docs/START_HERE.md). For canonical
+research status see
+[`docs/RESEARCH_STATUS.md`](docs/RESEARCH_STATUS.md); for the
+canonical theorem registry see
+[`docs/THEOREM_REGISTRY.md`](docs/THEOREM_REGISTRY.md); for the
+do-not-overstate rule book see
+[`docs/HOW_NOT_TO_OVERSTATE.md`](docs/HOW_NOT_TO_OVERSTATE.md).
 
 ## The Capsule Contract (SDK v3 centre of gravity)
 
@@ -137,6 +147,67 @@ context available); the two paths produce CID-equivalent ledgers
 for the spine kinds (Theorem W3-34, preserved under the v3.2
 intra-cell extension because intra-cell capsules are siblings of
 the spine, not modifications of it).
+
+### Sub-intra-cell parse-outcome + lifecycle audit + determinism (SDK v3.3)
+
+SDK v3.3 extends the discipline one further structural layer with a
+PARSE_OUTCOME capsule sealed *before* every PATCH_PROPOSAL:
+
+```
+                              SWEEP_SPEC
+                              ├── SWEEP_CELL_1   ··· SWEEP_CELL_n
+                              ├── PARSE_OUTCOME_1   (parent: SWEEP_SPEC)
+                              │       └── PATCH_PROPOSAL_1
+                              │               (parents: SWEEP_SPEC + PARSE_OUTCOME_1)
+                              │               └── TEST_VERDICT_1
+                              ├── PARSE_OUTCOME_2
+                              │       └── PATCH_PROPOSAL_2
+                              │               └── TEST_VERDICT_2
+                              └── ...
+```
+
+The parser's structured outcome — `ok` boolean, closed-vocabulary
+`failure_kind`, `recovery` label, substitutions count, bounded
+detail — becomes a typed witness on the capsule DAG. The parse →
+patch → verdict chain is enforced at the type level (Theorem W3-39).
+
+The **lifecycle audit** (`vision_mvp/wevra/lifecycle_audit.py`)
+mechanically verifies eight invariants L-1..L-8 over a finished
+ledger:
+
+  * L-1 No orphan capsules.
+  * L-2 PATCH_PROPOSAL parents include SWEEP_SPEC.
+  * L-3 TEST_VERDICT parent is exactly one sealed PATCH_PROPOSAL.
+  * L-4 PARSE_OUTCOME parent is exactly SWEEP_SPEC.
+  * L-5 SWEEP_CELL parent is exactly SWEEP_SPEC.
+  * L-6 PATCH_PROPOSAL ↔ TEST_VERDICT ↔ PARSE_OUTCOME coordinates
+    are equinumerous.
+  * L-7 PATCH_PROPOSAL coordinates match its PARSE_OUTCOME parent's.
+  * L-8 TEST_VERDICT is sealed strictly after its PATCH_PROPOSAL.
+
+The audit returns OK / BAD / EMPTY plus typed counterexamples. It is
+runnable from a `CapsuleNativeRunContext` (in-process) or from an
+on-disk `capsule_view.json` alone (forensic). Theorem W3-40 anchors
+the audit's soundness.
+
+**Deterministic-mode replay** (`RunSpec(deterministic=True)`) strips
+per-run / host-local / wall-clock fields from the
+PROVENANCE / READINESS_CHECK / RUN_REPORT capsule payloads and the
+ARTIFACT capsule paths so two runs of the same deterministic
+profile (mock mode, `in_process` / `subprocess` sandbox, frozen
+JSONL) produce byte-identical full-DAG CIDs and chain head
+(Theorem W3-41). On-disk product_report.json still records
+wall-clock fields for forensic context — the determinism is on
+the capsule graph, not on wall clock.
+
+Reference implementation:
+`vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_parse_outcome`,
+`vision_mvp/wevra/lifecycle_audit.py`,
+`vision_mvp/product/runner.py::_canonicalise_for_determinism`.
+Theory note:
+[`docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md`](docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md).
+Contract tests: `vision_mvp/tests/test_wevra_capsule_native_deeper.py`
+(18 tests).
 
 ### How capsules relate to the older CASR / substrate / handoff work
 

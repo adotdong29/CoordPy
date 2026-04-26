@@ -2430,3 +2430,177 @@ research milestone).
 | W3-34 in-flight ↔ post-hoc CID equivalence | `vision_mvp/tests/test_wevra_capsule_native.py::InFlightVsPostHocEquivalenceTests` |
 | W3-35 parent-CID gating | `vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext` (precondition checks in each `seal_*` method) |
 | Capsule-native runtime tests | `vision_mvp/tests/test_wevra_capsule_native.py` (16 tests) |
+| W3-39 PARSE_OUTCOME lifecycle gate | `vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_parse_outcome` |
+| W3-39 parse → patch DAG chain | `vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_patch_proposal(parse_outcome_cid=...)` |
+| W3-40 lifecycle-audit soundness | `vision_mvp/wevra/lifecycle_audit.py::CapsuleLifecycleAudit` |
+| W3-41 deterministic-mode CID determinism | `vision_mvp/product/runner.py::_canonicalise_for_determinism`, `_canonicalise_run_report_headers`, `_canonicalise_readiness_verdict`, `_canonicalise_sweep_result` |
+| Deeper-slice contract tests | `vision_mvp/tests/test_wevra_capsule_native_deeper.py` (18 tests) |
+
+---
+
+## 4.I SDK v3.3 extension — sub-intra-cell parser-axis + lifecycle audit + determinism
+
+### Theorem W3-39 (PARSE_OUTCOME lifecycle gate + parse → patch → verdict DAG chain)
+
+Define the **sub-intra-cell** kind alphabet
+$\mathbb{K}_{\rm sub} = \mathbb{K}_{\rm intra} \cup
+\{\mathtt{PARSE\_OUTCOME}\}$ extending the SDK v3.2 intra-cell
+alphabet.
+
+**Claim.** For any capsule-native run with sealed SWEEP_SPEC $s$:
+
+1. Every sealed PARSE_OUTCOME capsule $p$ satisfies
+   $\pi(p) = (\mathit{cid}(s),)$.
+2. For every PATCH_PROPOSAL $q$ admitted with the
+   `parse_outcome_cid=p.cid` argument:
+   - $\mathit{cid}(p) \in \pi(q)$ AND $\mathit{cid}(s) \in \pi(q)$.
+   - Admission of $q$ depends on $p$ being in the ledger (C5).
+
+**Proof.** Direct inspection of `seal_parse_outcome` (gates on
+`spec_cap is not None`; constructs the capsule with parents
+`(self.spec_cap.cid,)`) and `seal_patch_proposal` (when
+`parse_outcome_cid is not None`, builds parents
+`[self.spec_cap.cid, parse_outcome_cid]`; raises
+`CapsuleLifecycleError` if `parse_outcome_cid not in self.ledger`).
+$\square$
+
+**Code anchor.**
+`vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_parse_outcome`,
+`seal_patch_proposal`. Tests:
+`vision_mvp/tests/test_wevra_capsule_native_deeper.py
+::ParseOutcomeLifecycleTests`.
+
+### Theorem W3-40 (Lifecycle-audit soundness)
+
+Let $\mathcal{L}$ be a finished `CapsuleLedger` produced by a
+`CapsuleNativeRunContext`. Let $A(\mathcal{L})$ be the
+`CapsuleLifecycleAudit.run()` result.
+
+**Claim.** $A(\mathcal{L}).\mathrm{verdict} = \mathtt{OK}$ iff
+$\mathcal{L}$ satisfies the eight lifecycle invariants L-1..L-8
+defined in `vision_mvp/wevra/lifecycle_audit.py`.
+
+**Proof.** By construction. The audit's `run()` method calls
+the eight `_check_l*` methods in sequence, accumulates every
+returned violation, and returns `OK` iff the violation list is
+empty. Each `_check_l*` method enumerates every capsule of the
+relevant kind and emits a typed violation for each
+counterexample. Therefore: no violation emitted $\iff$ every
+invariant held on every checked capsule $\iff$ $\mathcal{L}$
+satisfies L-1..L-8. $\square$
+
+**Corollary (audit-from-view).** Given a rendered
+`capsule_view.json` dict $V$ on disk, the audit
+`audit_capsule_lifecycle_from_view(V)` reconstructs a synthetic
+ledger and runs the same audit. Soundness is preserved because
+`render_view`'s `payload_kinds_always` invariant guarantees that
+PARSE_OUTCOME / PATCH_PROPOSAL / TEST_VERDICT / ARTIFACT
+/ META_MANIFEST payloads are always included on disk; every
+L-2..L-8 check is recoverable. L-1 is vacuous on a forensic view
+(failed in-flight entries do not appear there).
+
+**Code anchor.**
+`vision_mvp/wevra/lifecycle_audit.py::CapsuleLifecycleAudit.run`.
+Tests:
+`vision_mvp/tests/test_wevra_capsule_native_deeper.py
+::LifecycleAuditTests`.
+
+### Theorem W3-41 (Deterministic-mode CID determinism on full DAG)
+
+Let $\Pi$ be a *deterministic profile*: mock mode,
+`in_process` or `subprocess` sandbox, JSONL whose SHA-256 is
+stable across runs. Let
+$R_1 = \mathrm{run}(\mathrm{RunSpec}(\Pi, O_1, \mathtt{deterministic}=
+\mathtt{True}))$ and $R_2 = \mathrm{run}(\mathrm{RunSpec}(\Pi,
+O_2, \mathtt{deterministic}=\mathtt{True}))$ for any output
+directories $O_1 \ne O_2$.
+
+**Claim.** For every kind $k \in \mathbb{K}'$:
+
+$$
+\{\mathit{cid}(c) : c \in R_1, k(c) = k\}
+\;=\;
+\{\mathit{cid}(c) : c \in R_2, k(c) = k\}
+$$
+
+(multiset equality). The chain heads
+$h_*(R_1) = h_*(R_2)$ and root CIDs
+$\mathit{cid}_{\rm root}(R_1) = \mathit{cid}_{\rm root}(R_2)$.
+
+**Proof sketch.** A capsule's CID is a function of
+$(\mathit{kind}, \mathrm{payload}, \mathrm{budget},
+\mathrm{sort}(\pi))$. The canonicalisation set
+$\Sigma = \{
+  \mathrm{timestamp\_utc},
+  \mathrm{git\_sha},
+  \mathrm{git\_dirty},
+  \mathrm{repo\_dir},
+  \mathrm{python\_version},
+  \mathrm{platform},
+  \mathrm{argv},
+  \mathrm{cwd},
+  \mathrm{user},
+  \mathrm{hostname},
+  \mathrm{out\_dir},
+  \mathrm{wall\_seconds},
+  \mathrm{cell\_wall\_s},
+  \mathrm{absolute\_path}
+\}$
+is exactly the set of payload fields that can vary between two
+runs of the same logical input on different machines. The
+canonicalisation functions in
+`_canonicalise_for_determinism`, `_canonicalise_run_report_headers`,
+`_canonicalise_readiness_verdict`, `_canonicalise_sweep_result`,
+plus the `recorded_path` argument to `seal_and_write_artifact`,
+strip every field in $\Sigma$ from the relevant capsule
+payloads. After stripping, every payload is a deterministic
+function of $\Pi$, the profile dict, the JSONL bytes, and the
+closed code path. Therefore every CID is deterministic; therefore
+every parent set is deterministic (parent CIDs are themselves
+deterministic); therefore by induction over the topologically
+sorted ledger every chain step
+$h_i = \mathrm{SHA\text{-}256}(\mathrm{enc}\{h_{i-1},
+\mathit{cid}, \mathit{kind}, \mathtt{SEALED}\})$ is deterministic.
+The root CID is in particular the RUN_REPORT capsule's CID, which
+is a function of the spine kinds' CIDs and the canonicalised
+headers. $\square$
+
+**Sharp scope.** Without `deterministic=True`, two runs produce
+different PROVENANCE / RUN_REPORT CIDs by design. Real-LLM mode
+(non-mock) is non-deterministic by construction. The on-disk
+`product_report.json` still records wall-clock fields for
+forensic context — the determinism is on the capsule graph,
+not on wall clock.
+
+**Code anchor.**
+`vision_mvp/product/runner.py::_canonicalise_for_determinism`,
+`_canonicalise_readiness_verdict`,
+`_canonicalise_sweep_result`,
+`_canonicalise_run_report_headers`. Tests:
+`vision_mvp/tests/test_wevra_capsule_native_deeper.py
+::DeterministicModeTests::test_w3_41_two_runs_collapse_to_identical_cids`.
+
+### Conjecture W3-C5 (sub-intra-cell PROMPT/LLM_RESPONSE slice — new, not in v3.3)
+
+Define a further sub-intra-cell extension to the alphabet:
+$\mathbb{K}_{\rm sub-sub} = \mathbb{K}_{\rm sub} \cup
+\{\mathtt{PROMPT}, \mathtt{LLM\_RESPONSE}\}$. A PROMPT capsule
+records the bytes of the LLM prompt sent for one (task, strategy);
+a LLM_RESPONSE capsule records the bytes returned. Parents:
+SWEEP_SPEC; downstream PATCH_PROPOSAL parents on the
+LLM_RESPONSE.
+
+**Conjecture.** A PROMPT/LLM_RESPONSE slice closes the inner-loop
+boundary while preserving Theorem W3-34 spine equivalence.
+
+**Falsifiers.**
+- PROMPT/LLM_RESPONSE bytes too large for any reasonable byte
+  budget; admission would systematically fail on real-LLM
+  profiles.
+- The new kinds force a SWEEP_SPEC payload change (e.g. to
+  carry a streaming-budget reference); this would break W3-34.
+- The capsule-DAG height bound (W3-13) lifts above 4 in a way
+  that breaks downstream consumers' assumptions.
+
+**Status.** Conjectural. Implementing this slice is the most
+likely next milestone (SDK v3.4).

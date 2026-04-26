@@ -107,6 +107,53 @@ def _select_sandbox(spec: SweepSpec):
     return get_sandbox(spec.sandbox)
 
 
+def _parse_outcome_from_rationale(
+        rationale: str,
+        *, n_substitutions: int,
+        ) -> tuple[bool, str, str, str]:
+    """Reverse-engineer the parser-axis structured outcome from
+    a ``ProposedPatch.rationale`` string.
+
+    The substrate stores the parser's ``failure_kind`` / ``recovery``
+    in the rationale string of the ``ProposedPatch`` it returns:
+
+      * ``"parse_failed:<kind>"`` for a parser failure (substitutions
+        empty);
+      * ``"llm_proposed"`` for a clean parse without recovery;
+      * ``"llm_proposed:<recovery>"`` when a recovery heuristic
+        fired;
+      * any other string (e.g. issue-summary text from the
+        deterministic oracle) is treated as the
+        ``PARSE_OUTCOME_ORACLE`` sentinel.
+
+    Returning ``(ok, failure_kind, recovery, detail)`` lets the
+    runtime build a PARSE_OUTCOME capsule without coupling the
+    capsule layer to substrate string formats.
+    """
+    rat = (rationale or "").strip()
+    if rat.startswith("parse_failed"):
+        # "parse_failed" or "parse_failed:<kind>"
+        if ":" in rat:
+            kind = rat.split(":", 1)[1]
+        else:
+            kind = "parse_failed"
+        return False, kind, "", rat
+    if rat.startswith("llm_proposed"):
+        # "llm_proposed" or "llm_proposed:<recovery>"
+        if ":" in rat:
+            recovery = rat.split(":", 1)[1]
+        else:
+            recovery = ""
+        return True, "ok", recovery, ""
+    if rat.startswith("gen_error"):
+        # Generator raised before parsing; surface as a typed
+        # generator-error parse outcome.
+        return False, "gen_error", "", rat[:200]
+    # Default — deterministic oracle or any non-parser path.
+    detail = rat[:200] if (n_substitutions > 0) else ""
+    return True, "oracle", "", detail
+
+
 def _make_intra_cell_hooks(ctx: "Any",
                               *,
                               parser_mode: str,
@@ -124,11 +171,38 @@ def _make_intra_cell_hooks(ctx: "Any",
     full (parser_mode, apply_mode, n_distractors, instance_id,
     strategy) tuple needed to navigate the DAG without an
     external index.
+
+    SDK v3.3: ``on_patch`` now also seals a PARSE_OUTCOME capsule
+    (parent: SWEEP_SPEC) BEFORE the PATCH_PROPOSAL. The parse
+    outcome's ``failure_kind`` / ``recovery`` are derived from the
+    substrate's ``ProposedPatch.rationale`` string (see
+    ``_parse_outcome_from_rationale``), so the capsule layer does
+    not need to peek inside the substrate's parser. The
+    PATCH_PROPOSAL is then parented on both SWEEP_SPEC and the
+    PARSE_OUTCOME, giving the parse → patch → verdict chain a
+    typed DAG witness.
     """
     if ctx is None:
         return None, None
 
     def on_patch(task, strat, proposed):
+        n_subs = len(tuple(proposed.patch))
+        ok, failure_kind, recovery, detail = (
+            _parse_outcome_from_rationale(
+                proposed.rationale or "",
+                n_substitutions=n_subs))
+        parse_cap = ctx.seal_parse_outcome(
+            instance_id=task.instance_id,
+            strategy=strat,
+            parser_mode=parser_mode,
+            apply_mode=apply_mode,
+            n_distractors=int(n_distractors),
+            ok=ok,
+            failure_kind=failure_kind,
+            recovery=recovery,
+            substitutions_count=n_subs,
+            detail=detail,
+        )
         cap = ctx.seal_patch_proposal(
             instance_id=task.instance_id,
             strategy=strat,
@@ -137,6 +211,7 @@ def _make_intra_cell_hooks(ctx: "Any",
             n_distractors=int(n_distractors),
             substitutions=tuple(proposed.patch),
             rationale=proposed.rationale or "",
+            parse_outcome_cid=parse_cap.cid,
         )
         return cap.cid
 

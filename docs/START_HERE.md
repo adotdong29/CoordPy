@@ -11,13 +11,20 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-SDK v3.2 (April 2026), capsules drive execution **past the cell
-boundary into the inner sweep loop**: each (task, strategy)
-parse→apply→test transition is two sealed capsules with
-parent-CID gating. Meta-artefacts (the report itself) are
-authenticated by a *detached* META_MANIFEST in a secondary
-ledger — the rendering circularity (impossible to seal a
-report whose bytes encode the seal) is now a sharp theorem
+SDK v3.3 (April 2026), capsules drive execution **one further
+structural layer past the cell boundary**: each (task, strategy)
+parse→patch→verdict transition is THREE sealed capsules
+(PARSE_OUTCOME → PATCH_PROPOSAL → TEST_VERDICT) with parent-CID
+gating, the parser-axis transition is a typed lifecycle step
+(Theorem W3-39), and a runtime-checkable
+``CapsuleLifecycleAudit`` mechanically verifies the lifecycle
+correspondence on every finished run (Theorem W3-40).
+Deterministic-mode replay (``RunSpec(deterministic=True)``)
+collapses the full capsule DAG byte-for-byte across runs of the
+same logical input (Theorem W3-41). Meta-artefacts (the report
+itself) are authenticated by a *detached* META_MANIFEST in a
+secondary ledger — the rendering circularity (impossible to seal
+a report whose bytes encode the seal) is a sharp theorem
 (W3-36) with a constructive boundary witness. ``wevra-capsule
 verify`` recomputes the chain from on-disk header bytes and
 re-hashes every artefact. See *"What capsules do at runtime
@@ -125,34 +132,67 @@ Two new structural moves were made:
     re-hashes every meta-artefact and primary artefact at
     audit time (W3-37 / W3-38).
 
+## What changed in SDK v3.3 (deeper intra-cell + audit + determinism)
+
+Three additive moves:
+
+  * **Sub-intra-cell ``PARSE_OUTCOME`` capsule.** Each
+    (task, strategy) now seals THREE capsules: a PARSE_OUTCOME
+    *before* the PATCH_PROPOSAL (parent: SWEEP_SPEC, payload:
+    coordinates + parser ``ok`` boolean + closed-vocabulary
+    ``failure_kind`` + ``recovery`` label + bounded ``detail``).
+    The PATCH_PROPOSAL's parents now include both SWEEP_SPEC and
+    the PARSE_OUTCOME's CID, so the parse → patch → verdict
+    chain is a typed witness on the DAG (Theorem W3-39). On
+    ``local_smoke`` this seals 48 PARSE_OUTCOME capsules per
+    run (all ``failure_kind == "oracle"`` because the bundled
+    profile uses the deterministic_oracle path); under real-LLM
+    profiles, ``failure_kind`` distributes over the parser's
+    closed vocabulary (``ok``, ``unclosed_new``, ``prose_only``,
+    ``parse_failed``, ``recovery=closed_at_eos`` etc.) so the
+    parser-axis attribution is now lifecycle-governed.
+  * **Runtime-checkable lifecycle audit** (``audit_capsule_lifecycle``,
+    ``audit_capsule_lifecycle_from_view``). Eight invariants
+    L-1..L-8 are checked mechanically on a finished run; the
+    audit returns OK/BAD/EMPTY plus typed counterexamples
+    (Theorem W3-40). The audit is also runnable from a
+    forensic ``capsule_view.json`` alone — auditors do not need
+    the runtime ctx that produced it.
+  * **Deterministic-mode replay** (``RunSpec(deterministic=True)``).
+    Strips per-run timestamps / wall-clock fields / host-local
+    paths from PROVENANCE / RUN_REPORT / READINESS_CHECK
+    payloads and ARTIFACT capsule paths so two runs of the same
+    deterministic profile (mock mode, frozen JSONL,
+    ``in_process``/``subprocess`` sandbox) produce byte-identical
+    full-DAG CIDs and identical chain head (Theorem W3-41).
+
 ## What remains post-hoc / audit only
 
 The capsule layer is *substantially* load-bearing in execution
 now, but a few axes are still post-hoc / not capsule-tracked:
 
-  * **Sub-intra-cell objects.** The LLM prompt that the patch
-    generator sends, the raw LLM response bytes, and the
-    parser's full ``ParseOutcome`` taxonomy (kind / recovery
-    label / detail) are still plain Python. The next intra-cell
-    slice would name them as ``PROMPT`` / ``LLM_RESPONSE`` /
-    ``PARSE_OUTCOME`` capsules. SDK v3.2 captures the *patch*
-    and the *verdict* — the load-bearing pair — not every
-    sub-step.
+  * **Sub-step bytes still outside the slice.** The LLM prompt
+    that the patch generator sends and the raw LLM response
+    bytes are still plain Python. SDK v3.3 captures the
+    *parse outcome* (the parser's structured verdict), not the
+    LLM bytes that triggered it. The next sub-intra-cell slice
+    would name them as ``PROMPT`` and ``LLM_RESPONSE`` capsules
+    (Conjecture W3-C5).
+  * **Sandbox stdout / stderr / test trace** remain plain bytes.
   * **The post-hoc ``build_report_ledger`` adapter** is retained
     as the third-party-facing path for code that has a
     ``product_report`` dict from somewhere outside the runtime
     (disk, an HTTP API, another tool). The two paths produce
     CID-equivalent ledgers on the spine kinds (Theorem W3-34
-    preserved under SDK v3.2's intra-cell extension); they
-    differ only on ARTIFACT (real SHA vs None) and transitively
-    RUN_REPORT.
-  * **Re-execution determinism on full DAG.** Two runs of the
-    same profile produce different PROVENANCE / RUN_REPORT CIDs
-    because the manifest carries a per-run timestamp. PROFILE /
-    SWEEP_SPEC / SWEEP_CELL CIDs *are* stable across runs of the
-    same deterministic profile. Cross-run RUN_REPORT
-    determinism would require a dedicated "deterministic-mode"
-    toggle and is out of scope.
+    preserved under SDK v3.2's intra-cell extension and SDK
+    v3.3's sub-intra-cell extension); they differ on ARTIFACT
+    (real SHA vs None) and transitively on RUN_REPORT.
+  * **Re-execution determinism is opt-in only.** Without
+    ``deterministic=True`` two runs produce different
+    PROVENANCE / RUN_REPORT CIDs (timestamp / wall-clock variance).
+    With the flag, the full DAG is reproducible (W3-41); the
+    underlying profile must be deterministic (mock mode,
+    frozen JSONL).
   * **META_MANIFEST authentication** is a one-hop trust unit.
     Theorem W3-36 establishes that authenticating the manifest
     *itself* within the primary ledger is impossible without
@@ -201,8 +241,9 @@ notes, and the master plan in `docs/context_zero_master_plan.md`).
 | Layer | One sentence | Stability |
 |---|---|---|
 | **Context Capsule primitives** (`wevra.capsule`) | `ContextCapsule` + `CapsuleLedger` + `CapsuleView`: the load-bearing SDK abstraction. Every cross-boundary artefact is a typed, content-addressed, lifecycle-bounded, budget-bounded, provenance-carrying capsule. | **Stable v1** (contract C1..C6). |
-| **Capsule-native runtime** (`wevra.capsule_runtime`) | `CapsuleNativeRunContext` + `seal_and_write_artifact` + intra-cell `seal_patch_proposal` / `seal_test_verdict` + detached `seal_meta_manifest`: capsules drive runtime stage transitions at run boundaries AND inside the inner sweep loop; substantive artefacts are content-addressed at write time and re-verifiable at audit time. The capsule layer is the runtime's typed execution contract on the spine and now extends one structural layer past the cell boundary. | **Stable v2** (theorems W3-32 / W3-33 / W3-34 / W3-35 / W3-32-extended / W3-36 / W3-37 / W3-38). |
-| **Wevra SDK** (`vision_mvp.wevra`) | Profile-driven context-capsule runtime for SWE-bench-Lite-shape banks; `RunSpec` → provenance-stamped report whose root is a sealed `RUN_REPORT` capsule + a detached `meta_manifest.json` witness. | **Stable v3.2** — public contract. |
+| **Capsule-native runtime** (`wevra.capsule_runtime`) | `CapsuleNativeRunContext` + `seal_and_write_artifact` + intra-cell `seal_patch_proposal` / `seal_test_verdict` + sub-intra-cell `seal_parse_outcome` (SDK v3.3) + detached `seal_meta_manifest`: capsules drive runtime stage transitions at run boundaries AND inside the inner sweep loop AND on the parser axis; substantive artefacts are content-addressed at write time and re-verifiable at audit time. The capsule layer is the runtime's typed execution contract on the spine and now extends two structural layers past the cell boundary. | **Stable v3** (theorems W3-32 / W3-33 / W3-34 / W3-35 / W3-32-extended / W3-36 / W3-37 / W3-38 / W3-39 / W3-40 / W3-41). |
+| **Lifecycle audit** (`wevra.lifecycle_audit`) | `CapsuleLifecycleAudit` + `audit_capsule_lifecycle_from_view`: mechanically verifies eight lifecycle invariants L-1..L-8 over a finished run (Theorem W3-40). Returns OK / BAD / EMPTY plus typed counterexamples. Runnable from runtime ctx OR from on-disk `capsule_view.json` alone. | **Stable v1** (SDK v3.3). |
+| **Wevra SDK** (`vision_mvp.wevra`) | Profile-driven context-capsule runtime for SWE-bench-Lite-shape banks; `RunSpec` → provenance-stamped report whose root is a sealed `RUN_REPORT` capsule + a detached `meta_manifest.json` witness. ``RunSpec.deterministic=True`` opt-in collapses CIDs across runs (Theorem W3-41). | **Stable v3.3** — public contract. |
 | **Wevra console scripts** | `wevra`, `wevra-import`, `wevra-ci`, `wevra-capsule` — installed by `pip install wevra`. | **Stable v3**. |
 | **Wevra extension protocols** (`wevra.extensions`) | `SandboxBackend`, `TaskBankLoader`, `ReportSink` — runtime-checkable Protocols, discovered via `importlib.metadata.entry_points`. | **Stable v1**. |
 | **Unified runtime** (`wevra.runtime`) | `SweepSpec` + `run_sweep`: one code path for mock and real-LLM runs, with an explicit `acknowledge_heavy` cost gate. Every sweep cell becomes a `SWEEP_CELL` capsule. | **Stable v1**. |

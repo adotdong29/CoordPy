@@ -182,6 +182,12 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
     p_cid = sub.add_parser(
         "cid", help="print the RUN_REPORT capsule CID for a report")
     p_cid.add_argument("--report", required=True)
+    p_audit = sub.add_parser(
+        "audit",
+        help=("run the SDK v3.3 lifecycle audit on a finished "
+              "capsule view (eight invariants L-1..L-8). Prints "
+              "OK / BAD plus typed counterexamples on violation."))
+    p_audit.add_argument("--report", required=True)
     args = ap.parse_args(argv)
 
     if args.sub is None:
@@ -200,6 +206,28 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
     if args.sub == "cid":
         print(cv.get("root_cid") or "")
         return 0
+
+    if args.sub == "audit":
+        # SDK v3.3 lifecycle audit: mechanically verifies eight
+        # invariants L-1..L-8 over the capsule view. Returns a
+        # short summary + typed counterexamples on BAD.
+        from .lifecycle_audit import audit_capsule_lifecycle_from_view
+        report_audit = audit_capsule_lifecycle_from_view(cv)
+        print(f"verdict        = {report_audit.verdict}")
+        print(f"rules_passed   = "
+               f"{len(report_audit.rules_passed)} / "
+               f"{len(report_audit.rules_checked)}")
+        print(f"violations     = {len(report_audit.violations)}")
+        print(f"by_kind        = {report_audit.stats}")
+        if report_audit.violations:
+            print()
+            print("counterexamples (first 8):")
+            for v in report_audit.violations[:8]:
+                print(f"  rule={v['rule']:<48s} cid="
+                       f"{(v['capsule_cid'] or '-')[:16]:<16s} "
+                       f"kind={v['capsule_kind']:<14s} "
+                       f"detail={v['detail'][:140]}")
+        return 0 if report_audit.verdict in ("OK", "EMPTY") else 4
 
     if args.sub == "verify":
         # SDK v3.2: stronger verify. Four independent on-disk

@@ -181,8 +181,22 @@ class IntraCellCapsuleTests(unittest.TestCase):
                       if c["kind"] == CapsuleKind.SWEEP_SPEC]
         self.assertEqual(len(spec_caps), 1)
         spec_cid = spec_caps[0]["cid"]
+        # SDK v3.3 — PATCH_PROPOSAL's parent set includes the spec
+        # AND the upstream PARSE_OUTCOME's CID (the parser-axis
+        # capsule sealed before the patch). The spec must be in the
+        # parent set; the second parent (when present) is a
+        # PARSE_OUTCOME.
+        parse_caps = [c for c in view["capsules"]
+                       if c["kind"] == CapsuleKind.PARSE_OUTCOME]
+        parse_cid_set = {p["cid"] for p in parse_caps}
         for patch in patches:
-            self.assertEqual(patch["parents"], [spec_cid])
+            self.assertIn(spec_cid, patch["parents"])
+            non_spec_parents = [p for p in patch["parents"]
+                                 if p != spec_cid]
+            for p in non_spec_parents:
+                self.assertIn(p, parse_cid_set,
+                                "non-spec parent of PATCH_PROPOSAL must "
+                                "be a sealed PARSE_OUTCOME (W3-39)")
         # Each TEST_VERDICT's parent is a sealed PATCH_PROPOSAL.
         patch_cid_set = {p["cid"] for p in patches}
         for v in verdicts:
@@ -207,7 +221,8 @@ class IntraCellCapsuleTests(unittest.TestCase):
         run_parent_set = set(run_cap["parents"])
         intra_kinds = {CapsuleKind.PATCH_PROPOSAL,
                         CapsuleKind.TEST_VERDICT,
-                        CapsuleKind.META_MANIFEST}
+                        CapsuleKind.META_MANIFEST,
+                        CapsuleKind.PARSE_OUTCOME}
         for cap in view["capsules"]:
             if cap["kind"] in intra_kinds:
                 self.assertNotIn(

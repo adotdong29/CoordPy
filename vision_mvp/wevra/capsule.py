@@ -227,11 +227,32 @@ class CapsuleKind:
     (``docs/CAPSULE_FORMALISM.md`` § 4.H). The manifest is the
     one-hop trust unit beyond the primary view."""
 
+    PARSE_OUTCOME = "PARSE_OUTCOME"
+    """A sub-intra-cell capsule (SDK v3.3) naming the
+    parser-axis transition that previously passed as a plain
+    ``ParseOutcome`` Python dataclass between
+    ``parse_patch_block(...)`` and ``llm_patch_generator``'s
+    return. Payload carries the (instance, strategy,
+    parser_mode, apply_mode, n_distractors) coordinates plus the
+    parser's structured outcome — ``ok`` boolean, closed-vocabulary
+    ``failure_kind`` (one of ``swe_patch_parser.ALL_PARSE_KINDS``
+    + ``oracle`` for the deterministic-oracle path), ``recovery``
+    label (one of ``swe_patch_parser.ALL_RECOVERY_LABELS``),
+    ``substitutions_count`` (integer, no patch bytes), and a
+    bounded ``detail`` string (≤200 chars). Parent: the
+    SWEEP_SPEC capsule. The downstream PATCH_PROPOSAL capsule
+    optionally records this CID as one of its parents (in
+    addition to SWEEP_SPEC), so the parse → patch → verdict
+    chain is observable on the capsule DAG. Theorem W3-39
+    (``docs/CAPSULE_FORMALISM.md`` § 4.I) — the parser-axis
+    transition is now lifecycle-governed. SDK v3.3 addition."""
+
     ALL = frozenset({
         HANDOFF, HANDLE, THREAD_RESOLUTION, ADAPTIVE_EDGE,
         SWEEP_CELL, SWEEP_SPEC, READINESS_CHECK, PROVENANCE,
         RUN_REPORT, PROFILE, ARTIFACT, COHORT,
         PATCH_PROPOSAL, TEST_VERDICT, META_MANIFEST,
+        PARSE_OUTCOME,
     })
 
 
@@ -384,6 +405,12 @@ def _default_budget_for(kind: str) -> CapsuleBudget:
         # Detached witness: payload is a list of meta-artifact SHAs +
         # the run's root_cid + chain_head. Parent: RUN_REPORT.
         return CapsuleBudget(max_bytes=1 << 16, max_parents=4)
+    if kind == CapsuleKind.PARSE_OUTCOME:
+        # Sub-intra-cell: payload is small (coordinates + structured
+        # parse outcome — booleans + closed-vocabulary failure_kind +
+        # recovery label + bounded detail). Parent is exactly the
+        # SWEEP_SPEC; patch proposals may parent on this capsule too.
+        return CapsuleBudget(max_bytes=1 << 13, max_parents=4)
     raise ValueError(f"no default budget for kind {kind!r}")
 
 
@@ -849,6 +876,7 @@ def render_view(ledger: CapsuleLedger,
     payload_kinds_always = (
         CapsuleKind.ARTIFACT, CapsuleKind.META_MANIFEST,
         CapsuleKind.PATCH_PROPOSAL, CapsuleKind.TEST_VERDICT,
+        CapsuleKind.PARSE_OUTCOME,
     )
     for cap in ledger.all_capsules():
         if include_payload or cap.kind in payload_kinds_always:
@@ -1368,6 +1396,85 @@ def capsule_from_test_verdict(*,
     )
 
 
+PARSE_OUTCOME_ORACLE = "oracle"
+"""Distinguished ``failure_kind`` value used when the parser axis
+was bypassed entirely — i.e. the deterministic_oracle_generator
+path. The capsule still seals so the lifecycle audit can witness
+"every (task, strategy) had a parse outcome" uniformly. ``ok=True``
+and ``recovery=""`` accompany this value."""
+
+
+def capsule_from_parse_outcome(*,
+                                  instance_id: str,
+                                  strategy: str,
+                                  parser_mode: str,
+                                  apply_mode: str,
+                                  n_distractors: int,
+                                  ok: bool,
+                                  failure_kind: str,
+                                  recovery: str = "",
+                                  substitutions_count: int = 0,
+                                  detail: str = "",
+                                  parents: Iterable[str] = (),
+                                  ) -> ContextCapsule:
+    """Build a ``PARSE_OUTCOME`` capsule from a parser call's
+    structured outcome.
+
+    Payload carries *coordinates + parser verdict*, never the LLM
+    response bytes:
+
+      * ``instance_id`` / ``strategy`` / ``parser_mode`` /
+        ``apply_mode`` / ``n_distractors`` — the cell + task
+        coordinates.
+      * ``ok`` — boolean, mirrors ``ParseOutcome.ok``.
+      * ``failure_kind`` — closed-vocabulary string from
+        ``swe_patch_parser.ALL_PARSE_KINDS`` (e.g. ``"ok"``,
+        ``"unclosed_new"``, ``"prose_only"``) or the special
+        ``"oracle"`` sentinel for the deterministic_oracle path.
+      * ``recovery`` — one of
+        ``swe_patch_parser.ALL_RECOVERY_LABELS`` (or empty
+        string when no recovery fired).
+      * ``substitutions_count`` — number of (old, new) pairs the
+        parser produced. Zero on parse failures.
+      * ``detail`` — bounded string (≤200 chars) that the parser
+        emitted alongside the structured outcome (``ParseOutcome
+        .detail``). NEVER carries patch content; only metadata.
+
+    The parent is typically the SWEEP_SPEC capsule's CID. The
+    downstream PATCH_PROPOSAL capsule may parent on this
+    PARSE_OUTCOME's CID *in addition* to SWEEP_SPEC, giving the
+    parse → patch → verdict chain a typed witness on the DAG.
+    """
+    detail_cap = (detail or "")
+    if len(detail_cap) > 200:
+        detail_cap = detail_cap[:200]
+    payload: dict[str, Any] = {
+        "instance_id": instance_id,
+        "strategy": strategy,
+        "parser_mode": parser_mode,
+        "apply_mode": apply_mode,
+        "n_distractors": int(n_distractors),
+        "ok": bool(ok),
+        "failure_kind": failure_kind or "",
+        "recovery": recovery or "",
+        "substitutions_count": int(substitutions_count),
+        "detail": detail_cap,
+    }
+    return ContextCapsule.new(
+        kind=CapsuleKind.PARSE_OUTCOME,
+        payload=payload,
+        parents=parents,
+        metadata={
+            "instance_id": instance_id,
+            "strategy": strategy,
+            "parser_mode": parser_mode,
+            "ok": bool(ok),
+            "failure_kind": failure_kind or "",
+            "recovery": recovery or "",
+        },
+    )
+
+
 def capsule_from_meta_manifest(*,
                                   root_cid: str,
                                   chain_head: str,
@@ -1556,4 +1663,6 @@ __all__ = [
     # SDK v3.2 — intra-cell capsule-native + detached-witness
     "capsule_from_patch_proposal", "capsule_from_test_verdict",
     "capsule_from_meta_manifest",
+    # SDK v3.3 — sub-intra-cell parse outcome (parser-axis lifecycle).
+    "capsule_from_parse_outcome", "PARSE_OUTCOME_ORACLE",
 ]

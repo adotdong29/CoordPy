@@ -91,6 +91,8 @@ from .capsule import (
     # SDK v3.2 — intra-cell + detached-witness adapters.
     capsule_from_patch_proposal, capsule_from_test_verdict,
     capsule_from_meta_manifest,
+    # SDK v3.3 — sub-intra-cell parser-axis adapter.
+    capsule_from_parse_outcome, PARSE_OUTCOME_ORACLE,
 )
 
 # Capsule-native runtime (SDK v3.1). The first execution-first
@@ -101,6 +103,15 @@ from .capsule_runtime import (
     CONSTRUCTION_IN_FLIGHT, CONSTRUCTION_POST_HOC,
     # SDK v3.2 — strong on-disk verification helpers.
     verify_artifacts_on_disk, verify_meta_manifest_on_disk,
+)
+
+# SDK v3.3 — runtime-checkable lifecycle audit. Mechanically
+# verifies the lifecycle correspondence (W3-32 / W3-32-extended /
+# W3-39) on a finished run. Returns OK/BAD/EMPTY plus a list of
+# violation counterexamples.
+from .lifecycle_audit import (
+    CapsuleLifecycleAudit, LifecycleAuditReport,
+    audit_capsule_lifecycle, audit_capsule_lifecycle_from_view,
 )
 
 # Layered API — three-tier ergonomic surfaces over the same substrate
@@ -158,16 +169,20 @@ from .capsule_decoder_v2 import (
     MultitaskBundleDecoder, train_multitask_bundle_decoder,
 )
 
-# SDK v3.2: intra-cell capsule-native + detached-witness manifest +
-# strong on-disk verification. Strictly additive on v3.1: the
-# run-boundary slice is unchanged; the new surface is two intra-cell
-# capsule kinds (PATCH_PROPOSAL, TEST_VERDICT) sealed inside each
-# sweep cell, a META_MANIFEST detached witness for meta-artefacts
-# (Theorem W3-36), and stronger on-disk verification by
-# ``wevra-capsule verify`` (Theorem W3-37). Every v3.1 contract test
-# still passes; the schema name ``wevra.capsule_view.v1`` is
-# unchanged because the new payloads are additive.
-SDK_VERSION = "wevra.sdk.v3.2"
+# SDK v3.3: sub-intra-cell parser-axis capsule + deterministic-mode
+# replay + lifecycle-invariant runtime audit. Strictly additive on
+# v3.2: the run-boundary slice and intra-cell pair are unchanged;
+# the new surface is one further structural layer (PARSE_OUTCOME)
+# sealed BEFORE every PATCH_PROPOSAL inside a sweep cell, a
+# deterministic-mode opt-in flag on ``RunSpec`` that strips per-run
+# timestamps from the provenance / run-report capsules so two runs
+# of the same deterministic profile collapse to identical full-DAG
+# CIDs (Theorem W3-41), and a runtime-checkable
+# ``CapsuleLifecycleAudit`` that mechanically verifies the lifecycle
+# correspondence (Theorem W3-40). Every v3.2 contract test still
+# passes; the schema name ``wevra.capsule_view.v1`` is unchanged
+# because the new payload is additive.
+SDK_VERSION = "wevra.sdk.v3.3"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -197,12 +212,18 @@ __all__ = [
     # SDK v3.2 — intra-cell + detached-witness adapters.
     "capsule_from_patch_proposal", "capsule_from_test_verdict",
     "capsule_from_meta_manifest",
+    # SDK v3.3 — sub-intra-cell parser-axis adapter.
+    "capsule_from_parse_outcome", "PARSE_OUTCOME_ORACLE",
     # Capsule-native runtime (SDK v3.1) — capsules drive execution.
     "CapsuleNativeRunContext", "ContentAddressMismatch",
     "seal_and_write_artifact",
     "CONSTRUCTION_IN_FLIGHT", "CONSTRUCTION_POST_HOC",
     # SDK v3.2 — strong on-disk verification.
     "verify_artifacts_on_disk", "verify_meta_manifest_on_disk",
+    # SDK v3.3 — lifecycle audit + deterministic mode opt-in
+    # (``RunSpec.deterministic``).
+    "CapsuleLifecycleAudit", "LifecycleAuditReport",
+    "audit_capsule_lifecycle", "audit_capsule_lifecycle_from_view",
     # Capsule admission policies (Phase 46 research milestone)
     "AdmissionPolicy", "FIFOPolicy", "KindPriorityPolicy",
     "SmallestFirstPolicy", "LearnedAdmissionPolicy",
