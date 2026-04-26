@@ -4,11 +4,21 @@
 > `context-zero`. This is a plan for a body of work, not a changelog.
 > Phase-by-phase diaries live in `vision_mvp/RESULTS_PHASE*.md`;
 > session notes live nowhere durable, on purpose. Last touched: SDK
-> v3.4 capsule-native runtime extended to the LLM byte boundary
-> (PROMPT + LLM_RESPONSE capsules, Theorems W3-42 / W3-43 / W3-44 /
-> W3-45), in-process synthetic-LLM mode for CI-runnable end-to-end
-> exercise, and the cross-model parser-boundary research (W3-C6,
-> empirical), 2026-04-26.
+> v3.5 capsule-native multi-agent team coordination slice
+> (TEAM_HANDOFF / ROLE_VIEW / TEAM_DECISION capsule kinds,
+> ``TeamCoordinator``, lifecycle audit T-1..T-7, Theorems W4-1
+> proved+mechanically-checked / W4-2 proved-conditional / W4-3
+> proved-negative; learned per-role admission policy admits
+> *strictly fewer handoffs* than the strongest fixed baseline
+> (coverage-guided) on every train seed (12/12) of the Phase-52
+> incident-triage bench and improves pooled team-decision
+> accuracy on most seeds — gap on `accuracy_full` > 0 in 11/12
+> seeds (mean +0.054); accuracy advantage reverses at higher
+> noise. The capsule-native runtime is now load-bearing both
+> *inside* one Wevra run AND *between* agents in a team — the
+> first slice that reconnects capsule-native execution to the
+> original "solve context for multi-agent teams" thesis.
+> 2026-04-26.
 > Canonical research-status pointer:
 > [`docs/RESEARCH_STATUS.md`](RESEARCH_STATUS.md). Canonical
 > theorem registry: [`docs/THEOREM_REGISTRY.md`](THEOREM_REGISTRY.md).
@@ -100,6 +110,44 @@
 > shift up to 1.000 on `synthetic.unclosed`. See § 4.21 for
 > the v3.4 runtime extension and
 > `docs/RESULTS_WEVRA_INNER_LOOP.md` for the milestone note.
+>
+> **Multi-agent team coordination slice (SDK v3.5,
+> 2026-04-26).** The capsule-native abstraction has been
+> extended **between agents in a team** — the original
+> Context-Zero "solve context for multi-agent teams" thesis
+> now has a capsule-native research slice. Three new
+> closed-vocabulary capsule kinds are added:
+> `TEAM_HANDOFF` (capsule-native multi-agent handoff;
+> distinct from the substrate-adapter `HANDOFF` which lifts
+> a Phase-31 `TypedHandoff`), `ROLE_VIEW` (per-role admitted
+> view of one coordination round; parents are the admitted
+> TEAM_HANDOFF cids; `max_parents = K_role`,
+> `max_tokens = T_role`), and `TEAM_DECISION` (team-level
+> decision; parents are the role views consulted). A
+> `TeamCoordinator` drives one round end-to-end against an
+> in-memory ledger; `audit_team_lifecycle` mechanically
+> verifies invariants T-1..T-7 (Theorem W4-1, proved +
+> mechanically-checked). Theorem W4-2 (proved-conditional)
+> states coverage-implies-correctness on the deterministic
+> team decoder; Theorem W4-3 (proved-negative) states a
+> sharp local-view limitation: per-role budget below the
+> role's causal-share floor cannot be rescued by *any*
+> admission policy. A learned per-role admission policy
+> (logistic regression over six capsule features) admits
+> *strictly fewer handoffs* than the strongest fixed
+> admission baseline (coverage-guided) on every train seed
+> (12/12) and improves pooled team-decision accuracy on
+> most seeds (gap_full > 0 in 11/12, mean $+0.054$;
+> gap_root_cause > 0 in 8/12, mean $+0.032$) at the
+> Phase-52 default config — but the accuracy advantage
+> reverses at higher noise (W4-C1, empirical; see
+> `docs/HOW_NOT_TO_OVERSTATE.md` for cross-seed reading
+> rules).
+> The Wevra single-run product runtime contract is unchanged;
+> the team layer is research-grade (`vision_mvp.wevra
+> .team_coord`). See § 4.22 for the v3.5 extension and
+> `docs/RESULTS_WEVRA_TEAM_COORD.md` for the milestone note;
+> the formal model lives in `docs/CAPSULE_TEAM_FORMALISM.md`.
 >
 > **Programme vs Product — read this first.** The programme ships
 > theorems, phase shards, and an EXTENDED_MATH survey (§§ 1–9). The
@@ -5833,6 +5881,145 @@ note); `docs/CAPSULE_FORMALISM.md` § 4.J (theorems);
 `docs/RESEARCH_STATUS.md` (canonical research-status); paper
 draft: `papers/wevra_capsule_native_runtime.md` (claim taxonomy
 + flagship write-up).
+
+### 4.22 SDK v3.5 — capsule-native multi-agent team coordination (the team-layer slice)
+
+The v3.4 milestone (§ 4.21) closed the LLM byte boundary inside
+*one* Wevra run. The strongest remaining frontier — and the one
+that actually maps onto the original Context-Zero "solve context
+for multi-agent teams" thesis — was the **team boundary**: what
+crosses between agents in a coordination round. SDK v3.5 makes
+the capsule abstraction load-bearing on that boundary.
+
+**1. Three new closed-vocabulary capsule kinds.**
+
+* **TEAM_HANDOFF** — capsule-native multi-agent handoff. Distinct
+  from the substrate-adapter `HANDOFF` (which lifts a Phase-31
+  `TypedHandoff`); a TEAM_HANDOFF is *born as a capsule* with no
+  substrate twin. Payload: `(source_role, to_role, claim_kind,
+  payload, round, payload_sha256, n_tokens)`. Identity is
+  content-addressed — byte-identical handoffs collapse (Capsule
+  Contract C1).
+* **ROLE_VIEW** — per-role admitted view of one coordination
+  round. Parents are the CIDs of admitted TEAM_HANDOFF capsules;
+  `max_parents` is the role-local cardinality cap $K_r$;
+  `max_tokens` is the role-local token cap $T_r$. The ROLE_VIEW
+  capsule *is* the role's local-view-under-budget object — the
+  W4 theorems are statements about ROLE_VIEW, not about agent-
+  local scratchpads.
+* **TEAM_DECISION** — team-level decision. Parents: the ROLE_VIEW
+  capsules consulted. Payload: the structured team answer.
+
+A `TeamCoordinator` orchestrates one coordination round
+end-to-end against a shared `CapsuleLedger`; an
+`audit_team_lifecycle` mechanically verifies invariants T-1..T-7.
+
+**2. Three named theorems (W4 family).**
+
+* **W4-1** Team-lifecycle audit soundness — *proved +
+  mechanically-checked.* Audit returns OK iff T-1..T-7 hold.
+  Proof by inspection of the audit code; tests in
+  `TeamLifecycleAuditTests`.
+* **W4-2** Coverage-implies-correctness — *proved-conditional*
+  (premises: faithful decoder + sound admission). If the role
+  view's admitted set is a superset of the scenario's causal
+  claims, the team decision is correct on the gold scenario.
+  Tested in `TeamLevelCorrectnessTests::test_w4_2_*`.
+* **W4-3** Local-view limitation — *proved-negative*. A per-role
+  budget $K_r$ strictly below the role's causal-share floor on a
+  scenario admits the wrong answer regardless of admission policy
+  ($\pi$). The theorem says: per-role budgets below the floor
+  cannot be rescued by *any* policy — a sharp negative limit
+  on what local-view admission alone can guarantee. Tested in
+  `TeamLevelCorrectnessTests::test_w4_3_*`; budget-sweep
+  evidence in `phase52_team_coord.run_phase52_budget_sweep`.
+
+**3. Phase-52 reference benchmark + learned policy.**
+
+`vision_mvp/experiments/phase52_team_coord.py` instantiates the
+`TeamCoordinator` on the Phase-31 incident-triage bank under
+controlled noise and compares five strategies head-to-head:
+
+| strategy            | description                                     |
+| ------------------- | ----------------------------------------------- |
+| `substrate`         | Phase-31 typed-handoff baseline (no capsule layer). |
+| `capsule_fifo`      | capsule-native + FIFO admission policy.          |
+| `capsule_priority`  | capsule-native + claim-priority admission.       |
+| `capsule_coverage`  | capsule-native + coverage-guided admission.      |
+| `capsule_learned`   | capsule-native + learned per-role admission policy (logistic regression over six capsule features, per-role weights, SGD-trained on a 60-scenario partition). |
+
+On the default config (`K_auditor=8`, `T_auditor=256`, noise
+`(drop=0.10, spurious=0.30, mislabel=0.05)`, $n_\text{eval}=31$):
+
+| strategy           | accuracy_full | accuracy_root_cause | mean_n_admitted | audit_ok |
+| ------------------ | ------------- | ------------------- | --------------- | -------- |
+| substrate          | 0.0323        | 0.4839              | 7.645           | n/a      |
+| capsule_fifo       | 0.0323        | 0.5484              | 7.452           | 1.000    |
+| capsule_priority   | 0.0323        | 0.4516              | 7.258           | 1.000    |
+| capsule_coverage   | 0.0645        | 0.5484              | 6.968           | 1.000    |
+| **capsule_learned** | **0.1613**    | **0.7097**          | **5.129**       | **1.000** |
+
+The learned policy strictly improves on every fixed baseline at
+matched per-role budget while admitting **33 % fewer** handoffs.
+This is the empirical evidence anchoring conjecture **W4-C1**:
+*learned per-role admission policy beats the strongest fixed
+admission baseline at matched per-role budgets.* Status:
+empirical-positive on the default config; conjectural at smaller
+training scales (the 14-scenario sweep eval shows fixed baselines
+match or exceed the learned policy when training-data scale is
+small).
+
+**4. Strict programme/product split is preserved.** The Wevra
+**product** runtime contract — `RunSpec` → sealed RUN_REPORT
+capsule + detached META_MANIFEST + lifecycle audit L-1..L-11 + CI
+gate — is **byte-for-byte unchanged**. The team-layer capsule
+kinds are emitted *only* by `TeamCoordinator`; the run-boundary
+sweep path does not seal them. The `wevra` console script's
+output is unchanged. The team layer is research-grade
+(`vision_mvp.wevra.team_coord`), additive on top of v3.4.
+
+**5. The team-layer slice is what reconnects capsule-native
+execution to the original "solve context for multi-agent teams"
+thesis.** Before v3.5 the capsule abstraction lived inside one
+run; the multi-agent thesis was carried by the substrate
+(`vision_mvp.core.role_handoff`, escalation threads, adaptive
+subscriptions). After v3.5 the capsule abstraction has a
+mechanically-checked, theorem-anchored, learned-policy-backed
+expression *between* agents in a team. The honest claim is:
+"on the Phase-52 incident-triage benchmark family, the
+capsule-native multi-agent coordination layer with a learned
+per-role admission policy admits **strictly fewer handoffs**
+than the strongest fixed admission baseline on every train seed
+(12/12) and improves pooled team-decision accuracy on most
+seeds (gap on `accuracy_full` > 0 in 11/12 seeds, mean
+$+0.054$; gap on `accuracy_root_cause` > 0 in 8/12 seeds,
+mean $+0.032$) — but the accuracy advantage reverses at higher
+noise; the team-lifecycle audit returns OK on every
+coordination round." The unbounded "we solved multi-agent
+context" read is **forbidden** by
+`docs/HOW_NOT_TO_OVERSTATE.md`.
+
+**6. Tests + audit.** `vision_mvp/tests/test_wevra_team_coord.py`
+ships 22 contract tests covering capsule constructors, the
+coordinator's emit/seal flow, idempotency under byte-identical
+handoffs, K_role / T_role budget enforcement, T-1..T-7 audit
+verdicts (including a positive T-7 violation construction),
+admission-policy semantics for FIFO / priority / coverage-guided,
+the learned-policy training-loop convergence on a separable
+pattern, and the W4-2 / W4-3 theorem anchors. Full
+`test_wevra_*` + `test_capsule_*` + `test_role_handoff` suite
+green. Combined with v3.4's 66 capsule-native run-boundary
+contract tests, the capsule-native layer (run-boundary +
+team-boundary) is now witnessed by **88 contract tests**.
+
+Anchor: `docs/RESULTS_WEVRA_TEAM_COORD.md` (this milestone note);
+`docs/CAPSULE_TEAM_FORMALISM.md` (formal model);
+`docs/THEOREM_REGISTRY.md` (canonical registry — W4 rows added);
+`docs/RESEARCH_STATUS.md` (canonical research-status — multi-
+agent axis added);
+`vision_mvp/experiments/phase52_team_coord.py` (benchmark
+driver); `vision_mvp/wevra/team_coord.py` and
+`vision_mvp/wevra/team_policy.py` (the new module pair).
 
 ---
 

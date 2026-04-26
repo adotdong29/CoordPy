@@ -198,6 +198,98 @@ result" without its number.
    capsule-native"; "signs the run"). PRs that introduce
    forbidden phrases are rejected.
 
+### Labelling the team-coordination layer "solves multi-agent context"
+
+> *"Wevra solves context for multi-agent teams."*
+
+Forbidden. SDK v3.5 ships *one* capsule-native team-coordination
+slice over *one* synthetic benchmark family (Phase-52 incident-
+triage) under a deterministic team decoder. The defensible
+readings are:
+
+* "On the Phase-52 incident-triage benchmark, the learned
+  per-role admission policy (W4-C1) improves pooled team-decision
+  accuracy by $+0.097$ full / $+0.156$ root_cause over the
+  strongest fixed admission baseline at matched per-role budgets
+  (default config, $n_\text{eval}=31$)."
+* "Theorem W4-1 mechanically verifies team-lifecycle invariants
+  T-1..T-7 on every coordination round. Theorem W4-2 proves
+  coverage-implies-correctness conditional on a faithful decoder
+  + sound admission. Theorem W4-3 proves a sharp local-view
+  limitation: per-role budget below the role's causal-share
+  floor cannot be rescued by any admission policy."
+
+The phrase "solves" / "closes" applied to the team-coordination
+slice must specify the **gate** (the named theorem and bench);
+unqualified is forbidden.
+
+### Labelling W4-C1 as a proven theorem or as a *strict* per-seed advantage
+
+> *"The learned admission policy strictly improves accuracy over
+> coverage-guided on every seed."*
+
+Forbidden. The honest reading is the cross-seed table in
+`docs/RESULTS_WEVRA_TEAM_COORD.md` § "Cross-seed result":
+
+* The learned policy admits *strictly fewer* handoffs than
+  coverage-guided on every train seed (12/12) — this is the
+  load-bearing positive empirical signal of W4-C1.
+* The learned policy improves pooled `accuracy_full` over
+  coverage-guided in 11/12 seeds (mean $+0.054$) and pooled
+  `accuracy_root_cause` in 8/12 seeds (mean $+0.032$). The
+  advantage is *mean-positive*, not strict per-seed. There is
+  one outlier seed where root_cause underperforms by $-0.097$.
+* At higher noise (spurious_prob = 0.50), coverage-guided beats
+  the learned policy on root_cause (mean $-0.089$).
+
+The accurate phrasings are: "*budget-efficiency dominance is
+robust per-seed*"; "*the accuracy advantage is mean-positive on
+the default noise config but not strict per-seed*"; "*the
+advantage does not survive heavier noise*."
+
+The phrasing "strictly improves" is permitted only on
+``mean_n_admitted_auditor`` (handoff-count savings), not on
+accuracy. **W4-C1 is a conjecture**, not a theorem.
+
+Single-seed numbers (the historical $+0.097$ full / $+0.156$
+root_cause result on one specific seed) may be cited only as
+"upper-end single seed" with cross-seed numbers immediately
+following. Reporting a single-seed number without the cross-seed
+distribution is forbidden.
+
+### Labelling team-level capsules as "production-grade"
+
+> *"Wevra ships capsule-native multi-agent coordination in production."*
+
+Forbidden. The TEAM_HANDOFF / ROLE_VIEW / TEAM_DECISION capsule
+kinds ship in the SDK's closed vocabulary, but the **Wevra product
+runtime** (the ``RunSpec`` → ``RUN_REPORT`` path, ``wevra-ci``,
+``wevra-capsule verify``) does not seal any of them. They are
+emitted only by ``TeamCoordinator`` — the multi-agent coordination
+*research slice* (``vision_mvp/wevra/team_coord.py``). The honest
+phrasing is: "SDK v3.5 ships a multi-agent capsule coordination
+research slice that runs side-by-side with the Wevra single-run
+runtime; the run-boundary product contract is unchanged."
+
+### Conflating substrate typed handoffs with TEAM_HANDOFF capsules
+
+> *"TypedHandoff and TEAM_HANDOFF are the same thing."*
+
+Forbidden. They are *adjacent* but distinct:
+
+* ``TypedHandoff`` (``vision_mvp.core.role_handoff``) is the
+  Phase-31 substrate primitive — a frozen dataclass routed
+  through ``HandoffRouter`` / ``RoleInbox``. The capsule layer
+  does not see it natively; the ``capsule_from_handoff`` adapter
+  produces a HANDOFF capsule (``CapsuleKind.HANDOFF``) from one.
+* ``TEAM_HANDOFF`` (``CapsuleKind.TEAM_HANDOFF``,
+  ``vision_mvp.wevra.team_coord``) is born as a capsule and has
+  no substrate twin. Identity is content-addressed by the
+  capsule's hash, not by a substrate ``handoff_id``.
+
+The two paths can run side by side; they are not interchangeable
+at the audit / lifecycle layer.
+
 ## Change log
 
 - **2026-04-26 (SDK v3.3).** Initial canonical version. Adds
@@ -212,3 +304,9 @@ result" without its number.
   failure-kind distribution is stable across LLMs" — the
   empirical claim only covers the calibrated synthetic
   distribution library, not real cross-LLM behaviour.
+- **2026-04-26 (SDK v3.5).** Adds team-coordination rules:
+  forbidden phrases "solves multi-agent context" without a
+  named theorem-bench gate; W4-C1 cited as a theorem; team-level
+  capsule kinds described as production-grade; conflation of
+  ``TypedHandoff`` with ``TEAM_HANDOFF``. Adds the canonical
+  defensible reading template for the Phase-52 result.

@@ -289,12 +289,57 @@ class CapsuleKind:
     (``docs/CAPSULE_FORMALISM.md`` § 4.J) — parent-CID gating
     extends to the LLM byte boundary. SDK v3.4 addition."""
 
+    TEAM_HANDOFF = "TEAM_HANDOFF"
+    """SDK v3.5 — a capsule-native multi-agent handoff. Distinct
+    from ``HANDOFF`` (which is the substrate-adapter view of the
+    Phase-31 ``TypedHandoff``): a TEAM_HANDOFF is *born as a
+    capsule* — it has no substrate twin object. Payload carries
+    ``(source_role, to_role, claim_kind, payload, round)`` plus
+    the canonical SHA-256 of the payload bytes
+    (``payload_sha256``) so two emissions of byte-identical
+    claims collapse to one capsule (Capsule Contract C1). The
+    parent set is the (zero or more) upstream TEAM_HANDOFF CIDs
+    that this handoff is causally derived from — admission fails
+    (Contract C5) on a forward reference, so the team-level DAG
+    is acyclic by construction. Theorems W4-1 / W4-2
+    (``docs/CAPSULE_TEAM_FORMALISM.md``) — the team-level
+    capsule flow contract. Research-grade kind: shipped under
+    SDK v3.5 as the multi-agent coordination research slice; not
+    part of the Wevra single-run product runtime contract."""
+
+    ROLE_VIEW = "ROLE_VIEW"
+    """SDK v3.5 — a per-role admitted view of a coordination
+    round. The ROLE_VIEW capsule's *parents* are the CIDs of the
+    TEAM_HANDOFF capsules the role admitted in this round; the
+    ``max_parents`` budget is the role-local inbox capacity
+    (``K_role``); ``max_tokens`` is the role-local token budget
+    (``T_role``). Payload carries
+    ``(role, round, n_admitted, n_dropped_budget, n_dropped_unknown_kind,
+    admitted_claim_kinds)`` so a downstream auditor can recover
+    the role's local view without holding the per-handoff
+    payloads. The ROLE_VIEW capsule is the load-bearing object
+    for the local-view-budget theorems (W4-1 mechanically-checked,
+    W4-2 conditional, W4-3 negative). Research-grade kind."""
+
+    TEAM_DECISION = "TEAM_DECISION"
+    """SDK v3.5 — the team-level decision capsule. Sealed once
+    per coordination round per team. Parents: the ROLE_VIEW
+    capsules the deciding role used to derive its answer (and
+    optionally the upstream TEAM_HANDOFF CIDs whose payloads
+    were the load-bearing evidence). Payload carries
+    ``(team_tag, round, decision, evidence_summary,
+    n_role_views, gate_passed)`` where ``decision`` is a
+    structured dict whose schema is task-specific; the only
+    invariant Wevra enforces at the capsule layer is that the
+    bytes are JSON-canonicalisable. Research-grade kind."""
+
     ALL = frozenset({
         HANDOFF, HANDLE, THREAD_RESOLUTION, ADAPTIVE_EDGE,
         SWEEP_CELL, SWEEP_SPEC, READINESS_CHECK, PROVENANCE,
         RUN_REPORT, PROFILE, ARTIFACT, COHORT,
         PATCH_PROPOSAL, TEST_VERDICT, META_MANIFEST,
         PARSE_OUTCOME, PROMPT, LLM_RESPONSE,
+        TEAM_HANDOFF, ROLE_VIEW, TEAM_DECISION,
     })
 
 
@@ -465,6 +510,31 @@ def _default_budget_for(kind: str) -> CapsuleBudget:
         # elapsed_ms. Same budget shape as PROMPT. Parent is exactly
         # the upstream PROMPT capsule's CID.
         return CapsuleBudget(max_bytes=1 << 14, max_parents=4)
+    if kind == CapsuleKind.TEAM_HANDOFF:
+        # SDK v3.5 — capsule-native handoff. Payload is
+        # (source_role, to_role, claim_kind, payload string,
+        # round, payload_sha256). Bounded payload string at 2 KiB
+        # so a moderate-detail claim fits; max_tokens is the
+        # PER-CAPSULE token budget for this handoff (the role-
+        # local cap is enforced by ROLE_VIEW.max_parents +
+        # ROLE_VIEW.max_tokens, not here). max_parents=8 covers
+        # multi-source corroboration patterns.
+        return CapsuleBudget(max_bytes=1 << 11, max_tokens=64,
+                              max_parents=8)
+    if kind == CapsuleKind.ROLE_VIEW:
+        # SDK v3.5 — role-local admitted view. max_parents is the
+        # role-local inbox capacity (default 32, override per
+        # benchmark). max_tokens is the role-local token budget
+        # (sum over admitted handoffs' payload tokens). Default
+        # 1024 tokens is generous; benchmarks tighten it.
+        return CapsuleBudget(max_parents=32, max_tokens=1024,
+                              max_bytes=1 << 14)
+    if kind == CapsuleKind.TEAM_DECISION:
+        # SDK v3.5 — team-level decision. Payload is the role's
+        # final structured answer + a bounded evidence_summary.
+        # Parent set is the role views (small — at most number of
+        # roles).
+        return CapsuleBudget(max_bytes=1 << 14, max_parents=16)
     raise ValueError(f"no default budget for kind {kind!r}")
 
 

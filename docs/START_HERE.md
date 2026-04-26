@@ -11,9 +11,21 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-SDK v3.4 (April 2026), capsules drive execution **one further
-structural layer past v3.3** by extending the discipline into the
-LLM byte boundary itself. The end-to-end inner-loop chain is
+**SDK v3.5 (April 2026)**, capsules are load-bearing both
+**inside one Wevra run** (W3 family, run-boundary → cell → parser
+axis → LLM byte boundary) AND **between agents in a team**
+(W4 family, the multi-agent coordination *research slice*: three
+new closed-vocabulary kinds — TEAM_HANDOFF, ROLE_VIEW,
+TEAM_DECISION — with a mechanically-checked T-1..T-7 lifecycle
+audit and a learned per-role admission policy that admits
+*strictly fewer handoffs* than the strongest fixed admission
+baseline on every train seed of the Phase-52 incident-triage
+bench, while improving pooled team-decision accuracy on most
+seeds — gap on `accuracy_full` is positive in 11/12 seeds (mean
+$+0.054$). The accuracy advantage reverses at higher noise.) The
+Wevra single-run product runtime contract is unchanged. Up through SDK v3.4, capsules drove execution **one
+further structural layer past v3.3** by extending the discipline
+into the LLM byte boundary itself. The end-to-end inner-loop chain is
 **five typed sealed capsules** —
 PROMPT → LLM_RESPONSE → PARSE_OUTCOME → PATCH_PROPOSAL →
 TEST_VERDICT — with strong parent-CID gating at each step
@@ -172,6 +184,48 @@ Three additive moves:
     ``in_process``/``subprocess`` sandbox) produce byte-identical
     full-DAG CIDs and identical chain head (Theorem W3-41).
 
+## What changed in SDK v3.5 (multi-agent capsule coordination — research slice)
+
+Three additive moves. The Wevra single-run product runtime
+contract is *byte-for-byte unchanged*; the new surface is a
+research slice (`vision_mvp.wevra.team_coord` +
+`vision_mvp.wevra.team_policy`).
+
+  * **Three new closed-vocabulary capsule kinds.**
+    `TEAM_HANDOFF` (capsule-native multi-agent handoff;
+    distinct from `HANDOFF` which adapts a substrate
+    `TypedHandoff`), `ROLE_VIEW` (per-role admitted view of one
+    coordination round; parents = admitted TEAM_HANDOFF cids;
+    `max_parents = K_role`, `max_tokens = T_role`), and
+    `TEAM_DECISION` (team-level decision; parents = role views
+    consulted). A `TeamCoordinator` orchestrates one round
+    end-to-end against a shared `CapsuleLedger`.
+  * **Mechanically-checked team-lifecycle audit.**
+    `audit_team_lifecycle` verifies invariants T-1..T-7 on every
+    coordination round (Theorem W4-1, *proved + mechanically-
+    checked*). Theorems W4-2 (*proved-conditional*: coverage-
+    implies-correctness) and W4-3 (*proved-negative*: per-role
+    budget below the role's causal-share floor cannot be rescued
+    by *any* admission policy) anchor the team-level mechanism
+    formally.
+  * **Learned per-role admission policy + Phase-52 reference
+    benchmark.** A logistic-regression scorer over six capsule
+    features (per-role weights, SGD-trained on a 60-scenario
+    partition) admits **strictly fewer handoffs** than the
+    strongest fixed admission baseline (coverage-guided) on
+    every train seed of the Phase-52 incident-triage bench
+    (12/12 seeds; mean savings ≈ 1.26 handoffs per scenario at
+    $K_\text{auditor}=8$, $n_\text{eval}=31$, default noise).
+    The learned policy *also* improves pooled team-decision
+    accuracy on most train seeds (gap on `accuracy_full` > 0 in
+    11/12 seeds, mean $+0.054$; gap on `accuracy_root_cause` > 0
+    in 8/12 seeds, mean $+0.032$) — but the accuracy advantage
+    reverses at higher noise (`spurious_prob = 0.50`). Conjecture
+    W4-C1: budget-efficiency dominance is robust per-seed;
+    accuracy advantage is mean-positive on the default noise
+    config but not strict per-seed; advantage does not survive
+    heavier noise.
+
 ## What changed in SDK v3.4 (LLM byte boundary + synthetic mode + parser-boundary research)
 
 Four additive moves:
@@ -303,6 +357,7 @@ notes, and the master plan in `docs/context_zero_master_plan.md`).
 | **Legacy product path** (`vision_mvp.product`) | Pre-Wevra import path. Still works; re-exported by `wevra`. | **Deprecated-compat** — do not import in new code. |
 | **Core substrate** (`vision_mvp.core`) | CASR routing, hierarchical router, context ledger, exact_ops, typed role-handoff, dynamic_comm, adaptive_sub. Research primitives Wevra rests on; each is adapter-able into the capsule surface (`capsule_from_handle`, `capsule_from_handoff`, …). | **Settled, but research API** — no SDK guarantees. |
 | **Research shards** (`vision_mvp.experiments`, `vision_mvp.tasks`, `RESULTS_PHASE*.md`, `EXTENDED_MATH_*.md`) | 45+ phases of falsifiability experiments, 72-framework theory survey, proofs. | **Research-grade** — empirical/proved per shard; no product-API guarantee. |
+| **Multi-agent capsule coordination** (`wevra.team_coord` + `wevra.team_policy`) | SDK v3.5 (research slice). `TEAM_HANDOFF` / `ROLE_VIEW` / `TEAM_DECISION` capsules + `TeamCoordinator` + `audit_team_lifecycle` (T-1..T-7) + learned per-role admission policy. Theorems W4-1 (proved + mechanically-checked) / W4-2 (proved-conditional) / W4-3 (proved-negative); Conjecture W4-C1 (empirical-positive on default config). | **Research-grade v1** — additive on top of the Wevra product surface; not part of the run-boundary product contract. |
 | **Boundary / next-slice** | Docker-first-by-default for public/untrusted JSONLs; first real out-of-tree plugin exemplar; release-on-tag firing. | **Declared, not fired** — see master plan § 10.5. |
 
 For the full living stability matrix, see

@@ -4,7 +4,7 @@
 > theorem-style claim in the Context Zero / Wevra programme.
 > If this file disagrees with any other doc on the *status* of a
 > claim, this file is right and the other file is stale. Last
-> touched: SDK v3.4, 2026-04-26.
+> touched: SDK v3.5, 2026-04-26.
 >
 > Status vocabulary (definitions in `docs/HOW_NOT_TO_OVERSTATE.md`):
 >
@@ -70,6 +70,14 @@
 | **W3-44 (SDK v3.4)**   | **PARSE_OUTCOME → LLM_RESPONSE chain coordinate consistency**                  | **proved + mechanically-checked** | `lifecycle_audit.py::_check_l11`; `LifecycleAuditExtendedTests`                |
 | **W3-45 (SDK v3.4)**   | **Lifecycle-audit soundness extends to L-1..L-11**                             | **proved + mechanically-checked** | `lifecycle_audit.py`; `LifecycleAuditExtendedTests::test_full_chain_audit_is_ok` |
 
+## Team-level capsule coordination (W4-1 .. W4-3) — SDK v3.5
+
+| Claim   | Description                                                                  | Status                            | Anchor                                                                          |
+| ------- | ---------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------- |
+| **W4-1 (SDK v3.5)** | **Team-lifecycle audit soundness on T-1..T-7**                                | **proved + mechanically-checked** | `team_coord.py::audit_team_lifecycle`; `TeamLifecycleAuditTests`                |
+| **W4-2 (SDK v3.5)** | **Coverage-implies-correctness on the deterministic team decoder**            | **proved-conditional**            | `team_coord.py::TeamCoordinator`; `TeamLevelCorrectnessTests::test_w4_2_*`     |
+| **W4-3 (SDK v3.5)** | **Local-view limitation: per-role budget below causal-share floor cannot be rescued by any admission policy** | **proved-negative**               | `TeamLevelCorrectnessTests::test_w4_3_*`; `phase52_team_coord.run_phase52_budget_sweep` |
+
 ## Conjectures (W3-C*)
 
 | Claim   | Description                                                              | Status                                       |
@@ -87,6 +95,9 @@
 | W3-C8   | (deferred — relational decoder closes Gate 2 strictly)                   | conjectural                                  |
 | W3-C9   | Refined paradigm-shift reading: $n=80$ point-estimate + zero-shot gap    | conjectural (candidate)                      |
 | W3-C10  | Relational decoder level-ceiling                                                | conjectural                                  |
+| **W4-C1 (SDK v3.5)** | **Learned per-role admission policy admits strictly fewer handoffs (12/12 seeds) and improves pooled team-decision accuracy on most train seeds (gap_full > 0 in 11/12 seeds, mean +0.054; gap_root_cause > 0 in 8/12 seeds, mean +0.032) over the strongest fixed admission baseline (coverage-guided) on the Phase-52 default config (K_auditor=8, noise=(0.10, 0.30, 0.05), PYTHONHASHSEED=0)** | **empirical** (budget-efficiency dominance is robust per-seed; accuracy advantage is mean-positive but not strict per-seed; reverses at higher noise — see § Cross-seed reading in `docs/RESULTS_WEVRA_TEAM_COORD.md`) |
+| **W4-C2 (SDK v3.5)** | **Cohort-lifted role view closes W4-3 on a sub-class of scenarios**           | **conjectural** (Phase 53 candidate; falsifier: a scenario whose causal-share floor exceeds a single COHORT's max_parents) |
+| **W4-C3 (SDK v3.5)** | **The capsule-layer admission rule subsumes the Phase-36 AdaptiveSubscriptionTable route-edit primitive** | **conjectural** (open) |
 
 ## Phase-substrate (P19, P31, P35, P36, P39..P44)
 

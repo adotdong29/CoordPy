@@ -61,18 +61,33 @@ class WevraSurfaceTests(unittest.TestCase):
             self.assertIsInstance(v, str)
             self.assertTrue(len(v) > 0)
 
-    def test_sdk_version_is_v3_4(self):
+    def test_sdk_version_is_v3_5(self):
         from vision_mvp.wevra import SDK_VERSION
-        # SDK v3.4 bump: capsule-native runtime extended one further
-        # structural layer with PROMPT and LLM_RESPONSE capsules
-        # (Theorems W3-42 / W3-43 / W3-44), an in-process
-        # synthetic-LLM mode for deterministic exercising of the
-        # LLM-backed path (``SweepSpec(mode="synthetic", ...)``),
-        # and lifecycle audit invariants L-9 / L-10 / L-11. Strictly
-        # additive over v3.3 — every v3.3 contract test still passes
-        # byte-for-byte. Capsule view schema unchanged
-        # (``wevra.capsule_view.v1``).
-        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.4")
+        # SDK v3.5 bump: capsule-native multi-agent team coordination
+        # research slice (TEAM_HANDOFF / ROLE_VIEW / TEAM_DECISION
+        # capsule kinds + ``TeamCoordinator`` + ``audit_team_lifecycle``
+        # over invariants T-1..T-7, Theorems W4-1 proved+mechanically-
+        # checked / W4-2 proved-conditional / W4-3 proved-negative).
+        # Strictly additive on v3.4 — every v3.4 run-boundary
+        # contract test still passes byte-for-byte. The Wevra single-
+        # run product runtime contract is unchanged; the new surface
+        # is research-grade.
+        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.5")
+
+    def test_team_coord_surface_is_exported(self):
+        # The SDK v3.5 multi-agent coordination research slice must
+        # be importable from the top-level ``vision_mvp.wevra``
+        # namespace (additive re-export).
+        from vision_mvp.wevra import (
+            TeamCoordinator, audit_team_lifecycle,
+            LearnedTeamAdmissionPolicy, RoleBudget,
+            DEFAULT_ROLE_BUDGETS,
+            capsule_team_handoff, capsule_role_view,
+            capsule_team_decision, T_INVARIANTS,
+        )
+        self.assertIsNotNone(TeamCoordinator)
+        self.assertEqual(len(T_INVARIANTS), 7)
+        self.assertIn("auditor", DEFAULT_ROLE_BUDGETS)
 
     def test_runspec_is_frozen_dataclass(self):
         from vision_mvp.wevra import RunSpec

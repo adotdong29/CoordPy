@@ -7,8 +7,40 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**As of SDK v3.4 (April 2026), capsules drive execution all the
-way through the LLM byte boundary.** Run-boundary stages
+**As of SDK v3.5 (April 2026), capsules are load-bearing both
+*inside one Wevra run* and *between agents in a team*.** A new
+multi-agent capsule coordination **research slice**
+([`vision_mvp/wevra/team_coord.py`](vision_mvp/wevra/team_coord.py)
++ [`vision_mvp/wevra/team_policy.py`](vision_mvp/wevra/team_policy.py))
+adds three closed-vocabulary capsule kinds (`TEAM_HANDOFF`,
+`ROLE_VIEW`, `TEAM_DECISION`) and a `TeamCoordinator` that drives
+one coordination round end-to-end, with a mechanically-checked
+`audit_team_lifecycle` over invariants T-1..T-7 (Theorem **W4-1**).
+Theorems W4-2 (proved-conditional: coverage-implies-correctness)
+and W4-3 (proved-negative: per-role budget below the role's
+causal-share floor cannot be rescued by *any* admission policy)
+anchor the team-level mechanism formally. A learned per-role admission policy
+(logistic regression over six capsule features) admits **strictly
+fewer handoffs** than the strongest fixed admission baseline
+(coverage-guided) on the Phase-52 incident-triage bench (12/12
+train seeds; mean savings ≈ 1.26 handoffs per scenario at
+$K_\text{auditor}=8$, $n_\text{eval}=31$, default noise). The
+learned policy *also* improves pooled team-decision accuracy on
+most train seeds (gap on `accuracy_full` is positive in 11/12
+seeds with mean $+0.054$; gap on `accuracy_root_cause` is
+positive in 8/12 seeds with mean $+0.032$) — but the accuracy
+advantage **reverses at higher noise** (`spurious_prob = 0.50`).
+Conjecture **W4-C1** therefore reads: *budget-efficiency
+dominance is robust per-seed; accuracy advantage is mean-positive
+on the default noise config but not strict per-seed; advantage
+does not survive heavier noise.* Honest-reading rules in
+[`docs/HOW_NOT_TO_OVERSTATE.md`](docs/HOW_NOT_TO_OVERSTATE.md).
+The Wevra single-run product runtime contract is unchanged. See
+[`docs/RESULTS_WEVRA_TEAM_COORD.md`](docs/RESULTS_WEVRA_TEAM_COORD.md)
+and [`docs/CAPSULE_TEAM_FORMALISM.md`](docs/CAPSULE_TEAM_FORMALISM.md).
+
+Up through **SDK v3.4 (April 2026)**, capsules drive execution all the
+way through the LLM byte boundary. Run-boundary stages
 (profile / readiness / sweep_spec / sweep_cell / provenance /
 artifact / run_report) seal capsules in flight as before
 (W3-32..W3-35). Inside every LLM-backed cell, the end-to-end

@@ -5,6 +5,89 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [SDK v3.5] — 2026-04-26 — capsule-native multi-agent team coordination (research slice)
+
+*Strictly additive on SDK v3.4. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The new surface is a
+capsule-native multi-agent coordination research slice that
+runs side-by-side with the Wevra SDK.*
+
+### Added
+
+- **Three new closed-vocabulary `CapsuleKind` values** — `TEAM_HANDOFF`
+  (capsule-native multi-agent handoff; distinct from `HANDOFF`
+  which adapts a substrate `TypedHandoff`), `ROLE_VIEW` (per-role
+  admitted view of one coordination round; `max_parents = K_role`,
+  `max_tokens = T_role`), `TEAM_DECISION` (team-level decision).
+- **`vision_mvp.wevra.team_coord`** — `RoleBudget`,
+  `DEFAULT_ROLE_BUDGETS`, `capsule_team_handoff`,
+  `capsule_role_view`, `capsule_team_decision`, three fixed
+  admission policies (`FifoAdmissionPolicy`,
+  `ClaimPriorityAdmissionPolicy`, `CoverageGuidedAdmissionPolicy`),
+  `TeamCoordinator`, `audit_team_lifecycle` over invariants
+  `T-1..T-7` (Theorem **W4-1**, *proved + mechanically-checked*).
+- **`vision_mvp.wevra.team_policy`** —
+  `LearnedTeamAdmissionPolicy` (per-role logistic-regression
+  scorer over six capsule features), `TrainSample`, `TrainStats`,
+  `train_team_admission_policy`. Numpy-only; deterministic given
+  seed.
+- **`vision_mvp/experiments/phase52_team_coord.py`** — reference
+  benchmark over a noisy-extraction expansion of the Phase-31
+  incident-triage bank. Cross-seed result on default config
+  ($K_\text{auditor}=8$, $T_\text{auditor}=256$,
+  $n_\text{eval}=31$, ``train_seed ∈ {0, …, 11}``,
+  ``PYTHONHASHSEED=0``): **learned policy** admits **strictly
+  fewer handoffs** than the strongest fixed baseline
+  (coverage-guided) on every train seed (12/12), with mean
+  savings ≈ 1.26 handoffs per scenario. The learned policy also
+  improves pooled team-decision accuracy on most train seeds
+  (gap on `accuracy_full` > 0 in 11/12 seeds, mean **+0.054**;
+  gap on `accuracy_root_cause` > 0 in 8/12 seeds, mean
+  **+0.032**) — but the accuracy advantage **reverses at higher
+  noise** (`spurious_prob = 0.50`). `audit_ok_rate = 1.000` for
+  every capsule strategy on every seed. Conjecture **W4-C1**:
+  budget-efficiency dominance is robust per-seed; accuracy
+  advantage is mean-positive on the default noise config but
+  not strict per-seed; advantage does not survive heavier
+  noise. (See ``docs/RESULTS_WEVRA_TEAM_COORD.md`` § Cross-seed
+  result for the canonical reading; ``docs/HOW_NOT_TO_OVERSTATE.md``
+  forbids reporting single-seed numbers without the cross-seed
+  distribution.)
+- **Theorems** — W4-1 (proved + mechanically-checked); W4-2
+  (proved-conditional: coverage-implies-correctness); W4-3
+  (proved-negative: per-role budget below the role's causal-
+  share floor cannot be rescued by *any* admission policy).
+- **Conjectures** — W4-C1, W4-C2 (cohort-lifted role view closes
+  W4-3 sub-class), W4-C3 (capsule admission rule subsumes
+  Phase-36 adaptive-sub).
+- **`docs/CAPSULE_TEAM_FORMALISM.md`** — formal model.
+- **`docs/RESULTS_WEVRA_TEAM_COORD.md`** — milestone note.
+- **`vision_mvp/tests/test_wevra_team_coord.py`** — 22 contract
+  tests.
+- **README**, **START_HERE**, **RESEARCH_STATUS**,
+  **THEOREM_REGISTRY**, **HOW_NOT_TO_OVERSTATE**, **master plan
+  §4.22** — all updated.
+
+### Compatibility
+
+- All 85 capsule-native run-boundary tests (v3.1..v3.4) +
+  Phase-31 typed-handoff tests continue to pass byte-for-byte.
+  Team-layer tests are 22 additional contracts.
+- The Wevra `wevra` console scripts are unchanged. The team layer
+  ships as `vision_mvp.wevra.team_coord` /
+  `vision_mvp.wevra.team_policy` and is also re-exported from
+  the top-level `vision_mvp.wevra` namespace as
+  `TeamCoordinator`, `audit_team_lifecycle`,
+  `LearnedTeamAdmissionPolicy`, etc.
+
+### Honest scope
+
+The Phase-52 benchmark is synthetic; the result *direction* is
+robust under deterministic noise; cross-bench transfer is open.
+"We solved multi-agent context" is **forbidden** by
+`docs/HOW_NOT_TO_OVERSTATE.md`; the defensible reading is
+W4-1 / W4-2 / W4-3 / W4-C1 above.
+
 ## [SDK v3.4] — 2026-04-26 — sub-sub-intra-cell PROMPT / LLM_RESPONSE slice + synthetic mode + cross-model parser-boundary research
 
 *Strictly additive on SDK v3.3. Every v3.3 contract test (18) still

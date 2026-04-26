@@ -172,20 +172,40 @@ from .capsule_decoder_v2 import (
     MultitaskBundleDecoder, train_multitask_bundle_decoder,
 )
 
-# SDK v3.3: sub-intra-cell parser-axis capsule + deterministic-mode
-# replay + lifecycle-invariant runtime audit. Strictly additive on
-# v3.2: the run-boundary slice and intra-cell pair are unchanged;
-# the new surface is one further structural layer (PARSE_OUTCOME)
-# sealed BEFORE every PATCH_PROPOSAL inside a sweep cell, a
-# deterministic-mode opt-in flag on ``RunSpec`` that strips per-run
-# timestamps from the provenance / run-report capsules so two runs
-# of the same deterministic profile collapse to identical full-DAG
-# CIDs (Theorem W3-41), and a runtime-checkable
-# ``CapsuleLifecycleAudit`` that mechanically verifies the lifecycle
-# correspondence (Theorem W3-40). Every v3.2 contract test still
-# passes; the schema name ``wevra.capsule_view.v1`` is unchanged
-# because the new payload is additive.
-SDK_VERSION = "wevra.sdk.v3.4"
+# SDK v3.5 — capsule-native multi-agent team coordination *research
+# slice*. Strictly additive on v3.4: the run-boundary product
+# runtime contract is unchanged. The new surface lives in
+# ``vision_mvp.wevra.team_coord`` and ``team_policy`` and emits
+# three new closed-vocabulary capsule kinds (TEAM_HANDOFF,
+# ROLE_VIEW, TEAM_DECISION). The team-level lifecycle audit
+# (``audit_team_lifecycle``) mechanically verifies invariants
+# T-1..T-7 (Theorem W4-1). See
+# ``docs/RESULTS_WEVRA_TEAM_COORD.md`` and
+# ``docs/CAPSULE_TEAM_FORMALISM.md``.
+from .team_coord import (
+    RoleBudget, DEFAULT_ROLE_BUDGETS,
+    capsule_team_handoff, capsule_role_view, capsule_team_decision,
+    AdmissionPolicy as TeamAdmissionPolicy,
+    AdmissionDecision as TeamAdmissionDecision,
+    FifoAdmissionPolicy as TeamFifoAdmissionPolicy,
+    ClaimPriorityAdmissionPolicy as TeamClaimPriorityAdmissionPolicy,
+    CoverageGuidedAdmissionPolicy as TeamCoverageGuidedAdmissionPolicy,
+    TeamCoordinator, audit_team_lifecycle,
+    TeamLifecycleAuditReport, T_INVARIANTS,
+)
+from .team_policy import (
+    LearnedTeamAdmissionPolicy,
+    TrainSample as TeamTrainSample,
+    TrainStats as TeamTrainStats,
+    train_team_admission_policy,
+    featurise_team_handoff,
+    KNOWN_SOURCE_ROLES, KNOWN_CLAIM_KINDS,
+    N_FEATURES as TEAM_FEATURE_DIM,
+    FEATURE_NAMES as TEAM_FEATURE_NAMES,
+)
+
+
+SDK_VERSION = "wevra.sdk.v3.5"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -253,6 +273,21 @@ __all__ = [
     "MLPBundleDecoder", "train_mlp_bundle_decoder",
     "DeepSetBundleDecoder", "train_deep_set_bundle_decoder",
     "MultitaskBundleDecoder", "train_multitask_bundle_decoder",
+    # SDK v3.5 — capsule-native multi-agent team coordination
+    # (research slice; not part of the run-boundary product
+    # runtime contract).
+    "RoleBudget", "DEFAULT_ROLE_BUDGETS",
+    "capsule_team_handoff", "capsule_role_view",
+    "capsule_team_decision",
+    "TeamAdmissionPolicy", "TeamAdmissionDecision",
+    "TeamFifoAdmissionPolicy", "TeamClaimPriorityAdmissionPolicy",
+    "TeamCoverageGuidedAdmissionPolicy",
+    "TeamCoordinator", "audit_team_lifecycle",
+    "TeamLifecycleAuditReport", "T_INVARIANTS",
+    "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
+    "train_team_admission_policy", "featurise_team_handoff",
+    "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",
+    "TEAM_FEATURE_DIM", "TEAM_FEATURE_NAMES",
     # Layered API (end-user / developer / researcher ergonomics)
     "WevraSimpleAPI", "WevraBuilderAPI", "WevraAdvancedAPI", "BuilderSpec",
     # Config
