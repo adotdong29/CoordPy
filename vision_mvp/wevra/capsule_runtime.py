@@ -100,10 +100,12 @@ from .capsule import (
     PARSE_OUTCOME_ORACLE,
     _default_budget_for,
     capsule_from_artifact,
+    capsule_from_llm_response,
     capsule_from_meta_manifest,
     capsule_from_parse_outcome,
     capsule_from_patch_proposal,
     capsule_from_profile,
+    capsule_from_prompt,
     capsule_from_provenance,
     capsule_from_readiness,
     capsule_from_report,
@@ -237,6 +239,16 @@ class CapsuleNativeRunContext:
         # downstream PATCH_PROPOSAL is parented on this capsule too,
         # giving the parse → patch → verdict chain a typed witness.
         self.parse_outcome_caps: list[ContextCapsule] = []
+        # SDK v3.4 — sub-sub-intra-cell PROMPT / LLM_RESPONSE slice.
+        # One PROMPT capsule per LLM call (idempotent on prompt
+        # bytes — two strategies that share a prompt collapse to
+        # one PROMPT CID). One LLM_RESPONSE capsule per LLM call,
+        # parented on the PROMPT. The PARSE_OUTCOME may reference
+        # the LLM_RESPONSE's CID (in addition to SWEEP_SPEC) so
+        # the prompt → response → parse → patch → verdict chain
+        # is observable on the DAG.
+        self.prompt_caps: list[ContextCapsule] = []
+        self.llm_response_caps: list[ContextCapsule] = []
         # SDK v3.2 — detached witness (Theorem W3-36). The
         # META_MANIFEST is sealed in a SECONDARY ledger after the
         # primary RUN_REPORT is sealed; it carries SHAs of the
@@ -377,18 +389,31 @@ class CapsuleNativeRunContext:
                               recovery: str = "",
                               substitutions_count: int = 0,
                               detail: str = "",
+                              llm_response_cid: str | None = None,
                               ) -> ContextCapsule:
         """Seal one ``PARSE_OUTCOME`` capsule for a single (task,
         strategy) pair, BEFORE the corresponding PATCH_PROPOSAL.
 
-        Parent: the sealed ``SWEEP_SPEC`` capsule. The lifecycle gate
-        is the same that protects SWEEP_CELL (W3-35) and the
-        intra-cell pair (W3-32-extended): a parse outcome outside a
-        sealed spec is meaningless. Theorem W3-39 (parser-axis
-        lifecycle correspondence): the parser-axis transition is now
-        a typed lifecycle step. Sealing this capsule before the
+        Parent: the sealed ``SWEEP_SPEC`` capsule, plus optionally
+        the upstream ``LLM_RESPONSE`` capsule's CID
+        (``llm_response_cid``). The lifecycle gate is the same that
+        protects SWEEP_CELL (W3-35) and the intra-cell pair
+        (W3-32-extended): a parse outcome outside a sealed spec is
+        meaningless. Theorem W3-39 (parser-axis lifecycle
+        correspondence): the parser-axis transition is now a typed
+        lifecycle step. Sealing this capsule before the
         PATCH_PROPOSAL gives the parse → patch → verdict chain a
         typed witness on the capsule DAG.
+
+        SDK v3.4 (Theorem W3-44): when ``llm_response_cid`` is
+        provided, the PARSE_OUTCOME's parent set is
+        ``(SWEEP_SPEC.cid, LLM_RESPONSE.cid)`` — the parser's
+        verdict is content-addressed against the *response bytes
+        that were parsed*, not just the spec. The downstream
+        prompt → response → parse → patch → verdict chain is
+        observable end-to-end on the DAG. Admission rejects
+        (Capsule Contract C5) if the LLM_RESPONSE is not yet
+        sealed in the ledger.
 
         The capsule's payload is *coordinates + structured parse
         outcome*: the parser's ``ok`` boolean, closed-vocabulary
@@ -403,6 +428,16 @@ class CapsuleNativeRunContext:
                 "sub-intra-cell transitions cannot precede their "
                 "cell spec (Theorem W3-39, parser-axis lifecycle "
                 "gate)")
+        parents: list[str] = [self.spec_cap.cid]
+        if llm_response_cid is not None:
+            if llm_response_cid not in self.ledger:
+                raise CapsuleLifecycleError(
+                    f"declared llm_response_cid "
+                    f"{llm_response_cid[:12]}… is not sealed; "
+                    f"cannot parent a PARSE_OUTCOME on a "
+                    f"non-sealed LLM_RESPONSE (Capsule Contract C5; "
+                    f"Theorem W3-44)")
+            parents.append(llm_response_cid)
         cap = capsule_from_parse_outcome(
             instance_id=instance_id, strategy=strategy,
             parser_mode=parser_mode, apply_mode=apply_mode,
@@ -411,10 +446,136 @@ class CapsuleNativeRunContext:
             recovery=recovery,
             substitutions_count=substitutions_count,
             detail=detail,
-            parents=(self.spec_cap.cid,))
+            parents=tuple(parents))
         entry = self._propose(cap)
         sealed = self._admit_and_seal(entry)
         self.parse_outcome_caps.append(sealed)
+        return sealed
+
+    # ------------------------------------------------------------
+    # Stage 4c: sub-sub-intra-cell PROMPT / LLM_RESPONSE (SDK v3.4)
+    # ------------------------------------------------------------
+
+    def seal_prompt(self,
+                     *,
+                     instance_id: str,
+                     strategy: str,
+                     parser_mode: str,
+                     apply_mode: str,
+                     n_distractors: int,
+                     model_tag: str,
+                     prompt_style: str,
+                     prompt_text: str,
+                     include_text: bool | None = None,
+                     ) -> ContextCapsule:
+        """Seal one ``PROMPT`` capsule for one LLM call.
+
+        Parent: the sealed ``SWEEP_SPEC`` capsule. The lifecycle
+        gate is the same as ``seal_parse_outcome`` — a prompt
+        outside a sealed spec is meaningless.
+
+        Idempotent on content (Capsule Contract C1): two calls
+        with byte-identical ``(coordinates, model_tag,
+        prompt_style, prompt_text)`` collapse to the same CID and
+        the second call returns the existing sealed capsule. This
+        is the natural deduplication for "two strategies that
+        share a prompt" (e.g. naive + routing on the
+        non-substrate path).
+
+        Theorem W3-42 (LLM-prompt boundary lifecycle gate, SDK
+        v3.4): the prompt construction is now a typed lifecycle
+        step. The downstream LLM_RESPONSE capsule parents on
+        this PROMPT's CID; admission of the response refuses if
+        the prompt is not sealed.
+
+        The payload carries the prompt's SHA-256 + byte length;
+        the bounded ``prompt_text`` snippet is included by
+        default when it fits the cap (4 KiB) and omitted
+        otherwise. The capsule does NOT store unbounded prompt
+        bytes; the SHA is the identity claim.
+        """
+        if self.spec_cap is None:
+            raise CapsuleLifecycleError(
+                "no SWEEP_SPEC capsule sealed; call "
+                "seal_sweep_spec() before seal_prompt() — "
+                "sub-sub-intra-cell transitions cannot precede "
+                "their cell spec (Theorem W3-42, LLM-prompt "
+                "boundary lifecycle gate)")
+        cap = capsule_from_prompt(
+            instance_id=instance_id, strategy=strategy,
+            parser_mode=parser_mode, apply_mode=apply_mode,
+            n_distractors=n_distractors,
+            model_tag=model_tag, prompt_style=prompt_style,
+            prompt_text=prompt_text,
+            include_text=include_text,
+            parents=(self.spec_cap.cid,))
+        # Content-addressing collapse: a PROMPT with the same CID
+        # already in the ledger is fine — return it.
+        if cap.cid in self.ledger:
+            return self.ledger.get(cap.cid)
+        entry = self._propose(cap)
+        sealed = self._admit_and_seal(entry)
+        self.prompt_caps.append(sealed)
+        return sealed
+
+    def seal_llm_response(self,
+                           *,
+                           instance_id: str,
+                           strategy: str,
+                           parser_mode: str,
+                           apply_mode: str,
+                           n_distractors: int,
+                           model_tag: str,
+                           response_text: str,
+                           prompt_cid: str,
+                           elapsed_ms: int | None = None,
+                           include_text: bool | None = None,
+                           ) -> ContextCapsule:
+        """Seal one ``LLM_RESPONSE`` capsule for one LLM call.
+
+        Parent: exactly the upstream ``PROMPT`` capsule's CID
+        (``prompt_cid``). Admission rejects if the prompt is not
+        already sealed in the ledger (Capsule Contract C5; Theorem
+        W3-43, parent-CID gating extends to the LLM byte boundary).
+
+        Idempotent on content (Capsule Contract C1): two
+        byte-identical responses collapse to the same CID. (Note
+        that two LLM calls with the same prompt and same response
+        — possibly because the call was cached — collapse to
+        ONE PROMPT and ONE LLM_RESPONSE on the DAG.)
+
+        The payload carries the response's SHA-256 + byte length;
+        the bounded ``response_text`` snippet is included by
+        default when it fits the cap and omitted otherwise. The
+        ``elapsed_ms`` field records the LLM call's wall-clock
+        latency observation (stripped under deterministic-mode
+        canonicalisation).
+        """
+        if self.spec_cap is None:
+            raise CapsuleLifecycleError(
+                "no SWEEP_SPEC capsule sealed; cannot seal an "
+                "LLM_RESPONSE outside a sealed cell spec (Theorem "
+                "W3-43)")
+        if prompt_cid not in self.ledger:
+            raise CapsuleLifecycleError(
+                f"declared prompt_cid {prompt_cid[:12]}… is not "
+                f"sealed; cannot parent an LLM_RESPONSE on a "
+                f"non-sealed PROMPT (Capsule Contract C5; "
+                f"Theorem W3-43, prompt → response parent gate)")
+        cap = capsule_from_llm_response(
+            instance_id=instance_id, strategy=strategy,
+            parser_mode=parser_mode, apply_mode=apply_mode,
+            n_distractors=n_distractors,
+            model_tag=model_tag,
+            response_text=response_text,
+            elapsed_ms=elapsed_ms,
+            include_text=include_text,
+            parents=(prompt_cid,))
+        if cap.cid in self.ledger:
+            return self.ledger.get(cap.cid)
+        entry = self._propose(cap)
+        sealed = self._admit_and_seal(entry)
+        self.llm_response_caps.append(sealed)
         return sealed
 
     def seal_patch_proposal(self,

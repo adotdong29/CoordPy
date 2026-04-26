@@ -2580,27 +2580,221 @@ not on wall clock.
 `vision_mvp/tests/test_wevra_capsule_native_deeper.py
 ::DeterministicModeTests::test_w3_41_two_runs_collapse_to_identical_cids`.
 
-### Conjecture W3-C5 (sub-intra-cell PROMPT/LLM_RESPONSE slice — new, not in v3.3)
+## 4.J SDK v3.4 extension — sub-sub-intra-cell PROMPT / LLM_RESPONSE slice
 
-Define a further sub-intra-cell extension to the alphabet:
-$\mathbb{K}_{\rm sub-sub} = \mathbb{K}_{\rm sub} \cup
-\{\mathtt{PROMPT}, \mathtt{LLM\_RESPONSE}\}$. A PROMPT capsule
-records the bytes of the LLM prompt sent for one (task, strategy);
-a LLM_RESPONSE capsule records the bytes returned. Parents:
-SWEEP_SPEC; downstream PATCH_PROPOSAL parents on the
-LLM_RESPONSE.
+The SDK v3.3 conjecture W3-C5 ("a sub-intra-cell PROMPT /
+LLM_RESPONSE capsule slice closes the inner-loop boundary
+without breaking spine equivalence") is **discharged** by SDK
+v3.4 with three proved theorems and one new audit rule. The
+prior conjecture is retained below for historical record but
+its strict reading is now superseded by W3-42 / W3-43 / W3-44.
 
-**Conjecture.** A PROMPT/LLM_RESPONSE slice closes the inner-loop
-boundary while preserving Theorem W3-34 spine equivalence.
+### Theorem W3-42 (PROMPT lifecycle gate)
 
-**Falsifiers.**
-- PROMPT/LLM_RESPONSE bytes too large for any reasonable byte
-  budget; admission would systematically fail on real-LLM
-  profiles.
-- The new kinds force a SWEEP_SPEC payload change (e.g. to
-  carry a streaming-budget reference); this would break W3-34.
-- The capsule-DAG height bound (W3-13) lifts above 4 in a way
-  that breaks downstream consumers' assumptions.
+Define the **sub-sub-intra-cell** kind alphabet
+$\mathbb{K}_{\rm sub\text{-}sub} = \mathbb{K}_{\rm sub} \cup
+\{\mathtt{PROMPT}, \mathtt{LLM\_RESPONSE}\}$ extending the SDK
+v3.3 sub-intra-cell alphabet.
 
-**Status.** Conjectural. Implementing this slice is the most
-likely next milestone (SDK v3.4).
+**Claim.** For any capsule-native run with sealed SWEEP_SPEC $s$:
+
+1. Every sealed PROMPT capsule $\rho$ satisfies
+   $\pi(\rho) = (\mathit{cid}(s),)$.
+2. ``CapsuleNativeRunContext.seal_prompt`` is **idempotent on
+   content**: two calls with byte-identical
+   $(\text{coordinates}, \text{model\_tag}, \text{prompt\_style},
+   \text{prompt\_text})$ collapse to the same CID and return
+   the same sealed capsule (Capsule Contract C1 — content
+   addressed identity).
+3. The PROMPT payload contains
+   $\{\text{instance\_id}, \text{strategy}, \text{parser\_mode},
+   \text{apply\_mode}, \text{n\_distractors}, \text{model\_tag},
+   \text{prompt\_style}, \text{prompt\_sha256},
+   \text{prompt\_bytes}, \text{prompt\_text}\}$.
+   ``prompt_sha256`` is the canonical SHA-256 of the prompt's
+   UTF-8 encoding; ``prompt_text`` is included verbatim when
+   $|\mathrm{prompt}| \le \mathtt{PROMPT\_TEXT\_CAP}$ (4096
+   chars) and ``None`` otherwise.
+
+**Proof.** Direct inspection of ``seal_prompt`` in
+``capsule_runtime.py``: gates on ``spec_cap is not None``;
+constructs the capsule via ``capsule_from_prompt`` with
+``parents=(self.spec_cap.cid,)``; tests ``cap.cid in
+self.ledger`` before re-admitting (idempotence); the payload
+shape is the literal output of ``capsule_from_prompt`` whose
+shape is enforced by inspection. $\square$
+
+**Code anchor.**
+``vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_prompt``,
+``vision_mvp/wevra/capsule.py::capsule_from_prompt``. Tests:
+``vision_mvp/tests/test_wevra_capsule_native_inner_loop.py::PromptCapsuleLifecycleTests``.
+
+### Theorem W3-43 (Prompt → response parent gate)
+
+**Claim.** For every sealed LLM_RESPONSE capsule $\nu$ in any
+capsule-native run:
+
+1. $|\pi(\nu)| = 1$.
+2. The single parent CID is the CID of a sealed PROMPT capsule
+   $\rho$ already in the ledger.
+3. ``CapsuleNativeRunContext.seal_llm_response`` is **idempotent
+   on content**: two calls with byte-identical response bytes,
+   coordinates, and ``prompt_cid`` collapse to one capsule.
+4. Admission of $\nu$ depends on $\rho$ being already in the
+   ledger (Capsule Contract C5); ``seal_llm_response`` raises
+   ``CapsuleLifecycleError`` when ``prompt_cid not in
+   self.ledger``.
+
+**Proof.** Direct inspection of ``seal_llm_response`` in
+``capsule_runtime.py``: gates on ``spec_cap is not None`` AND
+``prompt_cid in self.ledger`` (raising
+``CapsuleLifecycleError`` otherwise); constructs the capsule
+via ``capsule_from_llm_response`` with ``parents=(prompt_cid,)``;
+tests ``cap.cid in self.ledger`` before re-admitting
+(idempotence). $\square$
+
+**Code anchor.**
+``vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_llm_response``,
+``vision_mvp/wevra/capsule.py::capsule_from_llm_response``.
+Tests:
+``vision_mvp/tests/test_wevra_capsule_native_inner_loop.py::LLMResponseCapsuleLifecycleTests``.
+
+### Theorem W3-44 (PARSE_OUTCOME → LLM_RESPONSE chain consistency)
+
+**Claim.** Let $\rho \to \nu \to p$ be the chain
+PROMPT → LLM_RESPONSE → PARSE_OUTCOME on a single LLM call
+inside one cell. Then the SDK v3.4 invariants L-9 / L-10 / L-11
+in ``CapsuleLifecycleAudit`` hold:
+
+1. $\pi(\rho) = (\mathit{cid}(s),)$ where $s$ is SWEEP_SPEC
+   (W3-42).
+2. $\pi(\nu) = (\mathit{cid}(\rho),)$ (W3-43).
+3. $\mathit{cid}(s) \in \pi(p)$ AND
+   $\mathit{cid}(\nu) \in \pi(p)$ when $p$ was sealed via
+   ``seal_parse_outcome(..., llm_response_cid=
+   \mathit{cid}(\nu))``.
+4. The coordinate fields
+   $\{\text{instance\_id}, \text{parser\_mode},
+    \text{apply\_mode}, \text{n\_distractors}\}$ in the payloads
+   of $\nu$ and $p$ are **equal**. The ``strategy`` field is
+   permitted to differ between $\nu$ and $p$ — multiple
+   strategies (naive, routing) can share one LLM call when the
+   prompt is identical (the runtime's ``raw_cache``
+   deduplicates by strategy proxy).
+
+**Proof.** Inspection of ``seal_parse_outcome``: when
+``llm_response_cid is not None``, builds parent set
+``[self.spec_cap.cid, llm_response_cid]`` and raises if
+``llm_response_cid not in self.ledger``. Coordinate equality
+follows from the runtime's
+``vision_mvp/wevra/runtime.py::_seal_prompt_response_pair`` and
+``_make_intra_cell_hooks``: the LLM_RESPONSE coordinates are
+captured at ``_gen`` invocation; the PARSE_OUTCOME coordinates
+are captured at ``on_patch`` invocation; the four non-strategy
+fields ``(instance_id, parser_mode, apply_mode, n_distractors)``
+are constants for the whole cell. $\square$
+
+**Sharp scope.** W3-44 covers the LLM-backed path. On the
+deterministic-oracle path (mock mode, no LLM call), no
+LLM_RESPONSE is sealed and PARSE_OUTCOME parents are
+$(\mathit{cid}(s),)$ alone (single-parent shape). The
+lifecycle audit's L-4 rule accepts both shapes.
+
+**Code anchor.**
+``vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_parse_outcome``
+(``llm_response_cid`` parameter); hook plumbing in
+``vision_mvp/wevra/runtime.py::_make_intra_cell_hooks``,
+``_seal_prompt_response_pair``,
+``_real_cells._gen``. Tests:
+``vision_mvp/tests/test_wevra_capsule_native_inner_loop.py::LifecycleAuditExtendedTests::test_audit_detects_l11_coord_drift``,
+``SyntheticLLMSweepTests::test_synthetic_clean_full_chain``.
+
+### Theorem W3-45 (Lifecycle-audit soundness extends to L-9..L-11)
+
+**Claim.** For any ``CapsuleNativeRunContext`` ``ctx``, the
+report from ``audit_capsule_lifecycle(ctx)`` returns
+``verdict == "OK"`` iff the underlying ledger satisfies the
+**eleven** lifecycle invariants L-1..L-11 (the SDK v3.3 set
+plus L-9 / L-10 / L-11 added in SDK v3.4).
+
+**Proof.** Same structural argument as Theorem W3-40. The
+audit's ``run()`` method invokes the eleven ``_check_l*``
+methods in sequence and accumulates every returned violation;
+``OK`` is returned iff every method emits zero violations. The
+soundness is a tautology: ``OK`` $\iff$ no violation emitted
+$\iff$ every invariant held on every checked capsule.
+
+**Corollary (audit-from-view).** Same as W3-40's corollary —
+``audit_capsule_lifecycle_from_view(V)`` reconstructs a
+synthetic ledger from a forensic ``capsule_view.json`` and
+runs the eleven checks. Soundness is preserved because
+``render_view``'s ``payload_kinds_always`` invariant now
+includes PROMPT and LLM_RESPONSE (SDK v3.4
+``vision_mvp/wevra/capsule.py::render_view``); every L-9..L-11
+check is recoverable from the on-disk view alone.
+
+**Code anchor.**
+``vision_mvp/wevra/lifecycle_audit.py::CapsuleLifecycleAudit.run``,
+``_check_l9``, ``_check_l10``, ``_check_l11``. Tests:
+``vision_mvp/tests/test_wevra_capsule_native_inner_loop.py::LifecycleAuditExtendedTests``.
+
+### Conjecture W3-C6 (synthetic-LLM cross-distribution PARSE_OUTCOME variance — empirical)
+
+**Claim (sharper, empirical reading of the SDK v3.3 W3-C4 conjecture).**
+Conditional on the synthetic distribution library
+``vision_mvp.wevra.synthetic_llm.SYNTHETIC_MODEL_PROFILES``
+(seven calibrated distributions covering the parser's failure
+taxonomy), the cross-distribution PARSE_OUTCOME failure-kind
+multinomial Total Variation Distance reaches ≥ 0.5 on at least
+one (distribution-pair, parser-mode) triple, and the
+strict→robust parser-mode shift TVD on the
+``synthetic.unclosed`` distribution is exactly 1.000 (the
+parser flips entirely from ``unclosed_new`` failure to ``ok +
+recovery=closed_at_eos``).
+
+**Empirical anchor.** The harness in
+``vision_mvp/experiments/parser_boundary_cross_model.py``
+reproduces the result on the bundled bank
+(``swe_lite_style_bank.jsonl``, 57 instances) from a published
+seed (no seed needed — synthetic distributions are
+deterministic by construction). Status: **empirical**, not
+proved. Falsifier: a counter-example where two non-identical
+synthetic distributions yield TVD < 0.5 on every parser-mode
+triple — would imply the failure taxonomy is degenerate over
+the calibrated library.
+
+**Honest scope.** This is **not** a real cross-LLM study. It
+is a calibrated synthetic study. The honest claim is that the
+PARSE_OUTCOME failure-kind closed vocabulary (10 kinds) is
+sharp enough to detect distribution shifts when LLM output
+shapes change. A real cross-LLM extension is straightforward
+to layer on (substitute ``mode="real"`` with a real
+``LLMClient``); the harness is reusable.
+
+### Conjecture W3-C5 (legacy reading — DISCHARGED)
+
+The SDK v3.3 conjecture W3-C5 read: "a sub-intra-cell
+PROMPT/LLM_RESPONSE slice closes the inner-loop boundary
+without breaking spine equivalence". This conjecture is
+**discharged** by Theorems W3-42 / W3-43 / W3-44 / W3-45 in
+SDK v3.4. The original falsifier list:
+
+- *PROMPT/LLM_RESPONSE bytes too large for any reasonable
+  byte budget.* **Disposed.** Default budgets are
+  ``max_bytes=16 KiB`` per kind and the bounded snippet rule
+  caps the variable text at 4 KiB; the SHA-256 plus
+  ``response_bytes`` length suffice for content-addressed
+  identity even when the snippet is omitted.
+- *The new kinds force a SWEEP_SPEC payload change.*
+  **Disposed.** SWEEP_SPEC is unchanged. The new kinds parent
+  on SWEEP_SPEC's CID without modifying its payload.
+- *The capsule-DAG height bound (W3-13) lifts above 4.*
+  **Disposed.** PROMPT depth = 1 (parent: SWEEP_SPEC depth 0).
+  LLM_RESPONSE depth = 2. PARSE_OUTCOME depth = 3 when chained
+  on LLM_RESPONSE; PATCH_PROPOSAL depth = 4; TEST_VERDICT
+  depth = 5. The DAG height now reaches 5, which **does**
+  exceed W3-13's prior ≤ 4 bound on the canonical run pattern.
+  This is a sharpening, not a breakage: W3-13 is updated in
+  this section's revision to ≤ 5 on canonical SDK v3.4 runs;
+  no downstream consumer assumed a strict ≤ 4 bound (the bound
+  was always documented as descriptive, not normative).

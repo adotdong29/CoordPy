@@ -93,6 +93,9 @@ from .capsule import (
     capsule_from_meta_manifest,
     # SDK v3.3 — sub-intra-cell parser-axis adapter.
     capsule_from_parse_outcome, PARSE_OUTCOME_ORACLE,
+    # SDK v3.4 — sub-sub-intra-cell prompt + llm response adapters.
+    capsule_from_prompt, capsule_from_llm_response,
+    PROMPT_TEXT_CAP, LLM_RESPONSE_TEXT_CAP,
 )
 
 # Capsule-native runtime (SDK v3.1). The first execution-first
@@ -182,7 +185,7 @@ from .capsule_decoder_v2 import (
 # correspondence (Theorem W3-40). Every v3.2 contract test still
 # passes; the schema name ``wevra.capsule_view.v1`` is unchanged
 # because the new payload is additive.
-SDK_VERSION = "wevra.sdk.v3.3"
+SDK_VERSION = "wevra.sdk.v3.4"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -214,6 +217,9 @@ __all__ = [
     "capsule_from_meta_manifest",
     # SDK v3.3 — sub-intra-cell parser-axis adapter.
     "capsule_from_parse_outcome", "PARSE_OUTCOME_ORACLE",
+    # SDK v3.4 — sub-sub-intra-cell PROMPT/LLM_RESPONSE adapters.
+    "capsule_from_prompt", "capsule_from_llm_response",
+    "PROMPT_TEXT_CAP", "LLM_RESPONSE_TEXT_CAP",
     # Capsule-native runtime (SDK v3.1) — capsules drive execution.
     "CapsuleNativeRunContext", "ContentAddressMismatch",
     "seal_and_write_artifact",

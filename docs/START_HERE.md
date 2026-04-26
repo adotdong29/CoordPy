@@ -11,15 +11,16 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-SDK v3.3 (April 2026), capsules drive execution **one further
-structural layer past the cell boundary**: each (task, strategy)
-parse→patch→verdict transition is THREE sealed capsules
-(PARSE_OUTCOME → PATCH_PROPOSAL → TEST_VERDICT) with parent-CID
-gating, the parser-axis transition is a typed lifecycle step
-(Theorem W3-39), and a runtime-checkable
-``CapsuleLifecycleAudit`` mechanically verifies the lifecycle
-correspondence on every finished run (Theorem W3-40).
-Deterministic-mode replay (``RunSpec(deterministic=True)``)
+SDK v3.4 (April 2026), capsules drive execution **one further
+structural layer past v3.3** by extending the discipline into the
+LLM byte boundary itself. The end-to-end inner-loop chain is
+**five typed sealed capsules** —
+PROMPT → LLM_RESPONSE → PARSE_OUTCOME → PATCH_PROPOSAL →
+TEST_VERDICT — with strong parent-CID gating at each step
+(Theorems W3-42 / W3-43 / W3-44). A runtime-checkable
+``CapsuleLifecycleAudit`` mechanically verifies eleven
+invariants L-1..L-11 on every finished run (Theorems W3-40 /
+W3-45). Deterministic-mode replay (``RunSpec(deterministic=True)``)
 collapses the full capsule DAG byte-for-byte across runs of the
 same logical input (Theorem W3-41). Meta-artefacts (the report
 itself) are authenticated by a *detached* META_MANIFEST in a
@@ -27,9 +28,14 @@ secondary ledger — the rendering circularity (impossible to seal
 a report whose bytes encode the seal) is a sharp theorem
 (W3-36) with a constructive boundary witness. ``wevra-capsule
 verify`` recomputes the chain from on-disk header bytes and
-re-hashes every artefact. See *"What capsules do at runtime
-now"* below. Context Zero is the research programme that
-produced it.
+re-hashes every artefact. SDK v3.4 also ships a
+**synthetic-LLM mode** (``SweepSpec(mode="synthetic", ...)``)
+that exercises the full chain in CI without a network endpoint;
+the cross-model parser-boundary research (W3-C6) reports
+PARSE_OUTCOME failure-kind TVD up to 1.000 across the
+calibrated synthetic distribution library. See *"What capsules
+do at runtime now"* below. Context Zero is the research
+programme that produced it.
 
 ## The load-bearing abstraction — Context Capsule
 
@@ -166,19 +172,66 @@ Three additive moves:
     ``in_process``/``subprocess`` sandbox) produce byte-identical
     full-DAG CIDs and identical chain head (Theorem W3-41).
 
+## What changed in SDK v3.4 (LLM byte boundary + synthetic mode + parser-boundary research)
+
+Four additive moves:
+
+  * **Sub-sub-intra-cell ``PROMPT`` and ``LLM_RESPONSE``
+    capsules.** Every LLM call seals two capsules in flight: a
+    PROMPT (parent: SWEEP_SPEC) carrying coordinates + prompt
+    SHA-256 + byte length + bounded text snippet (≤ 4 KiB),
+    and an LLM_RESPONSE (parent: PROMPT) carrying coordinates
+    + response SHA-256 + byte length + snippet + elapsed
+    milliseconds. Both kinds are content-addressed (Capsule
+    Contract C1) so byte-identical prompts (e.g. a cached LLM
+    call shared by naive + routing strategies) collapse to one
+    capsule. Theorems W3-42 / W3-43 — proved.
+  * **End-to-end typed inner-loop chain.** The PARSE_OUTCOME
+    capsule's parent set is now either ``(SWEEP_SPEC,)`` (oracle
+    path) or ``(SWEEP_SPEC, LLM_RESPONSE)`` (LLM-backed path).
+    The full chain is
+    ``PROMPT → LLM_RESPONSE → PARSE_OUTCOME → PATCH_PROPOSAL →
+    TEST_VERDICT`` — five typed capsules with strong
+    parent-CID gating. The lifecycle audit's new rule **L-11**
+    mechanically verifies coordinate consistency between
+    PARSE_OUTCOME and LLM_RESPONSE (Theorem W3-44). The audit
+    soundness extends to L-1..L-11 (Theorem W3-45).
+  * **In-process synthetic-LLM mode**
+    (``SweepSpec(mode="synthetic", synthetic_model_tag=<tag>)``).
+    Uses a deterministic synthetic LLM client
+    (``vision_mvp.wevra.synthetic_llm.SyntheticLLMClient``) that
+    returns canned strings keyed by model tag. The full
+    PROMPT / LLM_RESPONSE / PARSE_OUTCOME / PATCH_PROPOSAL /
+    TEST_VERDICT chain runs end-to-end without an Ollama
+    endpoint. CI-runnable on every commit.
+  * **Cross-model parser-boundary research (W3-C6, empirical).**
+    ``vision_mvp.experiments.parser_boundary_cross_model``
+    sweeps seven calibrated synthetic distributions through the
+    real parser, computes pairwise PARSE_OUTCOME failure-kind
+    Total Variation Distance, and reports a parser-mode
+    (strict→robust) shift on each distribution. On the bundled
+    bank: max cross-distribution TVD = 1.000; max parser-mode
+    shift = 1.000 (the ``synthetic.unclosed`` distribution
+    flips entirely from ``unclosed_new`` failure under strict
+    to ``ok + recovery=closed_at_eos`` under robust). Honest
+    scope: synthetic distribution library, not real cross-LLM.
+
 ## What remains post-hoc / audit only
 
 The capsule layer is *substantially* load-bearing in execution
 now, but a few axes are still post-hoc / not capsule-tracked:
 
-  * **Sub-step bytes still outside the slice.** The LLM prompt
-    that the patch generator sends and the raw LLM response
-    bytes are still plain Python. SDK v3.3 captures the
-    *parse outcome* (the parser's structured verdict), not the
-    LLM bytes that triggered it. The next sub-intra-cell slice
-    would name them as ``PROMPT`` and ``LLM_RESPONSE`` capsules
-    (Conjecture W3-C5).
+  * **PROMPT / LLM_RESPONSE bytes are now capsule-tracked
+    (SDK v3.4).** The legacy "sub-step bytes outside the slice"
+    line is **superseded** by Theorems W3-42 / W3-43.
   * **Sandbox stdout / stderr / test trace** remain plain bytes.
+    Capsule-tracking these (an APPLY_OUTCOME capsule between
+    PATCH_PROPOSAL and TEST_VERDICT) is the natural SDK v3.5
+    candidate.
+  * **Parser-internal regex / recovery-heuristic state.** The
+    parser's intermediate match objects and recovery iteration
+    state are not capsule-tracked; PARSE_OUTCOME captures the
+    structured verdict only.
   * **The post-hoc ``build_report_ledger`` adapter** is retained
     as the third-party-facing path for code that has a
     ``product_report`` dict from somewhere outside the runtime

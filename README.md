@@ -7,32 +7,47 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**As of SDK v3.3 (April 2026), capsules drive execution one further
-structural layer past the cell boundary.** Run-boundary stages
+**As of SDK v3.4 (April 2026), capsules drive execution all the
+way through the LLM byte boundary.** Run-boundary stages
 (profile / readiness / sweep_spec / sweep_cell / provenance /
 artifact / run_report) seal capsules in flight as before
-(W3-32..W3-35). Inside every cell, each (task, strategy)
-parse→patch→verdict transition seals THREE capsules: a
-`PARSE_OUTCOME` (parent: SWEEP_SPEC, parser-axis lifecycle gate
-W3-39), a `PATCH_PROPOSAL` (parents: SWEEP_SPEC + PARSE_OUTCOME),
-and a `TEST_VERDICT` (parent: PATCH_PROPOSAL); the chain
-``parse → patch → verdict`` is enforced at the type level. A
-new runtime-checkable `CapsuleLifecycleAudit` mechanically
-verifies eight lifecycle invariants L-1..L-8 on every finished
-run (Theorem W3-40), surfacing typed counterexamples on
-violation. ``RunSpec(deterministic=True)`` opt-in collapses the
-full capsule DAG byte-for-byte across runs of the same logical
-input (Theorem W3-41) — every kind, chain head, and root CID is
-identical. The meta-artefact boundary
+(W3-32..W3-35). Inside every LLM-backed cell, the end-to-end
+inner-loop chain is **five typed sealed capsules**:
+
+  `PROMPT → LLM_RESPONSE → PARSE_OUTCOME → PATCH_PROPOSAL → TEST_VERDICT`
+
+The PROMPT capsule (parent: SWEEP_SPEC, **W3-42**) records the
+prompt's SHA-256 + byte length + bounded text snippet; the
+LLM_RESPONSE capsule (parent: PROMPT, **W3-43**) records the
+response's SHA-256 + length + snippet + elapsed milliseconds;
+the PARSE_OUTCOME capsule on the LLM-backed path parents on
+both SWEEP_SPEC and the upstream LLM_RESPONSE (**W3-44**), with
+coordinate consistency mechanically verified by audit rule
+**L-11** (**W3-45** — soundness of the eleven-rule audit). A new
+**in-process synthetic-LLM mode**
+(`SweepSpec(mode="synthetic", synthetic_model_tag=<tag>)`) lets
+the full chain run end-to-end in CI without an Ollama endpoint.
+The cross-model parser-boundary research (**W3-C6**, empirical)
+reports PARSE_OUTCOME failure-kind Total Variation Distance up
+to **1.000** across the calibrated synthetic distribution
+library and parser-mode (strict→robust) shift up to **1.000**
+on `synthetic.unclosed`.
+
+The SDK v3.3 layer is unchanged: PARSE_OUTCOME capsule
+(W3-39), eight-rule lifecycle audit (W3-40, now extended to
+eleven rules in W3-45), and `RunSpec(deterministic=True)` opt-in
+that collapses the full capsule DAG byte-for-byte across runs
+(W3-41). The meta-artefact boundary
 (`product_report.json` / `capsule_view.json` / `product_summary.txt`)
 remains a sharp circularity theorem (W3-36) with a constructive
-boundary witness: a *detached* `META_MANIFEST` capsule sealed in
-a secondary ledger, written to `meta_manifest.json`, is the
-strongest authentication achievable. `wevra-capsule verify`
-recomputes the chain from on-disk header bytes (W3-37) and
-re-hashes every artefact at audit time (W3-38). See
+detached `META_MANIFEST` witness in a secondary ledger.
+`wevra-capsule verify` recomputes the chain from on-disk header
+bytes (W3-37) and re-hashes every artefact at audit time (W3-38).
+See
+[`docs/RESULTS_WEVRA_INNER_LOOP.md`](docs/RESULTS_WEVRA_INNER_LOOP.md)
+for the SDK v3.4 milestone note,
 [`docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md`](docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md)
-for the SDK v3.3 milestone note,
+for SDK v3.3,
 [`docs/RESULTS_WEVRA_INTRA_CELL.md`](docs/RESULTS_WEVRA_INTRA_CELL.md)
 for SDK v3.2, and
 [`docs/RESULTS_WEVRA_CAPSULE_NATIVE.md`](docs/RESULTS_WEVRA_CAPSULE_NATIVE.md)
@@ -59,22 +74,32 @@ programme on per-agent minimum-sufficient context.
 > SDK v3.2 extended the gate past the cell boundary into the inner
 > parse→apply→test loop and formalised the meta-artefact circularity
 > as a sharp limitation theorem with a constructive detached-witness
-> boundary. **SDK v3.3 extends the gate one further structural
-> layer with a sub-intra-cell PARSE_OUTCOME capsule** (parent:
-> SWEEP_SPEC, parser-axis lifecycle gate W3-39), adds a
-> runtime-checkable lifecycle audit (W3-40), and adds
-> deterministic-mode replay collapsing the full DAG byte-for-byte
-> across runs (W3-41). See
+> boundary. SDK v3.3 extended the gate one further structural
+> layer with a sub-intra-cell PARSE_OUTCOME capsule (parent:
+> SWEEP_SPEC, W3-39), a runtime-checkable lifecycle audit (W3-40),
+> and deterministic-mode replay collapsing the full DAG
+> byte-for-byte across runs (W3-41). **SDK v3.4 extends the gate
+> one further structural layer to the LLM byte boundary itself**:
+> PROMPT and LLM_RESPONSE capsules (W3-42 / W3-43), the
+> PARSE_OUTCOME → LLM_RESPONSE chain coordinate consistency
+> theorem (W3-44, mechanically checked by audit rule L-11), the
+> extended audit soundness over eleven invariants (W3-45), and
+> a synthetic-LLM mode that lets the full chain run in CI
+> end-to-end. See
 > [`docs/RESULTS_WEVRA_CAPSULE.md`](docs/RESULTS_WEVRA_CAPSULE.md)
 > for the contract (C1..C6),
 > [`docs/RESULTS_WEVRA_CAPSULE_NATIVE.md`](docs/RESULTS_WEVRA_CAPSULE_NATIVE.md)
 > for the v3.1 run-boundary slice (W3-32..W3-35),
 > [`docs/RESULTS_WEVRA_INTRA_CELL.md`](docs/RESULTS_WEVRA_INTRA_CELL.md)
 > for the v3.2 intra-cell + detached witness milestone
-> (W3-32-extended / W3-36 / W3-37 / W3-38), and
+> (W3-32-extended / W3-36 / W3-37 / W3-38),
 > [`docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md`](docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md)
 > for the v3.3 deeper-slice / audit / determinism milestone
-> (W3-39 / W3-40 / W3-41). Canonical theorem registry:
+> (W3-39 / W3-40 / W3-41), and
+> [`docs/RESULTS_WEVRA_INNER_LOOP.md`](docs/RESULTS_WEVRA_INNER_LOOP.md)
+> for the v3.4 PROMPT / LLM_RESPONSE / synthetic mode /
+> parser-boundary research milestone
+> (W3-42 / W3-43 / W3-44 / W3-45 / W3-C6). Canonical theorem registry:
 > [`docs/THEOREM_REGISTRY.md`](docs/THEOREM_REGISTRY.md). Canonical
 > research-status:
 > [`docs/RESEARCH_STATUS.md`](docs/RESEARCH_STATUS.md). How not to
@@ -281,7 +306,7 @@ The SDK public surface is contract-tested in
 (invariants C1..C6) is tested in
 `vision_mvp/tests/test_wevra_capsules.py` — any rename or removal is a
 breaking change and requires bumping `wevra.SDK_VERSION` (currently
-`wevra.sdk.v3.3`).
+`wevra.sdk.v3.4`).
 
 ### Who Wevra is for
 
@@ -326,10 +351,10 @@ territory.
 
 | Layer | Scope | Stability | Import path |
 |---|---|---|---|
-| **Wevra SDK** — `RunSpec`, `run`, `SweepSpec`, `run_sweep`, `HeavyRunNotAcknowledged`, `WevraConfig`, `build_manifest`, `profiles`, `report`, `ci_gate`, `import_data`, `extensions`, schema constants. SDK v3.3 adds `RunSpec.deterministic` opt-in. | The public product contract | **Stable v3.3** (contract-tested) | `vision_mvp.wevra` |
+| **Wevra SDK** — `RunSpec`, `run`, `SweepSpec`, `run_sweep`, `HeavyRunNotAcknowledged`, `WevraConfig`, `build_manifest`, `profiles`, `report`, `ci_gate`, `import_data`, `extensions`, schema constants. SDK v3.3 adds `RunSpec.deterministic` opt-in. **SDK v3.4 adds `SweepSpec(mode="synthetic", synthetic_model_tag=...)`** — in-process synthetic-LLM mode for CI-runnable end-to-end chain exercise. | The public product contract | **Stable v3.4** (contract-tested) | `vision_mvp.wevra` |
 | **Context Capsule primitives** — `ContextCapsule`, `CapsuleKind`, `CapsuleLifecycle`, `CapsuleBudget`, `CapsuleLedger`, `CapsuleView`, `render_view`, `build_report_ledger`, `capsule_from_*` adapters | The **load-bearing SDK abstraction**: every cross-boundary artefact is a capsule | **Stable v1** (contract-tested: invariants C1..C6) | `vision_mvp.wevra.capsule` (re-exported from `vision_mvp.wevra`) |
-| **Capsule-native runtime** — `CapsuleNativeRunContext`, `seal_and_write_artifact`, `ContentAddressMismatch`, `CONSTRUCTION_IN_FLIGHT`/`CONSTRUCTION_POST_HOC`, `RunSpec.capsule_native` + intra-cell `seal_patch_proposal` / `seal_test_verdict` + sub-intra-cell `seal_parse_outcome` (SDK v3.3) + detached `seal_meta_manifest` + on-disk `verify_chain_from_view_dict` / `verify_artifacts_on_disk` / `verify_meta_manifest_on_disk` | Capsules drive runtime stage transitions at the run boundary AND inside the inner sweep loop AND on the parser axis; substantive artifacts are content-addressed at write time and re-verifiable at audit time; meta-artefacts are authenticated by a detached META_MANIFEST | **Stable v3** (contract-tested: theorems W3-32 / W3-33 / W3-34 / W3-35 / W3-32-extended / W3-36 / W3-37 / W3-38 / W3-39 / W3-40 / W3-41) | `vision_mvp.wevra.capsule_runtime` (re-exported from `vision_mvp.wevra`) |
-| **Lifecycle audit** — `CapsuleLifecycleAudit`, `LifecycleAuditReport`, `audit_capsule_lifecycle`, `audit_capsule_lifecycle_from_view` (SDK v3.3) | Mechanically verifies eight lifecycle invariants L-1..L-8 over a finished run. Returns OK / BAD / EMPTY plus typed counterexamples. | **Stable v1** (contract-tested: theorem W3-40) | `vision_mvp.wevra.lifecycle_audit` (re-exported) |
+| **Capsule-native runtime** — `CapsuleNativeRunContext`, `seal_and_write_artifact`, `ContentAddressMismatch`, `CONSTRUCTION_IN_FLIGHT`/`CONSTRUCTION_POST_HOC`, `RunSpec.capsule_native` + intra-cell `seal_patch_proposal` / `seal_test_verdict` + sub-intra-cell `seal_parse_outcome` (SDK v3.3) + **sub-sub-intra-cell `seal_prompt` / `seal_llm_response` (SDK v3.4)** + detached `seal_meta_manifest` + on-disk `verify_chain_from_view_dict` / `verify_artifacts_on_disk` / `verify_meta_manifest_on_disk` | Capsules drive runtime stage transitions at the run boundary AND inside the inner sweep loop AND on the parser axis AND at the LLM byte boundary; substantive artifacts are content-addressed at write time and re-verifiable at audit time; meta-artefacts are authenticated by a detached META_MANIFEST | **Stable v3.4** (contract-tested: theorems W3-32 / W3-33 / W3-34 / W3-35 / W3-32-extended / W3-36 / W3-37 / W3-38 / W3-39 / W3-40 / W3-41 / W3-42 / W3-43 / W3-44 / W3-45) | `vision_mvp.wevra.capsule_runtime` (re-exported from `vision_mvp.wevra`) |
+| **Lifecycle audit** — `CapsuleLifecycleAudit`, `LifecycleAuditReport`, `audit_capsule_lifecycle`, `audit_capsule_lifecycle_from_view` (SDK v3.3, **extended in SDK v3.4 to L-9..L-11**) | Mechanically verifies **eleven** lifecycle invariants L-1..L-11 over a finished run (eight from v3.3 + L-9 / L-10 / L-11 covering the PROMPT / LLM_RESPONSE / coordinate-consistency chain). Returns OK / BAD / EMPTY plus typed counterexamples. | **Stable v1.1** (contract-tested: theorems W3-40 / W3-45) | `vision_mvp.wevra.lifecycle_audit` (re-exported) |
 | **Wevra console scripts** — `wevra`, `wevra-import`, `wevra-ci`, `wevra-capsule` | CLI surface | **Stable v3** (Slice 3: `wevra-capsule view / verify / cid`) | `[project.scripts]` |
 | **Provenance manifest** — `wevra.provenance.v1` | Reproducibility artifact | **Stable v1** | `vision_mvp.wevra.provenance` |
 | **Capsule view artifact** — `wevra.capsule_view.v1` | Sealed capsule graph on disk | **Stable v1** | `capsule_view.json` next to every report |

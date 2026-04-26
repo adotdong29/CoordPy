@@ -1,10 +1,11 @@
-"""Capsule-native lifecycle audit (SDK v3.3).
+"""Capsule-native lifecycle audit (SDK v3.3 + SDK v3.4).
 
 The capsule-native runtime (``CapsuleNativeRunContext``) seals one
 typed capsule per runtime stage and refuses to seal a stage whose
 parent CID is not yet in the ledger. The lifecycle correspondence
-theorems (W3-32, W3-32-extended, W3-39) state that a finished
-ledger satisfies a small set of structural invariants:
+theorems (W3-32, W3-32-extended, W3-39, W3-42, W3-43, W3-44) state
+that a finished ledger satisfies a small set of structural
+invariants:
 
   * **L-1** Every capsule sealed in the ledger has a non-None
     sealed_cid in the in-flight register, and every PROPOSED capsule
@@ -14,7 +15,8 @@ ledger satisfies a small set of structural invariants:
     SWEEP_SPEC capsule's CID. Optionally a PARSE_OUTCOME CID.
   * **L-3** Every TEST_VERDICT capsule has exactly one parent, and
     that parent is a sealed PATCH_PROPOSAL.
-  * **L-4** Every PARSE_OUTCOME capsule's parent is the SWEEP_SPEC.
+  * **L-4** Every PARSE_OUTCOME capsule's parent set starts with
+    the SWEEP_SPEC; optionally adds an LLM_RESPONSE (SDK v3.4).
   * **L-5** Every SWEEP_CELL capsule's parent is the SWEEP_SPEC.
   * **L-6** Every PATCH_PROPOSAL has a corresponding TEST_VERDICT
     (one-to-one on (instance_id, strategy, parser_mode, apply_mode,
@@ -23,18 +25,33 @@ ledger satisfies a small set of structural invariants:
     PARSE_OUTCOME has matching coordinates with that PARSE_OUTCOME.
   * **L-8** No TEST_VERDICT precedes its PATCH_PROPOSAL in the
     append order (chain monotonicity at the intra-cell level).
+  * **L-9 (SDK v3.4)** Every PROMPT capsule has parent set
+    exactly ``(SWEEP_SPEC,)`` (the LLM-prompt boundary lifecycle
+    gate, Theorem W3-42).
+  * **L-10 (SDK v3.4)** Every LLM_RESPONSE capsule has exactly
+    one parent, and that parent is a sealed PROMPT
+    (the prompt → response parent gate, Theorem W3-43).
+  * **L-11 (SDK v3.4)** Every PARSE_OUTCOME whose parent set
+    contains an LLM_RESPONSE has matching coordinates
+    (instance_id, parser_mode, apply_mode, n_distractors) with
+    that LLM_RESPONSE — strategy is allowed to differ since
+    multiple strategies can share an LLM call. Additionally, no
+    PARSE_OUTCOME chains a non-LLM_RESPONSE second parent (the
+    only legal extra parent is an LLM_RESPONSE; Theorem W3-44).
 
 This module exposes ``CapsuleLifecycleAudit`` which mechanically
-checks each of L-1..L-8 on a finished ``CapsuleNativeRunContext``
+checks each of L-1..L-11 on a finished ``CapsuleNativeRunContext``
 (or any ``CapsuleLedger``) and returns a ``LifecycleAuditReport``.
 
 Theorem W3-40 (Lifecycle-audit soundness, proved by
 inspection): if ``CapsuleLifecycleAudit.run().verdict == "OK"`` for
 a finished ``CapsuleNativeRunContext``, then the ledger satisfies
-L-1..L-8 by construction. The audit is a runtime checker; its
-soundness is not a proof of *correctness* of the underlying
-runtime — it is a check that the ledger as observed at audit time
-is consistent with the lifecycle correspondence theorems.
+L-1..L-8 by construction. SDK v3.4 strengthens this to L-1..L-11
+(Theorem W3-45 — extended audit soundness over the LLM byte
+boundary). The audit is a runtime checker; its soundness is not
+a proof of *correctness* of the underlying runtime — it is a
+check that the ledger as observed at audit time is consistent
+with the lifecycle correspondence theorems.
 
 Counterexamples are surfaced as ``violations`` — a list of
 ``{rule, capsule_cid, capsule_kind, detail}`` dicts. The first
@@ -125,6 +142,10 @@ class CapsuleLifecycleAudit:
         "L-6_patch_has_matching_parse_and_verdict",
         "L-7_patch_coordinates_match_parse_outcome",
         "L-8_chain_order_patch_before_verdict",
+        # SDK v3.4 — PROMPT / LLM_RESPONSE slice (W3-42 / W3-43 / W3-44).
+        "L-9_prompt_parent_is_sweep_spec",
+        "L-10_response_parent_is_sealed_prompt",
+        "L-11_parse_outcome_response_chain_consistent",
     )
 
     def __init__(self,
@@ -239,7 +260,18 @@ class CapsuleLifecycleAudit:
         return out
 
     def _check_l4(self) -> list[dict[str, Any]]:
+        # SDK v3.4: PARSE_OUTCOME parent set is either
+        # ``(SWEEP_SPEC,)`` (oracle / no LLM observation path) or
+        # ``(SWEEP_SPEC, LLM_RESPONSE)`` (LLM-backed path). The
+        # SWEEP_SPEC must be the first parent; the LLM_RESPONSE,
+        # if present, must be a sealed LLM_RESPONSE. Coordinate
+        # consistency between PARSE_OUTCOME and LLM_RESPONSE is
+        # checked by L-11.
         out: list[dict[str, Any]] = []
+        response_cids = {
+            c.cid for c in self.ledger.by_kind(
+                CapsuleKind.LLM_RESPONSE)
+        }
         for cap in self.ledger.by_kind(CapsuleKind.PARSE_OUTCOME):
             if self._spec_cid is None:
                 out.append({
@@ -250,15 +282,145 @@ class CapsuleLifecycleAudit:
                                 "PARSE_OUTCOME exists"),
                 })
                 continue
-            if cap.parents != (self._spec_cid,):
+            parents = tuple(cap.parents)
+            if not parents or parents[0] != self._spec_cid:
                 out.append({
                     "rule": "L-4_parse_outcome_parent_is_sweep_spec",
                     "capsule_cid": cap.cid,
                     "capsule_kind": cap.kind,
-                    "detail": (f"PARSE_OUTCOME parents must be exactly "
+                    "detail": (f"PARSE_OUTCOME first parent must be "
+                                f"SWEEP_SPEC, got "
+                                f"{[p[:8] for p in parents]}"),
+                })
+                continue
+            if len(parents) == 1:
+                # Single-parent shape — oracle / no-LLM path.
+                continue
+            if len(parents) == 2:
+                # Two-parent shape — LLM-backed path. The second
+                # parent must be a sealed LLM_RESPONSE.
+                if parents[1] not in response_cids:
+                    out.append({
+                        "rule": "L-4_parse_outcome_parent_is_sweep_spec",
+                        "capsule_cid": cap.cid,
+                        "capsule_kind": cap.kind,
+                        "detail": (f"PARSE_OUTCOME second parent "
+                                    f"{parents[1][:12]}… is not a "
+                                    f"sealed LLM_RESPONSE (W3-44 / "
+                                    f"L-11 chain consistency)"),
+                    })
+                continue
+            out.append({
+                "rule": "L-4_parse_outcome_parent_is_sweep_spec",
+                "capsule_cid": cap.cid,
+                "capsule_kind": cap.kind,
+                "detail": (f"PARSE_OUTCOME parent count is "
+                            f"{len(parents)}; legal counts are 1 "
+                            f"(oracle) or 2 (LLM-backed)"),
+            })
+        return out
+
+    # ------------------------------------------------------------
+    # SDK v3.4 — PROMPT / LLM_RESPONSE invariants
+    # ------------------------------------------------------------
+
+    def _check_l9(self) -> list[dict[str, Any]]:
+        """Every PROMPT capsule's parent set is exactly
+        ``(SWEEP_SPEC,)`` (Theorem W3-42 — LLM-prompt boundary
+        lifecycle gate)."""
+        out: list[dict[str, Any]] = []
+        for cap in self.ledger.by_kind(CapsuleKind.PROMPT):
+            if self._spec_cid is None:
+                out.append({
+                    "rule": "L-9_prompt_parent_is_sweep_spec",
+                    "capsule_cid": cap.cid,
+                    "capsule_kind": cap.kind,
+                    "detail": "no SWEEP_SPEC sealed but PROMPT exists",
+                })
+                continue
+            if cap.parents != (self._spec_cid,):
+                out.append({
+                    "rule": "L-9_prompt_parent_is_sweep_spec",
+                    "capsule_cid": cap.cid,
+                    "capsule_kind": cap.kind,
+                    "detail": (f"PROMPT parents must be exactly "
                                 f"(SWEEP_SPEC,), got "
                                 f"{[p[:8] for p in cap.parents]}"),
                 })
+        return out
+
+    def _check_l10(self) -> list[dict[str, Any]]:
+        """Every LLM_RESPONSE capsule has exactly one parent, and
+        that parent is a sealed PROMPT (Theorem W3-43 —
+        prompt → response parent gate)."""
+        out: list[dict[str, Any]] = []
+        prompt_cids = {
+            c.cid for c in self.ledger.by_kind(CapsuleKind.PROMPT)
+        }
+        for cap in self.ledger.by_kind(CapsuleKind.LLM_RESPONSE):
+            if len(cap.parents) != 1:
+                out.append({
+                    "rule": "L-10_response_parent_is_sealed_prompt",
+                    "capsule_cid": cap.cid,
+                    "capsule_kind": cap.kind,
+                    "detail": (f"LLM_RESPONSE has {len(cap.parents)} "
+                                f"parents, must be exactly 1"),
+                })
+                continue
+            parent = cap.parents[0]
+            if parent not in prompt_cids:
+                out.append({
+                    "rule": "L-10_response_parent_is_sealed_prompt",
+                    "capsule_cid": cap.cid,
+                    "capsule_kind": cap.kind,
+                    "detail": (f"LLM_RESPONSE parent {parent[:12]}… "
+                                f"is not a sealed PROMPT"),
+                })
+        return out
+
+    def _check_l11(self) -> list[dict[str, Any]]:
+        """Every PARSE_OUTCOME whose parent set contains an
+        LLM_RESPONSE has matching coordinates (instance_id,
+        parser_mode, apply_mode, n_distractors) with that
+        LLM_RESPONSE. Strategy is allowed to differ — multiple
+        strategies can share one LLM call (and therefore one
+        LLM_RESPONSE) when the prompt is identical (Theorem
+        W3-44)."""
+        out: list[dict[str, Any]] = []
+        response_by_cid = {
+            c.cid: c for c in self.ledger.by_kind(
+                CapsuleKind.LLM_RESPONSE)
+        }
+        # Coordinates checked between PARSE_OUTCOME and LLM_RESPONSE.
+        # ``strategy`` is intentionally NOT in the comparison —
+        # naive + routing strategies can share an LLM call (the
+        # raw_cache deduplicates on strategy_proxy), so the LLM_RESPONSE's
+        # ``strategy`` may be the proxy ``"naive_or_routing"``
+        # while the PARSE_OUTCOME's ``strategy`` is the concrete
+        # ``"naive"`` or ``"routing"``.
+        coord_keys = (
+            "instance_id", "parser_mode", "apply_mode", "n_distractors")
+        for cap in self.ledger.by_kind(CapsuleKind.PARSE_OUTCOME):
+            for parent_cid in cap.parents:
+                if parent_cid not in response_by_cid:
+                    continue
+                response = response_by_cid[parent_cid]
+                p_payload = cap.payload or {}
+                r_payload = response.payload or {}
+                for k in coord_keys:
+                    if p_payload.get(k) != r_payload.get(k):
+                        out.append({
+                            "rule": "L-11_parse_outcome_response_chain_consistent",
+                            "capsule_cid": cap.cid,
+                            "capsule_kind": cap.kind,
+                            "detail": (
+                                f"PARSE_OUTCOME / LLM_RESPONSE "
+                                f"coordinate mismatch on field "
+                                f"{k!r}: "
+                                f"parse={p_payload.get(k)!r} vs "
+                                f"response={r_payload.get(k)!r}"),
+                        })
+                        break
         return out
 
     def _check_l5(self) -> list[dict[str, Any]]:
@@ -384,6 +546,10 @@ class CapsuleLifecycleAudit:
         violations.extend(self._check_l6())
         violations.extend(self._check_l7())
         violations.extend(self._check_l8())
+        # SDK v3.4 — PROMPT / LLM_RESPONSE chain.
+        violations.extend(self._check_l9())
+        violations.extend(self._check_l10())
+        violations.extend(self._check_l11())
         violated_rules = {v["rule"] for v in violations}
         rules_checked = self.RULES
         rules_passed = tuple(

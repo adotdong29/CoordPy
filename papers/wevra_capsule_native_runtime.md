@@ -1,9 +1,13 @@
 # Capsule-Native Runtimes: Lifecycle-Bounded Execution as a Type Discipline for Multi-Agent LLM Systems
 
 > Working draft. Authors: the Context Zero programme.
-> Status as of SDK v3.3 (2026-04-26): submission-quality structure
-> with strict claim taxonomy. Extension of the SDK v3.1 / v3.2
-> milestone notes into a single paper-shaped argument.
+> Status as of SDK v3.4 (2026-04-26): submission-quality structure
+> with strict claim taxonomy. Extension of the SDK v3.1 / v3.2 /
+> v3.3 milestone notes into a single paper-shaped argument.
+> SDK v3.4 added the sub-sub-intra-cell **PROMPT / LLM_RESPONSE
+> slice** — capsule-native execution now extends to the LLM byte
+> boundary, the load-bearing inner-loop frontier identified in
+> the prior version's "Future work" section.
 
 ## Abstract
 
@@ -15,28 +19,47 @@ lifecycle-bounded, budget-bounded, provenance-stamped *capsule*,
 and the runtime drives execution by sealing capsules in a
 hash-chained ledger rather than by passing untyped state. We
 implement this discipline in **Wevra**, an open-source
-SWE-bench-Lite-shape evaluation runtime, and prove four classes of
+SWE-bench-Lite-shape evaluation runtime, and prove five classes of
 guarantees the discipline buys:
 
 1. **Lifecycle correspondence** between runtime stages and capsule
    states (Theorem W3-32; intra-cell extension W3-32-extended;
-   sub-intra-cell extension W3-39).
+   sub-intra-cell extension W3-39; **sub-sub-intra-cell extension
+   W3-42 / W3-43 / W3-44 to the LLM byte boundary**, SDK v3.4).
 2. **Content addressing at write time** for substantive artifacts
    (Theorem W3-33), with audit-time on-disk re-verification
-   (Theorem W3-38).
+   (Theorem W3-38). PROMPT / LLM_RESPONSE capsules extend
+   content-addressing inside the LLM call boundary (SDK v3.4).
 3. **A sharp impossibility theorem on meta-artifact authentication**
    inside the primary ledger (Theorem W3-36) and a constructive
    detached-witness corollary.
 4. **Deterministic-mode replay** that collapses the full capsule DAG
    across runs of the same logical input (Theorem W3-41), enabling
    cross-machine CI gates with byte-identical capsule CIDs.
+5. **Mechanically-checkable inner-loop chain.** A
+   ``CapsuleLifecycleAudit`` verifies eleven invariants L-1..L-11
+   on every finished run (Theorems W3-40 / W3-45). The end-to-end
+   inner-loop chain
+   ``PROMPT → LLM_RESPONSE → PARSE_OUTCOME → PATCH_PROPOSAL →
+   TEST_VERDICT`` is observable as a typed DAG with strong
+   parent-CID gating; coordinate consistency between
+   PARSE_OUTCOME and LLM_RESPONSE is mechanically verified
+   (rule L-11).
 
-We give a runtime-checkable lifecycle audit that mechanically
-verifies the lifecycle correspondence (Theorem W3-40) on every
-finished run. We separate strictly from the substrate-ML and
-decoder-frontier results elsewhere in the programme: the
-contributions of this paper are about the *runtime discipline*,
-not about model accuracy.
+We separate strictly from the substrate-ML and decoder-frontier
+results elsewhere in the programme: the contributions of this
+paper are about the *runtime discipline*, not about model
+accuracy. We do, however, anchor a small **parser-boundary
+empirical study** (W3-C6, SDK v3.4): conditional on a calibrated
+synthetic LLM-output distribution library, the parser's
+PARSE_OUTCOME failure-kind closed vocabulary distinguishes
+distributions with cross-distribution Total Variation Distance
+up to 1.000, and the strict→robust parser-mode choice shifts
+the failure footprint by up to 1.000 on
+``synthetic.unclosed``. The honest scope: this is **not** a
+real cross-LLM measurement; it is a calibrated synthetic
+distribution library that exercises the parser's failure-kind
+closed vocabulary's resolving power.
 
 ## 1. Problem statement
 
@@ -125,31 +148,51 @@ the capsule DAG. The PATCH_PROPOSAL's parent set now contains both
 the SWEEP_SPEC and the PARSE_OUTCOME; the parse → patch → verdict
 chain has a typed DAG witness.
 
-### 3.1 What is in flight vs out of flight (SDK v3.3)
+SDK v3.4 extended the discipline **one further structural layer**
+into the LLM byte boundary itself. Two new kinds — **PROMPT** and
+**LLM_RESPONSE** — wrap the LLM call. PROMPT carries
+*coordinates + prompt SHA-256 + byte length + bounded text
+snippet (≤ 4 KiB)*; its parent is SWEEP_SPEC. LLM_RESPONSE carries
+*coordinates + response SHA-256 + byte length + bounded snippet +
+elapsed milliseconds*; its parent is exactly the upstream PROMPT.
+The PARSE_OUTCOME's parent set is then either `(SWEEP_SPEC,)` (on
+the deterministic-oracle path, no LLM call) or
+`(SWEEP_SPEC, LLM_RESPONSE)` (on the LLM-backed path). The
+end-to-end inner-loop chain is therefore
+`PROMPT → LLM_RESPONSE → PARSE_OUTCOME → PATCH_PROPOSAL →
+TEST_VERDICT`, a **five-link typed DAG** rooted at the cell's
+SWEEP_SPEC. Theorems W3-42 / W3-43 / W3-44 / W3-45 are proved by
+inspection; lifecycle audit invariants L-9 / L-10 / L-11
+mechanically check the chain on every run.
 
-| Layer                     | Capsule kind            | Status              | Parent      |
-| ------------------------- | ----------------------- | ------------------- | ----------- |
-| Profile resolution        | PROFILE                 | capsule-native      | (root)      |
-| Readiness verdict         | READINESS_CHECK         | capsule-native      | PROFILE     |
-| Sweep configuration       | SWEEP_SPEC              | capsule-native      | PROFILE     |
-| Per-cell metrics          | SWEEP_CELL              | capsule-native      | SWEEP_SPEC  |
-| **Per-(task,strat) parse** | **PARSE_OUTCOME**       | **capsule-native**  | SWEEP_SPEC  |
-| **Per-(task,strat) patch** | **PATCH_PROPOSAL**      | **capsule-native**  | SWEEP_SPEC + PARSE_OUTCOME |
-| **Per-(task,strat) test**  | **TEST_VERDICT**        | **capsule-native**  | PATCH_PROPOSAL |
-| Provenance manifest       | PROVENANCE              | capsule-native      | PROFILE     |
-| Substantive artifacts     | ARTIFACT                | capsule-native + content-addressed at write time | various |
-| Run report                | RUN_REPORT              | capsule-native      | spine kinds |
-| Meta-artifact witness     | META_MANIFEST           | detached witness    | (secondary) |
-| LLM prompt bytes          | (none)                  | not capsule-native  | —           |
-| Raw LLM response bytes    | (none)                  | not capsule-native  | —           |
-| Sandbox stdout/stderr     | (none)                  | not capsule-native  | —           |
+### 3.1 What is in flight vs out of flight (SDK v3.4)
+
+| Layer                          | Capsule kind            | Status              | Parent      |
+| ------------------------------ | ----------------------- | ------------------- | ----------- |
+| Profile resolution             | PROFILE                 | capsule-native      | (root)      |
+| Readiness verdict              | READINESS_CHECK         | capsule-native      | PROFILE     |
+| Sweep configuration            | SWEEP_SPEC              | capsule-native      | PROFILE     |
+| Per-cell metrics               | SWEEP_CELL              | capsule-native      | SWEEP_SPEC  |
+| **Per-call LLM prompt bytes**  | **PROMPT**              | **capsule-native (SDK v3.4)** | SWEEP_SPEC  |
+| **Per-call LLM response bytes** | **LLM_RESPONSE**       | **capsule-native (SDK v3.4)** | PROMPT      |
+| **Per-(task,strat) parse**     | **PARSE_OUTCOME**       | **capsule-native**  | SWEEP_SPEC  (+ LLM_RESPONSE on LLM-backed path) |
+| **Per-(task,strat) patch**     | **PATCH_PROPOSAL**      | **capsule-native**  | SWEEP_SPEC + PARSE_OUTCOME |
+| **Per-(task,strat) test**      | **TEST_VERDICT**        | **capsule-native**  | PATCH_PROPOSAL |
+| Provenance manifest            | PROVENANCE              | capsule-native      | PROFILE     |
+| Substantive artifacts          | ARTIFACT                | capsule-native + content-addressed at write time | various |
+| Run report                     | RUN_REPORT              | capsule-native      | spine kinds |
+| Meta-artifact witness          | META_MANIFEST           | detached witness    | (secondary) |
+| Sandbox stdout/stderr          | (none)                  | not capsule-native  | —           |
+| Parser-internal regex/recovery state | (none)            | not capsule-native  | —           |
 
 **The honest scope claim** of this paper: capsule-native execution
 covers the *load-bearing* artifacts of a Wevra run — every artifact
 whose presence or absence is observable in the report or whose
-bytes are content-checkable. Volatile, large, or repeatedly
-generated bytes (LLM prompts, raw responses, sandbox stdout) remain
-plain Python.
+bytes are content-checkable. SDK v3.4 brings the LLM byte boundary
+inside this scope. Sandbox stdout/stderr and the parser's internal
+recovery-heuristic state remain plain Python — these are
+**volatile sub-step bytes** whose capsule wrapping is the natural
+SDK v3.5 candidate.
 
 ## 4. Theorems
 
@@ -189,6 +232,25 @@ We list the load-bearing theorems and their epistemic status.
   sealed SWEEP_SPEC is rejected; a PATCH_PROPOSAL declaring a
   non-sealed PARSE_OUTCOME parent is rejected (C5 carry-over).
   [proved by inspection + contract test]
+- **W3-42 (new in SDK v3.4)** — PROMPT lifecycle gate. Every
+  sealed PROMPT capsule has parent set exactly `(SWEEP_SPEC,)`;
+  a PROMPT outside a sealed SWEEP_SPEC is rejected. The capsule
+  payload carries the prompt's SHA-256, byte length, model
+  tag, prompt style, and a bounded text snippet (≤ 4 KiB).
+  Two byte-identical prompts collapse to one capsule (C1
+  idempotence). [proved by inspection + contract test]
+- **W3-43 (new in SDK v3.4)** — Prompt → response parent gate.
+  Every LLM_RESPONSE capsule has exactly one parent, and that
+  parent is a sealed PROMPT. An LLM_RESPONSE declaring a
+  non-sealed prompt CID is rejected (C5). [proved by inspection
+  + contract test]
+- **W3-44 (new in SDK v3.4)** — PARSE_OUTCOME → LLM_RESPONSE
+  chain coordinate consistency. When PARSE_OUTCOME's parent set
+  contains an LLM_RESPONSE, their `(instance_id, parser_mode,
+  apply_mode, n_distractors)` coordinate fields are equal. The
+  `strategy` field is permitted to differ (multiple strategies
+  share an LLM call when the prompt is identical). [proved by
+  inspection + lifecycle audit invariant L-11]
 
 ### 4.3 Verification
 
@@ -204,6 +266,10 @@ We list the load-bearing theorems and their epistemic status.
   the eight invariants L-1..L-8 over the finished ledger.
   Counterexamples surface as typed violations. [proved by
   inspection + contract test]
+- **W3-45 (new in SDK v3.4)** — Lifecycle-audit soundness
+  extends to L-1..L-11 (the SDK v3.3 set plus
+  L-9 / L-10 / L-11 added in v3.4). Same structural argument
+  as W3-40. [proved by inspection + mechanically-checked]
 - **W3-41 (new in SDK v3.3)** — Deterministic-mode CID
   determinism. Two runs of the same deterministic profile under
   `RunSpec(deterministic=True)` produce byte-identical capsule
@@ -245,17 +311,27 @@ We do not report a leaderboard. The capsule-native runtime is a
 the discipline empirically with:
 
 - **101 contract tests** (`vision_mvp/tests/test_wevra_*.py`,
-  `test_capsule_*.py`) on SDK v3.2; **+18 new tests** for SDK
-  v3.3 covering PARSE_OUTCOME, lifecycle audit, and deterministic
-  mode (147 + new = 165 capsule tests passing locally as of
-  2026-04-26).
+  `test_capsule_*.py`) on SDK v3.2; **+18 tests** for SDK v3.3
+  covering PARSE_OUTCOME, lifecycle audit, and deterministic
+  mode; **+16 tests** for SDK v3.4 covering PROMPT /
+  LLM_RESPONSE / synthetic mode / W3-C6 cross-model parser
+  boundary (181 capsule tests passing locally as of 2026-04-26).
 - **A bundled local_smoke profile** that produces a 154-capsule
-  graph on a default run: 1 PROFILE, 1 READINESS_CHECK, 1
-  SWEEP_SPEC, 2 SWEEP_CELL, 48 PARSE_OUTCOME, 48 PATCH_PROPOSAL,
-  48 TEST_VERDICT, 1 PROVENANCE, 3 ARTIFACT, 1 RUN_REPORT, 1
-  META_MANIFEST (in secondary ledger). Chain-head verification
-  passes; on-disk re-hash passes; lifecycle audit returns OK on
-  all 8 rules.
+  graph on a default mock-mode run: 1 PROFILE, 1
+  READINESS_CHECK, 1 SWEEP_SPEC, 2 SWEEP_CELL, 48 PARSE_OUTCOME,
+  48 PATCH_PROPOSAL, 48 TEST_VERDICT, 1 PROVENANCE, 3 ARTIFACT,
+  1 RUN_REPORT, 1 META_MANIFEST (in secondary ledger). Chain-head
+  verification passes; on-disk re-hash passes; lifecycle audit
+  returns OK on all 11 rules (SDK v3.4).
+- **Synthetic-mode end-to-end demonstration.** A 4-instance
+  synthetic run (``mode="synthetic", synthetic_model_tag=
+  "synthetic.unclosed"``) produces a chain
+  ``PROMPT → LLM_RESPONSE → PARSE_OUTCOME → PATCH_PROPOSAL →
+  TEST_VERDICT``. Under strict parser mode every PARSE_OUTCOME
+  has ``failure_kind=unclosed_new``; under robust every
+  PARSE_OUTCOME has ``failure_kind=ok, recovery=closed_at_eos``
+  — the strict→robust shift is observable as a coordinate-aligned
+  shift in the LLM_RESPONSE-keyed PARSE_OUTCOME multiset.
 - **Cross-run determinism** under `deterministic=True`: two
   independent runs collapse to identical chain head and root
   CID across every capsule kind.
@@ -310,13 +386,18 @@ goal is to make hostile-reviewer-grade audit cheap.
 | **W3-39** | **PARSE_OUTCOME lifecycle gate + parse → patch → verdict DAG chain**       | **proved**            |
 | **W3-40** | **Lifecycle-audit soundness on L-1..L-8**                                  | **proved + mechanically-checked** |
 | **W3-41** | **Deterministic-mode CID determinism on full DAG**                         | **proved + empirical (set-equality test across two runs)** |
+| **W3-42 (SDK v3.4)** | **PROMPT lifecycle gate (parent = SWEEP_SPEC; idempotent on content)**       | **proved**            |
+| **W3-43 (SDK v3.4)** | **Prompt → response parent gate**                                            | **proved**            |
+| **W3-44 (SDK v3.4)** | **PARSE_OUTCOME → LLM_RESPONSE chain coordinate consistency**                | **proved + mechanically-checked** |
+| **W3-45 (SDK v3.4)** | **Lifecycle-audit soundness extends to L-1..L-11**                           | **proved + mechanically-checked** |
 | W3-C1   | General subsumption — every Phase-N bounded-context theorem subsumes        | conjectural           |
-| W3-C5   | Relational-axis extension closes W3-16                                       | conjectural           |
+| W3-C5 (legacy) | Relational-axis extension closes W3-16                                       | conjectural           |
 | W3-C7 (strict) | Strict point-estimate Gate-1 + zero-shot Gate-2 paradigm-shift threshold | retracted (W3-26, W3-27) |
 | W3-C9   | Refined paradigm-shift reading: $n=80$ point-estimate + zero-shot gap       | conjectural (candidate) |
 | W3-C10  | Relational decoder level-ceiling                                                | conjectural           |
-| **W3-C4 (new)** | **PARSE_OUTCOME failure_kind distribution stable across LLM tags**     | **conjectural**       |
-| **W3-C5 (new)** | **Sub-intra-cell PROMPT/LLM_RESPONSE capsule slice closes the inner-loop boundary without breaking spine equivalence W3-34** | **conjectural** |
+| **W3-C4 (legacy SDK v3.3)** | **PARSE_OUTCOME failure_kind distribution stable across LLM tags** | **superseded by W3-C6** |
+| **W3-C5 (legacy SDK v3.3)** | **Sub-intra-cell PROMPT/LLM_RESPONSE capsule slice closes the inner-loop boundary without breaking spine equivalence W3-34** | **DISCHARGED in SDK v3.4 by W3-42 / W3-43 / W3-44 / W3-45** |
+| **W3-C6 (new SDK v3.4)** | **Synthetic-LLM cross-distribution PARSE_OUTCOME failure-kind TVD ≥ 0.5; strict→robust shift up to 1.000** | **empirical (synthetic distribution library; not a real cross-LLM measurement)** |
 
 ## 7. How not to overstate this
 
@@ -385,15 +466,34 @@ The contribution is sharper than the v3.1 framing because:
 
 ## 9. Future work
 
-- **Sub-intra-cell PROMPT / LLM_RESPONSE capsule slice.** Conjecture
-  W3-C5 names the next structural slice. The challenge is bytes
-  size — raw LLM responses can be MB-sized; admission budgets
-  would need a streaming / chunked model.
+- **Sub-intra-cell PROMPT / LLM_RESPONSE capsule slice (SDK
+  v3.4).** ✅ **DISCHARGED** by Theorems W3-42 / W3-43 / W3-44 /
+  W3-45. The bytes-size challenge was disposed of by recording
+  the prompt / response SHA-256 + byte length + a bounded
+  snippet (≤ 4 KiB), rather than the raw bytes. Two
+  byte-identical prompts collapse to one capsule (idempotent
+  on content) so cached LLM calls produce one capsule pair on
+  the DAG. The on-disk view always carries PROMPT /
+  LLM_RESPONSE payloads (additive to the prior
+  ``payload_kinds_always`` invariant).
+- **Sandbox stdout/stderr / parser-internal state slice (SDK
+  v3.5 candidate).** The remaining inner-loop bytes that are
+  still plain Python. Capsule-tracking the apply outcome could
+  produce a six-link chain
+  ``PROMPT → LLM_RESPONSE → PARSE_OUTCOME → PATCH_PROPOSAL →
+  APPLY_OUTCOME → TEST_VERDICT`` and would relax the strict
+  invariant that TEST_VERDICT has exactly one parent.
+- **Real cross-LLM W3-C6 study.** Replace the synthetic
+  distribution library with a sweep over real Ollama LLMs
+  (``gemma2:9b``, ``qwen2.5:7b``, ``llama3:8b``). Straightforward
+  to layer on by passing ``llm_client=LLMClient(...)`` to
+  ``_real_cells``. The current synthetic study is a
+  necessary, sharper, in-CI-runnable preliminary.
 - **Cryptographic signing on top of the META_MANIFEST.** Authenticity
   against an adversary is orthogonal but composable.
 - **Cross-run determinism on full DAG without flag.** Could be
   achievable by stripping wall-clock and host-local fields
-  unconditionally; the trade-off is loss of forensic forensic
+  unconditionally; the trade-off is loss of forensic
   context (when did the run happen?).
 
 ## 10. Code anchor
@@ -403,9 +503,14 @@ The contribution is sharper than the v3.1 framing because:
   `vision_mvp/wevra/runtime.py`,
   `vision_mvp/product/runner.py`
 - Lifecycle audit: `vision_mvp/wevra/lifecycle_audit.py`
-- Formal model: `docs/CAPSULE_FORMALISM.md`
+- Synthetic LLM (SDK v3.4): `vision_mvp/wevra/synthetic_llm.py`
+- Cross-model parser-boundary experiment (SDK v3.4):
+  `vision_mvp/experiments/parser_boundary_cross_model.py`
+- Formal model: `docs/CAPSULE_FORMALISM.md` (§ 4.J for SDK v3.4)
+- Milestone notes: `docs/RESULTS_WEVRA_INNER_LOOP.md` (SDK v3.4)
 - Tests: `vision_mvp/tests/test_wevra_capsule_native*.py`,
   `test_wevra_capsule_native_deeper.py`,
+  `test_wevra_capsule_native_inner_loop.py` (SDK v3.4),
   `test_capsule_properties.py`,
   `test_capsule_subsumption.py`
 - TLA+ spec: `vision_mvp/formal/CapsuleContract.tla`
@@ -413,6 +518,8 @@ The contribution is sharper than the v3.1 framing because:
 
 A reader who wants to falsify any claim in this paper can clone
 the repository, run `pip install -e .[docker]`, and execute
-`pytest vision_mvp/tests/test_wevra_*.py -v`. The 18 new SDK v3.3
-contract tests are in `test_wevra_capsule_native_deeper.py`; their
-failure modes are the falsifiers for W3-39, W3-40, and W3-41.
+`pytest vision_mvp/tests/test_wevra_*.py -v`. The 18 SDK v3.3
+contract tests are in `test_wevra_capsule_native_deeper.py`; the
+16 new SDK v3.4 tests are in `test_wevra_capsule_native_inner_loop.py`;
+their failure modes are the falsifiers for W3-39 / W3-40 / W3-41
+(v3.3) and W3-42 / W3-43 / W3-44 / W3-45 / W3-C6 (v3.4).

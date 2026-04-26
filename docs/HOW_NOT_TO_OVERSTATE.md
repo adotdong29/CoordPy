@@ -113,11 +113,14 @@ check `THEOREM_REGISTRY.md` first.
 
 > *"The Wevra runtime is fully capsule-native."*
 
-Forbidden until LLM prompts, raw LLM responses, and sandbox
-stdout/stderr are capsule-tracked. The honest current reading is
-"capsule-native at the run boundary, intra-cell pair, and parse
-outcome; not capsule-native at the prompt / response / sandbox
-stdio layer." This is W3-39's scope, not the totality.
+Forbidden until sandbox stdout/stderr, parser-internal regex /
+recovery state, and on-the-wire LLM streaming chunks are
+capsule-tracked. **SDK v3.4 narrows the gap**: PROMPT and
+LLM_RESPONSE bytes ARE now capsule-tracked (Theorems W3-42 /
+W3-43). The honest current reading is *"capsule-native at the
+run boundary, intra-cell pair, parse outcome, and the
+prompt/response boundary; not capsule-native at the sandbox
+stdio layer or the parser's internal recovery state."*
 
 ### Labelling the META_MANIFEST a "signature"
 
@@ -201,3 +204,11 @@ result" without its number.
   PARSE_OUTCOME / lifecycle-audit / deterministic-mode rules
   ("not fully capsule-native", "not a signature", "not fully
   reproducible without scope").
+- **2026-04-26 (SDK v3.4).** Sharpens "fully capsule-native" rule
+  — PROMPT / LLM_RESPONSE bytes ARE now capsule-tracked
+  (W3-42 / W3-43). Adds rule that synthetic-LLM cross-model
+  research (W3-C6) must be cited as *synthetic*, not as a
+  cross-LLM measurement. New forbidden phrase: "the parser
+  failure-kind distribution is stable across LLMs" — the
+  empirical claim only covers the calibrated synthetic
+  distribution library, not real cross-LLM behaviour.

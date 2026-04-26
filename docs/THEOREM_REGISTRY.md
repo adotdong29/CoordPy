@@ -4,7 +4,7 @@
 > theorem-style claim in the Context Zero / Wevra programme.
 > If this file disagrees with any other doc on the *status* of a
 > claim, this file is right and the other file is stale. Last
-> touched: SDK v3.3, 2026-04-26.
+> touched: SDK v3.4, 2026-04-26.
 >
 > Status vocabulary (definitions in `docs/HOW_NOT_TO_OVERSTATE.md`):
 >
@@ -65,6 +65,10 @@
 | **W3-39 (SDK v3.3)**   | **PARSE_OUTCOME lifecycle gate + parse → patch → verdict DAG chain**          | **proved**                        | `test_wevra_capsule_native_deeper.py::ParseOutcomeLifecycleTests`               |
 | **W3-40 (SDK v3.3)**   | **Lifecycle-audit soundness on L-1..L-8**                                     | **proved + mechanically-checked** | `lifecycle_audit.py`; `LifecycleAuditTests`                                     |
 | **W3-41 (SDK v3.3)**   | **Deterministic-mode CID determinism on full DAG**                            | **proved + empirical**            | `DeterministicModeTests::test_w3_41_two_runs_collapse_to_identical_cids`        |
+| **W3-42 (SDK v3.4)**   | **PROMPT lifecycle gate (parent = SWEEP_SPEC; idempotent on content)**         | **proved**                        | `test_wevra_capsule_native_inner_loop.py::PromptCapsuleLifecycleTests`         |
+| **W3-43 (SDK v3.4)**   | **Prompt → response parent gate (LLM_RESPONSE has 1 parent = sealed PROMPT)**  | **proved**                        | `test_wevra_capsule_native_inner_loop.py::LLMResponseCapsuleLifecycleTests`     |
+| **W3-44 (SDK v3.4)**   | **PARSE_OUTCOME → LLM_RESPONSE chain coordinate consistency**                  | **proved + mechanically-checked** | `lifecycle_audit.py::_check_l11`; `LifecycleAuditExtendedTests`                |
+| **W3-45 (SDK v3.4)**   | **Lifecycle-audit soundness extends to L-1..L-11**                             | **proved + mechanically-checked** | `lifecycle_audit.py`; `LifecycleAuditExtendedTests::test_full_chain_audit_is_ok` |
 
 ## Conjectures (W3-C*)
 
@@ -74,9 +78,10 @@
 | W3-C2   | Capsule contract preserves all Phase-N substrate guarantees              | conjectural                                  |
 | W3-C3   | Honest-falsification frontier (table-level invariants)                   | retracted by W3-15 cohort lift               |
 | W3-C4 (legacy) | Earlier "decoder paradigm shift candidate at 0.400 / strict zero-shot" | **retracted** by W3-26 / W3-27       |
-| **W3-C4 (new SDK v3.3)** | **PARSE_OUTCOME failure_kind distribution stable across LLM tags** | **conjectural**                  |
+| **W3-C4 (new SDK v3.3)** | **PARSE_OUTCOME failure_kind distribution stable across LLM tags** | **superseded by W3-C6 (sharper synthetic reading)** |
 | W3-C5 (legacy) | Relational-axis extension closes W3-16                              | conjectural                                  |
-| **W3-C5 (new SDK v3.3)** | **Sub-intra-cell PROMPT/LLM_RESPONSE capsule slice closes the inner-loop boundary without breaking W3-34 spine equivalence** | **conjectural** |
+| **W3-C5 (new SDK v3.3)** | **Sub-intra-cell PROMPT/LLM_RESPONSE capsule slice closes the inner-loop boundary without breaking W3-34 spine equivalence** | **DISCHARGED by W3-42/W3-43/W3-44/W3-45 in SDK v3.4** |
+| **W3-C6 (new SDK v3.4)** | **Synthetic-LLM cross-distribution PARSE_OUTCOME failure-kind TVD ≥ 0.5; strict→robust parser-mode shift on synthetic.unclosed = 1.000** | **empirical (reproducible from synthetic distribution library)** |
 | W3-C6   | Plurality + auxiliary signal closes 0.200 priority-decoder ceiling       | partial — replaced by learned-decoder W3-19  |
 | W3-C7 (strict) | Strict point-estimate Gate-1 ($\hat p \ge 0.400$) + zero-shot Gate-2 strict penalty ≤ 5pp | **retracted** by W3-26, W3-27   |
 | W3-C8   | (deferred — relational decoder closes Gate 2 strictly)                   | conjectural                                  |

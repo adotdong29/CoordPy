@@ -5,6 +5,89 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [SDK v3.4] — 2026-04-26 — sub-sub-intra-cell PROMPT / LLM_RESPONSE slice + synthetic mode + cross-model parser-boundary research
+
+*Strictly additive on SDK v3.3. Every v3.3 contract test (18) still
+passes byte-for-byte; capsule view schema name unchanged
+(`wevra.capsule_view.v1` — PROMPT / LLM_RESPONSE payloads are
+additive). Full Wevra + capsule test suite green (199 tests).*
+
+### Added
+- **PROMPT capsule kind** (parent: SWEEP_SPEC; Theorem W3-42).
+  Records prompt SHA-256 + byte length + bounded text snippet
+  (≤ 4 KiB) + model_tag + prompt_style + coordinates.
+  Idempotent on content (Capsule Contract C1) — byte-identical
+  prompts collapse to one capsule.
+- **LLM_RESPONSE capsule kind** (parent: PROMPT; Theorem W3-43).
+  Records response SHA-256 + byte length + bounded snippet +
+  elapsed milliseconds + coordinates. Admission rejects if
+  prompt CID is not yet sealed (Capsule Contract C5).
+- **`CapsuleNativeRunContext.seal_prompt`** /
+  **`seal_llm_response`** runtime methods, plus
+  **`seal_parse_outcome(llm_response_cid=...)`** optional
+  argument. The end-to-end inner-loop chain is now five typed
+  capsules: `PROMPT → LLM_RESPONSE → PARSE_OUTCOME →
+  PATCH_PROPOSAL → TEST_VERDICT`.
+- **`capsule_from_prompt`**, **`capsule_from_llm_response`**
+  adapters; `PROMPT_TEXT_CAP` / `LLM_RESPONSE_TEXT_CAP` constants.
+- **Lifecycle audit invariants L-9 / L-10 / L-11** (Theorems
+  W3-44 / W3-45):
+  - L-9: PROMPT.parents == (SWEEP_SPEC,).
+  - L-10: LLM_RESPONSE has exactly one parent, a sealed PROMPT.
+  - L-11: PARSE_OUTCOME / LLM_RESPONSE coordinate consistency
+    (instance_id / parser_mode / apply_mode / n_distractors;
+    strategy may differ).
+- **Synthetic-LLM mode**: `SweepSpec(mode="synthetic",
+  synthetic_model_tag=<tag>)`. Uses a deterministic in-process
+  `SyntheticLLMClient` instead of an Ollama endpoint. Seven
+  calibrated distributions ship in
+  `vision_mvp.wevra.synthetic_llm.SYNTHETIC_MODEL_PROFILES`:
+  `clean`, `unclosed`, `prose`, `empty`, `fenced`,
+  `multi_block`, `mixed`. The full PROMPT / LLM_RESPONSE /
+  PARSE_OUTCOME / PATCH_PROPOSAL / TEST_VERDICT chain seals
+  end-to-end without network access.
+- **Cross-model parser-boundary experiment** (Conjecture W3-C6,
+  empirical):
+  `vision_mvp.experiments.parser_boundary_cross_model`. Sweeps
+  `(model_tag, parser_mode)` across the synthetic distribution
+  library; reports cross-distribution PARSE_OUTCOME failure-kind
+  TVD up to 1.000 and parser-mode (strict→robust) shift up to
+  1.000 on `synthetic.unclosed`. Reproducible from CLI:
+  `python3 -m vision_mvp.experiments.parser_boundary_cross_model`.
+- **16 new contract tests** in
+  `vision_mvp/tests/test_wevra_capsule_native_inner_loop.py`
+  covering W3-42 / W3-43 / W3-44 / W3-45 / W3-C6.
+
+### Changed
+- **`SDK_VERSION`** bumped to `wevra.sdk.v3.4`.
+- **`CapsuleKind.ALL`** now includes `PROMPT` and `LLM_RESPONSE`.
+- **`render_view.payload_kinds_always`** extended to include
+  PROMPT and LLM_RESPONSE (so on-disk audits can navigate the
+  full inner-loop chain from `capsule_view.json` alone).
+- **`CapsuleLifecycleAudit.RULES`** extended from 8 rules to 11.
+- **W3-13** (DAG height ≤ 4 on canonical run pattern) is updated
+  to ≤ 5 on canonical SDK v3.4 runs (the inner-loop chain adds
+  one structural layer). Documented in
+  `docs/CAPSULE_FORMALISM.md` § 4.J.
+- **Conjecture W3-C5 (legacy SDK v3.3)** is **DISCHARGED** by
+  Theorems W3-42 / W3-43 / W3-44 / W3-45.
+- **Conjecture W3-C4 (legacy SDK v3.3)** is **superseded** by the
+  sharper synthetic reading W3-C6.
+
+### Documentation
+- New milestone note: **`docs/RESULTS_WEVRA_INNER_LOOP.md`**.
+- `docs/CAPSULE_FORMALISM.md` § 4.J added (W3-42 / W3-43 / W3-44 /
+  W3-45 / W3-C6 + W3-C5-discharged).
+- `docs/THEOREM_REGISTRY.md`, `docs/RESEARCH_STATUS.md`,
+  `docs/HOW_NOT_TO_OVERSTATE.md` updated for SDK v3.4.
+- `docs/START_HERE.md` adds "What changed in SDK v3.4" section.
+- `docs/context_zero_master_plan.md` § 4.21 added.
+- `papers/wevra_capsule_native_runtime.md` strengthened —
+  capsule-native execution is now its real centre, with strict
+  claim taxonomy covering PROMPT / LLM_RESPONSE chain and the
+  W3-C6 empirical anchor.
+- README headline + stability matrix updated.
+
 ## [0.5.1] — 2026-04-22 — Wevra identity & clarity pass
 
 *Documentation / exemplar milestone. No SDK-contract change; all 1349

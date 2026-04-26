@@ -240,19 +240,61 @@ class CapsuleKind:
     label (one of ``swe_patch_parser.ALL_RECOVERY_LABELS``),
     ``substitutions_count`` (integer, no patch bytes), and a
     bounded ``detail`` string (≤200 chars). Parent: the
-    SWEEP_SPEC capsule. The downstream PATCH_PROPOSAL capsule
-    optionally records this CID as one of its parents (in
+    SWEEP_SPEC capsule (and optionally the upstream LLM_RESPONSE
+    capsule's CID under SDK v3.4). The downstream PATCH_PROPOSAL
+    capsule optionally records this CID as one of its parents (in
     addition to SWEEP_SPEC), so the parse → patch → verdict
     chain is observable on the capsule DAG. Theorem W3-39
     (``docs/CAPSULE_FORMALISM.md`` § 4.I) — the parser-axis
     transition is now lifecycle-governed. SDK v3.3 addition."""
+
+    PROMPT = "PROMPT"
+    """A sub-sub-intra-cell capsule (SDK v3.4) naming the
+    LLM-prompt-construction transition that previously passed as
+    a plain Python string built by ``build_patch_generator_prompt``
+    inside ``_real_cells._gen``. Payload carries the
+    (instance_id, strategy, parser_mode, apply_mode, n_distractors,
+    model_tag, prompt_style) coordinates plus the prompt's
+    SHA-256 (``prompt_sha256``), byte length (``prompt_bytes``),
+    and an OPTIONAL bounded ``prompt_text`` (≤4096 chars; omitted
+    when the prompt would exceed budget). Parent: the SWEEP_SPEC
+    capsule. The capsule does NOT carry the full prompt by
+    default — the SHA-256 is the identity claim; the bounded
+    text is recorded only when the prompt fits the byte budget.
+    Two strategies that elicit a byte-identical prompt collapse
+    to one PROMPT capsule (idempotent on CID — Capsule Contract
+    C1). Theorem W3-42 (``docs/CAPSULE_FORMALISM.md`` § 4.J) —
+    the LLM-prompt boundary is now lifecycle-governed. The
+    accompanying LLM_RESPONSE capsule parents on this PROMPT,
+    and the downstream PARSE_OUTCOME capsule may reference the
+    LLM_RESPONSE's CID, giving prompt → response → parse →
+    patch → verdict a typed witness on the DAG. SDK v3.4
+    addition."""
+
+    LLM_RESPONSE = "LLM_RESPONSE"
+    """A sub-sub-intra-cell capsule (SDK v3.4) naming the
+    LLM-response-capture transition that previously passed as a
+    plain Python string returned by ``LLMClient.generate``.
+    Payload carries the (instance_id, strategy, parser_mode,
+    apply_mode, n_distractors, model_tag) coordinates plus the
+    response's SHA-256 (``response_sha256``), byte length
+    (``response_bytes``), an OPTIONAL bounded ``response_text``
+    (≤4096 chars; omitted when over budget), and an optional
+    ``elapsed_ms`` latency annotation. Parent: the upstream
+    PROMPT capsule's CID — exactly one parent. The PARSE_OUTCOME
+    capsule sealed for this LLM call may add the LLM_RESPONSE's
+    CID as a second parent (in addition to SWEEP_SPEC) so the
+    parser's verdict is content-addressed against the *response
+    bytes that were parsed*. Theorem W3-43
+    (``docs/CAPSULE_FORMALISM.md`` § 4.J) — parent-CID gating
+    extends to the LLM byte boundary. SDK v3.4 addition."""
 
     ALL = frozenset({
         HANDOFF, HANDLE, THREAD_RESOLUTION, ADAPTIVE_EDGE,
         SWEEP_CELL, SWEEP_SPEC, READINESS_CHECK, PROVENANCE,
         RUN_REPORT, PROFILE, ARTIFACT, COHORT,
         PATCH_PROPOSAL, TEST_VERDICT, META_MANIFEST,
-        PARSE_OUTCOME,
+        PARSE_OUTCOME, PROMPT, LLM_RESPONSE,
     })
 
 
@@ -411,6 +453,18 @@ def _default_budget_for(kind: str) -> CapsuleBudget:
         # recovery label + bounded detail). Parent is exactly the
         # SWEEP_SPEC; patch proposals may parent on this capsule too.
         return CapsuleBudget(max_bytes=1 << 13, max_parents=4)
+    if kind == CapsuleKind.PROMPT:
+        # Sub-sub-intra-cell: payload is coordinates + prompt SHA +
+        # byte length + bounded text snippet (≤4096 chars). Capped
+        # generously at 16 KiB so a long bounded snippet still fits.
+        # Parent is exactly the SWEEP_SPEC; one parent CID.
+        return CapsuleBudget(max_bytes=1 << 14, max_parents=4)
+    if kind == CapsuleKind.LLM_RESPONSE:
+        # Sub-sub-intra-cell: payload is coordinates + response SHA +
+        # byte length + bounded text snippet (≤4096 chars) +
+        # elapsed_ms. Same budget shape as PROMPT. Parent is exactly
+        # the upstream PROMPT capsule's CID.
+        return CapsuleBudget(max_bytes=1 << 14, max_parents=4)
     raise ValueError(f"no default budget for kind {kind!r}")
 
 
@@ -877,6 +931,7 @@ def render_view(ledger: CapsuleLedger,
         CapsuleKind.ARTIFACT, CapsuleKind.META_MANIFEST,
         CapsuleKind.PATCH_PROPOSAL, CapsuleKind.TEST_VERDICT,
         CapsuleKind.PARSE_OUTCOME,
+        CapsuleKind.PROMPT, CapsuleKind.LLM_RESPONSE,
     )
     for cap in ledger.all_capsules():
         if include_payload or cap.kind in payload_kinds_always:
@@ -1475,6 +1530,189 @@ def capsule_from_parse_outcome(*,
     )
 
 
+PROMPT_TEXT_CAP = 4096
+"""Maximum number of characters of the LLM prompt's bounded
+``prompt_text`` field that a PROMPT capsule's payload will carry.
+Beyond this cap the field is omitted (set to ``None``); the
+capsule's ``prompt_sha256`` continues to identify the bytes
+content-addressably. The cap is generous (4 KiB) but small
+enough that the default budget admits the capsule even when the
+text is included verbatim."""
+
+LLM_RESPONSE_TEXT_CAP = 4096
+"""Maximum number of characters of the LLM response's bounded
+``response_text`` field that an LLM_RESPONSE capsule's payload
+will carry. Same semantics as ``PROMPT_TEXT_CAP``."""
+
+
+def _sha256_of_str(text: str) -> str:
+    """Canonical SHA-256 over a UTF-8 string. Used by PROMPT and
+    LLM_RESPONSE adapters so two identical bytes (per the prompt
+    or response payload) collapse to the same content address."""
+    return hashlib.sha256((text or "").encode("utf-8")).hexdigest()
+
+
+def capsule_from_prompt(*,
+                          instance_id: str,
+                          strategy: str,
+                          parser_mode: str,
+                          apply_mode: str,
+                          n_distractors: int,
+                          model_tag: str,
+                          prompt_style: str,
+                          prompt_text: str,
+                          parents: Iterable[str] = (),
+                          include_text: bool | None = None,
+                          ) -> ContextCapsule:
+    """Build a ``PROMPT`` capsule from a constructed LLM prompt.
+
+    Payload is *coordinates + content hash + bounded snippet*. The
+    capsule's payload carries:
+
+      * ``instance_id`` / ``strategy`` / ``parser_mode`` /
+        ``apply_mode`` / ``n_distractors`` — the cell + task
+        coordinates so a downstream consumer can recover which
+        cell this prompt belongs to without an extra index.
+      * ``model_tag`` — short string identifier of the LLM that
+        was about to be queried (e.g. ``"qwen2.5:0.5b"`` /
+        ``"gemma2:9b"`` / ``"synthetic.unclosed"``). The tag is
+        a property of the call, not of the prompt bytes.
+      * ``prompt_style`` — ``"block"`` or ``"unified_diff"``
+        (the prompt-shape contract under which the LLM was queried).
+      * ``prompt_sha256`` — canonical SHA-256 over the prompt's
+        UTF-8 bytes. The capsule's identity is therefore content-
+        addressed by the prompt bytes (modulo coordinates).
+      * ``prompt_bytes`` — integer length of the UTF-8 prompt.
+      * ``prompt_text`` — *optional* bounded snippet of the prompt
+        (≤``PROMPT_TEXT_CAP`` characters). Included by default
+        when ``len(prompt_text) <= PROMPT_TEXT_CAP``; omitted (set
+        to ``None``) otherwise. Callers may override via
+        ``include_text=False`` to always omit; ``include_text=True``
+        to include even past the cap (with truncation).
+
+    The capsule's *own* CID is a hash over kind+payload+budget+
+    parents (Contract C1); not the same as ``prompt_sha256``.
+
+    The parent is typically the SWEEP_SPEC capsule's CID. The
+    downstream LLM_RESPONSE capsule parents on this PROMPT's CID,
+    and the PARSE_OUTCOME capsule may reference the LLM_RESPONSE
+    CID as a second parent, giving prompt → response → parse →
+    patch → verdict a typed DAG witness.
+
+    Theorem W3-42 (``docs/CAPSULE_FORMALISM.md`` § 4.J): the
+    LLM-prompt boundary is now lifecycle-governed. SDK v3.4.
+    """
+    text = prompt_text or ""
+    sha = _sha256_of_str(text)
+    n_bytes = len(text.encode("utf-8"))
+    if include_text is None:
+        snippet: str | None = (text if n_bytes <= PROMPT_TEXT_CAP
+                                else None)
+    elif include_text:
+        snippet = text[:PROMPT_TEXT_CAP]
+    else:
+        snippet = None
+    payload: dict[str, Any] = {
+        "instance_id": instance_id,
+        "strategy": strategy,
+        "parser_mode": parser_mode,
+        "apply_mode": apply_mode,
+        "n_distractors": int(n_distractors),
+        "model_tag": str(model_tag),
+        "prompt_style": str(prompt_style),
+        "prompt_sha256": sha,
+        "prompt_bytes": int(n_bytes),
+        "prompt_text": snippet,
+    }
+    return ContextCapsule.new(
+        kind=CapsuleKind.PROMPT,
+        payload=payload,
+        parents=parents,
+        metadata={
+            "instance_id": instance_id,
+            "strategy": strategy,
+            "model_tag": str(model_tag),
+            "prompt_sha256": sha,
+            "prompt_bytes": int(n_bytes),
+        },
+    )
+
+
+def capsule_from_llm_response(*,
+                                  instance_id: str,
+                                  strategy: str,
+                                  parser_mode: str,
+                                  apply_mode: str,
+                                  n_distractors: int,
+                                  model_tag: str,
+                                  response_text: str,
+                                  elapsed_ms: int | None = None,
+                                  parents: Iterable[str] = (),
+                                  include_text: bool | None = None,
+                                  ) -> ContextCapsule:
+    """Build an ``LLM_RESPONSE`` capsule from one LLM call's
+    output text.
+
+    Payload is *coordinates + response hash + bounded snippet +
+    optional latency*:
+
+      * ``instance_id`` / ``strategy`` / ``parser_mode`` /
+        ``apply_mode`` / ``n_distractors`` — cell + task
+        coordinates.
+      * ``model_tag`` — same model tag as the upstream PROMPT.
+      * ``response_sha256`` — canonical SHA-256 over the response's
+        UTF-8 bytes. Two responses with byte-identical content
+        collapse to the same SHA (and, when coordinates also
+        match, to the same capsule CID).
+      * ``response_bytes`` — integer length of the UTF-8 response.
+      * ``response_text`` — *optional* bounded snippet of the
+        response (≤``LLM_RESPONSE_TEXT_CAP`` characters). Same
+        inclusion rule as PROMPT.
+      * ``elapsed_ms`` — optional integer wall-clock observation
+        of the LLM call. Stripped under deterministic-mode
+        canonicalisation.
+
+    The expected parent is the upstream PROMPT capsule's CID;
+    admission fails (Contract C5) if the parent CID is not yet
+    in the ledger. The PROMPT → LLM_RESPONSE ordering is enforced
+    at the parent-CID gate (Theorem W3-43).
+    """
+    text = response_text or ""
+    sha = _sha256_of_str(text)
+    n_bytes = len(text.encode("utf-8"))
+    if include_text is None:
+        snippet: str | None = (text if n_bytes <= LLM_RESPONSE_TEXT_CAP
+                                else None)
+    elif include_text:
+        snippet = text[:LLM_RESPONSE_TEXT_CAP]
+    else:
+        snippet = None
+    payload: dict[str, Any] = {
+        "instance_id": instance_id,
+        "strategy": strategy,
+        "parser_mode": parser_mode,
+        "apply_mode": apply_mode,
+        "n_distractors": int(n_distractors),
+        "model_tag": str(model_tag),
+        "response_sha256": sha,
+        "response_bytes": int(n_bytes),
+        "response_text": snippet,
+        "elapsed_ms": (None if elapsed_ms is None else int(elapsed_ms)),
+    }
+    return ContextCapsule.new(
+        kind=CapsuleKind.LLM_RESPONSE,
+        payload=payload,
+        parents=parents,
+        metadata={
+            "instance_id": instance_id,
+            "strategy": strategy,
+            "model_tag": str(model_tag),
+            "response_sha256": sha,
+            "response_bytes": int(n_bytes),
+        },
+    )
+
+
 def capsule_from_meta_manifest(*,
                                   root_cid: str,
                                   chain_head: str,
@@ -1665,4 +1903,7 @@ __all__ = [
     "capsule_from_meta_manifest",
     # SDK v3.3 — sub-intra-cell parse outcome (parser-axis lifecycle).
     "capsule_from_parse_outcome", "PARSE_OUTCOME_ORACLE",
+    # SDK v3.4 — sub-sub-intra-cell prompt + llm response capsules.
+    "capsule_from_prompt", "capsule_from_llm_response",
+    "PROMPT_TEXT_CAP", "LLM_RESPONSE_TEXT_CAP",
 ]

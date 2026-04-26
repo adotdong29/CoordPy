@@ -81,12 +81,26 @@ class SweepSpec:
     max_tokens: int = 400
     acknowledge_heavy: bool = False
     enable_raw_capture: bool = False
+    # SDK v3.4 — synthetic mode uses the same LLM-backed code path
+    # as real mode (and therefore exercises the PROMPT /
+    # LLM_RESPONSE capsule slice), but the LLM client is a
+    # deterministic in-process substitute (see
+    # ``vision_mvp.wevra.synthetic_llm.SyntheticLLMClient``).
+    # ``synthetic_model_tag`` selects one of the canned
+    # distributions in ``SYNTHETIC_MODEL_PROFILES``. No network is
+    # required; ``acknowledge_heavy`` is unused.
+    synthetic_model_tag: str | None = None
 
     def __post_init__(self) -> None:
-        if self.mode not in ("mock", "real"):
-            raise ValueError(f"mode must be mock|real, got {self.mode!r}")
+        if self.mode not in ("mock", "real", "synthetic"):
+            raise ValueError(
+                f"mode must be mock|real|synthetic, got {self.mode!r}")
         if self.mode == "real" and not self.model:
             raise ValueError("real mode requires model=<tag>")
+        if self.mode == "synthetic" and not self.synthetic_model_tag:
+            raise ValueError(
+                "synthetic mode requires synthetic_model_tag=<tag> "
+                "(see vision_mvp.wevra.synthetic_llm.SYNTHETIC_MODEL_PROFILES)")
 
 
 def _load_bank(spec: SweepSpec, n_distractors: int):
@@ -159,6 +173,7 @@ def _make_intra_cell_hooks(ctx: "Any",
                               parser_mode: str,
                               apply_mode: str,
                               n_distractors: int,
+                              llm_io_state: "dict[Any, Any] | None" = None,
                               ):
     """Build the (on_patch_proposed, on_test_completed) hook pair
     that routes intra-cell transitions into capsule lifecycle
@@ -181,6 +196,18 @@ def _make_intra_cell_hooks(ctx: "Any",
     PATCH_PROPOSAL is then parented on both SWEEP_SPEC and the
     PARSE_OUTCOME, giving the parse → patch → verdict chain a
     typed DAG witness.
+
+    SDK v3.4 (``llm_io_state`` parameter): when the caller is the
+    LLM-backed ``_real_cells`` path, it threads a per-cell mapping
+    ``(task.instance_id, strategy_proxy) -> llm_response_cid``
+    that ``_gen`` populates after sealing the PROMPT and
+    LLM_RESPONSE capsules. The ``on_patch`` hook reads the
+    mapping and, when an LLM_RESPONSE CID is available, parents
+    the PARSE_OUTCOME on it (in addition to SWEEP_SPEC). This
+    closes the prompt → response → parse → patch → verdict
+    chain on the DAG. When ``llm_io_state`` is ``None`` (the
+    mock-oracle path) the PARSE_OUTCOME is sealed as before, with
+    parents = (SWEEP_SPEC,) only.
     """
     if ctx is None:
         return None, None
@@ -191,6 +218,20 @@ def _make_intra_cell_hooks(ctx: "Any",
             _parse_outcome_from_rationale(
                 proposed.rationale or "",
                 n_substitutions=n_subs))
+        # SDK v3.4: thread the LLM_RESPONSE CID into the
+        # PARSE_OUTCOME capsule when one is available. The
+        # strategy_proxy used to key llm_io_state is "substrate"
+        # vs "naive_or_routing" because naive + routing share an
+        # LLM call (raw_cache deduplicates by strategy_proxy).
+        # The audit invariants (L-11) accept either parent shape
+        # — single-parent (oracle / no LLM observation) or
+        # two-parent (LLM-backed with response chain).
+        llm_response_cid = None
+        if llm_io_state is not None:
+            strat_proxy = ("substrate" if strat == "substrate"
+                            else "naive_or_routing")
+            llm_response_cid = llm_io_state.get(
+                (task.instance_id, strat_proxy))
         parse_cap = ctx.seal_parse_outcome(
             instance_id=task.instance_id,
             strategy=strat,
@@ -202,6 +243,7 @@ def _make_intra_cell_hooks(ctx: "Any",
             recovery=recovery,
             substitutions_count=n_subs,
             detail=detail,
+            llm_response_cid=llm_response_cid,
         )
         cap = ctx.seal_patch_proposal(
             instance_id=task.instance_id,
@@ -235,6 +277,59 @@ def _make_intra_cell_hooks(ctx: "Any",
         )
 
     return on_patch, on_verdict
+
+
+def _seal_prompt_response_pair(ctx: "Any",
+                                  *,
+                                  task,
+                                  strategy_proxy: str,
+                                  parser_mode: str,
+                                  apply_mode: str,
+                                  n_distractors: int,
+                                  model_tag: str,
+                                  prompt_style: str,
+                                  prompt_text: str,
+                                  response_text: str,
+                                  elapsed_ms: int | None,
+                                  ) -> str | None:
+    """Seal a PROMPT capsule + an LLM_RESPONSE capsule for one LLM
+    call and return the LLM_RESPONSE CID.
+
+    Returns ``None`` when ``ctx`` is None or the spec is not yet
+    sealed (defensive — the runtime always seals SWEEP_SPEC
+    before any cell runs). The two capsules are sealed in
+    succession; the LLM_RESPONSE's parent is the PROMPT's CID.
+
+    Idempotent on content (Capsule Contract C1): two calls with
+    byte-identical prompt + response collapse to the same pair of
+    CIDs. The runtime relies on this to deduplicate the
+    naive + routing strategies' shared LLM call (they hit the
+    raw_cache; the prompt and response bytes are identical).
+    """
+    if ctx is None or ctx.spec_cap is None:
+        return None
+    prompt_cap = ctx.seal_prompt(
+        instance_id=task.instance_id,
+        strategy=strategy_proxy,
+        parser_mode=parser_mode,
+        apply_mode=apply_mode,
+        n_distractors=int(n_distractors),
+        model_tag=str(model_tag),
+        prompt_style=prompt_style,
+        prompt_text=prompt_text,
+    )
+    response_cap = ctx.seal_llm_response(
+        instance_id=task.instance_id,
+        strategy=strategy_proxy,
+        parser_mode=parser_mode,
+        apply_mode=apply_mode,
+        n_distractors=int(n_distractors),
+        model_tag=str(model_tag),
+        response_text=response_text,
+        prompt_cid=prompt_cap.cid,
+        elapsed_ms=elapsed_ms,
+    )
+    return response_cap.cid
 
 
 def _mock_cells(spec: SweepSpec,
@@ -288,12 +383,36 @@ def _mock_cells(spec: SweepSpec,
 
 def _real_cells(spec: SweepSpec,
                  *, ctx: "Any" = None,
+                 llm_client: "Any" = None,
+                 model_tag: str | None = None,
                  ) -> list[dict[str, Any]]:
-    """Execute a real-LLM sweep in-process.
+    """Execute an LLM-backed sweep in-process.
 
     Lives here in ``wevra.runtime`` (not in `experiments/phase42`)
     so the Wevra SDK owns the unified path. Reuses the exact same
-    substrate primitives (``run_swe_loop_sandboxed``, parser, client).
+    substrate primitives (``run_swe_loop_sandboxed``, parser,
+    client).
+
+    SDK v3.4: a per-cell ``llm_io_state`` mapping keys
+    ``(task.instance_id, strategy_proxy)`` to the LLM_RESPONSE
+    CID just sealed by ``_gen``. The intra-cell hooks read this
+    mapping and, when an LLM_RESPONSE is available, parent the
+    PARSE_OUTCOME on it (in addition to SWEEP_SPEC). The
+    prompt → response → parse → patch → verdict chain is
+    therefore observable end-to-end on the DAG (Theorems
+    W3-42 / W3-43 / W3-44).
+
+    ``llm_client`` (optional, SDK v3.4): inject a duck-typed
+    substitute for ``LLMClient``. Used by ``_synthetic_cells``
+    (deterministic in-process LLM stand-in) and by tests that
+    want to drive the LLM-backed path without an Ollama
+    endpoint. When ``None`` the runtime instantiates a real
+    ``LLMClient`` against ``spec.endpoint``.
+
+    ``model_tag`` (optional, SDK v3.4): the string recorded as
+    the PROMPT / LLM_RESPONSE capsules' ``model_tag`` field.
+    Defaults to ``spec.model`` so the capsule layer can attribute
+    each prompt / response to the LLM that produced it.
     """
     from vision_mvp.core.llm_client import LLMClient
     from vision_mvp.tasks.swe_bench_bridge import (
@@ -307,9 +426,16 @@ def _real_cells(spec: SweepSpec,
     from vision_mvp.tasks.swe_sandbox import run_swe_loop_sandboxed
 
     sandbox = _select_sandbox(spec)
-    client = LLMClient(
-        model=spec.model, timeout=spec.llm_timeout,
-        base_url=spec.endpoint)
+    if llm_client is None:
+        client = LLMClient(
+            model=spec.model, timeout=spec.llm_timeout,
+            base_url=spec.endpoint)
+    else:
+        client = llm_client
+    resolved_model_tag = (
+        model_tag if model_tag is not None
+        else (spec.model if spec.model is not None
+              else getattr(client, "model", "unknown")))
     raw_cache: dict[tuple, str] = {}
     cells: list[dict[str, Any]] = []
     for parser_mode in spec.parser_modes:
@@ -322,29 +448,70 @@ def _real_cells(spec: SweepSpec,
             for nd in spec.n_distractors:
                 tasks, repo_files = _load_bank(spec, nd)
                 counter = ParserComplianceCounter()
+                # Per-cell LLM-IO state: maps (instance_id,
+                # strategy_proxy) → LLM_RESPONSE CID. Populated by
+                # _gen when an LLM call seals PROMPT + LLM_RESPONSE
+                # capsules; consumed by the on_patch hook to thread
+                # the response CID into the PARSE_OUTCOME parent set.
+                llm_io_state: dict[Any, Any] = {}
 
                 def _call(prompt: str,
                            _client=client,
-                           _max=spec.max_tokens) -> str:
-                    return _client.generate(
-                        prompt, max_tokens=_max, temperature=0.0)
+                           _max=spec.max_tokens) -> tuple[str, int]:
+                    """Return ``(response_text, elapsed_ms)``.
 
-                def _gen(task, ctx, buggy_source, issue_summary,
+                    The elapsed_ms is captured so the LLM_RESPONSE
+                    capsule can record latency under non-deterministic
+                    runs; it is stripped under deterministic-mode
+                    canonicalisation.
+                    """
+                    t_call = time.time()
+                    text = _client.generate(
+                        prompt, max_tokens=_max, temperature=0.0)
+                    return text, int(round((time.time() - t_call) * 1000))
+
+                def _gen(task, gen_ctx, buggy_source, issue_summary,
                           _counter=counter, _pm=resolved_mode,
-                          _nd=nd):
-                    strat_proxy = ("substrate" if "hunk" in ctx
+                          _nd=nd, _parser_mode=parser_mode,
+                          _apply_mode=apply_mode,
+                          _model_tag=resolved_model_tag,
+                          _state=llm_io_state):
+                    strat_proxy = ("substrate" if "hunk" in gen_ctx
                                     else "naive_or_routing")
                     prompt = build_patch_generator_prompt(
-                        task=task, ctx=ctx,
+                        task=task, ctx=gen_ctx,
                         buggy_source=buggy_source,
                         issue_summary=issue_summary,
                         prompt_style="block")
                     key = (task.instance_id, strat_proxy, _nd)
                     if key in raw_cache:
                         text = raw_cache[key]
+                        elapsed_ms_obs = 0
                     else:
-                        text = _call(prompt)
+                        text, elapsed_ms_obs = _call(prompt)
                         raw_cache[key] = text
+                    # SDK v3.4: seal PROMPT + LLM_RESPONSE capsules
+                    # for this LLM call. Idempotent on content —
+                    # naive + routing strategies share a prompt and
+                    # therefore a single PROMPT capsule and a single
+                    # LLM_RESPONSE capsule. The capsule layer's
+                    # admit_and_seal collapses duplicates by CID.
+                    response_cid = _seal_prompt_response_pair(
+                        ctx,
+                        task=task,
+                        strategy_proxy=strat_proxy,
+                        parser_mode=_parser_mode,
+                        apply_mode=_apply_mode,
+                        n_distractors=int(_nd),
+                        model_tag=_model_tag,
+                        prompt_style="block",
+                        prompt_text=prompt,
+                        response_text=text,
+                        elapsed_ms=elapsed_ms_obs,
+                    )
+                    if response_cid is not None:
+                        _state[(task.instance_id, strat_proxy)] = (
+                            response_cid)
                     outcome = parse_patch_block(
                         text, mode=_pm,
                         unified_diff_parser=parse_unified_diff)
@@ -363,7 +530,8 @@ def _real_cells(spec: SweepSpec,
                     ctx,
                     parser_mode=parser_mode,
                     apply_mode=apply_mode,
-                    n_distractors=int(nd))
+                    n_distractors=int(nd),
+                    llm_io_state=llm_io_state)
                 t0 = time.time()
                 rep = run_swe_loop_sandboxed(
                     bank=tasks, repo_files=repo_files,
@@ -387,6 +555,44 @@ def _real_cells(spec: SweepSpec,
                 if ctx is not None:
                     ctx.seal_sweep_cell(cell)
     return cells
+
+
+def _synthetic_cells(spec: SweepSpec,
+                       *, ctx: "Any" = None,
+                       ) -> list[dict[str, Any]]:
+    """Execute a synthetic-LLM sweep in-process.
+
+    Same code path as ``_real_cells`` (so the PROMPT /
+    LLM_RESPONSE / PARSE_OUTCOME / PATCH_PROPOSAL / TEST_VERDICT
+    capsule chain is exercised end-to-end), but the LLM client is
+    a deterministic in-process substitute returning canned
+    strings drawn from
+    ``synthetic_llm.SYNTHETIC_MODEL_PROFILES[spec.synthetic_model_tag]``.
+
+    Used by:
+      * SDK v3.4 contract tests covering the PROMPT /
+        LLM_RESPONSE slice without an Ollama endpoint.
+      * The cross-model parser-boundary research experiment
+        (``vision_mvp.experiments.parser_boundary_cross_model``)
+        sweeping multiple synthetic distributions through the
+        real parser.
+    """
+    from vision_mvp.wevra.synthetic_llm import (
+        SyntheticLLMClient, make_synthetic_response_fn,
+    )
+    tasks, _repo_files = _load_bank(spec, spec.n_distractors[0])
+    gold_patches: dict[str, tuple[str, str]] = {}
+    for task in tasks:
+        if task.gold_patch:
+            gold_patches[task.instance_id] = task.gold_patch[0]
+    fn = make_synthetic_response_fn(
+        spec.synthetic_model_tag or "synthetic.clean", gold_patches)
+    client = SyntheticLLMClient(
+        model_tag=spec.synthetic_model_tag or "synthetic.clean",
+        response_fn=fn)
+    return _real_cells(
+        spec, ctx=ctx, llm_client=client,
+        model_tag=spec.synthetic_model_tag or "synthetic.clean")
 
 
 def _resolve_launch_cmd(spec: SweepSpec) -> list[str]:
@@ -471,6 +677,25 @@ def run_sweep(spec: SweepSpec,
             "wall_seconds": round(time.time() - t0, 3),
             "model": None, "endpoint": None,
         }
+    if spec.mode == "synthetic":
+        # SDK v3.4: deterministic in-process synthetic LLM. No
+        # network, no acknowledge_heavy gate, no launch staging.
+        # The PROMPT / LLM_RESPONSE / PARSE_OUTCOME chain seals
+        # in flight for every (task, strategy) pair just as in the
+        # real-LLM path.
+        cells = _synthetic_cells(spec, ctx=ctx)
+        return {
+            "schema": "wevra.sweep.v2",
+            "mode": "synthetic", "executed_in_process": True,
+            "requires_acknowledgement": False,
+            "sandbox": spec.sandbox, "jsonl": spec.jsonl,
+            "cells": cells,
+            "launch_cmd": None,
+            "wall_seconds": round(time.time() - t0, 3),
+            "model": spec.synthetic_model_tag,
+            "endpoint": None,
+            "synthetic_model_tag": spec.synthetic_model_tag,
+        }
     # real mode
     if not spec.acknowledge_heavy:
         if strict_cost_gate:
@@ -517,7 +742,21 @@ def _spec_payload(spec: SweepSpec) -> dict[str, Any]:
     """Canonical payload for the SWEEP_SPEC capsule. Matches the
     shape ``build_report_ledger`` uses for its own post-hoc fold so
     in-flight and post-hoc ledgers stay CID-equivalent on the
-    SWEEP_SPEC kind (Theorem W3-34)."""
+    SWEEP_SPEC kind (Theorem W3-34).
+
+    SDK v3.4: synthetic-mode runs preserve the same shape (mode +
+    sandbox + jsonl + model + endpoint). For synthetic mode,
+    ``model`` carries the synthetic model tag (so two synthetic
+    runs with different tags do not collide on SWEEP_SPEC CID).
+    """
+    if spec.mode == "synthetic":
+        return {
+            "mode": spec.mode,
+            "sandbox": spec.sandbox,
+            "jsonl": spec.jsonl,
+            "model": spec.synthetic_model_tag,
+            "endpoint": None,
+        }
     return {
         "mode": spec.mode,
         "sandbox": spec.sandbox,
