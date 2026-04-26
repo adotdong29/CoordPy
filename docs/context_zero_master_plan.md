@@ -6377,6 +6377,159 @@ Anchor: `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`;
 `docs/data/phase53_scale_vs_structure_K4_n5.json`;
 `vision_mvp/experiments/phase53_scale_vs_structure.py`.
 
+### 4.25 SDK v3.8 — cross-role cohort-coherence multi-agent coordination (deterministic Phase-54 benchmark + W7 family)
+
+The v3.7 milestone (§ 4.24) produced an honest but unsatisfying
+result on multi-agent coordination: at the Phase-53 default config
+(real-LLM producer extractor, K_auditor=4), ``structure_gain`` was
+non-positive at every model regime tested and substrate FIFO was
+competitive with every fixed capsule admission policy. The capsule
+layer's load-bearing contribution at that bench was the
+*lifecycle audit* (T-1..T-7, 60/60 across regimes), not
+coordination performance. SDK v3.8 directly attacks the failure
+mode: **diagnose why FIFO won, redesign the regime so structure
+has a real chance, implement one stronger capsule coordination
+method, and run a disciplined experiment that produces a clean
+structural win conditional on a stated bench property.**
+
+**1. Phase-53 failure diagnosis (code-backed).** Three layered
+causes:
+
+* **Benchmark pathology (dominant).** At ``K_auditor=4`` with the
+  real-LLM producer emitting 0.65–0.90 claims/call, the auditor
+  admitted ``2.2 / 3.0 / 3.2 < 4`` candidates per scenario in
+  every regime — *always below the budget cap*. With no budget
+  pressure, every fixed admission policy is permutation-equivalent
+  to ``admit_all`` (W7-1). FIFO ties or beats by construction.
+* **Policy pathology (secondary).** The learned scorer was trained
+  with ``pos_rate=0.42`` and ``threshold=0.5``. On a real-LLM
+  stream that is near-fully-positive (the LLM pre-filters), the
+  same threshold rejects ~half of *real* causal candidates.
+* **Extraction pathology (orthogonal).** The Phase-53
+  ``deadlock_pool_exhaustion`` scenario is missed by *every*
+  admission strategy because neither LLM emits
+  ``DEADLOCK_SUSPECTED`` from the role-local events. This is the
+  extraction floor (W7-3): no admission policy can recover a
+  claim the producer never emitted.
+
+**2. Phase-54 deterministic cross-role coherence benchmark.**
+``vision_mvp/experiments/phase54_cross_role_coherence.py``
+materialises the smallest deterministic regime where cross-role
+cohort coherence can plausibly matter: each scenario has one
+``real_service`` (gold) and one ``decoy_service`` (foreign);
+each producer role emits 1–3 ``service=<tag>``-tagged candidates;
+the gold service has *strict plurality* in the auditor's
+candidate stream; the auditor stream contains 5–7 candidates at
+``K_auditor=4`` (so budget bites). The benchmark is
+**deterministic** (no LLM in loop) by design — to isolate the
+coordination axis from the producer-extraction-quality axis that
+dominated Phase-53. Bench properties (gold-plurality, cross-role,
+budget-bound) are *named and mechanically verified* by the
+contract tests
+(``test_wevra_cross_role_coherence.Phase54BankShapeTests``).
+
+**3. ``CohortCoherenceAdmissionPolicy`` (new, SDK v3.8).**
+``vision_mvp/wevra/team_coord.py``. A deterministic, training-
+free, interpretable cross-role admission rule that filters
+foreign-service decoys via a ``service=<tag>`` cohort signature.
+Two sub-modes:
+
+* **Streaming** (``fixed_plurality_tag=None``, default) — running
+  cohort over already-admitted; arrival-order-sensitive
+  (W7-1-aux limitation).
+* **Buffered**
+  (``CohortCoherenceAdmissionPolicy.from_candidate_payloads(...)``)
+  — pre-fitted plurality from the full candidate stream's
+  payloads; arrival-order-stable.
+
+The policy is **not OOD-fragile**: no scorer / no threshold tuned
+on a synthetic distribution. The W6-C2 OOD failure mode that bit
+the SDK v3.5 learned policy at SDK v3.7 cannot recur for this
+policy by construction.
+
+**4. Empirical headline (Phase-54 default, n=10, K=4).**
+
+| Strategy                           | accuracy_full | accuracy_services | mean_n_admitted_auditor |
+| ---------------------------------- | ------------- | ----------------- | ----------------------- |
+| substrate / capsule_fifo / capsule_priority | 0.000  | 0.000             | 4.00                    |
+| capsule_coverage                   | 0.000         | 0.000             | 4.00                    |
+| capsule_cohort_streaming           | 0.000         | 0.000             | 2.00                    |
+| **capsule_cohort_buffered**        | **1.000**     | **1.000**         | **3.60**                |
+
+Headline gap: ``cohort_buffered − fifo accuracy_full = +1.000``;
+stable across 5/5 alternate ``bank_seed`` values (11, 17, 23, 29,
+31).
+
+**5. The W7 theorem family.**
+
+* **W7-1 (proved-empirical).** FIFO unbeatability under low
+  surplus: when ``|candidates| ≤ K_role`` for every scenario,
+  every fixed admission policy is permutation-equivalent to
+  ``admit_all``; ``structure_gain`` is identically zero. Phase-53
+  default is the empirical anchor.
+* **W7-1-aux (proved-empirical).** Streaming cohort coherence is
+  unstable under candidate-arrival permutation. Phase-54 default
+  with decoys-first ordering is the anchor; streaming ties FIFO
+  at 0.000.
+* **W7-2 (proved-empirical, n=50 saturated).** Under gold-plurality
+  + cross-role coherence + ``|candidates| > K_auditor``, the
+  *buffered* cohort policy beats FIFO by ``+1.000`` on
+  ``accuracy_full``, stable across 5/5 bank seeds.
+* **W7-2-conditional (proved-empirical, K-sweep).** W7-2 holds in
+  the structure-win window; the gap is +0.40 at K=2, K=3 (gold
+  cohort partially fits) and +1.00 at K∈{4,5,6,8}. Sharper:
+  the decoder's set-equality services check makes service-blind
+  admission unable to ever achieve services_correct on
+  foreign-service-decoy benches, even with no budget pressure.
+* **W7-3 (proved-negative).** The extraction floor:
+  ``capsule_role_view.parents`` is constructed from ledger CIDs
+  (Capsule Contract C5); a never-emitted claim has no CID;
+  therefore no admission policy can recover it. Phase-53
+  ``deadlock_pool_exhaustion`` is the canonical empirical case.
+
+**6. What the W7 family says about the original thesis.** The
+capsule layer's **audit** contribution is preserved and extends to
+Phase-54 unchanged (T-1..T-7 hold on every cell). The capsule
+layer's **coordination-performance** contribution is now
+*demonstrable in a clean, falsifiable way* — but **conditional**
+on cross-role service-tag coherence. The earlier SDK v3.5
+"learned policy beats FIFO at noisy admission" framing was
+mean-positive but not robust; the SDK v3.8 "buffered cohort beats
+FIFO at gold-plurality" framing is **strict-positive on every
+test** under a stated condition. Phase-53 (W7-1) and Phase-54
+(W7-2) together form a **dichotomy**: substrate FIFO is
+unbeatable when the bench has no surplus; cohort coherence beats
+substrate cleanly when the bench has surplus + foreign-service
+decoys + gold-plurality. Both readings are conditional, named,
+and falsifiable.
+
+**7. What changed.**
+
+* `vision_mvp/wevra/team_coord.py` (extended) —
+  ``CohortCoherenceAdmissionPolicy``;
+  ``_candidate_service_tag``; updated ``ALL_FIXED_POLICY_NAMES``.
+* `vision_mvp/wevra/__init__.py` — re-exports
+  ``TeamCohortCoherenceAdmissionPolicy``;
+  ``SDK_VERSION = "wevra.sdk.v3.8"``.
+* `vision_mvp/experiments/phase54_cross_role_coherence.py` (new).
+* `vision_mvp/tests/test_wevra_cross_role_coherence.py` (new) —
+  21 contract tests including default-config win, K-sweep, audit
+  invariance, bank-seed stability.
+* `docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md` (new — milestone
+  results note).
+* `docs/data/phase54_cross_role_coherence_K4_n10.json` (frozen
+  default-config result).
+* `docs/data/phase54_cross_role_coherence_budget_sweep.json`
+  (frozen K-sweep).
+* `docs/THEOREM_REGISTRY.md` — W7-1 / W7-1-aux / W7-2 /
+  W7-2-conditional / W7-3 / W7-C1 / W7-C2 / W7-C3 added.
+* `docs/RESEARCH_STATUS.md` — seventh research axis added.
+* `docs/HOW_NOT_TO_OVERSTATE.md` — W7 overstatement guards added.
+
+Anchor: `docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md`;
+`docs/data/phase54_cross_role_coherence_K4_n10.json`;
+`vision_mvp/experiments/phase54_cross_role_coherence.py`.
+
 ---
 
 ## 5. End goals

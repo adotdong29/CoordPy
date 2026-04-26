@@ -203,6 +203,7 @@ from .team_coord import (
     FifoAdmissionPolicy as TeamFifoAdmissionPolicy,
     ClaimPriorityAdmissionPolicy as TeamClaimPriorityAdmissionPolicy,
     CoverageGuidedAdmissionPolicy as TeamCoverageGuidedAdmissionPolicy,
+    CohortCoherenceAdmissionPolicy as TeamCohortCoherenceAdmissionPolicy,
     TeamCoordinator, audit_team_lifecycle,
     TeamLifecycleAuditReport, T_INVARIANTS,
 )
@@ -218,7 +219,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.7"
+SDK_VERSION = "wevra.sdk.v3.8"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -299,6 +300,7 @@ __all__ = [
     "TeamAdmissionPolicy", "TeamAdmissionDecision",
     "TeamFifoAdmissionPolicy", "TeamClaimPriorityAdmissionPolicy",
     "TeamCoverageGuidedAdmissionPolicy",
+    "TeamCohortCoherenceAdmissionPolicy",
     "TeamCoordinator", "audit_team_lifecycle",
     "TeamLifecycleAuditReport", "T_INVARIANTS",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",

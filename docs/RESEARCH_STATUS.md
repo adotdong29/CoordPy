@@ -5,12 +5,12 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.7,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.8,
 > 2026-04-26.
 
 ## TL;DR
 
-The programme now has **six** coupled research axes, each with a
+The programme now has **seven** coupled research axes, each with a
 sharp status:
 
 1. **Capsule contract / runtime** — *active, advancing*. The
@@ -64,8 +64,40 @@ sharp status:
    unchanged. Mac 2 remains offline at the time of SDK v3.7
    (192.168.12.248 ARP "incomplete"); the runbook is the
    operator path when Mac 2 returns.
+7. **Cross-role cohort-coherence multi-agent coordination**
+   — *active, new (SDK v3.8)*. **Phase-54** benchmark
+   (`vision_mvp/experiments/phase54_cross_role_coherence.py`)
+   directly attacks the SDK v3.7 Phase-53 failure mode by
+   redesigning the regime so structure has a real chance: a
+   deterministic candidate stream where each scenario has one
+   ``real_service`` (gold) and one ``decoy_service`` (foreign);
+   each producer role emits ``service=<tag>``-tagged candidates
+   with the gold tag in **strict plurality**; the auditor sees
+   surplus candidates above ``K_auditor=4`` (``5 ≤ |candidates| ≤ 7``).
+   The new admission policy
+   ``CohortCoherenceAdmissionPolicy`` (in
+   ``vision_mvp.wevra.team_coord``) provides two sub-modes:
+   *streaming* (running cohort over admitted) and *buffered*
+   (pre-fitted plurality from candidate stream's payloads via
+   ``from_candidate_payloads``). Headline: at the pre-committed
+   default, ``capsule_cohort_buffered`` achieves
+   ``accuracy_full = 1.000`` while substrate FIFO,
+   ``capsule_fifo``, ``capsule_priority``, ``capsule_coverage``,
+   and ``capsule_cohort_streaming`` all produce 0.000 — a
+   **+1.000** structural win, stable across 5/5 alternate bank
+   seeds. The W7 family (W7-1 / W7-1-aux / W7-2 /
+   W7-2-conditional / W7-3 — proved or proved-empirical) anchors
+   the milestone formally; the W7-C family makes the multi-service
+   / decoder-side / real-LLM extensions falsifiable. **Honest
+   scope:** the structural win is *conditional* on the bench
+   property (gold-plurality + foreign-service decoys + budget
+   surplus); the streaming variant is unstable and ties FIFO
+   (W7-1-aux); W7-3 is the extraction floor — admission cannot
+   recover claims the producer never emitted (the Phase-53
+   ``deadlock_pool_exhaustion`` failure case).
+
 6. **Model-scale vs capsule-structure on multi-agent
-   coordination** — *active, new (SDK v3.7)*. **Phase-53**
+   coordination** — *active, settled (SDK v3.7)*. **Phase-53**
    benchmark (`vision_mvp/experiments/phase53_scale_vs_structure.py`)
    replaces the Phase-52 deterministic producer-role extractor
    with a real-LLM extractor and decomposes ``accuracy_full``
@@ -90,7 +122,55 @@ sharp status:
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.7, 2026-04-26)
+## Current frontier (SDK v3.8, 2026-04-26)
+
+### Active moves (SDK v3.8 — cross-role cohort-coherence multi-agent benchmark + W7 family)
+
+- **Phase-54 cross-role cohort-coherence benchmark.**
+  ``vision_mvp.experiments.phase54_cross_role_coherence`` runs 5
+  admission strategies (substrate, capsule_fifo, capsule_priority,
+  capsule_coverage, capsule_cohort_streaming, capsule_cohort_buffered)
+  on a deterministic 10-scenario bank with the **gold-plurality**
+  property (gold service has strictly more auditor-routed
+  candidates than any decoy service). Pre-committed default:
+  ``K_auditor=4``, ``T_auditor=128``, ``n_eval=10``,
+  ``bank_seed=11``. Headline: ``cohort_buffered − fifo
+  accuracy_full = +1.000``, stable across 5/5 alternate bank
+  seeds.
+- **``CohortCoherenceAdmissionPolicy`` (new).**
+  ``vision_mvp/wevra/team_coord.py``. Two sub-modes:
+  *streaming* (arrival-order-sensitive baseline) and *buffered*
+  (arrival-order-stable, pre-fitted plurality via
+  ``from_candidate_payloads``). Deterministic, training-free,
+  one regex + one counter. Re-exported as
+  ``TeamCohortCoherenceAdmissionPolicy``.
+- **Theorem family W7.** W7-1 (FIFO unbeatability under low
+  surplus, proved-empirical anchor on Phase-53), W7-1-aux
+  (streaming cohort instability under arrival permutation,
+  proved-empirical), W7-2 (cohort buffered structural win under
+  gold-plurality, proved-empirical n=50 saturated), W7-2-conditional
+  (K-sweep window, proved-empirical), W7-3 (extraction floor,
+  proved-negative — corollary of Capsule Contract C5). The
+  W7-C family (W7-C1/C2/C3) makes the multi-service /
+  decoder-side / real-LLM extensions falsifiable.
+- **Honest scope.** The W7-2 win is *conditional* on stated bench
+  properties (gold-plurality + cross-role coherence +
+  ``|candidates| > K_auditor``); it does not generalise to every
+  multi-agent benchmark. The capsule layer's *audit* contribution
+  (T-1..T-7) is preserved and extends to Phase-54 unchanged.
+
+### Active conjectures (SDK v3.8)
+
+- **W7-C1**: multi-service-gold extension (top-2 plurality).
+  conjectural; falsifier in Phase-55 candidate.
+- **W7-C2**: bundle-aware decoder + cohort admission strictly
+  dominates cohort admission alone on weak-coherence benches.
+  conjectural; not yet measured.
+- **W7-C3**: W7-2 transfers to the real-LLM regime when the LLM
+  is prompted with a multi-service event mix. conjectural;
+  Phase-56 candidate.
+
+## Previous frontier (SDK v3.7, 2026-04-26)
 
 ### Active moves (SDK v3.7 — stronger-model multi-agent benchmark + W6 family)
 
@@ -368,12 +448,15 @@ sharp status:
   `docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md` (SDK v3.4),
   `docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md` (SDK v3.5),
   `docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md` (SDK v3.6),
-  `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md` (SDK v3.7 — this milestone)
+  `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md` (SDK v3.7),
+  `docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md` (SDK v3.8 — this milestone)
 - Paper draft: `papers/wevra_capsule_native_runtime.md`
 - Tests: `vision_mvp/tests/test_wevra_capsule_native*.py`,
   `test_wevra_capsule_native_deeper.py`,
   `test_wevra_capsule_native_inner_loop.py` (SDK v3.4),
   `test_wevra_team_coord.py` (SDK v3.5 — multi-agent slice),
+  `test_wevra_scale_vs_structure.py` (SDK v3.7 — Phase-53),
+  `test_wevra_cross_role_coherence.py` (SDK v3.8 — Phase-54 + W7),
   `test_capsule_*.py`
 - Cross-model parser-boundary experiment:
   `vision_mvp/experiments/parser_boundary_cross_model.py`
@@ -381,5 +464,7 @@ sharp status:
   `vision_mvp/experiments/phase52_team_coord.py`
 - Stronger-model multi-agent benchmark (real LLM):
   `vision_mvp/experiments/phase53_scale_vs_structure.py`
+- Cross-role cohort-coherence benchmark (deterministic):
+  `vision_mvp/experiments/phase54_cross_role_coherence.py`
 - MLX distributed runbook (operator path for Mac 2):
   `docs/MLX_DISTRIBUTED_RUNBOOK.md`

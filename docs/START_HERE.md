@@ -17,7 +17,8 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.7)          | [`RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](RESULTS_WEVRA_SCALE_VS_STRUCTURE.md) |
+> | Latest milestone (SDK v3.8)          | [`RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md`](RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md) |
+> | Previous milestone (SDK v3.7)        | [`RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](RESULTS_WEVRA_SCALE_VS_STRUCTURE.md) |
 > | Repo top-level                       | [`../README.md`](../README.md), [`../ARCHITECTURE.md`](../ARCHITECTURE.md), [`../CHANGELOG.md`](../CHANGELOG.md) |
 > | Historical record (read-only)        | [`archive/`](archive/) — pre-Wevra theory, older Wevra milestones, sprint prompts |
 
@@ -29,31 +30,44 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.7 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.8 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
 ROLE_VIEW / TEAM_DECISION + T-1..T-7 lifecycle audit + learned
 per-role admission policy), **across the model-class gradient**
 (W5 family, real cross-LLM parser-boundary measurement
-TVD = 1.000 / 0.000), and now — most sharply — **across the
-*model regime × admission strategy* grid on a real-LLM-driven
-multi-agent coordination benchmark** (W6 family, SDK v3.7).
-SDK v3.7's headline result is a **conditional falsification
-of W4-C1**: the SDK v3.5 learned-admission-policy advantage
-(synthetic+noise default config) does **not** transfer
-out-of-distribution to a real-LLM regime on the Phase-53
-incident-triage benchmark. ``structure_gain`` is non-positive
-at every model regime tested (-0.4 / -0.4 / 0.0); scale
-(qwen2.5:14b → qwen3.5:35b) narrows a *structure deficit*
-created by OOD over-rejection, not a *structure surplus*. **The
-capsule layer's load-bearing contribution at this benchmark is
-the *lifecycle audit* (T-1..T-7 holds 60/60 across regimes),
-not admission policy gains.** Substrate FIFO is a stronger
-baseline than the W4 family suggested when the LLM is the
-producer (the LLM does its own implicit filtering). Mac 2 is
+TVD = 1.000 / 0.000), **across the *model regime × admission
+strategy* grid on a real-LLM-driven multi-agent coordination
+benchmark** (W6 family, SDK v3.7), and — most sharply — **across
+a deterministic cross-role cohort-coherence benchmark where
+capsule structure provides a strict +1.000 ``accuracy_full``
+advantage over substrate FIFO** (W7 family, SDK v3.8).
+SDK v3.8's headline result is a **conditional structural win**:
+on the Phase-54 deterministic benchmark (gold-plurality property
++ foreign-service decoys + ``|candidates| > K_auditor``), the
+new ``CohortCoherenceAdmissionPolicy`` (buffered mode, pre-fitted
+plurality from candidate-stream payloads) achieves
+``accuracy_full = 1.000`` while substrate FIFO,
+``capsule_fifo``, ``capsule_priority``, ``capsule_coverage``,
+and the streaming-cohort variant all produce 0.000 — a +1.000
+gap, stable across 5/5 alternate ``bank_seed`` values. The win
+is **conditional** on the bench property; under W7-1 (low
+surplus, Phase-53 anchor), substrate FIFO is unbeatable by
+construction. The Phase-53 / Phase-54 dichotomy (W7-1 / W7-2)
+makes the capsule layer's coordination-performance contribution
+*demonstrable in a falsifiable way* under a stated condition,
+without invalidating the Phase-53 reading. The streaming variant
+is unstable under arrival permutation (W7-1-aux); the buffered
+variant is the load-bearing policy. SDK v3.7's reading is
+preserved exactly: the SDK v3.5 learned-admission-policy
+advantage (synthetic+noise default config) does **not** transfer
+out-of-distribution to a real-LLM regime on Phase-53;
+``structure_gain`` is non-positive at every model regime tested
+(-0.4 / -0.4 / 0.0). The capsule layer's *audit* contribution
+(T-1..T-7) is preserved and extends to Phase-54 unchanged. Mac 2 is
 still offline (192.168.12.248 ARP "incomplete"); **no two-Mac
-sharded inference happened in SDK v3.7** — the
+sharded inference happened in SDK v3.7 or SDK v3.8** — the
 ``MLXDistributedBackend`` integration boundary is unchanged
 from SDK v3.6 and waits for the runbook
 (`docs/MLX_DISTRIBUTED_RUNBOOK.md`) when Mac 2 returns. The

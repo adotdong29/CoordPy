@@ -290,6 +290,75 @@ Forbidden. They are *adjacent* but distinct:
 The two paths can run side by side; they are not interchangeable
 at the audit / lifecycle layer.
 
+### Labelling the W7-2 cohort-coherence win as unconditional
+
+> *"Cohort-coherence admission beats FIFO."*
+
+Forbidden without the conditions. The defensible W7-2 reading
+names the bench properties that the win depends on:
+
+* **Surplus.** ``|candidates(scenario)| > K_auditor`` — without
+  budget pressure, FIFO ≡ admit-all and structure_gain = 0
+  identically (W7-1).
+* **Foreign-service decoys.** Some auditor-routed candidates carry
+  ``service=<tag>`` tokens whose tag differs from the gold
+  service. Without this, cohort coherence has no signal to
+  exploit.
+* **Gold plurality.** The gold service tag has strictly more
+  auditor-routed candidates than any decoy service tag. Without
+  this, buffered cohort coherence picks the *decoy* plurality and
+  ties FIFO at 0.000.
+* **Buffered mode.** ``CohortCoherenceAdmissionPolicy(fixed_plurality_tag=...)``
+  constructed via ``from_candidate_payloads``. The streaming
+  variant (``fixed_plurality_tag=None``) is unstable under arrival
+  permutation (W7-1-aux) and ties FIFO on the same bench.
+
+Permitted: "On the Phase-54 default config (K_auditor=4, n_eval=10,
+gold-plurality property, foreign-service decoys, surplus on every
+scenario), the *buffered* ``CohortCoherenceAdmissionPolicy``
+achieves ``accuracy_full = 1.000`` against ``capsule_fifo`` 0.000
+— a +1.000 conditional structural win (W7-2)."
+
+Forbidden: "Cohort coherence solves multi-agent context."
+Forbidden: "Capsule structure beats FIFO." (Without the bench
+conditions named.)
+
+### Conflating Phase-53 and Phase-54 results
+
+> *"SDK v3.8 reverses the SDK v3.7 result."*
+
+Forbidden. The two milestones measure *different bench properties*
+and are both true:
+
+* **Phase-53** (SDK v3.7): real-LLM producer extractor;
+  ``mean_n_admitted_auditor < K_auditor`` in every regime; FIFO
+  ties every fixed strategy at ``accuracy_full = 0.800``;
+  capsule layer's contribution is the **lifecycle audit**.
+* **Phase-54** (SDK v3.8): deterministic candidate stream with
+  cross-role service-tag coherence; gold-plurality property;
+  surplus on every scenario; buffered cohort coherence beats
+  FIFO by ``+1.000`` on accuracy_full.
+
+Phase-53 is preserved exactly. Phase-54 measures a different slice
+that the original bench did not surface. The honest combined
+reading is the W7-1/W7-2 dichotomy: **substrate FIFO is unbeatable
+under low surplus (W7-1, Phase-53); cohort coherence beats
+substrate cleanly under surplus + foreign-service decoys +
+gold-plurality (W7-2, Phase-54)**. Both are conditional on stated
+bench properties. Neither is universal.
+
+### Labelling the streaming cohort variant as the load-bearing policy
+
+> *"Cohort-coherence admission is the SDK v3.8 win."*
+
+Forbidden without specifying *which* cohort variant. The streaming
+variant (``CohortCoherenceAdmissionPolicy()`` with
+``fixed_plurality_tag=None``) is unstable under arrival permutation
+(W7-1-aux); on the Phase-54 default it ties FIFO at 0.000. The
+buffered variant is the load-bearing policy. The honest phrasing:
+"The *buffered* ``CohortCoherenceAdmissionPolicy`` (constructed
+via ``from_candidate_payloads``) is the SDK v3.8 win."
+
 ## Change log
 
 - **2026-04-26 (SDK v3.3).** Initial canonical version. Adds
@@ -310,3 +379,9 @@ at the audit / lifecycle layer.
   capsule kinds described as production-grade; conflation of
   ``TypedHandoff`` with ``TEAM_HANDOFF``. Adds the canonical
   defensible reading template for the Phase-52 result.
+- **2026-04-26 (SDK v3.8).** Adds W7 rules: forbidden phrases
+  "cohort-coherence admission beats FIFO" without the
+  bench-property conditions; "SDK v3.8 reverses SDK v3.7" without
+  the W7-1/W7-2 dichotomy framing; "cohort-coherence is the
+  SDK v3.8 win" without specifying *buffered* (vs streaming)
+  variant.

@@ -61,19 +61,28 @@ class WevraSurfaceTests(unittest.TestCase):
             self.assertIsInstance(v, str)
             self.assertTrue(len(v) > 0)
 
-    def test_sdk_version_is_v3_6(self):
+    def test_sdk_version_is_v3_8(self):
         from vision_mvp.wevra import SDK_VERSION
-        # SDK v3.6 bump: two-Mac distributed-inference integration
-        # boundary (chosen path: MLX distributed; not Hyperspace) +
-        # first real cross-LLM parser-boundary measurement
-        # (W5-1 / W5-2 / W5-3, W5-C1 / W5-C2 / W5-C3). Strictly
-        # additive on v3.5 — every v3.5 run-boundary AND team-
-        # boundary contract test still passes byte-for-byte. The
+        # SDK v3.8 bump: cross-role cohort-coherence multi-agent
+        # coordination (Phase-54 + W7 family). Strictly additive on
+        # v3.7 — every v3.7 run-boundary, team-boundary, LLM-backend,
+        # and Phase-53 contract test still passes byte-for-byte. The
         # Wevra single-run product runtime contract is unchanged;
-        # the new surface is one duck-typed ``LLMBackend`` Protocol
-        # with two backend adapters (``OllamaBackend``,
-        # ``MLXDistributedBackend``).
-        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.6")
+        # the new surface is the ``CohortCoherenceAdmissionPolicy``
+        # in ``vision_mvp.wevra.team_coord`` (multi-agent
+        # coordination research slice; not part of the run-boundary
+        # product runtime).
+        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.8")
+
+    def test_cohort_coherence_admission_policy_is_exported(self):
+        # The SDK v3.8 cross-role admission policy must be importable
+        # from the top-level ``vision_mvp.wevra`` namespace. The
+        # buffered factory ``from_candidate_payloads`` is the
+        # load-bearing constructor for the W7-2 anchor.
+        from vision_mvp.wevra import TeamCohortCoherenceAdmissionPolicy
+        p = TeamCohortCoherenceAdmissionPolicy.from_candidate_payloads(
+            ["a service=api", "b service=archival", "c service=api"])
+        self.assertEqual(p.fixed_plurality_tag, "api")
 
     def test_llm_backend_surface_is_exported(self):
         # The SDK v3.6 LLM-backend surface must be importable from

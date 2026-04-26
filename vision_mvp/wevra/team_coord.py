@@ -539,9 +539,204 @@ class CoverageGuidedAdmissionPolicy:
         return AdmissionDecision(admit=True, reason=REASON_ADMIT)
 
 
+# =============================================================================
+# Cohort-coherence admission (SDK v3.8 — relational/cross-role rule)
+# =============================================================================
+
+
+_SERVICE_TAG_RE = __import__("re").compile(r"service=(\w+)")
+
+
+def _candidate_service_tag(cand: ContextCapsule) -> str:
+    """Extract the ``service=<tag>`` cohort signature from a
+    candidate's payload, or the empty string if absent.
+
+    The match is intentionally narrow: only the exact ``service=<tag>``
+    token (the same key the existing
+    :func:`vision_mvp.tasks.incident_triage._decoder_from_handoffs`
+    uses to populate the auditor's ``services`` set) is honoured. Any
+    other identifier-shaped token in the payload is ignored.
+    """
+    if not isinstance(cand.payload, dict):
+        return ""
+    body = str(cand.payload.get("payload", ""))
+    if not body:
+        return ""
+    matches = _SERVICE_TAG_RE.findall(body)
+    if not matches:
+        return ""
+    # First-occurrence wins; consistent with the decoder's left-to-right
+    # token scan in ``_decoder_from_handoffs``.
+    return str(matches[0])
+
+
+@dataclasses.dataclass
+class CohortCoherenceAdmissionPolicy:
+    """Cross-role cohort-coherence admission (SDK v3.8 / W7 family).
+
+    Two sub-modes
+    -------------
+    The policy supports two operating modes, controlled by
+    ``fixed_plurality_tag``:
+
+    * **Streaming** (``fixed_plurality_tag=None``, default) —
+      maintain a running cohort signature over already-admitted
+      candidates and reject the next candidate if its
+      ``service=<tag>`` conflicts with the cohort plurality. Simple
+      and deterministic, but **arrival-order-sensitive**: if the
+      first admitted candidate carries a foreign tag, the cohort
+      locks onto that tag and rejects subsequent gold candidates.
+      This is a real limitation theorem (W7-1-aux): pure streaming
+      cohort-coherence is unstable under candidate-arrival
+      permutation.
+
+    * **Buffered** (``fixed_plurality_tag=<tag>``) — the policy
+      ignores the running cohort and instead uses a pre-fitted
+      plurality tag. Construct via :meth:`from_candidate_payloads`
+      to fit the plurality on the full candidate distribution before
+      streaming admission begins. This costs one extra pre-pass over
+      the candidate list but is **arrival-order-stable**: the
+      plurality is computed once, off-line, before any admission
+      decision is made, so the policy is independent of within-stream
+      ordering.
+
+    The Phase-54 default uses the buffered mode (W7-2 anchor): the
+    driver pre-fits the plurality tag on each scenario's candidate
+    stream, then runs admission. The streaming mode is retained as
+    a research baseline / falsifier (W7-1-aux witness).
+
+    Rule (per ``decide`` call)
+    --------------------------
+    1. Run the ``_enforce_budget`` pre-checks (kind whitelist, K_role,
+       T_role, payload-SHA dedupe). If any fails, return the
+       structural denial.
+    2. Extract the candidate's ``service=<tag>``.
+    3. If the candidate has no tag, admit (it cannot violate
+       cohort coherence on a missing key).
+    4. If ``fixed_plurality_tag`` is set, admit iff
+       ``cand_tag == fixed_plurality_tag``; else reject as
+       ``score_low``.
+    5. Else (streaming mode): admit iff the cohort is empty or the
+       candidate's tag matches the running plurality.
+
+    Why this is *cross-role* (not just single-role)
+    -----------------------------------------------
+    The auditor's ROLE_VIEW capsule's parents include TEAM_HANDOFF
+    capsules emitted by *every* producer role. The cohort signature
+    is therefore aggregated across roles — a service tag that one
+    role has admitted is "evidence" the auditor uses against a
+    candidate from another role with a different tag. This is the
+    minimum interesting cross-role coordination move: it requires a
+    relational view that single-role per-candidate FIFO cannot
+    express.
+
+    Why this is honest
+    ------------------
+    The policy is **deterministic** and **small** (one regex, one
+    counter, no learning). Buffered mode requires one O(N) pre-pass
+    over the candidate list to compute the plurality; this is
+    book-keeping, not learning. The policy is **not** training-
+    distribution-sensitive (no scorer, no threshold tuned on
+    synthetic noise) — so it is not subject to the W6-C2 OOD
+    failure mode that bit the learned policy at SDK v3.7.
+
+    Lifecycle invariants
+    --------------------
+    The policy preserves T-1..T-7 by construction: it returns
+    standard ``AdmissionDecision`` records via the existing
+    ``TeamCoordinator`` admission path. No new lifecycle states.
+    """
+
+    name: str = "cohort_coherence"
+    min_cohort_for_filter: int = 1
+    fixed_plurality_tag: str | None = None
+
+    @classmethod
+    def from_candidate_payloads(cls,
+                                  payloads: "Iterable[str]",
+                                  *,
+                                  min_cohort_for_filter: int = 1,
+                                  ) -> "CohortCoherenceAdmissionPolicy":
+        """Construct a *buffered* policy by pre-fitting the cohort
+        plurality tag on a candidate stream's payloads.
+
+        The plurality is computed once, off-line, over all payloads
+        carrying a ``service=<tag>`` token; ties are broken by
+        descending count, then ascending lex order. Payloads without
+        a service tag are skipped. If no payload carries a tag, the
+        returned policy is the streaming default (no plurality lock).
+
+        This is the W7-2 anchor mode: cohort coherence with arrival-
+        order-stable selection.
+        """
+        tags: list[str] = []
+        for p in payloads:
+            if not p:
+                continue
+            m = _SERVICE_TAG_RE.search(str(p))
+            if m:
+                tags.append(m.group(1))
+        if not tags:
+            return cls(min_cohort_for_filter=min_cohort_for_filter)
+        counts: dict[str, int] = {}
+        for t in tags:
+            counts[t] = counts.get(t, 0) + 1
+        max_count = max(counts.values())
+        # Lex-sort ties to make the plurality deterministic.
+        plurality_tags = sorted([t for t, c in counts.items()
+                                  if c == max_count])
+        return cls(min_cohort_for_filter=min_cohort_for_filter,
+                    fixed_plurality_tag=plurality_tags[0])
+
+    def decide(self, *, candidate, role, budget,
+               current_admitted, current_n_tokens):
+        denial = _enforce_budget(
+            candidate=candidate, role=role, budget=budget,
+            current_admitted=current_admitted,
+            current_n_tokens=current_n_tokens)
+        if denial is not None:
+            return denial
+        cand_tag = _candidate_service_tag(candidate)
+        if not cand_tag:
+            # Candidate carries no service token; cannot violate
+            # cohort coherence on a missing key. Admit.
+            return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+        if self.fixed_plurality_tag is not None:
+            # Buffered mode: plurality is pre-fitted; ignore running
+            # cohort.
+            if cand_tag == self.fixed_plurality_tag:
+                return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+            return AdmissionDecision(admit=False, reason=REASON_SCORE_LOW,
+                                      score=0.0)
+        # Streaming mode: cohort histogram over admitted candidates.
+        tags: list[str] = []
+        for c in current_admitted:
+            t = _candidate_service_tag(c)
+            if t:
+                tags.append(t)
+        if not tags:
+            return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+        if len(tags) < self.min_cohort_for_filter:
+            return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+        counts: dict[str, int] = {}
+        for t in tags:
+            counts[t] = counts.get(t, 0) + 1
+        max_count = max(counts.values())
+        plurality_tags = sorted([t for t, c in counts.items()
+                                  if c == max_count])
+        plurality = plurality_tags[0]
+        if cand_tag == plurality:
+            return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+        if len(plurality_tags) > 1 and cand_tag in plurality_tags:
+            return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+        return AdmissionDecision(admit=False, reason=REASON_SCORE_LOW,
+                                  score=0.0)
+
+
 # Closed-vocabulary handle for "policies named in TEAM_DECISION
 # audit logs". Keeps the per-policy diagnostics scannable.
-ALL_FIXED_POLICY_NAMES = ("fifo", "claim_priority", "coverage_guided")
+ALL_FIXED_POLICY_NAMES = ("fifo", "claim_priority", "coverage_guided",
+                            "cohort_coherence")
 
 
 # =============================================================================
@@ -1011,6 +1206,7 @@ __all__ = [
     "REASON_UNKNOWN_KIND", "REASON_DUPLICATE", "REASON_SCORE_LOW",
     "FifoAdmissionPolicy", "ClaimPriorityAdmissionPolicy",
     "CoverageGuidedAdmissionPolicy",
+    "CohortCoherenceAdmissionPolicy",
     "ALL_FIXED_POLICY_NAMES",
     # Coordinator
     "TeamCoordinator",

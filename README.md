@@ -7,12 +7,43 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**As of SDK v3.7 (April 2026), capsules are load-bearing
+**As of SDK v3.8 (April 2026), capsules are load-bearing
 *inside one Wevra run*, *between agents in a team*, *across the
-model-class gradient*, and now — most sharply — across the
-*model regime × admission strategy* grid on a real-LLM-driven
-multi-agent coordination benchmark.** SDK v3.7's contribution is
-the **Phase-53 stronger-model multi-agent benchmark**
+model-class gradient*, *across the model regime × admission
+strategy grid on a real-LLM benchmark*, and now — most sharply —
+*across a deterministic cross-role cohort-coherence benchmark
+where capsule structure provides a strict +1.000 ``accuracy_full``
+advantage over substrate FIFO under stated bench properties.**
+SDK v3.8's contribution is the **Phase-54 cross-role
+cohort-coherence benchmark**
+([`vision_mvp/experiments/phase54_cross_role_coherence.py`](vision_mvp/experiments/phase54_cross_role_coherence.py))
+plus a new admission policy
+[`CohortCoherenceAdmissionPolicy`](vision_mvp/wevra/team_coord.py).
+The headline (n=10 saturated, K_auditor=4, bank_seed=11):
+``capsule_cohort_buffered`` (pre-fitted plurality from the
+candidate stream's payloads) achieves ``accuracy_full = 1.000``
+while substrate FIFO, ``capsule_fifo``, ``capsule_priority``,
+``capsule_coverage``, and ``capsule_cohort_streaming`` all
+produce ``accuracy_full = 0.000`` — a **+1.000** structural win,
+stable across 5/5 alternate ``bank_seed`` values. The win is
+**conditional** on the bench having a stated *gold-plurality*
+property (gold service has strictly more auditor-routed
+candidates than any decoy service) plus surplus
+(``|candidates| > K_auditor``) plus foreign-service decoys.
+Without these conditions (e.g., on Phase-53 where the real LLM
+emits a clean below-budget stream), substrate FIFO is unbeatable
+by construction (W7-1). The Phase-53 / Phase-54 dichotomy is
+itself a sharp pair of theorems: the streaming variant of cohort
+coherence is unstable under arrival permutation (W7-1-aux); the
+buffered variant is the load-bearing policy. The capsule-team
+lifecycle audit (T-1..T-7) holds across every Phase-54 cell. See
+[`docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md`](docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md)
+for the full SDK v3.8 milestone note. The Wevra single-run
+product runtime contract is byte-for-byte unchanged from SDK
+v3.7.
+
+The previous milestone (**SDK v3.7**) contributed the
+**Phase-53 stronger-model multi-agent benchmark**
 ([`vision_mvp/experiments/phase53_scale_vs_structure.py`](vision_mvp/experiments/phase53_scale_vs_structure.py)),
 which replaces Phase-52's deterministic producer-role extractor
 with a real-LLM extractor (qwen2.5:14b-32k, qwen3.5:35b on Mac 1
@@ -48,6 +79,8 @@ and waits for the runbook
 ([`docs/MLX_DISTRIBUTED_RUNBOOK.md`](docs/MLX_DISTRIBUTED_RUNBOOK.md))
 when Mac 2 returns. The strongest model class actually exercised
 is single-Mac qwen3.5:35b (36 B-MoE Q4) on Mac 1 Ollama. See
+[`docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md`](docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md)
+for the full SDK v3.8 milestone note,
 [`docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md)
 for the full SDK v3.7 milestone note,
 [`docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md)
@@ -75,7 +108,11 @@ empirical-positive on its synthetic+noise anchor distribution
 but is now annotated as **conditional** in
 [`docs/THEOREM_REGISTRY.md`](docs/THEOREM_REGISTRY.md): SDK v3.7
 empirically falsifies it out-of-distribution on the real-LLM
-regime. Honest-reading rules in
+regime. SDK v3.8 supersedes the W4-C1 framing entirely with a
+deterministic, training-free cross-role admission rule
+(``CohortCoherenceAdmissionPolicy``) that produces a strict
++1.000 ``accuracy_full`` advantage over FIFO under named bench
+conditions (W7-2). Honest-reading rules in
 [`docs/HOW_NOT_TO_OVERSTATE.md`](docs/HOW_NOT_TO_OVERSTATE.md).
 
 Up through **SDK v3.4 (April 2026)**, capsules drive execution all the
@@ -500,7 +537,8 @@ context-zero/
 │   ├── CAPSULE_TEAM_FORMALISM.md        # team-boundary capsule formalism (W4 family)
 │   ├── context_zero_master_plan.md      # long-running master plan
 │   ├── MLX_DISTRIBUTED_RUNBOOK.md       # two-Mac MLX distributed-inference runbook
-│   ├── RESULTS_WEVRA_SCALE_VS_STRUCTURE.md # latest milestone (SDK v3.7)
+│   ├── RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md # latest milestone (SDK v3.8)
+│   ├── RESULTS_WEVRA_SCALE_VS_STRUCTURE.md # previous milestone (SDK v3.7)
 │   └── archive/                         # historical milestones + pre-Wevra theory (see archive/README.md)
 ├── papers/                     # paper-grade write-ups (Wevra capsule-native runtime, etc.)
 └── vision_mvp/                 # working implementation + research diary

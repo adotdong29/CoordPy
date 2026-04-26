@@ -5,6 +5,90 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.8] — 2026-04-26 — SDK v3.8 — cross-role cohort-coherence multi-agent coordination + W7 family
+
+*Strictly additive on SDK v3.7. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The new
+``CohortCoherenceAdmissionPolicy`` is a research-slice addition
+to the multi-agent coordination layer
+(``vision_mvp.wevra.team_coord``), not part of the run-boundary
+product runtime.*
+
+### Added
+
+- **Phase-54 cross-role cohort-coherence benchmark** (new):
+  ``vision_mvp/experiments/phase54_cross_role_coherence.py``.
+  Smallest deterministic multi-agent benchmark where cross-role
+  coordination provides a strict structural advantage over
+  substrate FIFO. Bench properties (gold-plurality, cross-role,
+  budget-bound, decoder-pollution) are *named and mechanically
+  verified* by the contract tests. Runs end-to-end without any
+  LLM in the loop.
+- **``CohortCoherenceAdmissionPolicy``** (new): in
+  ``vision_mvp/wevra/team_coord.py``. Deterministic, training-free,
+  interpretable cross-role admission rule. Two sub-modes:
+  *streaming* (running cohort over already-admitted; arrival-
+  order-sensitive) and *buffered* (pre-fitted plurality from the
+  full candidate stream's payloads via
+  ``from_candidate_payloads``; arrival-order-stable). Re-exported
+  as ``TeamCohortCoherenceAdmissionPolicy``.
+- **W7 theorem family**: W7-1 (FIFO unbeatability under low
+  surplus, proved-empirical anchor on Phase-53), W7-1-aux
+  (streaming cohort instability under arrival permutation,
+  proved-empirical), W7-2 (cohort_buffered structural win under
+  gold-plurality, proved-empirical, n=50 saturated, 5/5 stable
+  across bank seeds), W7-2-conditional (K-sweep window,
+  proved-empirical), W7-3 (extraction floor, proved-negative,
+  Capsule Contract C5 corollary). W7-C1/C2/C3 conjectures cover
+  multi-service-gold, decoder-side coordination, and real-LLM
+  transfer extensions.
+- **21 contract tests** for the new policy + bench:
+  ``vision_mvp/tests/test_wevra_cross_role_coherence.py``.
+- **Frozen reproducibility artefacts**:
+  ``docs/data/phase54_cross_role_coherence_K4_n10.json`` (default
+  config),
+  ``docs/data/phase54_cross_role_coherence_budget_sweep.json``
+  (K-sweep).
+- **Milestone results note**:
+  ``docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md``.
+
+### Changed
+
+- ``SDK_VERSION`` bumped to ``"wevra.sdk.v3.8"``.
+- ``vision_mvp/wevra/__init__.py``: re-exports
+  ``TeamCohortCoherenceAdmissionPolicy``.
+- ``vision_mvp/wevra/team_coord.py``:
+  ``ALL_FIXED_POLICY_NAMES`` extended with
+  ``"cohort_coherence"``; new helper ``_candidate_service_tag``.
+- ``docs/THEOREM_REGISTRY.md``: W7-1 / W7-1-aux / W7-2 /
+  W7-2-conditional / W7-3 / W7-C1 / W7-C2 / W7-C3 rows added.
+- ``docs/RESEARCH_STATUS.md``: seventh research axis added (W7
+  family); now lists 7 coupled axes.
+- ``docs/HOW_NOT_TO_OVERSTATE.md``: W7-overstatement guards
+  added (cohort-coherence wins are *conditional* on bench
+  properties; SDK v3.7 and SDK v3.8 results are both true,
+  conditioned on different bench properties; *buffered* vs
+  *streaming* distinction must be specified).
+- ``docs/context_zero_master_plan.md``: § 4.25 added.
+- ``docs/START_HERE.md``: SDK v3.8 paragraph added.
+
+### Honest scope
+
+- **The W7-2 win is conditional.** It depends on the bench having
+  gold-plurality + foreign-service decoys + ``|candidates| >
+  K_auditor``. The Phase-53 (real-LLM) reading is preserved
+  exactly: substrate FIFO ties every fixed strategy at
+  ``accuracy_full = 0.800`` because the bench has no surplus
+  (W7-1).
+- **The Wevra single-run product runtime contract is unchanged.**
+  ``RunSpec`` / ``run`` / ``SweepSpec`` / ``run_sweep`` /
+  report v2 schema: byte-for-byte identical from SDK v3.7.
+- **The capsule layer's audit contribution is preserved.**
+  T-1..T-7 hold on every Phase-54 cell unchanged.
+- **Mac 2 still offline.** No two-Mac sharded inference happened
+  in SDK v3.8; the ``MLXDistributedBackend`` integration boundary
+  is byte-for-byte unchanged from SDK v3.6.
+
 ## [docs] — 2026-04-26 — documentation consolidation (no SDK change)
 
 *Repo-cleanup only. No code change. SDK contract byte-for-byte

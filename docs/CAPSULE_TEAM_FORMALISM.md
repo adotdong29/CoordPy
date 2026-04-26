@@ -212,6 +212,13 @@ The W4 family is **layered on top of** the W3 family. Specifically:
 ## 4. Frontier (W4-C* conjectures)
 
 * **W4-C1**: Learned-policy advantage at matched budgets (above).
+  *Update (SDK v3.7).* W4-C1 is now **conditional**: empirical-
+  positive on the synthetic+noise default config but falsified
+  out-of-distribution on the real-LLM Phase-53 regime. See
+  `THEOREM_REGISTRY.md`. The SDK v3.8 ``CohortCoherenceAdmissionPolicy``
+  (W7-2) supersedes the W4-C1 framing with a deterministic,
+  training-free cross-role admission rule that is OOD-stable
+  by construction.
 * **W4-C2**: Cohort-lifted role view closes the W4-3 limitation
   on a sub-class of scenarios. Falsifier: a scenario whose
   causal-share is $> $ a single COHORT's ``max_parents``.
@@ -222,6 +229,68 @@ The W4 family is **layered on top of** the W3 family. Specifically:
   ``(source_role, claim_kind)`` pair for one round. Status:
   open.
 
+## 4.5 W7 family — cross-role cohort coherence (SDK v3.8)
+
+The W7 family is layered on top of W4: every theorem assumes the
+W4-1 lifecycle invariants T-1..T-7 and the deterministic decoder
+$\mathsf{Dec}$, then adds **cross-role admission** via the
+``service=<tag>`` cohort signature. The family makes precise
+when capsule structure can and cannot beat substrate FIFO at
+multi-agent coordination.
+
+* **W7-1** (proved-empirical, Phase-53 anchor). When
+  $|\text{candidates}(S)| \le K_{\text{role}}$ for every scenario
+  $S$ in the bench, every fixed admission policy is permutation-
+  equivalent to ``admit_all`` on $A_r$; the structure_gain over
+  substrate FIFO is identically zero. **Practical reading:** when
+  the producer pre-filters such that each scenario emits below
+  the auditor's budget cap, no admission policy can win — the
+  bench is FIFO-saturated by construction.
+
+* **W7-1-aux** (proved-empirical, Phase-54 anchor). Streaming
+  ``CohortCoherenceAdmissionPolicy`` (``fixed_plurality_tag=None``)
+  is unstable under candidate-arrival permutation: under a stream
+  whose first auditor-routed candidate carries a foreign-service
+  tag, the streaming policy admits the foreign tag and rejects
+  every subsequent gold-tag candidate. The buffered variant
+  (``from_candidate_payloads(...)``) corrects this by pre-fitting
+  the plurality off-line.
+
+* **W7-2** (proved-empirical, n=50 saturated). Under the
+  *gold-plurality property* (gold service tag has strictly more
+  auditor-routed candidates than any decoy service tag) and
+  $|\text{candidates}| > K_{\text{auditor}}$, the buffered cohort
+  policy achieves $\mathrm{accuracy\_full} = 1.000$ while every
+  admission policy that does not see service-tag information
+  produces $\mathrm{accuracy\_full} = 0.000$. **Practical
+  reading:** when the bench has cross-role service-tag coherence
+  the auditor can admit on, capsule structure provides a strict
+  +1.000 advantage over substrate FIFO. The win is **conditional**
+  on the bench property.
+
+* **W7-2-conditional** (proved-empirical, K-sweep). W7-2 holds
+  in the *structure-win window*: $\text{gold\_count\_min} \le
+  K_{\text{auditor}}$. The Phase-54 budget sweep observes +0.40
+  at $K \in \{2, 3\}$ (gold cohort partially fits) and +1.00 at
+  $K \in \{4, 5, 6, 8\}$.
+
+* **W7-3** (proved-negative, extraction floor). No per-role
+  admission policy can recover a missing causal claim that the
+  producer never emitted. Proof: ``capsule_role_view.parents``
+  is constructed from ledger CIDs (Capsule Contract C5); a
+  never-emitted claim has no CID. Empirical anchor: Phase-53
+  ``deadlock_pool_exhaustion`` is missed by every admission
+  strategy because neither LLM emits ``DEADLOCK_SUSPECTED``.
+  Implication: separates **admission-fixable** failures (W7-1,
+  W7-2) from **extraction-fixable** failures.
+
+The W7-1 / W7-2 dichotomy is the load-bearing scientific
+contribution of SDK v3.8: substrate FIFO is unbeatable when the
+bench has no surplus (W7-1, Phase-53); cohort coherence beats
+substrate cleanly when the bench has surplus + foreign-service
+decoys + gold-plurality (W7-2, Phase-54). Neither claim is
+universal; both are conditional on stated bench properties.
+
 ## 5. Code anchors
 
 | Theorem / claim | Code anchor                                               |
@@ -231,6 +300,11 @@ The W4 family is **layered on top of** the W3 family. Specifically:
 | W4-3            | `TeamLevelCorrectnessTests::test_w4_3_*`; sweep in `phase52_team_coord.run_phase52_budget_sweep` |
 | W4-C1           | `phase52_team_coord.run_phase52` default config;          |
 |                 | `LearnedAdmissionPolicyTests`                            |
+| W7-1            | `phase53_scale_vs_structure.run_phase53` default config; `docs/data/phase53_scale_vs_structure_K4_n5.json` |
+| W7-1-aux        | `team_coord.CohortCoherenceAdmissionPolicy` (streaming); `Phase54DefaultConfigTests::test_streaming_cohort_does_not_beat_fifo_at_K4` |
+| W7-2            | `team_coord.CohortCoherenceAdmissionPolicy.from_candidate_payloads`; `phase54_cross_role_coherence.run_phase54`; `Phase54DefaultConfigTests::test_buffered_cohort_strictly_beats_fifo_at_K4` |
+| W7-2-conditional | `phase54_cross_role_coherence.run_phase54_budget_sweep`; `Phase54BudgetSweepTests` |
+| W7-3            | Capsule Contract C5 (ledger-CID gating); empirical anchor: `docs/data/phase53_scale_vs_structure_K4_n5.json` (`deadlock_pool_exhaustion` failure_hist) |
 
 ## 6. Limits of this formalism
 
