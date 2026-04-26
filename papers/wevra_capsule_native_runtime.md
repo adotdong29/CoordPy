@@ -483,12 +483,16 @@ The contribution is sharper than the v3.1 framing because:
   ``PROMPT → LLM_RESPONSE → PARSE_OUTCOME → PATCH_PROPOSAL →
   APPLY_OUTCOME → TEST_VERDICT`` and would relax the strict
   invariant that TEST_VERDICT has exactly one parent.
-- **Real cross-LLM W3-C6 study.** Replace the synthetic
-  distribution library with a sweep over real Ollama LLMs
-  (``gemma2:9b``, ``qwen2.5:7b``, ``llama3:8b``). Straightforward
-  to layer on by passing ``llm_client=LLMClient(...)`` to
-  ``_real_cells``. The current synthetic study is a
-  necessary, sharper, in-CI-runnable preliminary.
+- **Real cross-LLM W3-C6 study.** ✅ **PARTIALLY DISCHARGED**
+  in SDK v3.6 by W5-1 on the available model class. Real
+  cross-LLM measurement on Mac 1 Ollama (``qwen2.5:14b-32k``
+  vs ``qwen3.5:35b``) yields cross-model PARSE_OUTCOME
+  failure-kind TVD = 1.000 on strict parsing (n=10), collapsing
+  to 0.000 on robust — saturated and reproducible. The
+  full discharge remaining is the 70 B-class measurement
+  across both Macs via MLX distributed (Mac 2 currently offline
+  at measurement time). See
+  ``docs/RESULTS_WEVRA_DISTRIBUTED.md``.
 - **Cryptographic signing on top of the META_MANIFEST.** Authenticity
   against an adversary is orthogonal but composable.
 - **Cross-run determinism on full DAG without flag.** Could be

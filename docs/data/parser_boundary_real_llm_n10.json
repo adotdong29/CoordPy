@@ -1,0 +1,279 @@
+{
+  "schema": "wevra.parser_boundary_real.v1",
+  "n_instances": 10,
+  "endpoint": "http://192.168.12.191:11434",
+  "model_tags": [
+    "qwen2.5:14b-32k",
+    "qwen3.5:35b"
+  ],
+  "parser_modes": [
+    "strict",
+    "robust"
+  ],
+  "distributions": {
+    "qwen2.5:14b-32k|strict": {
+      "n_total": 10,
+      "n_ok": 10,
+      "ok_rate": 1.0,
+      "failure_kind": {
+        "ok": 10,
+        "empty_output": 0,
+        "no_block": 0,
+        "unclosed_new": 0,
+        "unclosed_old": 0,
+        "malformed_diff": 0,
+        "empty_patch": 0,
+        "multi_block": 0,
+        "prose_only": 0,
+        "fenced_only": 0
+      },
+      "recovery": {
+        "<none>": 10,
+        "closed_at_eos": 0,
+        "fenced_code_heuristic": 0,
+        "label_prefix_heuristic": 0,
+        "unified_diff_fallback": 0,
+        "loose_delimiter_heuristic": 0,
+        "fence_wrapped_payload": 0
+      }
+    },
+    "qwen2.5:14b-32k|robust": {
+      "n_total": 10,
+      "n_ok": 10,
+      "ok_rate": 1.0,
+      "failure_kind": {
+        "ok": 10,
+        "empty_output": 0,
+        "no_block": 0,
+        "unclosed_new": 0,
+        "unclosed_old": 0,
+        "malformed_diff": 0,
+        "empty_patch": 0,
+        "multi_block": 0,
+        "prose_only": 0,
+        "fenced_only": 0
+      },
+      "recovery": {
+        "<none>": 7,
+        "closed_at_eos": 0,
+        "fenced_code_heuristic": 0,
+        "label_prefix_heuristic": 0,
+        "unified_diff_fallback": 0,
+        "loose_delimiter_heuristic": 0,
+        "fence_wrapped_payload": 3
+      }
+    },
+    "qwen3.5:35b|strict": {
+      "n_total": 10,
+      "n_ok": 0,
+      "ok_rate": 0.0,
+      "failure_kind": {
+        "ok": 0,
+        "empty_output": 0,
+        "no_block": 0,
+        "unclosed_new": 10,
+        "unclosed_old": 0,
+        "malformed_diff": 0,
+        "empty_patch": 0,
+        "multi_block": 0,
+        "prose_only": 0,
+        "fenced_only": 0
+      },
+      "recovery": {
+        "<none>": 10,
+        "closed_at_eos": 0,
+        "fenced_code_heuristic": 0,
+        "label_prefix_heuristic": 0,
+        "unified_diff_fallback": 0,
+        "loose_delimiter_heuristic": 0,
+        "fence_wrapped_payload": 0
+      }
+    },
+    "qwen3.5:35b|robust": {
+      "n_total": 10,
+      "n_ok": 10,
+      "ok_rate": 1.0,
+      "failure_kind": {
+        "ok": 10,
+        "empty_output": 0,
+        "no_block": 0,
+        "unclosed_new": 0,
+        "unclosed_old": 0,
+        "malformed_diff": 0,
+        "empty_patch": 0,
+        "multi_block": 0,
+        "prose_only": 0,
+        "fenced_only": 0
+      },
+      "recovery": {
+        "<none>": 0,
+        "closed_at_eos": 10,
+        "fenced_code_heuristic": 0,
+        "label_prefix_heuristic": 0,
+        "unified_diff_fallback": 0,
+        "loose_delimiter_heuristic": 0,
+        "fence_wrapped_payload": 0
+      }
+    }
+  },
+  "tvd_pairwise": {
+    "qwen2.5:14b-32k|qwen3.5:35b|strict": 1.0,
+    "qwen2.5:14b-32k|qwen3.5:35b|robust": 0.0
+  },
+  "parser_mode_shift": {
+    "qwen2.5:14b-32k": {
+      "strict_to_robust_tvd": 0.0
+    },
+    "qwen3.5:35b": {
+      "strict_to_robust_tvd": 1.0
+    }
+  },
+  "max_cross_tvd": 1.0,
+  "max_parser_mode_shift": 1.0,
+  "ok_rate_uplift_strict": -1.0,
+  "wall_seconds": 163.08,
+  "n_llm_calls": 20,
+  "elapsed_per_call": [
+    [
+      "qwen2.5:14b-32k",
+      "ext-calc-001",
+      26.792,
+      688,
+      235
+    ],
+    [
+      "qwen2.5:14b-32k",
+      "ext-strings-001",
+      4.08,
+      718,
+      176
+    ],
+    [
+      "qwen2.5:14b-32k",
+      "ext-list-001",
+      2.196,
+      704,
+      49
+    ],
+    [
+      "qwen2.5:14b-32k",
+      "ext-dict-001",
+      5.249,
+      678,
+      208
+    ],
+    [
+      "qwen2.5:14b-32k",
+      "ext-text-001",
+      5.492,
+      698,
+      245
+    ],
+    [
+      "qwen2.5:14b-32k",
+      "ext-math-001",
+      3.502,
+      674,
+      129
+    ],
+    [
+      "qwen2.5:14b-32k",
+      "ext-cmp-001",
+      3.592,
+      665,
+      120
+    ],
+    [
+      "qwen2.5:14b-32k",
+      "ext-range-001",
+      4.159,
+      693,
+      150
+    ],
+    [
+      "qwen2.5:14b-32k",
+      "ext-guard-001",
+      3.397,
+      688,
+      111
+    ],
+    [
+      "qwen2.5:14b-32k",
+      "ext-neg-001",
+      3.16,
+      657,
+      101
+    ],
+    [
+      "qwen3.5:35b",
+      "ext-calc-001",
+      75.581,
+      688,
+      221
+    ],
+    [
+      "qwen3.5:35b",
+      "ext-strings-001",
+      2.28,
+      718,
+      91
+    ],
+    [
+      "qwen3.5:35b",
+      "ext-list-001",
+      4.153,
+      704,
+      183
+    ],
+    [
+      "qwen3.5:35b",
+      "ext-dict-001",
+      2.806,
+      678,
+      104
+    ],
+    [
+      "qwen3.5:35b",
+      "ext-text-001",
+      2.76,
+      698,
+      129
+    ],
+    [
+      "qwen3.5:35b",
+      "ext-math-001",
+      2.783,
+      674,
+      118
+    ],
+    [
+      "qwen3.5:35b",
+      "ext-cmp-001",
+      2.917,
+      665,
+      113
+    ],
+    [
+      "qwen3.5:35b",
+      "ext-range-001",
+      2.966,
+      693,
+      143
+    ],
+    [
+      "qwen3.5:35b",
+      "ext-guard-001",
+      3.151,
+      688,
+      125
+    ],
+    [
+      "qwen3.5:35b",
+      "ext-neg-001",
+      2.057,
+      657,
+      76
+    ]
+  ],
+  "claim": "REAL cross-LLM measurement on 10 instances: max cross-model PARSE_OUTCOME failure-kind TVD = 1.000; max strict\u2192robust parser-mode shift = 1.000; strongest-model ok-rate uplift on strict parser = -1.000."
+}

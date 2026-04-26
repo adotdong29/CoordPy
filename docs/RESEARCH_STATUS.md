@@ -5,12 +5,12 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.5,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.6,
 > 2026-04-26.
 
 ## TL;DR
 
-The programme now has **four** coupled research axes, each with a
+The programme now has **five** coupled research axes, each with a
 sharp status:
 
 1. **Capsule contract / runtime** — *active, advancing*. The
@@ -44,6 +44,76 @@ sharp status:
    memory, typed handoffs, escalation threads, adaptive
    subscriptions. ~1500 substrate tests, no active development on
    substrate primitives themselves.
+5. **Two-Mac distributed inference + real cross-LLM measurement**
+   — *active, new (SDK v3.6)*. The chosen path for one-larger-
+   model inference across two Apple Silicon Macs is **MLX
+   distributed** (under `mpirun mlx_lm.server`); the Wevra-side
+   integration boundary is one duck-typed `LLMBackend` Protocol
+   plus an `MLXDistributedBackend` adapter that talks
+   OpenAI-compatible HTTP. Real cross-LLM measurement on the
+   available model class (Qwen-2.5-14B-dense vs
+   Qwen-3.5-35B-MoE on Mac 1) yields **W5-1
+   (proved-empirical)**: cross-model PARSE_OUTCOME failure-kind
+   TVD = 1.000 under strict parsing on the bundled bank,
+   collapsing to 0.000 under robust parsing — the **first real
+   confirmation** that the capsule-native runtime survives a
+   2.4× model-class jump and a dense → MoE architecture swap
+   without spine modification. The two-Mac MLX-distributed path
+   is **experimental infrastructure**, not product; the Wevra
+   single-run product runtime contract is byte-for-byte
+   unchanged.
+
+## Current frontier (SDK v3.6, 2026-04-26)
+
+### Active moves (SDK v3.6 — two-Mac distributed inference + real cross-LLM)
+
+- **Chosen two-Mac inference path: MLX distributed.** Apple-
+  official, supports Llama / Qwen / Mistral natively, and
+  exposes a single OpenAI-compatible HTTP server (head rank)
+  regardless of single-host or sharded across N hosts. Hyperspace
+  is a strong distributed-agent infrastructure but **not** a
+  single-model sharding system; llama.cpp `--rpc` is a
+  defensible alternative but with smaller Apple-Silicon
+  optimisation.
+- **Realistic model class on 2×36 GB:** 70B-class in Q4
+  (≈ 40 GB weights; fits across two Macs with KV-cache headroom).
+  35B-class in Q4 fits on a single Mac; sharding buys
+  context-length / KV headroom only.
+- **Wevra integration boundary** (`vision_mvp.wevra.llm_backend`):
+  a duck-typed `LLMBackend` Protocol with two concrete
+  implementations (`OllamaBackend`, `MLXDistributedBackend`).
+  The runtime's inner-loop seal-PROMPT / seal-LLM_RESPONSE chain
+  accepts any conformant backend without any spine modification
+  (W5-2 proved); the OpenAI-compatible wire shape is locked
+  against a stub server (W5-3 proved).
+- **Real cross-LLM parser-boundary measurement (W5-1)**:
+  `parser_boundary_real_llm.py` against the live Mac 1 Ollama
+  endpoint yields cross-model PARSE_OUTCOME failure-kind
+  TVD = 1.000 between Qwen-2.5-14B (dense, Q4) and Qwen-3.5-35B
+  (MoE, Q4, `think=False`) under strict parsing on n=10
+  instances — the larger model emits OLD/NEW close as `<<`
+  instead of `<<<` and lands entirely in `unclosed_new`, while
+  the smaller model emits `<<<` cleanly. Robust-mode
+  `recovery=closed_at_eos` collapses cross-model TVD to 0.000.
+  This **inverts the naive prediction** that a stronger model
+  would reduce parser-boundary instability.
+
+### Active conjectures (SDK v3.6)
+
+- **W5-C1**: parser-boundary instability is a (model
+  architecture × prompt-format) interaction, not a capacity
+  artefact. Empirical-research; falsifier = a bank on which
+  the larger model strict-parses ok > 50%.
+- **W5-C2**: robust-mode `recovery=closed_at_eos` is the
+  load-bearing safety net that makes the capsule-native runtime
+  model-class-agnostic on the bundled prompt format. Empirical-
+  research; falsifier = a model whose `unclosed_new` cannot be
+  salvaged.
+- **W5-C3**: closed-vocabulary `PARSE_OUTCOME.failure_kind` is
+  a *minimum sufficient* typed witness of cross-model behaviour
+  differences. Conjectural research; falsifier = a model pair
+  with identical strict-mode `failure_kind` distribution but
+  materially different downstream test-pass rate.
 
 ## Current frontier (SDK v3.5, 2026-04-26)
 

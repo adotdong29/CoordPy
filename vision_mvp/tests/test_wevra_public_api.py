@@ -61,18 +61,36 @@ class WevraSurfaceTests(unittest.TestCase):
             self.assertIsInstance(v, str)
             self.assertTrue(len(v) > 0)
 
-    def test_sdk_version_is_v3_5(self):
+    def test_sdk_version_is_v3_6(self):
         from vision_mvp.wevra import SDK_VERSION
-        # SDK v3.5 bump: capsule-native multi-agent team coordination
-        # research slice (TEAM_HANDOFF / ROLE_VIEW / TEAM_DECISION
-        # capsule kinds + ``TeamCoordinator`` + ``audit_team_lifecycle``
-        # over invariants T-1..T-7, Theorems W4-1 proved+mechanically-
-        # checked / W4-2 proved-conditional / W4-3 proved-negative).
-        # Strictly additive on v3.4 — every v3.4 run-boundary
-        # contract test still passes byte-for-byte. The Wevra single-
-        # run product runtime contract is unchanged; the new surface
-        # is research-grade.
-        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.5")
+        # SDK v3.6 bump: two-Mac distributed-inference integration
+        # boundary (chosen path: MLX distributed; not Hyperspace) +
+        # first real cross-LLM parser-boundary measurement
+        # (W5-1 / W5-2 / W5-3, W5-C1 / W5-C2 / W5-C3). Strictly
+        # additive on v3.5 — every v3.5 run-boundary AND team-
+        # boundary contract test still passes byte-for-byte. The
+        # Wevra single-run product runtime contract is unchanged;
+        # the new surface is one duck-typed ``LLMBackend`` Protocol
+        # with two backend adapters (``OllamaBackend``,
+        # ``MLXDistributedBackend``).
+        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.6")
+
+    def test_llm_backend_surface_is_exported(self):
+        # The SDK v3.6 LLM-backend surface must be importable from
+        # the top-level ``vision_mvp.wevra`` namespace (additive
+        # re-export). The integration boundary is one HTTP-client
+        # class — Wevra deliberately does not own cluster bring-up.
+        from vision_mvp.wevra import (
+            LLMBackend, OllamaBackend, MLXDistributedBackend,
+            make_backend,
+        )
+        self.assertIsNotNone(LLMBackend)
+        # Factory dispatch by name.
+        b1 = make_backend("ollama", model="m", base_url=None)
+        self.assertIsInstance(b1, OllamaBackend)
+        b2 = make_backend("mlx_distributed", model="m",
+                           base_url="http://x:8080")
+        self.assertIsInstance(b2, MLXDistributedBackend)
 
     def test_team_coord_surface_is_exported(self):
         # The SDK v3.5 multi-agent coordination research slice must

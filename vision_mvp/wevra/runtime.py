@@ -620,6 +620,7 @@ def _resolve_launch_cmd(spec: SweepSpec) -> list[str]:
 def run_sweep(spec: SweepSpec,
               *, strict_cost_gate: bool = False,
               ctx: "Any" = None,
+              llm_backend: "Any" = None,
               ) -> dict[str, Any]:
     """Execute ``spec`` and return a unified sweep block.
 
@@ -637,6 +638,7 @@ def run_sweep(spec: SweepSpec,
         "wall_seconds": float,
         "model": str | None,
         "endpoint": str | None,
+        "backend": str | None,           # SDK v3.6 — provenance only
       }
 
     ``strict_cost_gate=True`` makes a not-acknowledged real run raise
@@ -652,6 +654,20 @@ def run_sweep(spec: SweepSpec,
     None, the legacy behaviour is preserved (cells accumulate in
     memory; the post-hoc ``build_report_ledger`` folds them into
     capsules afterwards).
+
+    ``llm_backend`` (optional, SDK v3.6) is any object satisfying
+    the duck-typed :class:`vision_mvp.wevra.llm_backend.LLMBackend`
+    Protocol. When provided in real mode, the inner loop calls
+    ``llm_backend.generate`` instead of constructing a default
+    Ollama ``LLMClient``. This is the integration point for the
+    MLX-distributed two-Mac path: pass an
+    ``MLXDistributedBackend(model=..., base_url=...)`` whose
+    ``base_url`` is the head-rank ``mlx_lm.server`` started under
+    ``mpirun``. The Wevra spine is unchanged — the PROMPT /
+    LLM_RESPONSE capsules record the same SHA-256 + length +
+    snippet shape regardless of which backend produced them.
+    Backward compatible: ``llm_backend=None`` preserves byte-for-
+    byte behaviour with prior SDK versions.
     """
     t0 = time.time()
     spec_payload = _spec_payload(spec)
@@ -726,7 +742,9 @@ def run_sweep(spec: SweepSpec,
                 "command instead. Re-run with "
                 "RunSpec(acknowledge_heavy=True) to execute in-process."),
         }
-    cells = _real_cells(spec, ctx=ctx)
+    cells = _real_cells(spec, ctx=ctx, llm_client=llm_backend)
+    backend_name = (
+        type(llm_backend).__name__ if llm_backend is not None else None)
     return {
         "schema": "wevra.sweep.v2",
         "mode": "real", "executed_in_process": True,
@@ -735,6 +753,7 @@ def run_sweep(spec: SweepSpec,
         "cells": cells, "launch_cmd": None,
         "wall_seconds": round(time.time() - t0, 3),
         "model": spec.model, "endpoint": spec.endpoint,
+        "backend": backend_name,
     }
 
 

@@ -70,6 +70,19 @@ from vision_mvp.wevra import extensions
 # Unified runtime (Slice 2).
 from .runtime import SweepSpec, run_sweep, HeavyRunNotAcknowledged
 
+# SDK v3.6 — LLM backend abstraction. Strictly additive: when no
+# backend is supplied, the runtime instantiates ``LLMClient``
+# byte-for-byte unchanged. When a backend is supplied (e.g. an
+# ``MLXDistributedBackend`` whose ``base_url`` points at an
+# ``mlx_lm.server`` launched under ``mpirun`` across two Apple
+# Silicon hosts), the inner-loop calls dispatch through the
+# backend without any other change to the spine. The PROMPT /
+# LLM_RESPONSE capsules' shape (SHA-256 + length + snippet) is
+# preserved regardless of backend.
+from .llm_backend import (
+    LLMBackend, OllamaBackend, MLXDistributedBackend, make_backend,
+)
+
 # Capsule runtime (Slice 3 — SDK v3). The load-bearing abstraction
 # around which the rest of the SDK is centred.
 from .capsule import (
@@ -205,7 +218,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.5"
+SDK_VERSION = "wevra.sdk.v3.6"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -218,6 +231,10 @@ __all__ = [
     "RunSpec", "run",
     # Unified runtime (Slice 2)
     "SweepSpec", "run_sweep", "HeavyRunNotAcknowledged",
+    # SDK v3.6 — LLM backend abstraction (additive integration
+    # boundary for two-Mac MLX-distributed inference).
+    "LLMBackend", "OllamaBackend", "MLXDistributedBackend",
+    "make_backend",
     # Capsule runtime (Slice 3 — SDK v3)
     "ContextCapsule", "CapsuleKind", "CapsuleLifecycle",
     "CapsuleBudget", "CapsuleLedger", "CapsuleView",

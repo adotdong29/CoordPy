@@ -4,20 +4,29 @@
 > `context-zero`. This is a plan for a body of work, not a changelog.
 > Phase-by-phase diaries live in `vision_mvp/RESULTS_PHASE*.md`;
 > session notes live nowhere durable, on purpose. Last touched: SDK
-> v3.5 capsule-native multi-agent team coordination slice
-> (TEAM_HANDOFF / ROLE_VIEW / TEAM_DECISION capsule kinds,
-> ``TeamCoordinator``, lifecycle audit T-1..T-7, Theorems W4-1
-> proved+mechanically-checked / W4-2 proved-conditional / W4-3
-> proved-negative; learned per-role admission policy admits
-> *strictly fewer handoffs* than the strongest fixed baseline
-> (coverage-guided) on every train seed (12/12) of the Phase-52
-> incident-triage bench and improves pooled team-decision
-> accuracy on most seeds — gap on `accuracy_full` > 0 in 11/12
-> seeds (mean +0.054); accuracy advantage reverses at higher
-> noise. The capsule-native runtime is now load-bearing both
-> *inside* one Wevra run AND *between* agents in a team — the
-> first slice that reconnects capsule-native execution to the
-> original "solve context for multi-agent teams" thesis.
+> v3.6 two-Mac distributed-inference integration boundary +
+> real cross-LLM parser-boundary measurement (chosen path: **MLX
+> distributed** — Apple-official, supports Apple Silicon
+> sharded inference; not Hyperspace, which is distributed-agent
+> infra rather than single-model sharding). The Wevra-side
+> integration ships as a duck-typed ``LLMBackend`` Protocol with
+> two concrete implementations (``OllamaBackend``,
+> ``MLXDistributedBackend``); the inner-loop seal-PROMPT /
+> seal-LLM_RESPONSE chain is byte-for-byte unchanged. First
+> real cross-LLM measurement on the available model class
+> (Mac 1 Ollama: Qwen-2.5-14B-dense vs Qwen-3.5-35B-MoE)
+> yields a **saturated 1.000 cross-model PARSE_OUTCOME
+> failure-kind TVD on strict parsing** (n=10), collapsing to
+> 0.000 under robust parsing — the **first real evidence**
+> that the capsule-native runtime survives a 2.4× model-class
+> jump and a dense → MoE architecture swap without spine
+> modification (Theorem W5-1 proved-empirical; W5-2 / W5-3
+> proved on the integration boundary). The two-Mac MLX-distributed
+> path is **experimental infrastructure**, not product; Wevra's
+> single-run product runtime contract is byte-for-byte
+> unchanged. SDK v3.5 capsule-native multi-agent team
+> coordination slice still in force (TEAM_HANDOFF / ROLE_VIEW /
+> TEAM_DECISION; W4-1 / W4-2 / W4-3; W4-C1 empirical).
 > 2026-04-26.
 > Canonical research-status pointer:
 > [`docs/RESEARCH_STATUS.md`](RESEARCH_STATUS.md). Canonical
@@ -6020,6 +6029,178 @@ agent axis added);
 `vision_mvp/experiments/phase52_team_coord.py` (benchmark
 driver); `vision_mvp/wevra/team_coord.py` and
 `vision_mvp/wevra/team_policy.py` (the new module pair).
+
+### 4.23 SDK v3.6 — two-Mac distributed-inference integration boundary + real cross-LLM parser-boundary measurement
+
+The v3.5 milestone (§ 4.22) closed the team boundary inside the
+research slice. The v3.6 milestone closes a different — and
+complementary — boundary: the **inference-backend boundary**.
+Up through v3.5 the capsule-native runtime was load-bearing in
+its inner-loop spine but pinned to a single-host Ollama HTTP
+client; the **stronger-model regime** that two combined Apple
+Silicon Macs unlock (a single sharded model spanning
+`mac1.local + mac2.local`) was an operator concern, not a Wevra
+concern. SDK v3.6 ships the smallest honest integration boundary
+plus the first **real** (non-synthetic) cross-LLM measurement
+on the parser-boundary axis.
+
+**1. Chosen path: MLX distributed inference.**
+
+Three candidates were evaluated:
+
+* **MLX distributed (`mx.distributed` + `mlx_lm.server`).**
+  Apple-official, supports Apple Silicon (Metal), shards a
+  single transformer's weights across N hosts via tensor +
+  pipeline parallel under MPI. Exposes one OpenAI-compatible
+  HTTP endpoint on the head rank; the wire shape is identical
+  to a single-host run.
+* **llama.cpp `--rpc`.** Real, supports Apple Silicon (Metal),
+  shards a GGUF across multiple `rpc-server` processes. A
+  defensible alternative; not chosen because MLX is more deeply
+  optimised for Apple Silicon and the maintenance surface is
+  smaller.
+* **Hyperspace.** A strong distributed-agent infrastructure
+  (node discovery, message routing, agent caching) but **not**
+  a single-model sharding system. There is no public Hyperspace
+  surface that splits one transformer's weights across two
+  Macs and runs one forward pass across the cut. We do **not**
+  pick Hyperspace for this milestone — it solves a different
+  problem.
+
+The realistic model class on 2 × 36 GB Macs is **70B in 4-bit**
+(≈ 40 GB weights; fits across both Macs with KV-cache headroom).
+Sub-70B models run on a single Mac in 4-bit; sharding gives
+context-length / KV headroom only.
+
+**2. Wevra integration boundary
+(`vision_mvp/wevra/llm_backend.py`).**
+
+A duck-typed `LLMBackend` Protocol with three pieces:
+
+* `LLMBackend` (runtime-checkable Protocol) — `model: str`,
+  `base_url: str | None`, `generate(prompt, max_tokens,
+  temperature) -> str`. Matches the duck-type the inner-loop
+  already expected from `LLMClient`.
+* `OllamaBackend` — wraps the existing Ollama client unchanged.
+* `MLXDistributedBackend` — talks an OpenAI-compatible
+  `POST /v1/chat/completions` endpoint. Designed for an
+  `mlx_lm.server` launched under `mpirun --hostfile <hosts>`
+  so the same HTTP surface fronts a single-host run *or* a
+  sharded multi-host run. Wevra is **neutral on the sharding
+  strategy**: one HTTP client, one Protocol, one adapter class.
+* `make_backend(name, **kwargs)` — factory dispatch by name.
+
+`run_sweep(spec, *, ctx=None, llm_backend=None)` accepts an
+optional `llm_backend`. When set, the inner-loop dispatches
+through it; when None, behaviour is byte-for-byte identical to
+SDK v3.5. The PROMPT / LLM_RESPONSE / PARSE_OUTCOME /
+PATCH_PROPOSAL / TEST_VERDICT capsule chain seals byte-for-byte
+equivalently regardless of backend (W5-2 proved).
+
+**3. Three named theorems (W5 family).**
+
+* **W5-1 (proved-empirical, real LLM)** — On the bundled
+  SWE-bench-Lite-shape bank with `prompt_style="block"`,
+  `temperature=0`, `n=10`:
+    1. `qwen3.5:35b` (36B-MoE Q4 `think=False`) under strict
+       parsing produces `failure_kind=unclosed_new` 10/10;
+       `ok_rate=0.000`.
+    2. `qwen2.5:14b-32k` (14.8B-dense Q4) under strict
+       produces `failure_kind=ok` 10/10; `ok_rate=1.000`.
+    3. Cross-model PARSE_OUTCOME failure-kind TVD = 1.000 on
+       strict; collapses to 0.000 on robust via
+       `recovery=closed_at_eos`.
+  Anchor:
+  `vision_mvp/experiments/parser_boundary_real_llm.py`;
+  result JSON in `/tmp/wevra-distributed/`.
+* **W5-2 (proved)** — Backend integration: any duck-typed
+  `LLMBackend` substitutes for `LLMClient` in `_real_cells`;
+  the capsule chain seals end-to-end byte-for-byte.
+  Anchor:
+  `test_wevra_llm_backend.py::RunSweepBackendIntegrationTests`.
+* **W5-3 (proved)** — `MLXDistributedBackend` wire shape:
+  OpenAI-compatible `POST /v1/chat/completions` with
+  `{model, messages, max_tokens, temperature, stream:false}`,
+  parses `choices[0].message.content`. Locked against
+  in-process stub.
+
+**4. Three named conjectures (W5-C family).**
+
+* **W5-C1 (empirical-research, falsifiable)** — Parser-
+  boundary instability is a (model-architecture × prompt-format)
+  interaction, not a capacity artefact. Falsifier: a bank where
+  the larger model strict-parses ok > 50%.
+* **W5-C2 (empirical-research, falsifiable)** — Robust-mode
+  `recovery=closed_at_eos` is the load-bearing safety net
+  making the runtime model-class-agnostic on the bundled
+  prompt format. Falsifier: a model whose `unclosed_new`
+  cannot be salvaged.
+* **W5-C3 (research, conjectural)** — Closed-vocabulary
+  `PARSE_OUTCOME.failure_kind` is a *minimum sufficient* typed
+  witness of cross-model behaviour differences. Falsifier: a
+  model pair with identical strict-mode `failure_kind`
+  distribution but materially different downstream test-pass
+  rate.
+
+**5. Honest scope.**
+
+The MLX-distributed two-Mac path is **experimental
+infrastructure**, not product. Wevra does **not** ship `mlx`,
+`mlx-lm`, or `mpirun` as dependencies; it does not auto-bring-up
+the cluster. There is deliberately no
+`pip install wevra[mlx_distributed]` extra. The integration is
+one HTTP-client class.
+
+W5-1 was measured on a *single* Mac (Mac 1 alive at measurement
+time; Mac 2 offline / ARP "incomplete" at 192.168.12.248). The
+two-Mac MLX-distributed path is the integration boundary, not
+the inference path used for W5-1; it is the *next-step*
+research target once Mac 2 returns. The W5-1 result is
+nonetheless real cross-LLM evidence for the capsule-native
+runtime being model-class-agnostic — the model swap from
+14.8B-dense to 36B-MoE is a 2.4× capacity jump and an
+architecture switch (dense → mixture-of-experts).
+
+**6. Why this strengthens the original Context-Zero thesis.**
+
+The original thesis is "context is a routing / substrate /
+coordination problem in multi-agent LLM systems." SDK v3.5 made
+the capsule abstraction load-bearing **between agents**. SDK
+v3.6 demonstrates it is **load-bearing across the model-class
+gradient**: the typed-boundary discipline (PARSE_OUTCOME closed
+vocabulary, recovery-label closed vocabulary, lifecycle audit
+L-11) cleanly absorbs a model-architecture swap that breaks the
+naive "stronger = cleaner" prediction at the byte level. The
+larger-model regime is an *additional axis of evidence*, not a
+refutation. If anything, W5-1 says **the capsule-native runtime
+becomes more, not less, valuable as model class scales** —
+because the parser-boundary axis is a load-bearing source of
+distribution shift, and the runtime's typed witnesses are how
+you see it without hand-diffing N responses.
+
+**7. Files / tests / artefacts.**
+
+* `vision_mvp/wevra/llm_backend.py` (new) — Protocol +
+  `OllamaBackend` + `MLXDistributedBackend` + `make_backend`.
+* `vision_mvp/wevra/runtime.py` — `run_sweep` accepts optional
+  `llm_backend`; sweep block records `"backend"` field.
+* `vision_mvp/wevra/__init__.py` — re-exports + `SDK_VERSION =
+  "wevra.sdk.v3.6"`.
+* `vision_mvp/experiments/parser_boundary_real_llm.py` (new) —
+  real-LLM cross-model parser-boundary harness.
+* `vision_mvp/tests/test_wevra_llm_backend.py` (new) — 9
+  contract / wire-shape / integration tests.
+* `docs/RESULTS_WEVRA_DISTRIBUTED.md` (this milestone note).
+* `docs/MLX_DISTRIBUTED_RUNBOOK.md` (operator runbook).
+* `docs/THEOREM_REGISTRY.md` — W5-1 / W5-2 / W5-3 / W5-C1 /
+  W5-C2 / W5-C3 rows added.
+* `docs/RESEARCH_STATUS.md` — fifth research axis added.
+
+Anchor: `docs/RESULTS_WEVRA_DISTRIBUTED.md` (this milestone
+note); `docs/MLX_DISTRIBUTED_RUNBOOK.md` (operator runbook);
+`vision_mvp/experiments/parser_boundary_real_llm.py`
+(benchmark driver); `vision_mvp/wevra/llm_backend.py` (the new
+adapter module).
 
 ---
 

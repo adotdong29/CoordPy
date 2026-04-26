@@ -4,7 +4,7 @@
 > theorem-style claim in the Context Zero / Wevra programme.
 > If this file disagrees with any other doc on the *status* of a
 > claim, this file is right and the other file is stale. Last
-> touched: SDK v3.5, 2026-04-26.
+> touched: SDK v3.6, 2026-04-26.
 >
 > Status vocabulary (definitions in `docs/HOW_NOT_TO_OVERSTATE.md`):
 >
@@ -78,6 +78,14 @@
 | **W4-2 (SDK v3.5)** | **Coverage-implies-correctness on the deterministic team decoder**            | **proved-conditional**            | `team_coord.py::TeamCoordinator`; `TeamLevelCorrectnessTests::test_w4_2_*`     |
 | **W4-3 (SDK v3.5)** | **Local-view limitation: per-role budget below causal-share floor cannot be rescued by any admission policy** | **proved-negative**               | `TeamLevelCorrectnessTests::test_w4_3_*`; `phase52_team_coord.run_phase52_budget_sweep` |
 
+## Two-Mac distributed inference + real cross-LLM (W5-1 .. W5-3) — SDK v3.6
+
+| Claim                | Description                                                                                                                                                                         | Status                            | Anchor                                                                                                |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **W5-1 (SDK v3.6)**  | **Real cross-LLM parser-boundary saturation: ``qwen3.5:35b`` (36B-MoE Q4) under strict parsing yields ``failure_kind=unclosed_new`` 10/10; ``qwen2.5:14b-32k`` yields ``ok`` 10/10; cross-model TVD on strict = 1.000; robust mode collapses TVD to 0.000** | **proved-empirical (real LLM)**    | `parser_boundary_real_llm.py`; result JSON `/tmp/wevra-distributed/real_cross_model_n10.json`         |
+| **W5-2 (SDK v3.6)**  | **Backend integration: ``run_sweep(..., llm_backend=<duck-typed>)`` routes inner-loop calls through the backend; PROMPT/LLM_RESPONSE/PARSE_OUTCOME/PATCH_PROPOSAL/TEST_VERDICT chain seals byte-for-byte equivalently regardless of backend** | **proved**                        | `test_wevra_llm_backend.py::RunSweepBackendIntegrationTests`                                          |
+| **W5-3 (SDK v3.6)**  | **``MLXDistributedBackend`` wire shape: OpenAI-compatible POST /v1/chat/completions with ``{model, messages, max_tokens, temperature, stream:false}``; parses ``choices[0].message.content``** | **proved**                        | `test_wevra_llm_backend.py::MLXDistributedBackendWireShapeTests`                                      |
+
 ## Conjectures (W3-C*)
 
 | Claim   | Description                                                              | Status                                       |
@@ -98,6 +106,9 @@
 | **W4-C1 (SDK v3.5)** | **Learned per-role admission policy admits strictly fewer handoffs (12/12 seeds) and improves pooled team-decision accuracy on most train seeds (gap_full > 0 in 11/12 seeds, mean +0.054; gap_root_cause > 0 in 8/12 seeds, mean +0.032) over the strongest fixed admission baseline (coverage-guided) on the Phase-52 default config (K_auditor=8, noise=(0.10, 0.30, 0.05), PYTHONHASHSEED=0)** | **empirical** (budget-efficiency dominance is robust per-seed; accuracy advantage is mean-positive but not strict per-seed; reverses at higher noise — see § Cross-seed reading in `docs/RESULTS_WEVRA_TEAM_COORD.md`) |
 | **W4-C2 (SDK v3.5)** | **Cohort-lifted role view closes W4-3 on a sub-class of scenarios**           | **conjectural** (Phase 53 candidate; falsifier: a scenario whose causal-share floor exceeds a single COHORT's max_parents) |
 | **W4-C3 (SDK v3.5)** | **The capsule-layer admission rule subsumes the Phase-36 AdaptiveSubscriptionTable route-edit primitive** | **conjectural** (open) |
+| **W5-C1 (SDK v3.6)** | **Parser-boundary instability is a (model architecture × prompt-format) interaction, not a model-capacity artefact. Concretely, scaling 14.8B-dense → 36B-MoE under fixed prompt format on the bundled bank flips strict-mode parser failure rate from 0/10 to 10/10.** | **empirical-research** (n=10 saturation; falsifier = a bank where the larger model strict-parses ok > 50%) |
+| **W5-C2 (SDK v3.6)** | **Robust-mode parser recovery (specifically ``recovery=closed_at_eos``) is the load-bearing safety net that makes the capsule-native runtime model-class-agnostic on the bundled prompt format. Cross-model TVD on robust = 0.000 in W5-1.** | **empirical-research** (n=10 saturation; falsifier = a model whose ``unclosed_new`` cannot be salvaged) |
+| **W5-C3 (SDK v3.6)** | **The capsule-native runtime's closed-vocabulary ``PARSE_OUTCOME.failure_kind`` is a *minimum sufficient* typed witness of cross-model behaviour differences — strict-mode failure-kind TVD captures in one number what manual byte-level diff over N responses would surface.** | **conjectural** (research; falsifier = a model pair with identical strict-mode `failure_kind` distribution but materially different downstream test-pass rate) |
 
 ## Phase-substrate (P19, P31, P35, P36, P39..P44)
 
