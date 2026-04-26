@@ -11,27 +11,42 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.6 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.7 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
 ROLE_VIEW / TEAM_DECISION + T-1..T-7 lifecycle audit + learned
-per-role admission policy), AND **across the model-class
-gradient** (W5 family, real cross-LLM parser-boundary
-measurement: cross-model PARSE_OUTCOME failure-kind TVD = 1.000
-between Qwen-2.5-14B-dense and Qwen-3.5-35B-MoE under strict
-parsing on the bundled bank, collapsing to 0.000 under robust
-parsing — first real evidence that the capsule-native runtime
-survives a 2.4× model-size jump and a dense → MoE architecture
-swap without spine modification). SDK v3.6 also ships the
-two-Mac distributed-inference integration boundary (chosen path:
-**MLX distributed** under `mpirun mlx_lm.server`; **not**
-Hyperspace, which is distributed-agent infrastructure rather than
-single-model sharding) as a duck-typed `LLMBackend` Protocol
-with two concrete backends (`OllamaBackend`,
-`MLXDistributedBackend`) — experimental infrastructure, not
-product; the Wevra single-run product runtime contract is
-byte-for-byte unchanged. Up through SDK v3.4, capsules drove execution **one
+per-role admission policy), **across the model-class gradient**
+(W5 family, real cross-LLM parser-boundary measurement
+TVD = 1.000 / 0.000), and now — most sharply — **across the
+*model regime × admission strategy* grid on a real-LLM-driven
+multi-agent coordination benchmark** (W6 family, SDK v3.7).
+SDK v3.7's headline result is a **conditional falsification
+of W4-C1**: the SDK v3.5 learned-admission-policy advantage
+(synthetic+noise default config) does **not** transfer
+out-of-distribution to a real-LLM regime on the Phase-53
+incident-triage benchmark. ``structure_gain`` is non-positive
+at every model regime tested (-0.4 / -0.4 / 0.0); scale
+(qwen2.5:14b → qwen3.5:35b) narrows a *structure deficit*
+created by OOD over-rejection, not a *structure surplus*. **The
+capsule layer's load-bearing contribution at this benchmark is
+the *lifecycle audit* (T-1..T-7 holds 60/60 across regimes),
+not admission policy gains.** Substrate FIFO is a stronger
+baseline than the W4 family suggested when the LLM is the
+producer (the LLM does its own implicit filtering). Mac 2 is
+still offline (192.168.12.248 ARP "incomplete"); **no two-Mac
+sharded inference happened in SDK v3.7** — the
+``MLXDistributedBackend`` integration boundary is unchanged
+from SDK v3.6 and waits for the runbook
+(`docs/MLX_DISTRIBUTED_RUNBOOK.md`) when Mac 2 returns. The
+strongest model class actually exercised is single-Mac
+qwen3.5:35b (36 B-MoE Q4) on Mac 1 Ollama. SDK v3.6's two-Mac
+MLX-distributed integration boundary (chosen path: **MLX
+distributed** under `mpirun mlx_lm.server`; **not** Hyperspace,
+which is distributed-agent infrastructure rather than
+single-model sharding) is byte-for-byte unchanged — experimental
+infrastructure, not product; the Wevra single-run product
+runtime contract is byte-for-byte unchanged. Up through SDK v3.4, capsules drove execution **one
 further structural layer past v3.3** by extending the discipline
 into the LLM byte boundary itself. The end-to-end inner-loop chain is
 **five typed sealed capsules** —

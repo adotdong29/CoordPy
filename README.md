@@ -7,37 +7,76 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**As of SDK v3.5 (April 2026), capsules are load-bearing both
-*inside one Wevra run* and *between agents in a team*.** A new
-multi-agent capsule coordination **research slice**
+**As of SDK v3.7 (April 2026), capsules are load-bearing
+*inside one Wevra run*, *between agents in a team*, *across the
+model-class gradient*, and now — most sharply — across the
+*model regime × admission strategy* grid on a real-LLM-driven
+multi-agent coordination benchmark.** SDK v3.7's contribution is
+the **Phase-53 stronger-model multi-agent benchmark**
+([`vision_mvp/experiments/phase53_scale_vs_structure.py`](vision_mvp/experiments/phase53_scale_vs_structure.py)),
+which replaces Phase-52's deterministic producer-role extractor
+with a real-LLM extractor (qwen2.5:14b-32k, qwen3.5:35b on Mac 1
+Ollama) and decomposes accuracy across (model regime × admission
+strategy). The headline result (n=5 saturated, K_auditor=4):
+every fixed admission strategy — substrate, capsule_fifo,
+capsule_priority, capsule_coverage — achieves
+``accuracy_full = 0.800`` in every model regime; only
+``capsule_learned`` varies, scoring 0.400 on synthetic and 14B
+and recovering to 0.800 on 35B. **``structure_gain`` is
+*non-positive* at every regime tested** (-0.4 / -0.4 / 0.0);
+**``scale_gain[capsule_learned] = +0.4`` while
+``scale_gain[fixed] = 0.0``**; cross-(14B, 35B) candidate-kind
+TVD = 0.167. The capsule-team lifecycle audit (T-1..T-7) holds
+60/60 across (regime × capsule strategy × scenario) — Theorem
+**W6-1**. The honest reading: the SDK v3.5 conjecture **W4-C1**
+(learned admission policy beats fixed) is **conditionally
+falsified** out-of-distribution on the real-LLM regime — it
+holds on its anchor distribution (Phase-52 synthetic+noise
+default config) but loses to FIFO on the cleaner real-LLM
+candidate stream. Scale closes a *structure deficit* (created by
+OOD over-rejection of the synthetic-trained scorer), **not** a
+*structure surplus*. **The capsule layer's load-bearing
+contribution at this benchmark is the lifecycle audit, not
+admission policy gains.** Substrate FIFO is a stronger baseline
+than the W4 family suggested when the LLM is the producer (the
+LLM does its own implicit filtering). **Mac 2 is still offline**
+(192.168.12.248 ARP "incomplete"); **no two-Mac sharded inference
+ran in this milestone** — the
+[`MLXDistributedBackend`](vision_mvp/wevra/llm_backend.py)
+integration boundary is byte-for-byte unchanged from SDK v3.6
+and waits for the runbook
+([`docs/MLX_DISTRIBUTED_RUNBOOK.md`](docs/MLX_DISTRIBUTED_RUNBOOK.md))
+when Mac 2 returns. The strongest model class actually exercised
+is single-Mac qwen3.5:35b (36 B-MoE Q4) on Mac 1 Ollama. See
+[`docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md)
+for the full SDK v3.7 milestone note,
+[`docs/RESULTS_WEVRA_DISTRIBUTED.md`](docs/RESULTS_WEVRA_DISTRIBUTED.md)
+for SDK v3.6 (cross-LLM parser-boundary + integration boundary),
+and
+[`docs/RESULTS_WEVRA_TEAM_COORD.md`](docs/RESULTS_WEVRA_TEAM_COORD.md)
+for SDK v3.5 (multi-agent capsule-coordination research slice).
+The Wevra single-run product runtime contract is byte-for-byte
+unchanged.
+
+Up through **SDK v3.5**, the multi-agent capsule coordination
+**research slice**
 ([`vision_mvp/wevra/team_coord.py`](vision_mvp/wevra/team_coord.py)
 + [`vision_mvp/wevra/team_policy.py`](vision_mvp/wevra/team_policy.py))
-adds three closed-vocabulary capsule kinds (`TEAM_HANDOFF`,
-`ROLE_VIEW`, `TEAM_DECISION`) and a `TeamCoordinator` that drives
+added three closed-vocabulary capsule kinds (`TEAM_HANDOFF`,
+`ROLE_VIEW`, `TEAM_DECISION`) and a `TeamCoordinator` that drove
 one coordination round end-to-end, with a mechanically-checked
 `audit_team_lifecycle` over invariants T-1..T-7 (Theorem **W4-1**).
 Theorems W4-2 (proved-conditional: coverage-implies-correctness)
 and W4-3 (proved-negative: per-role budget below the role's
 causal-share floor cannot be rescued by *any* admission policy)
-anchor the team-level mechanism formally. A learned per-role admission policy
-(logistic regression over six capsule features) admits **strictly
-fewer handoffs** than the strongest fixed admission baseline
-(coverage-guided) on the Phase-52 incident-triage bench (12/12
-train seeds; mean savings ≈ 1.26 handoffs per scenario at
-$K_\text{auditor}=8$, $n_\text{eval}=31$, default noise). The
-learned policy *also* improves pooled team-decision accuracy on
-most train seeds (gap on `accuracy_full` is positive in 11/12
-seeds with mean $+0.054$; gap on `accuracy_root_cause` is
-positive in 8/12 seeds with mean $+0.032$) — but the accuracy
-advantage **reverses at higher noise** (`spurious_prob = 0.50`).
-Conjecture **W4-C1** therefore reads: *budget-efficiency
-dominance is robust per-seed; accuracy advantage is mean-positive
-on the default noise config but not strict per-seed; advantage
-does not survive heavier noise.* Honest-reading rules in
+anchor the team-level mechanism formally. The W4-C1 conjecture
+(learned admission policy beats the strongest fixed baseline) is
+empirical-positive on its synthetic+noise anchor distribution
+but is now annotated as **conditional** in
+[`docs/THEOREM_REGISTRY.md`](docs/THEOREM_REGISTRY.md): SDK v3.7
+empirically falsifies it out-of-distribution on the real-LLM
+regime. Honest-reading rules in
 [`docs/HOW_NOT_TO_OVERSTATE.md`](docs/HOW_NOT_TO_OVERSTATE.md).
-The Wevra single-run product runtime contract is unchanged. See
-[`docs/RESULTS_WEVRA_TEAM_COORD.md`](docs/RESULTS_WEVRA_TEAM_COORD.md)
-and [`docs/CAPSULE_TEAM_FORMALISM.md`](docs/CAPSULE_TEAM_FORMALISM.md).
 
 Up through **SDK v3.4 (April 2026)**, capsules drive execution all the
 way through the LLM byte boundary. Run-boundary stages

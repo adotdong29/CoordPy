@@ -5,6 +5,139 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [SDK v3.7] — 2026-04-26 — model-scale vs capsule-structure on multi-agent coordination (Phase-53 + W6 family)
+
+*Strictly additive on SDK v3.6. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The new surface is
+the Phase-53 stronger-model multi-agent benchmark + W6 theorem
+family. Mac 2 is still offline; no two-Mac sharded inference
+happened in this milestone — the ``MLXDistributedBackend``
+integration boundary is byte-for-byte unchanged from SDK v3.6
+and waits for the runbook.*
+
+### Added
+
+- **`vision_mvp/experiments/phase53_scale_vs_structure.py`** *(new)* —
+  Phase-53 stronger-model multi-agent benchmark. Drives the team
+  coordinator with a real-LLM producer-role extractor across
+  three model regimes (synthetic / qwen2.5:14b-32k / qwen3.5:35b)
+  × five admission strategies (substrate, capsule_fifo,
+  capsule_priority, capsule_coverage, capsule_learned) on the
+  same candidate-handoff stream. Reports a clean ``model regime ×
+  admission strategy`` decomposition with cross-regime
+  candidate-kind TVD.
+- **`vision_mvp/tests/test_wevra_scale_vs_structure.py`** *(new)*
+  — 19 contract tests: parser robustness on the closed-vocabulary
+  claim grammar (16 cases), backend duck-typing, audit_ok grid
+  end-to-end with a deterministic stub backend, schema lock.
+- **`docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`** *(new)* — full
+  milestone results note. Theorem-forward; declares W6-1..W6-4
+  proved-or-empirical and W6-C1..W6-C5 conjectures (W6-C1 / C2
+  drafted-then-falsified, W6-C3 positive, W6-C4 / C5 new).
+- **`docs/data/phase53_scale_vs_structure_K4_n5.json`** *(new
+  artefact)* — frozen benchmark output for reproducibility.
+
+### Changed
+
+- **`vision_mvp/wevra/__init__.py`** — `SDK_VERSION` bumped to
+  `wevra.sdk.v3.7`. No public API change.
+- **`docs/THEOREM_REGISTRY.md`** — W6-1 / W6-2 / W6-3 / W6-4 +
+  W6-C1 / W6-C2 / W6-C3 / W6-C4 / W6-C5 rows added. The W4-C1
+  row (SDK v3.5 conjecture) is now annotated as **conditional**:
+  empirical-positive on its anchor distribution; falsified
+  out-of-distribution on the Phase-53 real-LLM regime
+  (capsule_learned 0.4 vs fixed 0.8 on synthetic and qwen2.5:14b;
+  ties at qwen3.5:35b at 0.8/0.8).
+- **`docs/RESEARCH_STATUS.md`** — sixth research axis added;
+  active-conjectures section refreshed with W6-C family.
+- **`docs/context_zero_master_plan.md`** — § 4.24 added: full
+  Phase-53 narrative, W6 / W6-C summary, W4-C1 conditional
+  reading, honest scope (Mac 2 offline, single-Mac qwen3.5:35b
+  is the strongest model class actually exercised).
+- **`docs/START_HERE.md`** — headline paragraph updated to
+  reference the SDK v3.7 result and the *audit-axis* tightening
+  of the original Context-Zero thesis.
+
+### Headline empirical result
+
+(n=5 saturated, K_auditor=4, T_auditor=128, three model regimes,
+deterministic seeds (31, 32, 33))
+
+| regime           | substrate | fixed capsule | learned |
+| ---------------- | --------- | ------------- | ------- |
+| synthetic        | 0.800     | 0.800         | 0.400   |
+| qwen2.5:14b-32k  | 0.800     | 0.800         | 0.400   |
+| qwen3.5:35b      | 0.800     | 0.800         | 0.800   |
+
+* `structure_gain[regime]` = -0.4 / -0.4 / 0.0 (non-positive
+  everywhere; scale narrows a *deficit*, not a *surplus*).
+* `scale_gain[capsule_learned]` = +0.4; `scale_gain[fixed]` = 0.0.
+* Cross-(14B, 35B) candidate-kind TVD = 0.167.
+* Capsule-team lifecycle audit ``audit_team_lifecycle.is_ok()``
+  = 60/60 across (regime × capsule strategy × scenario).
+
+### Theorem registry deltas
+
+- **W6-1 (proved + mechanically-checked).** Lifecycle audit
+  T-1..T-7 holds 60/60 across the Phase-53 grid.
+- **W6-2 (proved).** Phase-53 driver accepts duck-typed
+  ``LLMBackend``.
+- **W6-3 (proved + mechanically-checked).** Parser robustness
+  on the closed-vocabulary claim grammar.
+- **W6-4 (proved-empirical, real LLM, n=5 saturated).** The
+  ``accuracy_full`` / ``structure_gain`` / ``scale_gain``
+  decomposition is what is reported above.
+- **W6-C1, W6-C2 (drafted, FALSIFIED-empirical).** Structure-
+  preservation under scale (W6-C1) and synthetic→real-LLM
+  transfer of the learned admission scorer (W6-C2) are both
+  falsified on Phase-53 default; honest revised reading is in
+  `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md` § 4.3.
+- **W6-C3 (empirical-positive).** Cross-(14B, 35B) candidate-
+  kind TVD = 0.167 > 0.10 falsifier.
+- **W6-C4, W6-C5 (new conjectures).** Substrate-FIFO competitive-
+  ness at sufficient K, and scale-narrows-the-OOD-gap of the
+  per-role admission scorer.
+
+### Honest scope
+
+* Mac 2 (192.168.12.248) is offline at the time of this
+  milestone (ARP "incomplete"). **No two-Mac sharded inference
+  ran.** No 70 B-class model ran. The strongest model class
+  exercised is **single-Mac** qwen3.5:35b (36 B-MoE Q4) via
+  Mac 1 Ollama.
+* The MLX-distributed integration boundary
+  (``MLXDistributedBackend``) is byte-for-byte unchanged from
+  SDK v3.6 and remains correct against the in-process stub
+  (W5-3). The runbook (`docs/MLX_DISTRIBUTED_RUNBOOK.md`) is the
+  operator path when Mac 2 returns.
+* Phase-53 is **incident-triage-bench-internal**. External
+  validity to other multi-agent benchmarks is open
+  (`task_scale_swe.py`, `phase33_security_escalation.py` are
+  obvious next targets).
+* The W4-C1 (SDK v3.5) reading on its anchor config (Phase-52
+  default, K=8, spurious=0.30) is unchanged. The new SDK v3.7
+  reading is OOD.
+
+### Tests + validation
+
+* `python3 -m unittest -v vision_mvp.tests.test_wevra_scale_vs_structure`
+  → **19 tests pass in 0.069 s**.
+* `python3 -m unittest vision_mvp.tests.test_wevra_team_coord
+  vision_mvp.tests.test_wevra_llm_backend
+  vision_mvp.tests.test_wevra_capsule_native_inner_loop
+  vision_mvp.tests.test_wevra_capsule_native
+  vision_mvp.tests.test_wevra_capsule_native_intra_cell
+  vision_mvp.tests.test_wevra_capsule_native_deeper
+  vision_mvp.tests.test_wevra_scale_vs_structure`
+  → **116 tests pass in 3.207 s** (SDK v3.6 invariants intact).
+* `python3 -m vision_mvp.experiments.phase53_scale_vs_structure
+  --endpoint http://192.168.12.191:11434
+  --models synthetic,qwen2.5:14b-32k,qwen3.5:35b
+  --n-eval 5 --K-auditor 4 --T-auditor 128
+  --out /tmp/wevra-distributed/phase53_scale_vs_structure_K4.json`
+  → 14B LLM wall 92.6 s; 35B LLM wall 152.0 s; n_results = 75.
+  Frozen at `docs/data/phase53_scale_vs_structure_K4_n5.json`.
+
 ## [SDK v3.5] — 2026-04-26 — capsule-native multi-agent team coordination (research slice)
 
 *Strictly additive on SDK v3.4. The Wevra single-run product

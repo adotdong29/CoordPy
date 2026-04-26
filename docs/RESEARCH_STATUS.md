@@ -5,12 +5,12 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.6,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.7,
 > 2026-04-26.
 
 ## TL;DR
 
-The programme now has **five** coupled research axes, each with a
+The programme now has **six** coupled research axes, each with a
 sharp status:
 
 1. **Capsule contract / runtime** — *active, advancing*. The
@@ -45,7 +45,7 @@ sharp status:
    subscriptions. ~1500 substrate tests, no active development on
    substrate primitives themselves.
 5. **Two-Mac distributed inference + real cross-LLM measurement**
-   — *active, new (SDK v3.6)*. The chosen path for one-larger-
+   — *active, settled (SDK v3.6)*. The chosen path for one-larger-
    model inference across two Apple Silicon Macs is **MLX
    distributed** (under `mpirun mlx_lm.server`); the Wevra-side
    integration boundary is one duck-typed `LLMBackend` Protocol
@@ -61,9 +61,84 @@ sharp status:
    without spine modification. The two-Mac MLX-distributed path
    is **experimental infrastructure**, not product; the Wevra
    single-run product runtime contract is byte-for-byte
-   unchanged.
+   unchanged. Mac 2 remains offline at the time of SDK v3.7
+   (192.168.12.248 ARP "incomplete"); the runbook is the
+   operator path when Mac 2 returns.
+6. **Model-scale vs capsule-structure on multi-agent
+   coordination** — *active, new (SDK v3.7)*. **Phase-53**
+   benchmark (`vision_mvp/experiments/phase53_scale_vs_structure.py`)
+   replaces the Phase-52 deterministic producer-role extractor
+   with a real-LLM extractor and decomposes ``accuracy_full``
+   across (model regime × admission strategy). Headline (n=5,
+   K_auditor=4): every fixed admission strategy (substrate /
+   capsule_fifo / capsule_priority / capsule_coverage) achieves
+   ``accuracy_full = 0.800`` in every model regime; only
+   ``capsule_learned`` varies (0.400 on synthetic and 14B; 0.800
+   on 35B). ``structure_gain`` is **non-positive at every
+   regime** (-0.4 / -0.4 / 0.0); ``scale_gain[capsule_learned]
+   = +0.4``, ``scale_gain[fixed] = 0.0``. **W4-C1 is conditionally
+   falsified** out-of-distribution on the real-LLM regime
+   (capsule_learned underperforms FIFO by 0.4 on synthetic and
+   14B; ties at 35B). Honest reading: scale closes a *structure
+   deficit* (created by OOD over-rejection of clean candidates
+   by the SDK v3.5 learned policy), not a *structure surplus*.
+   The capsule layer's load-bearing contribution at this
+   benchmark is the **lifecycle audit (T-1..T-7, 60/60 across
+   regimes)**, not admission policy gains. The W6 family
+   (W6-1/2/3/4 proved + mechanically-checked + empirically-
+   saturated) anchors the milestone formally; the W6-C family
+   (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
+   conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.6, 2026-04-26)
+## Current frontier (SDK v3.7, 2026-04-26)
+
+### Active moves (SDK v3.7 — stronger-model multi-agent benchmark + W6 family)
+
+- **Phase-53 stronger-model multi-agent benchmark.**
+  ``vision_mvp.experiments.phase53_scale_vs_structure`` runs
+  three model regimes (synthetic / qwen2.5:14b-32k /
+  qwen3.5:35b) × four capsule admission strategies + the
+  Phase-31 substrate baseline on the same candidate-handoff
+  stream. Real LLM calls hit Mac 1 Ollama at
+  ``192.168.12.191:11434`` (Mac 2 still offline). Wall: 14B =
+  92.6 s, 35B = 152 s.
+- **Theorem family W6.** W6-1 (audit-OK grid 60/60),
+  W6-2 (backend duck-typing), W6-3 (parser robustness on the
+  closed-vocabulary claim grammar) are proved + mechanically-
+  checked. W6-4 (the empirical decomposition) is proved-empirical
+  on n=5 saturated.
+- **Conditional falsification of W4-C1.** The SDK v3.5
+  learned-admission-policy advantage **does not transfer
+  out-of-distribution** to the real-LLM regime. Per-regime gap
+  (capsule_learned − capsule_fifo): -0.4 (synthetic) / -0.4
+  (qwen2.5:14b-32k) / 0.0 (qwen3.5:35b). The W4-C1 row in the
+  registry is now conditional (see § 4.4 of
+  `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`).
+- **Honest scope.** Mac 2 is still offline; no two-Mac sharded
+  inference run happened in SDK v3.7. The strongest model class
+  exercised is single-Mac qwen3.5:35b (36 B-MoE). The
+  ``MLXDistributedBackend`` adapter is unchanged from SDK v3.6
+  and remains correct against the in-process stub.
+
+### Active conjectures (SDK v3.7)
+
+- **W6-C1**: drafted-conjecture-falsified — structure_gain is
+  non-positive at every regime tested on Phase-53 default;
+  scale narrows a deficit (not a surplus).
+- **W6-C2**: drafted-conjecture-falsified — synthetic→real
+  transfer of the learned admission scorer LOSES to FIFO out-
+  of-distribution.
+- **W6-C3**: empirical-positive — cross-(14B, 35B) candidate-
+  kind TVD = 0.167 on the pooled (source_role × claim_kind)
+  histogram (above the 0.10 falsifier).
+- **W6-C4**: new conjectural-empirical — substrate FIFO is
+  competitive with every capsule admission policy at sufficient
+  K_auditor; falsifier search direction is K_auditor ∈ {1, 2, 3}.
+- **W6-C5**: new conjectural-empirical — model scale narrows
+  the OOD generalisation gap of the per-role admission scorer
+  trained on synthetic noise.
+
+## Previous frontier (SDK v3.6, 2026-04-26)
 
 ### Active moves (SDK v3.6 — two-Mac distributed inference + real cross-LLM)
 
@@ -291,7 +366,9 @@ sharp status:
   `docs/RESULTS_CAPSULE_*.md`,
   `docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md` (SDK v3.3),
   `docs/RESULTS_WEVRA_INNER_LOOP.md` (SDK v3.4),
-  `docs/RESULTS_WEVRA_TEAM_COORD.md` (SDK v3.5 — this milestone)
+  `docs/RESULTS_WEVRA_TEAM_COORD.md` (SDK v3.5),
+  `docs/RESULTS_WEVRA_DISTRIBUTED.md` (SDK v3.6),
+  `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md` (SDK v3.7 — this milestone)
 - Paper draft: `papers/wevra_capsule_native_runtime.md`
 - Tests: `vision_mvp/tests/test_wevra_capsule_native*.py`,
   `test_wevra_capsule_native_deeper.py`,
@@ -300,5 +377,9 @@ sharp status:
   `test_capsule_*.py`
 - Cross-model parser-boundary experiment:
   `vision_mvp/experiments/parser_boundary_cross_model.py`
-- Multi-agent team coordination benchmark:
+- Multi-agent team coordination benchmark (synthetic):
   `vision_mvp/experiments/phase52_team_coord.py`
+- Stronger-model multi-agent benchmark (real LLM):
+  `vision_mvp/experiments/phase53_scale_vs_structure.py`
+- MLX distributed runbook (operator path for Mac 2):
+  `docs/MLX_DISTRIBUTED_RUNBOOK.md`

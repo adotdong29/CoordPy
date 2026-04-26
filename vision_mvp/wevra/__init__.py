@@ -218,7 +218,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.6"
+SDK_VERSION = "wevra.sdk.v3.7"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.

@@ -6202,6 +6202,181 @@ note); `docs/MLX_DISTRIBUTED_RUNBOOK.md` (operator runbook);
 (benchmark driver); `vision_mvp/wevra/llm_backend.py` (the new
 adapter module).
 
+### 4.24 SDK v3.7 — model-scale vs capsule-structure on multi-agent coordination (real-LLM Phase-53 benchmark + W6 family)
+
+The v3.6 milestone (§ 4.23) closed the inference-backend
+boundary and produced the first *real* (non-synthetic) cross-LLM
+parser-boundary measurement. The v3.7 milestone turns the
+real-LLM regime on the **multi-agent capsule coordination axis**
+itself: replaces the Phase-52 deterministic producer-role
+extractor with a real LLM extractor, decomposes accuracy across
+``model regime × admission strategy``, and asks the central
+scientific question: **does scaling the underlying model
+preserve, amplify, or close the capsule-structure advantage on
+the original multi-agent-context thesis?**
+
+**1. Two-Mac sharded-inference status — plainly.**
+
+* `arp -a` for 192.168.12.248: **(incomplete)** at the time of
+  this milestone. Mac 2 is not on the LAN.
+* `ping -c2 192.168.12.248`: 100% packet loss.
+* No `mpirun mlx_lm.server` was launched. **No sharded 70B-class
+  model ran across both Macs.**
+* The integration boundary (`MLXDistributedBackend`,
+  `LLMBackend` Protocol, `run_sweep(..., llm_backend=...)`) is
+  byte-for-byte unchanged from SDK v3.6 and remains correct
+  against the in-process OpenAI-compat stub. The Wevra side has
+  nothing additional to do until the cluster lights up; the
+  runbook (`docs/MLX_DISTRIBUTED_RUNBOOK.md`) is the operator
+  path.
+* The strongest honest model class actually exercised in
+  SDK v3.7 is **single-Mac** Qwen-3.5-35B (36 B-MoE) in 4-bit
+  via Ollama on Mac 1. This is real (not synthetic) but is
+  **not sharded inference**.
+
+**2. Phase-53 stronger-model multi-agent benchmark.**
+
+`vision_mvp/experiments/phase53_scale_vs_structure.py` drives
+the team coordinator with a real-LLM producer-role extractor for
+each of the four producer roles (monitor, db_admin, sysadmin,
+network) and runs the same five admission strategies (substrate,
+capsule_fifo, capsule_priority, capsule_coverage, capsule_learned)
+on the LLM-generated candidate handoff stream. Sweeps the
+*model regime* (synthetic / qwen2.5:14b-32k / qwen3.5:35b)
+holding everything else fixed and decomposes:
+
+* `structure_gain[M]` := capsule_learned_acc[M] - substrate_acc[M]
+* `scale_gain[S]`     := acc(35B)[S] - acc(14B)[S]
+* `delta_with_scale`  := structure_gain[35B] - structure_gain[14B]
+
+**3. Headline empirical finding (n=5 saturated, K_auditor=4).**
+
+Every fixed admission strategy (substrate / capsule_fifo /
+capsule_priority / capsule_coverage) achieves
+``accuracy_full = 0.800`` in every model regime; only
+`capsule_learned` varies:
+
+| regime           | substrate | fixed capsule | learned | failed scenario       |
+| ---------------- | --------- | ------------- | ------- | --------------------- |
+| synthetic        | 0.800     | 0.800         | 0.400   | deadlock_pool_exhaustion |
+| qwen2.5:14b-32k  | 0.800     | 0.800         | 0.400   | deadlock_pool_exhaustion |
+| qwen3.5:35b      | 0.800     | 0.800         | 0.800   | deadlock_pool_exhaustion |
+
+Decomposition:
+* `structure_gain[synthetic]    = -0.400`
+* `structure_gain[qwen2.5:14b]  = -0.400`
+* `structure_gain[qwen3.5:35b]  =  0.000`
+* `scale_gain[capsule_learned]  = +0.400`
+* `scale_gain[every other strategy] =  0.000`
+* `delta_with_scale = +0.400`
+
+Cross-model candidate-kind TVD (14B vs 35B) = 0.167 (modest, but
+non-zero — the two model classes emit detectably different
+candidate distributions on the same bench).
+
+**4. Five named theorems (W6 family).**
+
+* **W6-1 (proved + mechanically-checked).** Capsule-team
+  lifecycle audit T-1..T-7 holds for every (regime × strategy ×
+  scenario) cell of the Phase-53 benchmark (60/60). Anchor:
+  `phase53_scale_vs_structure.py::audit_ok_grid`;
+  `docs/data/phase53_scale_vs_structure_K4_n5.json`.
+* **W6-2 (proved).** Phase-53 driver accepts any duck-typed
+  `LLMBackend` substitute as the producer-role extractor
+  backend; team-coord pipeline seals capsules end-to-end against
+  arbitrary backend.
+* **W6-3 (proved + mechanically-checked).** `parse_role_response`
+  is robust on the closed-vocabulary claim grammar (16 cases).
+* **W6-4 (proved-empirical).** The ``accuracy_full`` /
+  ``structure_gain`` / ``scale_gain`` decomposition above; n=5
+  saturated, real LLM, deterministic anchor JSON.
+
+**5. Five conjectures (W6-C family).**
+
+* **W6-C1 (FALSIFIED).** Drafted-conjecture: structure_gain is
+  preserved or grows when LLM scales up. Empirical reading:
+  structure_gain is **non-positive** at every regime tested
+  (-0.4, -0.4, 0.0); scale narrows a *deficit* not a *surplus*.
+* **W6-C2 (FALSIFIED).** Drafted-conjecture: the per-role
+  admission scorer trained on Phase-52 synthetic+noise transfers
+  usefully to real-LLM streams. Empirical reading:
+  capsule_learned LOSES to capsule_fifo by 0.40 on synthetic and
+  14B; ties at 35B; average gap = -0.267.
+* **W6-C3 (EMPIRICAL-POSITIVE).** Cross-(14B, 35B) candidate-
+  kind TVD = 0.167 on the pooled (source_role × claim_kind)
+  histogram across 5 scenarios; above the 0.10 falsifier.
+* **W6-C4 (NEW conjecture).** Substrate FIFO is competitive
+  with every capsule admission policy at sufficient
+  K_auditor in real-LLM-driven multi-agent benchmarks.
+  Falsifier: a (model, scenario, K_auditor) configuration where
+  substrate < min_capsule - 0.05.
+* **W6-C5 (NEW conjecture).** Model scale narrows the OOD
+  generalisation gap of the per-role admission scorer trained
+  on synthetic noise. Anchored by ``scale_gain[capsule_learned]
+  = +0.4`` against ``scale_gain[fixed] = 0`` on Phase-53 default.
+
+**6. W4-C1 (SDK v3.5) is conditionally falsified.**
+
+The SDK v3.5 W4-C1 reading (learned policy beats fixed
+admission baselines on Phase-52) holds **on its anchor
+distribution** (synthetic+noise default config). It is
+**falsified out-of-distribution** on the real-LLM regime in
+SDK v3.7: capsule_learned 0.400 vs fixed 0.800 on synthetic
+and 14B. The W4-C1 row in `docs/THEOREM_REGISTRY.md` now
+carries the conditional-status table.
+
+**7. Honest scope.**
+
+* This benchmark is **incident-triage-bench-internal**. External
+  validity to other multi-agent benches (security-escalation,
+  task_scale_swe) is open.
+* `K_auditor=4` is one budget point. The structural-pressure
+  regime where substrate FIFO must admit non-causal head-of-
+  arrival emissions is the conjectural W6-C4 falsifier search
+  direction (lower K_auditor).
+* The single failing scenario (`deadlock_pool_exhaustion`) fails
+  identically across all four "tied" strategies in every model
+  regime, because no model regime emits `DEADLOCK_SUSPECTED`
+  reliably from the role-local events on this scenario. This
+  is *not* an admission-policy weakness; it is a producer-role
+  extraction weakness that no admission policy can recover.
+* The W4-C1 reading on its anchor config (Phase-52 default) is
+  unchanged. The new W6 reading is OOD.
+
+**8. Why this strengthens the original Context-Zero thesis.**
+
+The original thesis is "context is a routing / substrate /
+coordination problem in multi-agent LLM systems." SDK v3.7
+**tightens** the reading on the *admission* axis (the W4-C1
+advantage does not transfer OOD; substrate FIFO is competitive
+when the LLM is the producer) while *strengthening* the reading
+on the *audit* axis (the W6-1 audit-OK grid is 60/60 across two
+real-LLM regimes). The capsule layer's load-bearing
+contribution at this benchmark is **mechanical proof of
+coordination well-formedness**, not admission policy gains.
+That is a smaller, sharper, defensible claim — and it is the
+right claim to hold at this benchmark size.
+
+**9. Files / tests / artefacts.**
+
+* `vision_mvp/experiments/phase53_scale_vs_structure.py` (new)
+  — 770-line driver: real-LLM extractor, candidate stream
+  builder, decomposition, cross-regime TVD.
+* `vision_mvp/tests/test_wevra_scale_vs_structure.py` (new) —
+  19 contract tests (parser robustness, backend duck-typing,
+  audit_ok grid, schema lock).
+* `vision_mvp/wevra/__init__.py` — `SDK_VERSION = "wevra.sdk.v3.7"`.
+* `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md` (this milestone note).
+* `docs/data/phase53_scale_vs_structure_K4_n5.json` (frozen
+  benchmark output).
+* `docs/THEOREM_REGISTRY.md` — W6-1 / W6-2 / W6-3 / W6-4 /
+  W6-C1 / W6-C2 / W6-C3 / W6-C4 / W6-C5 added; W4-C1 amended.
+* `docs/RESEARCH_STATUS.md` — sixth research axis added.
+
+Anchor: `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`;
+`docs/data/phase53_scale_vs_structure_K4_n5.json`;
+`vision_mvp/experiments/phase53_scale_vs_structure.py`.
+
 ---
 
 ## 5. End goals
