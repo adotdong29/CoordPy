@@ -3,6 +3,24 @@
 One-pass orientation for this repository. If you read only one doc, read
 this one. Everything else in the repo should make sense after this page.
 
+> **Current canonical reading.** The active scientific and product
+> position is captured by a small set of files; everything else is
+> historical record under [`archive/`](archive/).
+>
+> | Topic                                | Live doc                                                           |
+> | ------------------------------------ | ------------------------------------------------------------------ |
+> | One-pass orientation                 | this file (`docs/START_HERE.md`)                                   |
+> | What is true *now*                   | [`RESEARCH_STATUS.md`](RESEARCH_STATUS.md)                         |
+> | Theorem-by-theorem status            | [`THEOREM_REGISTRY.md`](THEOREM_REGISTRY.md)                       |
+> | What may be claimed (do-not-overstate) | [`HOW_NOT_TO_OVERSTATE.md`](HOW_NOT_TO_OVERSTATE.md)               |
+> | Run-boundary capsule formalism (W3)  | [`CAPSULE_FORMALISM.md`](CAPSULE_FORMALISM.md)                     |
+> | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
+> | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
+> | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Latest milestone (SDK v3.7)          | [`RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](RESULTS_WEVRA_SCALE_VS_STRUCTURE.md) |
+> | Repo top-level                       | [`../README.md`](../README.md), [`../ARCHITECTURE.md`](../ARCHITECTURE.md), [`../CHANGELOG.md`](../CHANGELOG.md) |
+> | Historical record (read-only)        | [`archive/`](archive/) — pre-Wevra theory, older Wevra milestones, sprint prompts |
+
 ---
 
 ## What this repo is — in one line
@@ -99,11 +117,11 @@ did. Handles (Phase 19), typed handoffs (Phase 31), thread resolutions
 (Phase 35), sweep cells, and the provenance manifest were already
 capsules — they just weren't named. SDK v3 names them.
 
-See [`RESULTS_WEVRA_CAPSULE.md`](RESULTS_WEVRA_CAPSULE.md) for the
+See [`archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md`](archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md) for the
 theorem-style statement of the Capsule Contract (invariants C1..C6)
 and why it is a better top-level description of the product than
 "bounded-context orchestration." See
-[`RESULTS_WEVRA_CAPSULE_NATIVE.md`](RESULTS_WEVRA_CAPSULE_NATIVE.md)
+[`archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md`](archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md)
 for the SDK v3.1 milestone in which capsules become the runtime's
 typed execution contract (W3-32 / W3-33 / W3-34 / W3-35).
 
@@ -404,9 +422,18 @@ escalation threads, adaptive subscriptions) are Wevra's *instances*
 of capsule-shaped objects, not its identity.
 
 If you came here because you want to **use** something, you want Wevra.
-If you came here because you want to **extend the theory**, you want
-Context Zero (`PROOFS.md`, `EXTENDED_MATH_*.md`, the RESULTS phase
-notes, and the master plan in `docs/context_zero_master_plan.md`).
+If you came here because you want to **extend the theory**, the active
+canonical entry points are
+[`docs/CAPSULE_FORMALISM.md`](CAPSULE_FORMALISM.md) (run-boundary,
+W3 family), [`docs/CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)
+(team-boundary, W4 family), and
+[`docs/THEOREM_REGISTRY.md`](THEOREM_REGISTRY.md). The pre-Wevra theory
+volumes (`PROOFS.md`, `EXTENDED_MATH_[1-7].md`, `OPEN_QUESTIONS.md`,
+`FRAMEWORK.md`, the original 12 theorems and 72-framework survey) are
+preserved under [`docs/archive/pre-wevra-theory/`](archive/pre-wevra-theory/);
+they are historical record, not the active position. The phase-by-phase
+research diary lives in `vision_mvp/RESULTS_PHASE*.md`. The long-running
+master plan is [`docs/context_zero_master_plan.md`](context_zero_master_plan.md).
 
 ---
 
@@ -423,7 +450,7 @@ notes, and the master plan in `docs/context_zero_master_plan.md`).
 | **Unified runtime** (`wevra.runtime`) | `SweepSpec` + `run_sweep`: one code path for mock and real-LLM runs, with an explicit `acknowledge_heavy` cost gate. Every sweep cell becomes a `SWEEP_CELL` capsule. | **Stable v1**. |
 | **Legacy product path** (`vision_mvp.product`) | Pre-Wevra import path. Still works; re-exported by `wevra`. | **Deprecated-compat** — do not import in new code. |
 | **Core substrate** (`vision_mvp.core`) | CASR routing, hierarchical router, context ledger, exact_ops, typed role-handoff, dynamic_comm, adaptive_sub. Research primitives Wevra rests on; each is adapter-able into the capsule surface (`capsule_from_handle`, `capsule_from_handoff`, …). | **Settled, but research API** — no SDK guarantees. |
-| **Research shards** (`vision_mvp.experiments`, `vision_mvp.tasks`, `RESULTS_PHASE*.md`, `EXTENDED_MATH_*.md`) | 45+ phases of falsifiability experiments, 72-framework theory survey, proofs. | **Research-grade** — empirical/proved per shard; no product-API guarantee. |
+| **Research shards** (`vision_mvp.experiments`, `vision_mvp.tasks`, `vision_mvp/RESULTS_PHASE*.md`, archived `EXTENDED_MATH_*.md`) | 53+ phases of falsifiability experiments, 72-framework theory survey (archived under `docs/archive/pre-wevra-theory/`), proofs. | **Research-grade** — empirical/proved per shard; no product-API guarantee. |
 | **Multi-agent capsule coordination** (`wevra.team_coord` + `wevra.team_policy`) | SDK v3.5 (research slice). `TEAM_HANDOFF` / `ROLE_VIEW` / `TEAM_DECISION` capsules + `TeamCoordinator` + `audit_team_lifecycle` (T-1..T-7) + learned per-role admission policy. Theorems W4-1 (proved + mechanically-checked) / W4-2 (proved-conditional) / W4-3 (proved-negative); Conjecture W4-C1 (empirical-positive on default config). | **Research-grade v1** — additive on top of the Wevra product surface; not part of the run-boundary product contract. |
 | **Boundary / next-slice** | Docker-first-by-default for public/untrusted JSONLs; first real out-of-tree plugin exemplar; release-on-tag firing. | **Declared, not fired** — see master plan § 10.5. |
 
@@ -436,19 +463,25 @@ For the full living stability matrix, see
 
 ```
     Context Zero (research programme)
-    ├── Theory: PROOFS.md, EXTENDED_MATH_[1-7].md, OPEN_QUESTIONS.md
+    ├── Theory (active):   docs/CAPSULE_FORMALISM.md (W3 family),
+    │                      docs/CAPSULE_TEAM_FORMALISM.md (W4 family),
+    │                      docs/THEOREM_REGISTRY.md
+    ├── Theory (archived): docs/archive/pre-wevra-theory/
+    │                      (PROOFS.md, EXTENDED_MATH_[1-7].md, OPEN_QUESTIONS.md, …)
     ├── Substrate: vision_mvp/core/*  (CASR router, exact memory,
     │                                   typed handoff, runtime calibration)
     ├── Research shards: vision_mvp/experiments/*, vision_mvp/tasks/*,
-    │                    RESULTS_PHASE*.md (empirical diary, per phase)
+    │                    vision_mvp/RESULTS_PHASE*.md (empirical diary, per phase)
     │
     └── Wevra (shipped product slice)
-        ├── SDK:     vision_mvp/wevra/          (stable contract)
-        ├── CLI:     wevra / wevra-import / wevra-ci
-        ├── Runtime: wevra.runtime.run_sweep    (mock + real, one path)
-        ├── Plugins: wevra.extensions           (3 Protocols + registry)
-        ├── Schemas: phase45.product_report.v2, wevra.provenance.v1, …
-        └── Legacy:  vision_mvp/product/*       (deprecated-compat)
+        ├── SDK:       vision_mvp/wevra/          (stable contract)
+        ├── CLI:       wevra / wevra-import / wevra-ci / wevra-capsule
+        ├── Runtime:   wevra.runtime.run_sweep    (mock + real, one path)
+        ├── Plugins:   wevra.extensions           (3 Protocols + registry)
+        ├── Schemas:   phase45.product_report.v2, wevra.provenance.v1, …
+        ├── Latest milestone: docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md (SDK v3.7)
+        ├── Older milestones: docs/archive/wevra-milestones/ (SDK v3.0 → v3.6)
+        └── Legacy:    vision_mvp/product/*       (deprecated-compat)
 ```
 
 The rule of thumb: **anything imported from `vision_mvp.wevra` is
@@ -515,10 +548,21 @@ For a real-LLM sweep, set `WEVRA_OLLAMA_URL` and add `--acknowledge-heavy`.
 - **I want to understand the substrate** → [`ARCHITECTURE.md`](../ARCHITECTURE.md)
   (skip the per-phase callouts on first read) and
   [`context_zero_master_plan.md` § 3](context_zero_master_plan.md).
-- **I want the theory** → [`PROOFS.md`](../PROOFS.md), `EXTENDED_MATH_[1-7].md`,
-  and [`context_zero_master_plan.md` § 1–2](context_zero_master_plan.md).
+- **I want the active theory** →
+  [`CAPSULE_FORMALISM.md`](CAPSULE_FORMALISM.md) (W3 family),
+  [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md) (W4 family),
+  [`THEOREM_REGISTRY.md`](THEOREM_REGISTRY.md), and
+  [`context_zero_master_plan.md` § 1–2](context_zero_master_plan.md).
+- **I want the historical theory** → pre-Wevra theory volumes are
+  preserved under [`archive/pre-wevra-theory/`](archive/pre-wevra-theory/)
+  (`PROOFS.md`, `EXTENDED_MATH_[1-7].md`, `OPEN_QUESTIONS.md`,
+  `FRAMEWORK.md`, `MVP.md`, `EVALUATION.md`, `ROADMAP.md`,
+  `VISION_MILLIONS.md`, `MATH_AUDIT.md`).
 - **I want the research diary** → `vision_mvp/RESULTS_PHASE*.md` in
-  order; `RESULTS_WEVRA_SLICE2.md` for the most recent SDK milestone.
+  order; the latest milestone is
+  [`RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](RESULTS_WEVRA_SCALE_VS_STRUCTURE.md)
+  (SDK v3.7); older Wevra milestone notes are under
+  [`archive/wevra-milestones/`](archive/wevra-milestones/).
 
 ---
 

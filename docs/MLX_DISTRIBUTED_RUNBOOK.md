@@ -8,7 +8,7 @@
 > Wevra **does not** auto-bring-up the cluster; this runbook is
 > the documented out-of-band procedure. The Wevra-side
 > integration boundary is one HTTP-client class — see
-> `vision_mvp/wevra/llm_backend.py` and `docs/RESULTS_WEVRA_DISTRIBUTED.md`.
+> `vision_mvp/wevra/llm_backend.py` and `docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md`.
 
 ## 0. Preconditions
 

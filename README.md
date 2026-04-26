@@ -50,10 +50,10 @@ when Mac 2 returns. The strongest model class actually exercised
 is single-Mac qwen3.5:35b (36 B-MoE Q4) on Mac 1 Ollama. See
 [`docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md)
 for the full SDK v3.7 milestone note,
-[`docs/RESULTS_WEVRA_DISTRIBUTED.md`](docs/RESULTS_WEVRA_DISTRIBUTED.md)
+[`docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md)
 for SDK v3.6 (cross-LLM parser-boundary + integration boundary),
 and
-[`docs/RESULTS_WEVRA_TEAM_COORD.md`](docs/RESULTS_WEVRA_TEAM_COORD.md)
+[`docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md)
 for SDK v3.5 (multi-agent capsule-coordination research slice).
 The Wevra single-run product runtime contract is byte-for-byte
 unchanged.
@@ -115,13 +115,13 @@ detached `META_MANIFEST` witness in a secondary ledger.
 `wevra-capsule verify` recomputes the chain from on-disk header
 bytes (W3-37) and re-hashes every artefact at audit time (W3-38).
 See
-[`docs/RESULTS_WEVRA_INNER_LOOP.md`](docs/RESULTS_WEVRA_INNER_LOOP.md)
+[`docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md)
 for the SDK v3.4 milestone note,
-[`docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md`](docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md)
+[`docs/archive/wevra-milestones/RESULTS_WEVRA_DEEP_INTRA_CELL.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_DEEP_INTRA_CELL.md)
 for SDK v3.3,
-[`docs/RESULTS_WEVRA_INTRA_CELL.md`](docs/RESULTS_WEVRA_INTRA_CELL.md)
+[`docs/archive/wevra-milestones/RESULTS_WEVRA_INTRA_CELL.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_INTRA_CELL.md)
 for SDK v3.2, and
-[`docs/RESULTS_WEVRA_CAPSULE_NATIVE.md`](docs/RESULTS_WEVRA_CAPSULE_NATIVE.md)
+[`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md)
 for the SDK v3.1 run-boundary slice. For the unified paper-grade
 write-up see
 [`papers/wevra_capsule_native_runtime.md`](papers/wevra_capsule_native_runtime.md).
@@ -157,17 +157,17 @@ programme on per-agent minimum-sufficient context.
 > extended audit soundness over eleven invariants (W3-45), and
 > a synthetic-LLM mode that lets the full chain run in CI
 > end-to-end. See
-> [`docs/RESULTS_WEVRA_CAPSULE.md`](docs/RESULTS_WEVRA_CAPSULE.md)
+> [`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md)
 > for the contract (C1..C6),
-> [`docs/RESULTS_WEVRA_CAPSULE_NATIVE.md`](docs/RESULTS_WEVRA_CAPSULE_NATIVE.md)
+> [`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md)
 > for the v3.1 run-boundary slice (W3-32..W3-35),
-> [`docs/RESULTS_WEVRA_INTRA_CELL.md`](docs/RESULTS_WEVRA_INTRA_CELL.md)
+> [`docs/archive/wevra-milestones/RESULTS_WEVRA_INTRA_CELL.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_INTRA_CELL.md)
 > for the v3.2 intra-cell + detached witness milestone
 > (W3-32-extended / W3-36 / W3-37 / W3-38),
-> [`docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md`](docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md)
+> [`docs/archive/wevra-milestones/RESULTS_WEVRA_DEEP_INTRA_CELL.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_DEEP_INTRA_CELL.md)
 > for the v3.3 deeper-slice / audit / determinism milestone
 > (W3-39 / W3-40 / W3-41), and
-> [`docs/RESULTS_WEVRA_INNER_LOOP.md`](docs/RESULTS_WEVRA_INNER_LOOP.md)
+> [`docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md)
 > for the v3.4 PROMPT / LLM_RESPONSE / synthetic mode /
 > parser-boundary research milestone
 > (W3-42 / W3-43 / W3-44 / W3-45 / W3-C6). Canonical theorem registry:
@@ -187,8 +187,10 @@ programme on per-agent minimum-sufficient context.
 > what is research-grade.
 >
 > **Naming.** `Context Zero` is the research programme — theorems, phase
-> shards, and the 72-framework theoretical survey (see `PROOFS.md`,
-> `EXTENDED_MATH_[1-7].md`, `vision_mvp/RESULTS_PHASE*.md`). `Wevra` is the
+> shards, and the 72-framework theoretical survey (see `vision_mvp/RESULTS_PHASE*.md`
+> for the active phase diary, and the archived pre-Wevra theory volumes
+> under [`docs/archive/pre-wevra-theory/`](docs/archive/pre-wevra-theory/)).
+> `Wevra` is the
 > shipped SDK/runtime under `vision_mvp/wevra/`, imported as
 > `from vision_mvp import wevra`. The older `vision_mvp/product/` modules
 > remain importable for backwards compatibility but are **not** the public
@@ -486,30 +488,39 @@ python -m vision_mvp test
 context-zero/
 ├── README.md                   # you are here
 ├── LICENSE                     # MIT
-├── pyproject.toml              # installable as context-zero
-├── PROOFS.md                   # 12 formal theorems underpinning the scaling claims
-├── FRAMEWORK.md                # original problem formulation
-├── ARCHITECTURE.md             # reference implementation design
-├── EVALUATION.md               # metrics + benchmarks + 'solved' definition
-├── MVP.md                      # Phase-1 spec
-├── ROADMAP.md                  # 4-phase research plan
-├── OPEN_QUESTIONS.md           # 7 open research questions
-├── VISION_MILLIONS.md          # the 10-idea vision for million-agent teams
-├── EXTENDED_MATH.md            # +6 volumes of mathematical grounding
-├── EXTENDED_MATH_2..7.md       # 72 independent frameworks converging on O(log N)
-└── vision_mvp/                 # the working implementation
-    ├── api.py                  # public CASRRouter class
-    ├── __main__.py             # CLI
-    ├── core/                   # manifold, stigmergy, workspace, predictor, market, scales…
-    ├── tasks/                  # consensus, drifting consensus, LLM QA
-    ├── protocols/              # naive, gossip, manifold-only, full, adaptive,
-    │                           # hierarchical, holographic, swarm, LLM
-    ├── experiments/            # phase 1–5 experiment harnesses
-    ├── tests/                  # 94 tests covering every module + the theorems
-    ├── RESULTS.md … RESULTS_PHASE5.md
-    ├── FINAL_RESULTS.md        # consolidated scaling table
+├── CHANGELOG.md                # SDK release history
+├── ARCHITECTURE.md             # substrate + product architecture
+├── pyproject.toml              # installable as wevra
+├── docs/                       # canonical research + product docs (see § Where to read next)
+│   ├── START_HERE.md                    # one-pass orientation
+│   ├── RESEARCH_STATUS.md               # what is true now, single source of truth
+│   ├── THEOREM_REGISTRY.md              # theorem-by-theorem status
+│   ├── HOW_NOT_TO_OVERSTATE.md          # do-not-overstate rules
+│   ├── CAPSULE_FORMALISM.md             # run-boundary capsule formalism (W3 family)
+│   ├── CAPSULE_TEAM_FORMALISM.md        # team-boundary capsule formalism (W4 family)
+│   ├── context_zero_master_plan.md      # long-running master plan
+│   ├── MLX_DISTRIBUTED_RUNBOOK.md       # two-Mac MLX distributed-inference runbook
+│   ├── RESULTS_WEVRA_SCALE_VS_STRUCTURE.md # latest milestone (SDK v3.7)
+│   └── archive/                         # historical milestones + pre-Wevra theory (see archive/README.md)
+├── papers/                     # paper-grade write-ups (Wevra capsule-native runtime, etc.)
+└── vision_mvp/                 # working implementation + research diary
+    ├── wevra/                  # public Wevra SDK (stable contract — see § Stability matrix)
+    ├── core/                   # CASR substrate primitives (research-grade)
+    ├── tasks/                  # task banks + adapters
+    ├── experiments/            # phase 1–53 experiment harnesses
+    ├── tests/                  # ~1500 substrate + capsule tests
+    ├── RESULTS_PHASE*.md       # phase-by-phase research diary (Phase 1 → 53+)
     └── README.md               # implementation-level README
 ```
+
+The pre-Wevra theory volumes (`PROOFS.md`, `EXTENDED_MATH_[1-7].md`,
+`OPEN_QUESTIONS.md`, `FRAMEWORK.md`, `EVALUATION.md`, `MVP.md`,
+`ROADMAP.md`, `VISION_MILLIONS.md`, `MATH_AUDIT.md`,
+`HIERARCHICAL_DECOMPOSITION.md`, `WAVES.md`) and older Wevra
+milestone notes (`RESULTS_WEVRA_*.md` SDK v3.0 → v3.6, the
+`RESULTS_CAPSULE_RESEARCH_MILESTONE*.md` series) are intact under
+[`docs/archive/`](docs/archive/) — the active scientific position is
+in `docs/`, the archive is historical record only.
 
 ---
 
@@ -622,7 +633,8 @@ of the document) continues running — the distributed approach works
 because each chunk fits any single agent.
 
 See `vision_mvp/RESULTS_PHASE9.md` for the full phase-9 writeup and
-`MATH_AUDIT.md` for an honest accounting of which of the 72 frameworks
+[`docs/archive/pre-wevra-theory/MATH_AUDIT.md`](docs/archive/pre-wevra-theory/MATH_AUDIT.md)
+for an honest accounting of which of the 72 frameworks
 in the extended math docs are actually in the running code (6 USED,
 13 STRUCTURAL, 3 BUILT-not-tested, 50 THEORY-only).
 
@@ -668,7 +680,7 @@ python -m vision_mvp.experiments.phase10_network --mock --n 500
 ```
 
 Full phase-10 writeup: `vision_mvp/RESULTS_PHASE10.md`. Design:
-`AGENT_NETWORK_DESIGN.md`.
+[`docs/archive/legacy-progress-notes/AGENT_NETWORK_DESIGN.md`](docs/archive/legacy-progress-notes/AGENT_NETWORK_DESIGN.md).
 
 ### Phase 43 — public-style-scale audit, frontier semantic headroom, and the post-parser-recovery semantic taxonomy
 
@@ -2168,7 +2180,8 @@ See
 `RESULTS_PHASE27.md`, `RESULTS_PHASE28.md`, `RESULTS_PHASE29.md`,
 and `RESULTS_PHASE30.md`.
 
-Five ideas stacked at the routing/trigger layers (see `VISION_MILLIONS.md`
+Five ideas stacked at the routing/trigger layers (see
+[`docs/archive/pre-wevra-theory/VISION_MILLIONS.md`](docs/archive/pre-wevra-theory/VISION_MILLIONS.md)
 for the full vision of 10):
 
 1. **Shared Latent Manifold** — every agent projects to, and reads from, a
@@ -2182,7 +2195,9 @@ for the full vision of 10):
    exponential rate, so drift is tracked without a sliding window.
 
 The math behind why O(log N) is the right bound, not O(N), is derived from
-72 independent mathematical frameworks in `EXTENDED_MATH_[1-7].md`:
+72 independent mathematical frameworks in
+[`docs/archive/pre-wevra-theory/EXTENDED_MATH.md`](docs/archive/pre-wevra-theory/EXTENDED_MATH.md)
+through `EXTENDED_MATH_7.md`:
 Information Bottleneck, Kolmogorov cascade, gauge theory, spin glasses,
 expander graphs, holographic entropy, TQFT, … — they all converge on the
 same scaling law.
@@ -2193,7 +2208,8 @@ same scaling law.
 
 - **Low intrinsic rank assumption.** These results hold when the task's
   relevant structure has effective rank ≤ O(log N). Fully-general tasks
-  with dim-d complexity need Ω(d) bandwidth by Theorem 11 in `PROOFS.md`.
+  with dim-d complexity need Ω(d) bandwidth by Theorem 11 in
+  [`docs/archive/pre-wevra-theory/PROOFS.md`](docs/archive/pre-wevra-theory/PROOFS.md).
 - **LLM experiments were run at N=10.** The numpy experiments go to
   N=100 000 but the bridge (N=100 real LLMs) was out of scope for the
   initial pass — that's the obvious next thing to check.
@@ -2207,8 +2223,8 @@ same scaling law.
 ## Project status
 
 This is one continuous research push (Apr 2026) producing:
-- a 72-framework theoretical survey (EXTENDED_MATH_[1-7].md)
-- 12 formal theorems (PROOFS.md)
+- a 72-framework theoretical survey (`docs/archive/pre-wevra-theory/EXTENDED_MATH_[1-7].md`)
+- 12 formal theorems (`docs/archive/pre-wevra-theory/PROOFS.md`; superseded by the W3..W6 families in `docs/THEOREM_REGISTRY.md`)
 - 5 experiment phases from pure NumPy to local LLMs
 - 94 passing unit + integration tests
 - a clean public API (CASRRouter)

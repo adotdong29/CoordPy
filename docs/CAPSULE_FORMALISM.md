@@ -105,7 +105,7 @@ what the programme has *not* claimed:
 
 ## 0. Why a separate formalisation document
 
-`docs/RESULTS_WEVRA_CAPSULE.md` states the Capsule Contract in prose
+`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md` states the Capsule Contract in prose
 and lists six theorems (W3-1 .. W3-6). That note is a milestone
 write-up; it is not a formalisation. The Wevra v3 milestone added
 nothing to the substrate's mathematical content beyond the
@@ -821,7 +821,7 @@ spurious DFC that is header-identical to a causal DFC).
 `vision_mvp/experiments/phase47_bundle_learning.py` —
 `bundle_learned(dec)` policy saturates at 0.200 on the test
 set for every budget; see
-`docs/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` § 2.3.
+`docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` § 2.3.
 
 **Interpretation.** W3-17 is the formal limitation Phase 47's
 empirical result named without proof. It is *why* admission-side
@@ -1719,7 +1719,7 @@ on (incident, security).
 **Status.** Named.  Code-backed by
 `vision_mvp/experiments/phase51_relational_decoder.py`.
 Empirical numbers reported in
-`docs/RESULTS_CAPSULE_RESEARCH_MILESTONE6.md`.
+`docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE6.md`.
 
 ### Conjecture W3-C10 (Level-ceiling of direction-invariant zero-shot transfer on (incident, security))
 
@@ -1790,7 +1790,7 @@ downstream consumer can prove offline that
 `product_report.json` bytes are equal up to canonical key reorder,
 using only the capsule view and SHA-256.
 
-**Status.** Stated in `RESULTS_WEVRA_CAPSULE.md`. Empirically
+**Status.** Stated in `docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md`. Empirically
 exercised by `test_capsule_view_on_disk_matches_embedded`. The
 adversarial collision attack is ruled out by SHA-256 second
 preimage hardness.
@@ -1898,7 +1898,7 @@ does.
 study. Reinforces Phase-47's admission-side P47-C3
 (task-family-indexed transfer) at the decoder layer. Code
 anchor: `vision_mvp/experiments/phase48_decoder_transfer.py`;
-empirical note: `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE3.md`
+empirical note: `docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE3.md`
 § 3.
 
 ### Conjecture W3-C7 (paradigm-shift threshold)
@@ -2004,7 +2004,7 @@ heuristic by more than measurement noise on any benchmark.
 
 **Status.** This is the front opened by PART B of the milestone.
 The Phase-46 capsule learning experiment is the first attempt; see
-`docs/RESULTS_CAPSULE_LEARNING.md` for the result.
+`docs/archive/capsule-research/RESULTS_CAPSULE_LEARNING.md` for the result.
 
 ---
 
@@ -2371,11 +2371,11 @@ For a reader who wants the *proof obligations*:
 4. § 5, W3-C1 — what is still open in subsumption.
 
 For a reader who wants the *runtime contract*: the original
-`docs/RESULTS_WEVRA_CAPSULE.md` is still the right entry; this
+`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md` is still the right entry; this
 document complements it.
 
 For a reader who wants to *learn capsule policies*: see
-`docs/RESULTS_CAPSULE_LEARNING.md` (PART B of the SDK-v3
+`docs/archive/capsule-research/RESULTS_CAPSULE_LEARNING.md` (PART B of the SDK-v3
 research milestone).
 
 ---

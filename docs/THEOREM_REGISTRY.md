@@ -131,7 +131,7 @@ P35-1..P35-3, P36-*, P39-*, P40-*, P41-*, P42-*, P43-*, P44-*)
 are stated and proved in their respective `RESULTS_PHASE*.md`
 notes. They are inputs to W3-11 (capsule subsumption) but are
 not maintained in this registry — see `vision_mvp/RESULTS_PHASE*.md`
-or `PROOFS.md`.
+or `docs/archive/pre-wevra-theory/PROOFS.md`.
 
 ## How to add a claim
 

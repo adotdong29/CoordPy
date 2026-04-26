@@ -52,7 +52,7 @@
 > ("context is an object") and has become a *research center*: a
 > formal mathematical model (`docs/CAPSULE_FORMALISM.md`), an ML
 > problem with a real held-out result
-> (`docs/RESULTS_CAPSULE_LEARNING.md`), and an empirical
+> (`docs/archive/capsule-research/RESULTS_CAPSULE_LEARNING.md`), and an empirical
 > unification audit across four prior substrate primitives. The
 > capsule contract is *additive on top of* every Phase-N
 > bounded-context theorem — no substrate primitive is modified.
@@ -71,7 +71,7 @@
 > CID-equivalent on non-ARTIFACT kinds (Theorem W3-34). The
 > capsule layer has therefore moved from *"capsules as audit
 > graph"* toward *"capsules as execution contract"*. See § 4.18
-> for the v3.1 runtime extension and `docs/RESULTS_WEVRA_CAPSULE_NATIVE.md`
+> for the v3.1 runtime extension and `docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md`
 > for the milestone note.
 >
 > **Intra-cell + detached witness (SDK v3.2, 2026-04-26).**
@@ -91,7 +91,7 @@
 > on-disk header bytes (Theorem W3-37) and re-hashes every
 > ARTIFACT against the on-disk file at audit time
 > (Theorem W3-38). See § 4.19 for the v3.2 runtime extension and
-> `docs/RESULTS_WEVRA_INTRA_CELL.md` for the milestone note.
+> `docs/archive/wevra-milestones/RESULTS_WEVRA_INTRA_CELL.md` for the milestone note.
 >
 > **PROMPT / LLM_RESPONSE slice (SDK v3.4, 2026-04-26).**
 > The capsule-native slice has been extended one further
@@ -118,7 +118,7 @@
 > (`vision_mvp/wevra/synthetic_llm.py`) and parser-mode
 > shift up to 1.000 on `synthetic.unclosed`. See § 4.21 for
 > the v3.4 runtime extension and
-> `docs/RESULTS_WEVRA_INNER_LOOP.md` for the milestone note.
+> `docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md` for the milestone note.
 >
 > **Multi-agent team coordination slice (SDK v3.5,
 > 2026-04-26).** The capsule-native abstraction has been
@@ -155,7 +155,7 @@
 > The Wevra single-run product runtime contract is unchanged;
 > the team layer is research-grade (`vision_mvp.wevra
 > .team_coord`). See § 4.22 for the v3.5 extension and
-> `docs/RESULTS_WEVRA_TEAM_COORD.md` for the milestone note;
+> `docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md` for the milestone note;
 > the formal model lives in `docs/CAPSULE_TEAM_FORMALISM.md`.
 >
 > **Programme vs Product — read this first.** The programme ships
@@ -167,7 +167,7 @@
 > **not** a universal agent platform. CASR (Causal-Abstraction Scale-
 > Renormalized Routing) is the *original substrate* — it lives in
 > `vision_mvp.core.*` as settled research code and grounds Wevra's
-> bounded-context claim (Theorem 3 in `PROOFS.md`); it is not itself
+> bounded-context claim (Theorem 3 in `docs/archive/pre-wevra-theory/PROOFS.md`); it is not itself
 > the product identity. The canonical one-pass orientation for a new
 > reader is [`docs/START_HERE.md`](START_HERE.md).
 
@@ -256,7 +256,7 @@ It means the following, in order of strength:
    per-agent context can be kept at O(log N) tokens per round
    without loss of accuracy, with the bound matching the
    information-theoretic lower bound up to a ceiling (Theorem 3
-   in `PROOFS.md`). This is settled, for the class of tasks it
+   in `docs/archive/pre-wevra-theory/PROOFS.md`). This is settled, for the class of tasks it
    covers (Phases 1–10, 94+ tests).
 2. **A losslessly recoverable external memory.** Every artifact the
    system has ever taken in is addressable by content hash,
@@ -340,7 +340,7 @@ downstream writeups:
 - **We do not claim arbitrary-task universality.** O(log N) requires
   low intrinsic rank (`r ≤ O(log N)`); general d-dimensional tasks
   at small tolerance ε have an Ω(d·log 1/ε) communication floor
-  (Theorem 11, `PROOFS.md`). When this condition fails, routing does
+  (Theorem 11, `docs/archive/pre-wevra-theory/PROOFS.md`). When this condition fails, routing does
   not save us.
 - **We do not claim soundness over adversarial code.** Phase-26 and
   Phase-27 sandboxes neuter common side-effectful APIs but are not
@@ -472,10 +472,10 @@ constraint.
 Two anchors:
 
 - **Rate-distortion theory** provides a lower bound on the size of
-  the representation that preserves answer quality (`FRAMEWORK.md`
+  the representation that preserves answer quality (`docs/archive/pre-wevra-theory/FRAMEWORK.md`
   §A.2). CASR is designed to approach but not violate it.
 - **Shannon-style channel capacity / broadcast lower bounds**
-  (Theorems 3, 11 in `PROOFS.md`) say that any protocol in which
+  (Theorems 3, 11 in `docs/archive/pre-wevra-theory/PROOFS.md`) say that any protocol in which
   every agent must learn one bit has `B · R ≥ log N`; a protocol
   achieving ⌈log₂ N⌉ peak context is optimal up to the ceiling.
 
@@ -498,7 +498,7 @@ unless you change the problem.
 - **Content-addressed storage** (Merkle DAGs, Git-style provenance)
   is the exact-memory layer (Phase 19).
 - **Rank-based / log-rank communication bounds** sit under the
-  workspace capacity O(log N) result (V2.14 in `MATH_AUDIT.md`).
+  workspace capacity O(log N) result (V2.14 in `docs/archive/pre-wevra-theory/MATH_AUDIT.md`).
 
 ### 2.3 Machine learning
 
@@ -544,7 +544,7 @@ content, not as decoration:
   router (Theorem 13).
 
 The `EXTENDED_MATH_[1-7].md` documents survey 72 such frameworks;
-`MATH_AUDIT.md` records which are `USED`, `STRUCTURAL`, `BUILT`, or
+`docs/archive/pre-wevra-theory/MATH_AUDIT.md` records which are `USED`, `STRUCTURAL`, `BUILT`, or
 `THEORY`. As of Phase 27, about 30 % of the survey is in the code,
 which is the honest number.
 
@@ -707,7 +707,7 @@ distributed async variants; rigorous fixed-point convergence for
 `T_i*`; trainable world models for the surprise filter at scale.
 The falsifiability test against the "most context is necessary"
 hypothesis has not been run on SWE-bench end-to-end yet
-(`ROADMAP.md`).
+(`docs/archive/pre-wevra-theory/ROADMAP.md`).
 
 **Why it matters.** The O(log N) bound is, if it holds up under
 peer review, a channel-capacity-level statement about a class of
@@ -2951,7 +2951,7 @@ operational-detection pair with smaller
 $\|w^*_A - w^*_B\|$ (structurally cleaner, Phase-52 candidate),
 or (c) accept W3-C10 and redirect (mechanical W3-C1 closure,
 relational *substrate* primitive).  Anchor:
-`docs/RESULTS_CAPSULE_RESEARCH_MILESTONE6.md` and
+`docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE6.md` and
 `docs/CAPSULE_FORMALISM.md` § 4.F.
 
 **Top-line, post-Phase-50 (strict-reading honest certification
@@ -2976,7 +2976,7 @@ or gap-reading Gate 2) but **NOT a strict** paradigm shift
 (strict CI Gate 1 + strict-penalty zero-shot Gate 2 are both
 structurally blocked).  The programme should adopt W3-C9's
 reformulated bar.  Anchor:
-`docs/RESULTS_CAPSULE_RESEARCH_MILESTONE5.md` and
+`docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE5.md` and
 `docs/CAPSULE_FORMALISM.md` § 4.E.
 
 **Top-line, post-Phase-49 (stronger decoder + symmetric
@@ -2998,7 +2998,7 @@ programme had a paradigm-shift *candidate* one well-scoped
 milestone away from strict certification.  **Phase 50
 ran that milestone and falsified the strict reading** —
 the CI and penalty gaps were structural, not statistical.
-Anchor: `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE4.md` and
+Anchor: `docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE4.md` and
 `docs/CAPSULE_FORMALISM.md` § 4.D.
 
 **Top-line, post-Phase-48 (bundle-aware decoder frontier).**
@@ -3033,7 +3033,7 @@ Conjecture P47-C1.
       *not* break the ceiling on the full bench
       (priority-tiebreak fallback reproduces the ceiling on
       one-vote-each scenarios) — falsifies a naive reading of
-      P47-C1. Anchor: `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE3.md`
+      P47-C1. Anchor: `docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE3.md`
       § 2.
 2. **Decoder-side cross-domain transfer — asymmetric (Part B).**
    First decoder-side transfer study (incident / security; the
@@ -3053,7 +3053,7 @@ Conjecture P47-C1.
    task-family-indexed transfer. P47-C3 (admission-side) and
    W3-C6 (decoder-side) are the *same phenomenon*, now sharp
    on both sides. Anchor:
-   `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE3.md` § 3.
+   `docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE3.md` § 3.
 3. **Paradigm-shift stance — still below bar (Part C).**
    Conjecture **W3-C7** sets the explicit threshold: a
    paradigm-shift-worthy decoder would (a) break 0.200 by
@@ -3107,7 +3107,7 @@ The Phase-46 research center is now **sharper on both sides**:
    (Phase 46) needs B = 96, a 6× efficiency lift. The next
    paradigm-shift candidate is therefore bundle-aware
    **decoding** (P47-C1), not more admission work. Anchor:
-   `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` § 2.
+   `docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` § 2.
 3. **Cross-domain transfer is asymmetric and task-family-
    indexed (Part C).** First three-domain transfer study
    (incident / compliance / security). Within-domain
@@ -3124,7 +3124,7 @@ The Phase-46 research center is now **sharper on both sides**:
    domains. P46-C2 is **partially supported, partially
    falsified**; successor conjecture P47-C3 states the
    task-family-indexed form. Anchor:
-   `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` § 3.
+   `docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` § 3.
 
 The remaining gap is now structurally **four-shaped**:
 (a) **bundle-aware decoding** (P47-C1, the post-Phase-47
@@ -4388,7 +4388,7 @@ heavy. The programme rotates between the two.
 
 ### 4.12 The Context Capsule as a research center (Phase 46 — post-SDK-v3 milestone)
 
-The SDK v3 milestone (`docs/RESULTS_WEVRA_CAPSULE.md`,
+The SDK v3 milestone (`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md`,
 2026-04-22) named the **Context Capsule** as Wevra's
 load-bearing abstraction: every piece of context that
 crosses a role / layer / run boundary is a typed, content-
@@ -4419,7 +4419,7 @@ W3-C1..W3-C4.
 **2. Capsule learning problem
 (`vision_mvp/wevra/capsule_policy.py`,
 `vision_mvp/experiments/phase46_capsule_learning.py`,
-`docs/RESULTS_CAPSULE_LEARNING.md`).** Capsule admission —
+`docs/archive/capsule-research/RESULTS_CAPSULE_LEARNING.md`).** Capsule admission —
 "should this proposed capsule be admitted under the ledger's
 budget?" — is a **learnable policy**, not just a fixed
 heuristic. The Phase-46 driver builds a 5 143-capsule
@@ -4455,7 +4455,7 @@ W3-C4 (admission learnability).** It opens three new
 conjectures (P46-C1 bundle-aware admission; P46-C2 cross-
 domain transfer; P46-C3 rate-distortion optimality of
 header features) — all named with sharp falsifiers in
-`docs/RESULTS_CAPSULE_LEARNING.md` § 6.
+`docs/archive/capsule-research/RESULTS_CAPSULE_LEARNING.md` § 6.
 
 **3. Unification stress test
 (`vision_mvp/experiments/phase46_unification_audit.py`,
@@ -4562,7 +4562,7 @@ Phase 47 continues the research-first stance of Phase 46. No
 new substrate primitive, no new benchmark domain — instead,
 three tightly-coupled research moves that **sharpen the
 boundary** of the capsule abstraction on all three fronts.
-See `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` for the
+See `docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` for the
 full note; the summary below is programme-level.
 
 **1. Formal frontier — cohort lift + relational limitation
@@ -5152,7 +5152,7 @@ is its limitation-theorem milestone.
 (c) **W3-C1 mechanical closure + W3-C5 relational extension**:
     unchanged from Phase 49.
 
-Anchor: `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE5.md` and
+Anchor: `docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE5.md` and
 `docs/CAPSULE_FORMALISM.md` § 4.E.
 
 ---
@@ -5271,7 +5271,7 @@ bar; do not claim Phase 51 broke the Phase-50 level ceiling.**
     primitive whose bounded-context invariant exercises W3-C5
     on the substrate side rather than the decoder side.
 
-Anchor: `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE6.md` and
+Anchor: `docs/archive/capsule-research/RESULTS_CAPSULE_RESEARCH_MILESTONE6.md` and
 `docs/CAPSULE_FORMALISM.md` § 4.F.
 
 ---
@@ -5388,7 +5388,7 @@ substantive-artifact content-addressing claim. The full
 new path; the legacy ``capsule_native=False`` path remains
 green (back-compat guarantee).
 
-Anchor: `docs/RESULTS_WEVRA_CAPSULE_NATIVE.md` (milestone note);
+Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md` (milestone note);
 `docs/CAPSULE_FORMALISM.md` § 4.G (theorems); test suite
 `vision_mvp/tests/test_wevra_capsule_native.py`.
 
@@ -5535,7 +5535,7 @@ contract tests. Full ``vision_mvp.tests/test_wevra_*`` suite
 hook addition does not regress any phase-40, phase-42, phase-45,
 or phase-47 substrate tests (98 / 98 green on the targeted run).
 
-Anchor: `docs/RESULTS_WEVRA_INTRA_CELL.md` (milestone note);
+Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_INTRA_CELL.md` (milestone note);
 `docs/CAPSULE_FORMALISM.md` § 4.H (theorems); test suite
 `vision_mvp/tests/test_wevra_capsule_native_intra_cell.py`.
 
@@ -5696,7 +5696,7 @@ suite **165 / 165 green**; the substrate's
 phase-40, phase-42, phase-45, phase-47, or phase-50 substrate
 tests.
 
-Anchor: `docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md` (this milestone
+Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_DEEP_INTRA_CELL.md` (this milestone
 note); `docs/THEOREM_REGISTRY.md` (canonical theorem registry);
 `docs/RESEARCH_STATUS.md` (canonical research-status); paper
 draft: `papers/wevra_capsule_native_runtime.md` (claim taxonomy +
@@ -5884,7 +5884,7 @@ capsule-native runtime contract is now witnessed by **66
 contract tests**. Full `vision_mvp.tests.test_wevra_*` +
 `test_capsule_*` suite green.
 
-Anchor: `docs/RESULTS_WEVRA_INNER_LOOP.md` (this milestone
+Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md` (this milestone
 note); `docs/CAPSULE_FORMALISM.md` § 4.J (theorems);
 `docs/THEOREM_REGISTRY.md` (canonical registry);
 `docs/RESEARCH_STATUS.md` (canonical research-status); paper
@@ -6021,7 +6021,7 @@ green. Combined with v3.4's 66 capsule-native run-boundary
 contract tests, the capsule-native layer (run-boundary +
 team-boundary) is now witnessed by **88 contract tests**.
 
-Anchor: `docs/RESULTS_WEVRA_TEAM_COORD.md` (this milestone note);
+Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md` (this milestone note);
 `docs/CAPSULE_TEAM_FORMALISM.md` (formal model);
 `docs/THEOREM_REGISTRY.md` (canonical registry — W4 rows added);
 `docs/RESEARCH_STATUS.md` (canonical research-status — multi-
@@ -6190,13 +6190,13 @@ you see it without hand-diffing N responses.
   real-LLM cross-model parser-boundary harness.
 * `vision_mvp/tests/test_wevra_llm_backend.py` (new) — 9
   contract / wire-shape / integration tests.
-* `docs/RESULTS_WEVRA_DISTRIBUTED.md` (this milestone note).
+* `docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md` (this milestone note).
 * `docs/MLX_DISTRIBUTED_RUNBOOK.md` (operator runbook).
 * `docs/THEOREM_REGISTRY.md` — W5-1 / W5-2 / W5-3 / W5-C1 /
   W5-C2 / W5-C3 rows added.
 * `docs/RESEARCH_STATUS.md` — fifth research axis added.
 
-Anchor: `docs/RESULTS_WEVRA_DISTRIBUTED.md` (this milestone
+Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md` (this milestone
 note); `docs/MLX_DISTRIBUTED_RUNBOOK.md` (operator runbook);
 `vision_mvp/experiments/parser_boundary_real_llm.py`
 (benchmark driver); `vision_mvp/wevra/llm_backend.py` (the new
@@ -6575,7 +6575,7 @@ axis and a systems axis; they are not the same.
 **Scientific goals.**
 
 - Run the falsifiability check for the core thesis end-to-end on
-  SWE-bench (`ROADMAP.md`). If fewer than 50 % of events are
+  SWE-bench (`docs/archive/pre-wevra-theory/ROADMAP.md`). If fewer than 50 % of events are
   causally relevant in a naive-context run, the routing thesis is
   confirmed empirically at task scale; if more than 80 %, the
   thesis is wrong and the programme pivots to compression-first.
@@ -6714,7 +6714,7 @@ approximation.
   `vision-tests`. Pattern extension is additive — keeps
   `may_raise_explicit` FN at 0.
 - **Cross-encoder re-ranking on retrieval.** Closes the narrow
-  residual gap on adversarial / synonym queries (`MATH_AUDIT.md`
+  residual gap on adversarial / synonym queries (`docs/archive/pre-wevra-theory/MATH_AUDIT.md`
   §Phase-20 candidates).
 - **LLM wrap-path on the Phase-29 open-vocabulary residual.** The
   Phase-29 substrate falls to a deterministic content-match on
@@ -6895,12 +6895,12 @@ are the near-term frontier. §6.1 is where the hard theory lives.
 | `docs/context_zero_master_plan.md`   | This doc. Long-running strategy + arcs + open problems.                 | Thesis, research strategy, durable framing        |
 | `README.md`                          | Entry point; current status + quickstart + headline table             | First impression, reproducibility instructions    |
 | `ARCHITECTURE.md`                    | Reference architecture of the substrate + CASR                         | Layer semantics + contract between layers         |
-| `FRAMEWORK.md`                       | Original problem formulation; routing-as-causal-inference              | Theoretical origin of CASR                        |
-| `PROOFS.md`                          | Formal theorems with proofs                                           | Mathematical claims                                |
-| `MATH_AUDIT.md`                      | Which of the 72 frameworks are actually in the code                   | Honest accounting of theory-to-code               |
-| `OPEN_QUESTIONS.md`                  | Seven foundational open questions + resolution status                 | Which hard problems the programme owns            |
-| `ROADMAP.md`                         | Phase 1–4 plan + risk register + falsifiability check                 | Empirical plan, SWE-bench framing                 |
-| `VISION_MILLIONS.md`                 | Forward-looking vision past CASR (10^6+ agents)                        | Speculative / post-CASR architectures             |
+| `docs/archive/pre-wevra-theory/FRAMEWORK.md`                       | Original problem formulation; routing-as-causal-inference              | Theoretical origin of CASR                        |
+| `docs/archive/pre-wevra-theory/PROOFS.md`                          | Formal theorems with proofs                                           | Mathematical claims                                |
+| `docs/archive/pre-wevra-theory/MATH_AUDIT.md`                      | Which of the 72 frameworks are actually in the code                   | Honest accounting of theory-to-code               |
+| `docs/archive/pre-wevra-theory/OPEN_QUESTIONS.md`                  | Seven foundational open questions + resolution status                 | Which hard problems the programme owns            |
+| `docs/archive/pre-wevra-theory/ROADMAP.md`                         | Phase 1–4 plan + risk register + falsifiability check                 | Empirical plan, SWE-bench framing                 |
+| `docs/archive/pre-wevra-theory/VISION_MILLIONS.md`                 | Forward-looking vision past CASR (10^6+ agents)                        | Speculative / post-CASR architectures             |
 | `vision_mvp/RESULTS_PHASE*.md`       | Per-phase empirical record                                            | What happened in each phase, with archived JSON   |
 
 This document refers to the others; the others should refer back
@@ -6929,7 +6929,7 @@ Legend: **✅** done, **◐** partial, **🧱** blocked externally,
 
 | Item | Status | Anchor |
 |---|---|---|
-| Bounded-context router (typed handoff, per-role inbox) | ✅ | Phases 1–10, Theorem 3 in `PROOFS.md` |
+| Bounded-context router (typed handoff, per-role inbox) | ✅ | Phases 1–10, Theorem 3 in `docs/archive/pre-wevra-theory/PROOFS.md` |
 | Byte-for-byte lossless external memory (content-hash) | ✅ | Phase 19 |
 | Routing + substrate gap validated on SWE-style tasks | ✅ | Phase 29, 40, 42 |
 | Strategy-invariance under parser / matcher / semantic refinement | ✅ | Theorem P43-3, P44 § D.4 |
@@ -7000,7 +7000,7 @@ Legend: **✅** done, **◐** partial, **🧱** blocked externally,
 | Master plan §9 Finished-Product Checklist (this section) | ✅ | here |
 | README thread for the product runner | ✅ | `README.md` |
 | ARCHITECTURE pointer to product surface | ✅ | `ARCHITECTURE.md` |
-| MATH_AUDIT refresh with P44 / P45 claims | ✅ | `MATH_AUDIT.md` |
+| MATH_AUDIT refresh with P44 / P45 claims | ✅ | `docs/archive/pre-wevra-theory/MATH_AUDIT.md` |
 | CI gate using `product_report.json` in upstream repo | ☐ | consumer concern, not programme concern |
 | Public announcement / paper | ☐ | explicitly deferred — §7.5 still stands |
 
@@ -7172,7 +7172,7 @@ contract, not parallel ad-hoc mechanisms.
     the contract; it claims to have picked the right top-level
     shape and implemented it.
 
-See [`docs/RESULTS_WEVRA_CAPSULE.md`](RESULTS_WEVRA_CAPSULE.md)
+See [`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md`](archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md)
 for theorems W3-1..W3-6 and conjectures W3-C1..W3-C3.
 
 ### 10.1 Stability matrix (living)

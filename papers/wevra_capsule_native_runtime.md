@@ -492,7 +492,7 @@ The contribution is sharper than the v3.1 framing because:
   full discharge remaining is the 70 B-class measurement
   across both Macs via MLX distributed (Mac 2 currently offline
   at measurement time). See
-  ``docs/RESULTS_WEVRA_DISTRIBUTED.md``.
+  ``docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md``.
 - **Cryptographic signing on top of the META_MANIFEST.** Authenticity
   against an adversary is orthogonal but composable.
 - **Cross-run determinism on full DAG without flag.** Could be
@@ -511,7 +511,7 @@ The contribution is sharper than the v3.1 framing because:
 - Cross-model parser-boundary experiment (SDK v3.4):
   `vision_mvp/experiments/parser_boundary_cross_model.py`
 - Formal model: `docs/CAPSULE_FORMALISM.md` (§ 4.J for SDK v3.4)
-- Milestone notes: `docs/RESULTS_WEVRA_INNER_LOOP.md` (SDK v3.4)
+- Milestone notes: `docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md` (SDK v3.4)
 - Tests: `vision_mvp/tests/test_wevra_capsule_native*.py`,
   `test_wevra_capsule_native_deeper.py`,
   `test_wevra_capsule_native_inner_loop.py` (SDK v3.4),

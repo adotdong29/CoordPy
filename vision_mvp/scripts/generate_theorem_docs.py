@@ -179,7 +179,7 @@ def main(argv: list[str] | None = None) -> int:
     argv = argv if argv is not None else sys.argv[1:]
     repo_root = Path(__file__).resolve().parents[2]
     source_dir = repo_root / "vision_mvp"
-    out_path = repo_root / "docs" / "THEOREMS_AUTO.md"
+    out_path = repo_root / "docs" / "archive" / "legacy-progress-notes" / "THEOREMS_AUTO.md"
 
     theorems = extract_theorems(source_dir)
     out_path.parent.mkdir(parents=True, exist_ok=True)

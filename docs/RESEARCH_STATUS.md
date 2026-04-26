@@ -362,12 +362,12 @@ sharp status:
 - Theorem registry: `docs/THEOREM_REGISTRY.md`
 - How-not-to-overstate rules: `docs/HOW_NOT_TO_OVERSTATE.md`
 - Master plan: `docs/context_zero_master_plan.md`
-- Milestone notes: `docs/RESULTS_WEVRA_*.md`,
-  `docs/RESULTS_CAPSULE_*.md`,
-  `docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md` (SDK v3.3),
-  `docs/RESULTS_WEVRA_INNER_LOOP.md` (SDK v3.4),
-  `docs/RESULTS_WEVRA_TEAM_COORD.md` (SDK v3.5),
-  `docs/RESULTS_WEVRA_DISTRIBUTED.md` (SDK v3.6),
+- Milestone notes: `docs/archive/wevra-milestones/RESULTS_WEVRA_*.md`,
+  `docs/archive/capsule-research/RESULTS_CAPSULE_*.md` (historical),
+  `docs/archive/wevra-milestones/RESULTS_WEVRA_DEEP_INTRA_CELL.md` (SDK v3.3),
+  `docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md` (SDK v3.4),
+  `docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md` (SDK v3.5),
+  `docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md` (SDK v3.6),
   `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md` (SDK v3.7 — this milestone)
 - Paper draft: `papers/wevra_capsule_native_runtime.md`
 - Tests: `vision_mvp/tests/test_wevra_capsule_native*.py`,

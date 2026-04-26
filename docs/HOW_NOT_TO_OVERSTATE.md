@@ -17,7 +17,7 @@ this repo. Unlabelled claims are forbidden.
 
 - **proved** — Mathematical proof, or proof-by-inspection of code
   that a reviewer can read in under 30 lines. The proof is in
-  `docs/CAPSULE_FORMALISM.md` or `PROOFS.md` or in the
+  `docs/CAPSULE_FORMALISM.md` or `docs/archive/pre-wevra-theory/PROOFS.md` or in the
   docstring of the relevant code. No simulation, no
   "experiments-show", no implicit cryptographic hardness.
 - **proved-conditional** — Proof depends on a stated assumption.
@@ -229,7 +229,7 @@ unqualified is forbidden.
 > coverage-guided on every seed."*
 
 Forbidden. The honest reading is the cross-seed table in
-`docs/RESULTS_WEVRA_TEAM_COORD.md` § "Cross-seed result":
+`docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md` § "Cross-seed result":
 
 * The learned policy admits *strictly fewer* handoffs than
   coverage-guided on every train seed (12/12) — this is the

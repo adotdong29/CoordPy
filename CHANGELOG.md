@@ -5,6 +5,67 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [docs] — 2026-04-26 — documentation consolidation (no SDK change)
+
+*Repo-cleanup only. No code change. SDK contract byte-for-byte
+unchanged. Strictly additive on SDK v3.7.*
+
+### Changed
+
+- **Top-level Markdown clutter consolidated.** The repo root and
+  `docs/` are reduced to a small canonical set; everything else is
+  preserved under `docs/archive/`. The active scientific position is
+  now obviously the live entry point and stale milestone notes can no
+  longer read like current claims.
+- **Canonical kept set** (top level): `README.md`, `ARCHITECTURE.md`,
+  `CHANGELOG.md`, `LICENSE`, `CLAUDE.md`. **Canonical kept set**
+  (`docs/`): `START_HERE.md`, `RESEARCH_STATUS.md`,
+  `THEOREM_REGISTRY.md`, `HOW_NOT_TO_OVERSTATE.md`,
+  `CAPSULE_FORMALISM.md`, `CAPSULE_TEAM_FORMALISM.md`,
+  `context_zero_master_plan.md`, `MLX_DISTRIBUTED_RUNBOOK.md`,
+  `RESULTS_WEVRA_SCALE_VS_STRUCTURE.md` (latest milestone, kept live).
+- **Archive layout** (`docs/archive/`):
+  - `capsule-research/` — `RESULTS_CAPSULE_LEARNING.md` +
+    `RESULTS_CAPSULE_RESEARCH_MILESTONE[1-6].md`.
+  - `wevra-milestones/` — older Wevra milestone notes
+    `RESULTS_WEVRA_{CAPSULE, CAPSULE_NATIVE, INTRA_CELL,
+    DEEP_INTRA_CELL, INNER_LOOP, TEAM_COORD, DISTRIBUTED}.md`
+    (SDK v3.0 → v3.6).
+  - `pre-wevra-theory/` — pre-Wevra Context Zero theory volumes:
+    `PROOFS.md`, `EXTENDED_MATH[_1-7].md`, `OPEN_QUESTIONS.md`,
+    `FRAMEWORK.md`, `EVALUATION.md`, `MVP.md`, `ROADMAP.md`,
+    `VISION_MILLIONS.md`, `MATH_AUDIT.md`,
+    `HIERARCHICAL_DECOMPOSITION.md`, `WAVES.md`.
+  - `legacy-progress-notes/` — sprint prompts, paradigm-shift
+    summaries, the pre-Wevra benchmark-reproduction guide, the
+    auto-generated theorem index.
+- **`docs/archive/README.md`** *(new)* — archive index. Names every
+  archived doc, points to the canonical replacement, and explains the
+  read-only contract: the active scientific position is in `docs/`,
+  the archive is historical record only.
+- **Internal links updated.** Every cross-link inside the canonical
+  docs (`README.md`, `ARCHITECTURE.md`, `CHANGELOG.md`, `docs/*.md`,
+  `papers/*.md`) now resolves to the new file paths. Validated
+  programmatically — zero broken Markdown links across the 14
+  canonical docs.
+- **`docs/START_HERE.md`** — adds a *Current canonical reading* table
+  at the very top of the file. Mental-model diagram updated to show
+  active vs archived theory paths.
+- **`vision_mvp/scripts/generate_theorem_docs.py`** — auto-generated
+  `THEOREMS_AUTO.md` now writes into
+  `docs/archive/legacy-progress-notes/THEOREMS_AUTO.md` (was
+  `docs/THEOREMS_AUTO.md`); the file was always a generated artefact,
+  not a canonical claim source.
+
+### Preserved
+
+- All historical research material is intact under `docs/archive/`.
+  No file deleted. No claim retracted. No theorem renumbered.
+- `vision_mvp/RESULTS_PHASE*.md` (the per-phase research diary) is
+  untouched — it lives with the code, not under `docs/`.
+- The Wevra SDK public contract, the Capsule Contract C1..C6, and
+  the W3 / W4 / W5 / W6 theorem families are unchanged.
+
 ## [SDK v3.7] — 2026-04-26 — model-scale vs capsule-structure on multi-agent coordination (Phase-53 + W6 family)
 
 *Strictly additive on SDK v3.6. The Wevra single-run product
@@ -182,7 +243,7 @@ runs side-by-side with the Wevra SDK.*
   budget-efficiency dominance is robust per-seed; accuracy
   advantage is mean-positive on the default noise config but
   not strict per-seed; advantage does not survive heavier
-  noise. (See ``docs/RESULTS_WEVRA_TEAM_COORD.md`` § Cross-seed
+  noise. (See ``docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md`` § Cross-seed
   result for the canonical reading; ``docs/HOW_NOT_TO_OVERSTATE.md``
   forbids reporting single-seed numbers without the cross-seed
   distribution.)
@@ -194,7 +255,7 @@ runs side-by-side with the Wevra SDK.*
   W4-3 sub-class), W4-C3 (capsule admission rule subsumes
   Phase-36 adaptive-sub).
 - **`docs/CAPSULE_TEAM_FORMALISM.md`** — formal model.
-- **`docs/RESULTS_WEVRA_TEAM_COORD.md`** — milestone note.
+- **`docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md`** — milestone note.
 - **`vision_mvp/tests/test_wevra_team_coord.py`** — 22 contract
   tests.
 - **README**, **START_HERE**, **RESEARCH_STATUS**,
@@ -291,7 +352,7 @@ additive). Full Wevra + capsule test suite green (199 tests).*
   sharper synthetic reading W3-C6.
 
 ### Documentation
-- New milestone note: **`docs/RESULTS_WEVRA_INNER_LOOP.md`**.
+- New milestone note: **`docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md`**.
 - `docs/CAPSULE_FORMALISM.md` § 4.J added (W3-42 / W3-43 / W3-44 /
   W3-45 / W3-C6 + W3-C5-discharged).
 - `docs/THEOREM_REGISTRY.md`, `docs/RESEARCH_STATUS.md`,
@@ -334,7 +395,7 @@ Slice-2 tests still pass.*
 ### Changed
 - **README headline** now leads with **Wevra** (the shipped product)
   and positions CASR as original-substrate research; the scaling
-  claims are preserved and re-anchored to Theorem 3 in `PROOFS.md`.
+  claims are preserved and re-anchored to Theorem 3 in `docs/archive/pre-wevra-theory/PROOFS.md`.
 - **ARCHITECTURE.md headline** re-anchored to Wevra + Context Zero;
   a framing callout was added before the Phase 26–44 block so
   readers know that block is a historical incremental record and
@@ -466,11 +527,11 @@ Initial alpha release. One continuous research session.
 
 ### Added — Theory
 
-- **`PROOFS.md`** — twelve formal theorems, each with a proof and a
+- **`docs/archive/pre-wevra-theory/PROOFS.md`** — twelve formal theorems, each with a proof and a
   machine-checkable empirical counterpart in `tests/`.
 - **`EXTENDED_MATH_[1–7].md`** — 72-framework survey converging on the
   O(log N) bound from Information Bottleneck through Geometric Langlands.
-- **`VISION_MILLIONS.md`** — the 10-idea paradigm shift for million-agent
+- **`docs/archive/pre-wevra-theory/VISION_MILLIONS.md`** — the 10-idea paradigm shift for million-agent
   systems. 6 of 10 ideas implemented.
 
 ### Added — Tests

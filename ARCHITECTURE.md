@@ -60,7 +60,7 @@ capsule, verify the chain end-to-end, and know the bytes haven't
 drifted.
 
 Reference implementation: `vision_mvp/wevra/capsule.py`. Theory note:
-[`docs/RESULTS_WEVRA_CAPSULE.md`](docs/RESULTS_WEVRA_CAPSULE.md).
+[`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md).
 Contract tests: `vision_mvp/tests/test_wevra_capsules.py`
 (invariants C1..C6 individually + end-to-end).
 
@@ -133,9 +133,9 @@ Reference implementation:
 ``seal_meta_manifest``); hooks plumbed through
 `vision_mvp/tasks/swe_sandbox.py::run_swe_loop_sandboxed`. Theory
 notes:
-[`docs/RESULTS_WEVRA_CAPSULE_NATIVE.md`](docs/RESULTS_WEVRA_CAPSULE_NATIVE.md)
+[`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md)
 (W3-32..W3-35) and
-[`docs/RESULTS_WEVRA_INTRA_CELL.md`](docs/RESULTS_WEVRA_INTRA_CELL.md)
+[`docs/archive/wevra-milestones/RESULTS_WEVRA_INTRA_CELL.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_INTRA_CELL.md)
 (W3-32-extended / W3-36 / W3-37 / W3-38). Contract tests:
 `vision_mvp/tests/test_wevra_capsule_native.py` (16 tests, v3.1)
 and `vision_mvp/tests/test_wevra_capsule_native_intra_cell.py`
@@ -205,7 +205,7 @@ Reference implementation:
 `vision_mvp/wevra/lifecycle_audit.py`,
 `vision_mvp/product/runner.py::_canonicalise_for_determinism`.
 Theory note:
-[`docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md`](docs/RESULTS_WEVRA_DEEP_INTRA_CELL.md).
+[`docs/archive/wevra-milestones/RESULTS_WEVRA_DEEP_INTRA_CELL.md`](docs/archive/wevra-milestones/RESULTS_WEVRA_DEEP_INTRA_CELL.md).
 Contract tests: `vision_mvp/tests/test_wevra_capsule_native_deeper.py`
 (18 tests).
 
@@ -239,7 +239,9 @@ thing.
 > finished product produced by it. The original substrate proposal — **CASR**
 > (Causal-Abstraction Scale-Renormalized Routing) — lives in
 > `vision_mvp.core.*` as research-grade code and grounds Wevra's O(log N)
-> bounded-context claim (Theorem 3 in `PROOFS.md`). The programme's phase-by-
+> bounded-context claim (Theorem 3 in
+> [`docs/archive/pre-wevra-theory/PROOFS.md`](docs/archive/pre-wevra-theory/PROOFS.md)).
+> The programme's phase-by-
 > phase diary lives in `vision_mvp/RESULTS_PHASE*.md`; the Wevra SDK boundary
 > lives under `vision_mvp/wevra/` and is the stable public contract.
 >
