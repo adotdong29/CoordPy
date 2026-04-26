@@ -3,7 +3,7 @@
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
 > README-of-README must satisfy these rules. Last touched: SDK
-> v3.3, 2026-04-26.
+> v3.9, 2026-04-26.
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or
@@ -385,3 +385,142 @@ via ``from_candidate_payloads``) is the SDK v3.8 win."
   the W7-1/W7-2 dichotomy framing; "cohort-coherence is the
   SDK v3.8 win" without specifying *buffered* (vs streaming)
   variant.
+- **2026-04-26 (SDK v3.9).** Adds W8 rules: forbidden phrases
+  "cross-role corroboration beats W7-2" without the
+  bench-property conditions; "we solved multi-agent context"
+  without naming the **strong success bar** in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` § 1.1; "the
+  three-regime win is universal" without naming the W8-4
+  falsifier regime.
+
+### Labelling the W8-1 corroboration win as unconditional
+
+> *"Cross-role corroboration beats W7-2 on multi-agent benchmarks."*
+
+Forbidden without the conditions. The defensible W8-1 reading
+names the bench properties:
+
+* **Surplus.** ``|candidates(scenario)| > K_auditor`` — without
+  budget pressure, FIFO ≡ admit-all and structure_gain = 0
+  identically (W7-1).
+* **Decoy raw plurality.** Some decoy service has strictly more
+  raw mentions in the auditor stream than gold. Without this,
+  W7-2 single-tag plurality also wins, so corroboration only
+  matches W7-2 (W8-3 backward-compat — not a strict separation).
+* **Cross-role-corroborated gold.** The gold service is mentioned
+  by strictly more distinct producer roles than any decoy
+  service. Without this, the corroboration policy picks the
+  decoy plurality and ties FIFO at 0.000 (W8-4 falsifier).
+* **Buffered mode.** ``CrossRoleCorroborationAdmissionPolicy(fixed_dominant_tag=...)``
+  constructed via ``from_candidate_stream``. The streaming variant
+  is unstable under arrival permutation in the same sense as
+  W7-1-aux; do not cite it as the load-bearing variant.
+
+Permitted: "On the Phase-55 default config (K_auditor=4,
+n_eval=10, decoy-plurality + cross-role-corroborated-gold property),
+the *buffered* ``CrossRoleCorroborationAdmissionPolicy`` achieves
+``accuracy_full = 1.000`` against ``capsule_fifo`` 0.000 AND
+``capsule_cohort_buffered`` (W7-2) 0.000 — a +1.000 strict
+separation from both baselines (W8-1)."
+
+Forbidden: "Cross-role corroboration solves multi-agent context."
+Forbidden: "Capsule corroboration always beats W7-2."
+Forbidden: "Capsule structure beats FIFO." (Without the bench
+conditions named — same as the W7-2 rule.)
+
+### Labelling the streaming corroboration variant as the load-bearing policy
+
+> *"Cross-role corroboration is the SDK v3.9 win."*
+
+Forbidden without specifying *buffered* mode. The streaming
+variant (``CrossRoleCorroborationAdmissionPolicy()`` with
+``fixed_dominant_tag=None``) is arrival-order-sensitive in the
+same way W7-1-aux describes for streaming cohort coherence. The
+buffered variant (constructed via ``from_candidate_stream``) is
+the load-bearing one and the W8-1 anchor. The honest phrasing:
+"The *buffered* ``CrossRoleCorroborationAdmissionPolicy`` is the
+SDK v3.9 win."
+
+### Labelling the SDK v3.9 result "we solved multi-agent context"
+
+> *"SDK v3.9 solves multi-agent context."*
+
+Forbidden. SDK v3.9 ships the strongest cross-regime conditional
+structural-win the programme has ever produced (Phase 55 strict
+gain + Phase 54 backward-compat + Phase 53 no-regression, stable
+across 5/5 bank seeds, named falsifier regime correctly ties FIFO).
+This clears the **strong success bar** of
+``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` § 1.1 — a real
+advance, not a null milestone. But "solved" remains forbidden:
+
+* The W8-1 win is *conditional* on the named bench property
+  (decoy-plurality + cross-role-corroborated gold). The W8-4
+  falsifier regime is the named conditional limit.
+* Real production multi-agent teams have additional axes
+  (heterogeneous producers, time-varying budgets, multi-round
+  handoffs, conflicting goals, multi-service gold answers) that
+  Phase 55 does not test. W8-C1 / W8-C2 / W8-C3 are the
+  conjectural extensions; none are yet shipped.
+* Three named regimes is a stronger cross-regime result than
+  two, but it is not "all regimes." Real-LLM under multi-service
+  decoy chatter (W8-C2) is the natural next falsifier.
+
+Permitted phrasings:
+
+* "SDK v3.9 clears the strong success bar of
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` § 1.1 on
+  three named regimes (no-regression on R-53, backward-compat on
+  R-54, strict win on R-55) with cross-bank stability and a named
+  falsifier."
+* "On the Phase-55 default config (named bench property),
+  buffered cross-role corroboration achieves +1.000 accuracy_full
+  vs both substrate FIFO and SDK v3.8 W7-2 buffered cohort, the
+  first strict separation between cross-role corroboration and
+  single-tag plurality cohort in the programme."
+* "Three regimes anchored, the W8-1 conditional win is sharp
+  and falsifiable. We have not solved multi-agent context;
+  we have made the strongest cross-regime conditional advance
+  to date."
+
+### Conflating Phase-54 and Phase-55 results
+
+> *"SDK v3.9 reverses the SDK v3.8 result."*
+
+Forbidden. The two milestones measure *different bench properties*
+and both are true:
+
+* **Phase-54** (SDK v3.8): deterministic candidate stream with
+  cross-role service-tag coherence; **gold raw plurality**
+  property; surplus on every scenario; buffered cohort coherence
+  beats FIFO by +1.000 on accuracy_full.
+* **Phase-55** (SDK v3.9): deterministic candidate stream with
+  cross-role corroboration; **decoy raw plurality** + **gold
+  cross-role corroboration** property (strict separation from
+  Phase 54); surplus on every scenario; buffered cross-role
+  corroboration beats both FIFO AND W7-2 by +1.000 on
+  accuracy_full.
+
+W7-2 on Phase 54 is preserved exactly. Corroboration on Phase 54
+matches W7-2 (W8-3 backward-compat). The honest combined reading
+is the W7-2 / W8-1 strict-generalisation hierarchy: **W7-2 wins
+on gold-plurality benches; W8-1 wins on the strict superset
+that includes decoy-plurality with cross-role-corroborated gold;
+W8-3 backward-compat preserves W7-2's wins under W8.**
+
+### Conflating Phase-53 and Phase-55 results
+
+> *"Phase 55 makes Phase 53 obsolete."*
+
+Forbidden. Phase 53 is the **real-LLM low-surplus** anchor for
+W7-1 (FIFO unbeatability under low surplus). Phase 55 is the
+**deterministic budget-pressured + decoy-plurality + gold-
+corroborated** anchor for W8-1. They measure orthogonal axes:
+
+* Phase 53 tests *real-LLM extractor variability* with a small
+  candidate stream (low surplus → no admission policy can win).
+* Phase 55 tests *cross-role admission decision quality* with a
+  designed candidate stream where admission *can* win.
+
+Both are true; both are conditional. The W8-1 win on Phase 55
+**does not contradict** the W7-1 result on Phase 53 — they
+operate in disjoint regimes (high surplus vs low surplus).

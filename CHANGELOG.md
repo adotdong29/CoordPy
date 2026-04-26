@@ -5,6 +5,90 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.9] — 2026-04-26 — SDK v3.9 — cross-role corroboration multi-agent coordination + W8 family
+
+*Strictly additive on SDK v3.8. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The new
+``CrossRoleCorroborationAdmissionPolicy`` is a research-slice
+addition to the multi-agent coordination layer
+(``vision_mvp.wevra.team_coord``), not part of the run-boundary
+product runtime. **First SDK milestone to clear the strong success
+bar of `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` § 1.1** —
+strict separation from W7-2 on Phase 55 (+1.000 corroboration −
+cohort_buffered, +1.000 corroboration − fifo on accuracy_full),
+backward-compat on Phase 54 (corroboration ties W7-2 at 1.000),
+no regression on Phase 53 synthetic (0.800) or 14B real-LLM
+(0.800), cross-bank stability across 5/5 seeds, named falsifier
+regime correctly ties FIFO at 0.000.*
+
+### Added
+
+- **`docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`** (new): pre-
+  committed strong / partial / null success bars with named
+  regimes (R-53 / R-54 / R-55).
+- **Phase-55 decoy-plurality + cross-role-corroborated benchmark**
+  (new): `vision_mvp/experiments/phase55_decoy_plurality.py`.
+  Smallest deterministic regime where (a) decoy raw plurality
+  breaks W7-2 single-tag plurality cohort coherence AND (b) gold
+  cross-role corroboration provides a relational signal a (role,
+  tag)-aggregating policy can exploit. Bench properties named and
+  mechanically verified.
+- **`CrossRoleCorroborationAdmissionPolicy`** (new): in
+  `vision_mvp/wevra/team_coord.py`. Deterministic, training-free
+  admission rule with score function `role_weight·|distinct_roles|
+  + |raw_mentions|`. Buffered factory `from_candidate_stream` is
+  the W8-1 anchor. Re-exported as
+  `TeamCrossRoleCorroborationAdmissionPolicy`.
+- **W8 theorem family**: W8-1 (strict separation, proved-empirical
+  n=50), W8-2 (score-function strict ordering, proved structural),
+  W8-3 (backward-compat with W7-2 on Phase 54, proved-empirical),
+  W8-4 (decoy-corroboration falsifier, proved-empirical n=10).
+  W8-C1 / W8-C2 / W8-C3 conjectures.
+- **34 contract tests**:
+  `vision_mvp/tests/test_wevra_cross_role_corroboration.py`.
+- **Frozen reproducibility artefacts**:
+  `docs/data/phase55_decoy_plurality_K4_n10.json` (default),
+  `docs/data/phase55_falsifier_K4_n10.json` (W8-4),
+  `docs/data/phase55_budget_sweep.json`,
+  `docs/data/phase55_seed_sweep.json`,
+  `docs/data/phase55_cross_regime.json`,
+  `docs/data/phase53_real_llm_corroboration_check.json`.
+
+### Changed
+
+- `vision_mvp/wevra/__init__.py`: re-exports
+  `TeamCrossRoleCorroborationAdmissionPolicy`; `SDK_VERSION`
+  bumped to `"wevra.sdk.v3.9"`.
+- `vision_mvp/tests/test_wevra_public_api.py`: SDK version test
+  updated to v3.9; new corroboration export test.
+- `docs/THEOREM_REGISTRY.md`: W8 family rows added; date stamp
+  v3.9.
+- `docs/RESEARCH_STATUS.md`: eighth research axis added.
+- `docs/HOW_NOT_TO_OVERSTATE.md`: W8 overstatement guards added
+  (W8-1 conditionality; "we solved multi-agent context" forbidden
+  without naming the strong success bar; Phase-54/55 conflation
+  forbidden; Phase-53/55 conflation forbidden).
+- `docs/context_zero_master_plan.md`: § 4.26 SDK v3.9 added.
+- `docs/START_HERE.md`: SDK v3.9 paragraph + canonical-reading
+  pointer to the success-criterion doc.
+- `docs/RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md`: new milestone
+  results note.
+
+### Honest scope
+
+- The W8-1 win is **conditional** on the named bench property
+  (decoy-plurality + cross-role-corroborated gold). The W8-4
+  falsifier regime is the explicit named counterexample.
+- Three named regimes is a stronger cross-regime result than two,
+  but not "all regimes." Real production multi-agent teams have
+  additional axes the W8 family does not test (heterogeneous
+  producers, time-varying budgets, multi-round handoffs,
+  multi-service gold). W8-C1 / W8-C2 / W8-C3 are conjectural;
+  none yet shipped.
+- The Wevra single-run product runtime contract is byte-for-byte
+  unchanged from SDK v3.8. The new admission policy is a
+  research-slice addition.
+
 ## [3.8] — 2026-04-26 — SDK v3.8 — cross-role cohort-coherence multi-agent coordination + W7 family
 
 *Strictly additive on SDK v3.7. The Wevra single-run product

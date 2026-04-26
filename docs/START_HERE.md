@@ -17,7 +17,9 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.8)          | [`RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md`](RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md) |
+> | Latest milestone (SDK v3.9)          | [`RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md`](RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md) |
+> | Pre-committed success bar (SDK v3.9) | [`SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`](SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md) |
+> | Previous milestone (SDK v3.8)        | [`RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md`](RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md) |
 > | Previous milestone (SDK v3.7)        | [`RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](RESULTS_WEVRA_SCALE_VS_STRUCTURE.md) |
 > | Repo top-level                       | [`../README.md`](../README.md), [`../ARCHITECTURE.md`](../ARCHITECTURE.md), [`../CHANGELOG.md`](../CHANGELOG.md) |
 > | Historical record (read-only)        | [`archive/`](archive/) — pre-Wevra theory, older Wevra milestones, sprint prompts |
@@ -30,7 +32,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.8 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.9 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
@@ -39,11 +41,36 @@ per-role admission policy), **across the model-class gradient**
 (W5 family, real cross-LLM parser-boundary measurement
 TVD = 1.000 / 0.000), **across the *model regime × admission
 strategy* grid on a real-LLM-driven multi-agent coordination
-benchmark** (W6 family, SDK v3.7), and — most sharply — **across
-a deterministic cross-role cohort-coherence benchmark where
-capsule structure provides a strict +1.000 ``accuracy_full``
-advantage over substrate FIFO** (W7 family, SDK v3.8).
-SDK v3.8's headline result is a **conditional structural win**:
+benchmark** (W6 family, SDK v3.7), **across a deterministic
+cross-role cohort-coherence benchmark where capsule structure
+provides a strict +1.000 ``accuracy_full`` advantage over
+substrate FIFO** (W7 family, SDK v3.8), and — most sharply —
+**across a strict separation between W7-2 single-tag plurality
+cohort and W8 cross-role corroboration on a harder
+decoy-plurality benchmark, with cross-bank stability and a named
+falsifier regime** (W8 family, SDK v3.9).
+SDK v3.9's headline result is a **strong-bar conditional
+structural win** (`docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`
+§ 1.1): on the Phase-55 deterministic benchmark (decoy-plurality
++ cross-role-corroborated-gold property + ``|candidates| >
+K_auditor``), the new ``CrossRoleCorroborationAdmissionPolicy``
+(buffered mode, pre-fitted dominant tag from the candidate
+stream's (role, payload) pairs) achieves
+``accuracy_full = 1.000`` while substrate FIFO,
+``capsule_fifo``, ``capsule_priority``, ``capsule_coverage``,
+**AND** the SDK v3.8 ``capsule_cohort_buffered`` (W7-2) all
+produce 0.000 — a +1.000 strict separation from both baselines,
+stable across **5/5** alternate ``bank_seed`` values. The win
+is **conditional** on the named bench property; under the
+named W8-4 falsifier regime (decoy-corroborated decoy), the
+new policy correctly ties FIFO at 0.000. Backward-compat
+preserved (W8-3): on Phase-54 the new policy ties W7-2 at
+1.000. No regression on Phase-53 synthetic or Phase-53 14B
+real-LLM (all strategies tie at 0.800, the W7-1 anchor). The
+milestone is the **first SDK release** to clear the strong
+success bar — three named regimes, cross-bank stability, named
+falsifier, audit T-1..T-7 preserved on every cell.
+SDK v3.8's headline result remains a **conditional structural win**:
 on the Phase-54 deterministic benchmark (gold-plurality property
 + foreign-service decoys + ``|candidates| > K_auditor``), the
 new ``CohortCoherenceAdmissionPolicy`` (buffered mode, pre-fitted

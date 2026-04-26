@@ -733,10 +733,227 @@ class CohortCoherenceAdmissionPolicy:
                                   score=0.0)
 
 
+# =============================================================================
+# Cross-role corroboration admission (SDK v3.9 — W8 family)
+# =============================================================================
+
+
+def _candidate_source_role(cand: ContextCapsule) -> str:
+    if not isinstance(cand.payload, dict):
+        return ""
+    return str(cand.payload.get("source_role", ""))
+
+
+@dataclasses.dataclass
+class CrossRoleCorroborationAdmissionPolicy:
+    """Cross-role corroboration admission (SDK v3.9 / W8 family).
+
+    A strict generalisation of :class:`CohortCoherenceAdmissionPolicy`
+    that aggregates a service tag's signal across **distinct
+    producer roles** rather than over raw mention counts. The
+    motivating regime is the *decoy-plurality* case (the
+    SDK v3.8 W7-2 falsifier): a candidate stream where some decoy
+    service has strictly more raw mentions than gold but is mentioned
+    by **fewer distinct producer roles** than gold. On such a
+    stream, single-tag-plurality cohort coherence (W7-2) picks the
+    decoy and ties FIFO; this policy picks the cross-role-corroborated
+    gold and wins.
+
+    Two sub-modes
+    -------------
+    The policy supports two operating modes, controlled by
+    ``fixed_dominant_tag``:
+
+    * **Streaming** (``fixed_dominant_tag=None``, default) — at each
+      ``decide`` call, recompute the corroboration score over the
+      currently-admitted candidates. Arrival-order-sensitive in the
+      same sense as ``CohortCoherenceAdmissionPolicy`` streaming
+      (W7-1-aux): if the first admitted candidate is from a foreign
+      service and that service's role-coverage equals or exceeds the
+      gold's *as the cohort grows*, the policy can lock onto the
+      decoy. The streaming variant is retained as a
+      research-baseline / falsifier; the buffered variant is the
+      load-bearing one.
+
+    * **Buffered** (``fixed_dominant_tag=<tag>``) — the policy
+      ignores the running cohort and uses a pre-fitted dominant tag.
+      Construct via :meth:`from_candidate_stream` to fit on the full
+      ``(source_role, payload)`` candidate list before streaming
+      admission begins. **Arrival-order-stable** by construction.
+
+    Scoring
+    -------
+    For each ``service=<tag>`` in the candidate stream, the
+    *corroboration score* is
+
+    .. math::
+
+        \\text{score}(\\text{tag}) =
+        W_\\text{role} \\cdot |\\{ \\text{distinct producer roles
+        emitting tag}\\}| + |\\{ \\text{total mentions of tag}\\}|
+
+    where ``W_role`` is a large constant (default ``100``) so
+    distinct-role corroboration **dominates** raw count for any
+    realistic candidate-stream size. Ties on score break by lex
+    order on the tag, deterministically. This is **proved** in
+    Theorem W8-2: any decoy with raw-count advantage `Δr ≤ 99`
+    and role-coverage disadvantage `Δr_role ≥ 1` is dominated.
+
+    Why this is *cross-role* (not just per-tag plurality)
+    -----------------------------------------------------
+    The single-tag plurality
+    (:class:`CohortCoherenceAdmissionPolicy`) does *not* see the
+    producer role of each candidate. It sees only the multiset of
+    service tags. The corroboration policy's score function
+    explicitly aggregates over the (role, tag) bipartite multiset,
+    so it *can* express "gold is mentioned by 3 distinct roles vs
+    decoy by 1 distinct role" — a relational signal the W7-2 policy
+    cannot represent. This is the minimum interesting *strict
+    generalisation* of W7-2.
+
+    Why this is honest
+    ------------------
+    * **Deterministic** and **small**: one regex (re-using
+      :data:`_SERVICE_TAG_RE`), one counter over (role, tag) pairs,
+      no learning, no training-distribution dependency.
+    * **Backward-compatible**: on any candidate stream where the
+      gold tag has the highest raw count *and* the highest distinct-
+      role count, this policy admits exactly the same set as the W7-2
+      buffered cohort. On Phase-54 default, the two policies are
+      indistinguishable on `accuracy_full`.
+    * **Falsifiable**: a stream where the *decoy* has strictly more
+      distinct-role coverage AND strictly more raw mentions than
+      gold falsifies W8-1. The W8-1 falsifier regime is named in
+      :file:`vision_mvp/experiments/phase55_decoy_plurality.py` as
+      the *decoy-corroborated decoy* falsifier.
+
+    Lifecycle invariants
+    --------------------
+    The policy preserves T-1..T-7 by construction: it returns
+    standard ``AdmissionDecision`` records via the existing
+    ``TeamCoordinator`` admission path. No new lifecycle states.
+
+    Theorem cross-reference (W8 family)
+    -----------------------------------
+    * **W8-1** (proved-empirical) — strict separation on Phase-55
+      decoy-plurality + cross-role-corroborated gold.
+    * **W8-2** (proved, structural) — for any constants
+      ``W_role > Δr_max`` and ``Δr_role ≥ 1``, the corroboration
+      score function strictly orders cross-role-corroborated gold
+      above raw-plurality decoy.
+    * **W8-3** (proved-empirical) — backward compatibility on
+      Phase-54 default.
+    """
+
+    name: str = "cross_role_corroboration"
+    role_weight: int = 100
+    fixed_dominant_tag: str | None = None
+
+    @classmethod
+    def from_candidate_stream(
+            cls,
+            stream: "Iterable[tuple[str, str]]",
+            *,
+            role_weight: int = 100,
+            ) -> "CrossRoleCorroborationAdmissionPolicy":
+        """Construct a *buffered* policy by pre-fitting the
+        cross-role-corroborated dominant service tag on a candidate
+        stream.
+
+        Parameters
+        ----------
+        stream
+            Iterable of ``(source_role, payload)`` pairs. Only the
+            payload's ``service=<tag>`` token is consulted; the
+            source_role is used to count distinct-role coverage.
+        role_weight
+            Constant ``W_role`` in the score function (default
+            100). Must be strictly greater than the largest raw
+            mention difference the bench can produce; otherwise
+            W8-2's strict-ordering premise is violated. The default
+            is sufficient for any candidate stream of size
+            ``< 100``.
+
+        Score function (re-stated for clarity):
+
+            score(tag) = role_weight * |distinct_roles(tag)|
+                       + raw_mentions(tag)
+
+        Ties break by lex order on the tag (deterministic). If no
+        candidate carries a service tag, the returned policy is the
+        streaming default.
+        """
+        role_per_tag: dict[str, set[str]] = {}
+        count_per_tag: dict[str, int] = {}
+        for (src_role, payload) in stream:
+            if not payload:
+                continue
+            m = _SERVICE_TAG_RE.search(str(payload))
+            if not m:
+                continue
+            tag = m.group(1)
+            count_per_tag[tag] = count_per_tag.get(tag, 0) + 1
+            role_per_tag.setdefault(tag, set()).add(str(src_role))
+        if not count_per_tag:
+            return cls(role_weight=role_weight)
+        scored: list[tuple[int, str]] = []
+        for tag, cnt in count_per_tag.items():
+            n_roles = len(role_per_tag.get(tag, set()))
+            scored.append((role_weight * n_roles + cnt, tag))
+        # Sort by (-score, tag) so the lex-smallest of the highest-
+        # scoring tags wins (deterministic).
+        scored.sort(key=lambda x: (-x[0], x[1]))
+        return cls(role_weight=role_weight,
+                    fixed_dominant_tag=scored[0][1])
+
+    def decide(self, *, candidate, role, budget,
+               current_admitted, current_n_tokens):
+        denial = _enforce_budget(
+            candidate=candidate, role=role, budget=budget,
+            current_admitted=current_admitted,
+            current_n_tokens=current_n_tokens)
+        if denial is not None:
+            return denial
+        cand_tag = _candidate_service_tag(candidate)
+        if not cand_tag:
+            # Untagged candidate: cannot violate corroboration on a
+            # missing key. Admit (consistent with W7-2).
+            return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+        if self.fixed_dominant_tag is not None:
+            # Buffered mode: pre-fitted dominant tag.
+            if cand_tag == self.fixed_dominant_tag:
+                return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+            return AdmissionDecision(admit=False, reason=REASON_SCORE_LOW,
+                                      score=0.0)
+        # Streaming mode: recompute corroboration over admitted set.
+        role_per_tag: dict[str, set[str]] = {}
+        count_per_tag: dict[str, int] = {}
+        for c in current_admitted:
+            t = _candidate_service_tag(c)
+            if not t:
+                continue
+            r = _candidate_source_role(c)
+            count_per_tag[t] = count_per_tag.get(t, 0) + 1
+            role_per_tag.setdefault(t, set()).add(r)
+        if not count_per_tag:
+            return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+        scored: list[tuple[int, str]] = []
+        for t, cnt in count_per_tag.items():
+            n_roles = len(role_per_tag.get(t, set()))
+            scored.append((self.role_weight * n_roles + cnt, t))
+        scored.sort(key=lambda x: (-x[0], x[1]))
+        dominant = scored[0][1]
+        if cand_tag == dominant:
+            return AdmissionDecision(admit=True, reason=REASON_ADMIT)
+        return AdmissionDecision(admit=False, reason=REASON_SCORE_LOW,
+                                  score=0.0)
+
+
 # Closed-vocabulary handle for "policies named in TEAM_DECISION
 # audit logs". Keeps the per-policy diagnostics scannable.
 ALL_FIXED_POLICY_NAMES = ("fifo", "claim_priority", "coverage_guided",
-                            "cohort_coherence")
+                            "cohort_coherence",
+                            "cross_role_corroboration")
 
 
 # =============================================================================
@@ -1207,6 +1424,7 @@ __all__ = [
     "FifoAdmissionPolicy", "ClaimPriorityAdmissionPolicy",
     "CoverageGuidedAdmissionPolicy",
     "CohortCoherenceAdmissionPolicy",
+    "CrossRoleCorroborationAdmissionPolicy",
     "ALL_FIXED_POLICY_NAMES",
     # Coordinator
     "TeamCoordinator",

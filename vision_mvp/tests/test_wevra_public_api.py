@@ -61,18 +61,18 @@ class WevraSurfaceTests(unittest.TestCase):
             self.assertIsInstance(v, str)
             self.assertTrue(len(v) > 0)
 
-    def test_sdk_version_is_v3_8(self):
+    def test_sdk_version_is_v3_9(self):
         from vision_mvp.wevra import SDK_VERSION
-        # SDK v3.8 bump: cross-role cohort-coherence multi-agent
-        # coordination (Phase-54 + W7 family). Strictly additive on
-        # v3.7 — every v3.7 run-boundary, team-boundary, LLM-backend,
-        # and Phase-53 contract test still passes byte-for-byte. The
+        # SDK v3.9 bump: cross-role corroboration multi-agent
+        # coordination (Phase-55 + W8 family). Strictly additive on
+        # v3.8 — every v3.8 run-boundary, team-boundary, LLM-backend,
+        # Phase-53/54 contract test still passes byte-for-byte. The
         # Wevra single-run product runtime contract is unchanged;
-        # the new surface is the ``CohortCoherenceAdmissionPolicy``
-        # in ``vision_mvp.wevra.team_coord`` (multi-agent
-        # coordination research slice; not part of the run-boundary
-        # product runtime).
-        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.8")
+        # the new surface is the
+        # ``CrossRoleCorroborationAdmissionPolicy`` in
+        # ``vision_mvp.wevra.team_coord`` (multi-agent coordination
+        # research slice; not part of the run-boundary product runtime).
+        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.9")
 
     def test_cohort_coherence_admission_policy_is_exported(self):
         # The SDK v3.8 cross-role admission policy must be importable
@@ -83,6 +83,25 @@ class WevraSurfaceTests(unittest.TestCase):
         p = TeamCohortCoherenceAdmissionPolicy.from_candidate_payloads(
             ["a service=api", "b service=archival", "c service=api"])
         self.assertEqual(p.fixed_plurality_tag, "api")
+
+    def test_cross_role_corroboration_admission_policy_is_exported(self):
+        # The SDK v3.9 cross-role corroboration policy must be
+        # importable from the top-level ``vision_mvp.wevra`` namespace.
+        # The buffered factory ``from_candidate_stream`` is the
+        # load-bearing constructor for the W8-1 anchor.
+        from vision_mvp.wevra import TeamCrossRoleCorroborationAdmissionPolicy
+        p = TeamCrossRoleCorroborationAdmissionPolicy.from_candidate_stream([
+            ("monitor",  "p1 service=archival"),
+            ("monitor",  "p2 service=archival"),
+            ("monitor",  "p3 service=archival"),
+            ("monitor",  "p4 service=archival"),
+            ("db_admin", "p5 service=api"),
+            ("sysadmin", "p6 service=api"),
+            ("network",  "p7 service=api"),
+        ])
+        # Cross-role corroboration: api wins (3 roles vs 1 role)
+        # despite archival having more raw mentions.
+        self.assertEqual(p.fixed_dominant_tag, "api")
 
     def test_llm_backend_surface_is_exported(self):
         # The SDK v3.6 LLM-backend surface must be importable from

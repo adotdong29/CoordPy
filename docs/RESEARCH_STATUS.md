@@ -5,12 +5,12 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.8,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.9,
 > 2026-04-26.
 
 ## TL;DR
 
-The programme now has **seven** coupled research axes, each with a
+The programme now has **eight** coupled research axes, each with a
 sharp status:
 
 1. **Capsule contract / runtime** — *active, advancing*. The
@@ -96,6 +96,45 @@ sharp status:
    recover claims the producer never emitted (the Phase-53
    ``deadlock_pool_exhaustion`` failure case).
 
+8. **Cross-role corroboration multi-agent coordination**
+   — *active, new (SDK v3.9)*. **Phase-55** benchmark
+   (`vision_mvp/experiments/phase55_decoy_plurality.py`) directly
+   attacks the W7-2 falsifier by building the smallest deterministic
+   regime where (i) some decoy service has *strictly more raw
+   mentions* than gold (so W7-2 single-tag plurality picks the
+   decoy and ties FIFO at 0.000) AND (ii) the gold service is
+   *cross-role corroborated* — mentioned by strictly more distinct
+   producer roles than any decoy. 10/10 default scenarios satisfy
+   both properties; mechanically verified by
+   ``Phase55BankShapeTests``. The new admission policy
+   ``CrossRoleCorroborationAdmissionPolicy`` aggregates over
+   (role, tag) bipartite multisets via the score function
+   ``score(tag) = role_weight·|distinct_roles(tag)| +
+   |raw_mentions(tag)|``. Headline: at the pre-committed default
+   (``K_auditor=4``, ``T_auditor=128``, ``n_eval=10``,
+   ``bank_seed=11``), ``capsule_corroboration`` achieves
+   ``accuracy_full = 1.000`` while substrate FIFO,
+   ``capsule_fifo``, ``capsule_priority``, ``capsule_coverage``,
+   AND ``capsule_cohort_buffered`` (W7-2) all produce 0.000 —
+   the **first strict separation** between cross-role corroboration
+   and W7-2 single-tag plurality, **+1.000** vs both baselines,
+   stable across **5/5** alternate bank seeds. The W8 family
+   (W8-1 / W8-2 / W8-3 / W8-4 — proved or proved-empirical)
+   anchors the milestone formally; the W8-C family makes the
+   multi-service / decoder-side / real-LLM extensions falsifiable.
+   **Honest scope:** the win is *conditional* on the named bench
+   property (decoy-plurality + cross-role-corroborated gold);
+   W8-4 is the named falsifier regime where the decoy is
+   corroborated and corroboration ties FIFO at 0.000;
+   W8-3 backward-compat preserves W7-2 on Phase 54 (corroboration
+   matches cohort_buffered at 1.000); no regression on Phase 53
+   synthetic (0.800) or Phase 53 14B real-LLM (0.800). The
+   milestone clears the **strong success bar** of
+   `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` § 1.1 — a
+   strict gain ≥ 0.20 on Phase 55, stable across ≥ 3 seeds, no
+   regression on Phase 53 / Phase 54, audit T-1..T-7 preserved
+   on every cell, named bench property + named falsifier regime.
+
 6. **Model-scale vs capsule-structure on multi-agent
    coordination** — *active, settled (SDK v3.7)*. **Phase-53**
    benchmark (`vision_mvp/experiments/phase53_scale_vs_structure.py`)
@@ -122,7 +161,59 @@ sharp status:
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.8, 2026-04-26)
+## Current frontier (SDK v3.9, 2026-04-26)
+
+### Active moves (SDK v3.9 — cross-role corroboration multi-agent benchmark + W8 family)
+
+- **Phase-55 decoy-plurality + cross-role-corroborated benchmark.**
+  ``vision_mvp.experiments.phase55_decoy_plurality`` runs 6
+  admission strategies (substrate, capsule_fifo, capsule_priority,
+  capsule_coverage, capsule_cohort_buffered (W7-2),
+  capsule_corroboration (W8)) on a deterministic 10-scenario bank
+  with the **decoy-plurality + gold-corroboration** properties.
+  Pre-committed default: ``K_auditor=4``, ``T_auditor=128``,
+  ``n_eval=10``, ``bank_seed=11``. Headline: ``corroboration −
+  fifo accuracy_full = +1.000`` AND ``corroboration −
+  cohort_buffered accuracy_full = +1.000``, stable across 5/5
+  alternate bank seeds. The first strict separation between W8
+  and W7-2 in the programme.
+- **``CrossRoleCorroborationAdmissionPolicy`` (new).**
+  ``vision_mvp/wevra/team_coord.py``. Two sub-modes (streaming /
+  buffered). Buffered factory ``from_candidate_stream`` is the
+  W8-1 anchor — pre-fits a (role, tag)-aggregated dominant tag
+  via score function ``W_role · |distinct_roles| + |raw_mentions|``.
+  Deterministic, training-free, one regex + two counters.
+  Re-exported as ``TeamCrossRoleCorroborationAdmissionPolicy``.
+- **Theorem family W8.** W8-1 (strict separation, proved-empirical
+  n=50 saturated), W8-2 (score-function strict-ordering, proved
+  structural), W8-3 (backward-compat with W7-2 on Phase 54,
+  proved-empirical), W8-4 (decoy-corroboration falsifier,
+  proved-empirical n=10 saturated). The W8-C family
+  (W8-C1/C2/C3) makes the multi-service / decoder-side / real-LLM
+  extensions falsifiable.
+- **Pre-committed success criterion** in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md``. The SDK v3.9
+  result clears the **strong success bar** § 1.1 (strict gain
+  ≥ 0.20 on R-55, stable across ≥ 3 seeds, no regression on R-53
+  / R-54, audit preserved on every cell, named bench property +
+  named falsifier regime).
+- **Honest scope.** The W8-1 win is *conditional* on the named
+  bench property; the W8-4 falsifier regime is the explicit
+  counterexample. W8-3 preserves the SDK v3.8 W7-2 win
+  byte-for-byte on Phase 54.
+
+### Active conjectures (SDK v3.9)
+
+- **W8-C1**: multi-service-gold extension (top-k corroboration).
+  conjectural; falsifier in Phase-56 candidate.
+- **W8-C2**: W8-1 transfers to a real-LLM regime when the
+  producer LLM emits multi-service decoy chatter that satisfies
+  the bench property. conjectural; Phase-56 candidate.
+- **W8-C3**: bundle-aware decoder + corroboration admission
+  strictly outperforms admission alone on partial-coverage
+  benches. conjectural; restates W7-C2 under W8 framing.
+
+## Previous frontier (SDK v3.8, 2026-04-26)
 
 ### Active moves (SDK v3.8 — cross-role cohort-coherence multi-agent benchmark + W7 family)
 
@@ -393,15 +484,21 @@ sharp status:
 ## What we are NOT actively claiming
 
 - **Not** "we solved context."
-- **Not** "we solved multi-agent context." SDK v3.5 makes the
-  capsule abstraction load-bearing at the **team boundary** on
-  one synthetic benchmark family (Phase-52 incident-triage) under
-  a deterministic team decoder. The W4-2 result is
-  proved-conditional (premises: faithful decoder + sound
-  admission); the W4-C1 learned-policy advantage is empirical-
-  positive on the default config and conjectural on smaller
-  training scales. External validity to real production
-  multi-agent teams is open.
+- **Not** "we solved multi-agent context." SDK v3.9's W8-1 result
+  is the strongest cross-regime structural-win the programme has
+  produced (corroboration wins on R-55, ties W7-2 on R-54, no
+  regression on R-53; stable across 5/5 bank seeds; named falsifier
+  regime), but it is still **conditional** on the named bench
+  property (decoy-plurality + cross-role-corroborated gold). Real
+  multi-agent teams have additional axes (heterogeneous producers,
+  time-varying budgets, multi-round handoffs, conflicting goals)
+  the W8 family does not cover. The W4-2 result is proved-conditional
+  (premises: faithful decoder + sound admission); the W4-C1 learned-
+  policy advantage is conditional empirical-positive on the SDK v3.5
+  config and falsified out-of-distribution on the SDK v3.7 real-LLM
+  regime. External validity to real production multi-agent teams is
+  partially advanced (three named regimes now anchored) but not
+  fully closed.
 - **Not** "the runtime is fully capsule-native." Specifically not
   capsule-native: sandbox stdout/stderr, sub-step parser-internal
   objects (regex match objects, recovery heuristic intermediate
@@ -449,7 +546,9 @@ sharp status:
   `docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md` (SDK v3.5),
   `docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md` (SDK v3.6),
   `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md` (SDK v3.7),
-  `docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md` (SDK v3.8 — this milestone)
+  `docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md` (SDK v3.8),
+  `docs/RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md` (SDK v3.9 — this milestone),
+  `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` (SDK v3.9 — pre-committed bar)
 - Paper draft: `papers/wevra_capsule_native_runtime.md`
 - Tests: `vision_mvp/tests/test_wevra_capsule_native*.py`,
   `test_wevra_capsule_native_deeper.py`,
@@ -466,5 +565,7 @@ sharp status:
   `vision_mvp/experiments/phase53_scale_vs_structure.py`
 - Cross-role cohort-coherence benchmark (deterministic):
   `vision_mvp/experiments/phase54_cross_role_coherence.py`
+- Cross-role corroboration benchmark (deterministic, harder):
+  `vision_mvp/experiments/phase55_decoy_plurality.py`
 - MLX distributed runbook (operator path for Mac 2):
   `docs/MLX_DISTRIBUTED_RUNBOOK.md`
