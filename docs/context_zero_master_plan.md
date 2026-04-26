@@ -6952,6 +6952,89 @@ Anchor: `docs/RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md`;
    companion** (W9-C1), which would attack the W9-4 falsifier from
    the decoder side rather than the admission side.
 
+### 4.28 SDK v3.11 — bundle-aware team decoder + W10 family (deterministic Phase-57 decoder-forcing benchmark)
+
+The SDK v3.10 milestone identified a sharp structural limit:
+service-blind admission cannot beat FIFO when the decoy is
+cross-role-corroborated above the min-roles threshold (W9-4).
+This is a property of the *(role, service-tag)* bipartite multiset
+— the only state every shipped admission policy depends on.
+
+SDK v3.11 lifts this limit on a named regime by adding a
+**decoder-side coordination move** for the first time in the
+programme: the bundle-aware team decoder
+(``BundleAwareTeamDecoder``) projects the auditor's admitted
+service set through the *causal claim-kind set* of the chosen
+``root_cause`` (CCK). When the gold root_cause is in a specific
+causal tier (data / storage / compute / edge / network) and the
+decoy is mentioned only via non-causal generic-noise kinds
+(LATENCY_SPIKE / ERROR_RATE_SPIKE / FW_BLOCK_SURGE), the CCK
+predicate filters the decoy out at decode time even though
+admission cannot.
+
+**Phase-57** (``vision_mvp/experiments/phase57_decoder_forcing.py``)
+is the *decoder-forcing* regime that anchors the milestone. Every
+scenario has multi-service gold (size 2) corroborated via causal
+claim_kinds AND a decoy corroborated via non-causal kinds.
+
+**Headline (n=10, K_auditor=8, T_auditor=256, bank_seed=11):**
+
+* ``capsule_bundle_decoder accuracy_full = 1.000``
+* every service-blind admission policy in the SDK
+  (substrate, FIFO, priority, coverage, W7-2, W8, W9): ``0.000``
+* **+1.000** vs every admission baseline; **+1.000** vs the SDK
+  v3.10 strongest method (W9). Stable across **5/5** alternate
+  bank seeds (11, 17, 23, 29, 31).
+* Backward-compat: bundle decoder ties prior best on Phase 54
+  (W7-2), Phase 55 (W8), Phase 56 (W9) at 1.000 (W10-3) — the
+  ``fallback_admitted_size_threshold = 2`` knob is the load-bearing
+  piece.
+* Audit T-1..T-7 OK on every cell of every regime (W10-aud).
+* W10-Λ admission limit witness: ``max_admission_only_accuracy_full
+  = 0.000`` on R-57.
+
+**Anchor:** ``docs/RESULTS_WEVRA_BUNDLE_DECODER.md``;
+``docs/data/phase57_decoder_K8_n10.json``;
+``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-57 anchor +
+bar 7 — admission/decoding split);
+``vision_mvp/experiments/phase57_decoder_forcing.py``;
+``vision_mvp/wevra/team_coord.py`` (``BundleAwareTeamDecoder``,
+``CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE``).
+
+**Master-plan post-v3.11 reading.** After SDK v3.11:
+
+1. **Post-v3.10 success bar.** R-57 (multi-service-gold +
+   corroborated-decoy via non-causal kinds; specific-tier gold
+   root_cause). Bar (R-57 anchor): strict gain ≥ 0.20 vs FIFO and
+   SDK v3.10 W9, stable across ≥ 3 seeds, no regression on
+   R-53/R-54/R-55/R-56, audit preserved, named falsifier regime,
+   AND admission/decoding split (bar 7).
+2. **Has admission reached a structural limit?** **Yes — explicitly,
+   by W10-Λ.** Service-blind admission cannot beat FIFO on R-57.
+   The SDK v3.11 moves the structural axis from admission into
+   decoding for the first time in the programme.
+3. **What is the next decoder-centred benchmark?** Phase-57 is
+   anchored as the canonical decoder-forcing regime. The named
+   falsifier (W10-4: decoy CCK-promotion) and the named conjectures
+   (W10-C1 cross-bench, W10-C2 real-LLM, W10-C3 multi-round) chart
+   the next moves.
+4. **Did decoding broaden the structural win beyond v3.10?** **Yes.**
+   The structural win now spans **five** named regimes (R-53
+   no-regression, R-54 / R-55 / R-56 backward-compat, R-57 strict
+   win on a regime where admission alone is provably insufficient).
+   W10-1 is the first strict separation between decoder-side
+   coordination and any service-blind admission policy.
+5. **Original thesis status.** *Per-agent minimum-sufficient
+   context for multi-agent teams* is now **materially stronger but
+   still conditional**. The shape of "minimum-sufficient" now has
+   two coupled axes: admission (W7-2 / W8 / W9) and decoding
+   (W10). The CCK predicate is closed-vocabulary, deterministic,
+   training-free, and additive on top of the existing capsule
+   lifecycle. The remaining conditions are: bench property, CCK
+   table existence for the benchmark family, and gold root_cause
+   being in a specific causal tier (W10-1 honest scope). The W10-4
+   falsifier names the next wall.
+
 ---
 
 ## 5. End goals

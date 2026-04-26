@@ -17,8 +17,9 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.10)         | [`RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md`](RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md) |
-> | Pre-committed success bar (SDK v3.10)| [`SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`](SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md) |
+> | Latest milestone (SDK v3.11)         | [`RESULTS_WEVRA_BUNDLE_DECODER.md`](RESULTS_WEVRA_BUNDLE_DECODER.md) |
+> | Pre-committed success bar (SDK v3.11)| [`SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`](SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md) |
+> | Previous milestone (SDK v3.10)       | [`RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md`](RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md) |
 > | Previous milestone (SDK v3.9)        | [`RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md`](RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md) |
 > | Previous milestone (SDK v3.8)        | [`RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md`](RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md) |
 > | Previous milestone (SDK v3.7)        | [`RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](RESULTS_WEVRA_SCALE_VS_STRUCTURE.md) |
@@ -33,7 +34,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.10 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.11 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
@@ -55,8 +56,36 @@ and W9 multi-service top-K corroboration on a harder
 multi-service-gold benchmark, where every gold answer requires
 admitting handoffs from two distinct gold services simultaneously,
 again with cross-bank stability and a named falsifier regime**
-(W9 family, SDK v3.10).
-SDK v3.10's headline result is the **second consecutive
+(W9 family, SDK v3.10), and — most sharply — **across the
+admission/decoding split itself: on the new Phase-57
+decoder-forcing benchmark (multi-service-gold + corroborated-decoy
+via *non-causal* claim_kinds), every service-blind admission policy
+in the SDK ties FIFO at 0.000 (the W10-Λ admission-only structural
+limit), while pairing W9 admission with the new
+``BundleAwareTeamDecoder`` (CCK-projection on admitted services)
+achieves 1.000 — the first capsule-native multi-agent coordination
+method that crosses the admission/decoding split** (W10 family,
+SDK v3.11).
+SDK v3.11's headline result is the **third consecutive
+strong-bar conditional structural win** in the programme: on the
+Phase-57 deterministic decoder-forcing benchmark, the new joint
+admit-and-decode method (``MultiServiceCorroborationAdmissionPolicy``
+with ``top_k=3`` + ``BundleAwareTeamDecoder`` with ``cck_filter=True``,
+``role_corroboration_floor=1``,
+``fallback_admitted_size_threshold=2``) achieves
+``accuracy_full = 1.000`` while substrate FIFO, ``capsule_fifo``,
+``capsule_priority``, ``capsule_coverage``,
+``capsule_cohort_buffered`` (W7-2),
+``capsule_corroboration`` (W8), **AND** ``capsule_multi_service``
+(W9) all produce 0.000 — a +1.000 strict separation from every
+admission-only baseline including SDK v3.10 W9 itself, stable
+across **5/5** alternate ``bank_seed`` values. Backward-compat
+preserved (W10-3): bundle decoder ties prior best on R-54
+(W7-2), R-55 (W8), R-56 (W9) at 1.000 each via the
+trust-admission fallback. The named W10-4 falsifier regime
+(decoy CCK-promotion) correctly ties FIFO at 0.000 — the
+structural limit of any single-round CCK-style filter.
+SDK v3.10's previous-headline result was the **second consecutive
 strong-bar conditional structural win** in the programme: on the
 Phase-56 deterministic benchmark (multi-service-gold property +
 both gold services corroborated by ≥ 2 distinct producer roles +

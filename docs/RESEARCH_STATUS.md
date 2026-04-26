@@ -5,7 +5,7 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.10,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.11,
 > 2026-04-26.
 
 ## TL;DR
@@ -201,7 +201,101 @@ sharp status:
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.10, 2026-04-26)
+## Current frontier (SDK v3.11, 2026-04-26)
+
+### Active moves (SDK v3.11 — bundle-aware team decoder + W10 family — *first decoder-side coordination move*)
+
+- **Phase-57 multi-service-gold + corroborated-decoy decoder-forcing
+  benchmark.**
+  ``vision_mvp.experiments.phase57_decoder_forcing`` runs 8 strategies
+  (substrate, capsule_fifo, capsule_priority, capsule_coverage,
+  capsule_cohort_buffered (W7-2), capsule_corroboration (W8),
+  capsule_multi_service (W9), capsule_bundle_decoder (W10-AD: W9
+  admission + bundle-aware decoder)) on a deterministic 12-scenario
+  bank (clipped to 10 by default) where (i) every scenario has
+  ``gold_services`` of size 2 with a *specific-tier* gold root_cause,
+  (ii) both gold services are corroborated by ≥ 2 distinct producer
+  roles via at least one CCK-eligible (causal-tier) claim_kind, AND
+  (iii) a decoy service is *also* corroborated by ≥ 2 distinct
+  producer roles via *only* non-causal claim_kinds (LATENCY_SPIKE,
+  ERROR_RATE_SPIKE, FW_BLOCK_SURGE). 10/10 default scenarios satisfy
+  the bench property; mechanically verified by
+  ``Phase57BankShapeTests``. Pre-committed default:
+  ``K_auditor=8``, ``T_auditor=256``, ``n_eval=10``,
+  ``bank_seed=11``, ``ms_top_k=3``, ``ms_min_corroborated_roles=2``,
+  ``bundle_role_floor=1``,
+  ``fallback_admitted_size_threshold=2``. Headline:
+  ``capsule_bundle_decoder`` achieves ``accuracy_full = 1.000``
+  while substrate, FIFO, priority, coverage, W7-2, W8, AND W9 all
+  produce ``accuracy_full = 0.000`` — the **first strict separation
+  between decoder-side coordination and any service-blind admission
+  policy** in the programme, **+1.000** vs every admission baseline,
+  stable across **5/5** alternate bank seeds. The W10 family
+  (W10-Λ / W10-1 / W10-2 / W10-3 / W10-4 — proved or proved-empirical)
+  anchors the milestone formally; the W10-C family (W10-C1/C2/C3)
+  makes the cross-bench / real-LLM / multi-round extensions
+  falsifiable.
+- **``BundleAwareTeamDecoder`` (new).**
+  ``vision_mvp/wevra/team_coord.py``. Three knobs (``cck_filter``,
+  ``role_corroboration_floor``,
+  ``fallback_admitted_size_threshold``). Closed-vocabulary CCK table
+  ``CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE`` maps each root_cause label
+  to its causal claim-kind set (data-tier / storage-tier / compute /
+  edge / network / generic). Decoder rule: pick root_cause via the
+  same priority decoder as
+  ``incident_triage._decoder_from_handoffs``; project admitted
+  service tags through the CCK predicate; trust admission when the
+  admitted-tag set is small (size ≤ threshold). Deterministic,
+  training-free, additive on top of the existing ``TeamCoordinator``
+  / ``ROLE_VIEW`` / ``TEAM_DECISION`` capsule layer. Re-exported as
+  ``BundleAwareTeamDecoder`` and ``decode_admitted_role_view``.
+- **Theorem family W10.** W10-Λ (admission-only structural limit on
+  R-57, proved-empirical + structural sketch), W10-1 (bundle-decoder
+  sufficiency, proved-empirical n=50 saturated), W10-2 (CCK
+  structural correctness, proved by inspection), W10-3 (backward-
+  compat with W7-2 / W8 / W9 on R-54 / R-55 / R-56, proved-empirical),
+  W10-4 (decoy-CCK-promotion falsifier, proved-empirical n=10
+  saturated). The W10-C family makes the cross-bench / real-LLM /
+  multi-round extensions falsifiable.
+- **Pre-committed success criterion** in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-57 anchor +
+  bar 7 — admission/decoding split). The SDK v3.11 result clears
+  the **strong success bar** § 1.1 (strict gain ≥ 0.20 on R-57 vs
+  both substrate FIFO and SDK v3.10 W9, stable across ≥ 3 seeds, no
+  regression on R-53 / R-54 / R-55 / R-56, audit T-1..T-7 preserved
+  on every cell, named bench property + named falsifier regime,
+  AND admission/decoding split bar 7 satisfied).
+- **Honest scope.** The W10-1 win is *conditional* on the named
+  bench property; the W10-4 falsifier regime is the explicit
+  counterexample. W10-3 backward-compat is exact on R-54 / R-55 /
+  R-56 thanks to the trust-admission fallback (size ≤ 2 threshold).
+  The CCK table is *closed-vocabulary for incident-triage*; W10-C1
+  is the conjectural extension to other benchmark families. The
+  bundle decoder is a no-op on generic-tier root_causes
+  (``error_spike`` / ``latency_spike``) — this is the named scope
+  limit of W10-1.
+
+### Active conjectures (SDK v3.11)
+
+- **W10-C1**: CCK table extends to non-incident-triage benchmark
+  families (security incident, robotics, compliance review).
+  Conjectural; falsifier = a benchmark family where no closed-
+  vocabulary tier mapping exists.
+- **W10-C2**: real-LLM transfer of W10-1. Conjectural; Phase-58
+  candidate.
+- **W10-C3**: multi-round bundle decoder closes W10-4 on a
+  sub-class of scenarios. Conjectural; multi-round capsule chain
+  not yet shipped.
+
+### Discharged conjectures (SDK v3.11)
+
+- **W9-C1** (SDK v3.10): bundle-aware decoder companion strictly
+  improves on Phase-56 falsifier. **DISCHARGED-empirical** by W10-1
+  on Phase 57 (+1.000 vs every admission-only baseline). The
+  decoder-side axis is now the load-bearing axis of the SDK v3.11
+  milestone.
+
+## Previous frontier (SDK v3.10, 2026-04-26)
 
 ### Active moves (SDK v3.10 — multi-service top-K cross-role corroboration multi-agent benchmark + W9 family)
 
@@ -593,15 +687,19 @@ sharp status:
 ## What we are NOT actively claiming
 
 - **Not** "we solved context."
-- **Not** "we solved multi-agent context." SDK v3.9's W8-1 result
+- **Not** "we solved multi-agent context." SDK v3.11's W10-1 result
   is the strongest cross-regime structural-win the programme has
-  produced (corroboration wins on R-55, ties W7-2 on R-54, no
-  regression on R-53; stable across 5/5 bank seeds; named falsifier
-  regime), but it is still **conditional** on the named bench
-  property (decoy-plurality + cross-role-corroborated gold). Real
-  multi-agent teams have additional axes (heterogeneous producers,
-  time-varying budgets, multi-round handoffs, conflicting goals)
-  the W8 family does not cover. The W4-2 result is proved-conditional
+  produced (bundle-aware decoder wins on R-57 by +1.000 vs every
+  service-blind admission; backward-compatible on R-54 / R-55 / R-56;
+  no regression on R-53; stable across 5/5 bank seeds; named bench
+  property + named falsifier regime W10-4), but it is still
+  **conditional** on (a) the bench property (specific-tier gold
+  root_cause + decoy mentioned only via non-causal claim_kinds) and
+  (b) the closed-vocabulary CCK table being meaningful for the
+  benchmark family. Real multi-agent teams have additional axes
+  (heterogeneous producers, time-varying budgets, multi-round
+  handoffs, conflicting goals, generic-tier root_causes the
+  bundle decoder cannot help with) the W10 family does not cover. The W4-2 result is proved-conditional
   (premises: faithful decoder + sound admission); the W4-C1 learned-
   policy advantage is conditional empirical-positive on the SDK v3.5
   config and falsified out-of-distribution on the SDK v3.7 real-LLM

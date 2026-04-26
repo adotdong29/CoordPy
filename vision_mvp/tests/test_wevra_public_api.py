@@ -61,18 +61,18 @@ class WevraSurfaceTests(unittest.TestCase):
             self.assertIsInstance(v, str)
             self.assertTrue(len(v) > 0)
 
-    def test_sdk_version_is_v3_10(self):
+    def test_sdk_version_is_v3_11(self):
         from vision_mvp.wevra import SDK_VERSION
-        # SDK v3.9 bump: cross-role corroboration multi-agent
-        # coordination (Phase-55 + W8 family). Strictly additive on
-        # v3.8 — every v3.8 run-boundary, team-boundary, LLM-backend,
-        # Phase-53/54 contract test still passes byte-for-byte. The
-        # Wevra single-run product runtime contract is unchanged;
-        # the new surface is the
-        # ``CrossRoleCorroborationAdmissionPolicy`` in
+        # SDK v3.11 bump: bundle-aware team decoder (W10 family) +
+        # Phase-57 decoder-forcing benchmark. Strictly additive on
+        # v3.10 — every v3.10 run-boundary, team-boundary, LLM-backend,
+        # Phase-53/54/55/56 contract test still passes byte-for-byte.
+        # The Wevra single-run product runtime contract is unchanged;
+        # the new surface is the ``BundleAwareTeamDecoder`` and
+        # ``CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE`` in
         # ``vision_mvp.wevra.team_coord`` (multi-agent coordination
         # research slice; not part of the run-boundary product runtime).
-        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.10")
+        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.11")
 
     def test_cohort_coherence_admission_policy_is_exported(self):
         # The SDK v3.8 cross-role admission policy must be importable

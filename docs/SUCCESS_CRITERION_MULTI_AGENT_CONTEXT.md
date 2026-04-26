@@ -1,11 +1,11 @@
-# Success criterion — solving multi-agent context (SDK v3.10 bar)
+# Success criterion — solving multi-agent context (SDK v3.11 bar)
 
 > Pre-committed, falsifiable bar for what counts as a *real* advance
 > on "solving multi-agent context" in the Context Zero / Wevra
-> programme. This document is the **referee** for SDK v3.9 / v3.10
-> (and later milestones). Any milestone note that claims an advance
-> must name the bar it cleared and cite the code-anchored evidence.
-> Last touched: SDK v3.10, 2026-04-26.
+> programme. This document is the **referee** for SDK v3.9 / v3.10 /
+> v3.11 (and later milestones). Any milestone note that claims an
+> advance must name the bar it cleared and cite the code-anchored
+> evidence. Last touched: SDK v3.11, 2026-04-26.
 >
 > The history of this programme is full of moves where a partial
 > result was written up too strongly and later had to be sharpened
@@ -48,18 +48,38 @@ The **named regimes** the bar refers to (anchored in code):
   corroboration argmax tier and recovers the multi-service gold.
   Anchor:
   `vision_mvp/experiments/phase56_multi_service_corroboration.py`.
+* **R-57** — Phase-57 *multi-service-gold + corroborated-decoy
+  decoder-forcing* regime, the *new harder regime* SDK v3.11
+  introduces. Multi-service gold (`|gold_services| = 2`), both gold
+  services corroborated by ≥ 2 distinct producer roles via
+  *root-cause-causal* claim_kinds, AND a decoy service is *also*
+  corroborated by ≥ 2 distinct producer roles via *non-causal*
+  generic-noise claim_kinds (`LATENCY_SPIKE`, `ERROR_RATE_SPIKE`,
+  `FW_BLOCK_SURGE`). The decoy enters W9's argmax tier; W9 picks
+  top-K by score and either drops a gold service (when decoy beats
+  one gold on raw count) or — under top_k≥3 — admits the decoy and
+  the decoder's set-equality check still fails. **No
+  service-blind admission policy can beat FIFO on R-57 by
+  construction (W10-Λ).** A *bundle-aware decoder* that filters
+  the admitted services by the chosen `root_cause`'s causal
+  claim-kind set (`CCK`) closes the gap (W10-1). Anchor:
+  `vision_mvp/experiments/phase57_decoder_forcing.py`.
 
 ## 1. Three pre-committed bars
 
-> **SDK v3.10 anchors the bar to R-56.** Each version of this
+> **SDK v3.11 anchors the bar to R-57.** Each version of this
 > document anchors the *strict-gain regime* to the milestone-
 > specific harder regime. SDK v3.9 anchored to R-55; SDK v3.10
-> updates the anchor to R-56 below. Earlier versions (R-55-anchored)
-> remain valid as historical bars; the *current* bar is R-56-anchored.
+> anchored to R-56; SDK v3.11 anchors the bar to **R-57** below
+> AND tightens the bar to require a **method that crosses the
+> admission/decoding split** (i.e., admission alone is provably
+> insufficient on R-57; only a method that also touches the decoder
+> can clear the bar). Earlier R-55 / R-56-anchored bars remain
+> valid as historical bars; the *current* bar is R-57-anchored.
 
 ### 1.1 Strong success bar (a "real" advance)
 
-A milestone *strongly advances* the thesis iff **all six** hold:
+A milestone *strongly advances* the thesis iff **all seven** hold:
 
 1. **Code anchor.** A new admission/decoder/coordination method
    ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
@@ -68,26 +88,33 @@ A milestone *strongly advances* the thesis iff **all six** hold:
    theorem family and falsifier.
 2. **Strict gain on the named harder regime.** The new method
    strictly improves `accuracy_full` over substrate FIFO **and**
-   over the previous SDK's strongest method (e.g. SDK v3.9
-   `CrossRoleCorroborationAdmissionPolicy`, W8) on the
-   *milestone-anchored harder regime* (currently **R-56** for
-   SDK v3.10), by `≥ 0.20` pooled, on `n_eval ≥ 10` scenarios.
+   over the previous SDK's strongest method (e.g. SDK v3.10
+   `MultiServiceCorroborationAdmissionPolicy`, W9) on the
+   *milestone-anchored harder regime* (currently **R-57** for
+   SDK v3.11), by `≥ 0.20` pooled, on `n_eval ≥ 10` scenarios.
 3. **Cross-bank stability.** The same gap `≥ 0.20` holds across
    `≥ 3` distinct `bank_seed` values, with no parameter retuning.
    Pre-commit the seed set in test code before running.
-4. **No regression elsewhere.** On **R-53**, **R-54**, **and R-55**,
-   the new method does not regress `accuracy_full` by more than
-   `0.05` pooled relative to the SDK v3.9 baseline.
+4. **No regression elsewhere.** On **R-53**, **R-54**, **R-55**,
+   **and R-56**, the new method does not regress `accuracy_full`
+   by more than `0.05` pooled relative to the SDK v3.10 baseline.
 5. **Audit + lifecycle preserved.** Every capsule strategy passes
    the team-lifecycle audit (T-1..T-7) on every cell of every
    regime. `audit_ok_grid[strategy] = True` for all capsule
-   strategies on R-53 / R-54 / R-55 / R-56.
+   strategies on R-53 / R-54 / R-55 / R-56 / R-57.
 6. **Named bench property + falsifier regime.** The harder regime's
    structural property is named in code (mechanically verified by a
    test in `test_wevra_*.py`) and at least **one** *falsifier regime*
    is explicitly identified — a regime where the bench property does
    not hold and the new method does *not* beat FIFO (i.e. the
    conditionality is sharp).
+7. **(SDK v3.11 only) Admission/decoding split.** The milestone-
+   anchored harder regime (R-57) is **provably insufficient for any
+   service-blind admission policy** (W10-Λ holds: every admission-only
+   policy in the SDK ties FIFO at 0.000 on R-57). The new method
+   either (a) modifies the decoder, or (b) jointly modifies admission
+   AND decoder. A pure new admission policy does NOT clear bar 7 on
+   SDK v3.11.
 
 If a milestone clears 1.1, the canonical phrasing is:
 
@@ -107,6 +134,23 @@ For SDK v3.10 specifically, the canonical phrasing instantiates as:
 > preserved on every cell. The win does not transfer to the
 > Phase-56-falsifier regime where the decoy is also corroborated by
 > ≥ 2 distinct producer roles (W9-4)."*
+
+For SDK v3.11 specifically, the canonical phrasing instantiates as:
+
+> *"On R-57 (multi-service-gold + corroborated-decoy), no
+> service-blind admission policy in the SDK (FIFO, priority,
+> coverage, W7-2 cohort, W8 corroboration, W9 multi-service)
+> improves accuracy_full above 0.000 — this is the structural
+> admission-only limitation (W10-Λ). The new
+> `BundleAwareTeamDecoder` (W10) — paired with the W9 admission
+> policy as the joint admit-and-decode method (W10-AD) — strictly
+> improves accuracy_full by ≥ 0.20 over both substrate FIFO and the
+> SDK v3.10 W9 admission, stable across ≥ 3 bank seeds, with no
+> regression on R-53 / R-54 / R-55 / R-56 and audit T-1..T-7
+> preserved on every cell. The win does not transfer to the
+> Phase-57-falsifier regime where the decoy is corroborated AND
+> mentioned via a causal claim_kind for the chosen root_cause
+> (W10-4)."*
 
 ### 1.2 Partial success bar (a real but narrower advance)
 
@@ -206,6 +250,44 @@ strict-gain anchor) must combine:
 
 A regime missing any of these is *not* R-56 — it does not test
 the SDK v3.10 hypothesis.
+
+## 2.6. Required ingredients of R-57 (SDK v3.11)
+
+The "harder fair regime" introduced by SDK v3.11 — the *current*
+strict-gain anchor, and the regime where admission alone is
+provably insufficient — must combine:
+
+* **Multi-service gold answer.** `gold_services` of size **≥ 2**
+  (Phase-57 default uses size 2). Set-equality grading, same as R-56.
+* **Both gold services cross-role corroborated by *causal*
+  claim_kinds.** For the scenario's `gold_root_cause`, define
+  `CCK(gold_root_cause)` as the set of claim_kinds the
+  `_decoder_from_handoffs` priority table maps to the same root_cause
+  label OR to a same-tier root_cause (data-tier / storage-tier /
+  network-tier / generic). Each gold service must be mentioned by
+  ≥ 2 distinct producer roles via at least one claim_kind in CCK.
+* **Decoy corroborated by ≥ `min_corroborated_roles` distinct roles
+  via *non-causal* claim_kinds.** The decoy_storm service must be
+  mentioned by ≥ 2 distinct producer roles via claim_kinds that are
+  NOT in `CCK(gold_root_cause)` (typically generic noise:
+  `LATENCY_SPIKE`, `ERROR_RATE_SPIKE`, `FW_BLOCK_SURGE`). This is
+  the *structural separator* that makes the bundle-aware decoder
+  necessary: admission cannot distinguish the corroborated decoy
+  from corroborated gold, but the decoder can — once the
+  high-priority gold-causal claim is admitted, the decoder reads
+  off `root_cause`, then filters services by CCK.
+* **Decoy raw plurality in W9 score.** The decoy's raw mention
+  count is high enough that with `top_k=2` the decoy beats at least
+  one gold service in the W9 dominant set (mechanically tested by
+  `Phase57BankShapeTests.test_W9_admission_misses_one_gold`).
+* **Budget pressure.** `|candidates_to_auditor| > K_auditor` on
+  every scenario.
+* **Audit-preserving by construction.** The team-lifecycle audit
+  (T-1..T-7) holds on every cell of every regime (mechanically
+  tested by `W10LifecycleAuditTests`).
+
+A regime missing any of these is *not* R-57 — it does not test
+the SDK v3.11 hypothesis.
 
 ## 3. What we are explicitly NOT testing
 

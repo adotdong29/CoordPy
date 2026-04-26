@@ -5,6 +5,67 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.11] — 2026-04-26 — SDK v3.11 — bundle-aware team decoder (first decoder-side coordination move) + W10 family
+
+*Strictly additive on SDK v3.10. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The new
+``BundleAwareTeamDecoder`` and the closed-vocabulary
+``CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE`` table are research-slice
+additions to the multi-agent coordination layer
+(``vision_mvp.wevra.team_coord``), not part of the run-boundary
+product runtime. **Third consecutive SDK milestone to clear the
+strong success bar of `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`
+§ 1.1 (R-57 anchor + new bar 7 — admission/decoding split)** — the
+**first capsule-native multi-agent coordination method that
+crosses the admission/decoding split**. On the new Phase-57
+*decoder-forcing* regime, every service-blind admission policy in
+the SDK (FIFO, priority, coverage, W7-2, W8, W9) ties FIFO at
+``accuracy_full = 0.000`` (the W10-Λ admission-only structural
+limit); pairing W9 admission with the new bundle decoder achieves
+``accuracy_full = 1.000`` (W10-1 sufficiency). Headline gap =
+**+1.000** vs every admission baseline, stable across **5/5**
+alternate bank seeds. Backward-compatible at 1.000 on R-54 / R-55
+/ R-56 (W10-3 via the trust-admission fallback). Named falsifier
+regime W10-4 (decoy CCK-promotion) correctly ties FIFO at 0.000.*
+
+### Added
+
+- **Phase-57 multi-service-gold + corroborated-decoy decoder-forcing
+  benchmark** (new):
+  `vision_mvp/experiments/phase57_decoder_forcing.py`. Eight
+  strategies including the new ``capsule_bundle_decoder`` (W10-AD:
+  W9 admission + bundle decoder) on a deterministic 12-scenario
+  bank where every scenario has multi-service gold corroborated via
+  causal claim_kinds AND a decoy corroborated via *non-causal*
+  generic-noise claim_kinds. 10/10 default scenarios satisfy the
+  bench property; mechanically verified by ``Phase57BankShapeTests``.
+- **`BundleAwareTeamDecoder` (new)**:
+  `vision_mvp/wevra/team_coord.py`. Three knobs (``cck_filter``,
+  ``role_corroboration_floor``,
+  ``fallback_admitted_size_threshold``). Re-exported as
+  ``BundleAwareTeamDecoder``, ``decode_admitted_role_view``, and
+  ``CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE``.
+- **Theorem family W10**: W10-Λ, W10-1, W10-2, W10-3, W10-4
+  (proved or proved-empirical); W10-C1/C2/C3 (conjectural).
+- **R-57 anchor + bar 7** added to
+  `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`.
+- **`docs/RESULTS_WEVRA_BUNDLE_DECODER.md`** (new): theory-forward
+  results note.
+- 21 new tests in `vision_mvp/tests/test_wevra_bundle_decoder.py`.
+
+### Changed
+
+- ``SDK_VERSION = "wevra.sdk.v3.11"``.
+- ``docs/RESEARCH_STATUS.md``, ``docs/THEOREM_REGISTRY.md``,
+  ``docs/context_zero_master_plan.md`` § 4.28 updated for SDK v3.11
+  / W10 family.
+
+### Discharged conjectures
+
+- **W9-C1** (SDK v3.10): bundle-aware decoder companion.
+  **DISCHARGED-empirical** by W10-1 on the Phase-57 decoder-forcing
+  regime.
+
 ## [3.10] — 2026-04-26 — SDK v3.10 — multi-service top-K cross-role corroboration multi-agent coordination + W9 family
 
 *Strictly additive on SDK v3.9. The Wevra single-run product

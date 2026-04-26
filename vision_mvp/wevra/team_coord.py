@@ -1718,6 +1718,334 @@ def audit_team_lifecycle(ledger: CapsuleLedger
         verdict=verdict, violations=violations, counts=counts)
 
 
+# =============================================================================
+# Bundle-aware team decoder (SDK v3.11 — W10 family)
+# =============================================================================
+
+
+# Closed-vocabulary causal-claim-kind set per root_cause label. The
+# table mirrors ``vision_mvp.tasks.incident_triage._decoder_from_handoffs``'s
+# priority list and groups claim_kinds by which root_cause they
+# *causally entail* under the incident-triage decoder.
+#
+# Tier semantics: a claim_kind is causal-for-root_cause R iff, in
+# isolation, it would lead the priority decoder to label root_cause = R
+# OR it sits in the same incident "tier" as R (data-tier vs storage-tier
+# vs network-tier vs compute-tier vs edge-tier vs generic).
+#
+# Why the *tier* extension and not strict equality
+# -------------------------------------------------
+# A multi-service incident in the data tier (e.g., gold_root_cause =
+# "deadlock" with gold_services = ("orders", "payments")) typically
+# has one gold service mentioned via DEADLOCK_SUSPECTED and a second
+# gold service mentioned via POOL_EXHAUSTION (the cascade). Both
+# claims are causal in the same tier; if CCK("deadlock") were
+# {DEADLOCK_SUSPECTED} only, the bundle decoder would filter out the
+# second gold service. The tier extension keeps the rule narrow
+# enough to filter generic-noise decoys (LATENCY/ERROR/FW) while
+# still admitting cascades within the same tier.
+#
+# A claim_kind that maps to no root_cause label and is generic noise
+# (LATENCY_SPIKE, ERROR_RATE_SPIKE) is in the *generic* tier — it
+# is in CCK only when the chosen root_cause is itself "error_spike"
+# or "latency_spike" (i.e. when the gold root_cause IS generic).
+CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE: dict[str, frozenset[str]] = {
+    # Data tier — the canonical multi-service incident family.
+    "pool_exhaustion": frozenset({
+        "POOL_EXHAUSTION", "DEADLOCK_SUSPECTED", "SLOW_QUERY_OBSERVED",
+    }),
+    "deadlock": frozenset({
+        "DEADLOCK_SUSPECTED", "POOL_EXHAUSTION", "SLOW_QUERY_OBSERVED",
+    }),
+    "slow_query_cascade": frozenset({
+        "SLOW_QUERY_OBSERVED", "POOL_EXHAUSTION", "DEADLOCK_SUSPECTED",
+    }),
+    # Storage tier.
+    "disk_fill": frozenset({
+        "DISK_FILL_CRITICAL", "CRON_OVERRUN",
+    }),
+    # Compute tier.
+    "memory_leak": frozenset({
+        "OOM_KILL",
+    }),
+    # Edge tier.
+    "tls_expiry": frozenset({
+        "TLS_EXPIRED",
+    }),
+    "dns_misroute": frozenset({
+        "DNS_MISROUTE",
+    }),
+    # Network tier.
+    "fw_block": frozenset({
+        "FW_BLOCK_SURGE",
+    }),
+    # Generic tier — when the gold root_cause IS generic noise, the
+    # decoder cannot do better than admission alone (the CCK includes
+    # everything noisy). This is the *named falsifier scope* of the
+    # bundle-aware decoder: generic-root-cause regimes are W10-Λ-hard.
+    "error_spike": frozenset({
+        "ERROR_RATE_SPIKE", "LATENCY_SPIKE",
+    }),
+    "latency_spike": frozenset({
+        "LATENCY_SPIKE", "ERROR_RATE_SPIKE",
+    }),
+    # Unknown root_cause — admit all services (no filtering).
+    "unknown": frozenset(),
+}
+
+
+# The decoder's priority over claim_kinds (mirror of
+# ``vision_mvp.tasks.incident_triage._decoder_from_handoffs``). Kept in
+# closed vocabulary so the bundle decoder is self-contained and does
+# not import from ``vision_mvp.tasks`` (which would create a layering
+# inversion). The list is in *priority order* — highest priority first.
+_DECODER_PRIORITY: tuple[tuple[str, str, str], ...] = (
+    ("DISK_FILL_CRITICAL", "disk_fill", "rotate_logs_and_clear_backup"),
+    ("TLS_EXPIRED",        "tls_expiry", "renew_tls_and_reload"),
+    ("DNS_MISROUTE",       "dns_misroute", "restore_internal_dns_zone"),
+    ("OOM_KILL",           "memory_leak", "rollback_app_to_prev_release"),
+    ("DEADLOCK_SUSPECTED", "deadlock", "enforce_lock_ordering_in_orders"),
+    ("CRON_OVERRUN",       "disk_fill", "rotate_logs_and_clear_backup"),
+    ("POOL_EXHAUSTION",    "pool_exhaustion",
+                            "raise_pool_cap_or_fix_upstream"),
+    ("SLOW_QUERY_OBSERVED", "slow_query_cascade",
+                             "index_or_split_slow_query"),
+    ("ERROR_RATE_SPIKE",   "error_spike", "roll_back_recent_deploy"),
+    ("LATENCY_SPIKE",      "latency_spike", "scale_up_api_pool"),
+    ("FW_BLOCK_SURGE",     "fw_block", "rescind_spurious_deny_rule"),
+)
+
+
+@dataclasses.dataclass(frozen=True)
+class _DecodedHandoff:
+    """Minimal duck-typed handoff record the decoder consumes.
+
+    Kept structural rather than nominal so the decoder works against
+    either ``ContextCapsule`` payloads or the
+    ``vision_mvp.tasks.incident_triage.TypedHandoff`` shape — same
+    interface ``substrate`` and ``capsule_*`` strategies already share.
+    """
+    source_role: str
+    claim_kind: str
+    payload: str
+
+
+def _decoded_root_cause(claim_kinds: set[str]) -> tuple[str, str]:
+    """Run the priority decoder on a set of admitted claim_kinds.
+
+    Returns ``(root_cause, remediation)`` — same closed vocabulary
+    as ``incident_triage._decoder_from_handoffs``. ``"unknown"`` /
+    ``"investigate"`` if no admitted kind matches.
+    """
+    for (kind, label, remed) in _DECODER_PRIORITY:
+        if kind in claim_kinds:
+            return label, remed
+    return "unknown", "investigate"
+
+
+@dataclasses.dataclass
+class BundleAwareTeamDecoder:
+    """Bundle-aware, contradiction-aware team decoder (SDK v3.11 / W10).
+
+    This is the **first decoder-side coordination move** in the
+    Wevra programme. Where W7 / W8 / W9 attacked the multi-agent
+    context problem from the *admission* side, W10 attacks it from
+    the *decoder* side: given a bundle of admitted handoffs, the
+    decoder uses the structural relationship between the chosen
+    ``root_cause`` and each admitted handoff's ``claim_kind`` to
+    *filter* the auditor's ``services`` set.
+
+    The structural rule (deterministic, training-free)
+    --------------------------------------------------
+    1. Compute the ``root_cause`` and ``remediation`` from the
+       admitted handoffs' ``claim_kinds`` via the priority decoder
+       (same priority as
+       :func:`vision_mvp.tasks.incident_triage._decoder_from_handoffs`).
+    2. Look up the *causal claim-kind set* for that root_cause:
+       ``CCK = CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE[root_cause]``.
+    3. For each admitted handoff, extract its ``service=<tag>`` token.
+       A service tag is admitted to ``services`` iff
+       ``cck_filter`` is disabled OR at least one admitted handoff
+       carrying that tag has ``claim_kind ∈ CCK``.
+    4. If ``role_corroboration_floor > 1``, additionally require that
+       the service tag is mentioned by ≥ ``role_corroboration_floor``
+       distinct producer roles (across CCK-eligible handoffs only).
+       This second filter is the *contradiction-aware* layer: a
+       service whose only causal mention is from one role is
+       considered a single-witness signal and may be dropped.
+
+    Why this is decoder-side, not admission-side
+    --------------------------------------------
+    The admitted set is *fixed* before the decoder runs. The
+    decoder's output (``services``) is a *projection* of that
+    admitted set under the CCK predicate — admission decides which
+    handoffs the auditor sees; decoding decides which of those
+    handoffs *count* toward each output field.
+
+    Why this is *contradiction-aware*
+    ---------------------------------
+    The CCK predicate encodes a structural compatibility relation:
+    ``service S is gold-set-eligible under root_cause R`` iff there
+    exists an admitted handoff ``(role, kind, service=S)`` whose
+    ``kind`` is causal for R. A corroborated decoy mentioned only
+    via generic-noise claim_kinds (LATENCY / ERROR_RATE / FW_BLOCK)
+    is *contradicted* by the chosen root_cause when R is a
+    specific-tier root_cause (deadlock / pool_exhaustion / disk_fill
+    / etc.) because LATENCY_SPIKE is not in the data-tier CCK.
+
+    The W10-Λ admission limit
+    --------------------------
+    Theorem W10-Λ (proved-empirical; see
+    :file:`docs/RESULTS_WEVRA_BUNDLE_DECODER.md`): on R-57
+    (multi-service-gold + corroborated-decoy via non-causal
+    claim_kinds), every service-blind admission policy in the SDK
+    (FIFO, priority, coverage, W7-2 cohort, W8 corroboration, W9
+    multi-service) achieves ``accuracy_full = 0.000``. Proof
+    sketch: every such policy admits service tags purely on the
+    basis of the (role, tag) bipartite multiset; the tier of each
+    tag's claim_kind is invisible to it. So no admission policy
+    can prefer the data-tier corroborated gold over the
+    generic-noise corroborated decoy when both have the same
+    role-corroboration count.
+
+    The W10 sufficiency claim
+    -------------------------
+    Theorem W10-1 (proved-empirical): pairing the W9 admission
+    policy (``MultiServiceCorroborationAdmissionPolicy`` with
+    ``top_k = |gold_services| + 1`` and
+    ``min_corroborated_roles = 2``) with this decoder
+    (``cck_filter=True``, ``role_corroboration_floor=2``) achieves
+    ``accuracy_full = 1.000`` on R-57. The decoder closes the gap
+    that admission alone cannot.
+
+    Backward compatibility (W10-3)
+    ------------------------------
+    On R-53 / R-54 / R-55 / R-56, the bundle-aware decoder admits
+    the same ``services`` set as the substrate decoder because:
+
+    * R-53 / R-54: ``|gold_services| = 1``; the only admitted gold
+      service is also CCK-eligible (gold root_cause is specific).
+    * R-55: ``|gold_services| = 1``; same.
+    * R-56: ``|gold_services| = 2``, both gold services CCK-eligible
+      via causal claim_kinds; the decoy is single-role (already
+      filtered by W9 admission).
+
+    Falsifier (W10-4)
+    -----------------
+    If the decoy is corroborated AND mentioned via at least one
+    claim_kind in CCK (i.e. the decoy IS in the same tier as the
+    gold root_cause), the bundle-aware decoder cannot distinguish
+    the decoy from gold — both pass the CCK filter. The R-57
+    falsifier bank instantiates this regime.
+    """
+
+    cck_filter: bool = True
+    # Minimum number of distinct producer roles required to mention a
+    # service via a CCK-eligible claim_kind for the service to enter
+    # the answer set. Default 1 (any single CCK mention keeps the tag);
+    # raise to 2+ for stricter contradiction-aware filtering on benches
+    # where each gold service has multiple CCK-eligible mentions.
+    role_corroboration_floor: int = 1
+    # Trust-admission fallback. When the admitted-tag set is small
+    # enough that the upstream admission policy is already strict (the
+    # W9 admission with default ``top_k = |gold|`` produces exactly
+    # ``|gold|`` tags), the bundle decoder should *not* second-guess
+    # admission by filtering further. This preserves W10-3 backward-
+    # compatibility on R-53 / R-54 / R-55 / R-56 where the admission
+    # policy alone already produces the gold-shaped admitted set.
+    # Default 2: when ``|admitted_tags| ≤ 2``, fall back to admitted
+    # set (do not apply CCK filter). Set to 0 to disable the fallback
+    # and apply CCK filter unconditionally.
+    fallback_admitted_size_threshold: int = 2
+    # Closed-vocabulary CCK table — overridable for tests; default is
+    # the incident-triage tiering above.
+    cck_table: dict[str, frozenset[str]] = dataclasses.field(
+        default_factory=lambda: dict(CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE))
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]) -> dict[str, Any]:
+        """Run the bundle-aware decode over a sequence of admitted
+        handoffs and return ``{"root_cause", "services", "remediation"}``
+        — the same shape as
+        :func:`vision_mvp.tasks.incident_triage._decoder_from_handoffs`.
+        """
+        kinds = {h.claim_kind for h in handoffs}
+        root_cause, remediation = _decoded_root_cause(kinds)
+        cck = self.cck_table.get(root_cause, frozenset())
+        # Per-service: collect the (role, kind) pairs from admitted
+        # handoffs carrying each tag.
+        roles_per_tag: dict[str, set[str]] = {}
+        cck_roles_per_tag: dict[str, set[str]] = {}
+        all_tags: set[str] = set()
+        for h in handoffs:
+            tag = ""
+            for tok in (h.payload or "").split():
+                m = _SERVICE_TAG_RE.search(tok)
+                if m:
+                    tag = m.group(1)
+                    break
+            if not tag:
+                continue
+            all_tags.add(tag)
+            roles_per_tag.setdefault(tag, set()).add(h.source_role)
+            if h.claim_kind in cck:
+                cck_roles_per_tag.setdefault(tag, set()).add(h.source_role)
+        # Service filter:
+        if not self.cck_filter or not cck:
+            # No filter: emit every observed tag (matches substrate
+            # decoder's behaviour). Backward-compat for unknown /
+            # generic root_cause.
+            services = tuple(sorted(all_tags))
+        elif (self.fallback_admitted_size_threshold > 0
+                and len(all_tags) <= self.fallback_admitted_size_threshold):
+            # Trust-admission fallback (W10-3 backward-compat anchor):
+            # when admission has already produced a small dominant set
+            # (size ≤ threshold), the upstream policy has done the
+            # filtering job — do not second-guess. This preserves the
+            # W7-2 / W8 / W9 wins on R-54 / R-55 / R-56.
+            services = tuple(sorted(all_tags))
+        else:
+            kept: set[str] = set()
+            for tag in all_tags:
+                cck_roles = cck_roles_per_tag.get(tag, set())
+                if len(cck_roles) >= self.role_corroboration_floor:
+                    kept.add(tag)
+            services = tuple(sorted(kept))
+        return {
+            "root_cause": root_cause,
+            "services": services,
+            "remediation": remediation,
+        }
+
+
+def decode_admitted_role_view(
+        ledger: CapsuleLedger,
+        role_view_cid: str,
+        decoder: "BundleAwareTeamDecoder | None" = None,
+        ) -> dict[str, Any]:
+    """Convenience: re-decode a sealed ROLE_VIEW capsule's parents
+    using the bundle-aware decoder. The substrate decoder is the
+    no-CCK-filter case (``BundleAwareTeamDecoder(cck_filter=False)``).
+    """
+    decoder = decoder or BundleAwareTeamDecoder()
+    if not role_view_cid or role_view_cid not in ledger:
+        return {"root_cause": "unknown", "services": (),
+                 "remediation": "investigate"}
+    rv = ledger.get(role_view_cid)
+    handoffs: list[_DecodedHandoff] = []
+    for p in rv.parents:
+        if p in ledger:
+            cap = ledger.get(p)
+            if cap.kind != CapsuleKind.TEAM_HANDOFF:
+                continue
+            payload = cap.payload if isinstance(cap.payload, dict) else {}
+            handoffs.append(_DecodedHandoff(
+                source_role=str(payload.get("source_role", "")),
+                claim_kind=str(payload.get("claim_kind", "")),
+                payload=str(payload.get("payload", "")),
+            ))
+    return decoder.decode(handoffs)
+
+
 __all__ = [
     # Per-role budget
     "RoleBudget", "DEFAULT_ROLE_BUDGETS",
@@ -1739,4 +2067,7 @@ __all__ = [
     # Audit
     "T_INVARIANTS", "TeamLifecycleAuditReport",
     "audit_team_lifecycle",
+    # SDK v3.11 — bundle-aware team decoder (W10 family).
+    "BundleAwareTeamDecoder", "decode_admitted_role_view",
+    "CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE",
 ]
