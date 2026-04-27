@@ -229,6 +229,13 @@ from .team_coord import (
     StructuredProducerProtocol,
     INCIDENT_TRIAGE_OBSERVATION_KINDS,
     incident_triage_role_schemas,
+    # SDK v3.16 — attention-aware capsule context packing (W15 family).
+    W15_DEFAULT_TIER_WEIGHT, W15_DEFAULT_CCK_WEIGHT,
+    W15_DEFAULT_CORROBORATION_WEIGHT, W15_DEFAULT_MAGNITUDE_WEIGHT,
+    W15_DEFAULT_ROUND_WEIGHT,
+    W15PackedHandoff, W15PackResult,
+    FifoContextPacker, CapsuleContextPacker,
+    AttentionAwareBundleDecoder,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -242,7 +249,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.15"
+SDK_VERSION = "wevra.sdk.v3.16"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -347,6 +354,13 @@ __all__ = [
     "StructuredProducerProtocol",
     "INCIDENT_TRIAGE_OBSERVATION_KINDS",
     "incident_triage_role_schemas",
+    # SDK v3.16 — attention-aware capsule context packing (W15 family).
+    "W15_DEFAULT_TIER_WEIGHT", "W15_DEFAULT_CCK_WEIGHT",
+    "W15_DEFAULT_CORROBORATION_WEIGHT", "W15_DEFAULT_MAGNITUDE_WEIGHT",
+    "W15_DEFAULT_ROUND_WEIGHT",
+    "W15PackedHandoff", "W15PackResult",
+    "FifoContextPacker", "CapsuleContextPacker",
+    "AttentionAwareBundleDecoder",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

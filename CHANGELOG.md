@@ -5,6 +5,126 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.16] — 2026-04-27 — SDK v3.16 — attention-aware capsule context packing (first decoder-side context-packing move + first joint-correctness-and-context-efficiency strict-gain anchor) + W15 family
+
+*Strictly additive on SDK v3.15. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The new
+``AttentionAwareBundleDecoder``, ``CapsuleContextPacker``, and
+``FifoContextPacker`` ship in ``vision_mvp.wevra.team_coord`` as
+research-slice additions to the multi-agent coordination layer, not
+part of the run-boundary product runtime. **First SDK milestone
+where joint correctness AND decoder-side context efficiency is the
+strict-gain axis** of `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`
+§ 1.1 (the new bar 12).
+
+On the new Phase-62 *attention-aware capsule context packing* benchmark:
+
+* **R-62-default** (synthetic, ``T_decoder=None``): bench property
+  (multi-hypothesis comparable-magnitude + asymmetric corroboration:
+  every decoy ≥ 2 distinct roles, every gold = 1 distinct role)
+  holds 8/8; W11/W12/W13/W15 cross-round decoders all achieve
+  ``accuracy_full = 1.000``. The W15 decoder ties W13 byte-for-byte
+  on the answer field (W15-3 backward-compat anchor).
+* **R-62-tightbudget** (synthetic, ``T_decoder=24`` strict; W15-1
+  anchor): under FIFO packing the round-2 specific-tier
+  disambiguator falls past the budget by construction
+  (``position_of_first_causal_claim_avg = -1.0`` in 8/8 cells);
+  ``capsule_layered_fifo_packed`` ties FIFO at
+  ``accuracy_full = 0.000``. The W15 ``AttentionAwareBundleDecoder``
+  salience-packs the union with hypothesis preservation and puts
+  the round-2 specific claim at rank 0 in 8/8 cells; achieves
+  ``accuracy_full = 1.000``. **+1.000 strict separation vs FIFO-
+  packed-W13, stable across 5/5 alternate ``bank_seed`` values**.
+* **R-62-saturation** (synthetic, ``T_decoder=9999`` effectively
+  unbounded; W15-Λ-budget falsifier): under no decoder-side budget
+  pressure both packers tie at 1.000. The W15-1 win is *conditional*
+  on budget pressure — this regime makes the conditionality sharp.
+
+The W15 layer is the seventh structural axis of the Wevra programme:
+
+| Layer                                | SDK   | Theorem | Anchor regime    |
+|--------------------------------------|-------|---------|------------------|
+| Admission (cohort coherence)         | v3.8  | W7-2    | R-54             |
+| Admission (cross-role corrob.)       | v3.9  | W8-1    | R-55             |
+| Admission (multi-service)            | v3.10 | W9-1    | R-56             |
+| Decoding (intra-round bundle)        | v3.11 | W10-1   | R-57             |
+| Decoding (cross-round bundle)        | v3.12 | W11-1   | R-58             |
+| Normalisation (fixed-vocabulary)     | v3.13 | W12-1   | R-59             |
+| Normalisation (open-world)           | v3.14 | W13-1   | R-60-wide        |
+| Producer protocol                    | v3.15 | W14-1   | R-61 + R-61-OLLAMA-A |
+| **Decoder context packing**          | v3.16 | **W15-1** | **R-62-tightbudget** |
+
+The W14 layer (SDK v3.15) closed the producer-side gap; SDK v3.16
+attacks the symmetric *downstream* gap directly. The W15 packer's
+salience score is closed-form deterministic (tier + CCK +
+corroboration + magnitude + round) with pre-committed weight
+defaults; per-(tag, role, tier) hypothesis preservation guarantees
+multi-hypothesis multi-role evidence survives the pack so the W11
+contradiction-aware drop fires correctly.
+
+**Token / context / attention measurement (Part E of the milestone
+brief).** Pack-stats expose ``position_of_first_causal_claim`` (the
+proxy attention metric — rank 0 in 8/8 W15 cells, −1 in 8/8 FIFO-
+pack cells), ``tokens_kept_sum`` / ``tokens_input_sum`` (84.6 % vs
+87.3 %), ``hypothesis_count_kept`` (4/4 in both packers), and
+``n_dropped_budget`` for direct audit. Token reduction is not the
+goal — *causal-evidence concentration in early prompt positions* is.
+The proxy attention metric is auditable; we do NOT claim transformer
+attention manipulation. The W15-1 win is conditional on (a) the
+bench property holding, (b) ``T_decoder`` < admitted-union token
+sum, AND (c) round-2 carrying a specific-tier disambiguator with
+no ``service=`` token; W15-Λ-degenerate makes the conditionality
+sharp.
+
+Backward-compatible on R-54 / R-55 / R-56 / R-57 / R-58 / R-59 /
+R-60 / R-61 (default + falsifier). 393/393 prior wevra tests pass
+byte-for-byte; 37 new tests cover the W15 surface, hypothesis
+preservation, FIFO packer, backward-compat with W13, Phase-62 bank
+shape, default config (W15-1 anchor), 5-seed stability, and cross-
+regime separation. The wevra suite totals 430/430 passing.
+
+Honest scope: SDK v3.16 is a *synthetic* milestone — the producer
+is the deterministic ``IdentityExtractor``, not a real LLM. Real-LLM
+transfer of W15 is W15-C-real, conjectural; it requires Mac 1 or
+Mac 2 to be online and the bundle to be re-decoded by an LLM agent
+under a real context window. SDK v3.16 does not run this probe.
+"Attention-aware" uses an *honest proxy* metric — the
+``position_of_first_causal_claim`` rank in the salience-ordered
+pack — not transformer attention manipulation. Composition with
+W14 on a real-Ollama stream (W15-C-COMPOSE-W14, conjectural) is
+the natural next probe.
+
+Public surface (additive):
+
+* :class:`vision_mvp.wevra.team_coord.AttentionAwareBundleDecoder` —
+  two-stage decoder: first-pass priority decode → salience-aware
+  repack → final W13 layered decode.
+* :class:`vision_mvp.wevra.team_coord.CapsuleContextPacker` — closed-
+  form salience pack with hypothesis preservation.
+* :class:`vision_mvp.wevra.team_coord.FifoContextPacker` — load-
+  bearing baseline (FIFO truncation under the same ``T_decoder``).
+* :class:`vision_mvp.wevra.team_coord.W15PackResult`,
+  :class:`vision_mvp.wevra.team_coord.W15PackedHandoff` — pack-stats
+  surface.
+* ``W15_DEFAULT_TIER_WEIGHT``, ``W15_DEFAULT_CCK_WEIGHT``,
+  ``W15_DEFAULT_CORROBORATION_WEIGHT``,
+  ``W15_DEFAULT_MAGNITUDE_WEIGHT``,
+  ``W15_DEFAULT_ROUND_WEIGHT`` — pre-committed salience weights.
+
+New experiment driver:
+``vision_mvp.experiments.phase62_attention_aware_packing``.
+
+Cross-references:
+* Bench: ``vision_mvp/experiments/phase62_attention_aware_packing.py``
+* Method: ``vision_mvp/wevra/team_coord.py``
+* Tests: ``vision_mvp/tests/test_wevra_attention_aware.py`` (37 tests)
+* Milestone note: ``docs/RESULTS_WEVRA_ATTENTION_AWARE.md``
+* Success criterion: ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md``
+  (R-62 anchor + bar 12 + § 2.11)
+* Theorem registry: ``docs/THEOREM_REGISTRY.md`` (W15 family)
+* Master plan: ``docs/context_zero_master_plan.md`` § 4.33
+* Data: ``docs/data/phase62_*.json``
+
 ## [3.15] — 2026-04-27 — SDK v3.15 — structured producer protocol (first producer-protocol move + first real-LLM strict gain ≥ 0.50 over substrate FIFO) + W14 family
 
 *Strictly additive on SDK v3.14. The Wevra single-run product

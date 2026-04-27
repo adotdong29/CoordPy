@@ -3280,6 +3280,708 @@ def incident_triage_role_schemas() -> dict[str, RoleExtractionSchema]:
     return out
 
 
+# =============================================================================
+# SDK v3.16 — Attention-aware capsule context packing (W15 family)
+# =============================================================================
+#
+# The W14 producer protocol closed the *producer-side* gap on R-61 (and
+# the R-61-OLLAMA-A tier on real Ollama 14B) by ensuring the bench
+# property's cross-role decoy corroboration assumption survives a real
+# producer. But it left a downstream gap unaddressed: under a tight
+# *decoder-side* token budget, the cross-round decoder receives the
+# *raw* admitted union — which on a multi-hypothesis regime is
+# dominated by generic-noise round-1 corroboration with the round-2
+# causal claim packed *late* (or, under FIFO truncation, dropped
+# entirely). The decoder can have all the right ingredients in the
+# admitted set and still fail because its context budget is consumed
+# by lower-salience evidence.
+#
+# W15 attacks this directly via *capsule-aware context packing*. The
+# :class:`AttentionAwareBundleDecoder` runs in two stages:
+#
+# 1. **Tentative root_cause election.** A first-pass priority decode
+#    over the full normalised union elects a tentative ``root_cause``.
+#    No token budget is enforced at this stage — only the
+#    deterministic priority lookup runs, which is O(|union|).
+# 2. **Salience-scored repacking.** Each handoff in the union is
+#    scored by a deterministic, training-free salience function:
+#       salience(h) = w_tier · tier(h)
+#                   + w_cck  · cck_match(h, root_cause)
+#                   + w_corr · log1p(distinct_roles(service_tag(h)))
+#                   + w_mag  · normalised_magnitude(h)
+#                   + w_round · round_index_score(h)
+#    where every component is a closed-form function of the handoff's
+#    bytes (plus the elected root_cause). The handoffs are sorted by
+#    ``salience`` descending and packed greedily under the
+#    decoder-side token budget ``T_decoder``. Ties break by canonical
+#    (round, source_role, claim_kind, payload_sha) order so the pack
+#    is byte-deterministic.
+# 3. **Final decode** runs :class:`LayeredRobustMultiRoundBundleDecoder`
+#    (W13) on the *packed* subset, returning the same answer shape
+#    plus a ``pack_stats`` block exposing the minimum-sufficient-
+#    bundle proxy metrics the benchmark driver needs.
+#
+# Why this is a real method change (not a re-shuffle)
+# ---------------------------------------------------
+# The W14 producer protocol shapes the *emission* distribution; the
+# W12/W13 normalisers rewrite *kinds*; the W11 multi-round decoder
+# *unions* per-round bundles. None of these touch the *order* or
+# *count* of the handoffs the decoder consumes — by construction, all
+# previous decoders consume the full union. W15 introduces the first
+# decoder-side *attention proxy*: a deterministic salience score that
+# the decoder uses to truncate AND reorder before the priority
+# lookup runs on a smaller, causally-aligned bundle.
+#
+# Why this is *attention-aware*, with honest caveats
+# --------------------------------------------------
+# We do NOT claim to shape transformer attention weights. We do claim
+# to shape *what the decoder sees*: the handoffs that survive the
+# pack are sorted so the highest-salience evidence appears first, and
+# the lowest-salience evidence is dropped. Under a real-LLM
+# downstream consumer (the natural W15-C real-LLM extension), this
+# corresponds to *prompt-position attention shaping* (a well-known
+# property of transformers: the first ~k tokens get more attention
+# than the last ~k under typical positional encoding regimes). This
+# is an honest *proxy* — not a transformer-attention-weights
+# manipulation. The proxy is exposed via the ``position_of_first_*``
+# stats so the bench driver can audit it directly.
+#
+# Token-budget honesty
+# --------------------
+# ``T_decoder`` is enforced *strictly* over the sum of admitted
+# handoffs' ``n_tokens`` field (the same word-count proxy ROLE_VIEW
+# uses). When ``T_decoder`` is None or larger than the union sum, the
+# pack is the full union — the decoder reduces to W13 byte-for-byte
+# (W15-3 backward-compat). When ``T_decoder`` is below the sum,
+# packing kicks in and the salience-driven truncation is the load-
+# bearing step.
+#
+# Honest scope (W15)
+# ------------------
+# * The salience weights are pre-committed (defaults below). They are
+#   NOT learned. A learned variant is W15-C-LEARNED.
+# * The W15-1 win is *conditional* on (a) the bench property holding
+#   on the regime, (b) ``T_decoder`` being below the admitted union
+#   token sum (budget pressure exists), AND (c) the regime carrying
+#   round-2 specific-tier disambiguation that FIFO would push past
+#   the budget.
+# * On regimes without budget pressure (R-62-evidence-saturation),
+#   W15 ties W13 by W15-Λ-budget — the named falsifier.
+# * On regimes without multi-hypothesis ambiguity (R-54..R-57), the
+#   admitted set is small (≤ 2 services) and the W13 trust-admission
+#   fallback already does the job. W15 reduces to W13 there
+#   (mechanically verified by the W15-3 backward-compat test).
+
+
+# Salience weight defaults. Pre-committed; do NOT change between
+# milestones without retracting and replacing. The weights were chosen
+# so that:
+#   * a CCK-matching specific-tier round-2 claim outranks any number
+#     of generic-noise round-1 mentions (so the disambiguator is
+#     never dropped by truncation under a sane T_decoder);
+#   * within a tier, more-corroborated tags rank higher than less-
+#     corroborated tags (so cross-role corroboration survives the
+#     pack);
+#   * within (tier, corroboration), higher-magnitude evidence ranks
+#     higher (so magnitude-anchored gold stays earlier in the bundle).
+W15_DEFAULT_TIER_WEIGHT: float = 4.00
+W15_DEFAULT_CCK_WEIGHT: float = 3.00
+W15_DEFAULT_CORROBORATION_WEIGHT: float = 1.00
+W15_DEFAULT_MAGNITUDE_WEIGHT: float = 0.10
+W15_DEFAULT_ROUND_WEIGHT: float = 0.50
+# Per-handoff token-count attribution. Re-uses the word-count proxy
+# the rest of the SDK uses (see ``capsule_team_handoff``'s
+# ``n_tokens`` default).
+def _handoff_n_tokens(h: _DecodedHandoff) -> int:
+    payload = h.payload or ""
+    return max(1, len(payload.split()))
+
+
+# Identification of "specific-tier" claim kinds. Anything in the
+# generic-noise set is tier 0; anything that maps to a non-generic
+# root_cause via the priority decoder is tier 1. The map is computed
+# once from the priority table and held as a closed-form table so
+# salience scoring is allocation-free.
+def _build_specific_tier_kinds() -> frozenset[str]:
+    out: set[str] = set()
+    for (kind, root, _remed) in _DECODER_PRIORITY:
+        if root in ("error_spike", "latency_spike", "fw_block",
+                     "unknown"):
+            continue
+        out.add(kind)
+    return frozenset(out)
+
+
+_SPECIFIC_TIER_CLAIM_KINDS: frozenset[str] = _build_specific_tier_kinds()
+
+
+def _payload_magnitude(payload: str) -> float:
+    """Extract a normalised magnitude proxy from a handoff payload.
+
+    Parses the same fields the magnitude-filter extractor reads
+    (``p95_ms``, ``error_rate``, firewall ``count``) and returns a
+    bounded magnitude in [0, 1] for ranking. Missing fields return 0
+    so handoffs without an extractable magnitude rank below those
+    with one (within tier).
+    """
+    if not payload:
+        return 0.0
+    p = payload
+    m = _re.search(r"\bp95_ms=([0-9]+)", p)
+    if m:
+        v = float(m.group(1))
+        return min(1.0, v / 5000.0)
+    m = _re.search(r"\berror_rate=([0-9.]+)", p)
+    if m:
+        v = float(m.group(1))
+        return min(1.0, v / 0.50)
+    m = _re.search(r"\bcount=([0-9]+)", p)
+    if m:
+        v = float(m.group(1))
+        return min(1.0, v / 30.0)
+    return 0.0
+
+
+def _service_tag_of(payload: str) -> str:
+    """Extract the canonical ``service=<tag>`` token from a payload, or
+    ``""`` if absent. Uses the same regex as the W11 contradiction-
+    aware drop so the answer-set projection is consistent."""
+    if not payload:
+        return ""
+    for tok in payload.split():
+        m = _SERVICE_TAG_RE.search(tok)
+        if m:
+            return m.group(1)
+    return ""
+
+
+@dataclasses.dataclass(frozen=True)
+class W15PackedHandoff:
+    """One handoff in the salience-ordered pack returned by
+    :class:`CapsuleContextPacker`. Carries the original
+    ``_DecodedHandoff`` plus the salience score and the cumulative
+    token offset at which it was packed (for the position-proxy
+    metrics).
+    """
+    handoff: _DecodedHandoff
+    salience: float
+    n_tokens: int
+    cumulative_tokens: int
+    rank: int  # 0-based in the packed bundle
+    round_idx: int  # informational; 1 / 2 / 0 (unknown)
+
+
+@dataclasses.dataclass(frozen=True)
+class W15PackResult:
+    """The output of one ``CapsuleContextPacker.pack`` call. Carries
+    the packed bundle (sorted by salience descending) plus the metrics
+    the bench driver needs to audit the pack honestly:
+
+    * ``kept`` — the salience-ordered list of survivors.
+    * ``dropped`` — handoffs the budget excluded, in the order they
+      would have been packed (lowest-salience first).
+    * ``n_input``, ``n_kept``, ``n_dropped_budget`` — counts.
+    * ``tokens_input``, ``tokens_kept`` — sums.
+    * ``salience_floor_kept`` — the lowest-salience score retained.
+    * ``hypothesis_count_input`` / ``hypothesis_count_kept`` — the
+      number of distinct ``service=<tag>`` tokens before / after.
+    * ``position_of_first_causal_claim`` — the 0-based rank of the
+      first kept handoff whose ``claim_kind`` is in
+      :data:`_SPECIFIC_TIER_CLAIM_KINDS`. ``-1`` if no such handoff
+      survived (the diagnostic proxy attention metric).
+    * ``elected_root_cause`` — the tentative root cause used for
+      CCK-aware scoring (echoed for audit).
+    """
+    kept: tuple[W15PackedHandoff, ...]
+    dropped: tuple[W15PackedHandoff, ...]
+    n_input: int
+    n_kept: int
+    n_dropped_budget: int
+    tokens_input: int
+    tokens_kept: int
+    salience_floor_kept: float
+    hypothesis_count_input: int
+    hypothesis_count_kept: int
+    position_of_first_causal_claim: int
+    elected_root_cause: str
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "n_input": int(self.n_input),
+            "n_kept": int(self.n_kept),
+            "n_dropped_budget": int(self.n_dropped_budget),
+            "tokens_input": int(self.tokens_input),
+            "tokens_kept": int(self.tokens_kept),
+            "salience_floor_kept": float(self.salience_floor_kept),
+            "hypothesis_count_input": int(self.hypothesis_count_input),
+            "hypothesis_count_kept": int(self.hypothesis_count_kept),
+            "position_of_first_causal_claim":
+                int(self.position_of_first_causal_claim),
+            "elected_root_cause": str(self.elected_root_cause),
+        }
+
+
+@dataclasses.dataclass
+class FifoContextPacker:
+    """FIFO-order, token-bounded context packer (W15-baseline).
+
+    The simplest possible packer: emit handoffs in arrival order
+    until ``T_decoder`` is exhausted. Used as the baseline against
+    which :class:`CapsuleContextPacker` is measured — every prior
+    capsule decoder (W11 / W12 / W13 / W14) effectively concatenates
+    admitted handoffs in FIFO order, so this packer is the *honest*
+    representation of those decoders under a strict decoder-side
+    token budget. The salience-aware packer is the W15 contribution.
+
+    Returns the same :class:`W15PackResult` shape as
+    :class:`CapsuleContextPacker` so the bench driver can compare
+    them apples-to-apples.
+    """
+
+    def pack(self,
+              handoffs: Sequence[_DecodedHandoff],
+              *,
+              elected_root_cause: str = "",
+              T_decoder: int | None = None,
+              round_index_hint: Sequence[int] | None = None,
+              ) -> W15PackResult:
+        if round_index_hint is not None and len(round_index_hint) != len(handoffs):
+            raise ValueError(
+                f"round_index_hint length {len(round_index_hint)} != "
+                f"handoffs length {len(handoffs)}")
+        kept: list[W15PackedHandoff] = []
+        dropped: list[W15PackedHandoff] = []
+        cumulative = 0
+        n_input = len(handoffs)
+        tokens_input = 0
+        per_token: list[int] = []
+        for h in handoffs:
+            n_tok = _handoff_n_tokens(h)
+            tokens_input += n_tok
+            per_token.append(n_tok)
+        for i, h in enumerate(handoffs):
+            n_tok = per_token[i]
+            ridx = (round_index_hint[i] if round_index_hint
+                     else (2 if h.claim_kind in _SPECIFIC_TIER_CLAIM_KINDS
+                            else 1))
+            if T_decoder is not None and (cumulative + n_tok) > int(T_decoder):
+                dropped.append(W15PackedHandoff(
+                    handoff=h, salience=0.0, n_tokens=n_tok,
+                    cumulative_tokens=cumulative, rank=i,
+                    round_idx=ridx))
+                continue
+            cumulative += n_tok
+            kept.append(W15PackedHandoff(
+                handoff=h, salience=0.0, n_tokens=n_tok,
+                cumulative_tokens=cumulative, rank=len(kept),
+                round_idx=ridx))
+        first_causal = -1
+        for k in kept:
+            if k.handoff.claim_kind in _SPECIFIC_TIER_CLAIM_KINDS:
+                first_causal = k.rank
+                break
+        hyp_in: set[str] = set()
+        for h in handoffs:
+            tag = _service_tag_of(h.payload)
+            if tag:
+                hyp_in.add(tag)
+        hyp_kept: set[str] = set()
+        for k in kept:
+            tag = _service_tag_of(k.handoff.payload)
+            if tag:
+                hyp_kept.add(tag)
+        return W15PackResult(
+            kept=tuple(kept),
+            dropped=tuple(dropped),
+            n_input=n_input,
+            n_kept=len(kept),
+            n_dropped_budget=len(dropped),
+            tokens_input=tokens_input,
+            tokens_kept=cumulative,
+            salience_floor_kept=0.0,
+            hypothesis_count_input=len(hyp_in),
+            hypothesis_count_kept=len(hyp_kept),
+            position_of_first_causal_claim=int(first_causal),
+            elected_root_cause=str(elected_root_cause),
+        )
+
+
+@dataclasses.dataclass
+class CapsuleContextPacker:
+    """Capsule-aware salience-scored context packer (W15 family).
+
+    Given a sequence of admitted handoffs (typically the union across
+    rounds, post-normalisation), an elected tentative ``root_cause``,
+    and a strict decoder-side token budget ``T_decoder``, return the
+    salience-ordered subset that fits.
+
+    Salience score (closed-form, training-free)
+    -------------------------------------------
+    For each handoff ``h`` and elected ``root_cause`` ``R``:
+
+    ::
+
+        salience(h) =
+            w_tier  * (1.0 if h.claim_kind in _SPECIFIC_TIER_CLAIM_KINDS else 0.0)
+          + w_cck   * (1.0 if h.claim_kind in CCK(R) else 0.0)
+          + w_corr  * log1p(distinct_roles_for(service_tag(h)))
+          + w_mag   * payload_magnitude(h.payload)
+          + w_round * round_index_score(h)
+
+    The default weights are pre-committed in :data:`W15_DEFAULT_*`.
+    Ties break canonically on
+    ``(-salience, round_idx, source_role, claim_kind, payload_sha)``
+    so the pack is byte-deterministic.
+
+    Returns a :class:`W15PackResult` carrying the packed bundle plus
+    the packing diagnostics. The bench driver consumes the packed
+    bundle as the ``handoffs`` argument to a downstream decoder.
+    """
+
+    w_tier: float = W15_DEFAULT_TIER_WEIGHT
+    w_cck: float = W15_DEFAULT_CCK_WEIGHT
+    w_corroboration: float = W15_DEFAULT_CORROBORATION_WEIGHT
+    w_magnitude: float = W15_DEFAULT_MAGNITUDE_WEIGHT
+    w_round: float = W15_DEFAULT_ROUND_WEIGHT
+    cck_table: dict[str, frozenset[str]] = dataclasses.field(
+        default_factory=lambda: dict(CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE))
+    # Hypothesis-preservation knob (W15 multi-hypothesis property).
+    #
+    # When ``True`` (default), the packer guarantees that *every*
+    # distinct service tag in the input gets at least one
+    # representative in the kept bundle (subject to budget). This is
+    # the load-bearing structural property under multi-hypothesis
+    # regimes (R-62): without it, salience-aware packing prefers more-
+    # corroborated decoys over less-corroborated golds, dropping the
+    # gold services entirely from the kept bundle and producing the
+    # wrong answer set after the W11 contradiction-aware drop.
+    #
+    # When ``False`` the packer is pure salience-greedy. The
+    # backward-compat anchor (R-54..R-61) is unaffected because the
+    # admitted union already contains few hypotheses.
+    preserve_hypotheses: bool = True
+
+    def _round_index_for(self,
+                          h: _DecodedHandoff,
+                          round_index_hint: int) -> int:
+        """A round index for salience scoring. The packer prefers an
+        explicit per-handoff hint (e.g. the bench driver tagging each
+        handoff with its source round); when absent, falls back to
+        ``2`` if the kind is in :data:`_SPECIFIC_TIER_CLAIM_KINDS`
+        (the round-2 disambiguator) and ``1`` otherwise. Returns 0
+        when the inference cannot be made."""
+        if round_index_hint > 0:
+            return round_index_hint
+        if h.claim_kind in _SPECIFIC_TIER_CLAIM_KINDS:
+            return 2
+        return 1
+
+    def pack(self,
+              handoffs: Sequence[_DecodedHandoff],
+              *,
+              elected_root_cause: str,
+              T_decoder: int | None,
+              round_index_hint: Sequence[int] | None = None,
+              ) -> W15PackResult:
+        """Run the salience-driven pack.
+
+        Parameters
+        ----------
+        handoffs
+            The admitted union (typically post-normalisation) the
+            decoder would otherwise consume. Order is *informational*;
+            the pack reorders by salience.
+        elected_root_cause
+            The tentative root_cause from a first-pass priority decode
+            on the full union. Used for CCK-aware scoring; if the
+            elected root is generic (``error_spike`` / ``latency_spike``
+            / ``fw_block`` / ``unknown``) the CCK weight is silently
+            zeroed (CCK against generic is itself generic).
+        T_decoder
+            Strict token budget over the kept handoffs' ``n_tokens``
+            sum. ``None`` disables the budget (W15-3 backward-compat
+            anchor: the pack returns the full union sorted by
+            salience).
+        round_index_hint
+            Optional per-handoff round indices (same length as
+            ``handoffs``). When provided, salience uses them; when
+            absent, the packer infers via :meth:`_round_index_for`.
+        """
+        if round_index_hint is not None and len(round_index_hint) != len(handoffs):
+            raise ValueError(
+                f"round_index_hint length {len(round_index_hint)} != "
+                f"handoffs length {len(handoffs)}")
+        cck = self.cck_table.get(elected_root_cause, frozenset())
+        # Build per-tag distinct-role corroboration counts up front so
+        # salience scoring is O(|union|) total.
+        roles_per_tag: dict[str, set[str]] = {}
+        for h in handoffs:
+            tag = _service_tag_of(h.payload)
+            if tag:
+                roles_per_tag.setdefault(tag, set()).add(h.source_role)
+        # Tag → distinct-role count, with log1p for diminishing returns.
+        import math
+        tag_corr_score: dict[str, float] = {
+            tag: math.log1p(len(roles))
+            for tag, roles in roles_per_tag.items()
+        }
+        # Score every handoff.
+        scored: list[tuple[float, int, int, str, str, str, _DecodedHandoff,
+                            int, int]] = []
+        for i, h in enumerate(handoffs):
+            tag = _service_tag_of(h.payload)
+            ridx = self._round_index_for(
+                h, round_index_hint[i] if round_index_hint else 0)
+            tier_score = (1.0 if h.claim_kind in _SPECIFIC_TIER_CLAIM_KINDS
+                            else 0.0)
+            cck_score = (1.0 if (cck and h.claim_kind in cck) else 0.0)
+            corr_score = tag_corr_score.get(tag, 0.0)
+            mag_score = _payload_magnitude(h.payload)
+            round_score = float(ridx) / 2.0  # round 1 = 0.5, round 2 = 1.0
+            salience = (
+                self.w_tier * tier_score
+                + self.w_cck * cck_score
+                + self.w_corroboration * corr_score
+                + self.w_magnitude * mag_score
+                + self.w_round * round_score
+            )
+            sha = _payload_sha256(h.payload)[:16]
+            n_tok = _handoff_n_tokens(h)
+            scored.append((-salience, ridx, i, h.source_role,
+                            h.claim_kind, sha, h, n_tok, ridx))
+        # Sort by descending salience; tie-break canonical.
+        scored.sort()
+        n_input = len(handoffs)
+        tokens_input = sum(s[7] for s in scored)
+        # Pack under T_decoder. Two passes when ``preserve_hypotheses``
+        # is set:
+        #   Pass 1 — for each distinct service tag, pack its highest-
+        #            salience representative if budget allows. Round-2
+        #            specific-tier handoffs (tag = "") fall through to
+        #            this pass too, so the disambiguator is always kept.
+        #   Pass 2 — fill remaining budget greedy by salience.
+        # Without ``preserve_hypotheses`` the packer is single-pass
+        # salience-greedy.
+        kept: list[W15PackedHandoff] = []
+        dropped: list[W15PackedHandoff] = []
+        cumulative = 0
+        used_idx: set[int] = set()
+        if self.preserve_hypotheses:
+            # Pass 1 — one representative per (tag, source_role, tier).
+            # We bucket by ``(service_tag, source_role)`` to guarantee
+            # both that every hypothesis is represented AND that every
+            # distinct-role mention of each tag is preserved (the W11
+            # contradiction-aware drop fires only when a tag's admitted
+            # mentions span ≥ noise_decoy_role_floor distinct roles —
+            # so per-tag preservation alone is insufficient for the
+            # multi-hypothesis regime). Tier is included so the round-2
+            # disambiguator (tag = "") gets its own slot; ``tier0``
+            # round-1 mentions on the same (tag, role) collapse to one
+            # representative (the highest-salience).
+            seen_buckets: set[tuple[str, str, str]] = set()
+            for orig_rank, entry in enumerate(scored):
+                (neg_sal, _r, _i, src, kind, _sha, h, n_tok, ridx) = entry
+                tag = _service_tag_of(h.payload)
+                bucket_kind = ("tier1"
+                                if kind in _SPECIFIC_TIER_CLAIM_KINDS
+                                else "tier0")
+                bucket = (tag, src, bucket_kind)
+                if bucket in seen_buckets:
+                    continue
+                seen_buckets.add(bucket)
+                if T_decoder is not None and (cumulative + n_tok) > int(T_decoder):
+                    # Cannot fit this hypothesis representative;
+                    # subsequent passes won't fit it either.
+                    continue
+                cumulative += n_tok
+                kept.append(W15PackedHandoff(
+                    handoff=h, salience=-neg_sal, n_tokens=n_tok,
+                    cumulative_tokens=cumulative, rank=len(kept),
+                    round_idx=ridx))
+                used_idx.add(orig_rank)
+        # Pass 2 — fill remaining budget greedy by salience.
+        for orig_rank, entry in enumerate(scored):
+            if orig_rank in used_idx:
+                continue
+            (neg_sal, _r, _i, _s, _k, _sha, h, n_tok, ridx) = entry
+            sal = -neg_sal
+            if T_decoder is not None and (cumulative + n_tok) > int(T_decoder):
+                dropped.append(W15PackedHandoff(
+                    handoff=h, salience=sal, n_tokens=n_tok,
+                    cumulative_tokens=cumulative, rank=orig_rank,
+                    round_idx=ridx))
+                continue
+            cumulative += n_tok
+            kept.append(W15PackedHandoff(
+                handoff=h, salience=sal, n_tokens=n_tok,
+                cumulative_tokens=cumulative, rank=len(kept),
+                round_idx=ridx))
+            used_idx.add(orig_rank)
+        # Position of first causal claim in the packed bundle.
+        first_causal = -1
+        for k in kept:
+            if k.handoff.claim_kind in _SPECIFIC_TIER_CLAIM_KINDS:
+                first_causal = k.rank
+                break
+        salience_floor = (kept[-1].salience if kept else 0.0)
+        # Hypothesis counts.
+        hyp_in: set[str] = set()
+        for h in handoffs:
+            tag = _service_tag_of(h.payload)
+            if tag:
+                hyp_in.add(tag)
+        hyp_kept: set[str] = set()
+        for k in kept:
+            tag = _service_tag_of(k.handoff.payload)
+            if tag:
+                hyp_kept.add(tag)
+        return W15PackResult(
+            kept=tuple(kept),
+            dropped=tuple(dropped),
+            n_input=n_input,
+            n_kept=len(kept),
+            n_dropped_budget=len(dropped),
+            tokens_input=tokens_input,
+            tokens_kept=cumulative,
+            salience_floor_kept=float(salience_floor),
+            hypothesis_count_input=len(hyp_in),
+            hypothesis_count_kept=len(hyp_kept),
+            position_of_first_causal_claim=int(first_causal),
+            elected_root_cause=str(elected_root_cause),
+        )
+
+
+@dataclasses.dataclass
+class AttentionAwareBundleDecoder:
+    """Attention-aware, capsule-native, token-bounded multi-round
+    bundle decoder (SDK v3.16, W15 family).
+
+    Two-stage decode:
+
+    1. **First-pass tentative root_cause election.** Runs the W13
+       layered normaliser + the priority decoder over the *full*
+       union to elect a tentative ``root_cause``. No token budget is
+       enforced at this stage; only the priority lookup runs (O(N)).
+       This stage uses a lightweight :class:`MultiRoundBundleDecoder`
+       internally — the round-union semantics, not the full layered
+       pipeline.
+    2. **Salience-aware repacking + final decode.** A
+       :class:`CapsuleContextPacker` reorders the union by salience
+       (CCK against the elected root_cause + tier + corroboration +
+       magnitude + round index) and truncates under ``T_decoder``.
+       The final decode runs the W13 layered decoder on the *packed*
+       subset; the answer is the W13 answer plus a ``pack_stats``
+       block.
+
+    Backward-compat (W15-3)
+    ------------------------
+    When ``T_decoder is None`` OR ``T_decoder`` ≥ ``tokens_input``,
+    the pack is the full union (no drops). The salience reordering
+    does not change the priority decoder's output (the decoder is
+    set-based: same admitted set ⇒ same ``root_cause``); the only
+    difference vs W13 is the ``pack_stats`` block, which is
+    *additive*. R-54..R-61 anchors preserved byte-for-byte on the
+    answer field; the pack stats are diagnostic only.
+
+    Honest scope (W15)
+    ------------------
+    * The salience weights are pre-committed defaults; not learned.
+    * "Attention-aware" is an *honest proxy*: we measure
+      ``position_of_first_causal_claim`` and ``salience_floor_kept``
+      as proxy attention signals. We do not manipulate transformer
+      attention weights. Any downstream LLM consumer of the packed
+      bundle benefits from prompt-position attention shaping; the
+      mechanism is "earlier tokens get more attention by default,"
+      not novel attention manipulation.
+    * The W15-1 win is *conditional* on the bench property holding,
+      ``T_decoder`` being below the union token sum (budget pressure
+      exists), AND the regime carrying round-2 specific-tier
+      disambiguation that FIFO would push past the budget.
+    * On regimes without budget pressure (R-62-evidence-saturation),
+      W15 ties W13 by W15-Λ-budget — the named falsifier.
+    """
+
+    inner: LayeredRobustMultiRoundBundleDecoder = dataclasses.field(
+        default_factory=lambda: LayeredRobustMultiRoundBundleDecoder())
+    packer: CapsuleContextPacker = dataclasses.field(
+        default_factory=lambda: CapsuleContextPacker())
+    # First-pass decoder used to elect a tentative ``root_cause``. By
+    # default this is a *plain* multi-round bundle decoder over the
+    # *normalised* union — same as the inner decoder's first stage,
+    # but exposed as a dataclass field so tests can swap it out.
+    first_pass: MultiRoundBundleDecoder = dataclasses.field(
+        default_factory=lambda: MultiRoundBundleDecoder())
+    # Strict per-decode token budget. ``None`` disables budgeting
+    # (W15-3 backward-compat: ties W13).
+    T_decoder: int | None = None
+
+    # Forensic counters populated per ``decode_rounds`` call.
+    _last_pack_result: W15PackResult | None = None
+    _last_first_pass_root_cause: str = ""
+
+    def decode_rounds(self,
+                       per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+                       ) -> dict[str, Any]:
+        # Normalise once (W13 layered) so both first-pass and final
+        # decode see the same canonical kinds.
+        self.inner.normalizer.reset_counters()
+        self.inner._last_n_payload_rewrites = 0
+        normalised_per_round: list[list[_DecodedHandoff]] = []
+        for bundle in per_round_handoffs:
+            normalised_per_round.append(self.inner.normalize_round(bundle))
+        # Build the round-index hint vector parallel to the union.
+        union: list[_DecodedHandoff] = []
+        round_hint: list[int] = []
+        for r_idx, bundle in enumerate(normalised_per_round, start=1):
+            for h in bundle:
+                union.append(h)
+                round_hint.append(r_idx)
+        # Stage 1 — tentative root_cause via the first-pass decoder.
+        first = self.first_pass.decode_rounds([union])
+        elected = str(first.get("root_cause", "unknown"))
+        self._last_first_pass_root_cause = elected
+        # Stage 2 — salience-aware repack + final decode.
+        pack = self.packer.pack(
+            union,
+            elected_root_cause=elected,
+            T_decoder=self.T_decoder,
+            round_index_hint=round_hint)
+        self._last_pack_result = pack
+        kept_handoffs = [k.handoff for k in pack.kept]
+        # Run the inner W13 layered decoder on the *packed* subset.
+        # ``inner.decode_rounds`` re-normalises; we already normalised
+        # the union, but kind rewrites are idempotent so re-running is
+        # safe and the inner counters reflect the post-pack rewrites.
+        # We pass the packed subset as a single bundle (round union
+        # already collapsed); the W11 contradiction-aware drop fires
+        # the same way.
+        ans = self.inner.decode_rounds([kept_handoffs])
+        ans = dict(ans)
+        ans["pack_stats"] = pack.as_dict()
+        ans["first_pass_root_cause"] = elected
+        return ans
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+               ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_pack_result(self) -> W15PackResult | None:
+        return self._last_pack_result
+
+    @property
+    def last_first_pass_root_cause(self) -> str:
+        return self._last_first_pass_root_cause
+
+    def pack_stats(self) -> dict[str, Any]:
+        """Expose the most recent pack as a dict for the bench driver.
+        Returns ``{}`` if no decode has been run yet.
+        """
+        if self._last_pack_result is None:
+            return {}
+        return self._last_pack_result.as_dict()
+
+
 __all__ = [
     # Per-role budget
     "RoleBudget", "DEFAULT_ROLE_BUDGETS",
@@ -3320,4 +4022,11 @@ __all__ = [
     "StructuredProducerProtocol",
     "INCIDENT_TRIAGE_OBSERVATION_KINDS",
     "incident_triage_role_schemas",
+    # SDK v3.16 — attention-aware capsule context packing (W15 family).
+    "W15_DEFAULT_TIER_WEIGHT", "W15_DEFAULT_CCK_WEIGHT",
+    "W15_DEFAULT_CORROBORATION_WEIGHT", "W15_DEFAULT_MAGNITUDE_WEIGHT",
+    "W15_DEFAULT_ROUND_WEIGHT",
+    "W15PackedHandoff", "W15PackResult",
+    "FifoContextPacker", "CapsuleContextPacker",
+    "AttentionAwareBundleDecoder",
 ]

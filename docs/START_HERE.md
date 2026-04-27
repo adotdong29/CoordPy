@@ -17,7 +17,8 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.15)         | [`RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`](RESULTS_WEVRA_PRODUCER_AMBIGUITY.md) |
+> | Latest milestone (SDK v3.16)         | [`RESULTS_WEVRA_ATTENTION_AWARE.md`](RESULTS_WEVRA_ATTENTION_AWARE.md) |
+> | Previous milestone (SDK v3.15)       | [`RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`](RESULTS_WEVRA_PRODUCER_AMBIGUITY.md) |
 > | Previous milestone (SDK v3.14)       | [`RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md`](RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md) |
 > | Previous milestone (SDK v3.13)       | [`RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md`](RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md) |
 > | Previous milestone (SDK v3.12)       | [`RESULTS_WEVRA_MULTI_ROUND_DECODER.md`](RESULTS_WEVRA_MULTI_ROUND_DECODER.md) |
@@ -38,7 +39,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.15 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.16 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
@@ -70,9 +71,44 @@ limit), while pairing W9 admission with the new
 achieves 1.000 — the first capsule-native multi-agent coordination
 method that crosses the admission/decoding split** (W10 family,
 SDK v3.11).
-SDK v3.15's headline result is the **first producer-protocol move**
+SDK v3.16's headline result is the **first decoder-side capsule-
+context-packing move** in the programme — and the **first
+synthetic benchmark in which joint correctness AND decoder-side
+context efficiency is the strict-gain anchor**. SDK v3.15 (W14)
+closed the producer-side gap on R-61 (the structured prompt
+restored the bench property's cross-role decoy corroboration
+assumption under a real Ollama 14B producer at +0.500 strict gain
+over substrate FIFO). SDK v3.16 (W15) attacks the symmetric
+*downstream* gap directly: even when the bench property holds and
+the cross-round capsule pipeline is in scope, a strict
+*decoder-side* token budget ``T_decoder`` can drop the round-2
+specific-tier disambiguator under naive FIFO packing of the
+admitted union. The new
+:class:`vision_mvp.wevra.team_coord.AttentionAwareBundleDecoder`
+salience-packs the union (CCK + tier + corroboration + magnitude
++ round) with hypothesis preservation under ``T_decoder`` and
+defeats the FIFO-packed baseline. On the new R-62-tightbudget
+regime (multi-hypothesis comparable-magnitude events with
+asymmetric corroboration shape, 2 gold + 2 decoy services per
+scenario, ``T_decoder = 24``), the W15 method achieves
+``accuracy_full = 1.000`` while every FIFO-packed cross-round
+decoder ties FIFO at ``accuracy_full = 0.000`` — **+1.000 strict
+separation, stable across 5/5 alternate ``bank_seed`` values**.
+The W15-Λ-budget limit theorem extends W7-3 (extraction floor)
+to the decoder-side axis: a never-decoded handoff has no
+influence on the answer. The W15-Λ-degenerate falsifier on
+R-62-saturation (``T_decoder = 9999``) confirms the conditionality:
+without budget pressure, salience reordering is a no-op on the
+answer field. Backward-compat (W15-3) preserved byte-for-byte:
+393/393 prior tests pass; with ``T_decoder = None`` the W15
+decoder ties the W13 layered decoder byte-for-byte on the answer
+field. The Wevra programme now has **seven** coupled structural
+axes with named limit theorems on each. The Wevra single-run
+product runtime contract is byte-for-byte unchanged.
+
+SDK v3.15's headline result was the **first producer-protocol move**
 in the programme — and the **first real-Ollama benchmark in which a
-Wevra cross-round capsule decoder produces a strict +0.50 gain over
+Wevra cross-round capsule decoder produced a strict +0.50 gain over
 substrate FIFO under a real LLM**. SDK v3.14 closed the synthetic
 open-world normalisation axis (W13-1) but produced an honest
 negative on real Ollama 14B (W13-Λ-real): the bench property was

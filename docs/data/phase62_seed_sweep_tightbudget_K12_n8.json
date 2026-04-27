@@ -1,0 +1,1296 @@
+{
+  "K_auditor": 12,
+  "T_auditor": 256,
+  "T_decoder": 24,
+  "n_eval": 8,
+  "per_seed": {
+    "11": {
+      "audit_ok_grid": {
+        "capsule_attention_aware": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_fifo_packed": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "bench_summary": {
+        "K_auditor": 12,
+        "T_decoder": 24,
+        "n_scenarios": 8,
+        "scenarios_with_all_decoys_corr": 8,
+        "scenarios_with_all_golds_single_role": 8,
+        "scenarios_with_multi_hypothesis": 8,
+        "scenarios_with_property": 8
+      },
+      "headline_gap": {
+        "attention_minus_fifo": 1.0,
+        "attention_minus_fifo_packed": 1.0,
+        "attention_minus_layered": 0.0,
+        "fifo_packed_minus_layered": -1.0,
+        "max_non_attention_accuracy_full": 1.0
+      },
+      "pack_stats_summary": {
+        "capsule_attention_aware": {
+          "fraction_handoffs_kept": 0.8636,
+          "handoffs_admitted_sum": 88,
+          "handoffs_decoder_input_sum": 76,
+          "hypothesis_count_input_avg": 4.0,
+          "hypothesis_count_kept_avg": 4.0,
+          "n_cells": 8,
+          "n_dropped_budget_sum": 12,
+          "n_with_causal_claim_kept": 8,
+          "position_of_first_causal_claim_avg": 0.0,
+          "tokens_input_sum": 220,
+          "tokens_kept_over_input": 0.8455,
+          "tokens_kept_sum": 186
+        },
+        "capsule_layered_fifo_packed": {
+          "fraction_handoffs_kept": 0.9091,
+          "handoffs_admitted_sum": 88,
+          "handoffs_decoder_input_sum": 80,
+          "hypothesis_count_input_avg": 4.0,
+          "hypothesis_count_kept_avg": 4.0,
+          "n_cells": 8,
+          "n_dropped_budget_sum": 8,
+          "n_with_causal_claim_kept": 0,
+          "position_of_first_causal_claim_avg": -1.0,
+          "tokens_input_sum": 220,
+          "tokens_kept_over_input": 0.8727,
+          "tokens_kept_sum": 192
+        }
+      },
+      "pooled": {
+        "capsule_attention_aware": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_attention_aware"
+        },
+        "capsule_cohort_buffered": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_cohort_buffered"
+        },
+        "capsule_corroboration": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_corroboration"
+        },
+        "capsule_coverage": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_coverage"
+        },
+        "capsule_fifo": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_fifo"
+        },
+        "capsule_layered_fifo_packed": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.0,
+          "accuracy_root_cause": 0.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_layered_fifo_packed"
+        },
+        "capsule_layered_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_layered_multi_round"
+        },
+        "capsule_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_multi_round"
+        },
+        "capsule_multi_service": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_multi_service"
+        },
+        "capsule_priority": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_priority"
+        },
+        "capsule_robust_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_robust_multi_round"
+        },
+        "substrate": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 0.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 11.0,
+          "mean_n_role_view": 0.0,
+          "mean_n_team_handoff": 0.0,
+          "mean_tokens_admitted": 27.5,
+          "n": 8,
+          "strategy": "substrate"
+        }
+      }
+    },
+    "17": {
+      "audit_ok_grid": {
+        "capsule_attention_aware": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_fifo_packed": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "bench_summary": {
+        "K_auditor": 12,
+        "T_decoder": 24,
+        "n_scenarios": 8,
+        "scenarios_with_all_decoys_corr": 8,
+        "scenarios_with_all_golds_single_role": 8,
+        "scenarios_with_multi_hypothesis": 8,
+        "scenarios_with_property": 8
+      },
+      "headline_gap": {
+        "attention_minus_fifo": 1.0,
+        "attention_minus_fifo_packed": 1.0,
+        "attention_minus_layered": 0.0,
+        "fifo_packed_minus_layered": -1.0,
+        "max_non_attention_accuracy_full": 1.0
+      },
+      "pack_stats_summary": {
+        "capsule_attention_aware": {
+          "fraction_handoffs_kept": 0.8636,
+          "handoffs_admitted_sum": 88,
+          "handoffs_decoder_input_sum": 76,
+          "hypothesis_count_input_avg": 4.0,
+          "hypothesis_count_kept_avg": 4.0,
+          "n_cells": 8,
+          "n_dropped_budget_sum": 12,
+          "n_with_causal_claim_kept": 8,
+          "position_of_first_causal_claim_avg": 0.0,
+          "tokens_input_sum": 220,
+          "tokens_kept_over_input": 0.8455,
+          "tokens_kept_sum": 186
+        },
+        "capsule_layered_fifo_packed": {
+          "fraction_handoffs_kept": 0.9091,
+          "handoffs_admitted_sum": 88,
+          "handoffs_decoder_input_sum": 80,
+          "hypothesis_count_input_avg": 4.0,
+          "hypothesis_count_kept_avg": 4.0,
+          "n_cells": 8,
+          "n_dropped_budget_sum": 8,
+          "n_with_causal_claim_kept": 0,
+          "position_of_first_causal_claim_avg": -1.0,
+          "tokens_input_sum": 220,
+          "tokens_kept_over_input": 0.8727,
+          "tokens_kept_sum": 192
+        }
+      },
+      "pooled": {
+        "capsule_attention_aware": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_attention_aware"
+        },
+        "capsule_cohort_buffered": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_cohort_buffered"
+        },
+        "capsule_corroboration": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_corroboration"
+        },
+        "capsule_coverage": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_coverage"
+        },
+        "capsule_fifo": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_fifo"
+        },
+        "capsule_layered_fifo_packed": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.0,
+          "accuracy_root_cause": 0.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_layered_fifo_packed"
+        },
+        "capsule_layered_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_layered_multi_round"
+        },
+        "capsule_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_multi_round"
+        },
+        "capsule_multi_service": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_multi_service"
+        },
+        "capsule_priority": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_priority"
+        },
+        "capsule_robust_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_robust_multi_round"
+        },
+        "substrate": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 0.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 11.0,
+          "mean_n_role_view": 0.0,
+          "mean_n_team_handoff": 0.0,
+          "mean_tokens_admitted": 27.5,
+          "n": 8,
+          "strategy": "substrate"
+        }
+      }
+    },
+    "23": {
+      "audit_ok_grid": {
+        "capsule_attention_aware": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_fifo_packed": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "bench_summary": {
+        "K_auditor": 12,
+        "T_decoder": 24,
+        "n_scenarios": 8,
+        "scenarios_with_all_decoys_corr": 8,
+        "scenarios_with_all_golds_single_role": 8,
+        "scenarios_with_multi_hypothesis": 8,
+        "scenarios_with_property": 8
+      },
+      "headline_gap": {
+        "attention_minus_fifo": 1.0,
+        "attention_minus_fifo_packed": 1.0,
+        "attention_minus_layered": 0.0,
+        "fifo_packed_minus_layered": -1.0,
+        "max_non_attention_accuracy_full": 1.0
+      },
+      "pack_stats_summary": {
+        "capsule_attention_aware": {
+          "fraction_handoffs_kept": 0.8636,
+          "handoffs_admitted_sum": 88,
+          "handoffs_decoder_input_sum": 76,
+          "hypothesis_count_input_avg": 4.0,
+          "hypothesis_count_kept_avg": 4.0,
+          "n_cells": 8,
+          "n_dropped_budget_sum": 12,
+          "n_with_causal_claim_kept": 8,
+          "position_of_first_causal_claim_avg": 0.0,
+          "tokens_input_sum": 220,
+          "tokens_kept_over_input": 0.8455,
+          "tokens_kept_sum": 186
+        },
+        "capsule_layered_fifo_packed": {
+          "fraction_handoffs_kept": 0.9091,
+          "handoffs_admitted_sum": 88,
+          "handoffs_decoder_input_sum": 80,
+          "hypothesis_count_input_avg": 4.0,
+          "hypothesis_count_kept_avg": 4.0,
+          "n_cells": 8,
+          "n_dropped_budget_sum": 8,
+          "n_with_causal_claim_kept": 0,
+          "position_of_first_causal_claim_avg": -1.0,
+          "tokens_input_sum": 220,
+          "tokens_kept_over_input": 0.8727,
+          "tokens_kept_sum": 192
+        }
+      },
+      "pooled": {
+        "capsule_attention_aware": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_attention_aware"
+        },
+        "capsule_cohort_buffered": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_cohort_buffered"
+        },
+        "capsule_corroboration": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_corroboration"
+        },
+        "capsule_coverage": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_coverage"
+        },
+        "capsule_fifo": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_fifo"
+        },
+        "capsule_layered_fifo_packed": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.0,
+          "accuracy_root_cause": 0.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_layered_fifo_packed"
+        },
+        "capsule_layered_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_layered_multi_round"
+        },
+        "capsule_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_multi_round"
+        },
+        "capsule_multi_service": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_multi_service"
+        },
+        "capsule_priority": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_priority"
+        },
+        "capsule_robust_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_robust_multi_round"
+        },
+        "substrate": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 0.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 11.0,
+          "mean_n_role_view": 0.0,
+          "mean_n_team_handoff": 0.0,
+          "mean_tokens_admitted": 27.5,
+          "n": 8,
+          "strategy": "substrate"
+        }
+      }
+    },
+    "29": {
+      "audit_ok_grid": {
+        "capsule_attention_aware": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_fifo_packed": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "bench_summary": {
+        "K_auditor": 12,
+        "T_decoder": 24,
+        "n_scenarios": 8,
+        "scenarios_with_all_decoys_corr": 8,
+        "scenarios_with_all_golds_single_role": 8,
+        "scenarios_with_multi_hypothesis": 8,
+        "scenarios_with_property": 8
+      },
+      "headline_gap": {
+        "attention_minus_fifo": 1.0,
+        "attention_minus_fifo_packed": 1.0,
+        "attention_minus_layered": 0.0,
+        "fifo_packed_minus_layered": -1.0,
+        "max_non_attention_accuracy_full": 1.0
+      },
+      "pack_stats_summary": {
+        "capsule_attention_aware": {
+          "fraction_handoffs_kept": 0.8636,
+          "handoffs_admitted_sum": 88,
+          "handoffs_decoder_input_sum": 76,
+          "hypothesis_count_input_avg": 4.0,
+          "hypothesis_count_kept_avg": 4.0,
+          "n_cells": 8,
+          "n_dropped_budget_sum": 12,
+          "n_with_causal_claim_kept": 8,
+          "position_of_first_causal_claim_avg": 0.0,
+          "tokens_input_sum": 220,
+          "tokens_kept_over_input": 0.8455,
+          "tokens_kept_sum": 186
+        },
+        "capsule_layered_fifo_packed": {
+          "fraction_handoffs_kept": 0.9091,
+          "handoffs_admitted_sum": 88,
+          "handoffs_decoder_input_sum": 80,
+          "hypothesis_count_input_avg": 4.0,
+          "hypothesis_count_kept_avg": 4.0,
+          "n_cells": 8,
+          "n_dropped_budget_sum": 8,
+          "n_with_causal_claim_kept": 0,
+          "position_of_first_causal_claim_avg": -1.0,
+          "tokens_input_sum": 220,
+          "tokens_kept_over_input": 0.8727,
+          "tokens_kept_sum": 192
+        }
+      },
+      "pooled": {
+        "capsule_attention_aware": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_attention_aware"
+        },
+        "capsule_cohort_buffered": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_cohort_buffered"
+        },
+        "capsule_corroboration": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_corroboration"
+        },
+        "capsule_coverage": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_coverage"
+        },
+        "capsule_fifo": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_fifo"
+        },
+        "capsule_layered_fifo_packed": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.0,
+          "accuracy_root_cause": 0.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_layered_fifo_packed"
+        },
+        "capsule_layered_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_layered_multi_round"
+        },
+        "capsule_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_multi_round"
+        },
+        "capsule_multi_service": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_multi_service"
+        },
+        "capsule_priority": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_priority"
+        },
+        "capsule_robust_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_robust_multi_round"
+        },
+        "substrate": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 0.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 11.0,
+          "mean_n_role_view": 0.0,
+          "mean_n_team_handoff": 0.0,
+          "mean_tokens_admitted": 27.5,
+          "n": 8,
+          "strategy": "substrate"
+        }
+      }
+    },
+    "31": {
+      "audit_ok_grid": {
+        "capsule_attention_aware": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_fifo_packed": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "bench_summary": {
+        "K_auditor": 12,
+        "T_decoder": 24,
+        "n_scenarios": 8,
+        "scenarios_with_all_decoys_corr": 8,
+        "scenarios_with_all_golds_single_role": 8,
+        "scenarios_with_multi_hypothesis": 8,
+        "scenarios_with_property": 8
+      },
+      "headline_gap": {
+        "attention_minus_fifo": 1.0,
+        "attention_minus_fifo_packed": 1.0,
+        "attention_minus_layered": 0.0,
+        "fifo_packed_minus_layered": -1.0,
+        "max_non_attention_accuracy_full": 1.0
+      },
+      "pack_stats_summary": {
+        "capsule_attention_aware": {
+          "fraction_handoffs_kept": 0.8636,
+          "handoffs_admitted_sum": 88,
+          "handoffs_decoder_input_sum": 76,
+          "hypothesis_count_input_avg": 4.0,
+          "hypothesis_count_kept_avg": 4.0,
+          "n_cells": 8,
+          "n_dropped_budget_sum": 12,
+          "n_with_causal_claim_kept": 8,
+          "position_of_first_causal_claim_avg": 0.0,
+          "tokens_input_sum": 220,
+          "tokens_kept_over_input": 0.8455,
+          "tokens_kept_sum": 186
+        },
+        "capsule_layered_fifo_packed": {
+          "fraction_handoffs_kept": 0.9091,
+          "handoffs_admitted_sum": 88,
+          "handoffs_decoder_input_sum": 80,
+          "hypothesis_count_input_avg": 4.0,
+          "hypothesis_count_kept_avg": 4.0,
+          "n_cells": 8,
+          "n_dropped_budget_sum": 8,
+          "n_with_causal_claim_kept": 0,
+          "position_of_first_causal_claim_avg": -1.0,
+          "tokens_input_sum": 220,
+          "tokens_kept_over_input": 0.8727,
+          "tokens_kept_sum": 192
+        }
+      },
+      "pooled": {
+        "capsule_attention_aware": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_attention_aware"
+        },
+        "capsule_cohort_buffered": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_cohort_buffered"
+        },
+        "capsule_corroboration": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_corroboration"
+        },
+        "capsule_coverage": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_coverage"
+        },
+        "capsule_fifo": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_fifo"
+        },
+        "capsule_layered_fifo_packed": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 0.0,
+          "accuracy_root_cause": 0.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_layered_fifo_packed"
+        },
+        "capsule_layered_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_layered_multi_round"
+        },
+        "capsule_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_multi_round"
+        },
+        "capsule_multi_service": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_multi_service"
+        },
+        "capsule_priority": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_priority"
+        },
+        "capsule_robust_multi_round": {
+          "accuracy_full": 1.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 1.0,
+          "audit_ok_rate": 1.0,
+          "failure_hist": {
+            "none": 8
+          },
+          "mean_n_admitted_auditor": 1.0,
+          "mean_n_role_view": 10.0,
+          "mean_n_team_handoff": 11.25,
+          "mean_tokens_admitted": 3.5,
+          "n": 8,
+          "strategy": "capsule_robust_multi_round"
+        },
+        "substrate": {
+          "accuracy_full": 0.0,
+          "accuracy_remediation": 1.0,
+          "accuracy_root_cause": 1.0,
+          "accuracy_services": 0.0,
+          "audit_ok_rate": 0.0,
+          "failure_hist": {
+            "decoder_error": 8
+          },
+          "mean_n_admitted_auditor": 11.0,
+          "mean_n_role_view": 0.0,
+          "mean_n_team_handoff": 0.0,
+          "mean_tokens_admitted": 27.5,
+          "n": 8,
+          "strategy": "substrate"
+        }
+      }
+    }
+  },
+  "schema": "phase62.attention_aware_packing_seed_sweep.v1",
+  "seeds": [
+    11,
+    17,
+    23,
+    29,
+    31
+  ]
+}

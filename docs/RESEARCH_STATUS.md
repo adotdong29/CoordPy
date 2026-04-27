@@ -5,13 +5,28 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.15,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.16,
 > 2026-04-27.
 
 ## TL;DR
 
-The programme now has **eleven** coupled research axes, each with a
-sharp status:
+The programme now has **twelve** coupled research axes, each with a
+sharp status. SDK v3.16 mints axis 12: **decoder-side capsule
+context packing**. Under a strict decoder-side token budget on the
+new R-62-tightbudget regime (multi-hypothesis comparable-magnitude
+events with asymmetric corroboration shape), the new
+:class:`AttentionAwareBundleDecoder` (W15) achieves
+``accuracy_full = 1.000`` while every FIFO-packed cross-round
+decoder ties FIFO at ``accuracy_full = 0.000`` — a +1.000 strict
+separation, stable across 5/5 ``bank_seed`` values. The W15-Λ-budget
+limit theorem extends W7-3 (extraction floor) to the decoder-side
+axis: a never-decoded handoff has no influence on the answer.
+Backward-compat (W15-3) preserved byte-for-byte: 393/393 prior
+tests pass; with ``T_decoder = None`` the W15 decoder ties the W13
+layered decoder byte-for-byte on the answer field. The W15 layer
+adds the seventh structural axis to the Wevra programme; the
+runtime contract is byte-for-byte unchanged. See
+`docs/RESULTS_WEVRA_ATTENTION_AWARE.md` for the milestone note.
 
 1. **Capsule contract / runtime** — *active, advancing*. The
    contract (C1..C6) is settled. SDK v3.4 pushes capsule-native
@@ -201,9 +216,91 @@ sharp status:
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.15, 2026-04-27)
+## Current frontier (SDK v3.16, 2026-04-27)
 
-### Active moves (SDK v3.15 — structured producer protocol + W14 family — *first producer-protocol move + first real-LLM strict gain ≥ 0.50 over substrate FIFO*)
+### Active moves (SDK v3.16 — attention-aware capsule context packing + W15 family — *first decoder-side context-packing move + joint-correctness-and-context-efficiency strict-gain anchor*)
+
+- **Phase-62 attention-aware capsule context packing benchmark.**
+  ``vision_mvp.experiments.phase62_attention_aware_packing`` ships
+  three pre-committed sub-banks:
+  (i) ``T_decoder=None`` — the R-62-default sanity anchor; every
+  cross-round decoder (W11/W12/W13/W15) saturates at 1.000. The W15
+  decoder ties W13 byte-for-byte on the answer field (W15-3
+  backward-compat).
+  (ii) ``T_decoder=24`` — the R-62-tightbudget W15-1 anchor; under
+  FIFO packing the round-2 specific-tier disambiguator falls past
+  the budget and ``capsule_layered_fifo_packed`` ties FIFO at
+  ``accuracy_full = 0.000``. The W15
+  :class:`AttentionAwareBundleDecoder` salience-packs with hypothesis
+  preservation and achieves ``accuracy_full = 1.000``; +1.000 strict
+  separation, stable across 5/5 alternate ``bank_seed`` values.
+  (iii) ``T_decoder=9999`` — the R-62-saturation W15-Λ-budget
+  falsifier; under no decoder-side budget pressure the salience
+  reordering is a no-op on the answer field — both W15 and FIFO-pack
+  tie at the W13 answer (1.000). The W15-1 win is *conditional* on
+  budget pressure; this regime makes the conditionality sharp.
+- **``AttentionAwareBundleDecoder`` + ``CapsuleContextPacker`` +
+  ``FifoContextPacker`` (new).**
+  ``vision_mvp/wevra/team_coord.py``. A two-stage decoder: (1)
+  first-pass priority decode over the normalised union elects a
+  tentative ``root_cause``; (2) salience-aware repack reorders +
+  truncates the union under ``T_decoder`` (using closed-form weights
+  on tier + CCK + corroboration + magnitude + round index, with
+  ``preserve_hypotheses=True`` defaulting on) before final W13
+  layered decode. Pack-stats expose ``position_of_first_causal_claim``
+  (the proxy attention metric), ``tokens_kept_sum`` /
+  ``tokens_input_sum``, ``hypothesis_count_kept``, and
+  ``n_dropped_budget`` for direct audit. ``FifoContextPacker`` is the
+  load-bearing baseline (FIFO truncation under the same
+  ``T_decoder``). Re-exported via ``__all__``.
+- **Theorem family W15.** W15-Λ-budget (decoder-side budget
+  structural limit on R-62-tightbudget under FIFO packing,
+  proved-empirical n=40 saturated × 5 seeds + structural sketch via
+  W7-3 extension to the decoder-side axis),
+  W15-1 (AttentionAwareBundleDecoder sufficiency under bounded
+  ``T_decoder`` with hypothesis preservation, proved-conditional +
+  proved-empirical synthetic n=40 saturated × 5 seeds, +1.000 vs
+  fifo_packed_layered), W15-2 (pack determinism + closed-form
+  salience, proved by inspection + mechanically-checked), W15-3
+  (backward-compat with R-54..R-61 default banks, proved-empirical
+  full programme-wide regression 393/393 + 37 new tests = 430/430),
+  W15-Λ-degenerate (saturation falsifier on R-62-saturation,
+  proved-empirical n=8: under no decoder-side budget pressure the
+  W15-1 win is structurally invisible by construction), W15-4
+  (token-efficiency floor: ``tokens_kept ≤ T_decoder`` strict, proved
+  by inspection + mechanically-checked). The W15-C family (W15-C-real,
+  W15-C1, W15-C-LEARNED, W15-C-SYMMETRIC, W15-C-COMPOSE-W14) makes
+  real-LLM-downstream-decoder, cross-bench, learned-salience,
+  symmetric-corroboration, and W14+W15 compose extensions
+  falsifiable.
+- **Pre-committed success criterion** in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-62 anchor +
+  bar 12 — joint-correctness-and-context-efficiency split + § 2.11
+  R-62 ingredients). The SDK v3.16 result clears the **strong
+  success bar** § 1.1 on R-62-tightbudget synthetic (strict gain
+  +1.000 vs FIFO-packed-W13, stable across 5/5 (bank_seed) values,
+  no regression on R-53..R-61, audit T-1..T-7 preserved on every
+  cell, named bench property + named falsifier regime
+  W15-Λ-degenerate, AND joint-correctness-and-context-efficiency
+  split bar 12 satisfied — the new method includes a load-bearing
+  decoder-side context-packing intervention beyond every prior
+  layer). Headline data file:
+  ``docs/data/phase62_seed_sweep_tightbudget_K12_n8.json``.
+- **Honest scope.** R-62 is a *synthetic* milestone — the producer
+  is :class:`IdentityExtractor`, not a real LLM. Real-LLM transfer
+  of W15 is W15-C-real, conjectural; it requires Mac 1 / Mac 2 to
+  be online and the bundle to be re-decoded by an LLM agent under a
+  real context window. SDK v3.16 does not run this probe.
+  "Attention-aware" uses an *honest proxy* — the
+  ``position_of_first_causal_claim`` metric — not transformer
+  attention manipulation. The W15-1 win is *conditional* on (a) the
+  bench property holding, (b) ``T_decoder`` below the union token
+  sum, AND (c) round-2 carrying a specific-tier disambiguator with
+  no ``service=`` token; W15-Λ-degenerate makes the conditionality
+  sharp. The Wevra single-run product runtime contract is byte-for-
+  byte unchanged.
+
+### Prior moves (SDK v3.15 — structured producer protocol + W14 family — *first producer-protocol move + first real-LLM strict gain ≥ 0.50 over substrate FIFO*)
 
 - **Phase-61 producer-side ambiguity-preservation benchmark.**
   ``vision_mvp.experiments.phase61_producer_ambiguity_preservation``

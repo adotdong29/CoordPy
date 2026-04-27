@@ -3,7 +3,7 @@
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
 > README-of-README must satisfy these rules. Last touched: SDK
-> v3.15, 2026-04-27.
+> v3.16, 2026-04-27.
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or
@@ -108,6 +108,74 @@ theorem still says what you remember. Theorems can be sharpened
 (W3-32 → W3-32-extended), conditional premises can be added or
 removed, and conjectures can be promoted or retracted. Always
 check `THEOREM_REGISTRY.md` first.
+
+### "W15 shapes transformer attention" or "the salience pack proves attention manipulation"
+
+> *"W15 shapes transformer attention weights so the auditor's
+> decoder pays attention to the right evidence."*
+
+Forbidden. The W15 layer uses an *honest proxy* attention metric:
+the ``position_of_first_causal_claim`` in the salience-ordered
+pack. We do NOT manipulate transformer attention weights; we DO
+reorder the bundle so the highest-salience evidence appears at
+rank 0, which benefits any downstream LLM consumer via
+prompt-position attention (a well-known property of transformer
+attention under typical positional encoding regimes). The proxy
+metric is auditable; the attention claim is not.
+
+Permitted phrasings: *"W15 places the round-2 specific-tier claim
+at rank 0 of the kept bundle in 8/8 R-62-tightbudget cells (the
+proxy attention signal)"*, *"the W15 salience pack benefits any
+downstream LLM consumer via prompt-position attention shaping under
+typical transformer positional encoding regimes"*, *"the
+``position_of_first_causal_claim`` metric is the load-bearing
+auditable W15 signal"*. Forbidden: *"W15 manipulates attention
+weights"*, *"W15 proves attention shaping"*, *"the salience pack is
+an attention-mechanism intervention"*. The honest reading is: W15
+is a context-packing intervention, not an attention intervention;
+the prompt-position attention benefit follows from the packing,
+not from any model-internal change.
+
+### "W15 solves multi-agent context" or "the salience pack is universal"
+
+> *"The W15 attention-aware packer solved multi-agent context."*
+
+Forbidden. The honest reading on R-62-tightbudget at n=8 × 5 seeds
+is:
+
+* the W15 method achieves ``accuracy_full = 1.000`` on every seed;
+* ``capsule_layered_fifo_packed`` (the load-bearing FIFO baseline)
+  ties FIFO at ``accuracy_full = 0.000``;
+* ``attention_minus_fifo_packed = +1.000`` strict separation
+  on every seed.
+
+This is a strong result, but it is **not** "multi-agent context
+solved." Permitted phrasings: *"clears bar 12 of the
+SDK-v3.16-anchored success criterion"*, *"first decoder-side
+context-packing strict gain in the programme"*, *"closes the
+W15-Λ-budget gap on R-62-tightbudget under the named bench
+property"*. Forbidden: *"solves multi-agent context"*, *"the W15
+packer is universal"*, *"W15-1 holds for any decoder budget"*. The
+W15-1 win is conditional on (a) the bench property holding, (b)
+``T_decoder`` below the union token sum, AND (c) round-2 carrying
+a specific-tier disambiguator with no ``service=`` token; if any
+of the three is removed, W15-Λ-budget or W15-Λ-degenerate fires
+and the result collapses. The W15 layer is *one of seven*
+structural axes the programme has identified; "multi-agent context
+solved" requires resolving every named limit theorem on every axis,
+which the programme has not done.
+
+### "W15 makes the W14 producer protocol obsolete"
+
+Forbidden. W15 is a *decoder-side* intervention; W14 is a
+*producer-side* intervention. They compose additively:
+W15-C-COMPOSE-W14 conjectures that running W15 over a W14-emitted
+stream on R-61-ollama-structured may close the 1/8 model-error
+failure that W14 alone leaves, but this is a conjecture not yet
+empirically verified. The W15 layer does not refute W14; it adds
+an orthogonal axis. On any regime where the producer's emission
+stream is the bottleneck (R-61-ollama-naive, R-13-Λ-real), W14 is
+load-bearing and W15 has no influence on the producer side.
 
 ### "Solved real-LLM transfer" or "the structured prompt closes the W13-Λ-real gap"
 

@@ -1,12 +1,12 @@
-# Success criterion — solving multi-agent context (SDK v3.15 bar)
+# Success criterion — solving multi-agent context (SDK v3.16 bar)
 
 > Pre-committed, falsifiable bar for what counts as a *real* advance
 > on "solving multi-agent context" in the Context Zero / Wevra
 > programme. This document is the **referee** for SDK v3.9 / v3.10 /
-> v3.11 / v3.12 / v3.13 / v3.14 / v3.15 (and later milestones). Any
-> milestone note that claims an advance must name the bar it cleared
-> and cite the code-anchored evidence. Last touched: SDK v3.15,
-> 2026-04-27.
+> v3.11 / v3.12 / v3.13 / v3.14 / v3.15 / v3.16 (and later
+> milestones). Any milestone note that claims an advance must name
+> the bar it cleared and cite the code-anchored evidence. Last
+> touched: SDK v3.16, 2026-04-27.
 >
 > The history of this programme is full of moves where a partial
 > result was written up too strongly and later had to be sharpened
@@ -109,6 +109,50 @@ The **named regimes** the bar refers to (anchored in code):
   Anchor:
   `vision_mvp/experiments/phase60_open_world_normalization.py`.
 
+* **R-62** — Phase-62 *attention-aware capsule context packing under
+  decoder-side budget pressure* regime, the *new harder regime* SDK
+  v3.16 introduces. The producer-side gap was closed by W14 on R-61;
+  R-62 attacks the symmetric *downstream* gap: even when the bench
+  property holds and the cross-round capsule pipeline is in scope, a
+  strict *decoder-side* token budget ``T_decoder`` can drop the
+  round-2 specific-tier disambiguator under naive FIFO packing of the
+  admitted union. R-62 attacks this directly via two paired moves:
+    - **Multi-hypothesis comparable-magnitude events.** Each scenario
+      carries 2 gold services + 2 decoy services. Every decoy service
+      is mentioned by ≥ 2 distinct producer roles in round 1 (the W11
+      noise-decoy-drop trigger condition); every gold service is
+      mentioned by exactly 1 distinct producer role in round 1 (so
+      the W11 drop preserves golds). Multi-hypothesis means: 4
+      service hypotheses survive naive admission; the disambiguation
+      is recoverable *only* from the round-2 specific causal claim
+      AND cross-role corroboration of round-1 noise.
+    - **Decoder-side token budget.** A new strict budget ``T_decoder``
+      is enforced over the cross-round bundle the decoder consumes.
+      Default is loose (R-62-default sanity anchor); the
+      R-62-tightbudget regime sets ``T_decoder`` strictly below the
+      admitted union's token sum so the budget bites.
+  Three pre-committed sub-banks plus a named falsifier:
+    - **R-62-default** (synthetic, ``T_decoder=None``). Sanity
+      anchor: every cross-round decoder (W11 / W12 / W13 / W15)
+      saturates at ``accuracy_full = 1.000``. The W15 method ties
+      W13 byte-for-byte (W15-3 backward-compat anchor).
+    - **R-62-tightbudget** (synthetic, ``T_decoder=24``). The W15-1
+      anchor. Under FIFO packing the round-2 specific claim falls
+      past the budget and ``capsule_layered_fifo_packed`` ties FIFO
+      at ``accuracy_full = 0.000``. The W15
+      :class:`AttentionAwareBundleDecoder` reorders the union by
+      salience (CCK + tier + corroboration + magnitude + round) and
+      packs greedy with hypothesis preservation; ``accuracy_full =
+      1.000``. The strict separation is +1.000 vs FIFO-packed-W13,
+      stable across 5/5 alternate ``bank_seed`` values.
+    - **R-62-saturation** (synthetic, ``T_decoder=9999``; W15-Λ-budget
+      named falsifier). Under no budget pressure, salience reordering
+      is a no-op on the answer field — both W15 and FIFO-pack hit
+      1.000 alike. The W15-1 win is *conditional* on budget
+      pressure; this regime makes the conditionality sharp.
+  Anchor:
+  `vision_mvp/experiments/phase62_attention_aware_packing.py`.
+
 * **R-61** — Phase-61 *producer-side ambiguity-preservation* regime,
   the *new harder regime* SDK v3.15 introduces, anchored on the
   W13-Λ-real diagnosis. R-58..R-60's bottleneck under a real LLM is
@@ -187,7 +231,7 @@ The **named regimes** the bar refers to (anchored in code):
 
 ## 1. Three pre-committed bars
 
-> **SDK v3.15 anchors the bar to R-61.** Each version of this
+> **SDK v3.16 anchors the bar to R-62.** Each version of this
 > document anchors the *strict-gain regime* to the milestone-
 > specific harder regime. SDK v3.9 anchored to R-55; SDK v3.10
 > anchored to R-56; SDK v3.11 anchored to **R-57** AND introduced
@@ -199,18 +243,23 @@ The **named regimes** the bar refers to (anchored in code):
 > normalisation split: a method must survive a producer-noise
 > channel that *exceeds* the fixed-vocabulary closure when the drift
 > remains inside the heuristic abstraction closure). SDK v3.15
-> anchors the bar to **R-61** below AND introduces **bar 11**
+> anchored the bar to **R-61** AND introduced **bar 11**
 > (producer-side ambiguity-preservation split: a method must clear
 > the *prompt-side discipline* gate that W13-Λ-real identified as
 > the dominant blocker on real-LLM transfer; a downstream-only
 > method that does not address producer-side compression of the
-> bench property does NOT clear bar 11). Earlier R-55..R-60-anchored
-> bars remain valid as historical bars; the *current* bar is
-> R-61-anchored.
+> bench property does NOT clear bar 11). SDK v3.16 anchors the bar
+> to **R-62** below AND introduces **bar 12**
+> (joint-correctness-and-context-efficiency split: a method must
+> clear *both* an accuracy threshold AND an explicit decoder-side
+> token-budget constraint; a method that wins on accuracy alone
+> while ignoring decoder context budget does NOT clear bar 12).
+> Earlier R-55..R-61-anchored bars remain valid as historical bars;
+> the *current* bar is R-62-anchored.
 
 ### 1.1 Strong success bar (a "real" advance)
 
-A milestone *strongly advances* the thesis iff **all eleven** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15):
+A milestone *strongly advances* the thesis iff **all twelve** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16):
 
 1. **Code anchor.** A new admission/decoder/coordination method
    ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
@@ -275,6 +324,49 @@ A milestone *strongly advances* the thesis iff **all eleven** hold (bars 1–6 a
    FIFO at 0.000 (W13-4). The closure boundary is structural for any
    predicate-based normaliser; widening it is a research move
    (W13-C2 / W13-C3), not a structural fix.
+
+12. **(SDK v3.16+) Joint-correctness-and-context-efficiency split.**
+   The milestone-anchored harder regime (R-62-tightbudget) is
+   **provably insufficient for any FIFO-packed cross-round decoder
+   under decoder-side budget pressure** (W15-Λ-budget at the
+   decoder-side axis: every FIFO-packed cross-round decoder in the
+   SDK ties FIFO at 0.000 on R-62-tightbudget default at
+   ``T_decoder = 24``; the round-2 specific-tier disambiguator falls
+   past the budget by construction in arrival-order packing). The
+   new method must include an explicit *capsule-aware context
+   packing layer*: a salience function over admitted handoffs that
+   uses (causal tier, CCK match against the elected root_cause,
+   cross-role corroboration, magnitude, round index) to reorder
+   AND truncate the cross-round bundle under ``T_decoder``, with
+   *hypothesis preservation* so every distinct service tag's
+   highest-salience (tag, role) representatives survive the pack.
+   A pure FIFO-packed decoder OR a salience-greedy packer without
+   hypothesis preservation does NOT clear bar 12 on SDK v3.16.
+   **Pre-committed bench property:** the salience packer's pack
+   must put a round-2 specific-tier claim at rank 0 of the kept
+   bundle in *every* scenario where the bench property holds
+   (mechanically verified by ``Phase62DefaultTests
+   ::test_tightbudget_w15_keeps_round2_specific_claim``).
+   **Pre-committed token-efficiency floor:** the salience pack's
+   ``tokens_kept_over_input`` ratio is bounded by 1.0 (the budget is
+   strict, not lossy on the kept set). **Pre-committed falsifier:**
+   under no decoder-side budget pressure (R-62-saturation,
+   ``T_decoder ≥ admitted union token sum``), the W15 salience pack
+   is a no-op on the answer field — both salience-pack and FIFO-pack
+   tie at the W13 answer (W15-Λ-budget). The W15-1 win is *not*
+   observable on regimes without budget pressure — by construction.
+   **Attention-shaping caveat (honest proxy).** "Attention-aware"
+   uses an *honest proxy* metric — ``position_of_first_causal_claim``
+   in the salience-ordered pack. We do NOT claim transformer
+   attention weights are manipulated; we DO claim that under a
+   real-LLM downstream consumer, putting the highest-salience
+   evidence first benefits from prompt-position attention shaping
+   (a well-known property of transformer attention under typical
+   positional encoding regimes). This is W15's *proxy* attention
+   metric, not a transformer-attention manipulation. The bar 12
+   clearance condition uses this proxy directly: rank 0 of the
+   kept bundle must be a specific-tier claim in every cell where
+   the bench property holds.
 
 11. **(SDK v3.15+) Producer-side ambiguity-preservation split.** The
    milestone-anchored harder regime (R-61-naive-prompt) is
@@ -367,6 +459,38 @@ For SDK v3.11 specifically, the canonical phrasing instantiates as:
 > Phase-57-falsifier regime where the decoy is corroborated AND
 > mentioned via a causal claim_kind for the chosen root_cause
 > (W10-4)."*
+
+For SDK v3.16 specifically, the canonical phrasing instantiates as:
+
+> *"On R-62-tightbudget (Phase-62 multi-hypothesis comparable-magnitude
+> events under a strict decoder-side token budget ``T_decoder = 24``),
+> every FIFO-packed cross-round decoder in the SDK
+> (``capsule_layered_fifo_packed`` and the implicit FIFO truncation
+> any naive cross-round decoder would apply at this budget) ties
+> substrate FIFO at ``accuracy_full = 0.000`` — this is the
+> structural decoder-side budget limit (W15-Λ-budget: the round-2
+> specific-tier disambiguator falls past the budget under
+> arrival-order packing; no downstream layer can elect the correct
+> specific root_cause without it). The new
+> :class:`AttentionAwareBundleDecoder` (W15) — a salience-aware
+> capsule context packer with hypothesis preservation — achieves
+> ``accuracy_full = 1.000`` on R-62-tightbudget default
+> (``K_auditor = 12``, ``T_auditor = 256``, ``T_decoder = 24``,
+> ``n_eval = 8``, ``bank_seed = 11``), strictly improving over both
+> substrate FIFO (+1.000) and the SDK v3.14 W13 layered decoder under
+> FIFO packing (+1.000), stable across 5/5 alternate ``bank_seed``
+> values (11, 17, 23, 29, 31) with min gap ≥ 1.000 well above the
+> strong-bar 0.50 threshold. The W15 packer puts the round-2
+> specific-tier claim at rank 0 of the kept bundle in 8/8 scenarios
+> (the proxy attention signal); the FIFO packer keeps the round-2
+> claim in 0/8 scenarios. The win does not transfer to the
+> R-62-saturation falsifier (``T_decoder ≥ admitted union token
+> sum``) where both packers tie at W13's 1.000 (W15-Λ-budget).
+> Backward-compat preserved: R-54 / R-55 / R-56 / R-57 / R-58 /
+> R-59 / R-60 / R-61 default banks all still hit prior anchors;
+> 393/393 prior tests pass byte-for-byte; the W15 decoder with
+> ``T_decoder = None`` ties the W13 layered decoder byte-for-byte on
+> the answer field (W15-3)."*
 
 For SDK v3.15 specifically, the canonical phrasing instantiates as:
 
@@ -778,6 +902,65 @@ are provably insufficient — must combine:
 
 A regime missing any of these is *not* R-60 — it does not test
 the SDK v3.14 hypothesis.
+
+## 2.11. Required ingredients of R-62 (SDK v3.16)
+
+The "harder fair regime" introduced by SDK v3.16 — the *current*
+strict-gain anchor and the regime where decoder-side context
+packing is provably load-bearing — must combine:
+
+* **All R-58 structural ingredients (post-R-58 decoder shape).**
+  R-62 retains the two-round delayed-causal-evidence shape: round 1
+  carries generic-noise emissions on every service tag; round 2
+  carries one specific-tier disambiguating claim with no
+  ``service=`` token; decoy services do not appear in round 2.
+* **Multi-hypothesis decoy population.** Each scenario carries
+  ``|gold_services| = 2`` AND ``|decoy_services| ≥ 2``. The total
+  number of distinct service hypotheses surviving naive admission is
+  ≥ 4. Mechanically verified by
+  ``Phase62BankShapeTests::test_every_scenario_has_two_distinct_decoys``.
+* **Asymmetric corroboration shape.** Every decoy service is
+  mentioned by ≥ 2 distinct producer roles in round 1 (the W11-drop
+  trigger condition); every gold service is mentioned by exactly 1
+  distinct producer role in round 1. This is the load-bearing
+  structural separator: it lets the W11 contradiction-aware drop
+  remove decoys from the answer set without removing golds.
+  Mechanically verified by
+  ``Phase62BankShapeTests::test_all_decoys_corroborated_all_golds_single_role``.
+* **Comparable-magnitude decoy events.** Decoy round-1 spikes have
+  operational magnitudes inside the gold magnitude range so the
+  magnitude-filter producer (W14) does not trivially separate them.
+  R-62 inherits the W14-1 closure property from R-61.
+* **Decoder-side token budget ``T_decoder``.** The R-62-tightbudget
+  regime sets ``T_decoder = 24`` (per the pre-committed default), a
+  value strictly below the admitted union's token sum
+  (``≈ 27 / 28`` per scenario at K_auditor=12, n_eval=8, bank_seed=11).
+  Under this budget, FIFO packing of the union drops the round-2
+  specific-tier disambiguator by construction. Mechanically verified
+  by
+  ``Phase62DefaultTests::test_tightbudget_fifo_pack_drops_round2_specific_claim``.
+* **Saturation-falsifier sub-bank.** R-62-saturation sets
+  ``T_decoder = 9999`` (effectively unbounded). The W15-1 win
+  evaporates on this regime by construction (the salience packer
+  keeps every handoff regardless of budget). Mechanically verified
+  by
+  ``Phase62DefaultTests::test_saturation_falsifier_w15_ties_fifo_pack``.
+* **Audit-preserving.** T-1..T-7 holds on every cell of every
+  capsule strategy on every (T_decoder, bank_seed) cell.
+* **Determinism.** The Phase-62 synthetic extractor is RNG-
+  deterministic given ``(bank_seed, scenario_id)``; the W15
+  salience pack is byte-deterministic given the input handoffs +
+  the elected root_cause + ``T_decoder``.
+* **No regression on R-54..R-61.** The W15 decoder with
+  ``T_decoder = None`` ties the W13 layered decoder byte-for-byte
+  on the answer field (W15-3 backward-compat anchor). On R-58
+  default n=8 the W15 answers match W13 in 8/8 scenarios; on
+  R-54..R-57 the admitted set is small enough that the trust-
+  admission fallback fires identically under both decoders. The
+  W15 ``pack_stats`` block is purely additive on prior reports.
+
+A regime missing any of these is *not* R-62 — it does not test
+the SDK v3.16 hypothesis.
 
 ## 2.10. Required ingredients of R-61 (SDK v3.15)
 

@@ -7560,6 +7560,182 @@ structured was a model judgment error, not a protocol failure);
 over-claiming is the failure mode the ``HOW_NOT_TO_OVERSTATE.md``
 § "Solved real-LLM transfer" rules guard against.
 
+### 4.33 SDK v3.16 — attention-aware capsule context packing + W15 family (Phase-62 multi-hypothesis decoder-side budget benchmark)
+
+SDK v3.16 attacks the symmetric *downstream* gap that SDK v3.15
+left unaddressed. SDK v3.15 (W14) closed the producer-side gap on
+R-61: under the structured prompt + comparable-magnitude events,
+the bench property's cross-role decoy corroboration assumption
+survives a real Ollama 14B producer at +0.500 strict gain over
+substrate FIFO. But the W14 layer has no influence on what
+happens *between* admission and decoding. The cross-round decoders
+W11/W12/W13 consume the *full union* of admitted handoffs, with no
+token budget enforcement at the decode step. In a real-LLM
+downstream consumer (an audit agent that re-decodes the bundle for
+human-readable summarisation, or a ranker LLM that prioritises
+capsule witnesses), the bundle is a *prompt* with a *context
+window*. When the admitted union exceeds the window, the naive
+choice is FIFO truncation — drop handoffs from the tail until the
+bundle fits.
+
+The SDK v3.16 mint:
+
+1. **Multi-hypothesis comparable-magnitude events** (Phase-62).
+   Each scenario has 2 gold services + 2 decoy services. Every
+   decoy service is mentioned by ≥ 2 distinct producer roles in
+   round 1 (the W11-drop trigger condition); every gold service
+   is mentioned by exactly 1 distinct producer role in round 1
+   (so the W11 drop preserves golds). Multi-hypothesis means: 4
+   service hypotheses survive naive admission; the disambiguation
+   is recoverable *only* from the round-2 specific causal claim
+   AND cross-role corroboration of round-1 noise. The bench
+   property is mechanically verified by ``Phase62BankShapeTests``.
+2. **Decoder-side token budget** (``T_decoder``). A new strict
+   budget is enforced over the cross-round bundle the decoder
+   consumes. R-62-tightbudget sets ``T_decoder = 24``, strictly
+   below the admitted union's token sum (≈ 27/28 per scenario).
+   Under FIFO packing the round-2 specific-tier disambiguator is
+   dropped by construction (``position_of_first_causal_claim = -1``
+   in 8/8 cells). R-62-saturation sets ``T_decoder = 9999`` (no
+   budget pressure), the W15-Λ-budget falsifier anchor.
+3. **AttentionAwareBundleDecoder + CapsuleContextPacker +
+   FifoContextPacker** (W15 family). A two-stage decoder that
+   (a) runs a first-pass priority decode over the normalised union
+   to elect a tentative ``root_cause``, (b) salience-aware repacks
+   the union under ``T_decoder`` using a closed-form deterministic
+   score (``w_tier=4.0``, ``w_cck=3.0``, ``w_corroboration=1.0``,
+   ``w_magnitude=0.1``, ``w_round=0.5``) with per-(tag, role, tier)
+   hypothesis preservation, then (c) runs the W13 layered decoder
+   on the *packed* subset. Pack-stats expose
+   ``position_of_first_causal_claim`` (the proxy attention metric),
+   ``tokens_kept_sum`` / ``tokens_input_sum``,
+   ``hypothesis_count_kept``, ``n_dropped_budget``, and
+   ``salience_floor_kept`` for direct audit.
+   :class:`FifoContextPacker` is the load-bearing baseline.
+
+The W15 family's six theorems span the three structural axes named
+by the milestone:
+
+* **W15-Λ-budget** (proved-empirical n=40 saturated × 5 seeds +
+  structural sketch via W7-3 extension to the decoder-side axis):
+  on R-62-tightbudget default, every FIFO-packed cross-round
+  decoder ties FIFO at 0.000 — the round-2 specific-tier
+  disambiguator falls past the budget by construction. A
+  never-decoded handoff has no influence on the answer.
+* **W15-1** (proved-conditional + proved-empirical): pairing the
+  AttentionAwareBundleDecoder with the W13 layered decoder
+  achieves ``accuracy_full = 1.000`` on R-62-tightbudget default,
+  +1.000 strict separation vs FIFO-packed-W13, stable across 5/5
+  alternate ``bank_seed`` values.
+* **W15-2** (proved + mechanically-checked): salience score is a
+  closed-form deterministic function of the handoff's bytes plus
+  the elected root_cause; the pack is byte-deterministic given a
+  canonical tie-break order; FIFO packer preserves arrival order
+  byte-for-byte under T_decoder=None.
+* **W15-3** (proved-empirical full programme-wide regression):
+  393/393 prior tests pass; 37 new tests cover the W15 surface
+  and Phase-62; with ``T_decoder = None`` the W15 decoder ties
+  the W13 layered decoder byte-for-byte on the answer field.
+* **W15-Λ-degenerate** (proved-empirical n=8): on R-62-saturation
+  the W15-1 win is structurally invisible — both salience and
+  FIFO packers tie W13 at 1.000.
+* **W15-4** (proved + mechanically-checked): token-efficiency
+  floor — both packers strictly enforce
+  ``tokens_kept ≤ T_decoder``.
+
+**Master-plan post-v3.16 reading.** After SDK v3.16:
+
+1. **Post-v3.15 success bar.** R-62-tightbudget (multi-hypothesis
+   comparable-magnitude events + ``T_decoder = 24`` strict
+   decoder-side budget) instantiates the strong-bar regime: a
+   method must improve ``accuracy_full`` by ≥ 0.20 on
+   R-62-tightbudget vs every prior anchor including SDK v3.14 W13
+   under FIFO packing, stable across ≥ 3 ``bank_seed`` values, AND
+   clear bar 12 (joint correctness + decoder-side context budget).
+   The W15 method clears this bar with synthetic gap +1.000 (5/5
+   seeds).
+2. **W15-Λ-budget sharpens W14-Λ-prompt at the decoder-side axis.**
+   The FIFO-packed cross-round decoder collapse on R-62-tightbudget
+   reproduces the W14-Λ-prompt structural argument (a never-emitted
+   handoff has no CID; a never-decoded handoff has no influence on
+   the answer) at the decoder-side axis. The synthetic
+   counterpart makes decoder-side budget pressure mechanically
+   tractable in CI without requiring a real LLM.
+3. **What is the next benchmark?** Phase-62 is anchored as the
+   *attention-aware capsule context packing* benchmark. The next
+   milestone could attack:
+   * **W15-C-real** — the W15 salience pack plugged into a real-LLM
+     downstream re-decoder agent (Mac-1 ``qwen2.5:14b-32k``)
+     under a real context window. Falsifier: a real LLM whose
+     attention is sufficiently uniform that prompt-position
+     ordering does not change correctness.
+   * **W15-C-COMPOSE-W14** — composing W15 on the W14 R-61-ollama-
+     structured stream to close the 1/8 model-error failure that
+     W14 alone leaves.
+   * **W15-C-SYMMETRIC** — a regime with symmetric cross-role
+     corroboration (gold AND decoy both ≥ 2 distinct roles) where
+     the W11 drop fires on both — the named structural limit of
+     the current capsule pipeline; the natural next-axis open
+     question for SDK v3.17+.
+   * **W15-C-LEARNED** — a learned salience scorer that
+     outperforms the closed-form W15 weights on a held-out test
+     set.
+4. **Is the structural win materially stronger than v3.15?**
+   **Yes — it adds a structurally-orthogonal seventh axis.**
+   The W14 layer is a *producer-side* intervention; the W15 layer
+   is a *decoder-side* intervention. They compose additively. The
+   Wevra programme now has seven coupled structural axes with
+   named limit theorems on each, and the W15 layer is the first
+   to make *joint correctness AND decoder-side context efficiency*
+   the strict-gain anchor.
+
+The defensible "thesis-after-SDK-v3.16" is that the synthetic→
+real-LLM-and-bounded-context transfer story now has **seven
+layers**:
+
+* **Layer 1 (W6-C2 falsified):** un-normalised admission cannot
+  transfer.
+* **Layer 2 (W12-Λ at the real-LLM axis):** un-normalised cross-
+  round decoding cannot transfer.
+* **Layer 3 (SDK v3.13, W12-1):** fixed-vocabulary normalised
+  cross-round decoding DOES transfer, conditional on the closed-
+  vocabulary closure.
+* **Layer 4 (SDK v3.14, W13-1):** layered (exact + heuristic)
+  normalised cross-round decoding DOES transfer on a strictly
+  *wider* drift channel, conditional on the heuristic predicate
+  closure.
+* **Layer 5 (SDK v3.14, W13-Λ-real, empirical):** real Ollama 14B
+  at default settings does not produce the drift OR the cross-role
+  decoy corroboration shape — the gating axis is *event-shape
+  design + prompt-side discipline*, not normalisation.
+* **Layer 6 (SDK v3.15, W14-1 + W14-Λ-real, conditional):** the
+  structured producer protocol + comparable-magnitude events
+  combined with the cross-round capsule pipeline DOES transfer
+  on a real-LLM stream at +0.500 strict gain over substrate FIFO,
+  conditional on (a) the redesigned events, (b) the structured
+  prompt, (c) the cross-round pipeline.
+* **Layer 7 (SDK v3.16, W15-1 + W15-Λ-budget, conditional):** the
+  attention-aware capsule context packer + hypothesis preservation
+  DOES restore correctness when the cross-round bundle is bounded
+  by a strict decoder-side token budget, conditional on the
+  multi-hypothesis bench property + budget pressure existing. The
+  W15 layer adds an *orthogonal* axis to the prior six: even when
+  W11/W12/W13/W14 all succeed at producing a clean ambiguity-
+  preserving union, the union may exceed the downstream context
+  budget — and FIFO truncation drops the load-bearing
+  disambiguator. W15 is the structural fix.
+
+The W15-Λ-degenerate falsifier sharpens the structural composition:
+*no decoder-side budget pressure* removes the W15 advantage by
+construction. This is *not* a refutation — it is the named
+counterexample regime that confirms W15-1 is a conditional, not a
+universal, win. The **honest cap** on the SDK v3.16 advance is
+therefore the synthetic-only scope: real-LLM downstream-decoder
+transfer (W15-C-real) is conjectural and not yet wired.
+Over-claiming is the failure mode the ``HOW_NOT_TO_OVERSTATE.md``
+§ "W15 shapes transformer attention" and § "W15 solves multi-agent
+context" rules guard against.
+
 ---
 
 ## 5. End goals
