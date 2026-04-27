@@ -5,12 +5,12 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.13,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.14,
 > 2026-04-26.
 
 ## TL;DR
 
-The programme now has **nine** coupled research axes, each with a
+The programme now has **ten** coupled research axes, each with a
 sharp status:
 
 1. **Capsule contract / runtime** — *active, advancing*. The
@@ -201,7 +201,162 @@ sharp status:
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.13, 2026-04-26)
+## Current frontier (SDK v3.14, 2026-04-26)
+
+### Active moves (SDK v3.14 — layered open-world normalisation + real-Ollama probe + W13 family — *first open-world normalisation move and first real-Ollama transfer measurement*)
+
+- **Phase-60 open-world normalisation + real-Ollama benchmark.**
+  ``vision_mvp.experiments.phase60_open_world_normalization``
+  ships three pre-committed sub-banks plus an opt-in real-Ollama
+  extension:
+  (i) ``synthetic_wide_oov_llm`` — the W13-1 anchor; the producer
+  emits drifted variants from
+  :data:`HEURISTIC_RESCUABLE_OOV_KINDS` (every entry verified
+  *outside* :data:`CLAIM_KIND_SYNONYMS` and *inside* the W13
+  heuristic closure); pre-committed default
+  ``K_auditor=8, T_auditor=256, n_eval=12, bank_seed=11,
+  wide_oov_prob=0.50, svc_token_alt_prob=0.30``. Headline: ``capsule_layered_multi_round`` achieves
+  ``accuracy_full = 1.000`` while ``capsule_robust_multi_round``
+  (W12) **and** every other strategy ties FIFO at 0.000 — the
+  *first strict separation between layered (open-world) and
+  fixed-vocabulary normalisation* in the programme; +1.000 vs every
+  un-widened method including SDK v3.13 W12; stable across **5/5**
+  alternate (bank_seed, llm_seed) values with min gap layered − w12
+  = +0.917 (well above the 0.50 stability threshold).
+  (ii) ``synthetic_cosmic_oov_llm`` — the W13-4 closure-boundary
+  anchor; round-2 specific-tier kinds are replaced by entries from
+  :data:`COSMIC_OOV_KINDS` (every entry verified outside both
+  layers); ``capsule_layered_multi_round`` ties FIFO at 0.000 on
+  8/8 falsifier scenarios.
+  (iii) ``synthetic_clean_llm`` + cross-regime audit — the W13-3
+  backward-compat anchor; on R-58 / R-59 / R-60-clean / R-54..R-57,
+  the W13 decoder produces byte-for-byte the same answer as W11 /
+  W12 (heuristic layer fires zero times); R-54..R-58 / R-59-noisy
+  anchors all preserved at ``accuracy_full = 1.000``.
+  (iv) ``ollama`` — the R-60-ollama probe; talks Mac-1
+  ``qwen2.5:14b-32k`` on the same Phase-58 events; raw producer
+  responses captured into the report. **Honest negative finding
+  (W13-Λ-real, see § *Active observations* below)**: real Ollama 14B
+  emits canonical kinds and filters low-magnitude decoy events;
+  the bench property holds in 0/4 scenarios; W13 has nothing to
+  rescue and ties W12.
+- **``LayeredClaimNormalizer`` + ``LayeredRobustMultiRoundBundleDecoder``
+  (new).** ``vision_mvp/wevra/team_coord.py``. Two-layer normaliser:
+  (a) exact :data:`CLAIM_KIND_SYNONYMS` lookup (the W12 path); (b)
+  ordered :data:`_HEURISTIC_KIND_RULES` regex-predicate abstraction
+  rules whose union strictly widens the W12 closure; (c) optional
+  abstention via the :data:`LAYERED_NORMALIZER_ABSTAIN` sentinel.
+  Per-call counters expose load-bearing layer breakdowns
+  (``n_exact``, ``n_heuristic``, ``n_abstained``, ``n_passthrough``,
+  ``rule_hits``). Re-exported as ``LayeredClaimNormalizer``,
+  ``LayeredRobustMultiRoundBundleDecoder``,
+  ``HeuristicAbstractionRule``, ``LAYERED_NORMALIZER_ABSTAIN``.
+- **Theorem family W13.** W13-Λ-fixed (fixed-vocabulary closure
+  limit on R-60-wide, proved-empirical n=12 + structural sketch),
+  W13-1 (LayeredRobustMultiRoundBundleDecoder sufficiency under
+  bounded OOV in the heuristic closure, proved-conditional + proved-
+  empirical n=60 saturated across 5 seeds), W13-2 (heuristic
+  abstraction soundness, proved by inspection + mechanically-
+  checked), W13-3 (backward-compat with R-54..R-58 + R-59 + R-60-
+  clean, proved-empirical n=8 each + cross-regime audit), W13-4
+  (cosmic-OOV closure boundary, proved-empirical n=8 saturated),
+  W13-Λ-real (real Ollama 14B canonical-kind + magnitude-filtering
+  observation, empirical-research n=4 producer-side observation +
+  12 real Ollama calls). The W13-C family (W13-C1..W13-C4) makes
+  cross-bench, learned-normaliser, real-Ollama-with-redesigned-
+  events, and abstention-aware-decoder extensions falsifiable.
+- **Pre-committed success criterion** in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-60 anchor +
+  bar 10 — open-world normalisation split + § 1.4 R-60-ollama
+  4-tier grading). The SDK v3.14 result clears the **strong success
+  bar** § 1.1 on R-60-wide (strict gain ≥ 0.20 vs every fixed-
+  vocabulary method including SDK v3.13 W12, stable across ≥ 3
+  (bank_seed, llm_seed) values, no regression on
+  R-53..R-59 / R-60-clean, audit T-1..T-7 preserved on every cell,
+  named bench property + named falsifier regime W13-4, AND open-
+  world normalisation split bar 10 satisfied — the new method
+  includes a load-bearing heuristic abstraction layer beyond the
+  exact synonym table). The R-60-ollama probe lands at the
+  **R-60-OLLAMA-C tier** (honest null real transfer): the milestone
+  is therefore a *strong-success on R-60-wide synthetic + a
+  partial-success / honest-null on R-60-ollama*, NOT a strong
+  cross-axis advance. § 1.4 of the success criterion makes this
+  partition pre-committed and falsifiable.
+- **Honest scope.** The W13-1 win is *conditional* on (a) the named
+  bench property (R-58 delayed-causal-evidence shape with the
+  Phase-60 wide-OOV drift channel), (b) the producer-noise channel
+  being bounded by the *heuristic* closure (every variant in
+  :data:`HEURISTIC_RESCUABLE_OOV_KINDS` matches at least one
+  pattern in :data:`_HEURISTIC_KIND_RULES`), AND (c) round-N
+  admission not being budget-starved (inherits W11-4). The W13-4
+  falsifier regime is the explicit counterexample; the W13-Λ-real
+  observation is a *separate, honest, partial* outcome. The W13
+  method is research-grade SDK code, additive on top of W12.
+
+### Active observations (SDK v3.14)
+
+- **W13-Λ-real (honest negative).** Real Ollama 14B
+  (qwen2.5:14b-32k on Mac 1, ``temperature=0``) on the calibrated
+  Phase-58 incident-triage prompt does NOT generate the R-58
+  delayed-causal-evidence bench property: across 4 scenarios × 12
+  producer calls, the LLM emits 0 drifted kinds (every claim_kind
+  is canonical) and filters low-magnitude decoy events as noise
+  (the ``monitor`` role emits ``NONE`` for the deliberately-low-
+  magnitude decoy events, breaking the cross-role decoy
+  corroboration assumption). The bench property holds in 0/4
+  scenarios; normalisation has nothing to rescue; W13 ties W12 ties
+  multi_round at ``accuracy_full = 0.250``. The R-60-ollama probe
+  is therefore a *measurement*, not a *claim*: the synthetic→real-
+  LLM transfer story has **five layers** —
+  (i) un-normalised admission cannot transfer (W6-C2 falsified),
+  (ii) un-normalised cross-round decoding cannot transfer
+  (W12-Λ at the real-LLM axis),
+  (iii) fixed-vocabulary normalisation transfers under bounded
+  *synthetic* drift (W12-1, conditional),
+  (iv) heuristic-widened normalisation transfers under bounded
+  *open-world* drift inside the heuristic closure (W13-1,
+  conditional),
+  (v) real Ollama 14B at default settings does not produce the
+  drift OR the cross-role decoy corroboration shape (W13-Λ-real,
+  empirical observation; the gating axis on real Ollama is *event-
+  shape design + prompt-side discipline*, not normalisation).
+  Future work: redesign the events so the decoy has comparable
+  magnitudes to gold (W13-C3) — and accept that the contribution
+  shifts from "the normaliser" to "the prompt + event design".
+
+### Active conjectures (SDK v3.14)
+
+- **W13-C1**: cross-bench transfer of the W13 closure-widening
+  contract to non-incident-triage benchmark families.
+  Conjectural; falsifier = a benchmark family where any size-
+  bounded predicate set covers < 50 % of LLM kind drift.
+- **W13-C2**: a learned normaliser strictly widens the W13
+  heuristic closure on R-60-cosmic. Conjectural; restated as a
+  closure-widening move, not a structural fix.
+- **W13-C3**: real-Ollama transfer of W13-1 with redesigned
+  events. Conjectural; Phase-60 v2 candidate.
+- **W13-C4**: abstention as a load-bearing signal — an
+  abstention-aware decoder strictly improves over a passthrough
+  decoder. Conjectural; the abstention sentinel is implemented but
+  the abstention-aware decoder is not yet wired.
+
+### Discharged / partially-discharged conjectures (SDK v3.14)
+
+- **W12-C2** (SDK v3.13; real-Ollama transfer of W12-1).
+  **PARTIALLY DISCHARGED-empirical** (negatively): real Ollama 14B
+  on the Phase-58 events does NOT emit drift, so the W12 advance
+  is *structurally invisible* on R-60-ollama (W13-Λ-real). The
+  W12-C2 question reframes as: under what (event design × prompt)
+  does a real LLM emit non-trivial bounded drift? — that is W13-C3.
+- **W12-C3** (SDK v3.13; learned synonym table widens the W12
+  closure). **PARTIALLY DISCHARGED-empirical** by W13-1: a
+  *heuristic* layered normaliser strictly widens the closure
+  beyond the fixed table on R-60-wide. The *learned* variant
+  remains conjectural (W13-C2). The W13-4 closure boundary applies
+  to any predicate-based normaliser, learned or not — a learned
+  normaliser only widens, does not eliminate, the closure.
+
+## Previous frontier (SDK v3.13, 2026-04-26)
 
 ### Active moves (SDK v3.13 — real-LLM-robust multi-round bundle decoder + W12 family — *first synthetic→real-LLM transfer move*)
 
@@ -901,9 +1056,27 @@ sharp status:
 ## What we are NOT actively claiming
 
 - **Not** "we solved context."
-- **Not** "we solved multi-agent context." SDK v3.13's W12-1 result
-  is the strongest *real-LLM-shaped-stream* structural-win the
-  programme has produced (RobustMultiRoundBundleDecoder wins on
+- **Not** "we solved multi-agent context." SDK v3.14's W13-1 result
+  is the strongest *open-world-drift-under-bounded-heuristic-
+  closure* structural-win the programme has produced
+  (LayeredRobustMultiRoundBundleDecoder wins on R-60-wide by +1.000
+  vs every fixed-vocabulary method **including SDK v3.13 W12**;
+  backward-compatible on R-54..R-58 / R-59 / R-60-clean; stable
+  across 5/5 (bank_seed, llm_seed) values; named bench property +
+  named falsifier regime W13-4), but it is still **conditional on**
+  (a) the bench property (R-58 delayed-causal-evidence shape with
+  the Phase-60 wide-OOV drift channel), (b) the producer-noise
+  channel being bounded by the heuristic closure, AND (c) round-N
+  admission not being budget-starved (inherits W11-4). On a real
+  Ollama producer at the 14B class, the bench property does NOT
+  hold by default (W13-Λ-real); the synthetic→real-LLM transfer is
+  gated by event-shape design + prompt-side discipline, not by
+  normalisation. This is an honest empirical finding, not a closure
+  of the question.
+
+  SDK v3.13's W12-1 result remains the strongest *real-LLM-shaped-
+  stream* (synthetic noisy) structural-win the programme has
+  produced (RobustMultiRoundBundleDecoder wins on
   R-59 by +1.000 vs every un-normalised single-round / multi-round
   method **including SDK v3.12 W11**; backward-compatible on
   R-54 / R-55 / R-56 / R-57 / R-58 / R-59-clean; stable across

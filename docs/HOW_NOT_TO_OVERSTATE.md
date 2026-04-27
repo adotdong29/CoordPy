@@ -3,7 +3,7 @@
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
 > README-of-README must satisfy these rules. Last touched: SDK
-> v3.13, 2026-04-26.
+> v3.14, 2026-04-26.
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or
@@ -443,6 +443,117 @@ ahead of the W11 multi-round bundle decoder; the closure property
 on the noise channel is the load-bearing premise; the real-Ollama
 transfer (W12-C2) is the next data point."
 
+### Labelling the W13-1 win as unconditional
+
+> *"Layered open-world normalisation solves real-LLM multi-agent
+> context."*
+
+Forbidden without the conditions. The defensible W13-1 reading
+names the bench properties **and** the closure contract **and** the
+honest real-LLM caveat:
+
+* **R-58 delayed-causal-evidence shape.** R-60-wide inherits R-58's
+  four properties; without them the W11 contradiction-aware drop
+  cannot fire even after layered normalisation.
+* **Bounded producer-noise channel inside the heuristic closure.**
+  Every variant the wide-OOV extractor emits must be in
+  :data:`HEURISTIC_RESCUABLE_OOV_KINDS` AND must match at least one
+  pattern in :data:`_HEURISTIC_KIND_RULES`. The closure-membership
+  property is mechanically verified by
+  ``W13ClosureTests::test_every_wide_oov_variant_outside_w12_inside_w13``.
+* **Heuristic abstraction rules fit the benchmark family.** The
+  default :data:`_HEURISTIC_KIND_RULES` is fitted to the closed-
+  vocabulary incident-triage claim grammar; other benchmark
+  families need their own rule sets (W13-C1).
+* **Round-N admission not budget-starved** (inherits W11-4).
+
+Permitted: "On the Phase-60 default config (K_auditor=8, n_eval=12,
+``synthetic_wide_oov_llm`` extractor at ``wide_oov_prob=0.50``;
+bench property holds 12/12 after layered normalisation),
+``LayeredRobustMultiRoundBundleDecoder`` achieves
+``accuracy_full = 1.000`` against every fixed-vocabulary method
+including W12 ``RobustMultiRoundBundleDecoder`` at 0.000 — a
++1.000 strict separation under the named bounded-OOV-in-heuristic-
+closure channel (W13-1). On real Ollama 14B (R-60-ollama), the
+bench property does not hold and the W13 advance is structurally
+invisible — see § 1.4 of the success criterion (R-60-OLLAMA-C
+honest negative)."
+
+Forbidden: "W13 solves real-LLM multi-agent context."
+Forbidden: "Layered normalisation always beats W12."
+(Without the bench-shape + closure-membership conditions named.)
+Forbidden: "Real Ollama 14B drifts kinds and W13 rescues the run."
+(The empirical observation is the *opposite*: real Ollama 14B
+emits canonical kinds at temperature 0; the W13 advance is on
+synthetic wide-OOV, not on real-LLM drift.)
+Forbidden: "The synthetic→real-LLM transfer is closed."
+(R-60-ollama is R-60-OLLAMA-C honest-null; the transfer story has
+five layers and the real-LLM gate is event-shape / prompt-side
+discipline, not normalisation.)
+
+### Labelling the heuristic abstraction layer "open-world generalisation"
+
+> *"Wevra now generalises to open-world LLM drift."*
+
+Forbidden without the closure boundary disclosure. The W13-1 result
+is *closure widening*, not *closure elimination*:
+
+* The heuristic rule set has a *finite predicate union*. Inputs
+  whose surface form witnesses none of the patterns escape the
+  closure.
+* The W13-4 falsifier (R-60-cosmic) is the named structural limit:
+  truly arbitrary OOV (XYZZY_QQQQ, COSMIC_RAY_FLIP, …) ties
+  ``LayeredRobustMultiRoundBundleDecoder`` at FIFO 0.000.
+* The W13 method *widens* the W12 closure on the kinds the
+  benchmark family's heuristic rules cover; it does not generalise
+  to arbitrary LLM drift.
+
+Permitted: "W13 widens the W12 fixed-vocabulary closure on the
+incident-triage benchmark family by adding a small set of regex-
+predicate abstraction rules; the new closure strictly contains the
+W12 closure on R-60-wide (proved-empirical) and is bounded above
+by the predicate union (W13-4)."
+
+Forbidden: "W13 normalises arbitrary LLM drift."
+Forbidden: "W13 generalises to any benchmark family."
+(W13-C1 is conjectural for non-incident-triage families.)
+
+### Labelling the R-60-ollama probe a "real-LLM win"
+
+> *"SDK v3.14 wins on real Ollama 14B."*
+
+Forbidden. The honest reading is the four-tier R-60-ollama grading
+(§ 1.4 of the success criterion):
+
+* SDK v3.14's R-60-ollama observation lands at **R-60-OLLAMA-C
+  (null real transfer; honest negative)**: real Ollama 14B at
+  temperature 0 on the calibrated incident-triage prompt does not
+  drift kinds AND filters low-magnitude decoy events. The bench
+  property holds in 0/4 scenarios; W12 / W13 normalisation has
+  nothing to rescue.
+* The W13 advance is on R-60-wide synthetic, NOT on R-60-ollama.
+* The R-60-ollama probe is a *measurement* anchor; it falsified the
+  conjecture (W12-C2) that real Ollama would emit non-trivial
+  drift on this prompt. It does NOT falsify the W13 method itself
+  on R-60-wide.
+
+Permitted phrasings:
+
+* "SDK v3.14 clears the strong success bar of
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` § 1.1 (R-60
+  anchor) on the Phase-60 wide-OOV synthetic regime; the R-60-
+  ollama probe lands at the R-60-OLLAMA-C tier (honest null real
+  transfer) — the milestone is therefore strong-success on R-60-
+  wide AND a partial-success / honest-null on R-60-ollama."
+* "Real Ollama 14B at default settings emits canonical kinds and
+  filters low-magnitude decoy events; the synthetic→real-LLM
+  transfer story is gated by event-shape design + prompt-side
+  discipline (W13-Λ-real), not by normalisation. SDK v3.14 measures
+  this honestly without overclaiming."
+
+Forbidden: "SDK v3.14 closes synthetic→real-LLM transfer."
+Forbidden: "Real Ollama 14B emits drift; W13 rescues it."
+
 ## Change log
 
 - **2026-04-26 (SDK v3.3).** Initial canonical version. Adds
@@ -487,6 +598,21 @@ transfer (W12-C2) is the next data point."
   decoy); "W8 was wrong" — W8 is *unchanged* and still wins on
   Phase 55, W9 is a strict generalisation that adds Phase 56,
   not a refutation.
+- **2026-04-26 (SDK v3.14).** Adds W13 rules: forbidden phrases
+  "layered open-world normalisation solves real-LLM multi-agent
+  context" without the closure-membership conditions; "Wevra now
+  generalises to open-world LLM drift" without the W13-4 closure
+  boundary disclosure; "SDK v3.14 wins on real Ollama 14B" without
+  the R-60-OLLAMA-C honest-null tier disclosure; "we solved
+  multi-agent context" still forbidden after R-60-wide — the
+  strongest cross-regime win now spans **seven** named regimes
+  (R-54..R-58 + R-59 noisy + R-60-wide) AND a real-LLM
+  *measurement* (R-60-ollama, honest-null), but is conditional on
+  bounded drift inside a finite predicate-set closure; "W12 was
+  wrong" — W12 is *unchanged* and still wins on R-58 / R-59 /
+  R-60-clean / R-60-synonym, W13 is a strict additive widening
+  layer that adds R-60-wide, not a refutation.
+
 - **2026-04-26 (SDK v3.13).** Adds W12 rules: forbidden phrases
   "robust multi-round bundle decoding solves real-LLM multi-agent
   context" without the bench-shape + closure-property conditions;

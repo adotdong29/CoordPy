@@ -218,6 +218,10 @@ from .team_coord import (
     # SDK v3.13 — real-LLM-robust multi-round bundle decoder (W12 family).
     RobustMultiRoundBundleDecoder, CLAIM_KIND_SYNONYMS,
     normalize_claim_kind, normalize_payload, normalize_handoff,
+    # SDK v3.14 — layered open-world normaliser + decoder (W13 family).
+    HeuristicAbstractionRule, LayeredClaimNormalizer,
+    LayeredRobustMultiRoundBundleDecoder,
+    LAYERED_NORMALIZER_ABSTAIN,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -231,7 +235,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.13"
+SDK_VERSION = "wevra.sdk.v3.14"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -325,6 +329,10 @@ __all__ = [
     # SDK v3.13 — real-LLM-robust multi-round bundle decoder (W12 family).
     "RobustMultiRoundBundleDecoder", "CLAIM_KIND_SYNONYMS",
     "normalize_claim_kind", "normalize_payload", "normalize_handoff",
+    # SDK v3.14 — layered open-world normaliser + decoder (W13 family).
+    "HeuristicAbstractionRule", "LayeredClaimNormalizer",
+    "LayeredRobustMultiRoundBundleDecoder",
+    "LAYERED_NORMALIZER_ABSTAIN",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

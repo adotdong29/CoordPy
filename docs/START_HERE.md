@@ -17,7 +17,8 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.13)         | [`RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md`](RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md) |
+> | Latest milestone (SDK v3.14)         | [`RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md`](RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md) |
+> | Previous milestone (SDK v3.13)       | [`RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md`](RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md) |
 > | Previous milestone (SDK v3.12)       | [`RESULTS_WEVRA_MULTI_ROUND_DECODER.md`](RESULTS_WEVRA_MULTI_ROUND_DECODER.md) |
 > | Previous milestone (SDK v3.11)       | [`RESULTS_WEVRA_BUNDLE_DECODER.md`](RESULTS_WEVRA_BUNDLE_DECODER.md) |
 > | Pre-committed success bar (SDK v3.13)| [`SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`](SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md) |
@@ -36,7 +37,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.13 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.14 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
@@ -68,6 +69,39 @@ limit), while pairing W9 admission with the new
 achieves 1.000 — the first capsule-native multi-agent coordination
 method that crosses the admission/decoding split** (W10 family,
 SDK v3.11).
+SDK v3.14's headline result is the **first open-world
+normalisation move** in the programme: on the new Phase-60
+``synthetic_wide_oov_llm`` regime (R-60-wide; producer emits LLM
+variants from :data:`HEURISTIC_RESCUABLE_OOV_KINDS` whose every
+entry is verified outside :data:`CLAIM_KIND_SYNONYMS`), the new
+``LayeredRobustMultiRoundBundleDecoder`` (W13: exact synonym table
+→ ordered heuristic abstraction rules → optional abstention,
+ahead of the W11 multi-round bundle decoder) achieves
+``accuracy_full = 1.000`` while the SDK v3.13 W12
+``RobustMultiRoundBundleDecoder`` ties FIFO at 0.000 — a
+**+1.000** strict separation, stable across **5/5** alternate
+(bank_seed, llm_seed) values with min gap layered − w12 = +0.917.
+This sharpens W12-4 into the named limit theorem **W13-Λ-fixed**
+(any fixed-vocabulary table has a finite closure) and widens the
+practical closure with the heuristic predicate union. The named
+falsifier **W13-4** (R-60-cosmic, truly arbitrary OOV outside
+both layers) ties FIFO at 0.000, preserving the structural bound
+on any predicate-based normaliser. Backward-compat preserved:
+R-54 / R-55 / R-56 / R-57 / R-58 / R-59 / R-60-clean all still
+hit ``accuracy_full = 1.000``. The opt-in ``ollama`` mode is the
+**first real-Ollama probe** through the team-coord pipeline; on
+Mac-1 ``qwen2.5:14b-32k`` at temperature 0 it produces a
+**R-60-OLLAMA-C tier honest negative** (W13-Λ-real): the LLM
+emits canonical kinds AND filters low-magnitude decoy events as
+noise, so the bench property holds in 0/4 scenarios and W13/W12
+have nothing to rescue. The synthetic→real-LLM transfer story
+therefore has five layers and the real-LLM gating axis is
+event-shape design + prompt-side discipline (W13-C3), not
+normalisation. SDK v3.13's
+real-LLM-robust multi-round bundle decoder remains the W12-1
+anchor for synthetic noisy transfer; W13 is a strict additive
+layer that adds R-60-wide, not a refutation.
+
 SDK v3.11's headline result is the **third consecutive
 strong-bar conditional structural win** in the programme: on the
 Phase-57 deterministic decoder-forcing benchmark, the new joint

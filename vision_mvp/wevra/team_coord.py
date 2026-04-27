@@ -2503,6 +2503,423 @@ class RobustMultiRoundBundleDecoder:
         return self.decode_rounds([handoffs])
 
 
+# =============================================================================
+# SDK v3.14 — Layered open-world normaliser + decoder (W13 family)
+# =============================================================================
+#
+# W12 attacked the real-LLM-noise axis with a *fixed closed-vocabulary*
+# synonym table. The named limit theorem on the W12 method is W12-4:
+# any kind variant outside :data:`CLAIM_KIND_SYNONYMS` survives
+# normalisation unchanged and the priority decoder cannot match it.
+# In practice, real LLMs (and any future producer the synthetic
+# extractor was not calibrated against) emit a steady tail of
+# variants the table never saw — call this the *open-world drift
+# channel*.
+#
+# W13 attacks that boundary with a *layered* normaliser:
+#
+#   1. **Exact synonym table** — the W12 path. Lossless on calibrated
+#      drift; idempotent on canonical input; the W12-2 closure
+#      contract is preserved unchanged.
+#   2. **Heuristic abstraction rules** — a small, ordered table of
+#      regex predicates over the upper-cased kind text. Each rule's
+#      output is a canonical kind in ``_DECODER_PRIORITY``. Rules are
+#      designed to fire on substring witnesses ("DEADLOCK", "POOL +
+#      EXHAUST", "DISK + FILL", "QUERY + SLOW") that the calibrated
+#      table did not enumerate. The rules trade a tiny soundness risk
+#      (an arbitrary kind that incidentally contains "DEADLOCK" gets
+#      mapped to the deadlock canonical) for a strict closure
+#      widening: every variant the W12-4 falsifier emits
+#      (DEADLOCK_PROBABLY_DETECTED_MAYBE, POOL_LOOKING_BUSY,
+#      QUERY_SOMEWHAT_SLUGGISH, DISK_GETTING_FULL_PROBABLY) is in the
+#      W13 closure.
+#   3. **Abstention or pass-through** — when no exact entry and no
+#      heuristic rule fires, the normaliser either returns the input
+#      unchanged (W12 default) or returns a sentinel ``ABSTAINED``
+#      that the decoder can treat as "unknown evidence; do not vote
+#      this kind into the priority decoder." Abstention preserves
+#      determinism while exposing OOV rate as a load-bearing metric.
+#
+# Honest scope (W13)
+# ------------------
+# The heuristic layer **widens** the W12 closure but does not
+# eliminate the closure boundary. A truly arbitrary OOV kind
+# (``X_QQQQ_PPPP``, a random hash, a phrase the rule set never
+# imagined) still escapes both layers. W13-4 is the named falsifier:
+# at high enough drift across an *unbounded* variant distribution,
+# the layered normaliser ties FIFO at 0.000 — same shape as W12-4 but
+# with a *strictly larger* closure.
+#
+# The W13-1 advance is therefore *conditional widening*: the
+# heuristic rules form a closed-vocabulary set of predicates; their
+# union covers more inputs than the exact table; the W13-Λ-fixed
+# limit (proved by inspection) is that any predicate set that runs in
+# bounded time on an unbounded input language has a finite vocabulary
+# of *outputs* and a finite set of *firing patterns* — so OOV inputs
+# whose surface form witnesses none of the patterns escape the W13
+# closure too. Beyond W13 we would need a fundamentally different
+# mechanism — e.g. an embedding-distance lookup, an LLM-distilled
+# rewriter, or richer prompt-side discipline (W13-C2/W13-C3).
+
+
+@dataclasses.dataclass(frozen=True)
+class HeuristicAbstractionRule:
+    """One predicate-to-canonical rule in the W13 layered normaliser.
+
+    Fields
+    ------
+    pattern
+        ``re.compile`` object whose ``search`` is the predicate. The
+        search is case-folded against the upper-cased kind text in
+        :func:`LayeredClaimNormalizer.normalize`.
+    canonical
+        The canonical kind label this rule resolves to. Must appear
+        as a key in :data:`_DECODER_PRIORITY`.
+    name
+        A short stable identifier ("deadlock", "pool_exhaust", …) used
+        in audit reporting.
+    """
+    pattern: Any
+    canonical: str
+    name: str
+
+
+# Sentinel returned by :func:`LayeredClaimNormalizer.normalize` when
+# both the exact table and the heuristic rules miss AND the normaliser
+# is in abstention mode. The priority decoder ignores it (it is not in
+# ``_DECODER_PRIORITY``); the layered decoder counts it as OOV.
+LAYERED_NORMALIZER_ABSTAIN = "_W13_ABSTAINED_"
+
+
+# Heuristic abstraction rules. Each pattern is matched against the
+# *upper-cased* kind text. Order matters — first match wins.
+#
+# Soundness contract (W13-2):
+#   * Every rule's canonical output is a key in ``_DECODER_PRIORITY``.
+#   * Rules are designed so the canonical kinds themselves match each
+#     rule's pattern (idempotency on canonical: the heuristic layer
+#     never disagrees with the exact-table layer on canonical input).
+#   * Rules are ordered most-specific-first so multi-word kinds like
+#     ``DISK_FULL`` resolve before single-word ``DISK`` would.
+#
+# Soundness risk (declared, not denied):
+#   * A truly random kind that incidentally contains, say, "DEADLOCK"
+#     ("DEADLOCK_IS_AWESOME") is mapped to the deadlock canonical.
+#     The W13 method's audit flags this in the heuristic-rewrite
+#     counter, so a downstream operator can spot suspicious inputs.
+_HEURISTIC_KIND_RULES: tuple[HeuristicAbstractionRule, ...] = (
+    # Storage tier — disk fill family.
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\bDISK[_ ]*(FILL|FULL|OVERFLOW|"
+                              r"GETTING[_ ]*FULL|NEAR[_ ]*FULL|"
+                              r"USAGE[_ ]*CRITICAL|AT[_ ]*CAPACITY|"
+                              r"OUT[_ ]*OF[_ ]*SPACE)"),
+        canonical="DISK_FILL_CRITICAL",
+        name="disk_fill"),
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\bCRON[_ ]*(OVERRUN|TIMEOUT|LATE|"
+                              r"MISSED|FAILED|STUCK)"),
+        canonical="CRON_OVERRUN",
+        name="cron_overrun"),
+    # Database — pool exhaustion family. Order matters: pool rules
+    # come before slow-query rules because POOL is a stronger witness.
+    # Two-pattern OR: the first matches direct adjacency
+    # (POOL_EXHAUST*, POOL_FULL, POOL_SATUR*, POOL_MAX*,
+    # POOL_BUSY, POOL_LOOKING_BUSY); the second is a conjunctive
+    # look-ahead that fires when POOL appears anywhere alongside any
+    # capacity-witness word ("AT_CAPACITY", "FULL_NOW",
+    # "SATURATED_OBSERVED", "MAX_REACHED"). The look-ahead lets the
+    # rule absorb LLM variants like POOL_AT_CAPACITY,
+    # CONNECTION_POOL_FULL_NOW that the direct pattern does not catch.
+    HeuristicAbstractionRule(
+        pattern=_re.compile(
+            r"(?=.*\b(CONNECTION[_ ]*)?POOL)"
+            r"(?=.*(EXHAUST|EXHAUSTED|EXHAUSTION|FULL|"
+            r"SATURAT|SATURATED|MAX(ED|IMUM)?|"
+            r"BUSY|CAPACITY|LIMIT|OVERLOAD))"),
+        canonical="POOL_EXHAUSTION",
+        name="pool_exhaustion"),
+    # Database — deadlock family.
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\bDEADLOCK"),
+        canonical="DEADLOCK_SUSPECTED",
+        name="deadlock"),
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\bLOCK[_ ]*(CYCLE|CHAIN|CONFLICT|WAIT)"),
+        canonical="DEADLOCK_SUSPECTED",
+        name="lock_cycle"),
+    # Database — slow query family. Must come AFTER pool/deadlock.
+    # The conjunctive look-ahead matches any kind text that mentions
+    # both QUERY/QUERIES AND a slow-witness word (SLOW/SLUG/SLUGG/
+    # SLOWDOWN/TIMING_OUT) regardless of the order or the separator
+    # tokens in between. Note: ``\b`` is unreliable around underscores
+    # in Python regex (``_S`` has no word boundary because ``_`` is a
+    # word character), so the look-aheads use plain substring matches.
+    # Examples that fire:
+    #   SLOW_QUERY_OBSERVED, SLOW_QUERIES,
+    #   QUERY_SLOWDOWN, QUERIES_TIMING_OUT,
+    #   QUERY_SOMEWHAT_SLUGGISH (W12-4 falsifier variant — W13 rescues),
+    #   SLUGGISH_QUERY_PERFORMANCE.
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"(?=.*QUER(Y|IES))"
+                              r"(?=.*(SLOW|SLUG|TIMING[_ ]*OUT))"),
+        canonical="SLOW_QUERY_OBSERVED",
+        name="slow_query"),
+    # Compute tier — OOM family.
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\b(OOM|OUT[_ ]*OF[_ ]*MEM(ORY)?)"),
+        canonical="OOM_KILL",
+        name="oom"),
+    # Edge tier — TLS family.
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\b(TLS|CERT(IFICATE)?)[_ ]*("
+                              r"EXPIR|EXPIRY|EXPIRED|"
+                              r"EOL|END[_ ]*OF[_ ]*LIFE)"),
+        canonical="TLS_EXPIRED",
+        name="tls_expired"),
+    # Edge tier — DNS family.
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\bDNS[_ ]*("
+                              r"MISROUTE|FAIL|FAILURE|SERVFAIL|"
+                              r"NXDOMAIN|RESOLUTION[_ ]*FAIL|LOOKUP)"),
+        canonical="DNS_MISROUTE",
+        name="dns_misroute"),
+    # Network tier — firewall family.
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\b(FW|FIREWALL)[_ ]*("
+                              r"BLOCK|DENY|DROP|SURGE|REJECTED?|"
+                              r"DENIED|DENIAL)"),
+        canonical="FW_BLOCK_SURGE",
+        name="fw_block"),
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\bBLOCKED[_ ]*PACKET"),
+        canonical="FW_BLOCK_SURGE",
+        name="fw_blocked_packet"),
+    # Generic-tier — error rate family. Note: ERROR_RATE_SPIKE itself
+    # matches both ERROR rules below but the exact-table layer would
+    # have caught it first; the heuristic layer is the open-world fall-
+    # back. We put error/latency last so they don't poach more-specific
+    # tier matches like POOL_EXHAUSTION (which never contains the word
+    # ERROR / LATENCY in any reasonable variant).
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\bERROR[_ ]*("
+                              r"RATE|SURGE|SPIKE|HIGH|ELEVATED|"
+                              r"INCIDENT|BURST)"),
+        canonical="ERROR_RATE_SPIKE",
+        name="error_rate"),
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\bHIGH[_ ]*ERROR[_ ]*RATE"),
+        canonical="ERROR_RATE_SPIKE",
+        name="high_error_rate"),
+    # Generic-tier — latency family.
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\b(LATENCY|P95|P99)[_ ]*("
+                              r"HIGH|SPIKE|BREACH|ELEVATED|"
+                              r"REGRESSION|INCREASE)"),
+        canonical="LATENCY_SPIKE",
+        name="latency_spike"),
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\bHIGH[_ ]*(LATENCY|P95|P99)"),
+        canonical="LATENCY_SPIKE",
+        name="high_latency"),
+    HeuristicAbstractionRule(
+        pattern=_re.compile(r"\bSLO[_ ]*(BREACH|VIOLATED?|MISS)"),
+        canonical="LATENCY_SPIKE",
+        name="slo_breach"),
+)
+
+
+@dataclasses.dataclass
+class LayeredClaimNormalizer:
+    """Two-layer claim-kind normaliser (SDK v3.14, W13 family).
+
+    Tries the W12 :data:`CLAIM_KIND_SYNONYMS` exact lookup first; on a
+    miss, walks an ordered set of :class:`HeuristicAbstractionRule`
+    predicates over the upper-cased kind text. On a miss in both
+    layers, returns either the input unchanged (``abstain_on_unknown
+    = False``, the default) or :data:`LAYERED_NORMALIZER_ABSTAIN`
+    (``abstain_on_unknown = True``). Abstention is information-
+    preserving: the priority decoder ignores ``_W13_ABSTAINED_`` (it is
+    not in ``_DECODER_PRIORITY``), the rewrite counters expose OOV
+    rate as a metric.
+
+    The W12 closure is a strict subset of the W13 closure:
+
+        * On every key in :data:`CLAIM_KIND_SYNONYMS`, layered ≡ W12
+          (W13-3 backward-compat).
+        * On every variant in :data:`OUT_OF_VOCAB_KINDS` named in
+          ``vision_mvp/experiments/phase59_real_llm_multi_round.py``
+          (DEADLOCK_PROBABLY_DETECTED_MAYBE, POOL_LOOKING_BUSY,
+          QUERY_SOMEWHAT_SLUGGISH, DISK_GETTING_FULL_PROBABLY), the
+          heuristic layer fires and resolves to the matching canonical
+          (W13-1). The W12-4 falsifier regime is therefore *partly*
+          inside the W13 closure.
+        * On a *truly* arbitrary kind that witnesses none of the
+          heuristic patterns (e.g. ``XYZZY_QQQQ`` or a random hash),
+          both layers miss and the W13-4 closure boundary is reached.
+
+    This class is the load-bearing W13 method change. The W13 decoder
+    (``LayeredRobustMultiRoundBundleDecoder``) wraps the W11 multi-
+    round bundle decoder around this normaliser, *not* around the W12
+    closed-vocabulary table.
+    """
+
+    synonyms: dict[str, str] = dataclasses.field(
+        default_factory=lambda: dict(CLAIM_KIND_SYNONYMS))
+    rules: tuple[HeuristicAbstractionRule, ...] = dataclasses.field(
+        default_factory=lambda: _HEURISTIC_KIND_RULES)
+    abstain_on_unknown: bool = False
+    last_n_exact: int = 0
+    last_n_heuristic: int = 0
+    last_n_abstained: int = 0
+    last_n_passthrough: int = 0
+    # Mapping rule_name -> int for the most recent batch — useful for
+    # forensic inspection of which heuristic patterns are firing.
+    last_rule_hits: dict[str, int] = dataclasses.field(
+        default_factory=dict)
+
+    def reset_counters(self) -> None:
+        self.last_n_exact = 0
+        self.last_n_heuristic = 0
+        self.last_n_abstained = 0
+        self.last_n_passthrough = 0
+        self.last_rule_hits = {}
+
+    def normalize(self, kind: str) -> str:
+        """Layered normalisation. Returns the canonical kind, the
+        sentinel ``LAYERED_NORMALIZER_ABSTAIN``, or the input unchanged
+        depending on ``abstain_on_unknown``."""
+        if not kind:
+            return ""
+        upper = kind.upper()
+        # Layer 1: exact synonym table (W12 path).
+        canon = self.synonyms.get(upper)
+        if canon is not None:
+            self.last_n_exact += 1
+            return canon
+        # Layer 2: heuristic abstraction rules.
+        for rule in self.rules:
+            if rule.pattern.search(upper):
+                self.last_n_heuristic += 1
+                self.last_rule_hits[rule.name] = (
+                    self.last_rule_hits.get(rule.name, 0) + 1)
+                return rule.canonical
+        # Layer 3: abstain or pass-through.
+        if self.abstain_on_unknown:
+            self.last_n_abstained += 1
+            return LAYERED_NORMALIZER_ABSTAIN
+        self.last_n_passthrough += 1
+        return kind
+
+    def normalize_handoff(self, h: _DecodedHandoff) -> _DecodedHandoff:
+        """Apply layered kind normalisation + payload normalisation
+        (the W12 :data:`_SERVICE_TAG_REWRITES` patterns are reused —
+        payload drift is not the W13 contribution)."""
+        return _DecodedHandoff(
+            source_role=h.source_role,
+            claim_kind=self.normalize(h.claim_kind),
+            payload=normalize_payload(h.payload),
+        )
+
+
+@dataclasses.dataclass
+class LayeredRobustMultiRoundBundleDecoder:
+    """Layered open-world normalising multi-round bundle decoder
+    (SDK v3.14, W13 family).
+
+    Same shape as :class:`RobustMultiRoundBundleDecoder` (W12), but the
+    closed-vocabulary :data:`CLAIM_KIND_SYNONYMS` is replaced by a
+    :class:`LayeredClaimNormalizer` whose closure strictly contains
+    the W12 closure. The inner :class:`MultiRoundBundleDecoder` is
+    unchanged.
+
+    Backward-compat (W13-3)
+    ------------------------
+    On any input where every kind is in :data:`CLAIM_KIND_SYNONYMS`,
+    the heuristic layer is never reached and the result is byte-for-
+    byte identical to W12. The rewrite counters (``last_n_exact``,
+    ``last_n_heuristic``, ``last_n_abstained``,
+    ``last_n_passthrough``) expose which layer fired so the bench
+    driver can verify W13's *additional* contribution mechanically.
+
+    W13-1 sufficiency
+    -----------------
+    On a regime where the LLM emits OOV variants whose surface form
+    witnesses one of the heuristic patterns
+    (``DEADLOCK_PROBABLY_DETECTED_MAYBE`` →
+    pattern ``\\bDEADLOCK`` matches → canonical
+    ``DEADLOCK_SUSPECTED``), the W13 decoder rescues the run while
+    W12 ties FIFO at 0.000 by W12-4.
+
+    W13-4 falsifier
+    ---------------
+    On a regime where the LLM emits OOV variants whose surface form
+    witnesses *neither* the exact table *nor* any heuristic pattern
+    (e.g. random tokens like ``XYZZY_QQQQ`` or an unrelated label
+    like ``COSMIC_RAY_FLIP``), both layers miss, the priority decoder
+    cannot match, and W13 ties FIFO at 0.000 — the named open-world
+    closure boundary.
+    """
+
+    inner: MultiRoundBundleDecoder = dataclasses.field(
+        default_factory=lambda: MultiRoundBundleDecoder())
+    normalizer: LayeredClaimNormalizer = dataclasses.field(
+        default_factory=lambda: LayeredClaimNormalizer())
+
+    @property
+    def last_n_kind_rewrites(self) -> int:
+        """Total kind rewrites (exact + heuristic) over the most
+        recent ``decode_rounds`` call."""
+        return self.normalizer.last_n_exact + self.normalizer.last_n_heuristic
+
+    @property
+    def last_n_payload_rewrites(self) -> int:
+        return self._last_n_payload_rewrites
+
+    _last_n_payload_rewrites: int = 0
+
+    def normalize_round(self,
+                          handoffs: Sequence[_DecodedHandoff],
+                          ) -> list[_DecodedHandoff]:
+        out: list[_DecodedHandoff] = []
+        for h in handoffs:
+            new_kind = self.normalizer.normalize(h.claim_kind)
+            new_payload = normalize_payload(h.payload)
+            if new_payload != h.payload:
+                self._last_n_payload_rewrites += 1
+            out.append(_DecodedHandoff(
+                source_role=h.source_role,
+                claim_kind=new_kind,
+                payload=new_payload,
+            ))
+        return out
+
+    def decode_rounds(self,
+                        per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+                        ) -> dict[str, Any]:
+        self.normalizer.reset_counters()
+        self._last_n_payload_rewrites = 0
+        normalised: list[list[_DecodedHandoff]] = []
+        for bundle in per_round_handoffs:
+            normalised.append(self.normalize_round(bundle))
+        return self.inner.decode_rounds(normalised)
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+               ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    def normalizer_stats(self) -> dict[str, Any]:
+        """Expose normaliser counters as a dict for the bench driver."""
+        return {
+            "n_exact": int(self.normalizer.last_n_exact),
+            "n_heuristic": int(self.normalizer.last_n_heuristic),
+            "n_abstained": int(self.normalizer.last_n_abstained),
+            "n_passthrough": int(self.normalizer.last_n_passthrough),
+            "n_payload_rewrites": int(self._last_n_payload_rewrites),
+            "rule_hits": dict(self.normalizer.last_rule_hits),
+        }
+
+
 __all__ = [
     # Per-role budget
     "RoleBudget", "DEFAULT_ROLE_BUDGETS",
@@ -2532,4 +2949,8 @@ __all__ = [
     # SDK v3.13 — real-LLM-robust multi-round bundle decoder (W12 family).
     "RobustMultiRoundBundleDecoder", "CLAIM_KIND_SYNONYMS",
     "normalize_claim_kind", "normalize_payload", "normalize_handoff",
+    # SDK v3.14 — layered open-world normaliser + decoder (W13 family).
+    "HeuristicAbstractionRule", "LayeredClaimNormalizer",
+    "LayeredRobustMultiRoundBundleDecoder",
+    "LAYERED_NORMALIZER_ABSTAIN",
 ]

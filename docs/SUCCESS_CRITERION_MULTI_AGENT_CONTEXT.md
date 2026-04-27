@@ -1,11 +1,11 @@
-# Success criterion — solving multi-agent context (SDK v3.13 bar)
+# Success criterion — solving multi-agent context (SDK v3.14 bar)
 
 > Pre-committed, falsifiable bar for what counts as a *real* advance
 > on "solving multi-agent context" in the Context Zero / Wevra
 > programme. This document is the **referee** for SDK v3.9 / v3.10 /
-> v3.11 / v3.12 / v3.13 (and later milestones). Any milestone note
-> that claims an advance must name the bar it cleared and cite the
-> code-anchored evidence. Last touched: SDK v3.13, 2026-04-26.
+> v3.11 / v3.12 / v3.13 / v3.14 (and later milestones). Any milestone
+> note that claims an advance must name the bar it cleared and cite
+> the code-anchored evidence. Last touched: SDK v3.14, 2026-04-26.
 >
 > The history of this programme is full of moves where a partial
 > result was written up too strongly and later had to be sharpened
@@ -75,6 +75,39 @@ The **named regimes** the bar refers to (anchored in code):
   AND drops noise-corroborated decoys closes the gap (W11-1).
   Anchor:
   `vision_mvp/experiments/phase58_multi_round_decoder.py`.
+* **R-60** — Phase-60 *open-world normalisation + real-Ollama
+  transfer* regime, the *new harder regime* SDK v3.14 introduces.
+  Two pre-committed sub-banks plus an opt-in real-LLM extension:
+    - **R-60-wide** (synthetic_wide_oov_llm). Same R-58 delayed-
+      causal-evidence shape but the LLM-shaped extractor emits kind
+      variants from :data:`HEURISTIC_RESCUABLE_OOV_KINDS` —
+      ``DEADLOCK_PROBABLY_DETECTED_MAYBE``, ``POOL_LOOKING_BUSY``,
+      ``QUERY_SOMEWHAT_SLUGGISH``, ``DISK_GETTING_FULL_PROBABLY``,
+      ``POOL_AT_CAPACITY``, ``P95_REGRESSION``, ``SLO_VIOLATED``,
+      ``FW_DENIAL_BURST``, … — *outside* :data:`CLAIM_KIND_SYNONYMS`
+      but *inside* the W13 heuristic abstraction closure. **No fixed-
+      table normaliser can win on R-60-wide by construction**
+      (W13-Λ-fixed at the open-world axis): every drifted variant
+      survives :data:`CLAIM_KIND_SYNONYMS` unchanged and the priority
+      decoder cannot match it. A *layered open-world normaliser*
+      (``LayeredRobustMultiRoundBundleDecoder``: exact synonym table
+      → heuristic abstraction rules → optional abstention, ahead of
+      the W11 multi-round decoder) closes the gap (W13-1).
+    - **R-60-cosmic** (synthetic_cosmic_oov_llm). Round-2 specific-
+      tier disambiguating claims are replaced by truly arbitrary
+      OOV tokens (``XYZZY_QQQQ``, ``COSMIC_RAY_FLIP``,
+      ``INCIDENT_NUMBER_42``, …) — *outside both layers*. Both W12
+      and W13 tie FIFO at 0.000; the *named open-world closure
+      boundary* of any predicate-based normaliser (W13-4).
+    - **R-60-ollama** (opt-in real-LLM extension; W13-Λ-real probe).
+      Same R-58 events under the real Ollama Mac-1 producer (default
+      ``qwen2.5:14b-32k``, optionally ``qwen3.5:35b``). The driver
+      records every raw producer string into the report. The
+      milestone *measures*, not *claims*, real-LLM transfer — see
+      § 1.4 for the honest 4-tier grading on R-60-ollama.
+  Anchor:
+  `vision_mvp/experiments/phase60_open_world_normalization.py`.
+
 * **R-59** — Phase-59 *real-LLM-driven multi-round delayed-
   disambiguation* regime, the *new harder regime* SDK v3.13
   introduces. Same two-round structural shape as R-58 but the
@@ -96,22 +129,24 @@ The **named regimes** the bar refers to (anchored in code):
 
 ## 1. Three pre-committed bars
 
-> **SDK v3.13 anchors the bar to R-59.** Each version of this
+> **SDK v3.14 anchors the bar to R-60.** Each version of this
 > document anchors the *strict-gain regime* to the milestone-
 > specific harder regime. SDK v3.9 anchored to R-55; SDK v3.10
 > anchored to R-56; SDK v3.11 anchored to **R-57** AND introduced
 > bar 7 (admission/decoding split). SDK v3.12 anchored to R-58 AND
-> introduced bar 8 (temporal/structural split). SDK v3.13 anchors
-> the bar to **R-59** below AND introduces **bar 9** (synthetic→
-> real-LLM transfer split: a method must survive a *bounded
-> producer-noise channel* because synthetic cross-round wins do not
-> automatically transfer to LLM-shaped candidate streams). Earlier
-> R-55..R-58-anchored bars remain valid as historical bars; the
-> *current* bar is R-59-anchored.
+> introduced bar 8 (temporal/structural split). SDK v3.13 anchored
+> to R-59 AND introduced bar 9 (synthetic→real-LLM transfer split
+> under bounded *fixed-vocabulary* producer noise). SDK v3.14
+> anchors the bar to **R-60** below AND introduces **bar 10**
+> (open-world normalisation split: a method must survive a producer-
+> noise channel that *exceeds* the fixed-vocabulary closure when the
+> drift remains inside the heuristic abstraction closure). Earlier
+> R-55..R-59-anchored bars remain valid as historical bars; the
+> *current* bar is R-60-anchored.
 
 ### 1.1 Strong success bar (a "real" advance)
 
-A milestone *strongly advances* the thesis iff **all nine** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13):
+A milestone *strongly advances* the thesis iff **all ten** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14):
 
 1. **Code anchor.** A new admission/decoder/coordination method
    ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
@@ -155,6 +190,28 @@ A milestone *strongly advances* the thesis iff **all nine** hold (bars 1–6 alw
    cross-round boundary (i.e. consume admitted handoffs from ≥ 2
    rounds and produce a single decoded answer). A pure
    single-round method does NOT clear bar 8 on SDK v3.12.
+10. **(SDK v3.14+) Open-world normalisation split.** The milestone-
+   anchored harder regime (R-60-wide) is **provably insufficient for
+   any fixed-closed-vocabulary normaliser** (W13-Λ-fixed at the
+   open-world axis: every entry in
+   :data:`HEURISTIC_RESCUABLE_OOV_KINDS` is *not* in
+   :data:`CLAIM_KIND_SYNONYMS`, so :class:`RobustMultiRoundBundleDecoder`
+   ties FIFO at 0.000 on R-60-wide default). The new method must
+   include an explicit *closure-widening* layer beyond exact lookup —
+   either heuristic regex predicates over the kind text, embedding-
+   distance lookups, or a learned normaliser. A pure exact-table
+   method does NOT clear bar 10 on SDK v3.14. **Pre-committed bench
+   property:** the layered normaliser's heuristic rules must resolve
+   *every* variant in :data:`HEURISTIC_RESCUABLE_OOV_KINDS` to its
+   named canonical kind (mechanically verified by
+   ``W13ClosureTests::test_every_wide_oov_variant_outside_w12_inside_w13``).
+   **Pre-committed falsifier:** when the producer LLM emits a *truly
+   arbitrary* kind outside both layers (R-60-cosmic regime, every
+   entry in :data:`COSMIC_OOV_KINDS`), the layered normaliser ties
+   FIFO at 0.000 (W13-4). The closure boundary is structural for any
+   predicate-based normaliser; widening it is a research move
+   (W13-C2 / W13-C3), not a structural fix.
+
 9. **(SDK v3.13 only) Real-LLM transfer / bounded-producer-noise
    split.** The milestone-anchored harder regime (R-59) is
    **provably insufficient for any un-normalised single-round /
@@ -219,6 +276,44 @@ For SDK v3.11 specifically, the canonical phrasing instantiates as:
 > mentioned via a causal claim_kind for the chosen root_cause
 > (W10-4)."*
 
+For SDK v3.14 specifically, the canonical phrasing instantiates as:
+
+> *"On R-60-wide (open-world drift, every variant in
+> :data:`HEURISTIC_RESCUABLE_OOV_KINDS` outside the W12 fixed table),
+> no fixed-closed-vocabulary normaliser in the SDK improves
+> accuracy_full above 0.000 — this is the W13-Λ-fixed limit. The new
+> ``LayeredRobustMultiRoundBundleDecoder`` (W13) — exact synonym
+> table → heuristic abstraction rules → optional abstention, ahead
+> of the W11 multi-round decoder — achieves accuracy_full = 1.000,
+> strictly improving over both substrate FIFO (+1.000) and the SDK
+> v3.13 W12 ``RobustMultiRoundBundleDecoder`` (+1.000), stable across
+> 5/5 alternate (bank_seed, llm_seed) values with min gap +0.917
+> well above the strong-bar 0.50 threshold, with no regression on
+> R-53 / R-54 / R-55 / R-56 / R-57 / R-58 / R-59 / R-60-clean and
+> audit T-1..T-7 preserved on every cell. The win does not transfer
+> to the R-60-cosmic falsifier where the producer emits truly
+> arbitrary OOV (W13-4)."*
+
+Honest R-60-ollama partial-success reading (when the milestone runs
+the opt-in real-Ollama mode):
+
+> *"On R-60-ollama (real Mac-1 ``qwen2.5:14b-32k`` on the Phase-58
+> events), the R-60 strong bar is **NOT** cleared. The 14B model
+> emits *canonical* claim kinds (zero kind drift across n=4 ×
+> 12 producer calls) and *filters out low-magnitude decoy events*
+> as noise (zero cross-role decoy corroboration in 4/4 scenarios).
+> The bench property does not hold in 0/4 scenarios. Normalisation
+> (W12 / W13) has nothing to rescue. The honest empirical reading is
+> W13-Λ-real: real Ollama 14B at temperature 0 on the calibrated
+> incident-triage prompt does not, by default, generate the R-58
+> delayed-causal-evidence shape that the synthetic noisy extractor
+> mimics. The synthetic→real-LLM transfer story therefore has a fifth
+> layer: prompt-side discipline + event-shape design (not just
+> normalisation) is required to elicit the bench property from a real
+> producer. R-60-ollama is the *measurement* anchor; the W13 advance
+> is on R-60-wide synthetic, where the W13 method does materially
+> better than W12."*
+
 For SDK v3.13 specifically, the canonical phrasing instantiates as:
 
 > *"On R-59 (real-LLM-driven multi-round delayed-disambiguation,
@@ -257,6 +352,50 @@ A milestone *partially advances* the thesis iff **all four** hold:
 The canonical phrasing for partial success names the trade-off
 explicitly: *"...wins R-55 by +X but trades R-54 by −Y; net
 mean across the three regimes is +Z..."*. No "broad win" framing.
+
+### 1.4 R-60-ollama 4-tier grading (SDK v3.14 only)
+
+R-60-ollama is the **first real-LLM probe in the programme that runs
+through the full team-coord pipeline**. It is graded *separately* from
+R-60-wide because real-LLM behaviour is empirically observed (not
+designed). The grading has four pre-committed tiers:
+
+* **R-60-OLLAMA-A (strong real transfer).** The bench property holds
+  in ≥ 75 % of scenarios under the real LLM, the LLM emits drifted
+  kinds in ≥ 20 % of causal claims (≥ 50 % of those *outside*
+  :data:`CLAIM_KIND_SYNONYMS` so W12 cannot rescue), AND the W13
+  layered method strictly improves over the W12 method by ≥ 0.20
+  pooled accuracy_full. Anchor: ``run_phase60(llm_mode='ollama',
+  n_eval=12, model='qwen2.5:14b-32k', endpoint=...)``.
+* **R-60-OLLAMA-B (partial real transfer).** The bench property
+  holds in ≥ 50 % of scenarios AND either (i) the LLM emits enough
+  W13-rescuable drift that the W13 advance is non-zero pooled, OR
+  (ii) the LLM emits W12-rescuable drift and W12 already wins
+  (in which case W13 ties W12 — a backward-compat win, not a strict
+  W13 advance).
+* **R-60-OLLAMA-C (null real transfer; honest negative).** The
+  bench property holds in < 50 % of scenarios AND/OR the LLM emits
+  zero drift on causal claims. Normalisation (W12 / W13) has
+  nothing to rescue. The synthetic→real-LLM transfer story is
+  dominated by event-shape mismatch / prompt-side discipline rather
+  than by normalisation.
+* **R-60-OLLAMA-D (failure).** Audit breaks on any cell, OR the LLM
+  endpoint is unreachable / fails on > 50 % of producer calls.
+
+R-60-OLLAMA-A clears bar 10 *and* clears the historical bar 9
+(W12-C2 — real-Ollama transfer of W12-1) end-to-end and is the
+strongest possible empirical anchor.
+
+R-60-OLLAMA-C is the **honest current reading** for SDK v3.14:
+real Ollama ``qwen2.5:14b-32k`` on the Phase-58 events at
+temperature 0 emits canonical kinds and filters low-magnitude
+decoy events. The bench property does not hold in any scenario;
+the W13 advance is structurally invisible because there is no
+drift for either layer to rescue. SDK v3.14 documents this as a
+**partial success** at the milestone level (the W13 wide-OOV win
+is the strong-success anchor; R-60-ollama is the partial-real
+anchor). See `docs/RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md`
+§ 4 and § 6 for the honest scope statement.
 
 ### 1.3 Falsifying failure bar (the milestone is null)
 
@@ -442,6 +581,47 @@ decoders are provably insufficient — must combine:
 
 A regime missing any of these is *not* R-59 — it does not test
 the SDK v3.13 hypothesis.
+
+## 2.9. Required ingredients of R-60 (SDK v3.14)
+
+The "harder fair regime" introduced by SDK v3.14 — the *current*
+strict-gain anchor and the regime where fixed-vocabulary normalisers
+are provably insufficient — must combine:
+
+* **All R-58 structural ingredients.** R-60 retains the two-round
+  delayed-causal-evidence shape from R-58 unchanged. The W11
+  contradiction-aware drop is the *target* the W13 normalisation
+  layer has to be able to feed, just like W12.
+* **An LLM-shaped extractor between the events and the candidate
+  stream.** Phase-60 ships three modes: ``synthetic_clean_llm``,
+  ``synthetic_wide_oov_llm`` (the W13-1 anchor), and
+  ``synthetic_cosmic_oov_llm`` (the W13-4 anchor). The opt-in
+  ``ollama`` mode is the R-60-ollama probe — § 1.4.
+* **Drift channel that exceeds the W12 fixed-vocabulary closure.**
+  The R-60-wide bank emits variants from
+  :data:`HEURISTIC_RESCUABLE_OOV_KINDS` whose *every* entry is
+  *not* in :data:`CLAIM_KIND_SYNONYMS`. Mechanically verified by
+  ``W13ClosureTests::test_every_wide_oov_variant_outside_w12_inside_w13``.
+* **Drift channel that stays inside the W13 heuristic closure.**
+  The R-60-wide bank's variants must *all* resolve to their named
+  canonical kinds via :class:`LayeredClaimNormalizer` (the
+  closure-widening contract). Mechanically verified by the same
+  test.
+* **Cosmic-OOV falsifier bank (R-60-cosmic).** The Phase-60
+  ``synthetic_cosmic_oov_llm`` extractor replaces every round-2
+  specific-tier disambiguating claim with an entry from
+  :data:`COSMIC_OOV_KINDS`; *every* entry is verified absent from
+  :data:`CLAIM_KIND_SYNONYMS` AND verified *not* to resolve through
+  the heuristic layer. Mechanically verified by
+  ``W13ClosureTests::test_every_cosmic_oov_variant_escapes_both_layers``.
+* **Determinism.** The Phase-60 synthetic extractor is RNG-
+  deterministic given ``(bank_seed, llm_seed, scenario_id,
+  round_idx)``.
+* **Audit-preserving.** T-1..T-7 holds on every cell of every
+  capsule strategy on every (LLM mode, bank_seed) cell.
+
+A regime missing any of these is *not* R-60 — it does not test
+the SDK v3.14 hypothesis.
 
 ## 3. What we are explicitly NOT testing
 
