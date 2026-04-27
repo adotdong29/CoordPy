@@ -3,9 +3,9 @@
 > Pre-committed, falsifiable bar for what counts as a *real* advance
 > on "solving multi-agent context" in the Context Zero / Wevra
 > programme. This document is the **referee** for SDK v3.9 / v3.10 /
-> v3.11 (and later milestones). Any milestone note that claims an
-> advance must name the bar it cleared and cite the code-anchored
-> evidence. Last touched: SDK v3.11, 2026-04-26.
+> v3.11 / v3.12 (and later milestones). Any milestone note that
+> claims an advance must name the bar it cleared and cite the
+> code-anchored evidence. Last touched: SDK v3.12, 2026-04-26.
 >
 > The history of this programme is full of moves where a partial
 > result was written up too strongly and later had to be sharpened
@@ -64,22 +64,34 @@ The **named regimes** the bar refers to (anchored in code):
   the admitted services by the chosen `root_cause`'s causal
   claim-kind set (`CCK`) closes the gap (W10-1). Anchor:
   `vision_mvp/experiments/phase57_decoder_forcing.py`.
+* **R-58** — Phase-58 *multi-round delayed-causal-evidence* regime,
+  the *new harder regime* SDK v3.12 introduces. Two-round
+  coordination where round-1 carries generic-noise-only mentions
+  of (gold_A, gold_B, decoy) with the decoy cross-role-corroborated,
+  AND round-2 carries one specific-tier disambiguating ``claim_kind``
+  with NO ``service=`` token. **No single-round decoder can win on
+  R-58 by construction (W11-Λ).** A *multi-round bundle decoder*
+  that decodes the union of round-1 and round-2 admitted handoffs
+  AND drops noise-corroborated decoys closes the gap (W11-1).
+  Anchor:
+  `vision_mvp/experiments/phase58_multi_round_decoder.py`.
 
 ## 1. Three pre-committed bars
 
-> **SDK v3.11 anchors the bar to R-57.** Each version of this
+> **SDK v3.12 anchors the bar to R-58.** Each version of this
 > document anchors the *strict-gain regime* to the milestone-
 > specific harder regime. SDK v3.9 anchored to R-55; SDK v3.10
-> anchored to R-56; SDK v3.11 anchors the bar to **R-57** below
-> AND tightens the bar to require a **method that crosses the
-> admission/decoding split** (i.e., admission alone is provably
-> insufficient on R-57; only a method that also touches the decoder
-> can clear the bar). Earlier R-55 / R-56-anchored bars remain
-> valid as historical bars; the *current* bar is R-57-anchored.
+> anchored to R-56; SDK v3.11 anchored to **R-57** AND introduced
+> bar 7 (admission/decoding split). SDK v3.12 anchors the bar to
+> **R-58** below AND introduces **bar 8** (temporal/structural
+> split: a method must cross the *cross-round* boundary because
+> single-round decoding alone is provably insufficient). Earlier
+> R-55..R-57-anchored bars remain valid as historical bars; the
+> *current* bar is R-58-anchored.
 
 ### 1.1 Strong success bar (a "real" advance)
 
-A milestone *strongly advances* the thesis iff **all seven** hold:
+A milestone *strongly advances* the thesis iff **all eight** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12):
 
 1. **Code anchor.** A new admission/decoder/coordination method
    ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
@@ -108,13 +120,21 @@ A milestone *strongly advances* the thesis iff **all seven** hold:
    is explicitly identified — a regime where the bench property does
    not hold and the new method does *not* beat FIFO (i.e. the
    conditionality is sharp).
-7. **(SDK v3.11 only) Admission/decoding split.** The milestone-
+7. **(SDK v3.11+) Admission/decoding split.** The milestone-
    anchored harder regime (R-57) is **provably insufficient for any
    service-blind admission policy** (W10-Λ holds: every admission-only
    policy in the SDK ties FIFO at 0.000 on R-57). The new method
    either (a) modifies the decoder, or (b) jointly modifies admission
    AND decoder. A pure new admission policy does NOT clear bar 7 on
-   SDK v3.11.
+   SDK v3.11+.
+8. **(SDK v3.12 only) Temporal/structural split.** The milestone-
+   anchored harder regime (R-58) is **provably insufficient for any
+   single-round decoder** (W11-Λ holds: every single-round capsule
+   strategy — including the SDK v3.11 W10 bundle decoder — ties
+   FIFO at 0.000 on R-58 default). The new method must cross the
+   cross-round boundary (i.e. consume admitted handoffs from ≥ 2
+   rounds and produce a single decoded answer). A pure
+   single-round method does NOT clear bar 8 on SDK v3.12.
 
 If a milestone clears 1.1, the canonical phrasing is:
 

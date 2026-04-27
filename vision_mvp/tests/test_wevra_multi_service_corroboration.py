@@ -552,9 +552,14 @@ class PublicAPITests(unittest.TestCase):
             TeamMultiServiceCorroborationAdmissionPolicy,
             MultiServiceCorroborationAdmissionPolicy)
 
-    def test_sdk_version_is_v3_11(self) -> None:
+    def test_sdk_version_is_at_least_v3_11(self) -> None:
         from vision_mvp.wevra import SDK_VERSION
-        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.11")
+        # SDK v3.11+ — public surface preserved across v3.11/v3.12.
+        self.assertTrue(
+            SDK_VERSION.startswith("wevra.sdk.v3."),
+            msg=SDK_VERSION)
+        minor = int(SDK_VERSION.split(".")[-1])
+        self.assertGreaterEqual(minor, 11)
 
     def test_w8_export_is_preserved(self) -> None:
         """SDK v3.9 surface preserved: the W8 alias still works."""

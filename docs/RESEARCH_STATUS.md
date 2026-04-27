@@ -5,7 +5,7 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.11,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.12,
 > 2026-04-26.
 
 ## TL;DR
@@ -201,7 +201,101 @@ sharp status:
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.11, 2026-04-26)
+## Current frontier (SDK v3.12, 2026-04-26)
+
+### Active moves (SDK v3.12 — multi-round bundle-aware team decoder + W11 family — *first cross-round coordination move*)
+
+- **Phase-58 multi-round delayed-causal-evidence benchmark.**
+  ``vision_mvp.experiments.phase58_multi_round_decoder`` runs 9
+  strategies (substrate, capsule_fifo, capsule_priority,
+  capsule_coverage, capsule_cohort_buffered (W7-2),
+  capsule_corroboration (W8), capsule_multi_service (W9),
+  capsule_bundle_decoder (W10 single-round), capsule_multi_round
+  (W11)) on a deterministic 8-scenario bank with the
+  **delayed-causal-evidence** property: round-1 carries
+  generic-noise-only mentions of (gold_A, gold_B, decoy) where the
+  decoy is cross-role-corroborated; round-2 carries one
+  specific-tier disambiguating ``claim_kind`` with NO ``service=``
+  token. 8/8 default scenarios satisfy the property; mechanically
+  verified by ``Phase58BankShapeTests``. Pre-committed default:
+  ``K_auditor=8``, ``T_auditor=256``, ``n_eval=8``,
+  ``bank_seed=11``, ``bank_replicates=2``,
+  ``noise_decoy_role_floor=2``. Headline:
+  ``capsule_multi_round`` achieves ``accuracy_full = 1.000`` while
+  substrate, FIFO, priority, coverage, W7-2, W8, W9, AND W10
+  single-round all produce ``accuracy_full = 0.000`` — the **first
+  strict separation between multi-round and single-round capsule-
+  native coordination** in the programme, **+1.000** vs every
+  prior method, stable across **5/5** alternate bank seeds. The
+  W11 family (W11-Λ / W11-1 / W11-2 / W11-3 / W11-4 — proved or
+  proved-empirical) anchors the milestone formally; the W11-C
+  family (W11-C1/C2/C3) makes the cross-bench / real-LLM /
+  multi-step extensions falsifiable.
+- **``MultiRoundBundleDecoder`` (new).**
+  ``vision_mvp/wevra/team_coord.py``. Decodes the *union* of
+  admitted handoffs across multiple ROLE_VIEW capsules; if the
+  elected root_cause is specific-tier, drops every service tag
+  whose admitted mentions are exclusively generic-noise kinds AND
+  span ≥ ``noise_decoy_role_floor`` distinct producer roles
+  (default 2). Inner ``BundleAwareTeamDecoder`` configured with
+  ``cck_filter=False`` so the contradiction-aware step is the only
+  filter; the W10 fallback path preserves single-round wins on
+  R-54..R-57 (W11-3). Companion helper
+  ``collect_admitted_handoffs(ledger, role_view_cids)`` materialises
+  multi-round admitted handoffs into the duck-typed
+  ``_DecodedHandoff`` shape. Re-exported as
+  ``MultiRoundBundleDecoder`` and ``collect_admitted_handoffs``.
+- **Theorem family W11.** W11-Λ (single-round structural limit on
+  R-58, proved-empirical + structural sketch), W11-1 (multi-round
+  decoder sufficiency, proved-empirical n=40 saturated across 5
+  seeds), W11-2 (round-union monotonicity, proved structural),
+  W11-3 (backward-compat with W7-2 / W8 / W9 / W10 on
+  R-54 / R-55 / R-56 / R-57, proved-empirical), W11-4 (round-budget
+  falsifier, proved-empirical n=8 saturated). The W11-C family
+  (W11-C1/C2/C3) makes the cross-bench / real-LLM / multi-step
+  extensions falsifiable.
+- **Pre-committed success criterion** in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-58 anchor +
+  bar 8 — temporal/structural split). The SDK v3.12 result clears
+  the **strong success bar** § 1.1 (strict gain ≥ 0.20 on R-58 vs
+  every SDK v3.11 single-round method, stable across ≥ 3 seeds, no
+  regression on R-53 / R-54 / R-55 / R-56 / R-57, audit T-1..T-7
+  preserved on every cell, named bench property + named falsifier
+  regime, AND temporal/structural split bar 8 satisfied).
+- **Honest scope.** The W11-1 win is *conditional* on the named
+  bench property; the W11-4 falsifier regime is the explicit
+  counterexample. W11-3 backward-compat is exact on R-54 / R-55 /
+  R-56 / R-57 thanks to (a) the inner W10 decoder's fallback-on-
+  small-admitted-set path, (b) the noise-decoy floor being
+  insensitive to single-role decoys. The contradiction-aware drop
+  is closed-vocabulary on incident-triage; W11-C1 is the
+  conjectural extension to other benchmark families. The decoder
+  is a no-op on generic-tier elected root_cause (W11-Λ at the
+  temporal axis collapses).
+
+### Active conjectures (SDK v3.12)
+
+- **W11-C1**: noise-decoy drop generalises to non-incident-triage
+  benchmark families. Conjectural; falsifier = a benchmark family
+  where a generic-noise-only mention is informative.
+- **W11-C2**: real-LLM transfer of W11-1. Conjectural; Phase-59
+  candidate.
+- **W11-C3**: contradiction-aware round-resolution rule (last-wins
+  / weighted-confidence) strictly outperforms naive union with
+  ≥ 3 rounds and conflicting specific-tier evidence across rounds.
+  Conjectural; multi-step capsule chains not yet shipped.
+
+### Discharged conjectures (SDK v3.12)
+
+- **W10-C3** (SDK v3.11): multi-round bundle decoder closes W10-4
+  on a sub-class of scenarios. **PARTIALLY DISCHARGED** by the
+  W11 family on R-58 (a different regime than W10-4): W11-1
+  resolves the *delayed-causal-evidence* sub-class; the W10-4
+  *decoy-CCK-promotion* sub-class remains open (the W11
+  contradiction-aware drop is orthogonal — drops noise-corroborated
+  decoys, not CCK-corroborated decoys).
+
+## Previous frontier (SDK v3.11, 2026-04-26)
 
 ### Active moves (SDK v3.11 — bundle-aware team decoder + W10 family — *first decoder-side coordination move*)
 
@@ -687,16 +781,18 @@ sharp status:
 ## What we are NOT actively claiming
 
 - **Not** "we solved context."
-- **Not** "we solved multi-agent context." SDK v3.11's W10-1 result
+- **Not** "we solved multi-agent context." SDK v3.12's W11-1 result
   is the strongest cross-regime structural-win the programme has
-  produced (bundle-aware decoder wins on R-57 by +1.000 vs every
-  service-blind admission; backward-compatible on R-54 / R-55 / R-56;
-  no regression on R-53; stable across 5/5 bank seeds; named bench
-  property + named falsifier regime W10-4), but it is still
-  **conditional** on (a) the bench property (specific-tier gold
-  root_cause + decoy mentioned only via non-causal claim_kinds) and
-  (b) the closed-vocabulary CCK table being meaningful for the
-  benchmark family. Real multi-agent teams have additional axes
+  produced (multi-round bundle decoder wins on R-58 by +1.000 vs
+  every single-round method including SDK v3.11 W10;
+  backward-compatible on R-54 / R-55 / R-56 / R-57; no regression
+  on R-53; stable across 5/5 bank seeds; named bench property +
+  named falsifier regime W11-4), but it is still **conditional**
+  on (a) the bench property (delayed-causal-evidence with
+  noise-corroborated decoy and specific-tier round-N
+  disambiguation), (b) the closed-vocabulary generic-noise kind
+  set being meaningful for the benchmark family, AND (c) round-N
+  admission not being budget-starved (W11-4). Real multi-agent teams have additional axes
   (heterogeneous producers, time-varying budgets, multi-round
   handoffs, conflicting goals, generic-tier root_causes the
   bundle decoder cannot help with) the W10 family does not cover. The W4-2 result is proved-conditional

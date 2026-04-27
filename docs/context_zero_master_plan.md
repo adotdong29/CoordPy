@@ -7037,6 +7037,111 @@ bar 7 — admission/decoding split);
 
 ---
 
+### 4.29 SDK v3.12 — multi-round bundle decoder + W11 family (deterministic Phase-58 multi-round delayed-causal-evidence benchmark)
+
+The SDK v3.11 W10 milestone established the *decoder/admission
+split* (W10-Λ) and produced the first decoder-side win on R-57.
+But W10's CCK filter is intra-round: it consumes one ROLE_VIEW
+capsule's admitted handoffs. SDK v3.11 already named the next
+wall (W10-C3 conjecture: multi-round bundle decoder closes a
+sub-class of cases where admission alone fails).
+
+SDK v3.12 lifts the *temporal* axis on a named sub-regime — but
+not the W10-4 sub-regime (CCK-promoted decoy); a different
+sub-regime where the decoy is **noise-corroborated** and the
+disambiguating causal evidence arrives in a **later round with no
+service tag**. This is the **W11 family**.
+
+**Phase-58** (``vision_mvp/experiments/phase58_multi_round_decoder.py``)
+is the *multi-round delayed-causal-evidence* regime that anchors
+the milestone. Two-round coordination where round-1 carries
+generic-noise-only mentions of ``(gold_A, gold_B, decoy)`` with
+the decoy cross-role-corroborated, AND round-2 carries one
+specific-tier disambiguating ``claim_kind`` with **no
+``service=`` token**. Single-round decoding — including W10 —
+cannot win.
+
+**Headline (n=8, K_auditor=8, T_auditor=256, bank_seed=11):**
+
+* ``capsule_multi_round accuracy_full = 1.000``
+* every single-round capsule strategy
+  (substrate, FIFO, priority, coverage, W7-2, W8, W9, W10): ``0.000``
+* **+1.000** vs every single-round method including SDK v3.11 W10.
+  Stable across **5/5** alternate bank seeds (11, 17, 23, 29, 31).
+* Backward-compat (W11-3): cross-regime summary preserves prior
+  best at 1.000 on R-54 (W7-2), R-55 (W8), R-56 (W9), R-57 (W10).
+* Audit T-1..T-7 OK on every cell of every R-58 capsule strategy.
+* W11-Λ single-round limit witness: ``max_single_round_accuracy_full
+  = 0.000`` on R-58 default.
+* Named falsifier W11-4 (round-1 noise floods K_auditor=4 budget):
+  multi_round ties FIFO at 0.000.
+
+**Anchor:** ``docs/RESULTS_WEVRA_MULTI_ROUND_DECODER.md``;
+``docs/data/phase58_default_K8_n8.json``;
+``docs/data/phase58_seed_sweep_K8_n8.json``;
+``docs/data/phase58_falsifier_K4_n8.json``;
+``docs/data/phase58_cross_regime.json``;
+``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-58 anchor +
+bar 8 — temporal/structural split);
+``vision_mvp/experiments/phase58_multi_round_decoder.py``;
+``vision_mvp/wevra/team_coord.py`` (``MultiRoundBundleDecoder``,
+``collect_admitted_handoffs``, ``_GENERIC_NOISE_CLAIM_KINDS``).
+
+**Master-plan post-v3.12 reading.** After SDK v3.12:
+
+1. **Post-v3.11 success bar.** R-58 (delayed-causal-evidence with
+   noise-corroborated decoy and round-N specific-tier
+   disambiguation). Bar (R-58 anchor): strict gain ≥ 0.20 vs every
+   SDK v3.11 single-round method, stable across ≥ 3 seeds, no
+   regression on R-53..R-57, audit preserved, named falsifier
+   regime, AND temporal/structural split (bar 8).
+2. **Has hand-crafted single-round decoding reached a structural
+   limit?** **Yes — explicitly, by W11-Λ.** No single-round
+   capsule strategy can beat FIFO on R-58 default. The SDK v3.12
+   moves the structural axis from intra-round decoding into
+   cross-round decoding for the first time in the programme.
+3. **What is the next benchmark?** Phase-58 is anchored as the
+   canonical multi-round delayed-causal-evidence regime. The
+   named falsifier (W11-4: round-1 budget flood) and the named
+   conjectures (W11-C1 cross-bench, W11-C2 real-LLM, W11-C3
+   multi-step disambiguation across ≥ 3 rounds) chart the next
+   moves.
+4. **Did multi-round decoding broaden the structural win beyond
+   v3.11?** **Yes.** The structural win now spans **six** named
+   regimes (R-53 no-regression, R-54 / R-55 / R-56 / R-57
+   backward-compat, R-58 strict win on a regime where every
+   single-round method is provably insufficient). W11-1 is the
+   first strict separation between cross-round and intra-round
+   decoder-side coordination.
+5. **Original thesis status.** *Per-agent minimum-sufficient
+   context for multi-agent teams* is now **materially stronger but
+   still conditional along three coupled axes**:
+   admission (W7-2 / W8 / W9), intra-round decoding (W10),
+   cross-round decoding (W11). The contradiction-aware noise-decoy
+   drop is closed-vocabulary, deterministic, training-free, and
+   additive on top of the existing capsule lifecycle and the W10
+   CCK filter. The remaining conditions are: bench property, the
+   closed-vocabulary noise-kind set being meaningful for the
+   benchmark family, gold root_cause being in a specific causal
+   tier, AND round-N admission not being budget-starved (W11-4).
+   The W11-4 falsifier names the next wall: a smarter admission
+   policy that prioritises specific-tier kinds, OR a multi-step
+   contradiction-aware round-resolution rule (W11-C3), is the
+   natural next move.
+
+**Honest reading.** SDK v3.12 does **not** discharge the
+strongest open question: real-LLM transfer of any of W7..W11.
+All wins remain on deterministic synthetic benches. The next
+real-LLM step is W11-C2 (Phase 59 candidate) — and it is
+genuinely the next research move, not a polish pass. The
+SDK is now an explicit hierarchy of three structural axes, each
+with a sharp limit theorem on its own; whether real production
+multi-agent teams *actually* hit these regimes is the open
+empirical question that the closed-vocabulary closure cannot
+answer alone.
+
+---
+
 ## 5. End goals
 
 We keep goals at three horizons. Each horizon has both a scientific

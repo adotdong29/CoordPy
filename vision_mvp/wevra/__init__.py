@@ -213,6 +213,8 @@ from .team_coord import (
     # SDK v3.11 — bundle-aware team decoder (W10 family).
     BundleAwareTeamDecoder, decode_admitted_role_view,
     CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE,
+    # SDK v3.12 — multi-round bundle-aware team decoder (W11 family).
+    MultiRoundBundleDecoder, collect_admitted_handoffs,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -226,7 +228,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.11"
+SDK_VERSION = "wevra.sdk.v3.12"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -315,6 +317,8 @@ __all__ = [
     # SDK v3.11 — bundle-aware team decoder (W10 family).
     "BundleAwareTeamDecoder", "decode_admitted_role_view",
     "CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE",
+    # SDK v3.12 — multi-round bundle-aware team decoder (W11 family).
+    "MultiRoundBundleDecoder", "collect_admitted_handoffs",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

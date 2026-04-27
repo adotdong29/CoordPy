@@ -72,7 +72,14 @@ class WevraSurfaceTests(unittest.TestCase):
         # ``CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE`` in
         # ``vision_mvp.wevra.team_coord`` (multi-agent coordination
         # research slice; not part of the run-boundary product runtime).
-        self.assertEqual(SDK_VERSION, "wevra.sdk.v3.11")
+        # SDK v3.11+ — bumped to v3.12 with the multi-round bundle
+        # decoder (W11). Public surface remains additively
+        # compatible.
+        self.assertTrue(
+            SDK_VERSION.startswith("wevra.sdk.v3."),
+            msg=SDK_VERSION)
+        minor = int(SDK_VERSION.split(".")[-1])
+        self.assertGreaterEqual(minor, 11)
 
     def test_cohort_coherence_admission_policy_is_exported(self):
         # The SDK v3.8 cross-role admission policy must be importable

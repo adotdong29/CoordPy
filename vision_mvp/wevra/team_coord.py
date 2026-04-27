@@ -2046,6 +2046,191 @@ def decode_admitted_role_view(
     return decoder.decode(handoffs)
 
 
+# =============================================================================
+# SDK v3.12 — Multi-round bundle-aware team decoder (W11 family)
+# =============================================================================
+#
+# W11 attacks the *temporal* axis the W10 single-round decoder cannot
+# touch. On a regime where round-1 admitted evidence is ALL generic-
+# tier (LATENCY_SPIKE / ERROR_RATE_SPIKE / FW_BLOCK_SURGE), the W10
+# bundle decoder picks a generic root_cause (``error_spike`` /
+# ``latency_spike``) whose CCK is itself generic — the CCK filter is a
+# no-op, the corroborated decoy survives, and W10 ties FIFO at 0.000.
+# This is W11-Λ (single-round structural limit).
+#
+# The W11 decoder takes the *union* of admitted handoffs across
+# multiple ROLE_VIEW capsules (one per round) and decodes that union.
+# When round-2 carries a single specific-tier disambiguating claim
+# (DEADLOCK_SUSPECTED / POOL_EXHAUSTION / DISK_FILL_CRITICAL / ...),
+# the union's claim_kind set re-elects a specific root_cause; the CCK
+# filter then excludes the round-1 decoy. This is W11-1 (multi-round
+# sufficiency).
+
+
+_GENERIC_NOISE_CLAIM_KINDS: frozenset[str] = frozenset({
+    "LATENCY_SPIKE", "ERROR_RATE_SPIKE", "FW_BLOCK_SURGE",
+})
+
+
+@dataclasses.dataclass
+class MultiRoundBundleDecoder:
+    """Multi-round, bundle-aware team decoder (SDK v3.12, W11 family).
+
+    Wraps :class:`BundleAwareTeamDecoder` with an explicit *round
+    union* step plus a contradiction-aware *noise-corroborated-decoy*
+    drop. The decoder consumes a sequence of per-round handoff
+    bundles (one bundle per round's ROLE_VIEW) and decodes the
+    *concatenation*; if the union elects a specific-tier root_cause
+    (i.e. the chosen ``root_cause``'s CCK is NOT in the generic-
+    noise tier), it then drops every service tag whose admitted
+    mentions are *exclusively* generic-noise kinds and span ≥
+    ``noise_decoy_role_floor`` distinct producer roles. This
+    *contradiction-aware* drop is the load-bearing W11 move: when
+    round-N evidence (specific) names the *kind* of incident but
+    not a *service* (e.g. ``DEADLOCK_SUSPECTED relation=orders_payments``
+    with no ``service=`` token), and round-1 noise *did* name the
+    services, the decoder must use the round-N kind to elect the
+    root_cause, then re-project round-1's service inventory through
+    the chosen tier.
+
+    Why this is multi-round
+    -----------------------
+    With a single bundle (per-round mode) the union is the bundle
+    itself. The W10 single-round bundle decoder running on round-N
+    alone cannot resolve the regime because:
+
+      * If round-N is generic-only, root_cause is generic and the
+        CCK is itself generic — no filter.
+      * If round-N is specific-only (no service tags), services
+        come up empty.
+
+    Pairing rounds is the structural move: the union joins
+    *round-1's service tag inventory* with *round-2's specific
+    root_cause kind*.
+
+    Backward compatibility (W11-3)
+    ------------------------------
+    With a single bundle (single-round) the decoder reduces to
+    :class:`BundleAwareTeamDecoder` exactly when
+    ``noise_decoy_role_floor`` is large enough that no R-54..R-57
+    bench triggers the noise-decoy drop. R-54 / R-55 / R-56 have
+    ``|gold_services| ≤ 2``; the W7-2/W8/W9 admission policies
+    already filter to a small dominant set; the W10 fallback path
+    (admitted-set size ≤ 2) preserves their wins. Only on R-57 with
+    a corroborated noise decoy does the noise-decoy drop fire.
+
+    Falsifier (W11-4)
+    -----------------
+    If round-2 admission drops the disambiguating specific-tier
+    claim (e.g. budget already spent on round-1 noise), the union
+    is still all-generic and the decoder cannot help. The Phase-58
+    falsifier bank instantiates this regime by setting
+    ``K_auditor`` so round-1 fills the budget.
+    """
+
+    # The inner decoder is configured with ``cck_filter=False`` by
+    # default: the W11 contradiction-aware drop subsumes the W10
+    # CCK filter on regimes where round-N specific-tier evidence
+    # carries no service tags (the only regime W10 cannot reach
+    # alone). On R-54..R-57 the inner falls back to admitted
+    # services anyway (``fallback_admitted_size_threshold=2``), so
+    # the union still matches W10 byte-for-byte (W11-3).
+    inner: BundleAwareTeamDecoder = dataclasses.field(
+        default_factory=lambda: BundleAwareTeamDecoder(cck_filter=False))
+    # Drop a tag whose admitted mentions are *exclusively* generic-
+    # noise kinds AND span ≥ this many distinct producer roles, IFF
+    # the elected root_cause is in a specific (non-generic) tier.
+    # Default 2: a single-role generic-noise mention is preserved.
+    noise_decoy_role_floor: int = 2
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+            ) -> dict[str, Any]:
+        """Decode the union of admitted handoffs across rounds.
+
+        The W11 semantic: union, then if root_cause is specific-tier,
+        drop noise-corroborated tags. Falls back to the inner CCK
+        decoder result otherwise.
+        """
+        union: list[_DecodedHandoff] = []
+        for bundle in per_round_handoffs:
+            union.extend(bundle)
+        base = self.inner.decode(union)
+        root_cause = str(base.get("root_cause", "unknown"))
+        # Generic-tier root_cause: nothing the W11 contradiction-
+        # aware step can do (W11-Λ at the temporal axis collapses).
+        if root_cause in ("error_spike", "latency_spike", "fw_block",
+                            "unknown"):
+            return base
+        # Specific-tier: identify and drop noise-corroborated decoys.
+        roles_per_tag: dict[str, set[str]] = {}
+        noise_only_per_tag: dict[str, bool] = {}
+        for h in union:
+            tag = ""
+            for tok in (h.payload or "").split():
+                m = _SERVICE_TAG_RE.search(tok)
+                if m:
+                    tag = m.group(1)
+                    break
+            if not tag:
+                continue
+            roles_per_tag.setdefault(tag, set()).add(h.source_role)
+            if h.claim_kind in _GENERIC_NOISE_CLAIM_KINDS:
+                noise_only_per_tag.setdefault(tag, True)
+            else:
+                noise_only_per_tag[tag] = False
+        services_in = tuple(base.get("services", ()))
+        kept = []
+        for tag in services_in:
+            if (noise_only_per_tag.get(tag, False)
+                    and len(roles_per_tag.get(tag, set()))
+                        >= self.noise_decoy_role_floor):
+                continue
+            kept.append(tag)
+        return {
+            "root_cause": root_cause,
+            "services": tuple(kept),
+            "remediation": base.get("remediation", "investigate"),
+        }
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+               ) -> dict[str, Any]:
+        """Single-bundle path — degenerate case of ``decode_rounds``."""
+        return self.decode_rounds([handoffs])
+
+
+def collect_admitted_handoffs(
+        ledger: CapsuleLedger,
+        role_view_cids: Sequence[str],
+        ) -> list[_DecodedHandoff]:
+    """Collect admitted TEAM_HANDOFF parents from a sequence of
+    ROLE_VIEW CIDs (per-round role views) and return them as
+    ``_DecodedHandoff`` records, deduplicated by handoff CID and
+    preserving first-occurrence order.
+    """
+    seen: set[str] = set()
+    out: list[_DecodedHandoff] = []
+    for rv_cid in role_view_cids:
+        if not rv_cid or rv_cid not in ledger:
+            continue
+        rv = ledger.get(rv_cid)
+        for p in rv.parents:
+            if p in seen or p not in ledger:
+                continue
+            cap = ledger.get(p)
+            if cap.kind != CapsuleKind.TEAM_HANDOFF:
+                continue
+            seen.add(p)
+            payload = cap.payload if isinstance(cap.payload, dict) else {}
+            out.append(_DecodedHandoff(
+                source_role=str(payload.get("source_role", "")),
+                claim_kind=str(payload.get("claim_kind", "")),
+                payload=str(payload.get("payload", "")),
+            ))
+    return out
+
+
 __all__ = [
     # Per-role budget
     "RoleBudget", "DEFAULT_ROLE_BUDGETS",
@@ -2070,4 +2255,6 @@ __all__ = [
     # SDK v3.11 — bundle-aware team decoder (W10 family).
     "BundleAwareTeamDecoder", "decode_admitted_role_view",
     "CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE",
+    # SDK v3.12 — multi-round bundle-aware team decoder (W11 family).
+    "MultiRoundBundleDecoder", "collect_admitted_handoffs",
 ]
