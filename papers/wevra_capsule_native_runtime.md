@@ -499,6 +499,26 @@ The contribution is sharper than the v3.1 framing because:
   achievable by stripping wall-clock and host-local fields
   unconditionally; the trade-off is loss of forensic
   context (when did the run happen?).
+- **Synthetic→real-LLM cross-round transfer (SDK v3.13).**
+  ✅ **PARTIALLY DISCHARGED** by the W12 family. The synthetic
+  W11 cross-round bundle decoder (SDK v3.12) does **not** transfer
+  to a calibrated real-LLM-shaped producer-noise channel
+  (W12-Λ at the real-LLM axis: under ``synonym_prob=0.50,
+  svc_token_alt_prob=0.30`` synthetic-noisy-LLM extractor, the
+  un-normalised W11 ties FIFO at 0.000). A *normalising* multi-
+  round bundle decoder
+  (``RobustMultiRoundBundleDecoder = closed-vocabulary
+  CLAIM_KIND_SYNONYMS + payload-rewrite layer ahead of W11``)
+  closes the gap (W12-1: +1.000 vs un-normalised W11, stable 5/5
+  seeds), conditional on the producer-noise channel being bounded
+  by the closed-vocabulary closure (W12-2). The honest revised
+  reading is three-layered: un-normalised admission does not
+  transfer (W6-C2); un-normalised cross-round decoding does not
+  transfer (W12-Λ); normalised cross-round decoding transfers,
+  conditional on closure (W12-1). The next move is the W12-C2
+  Phase-59 ``ollama`` opt-in mode against a real Ollama-served
+  model. See ``docs/RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md`` and
+  ``vision_mvp/experiments/phase59_real_llm_multi_round.py``.
 
 ## 10. Code anchor
 

@@ -17,8 +17,10 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.11)         | [`RESULTS_WEVRA_BUNDLE_DECODER.md`](RESULTS_WEVRA_BUNDLE_DECODER.md) |
-> | Pre-committed success bar (SDK v3.11)| [`SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`](SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md) |
+> | Latest milestone (SDK v3.13)         | [`RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md`](RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md) |
+> | Previous milestone (SDK v3.12)       | [`RESULTS_WEVRA_MULTI_ROUND_DECODER.md`](RESULTS_WEVRA_MULTI_ROUND_DECODER.md) |
+> | Previous milestone (SDK v3.11)       | [`RESULTS_WEVRA_BUNDLE_DECODER.md`](RESULTS_WEVRA_BUNDLE_DECODER.md) |
+> | Pre-committed success bar (SDK v3.13)| [`SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`](SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md) |
 > | Previous milestone (SDK v3.10)       | [`RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md`](RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md) |
 > | Previous milestone (SDK v3.9)        | [`RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md`](RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md) |
 > | Previous milestone (SDK v3.8)        | [`RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md`](RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md) |
@@ -34,7 +36,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.11 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.13 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /

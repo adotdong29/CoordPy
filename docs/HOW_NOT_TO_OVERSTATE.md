@@ -3,7 +3,7 @@
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
 > README-of-README must satisfy these rules. Last touched: SDK
-> v3.9, 2026-04-26.
+> v3.13, 2026-04-26.
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or
@@ -359,6 +359,90 @@ buffered variant is the load-bearing policy. The honest phrasing:
 "The *buffered* ``CohortCoherenceAdmissionPolicy`` (constructed
 via ``from_candidate_payloads``) is the SDK v3.8 win."
 
+### Labelling the W12-1 win as unconditional
+
+> *"Robust multi-round bundle decoding solves real-LLM multi-agent
+> context."*
+
+Forbidden without the conditions. The defensible W12-1 reading
+names the bench properties **and** the closure contract:
+
+* **R-58 delayed-causal-evidence shape.** R-59 inherits the four
+  R-58 properties; without them the W11 contradiction-aware drop
+  cannot fire even after normalisation.
+* **Bounded producer-noise channel.** ``synonym_prob`` and
+  ``svc_token_alt_prob`` must be set such that *every* drifted
+  ``claim_kind`` is in :data:`CLAIM_KIND_SYNONYMS` and *every*
+  drifted ``service=`` token matches a pattern in
+  :data:`_SERVICE_TAG_REWRITES`. The closure property is mechanically
+  verified by ``NoisyExtractorTests::test_noisy_variants_all_in_synonym_table``.
+* **Closed-vocabulary normalisation table fits the benchmark
+  family.** The default ``CLAIM_KIND_SYNONYMS`` is fitted to the
+  closed-vocabulary incident-triage claim grammar; other benchmark
+  families need their own tables.
+* **Round-N admission not budget-starved** (inherits W11-4).
+
+Permitted: "On the Phase-59 default config (K_auditor=8,
+n_eval=12, ``synonym_prob=0.50, svc_token_alt_prob=0.30``,
+synthetic-noisy-LLM extractor; bench property holds 12/12),
+``RobustMultiRoundBundleDecoder`` achieves ``accuracy_full = 1.000``
+against every un-normalised method including W11
+``MultiRoundBundleDecoder`` at 0.000 — a +1.000 strict separation
+under the named bounded-noise channel (W12-1)."
+
+Forbidden: "W12 solves real-LLM multi-agent context."
+Forbidden: "Robust multi-round bundle decoder beats W11."
+(without the bench-shape conditions named).
+Forbidden: "Real LLMs satisfy the R-59 bench property out of the
+box." (the synthetic noisy extractor is a *calibrated approximation*,
+not an empirical real-LLM measurement; the ``ollama`` opt-in mode
+is the W12-C2 next data point.)
+
+### Labelling the synthetic-noisy-LLM extractor a "real LLM"
+
+> *"Phase-59 evaluates Wevra on a real LLM."*
+
+Forbidden without the mode disclosure. The Phase-59 default mode
+``synthetic_noisy_llm`` is a *deterministic in-process synthetic
+extractor* whose noise channel is calibrated against Phase-53 14B /
+35B empirical kind-drift histograms but is *not itself a real LLM
+measurement*. The ``ollama`` opt-in mode is the real-LLM path; when
+used, the report's ``extractor_stats`` block records
+``llm_mode='ollama'``, ``n_real_calls``, ``n_failed_calls``, and
+``n_synthetic_fallbacks``. Honest phrasings:
+
+* "Phase-59 default uses a *calibrated synthetic-noisy-LLM
+  extractor* whose drift channel mimics Phase-53 14B/35B
+  parser_role_response distributions; this is the W12-1 anchor."
+* "Phase-59 ``--llm-mode ollama`` is the opt-in real-LLM extension
+  path; the W12-C2 conjecture targets that mode."
+
+Forbidden: "Phase-59 measures real-LLM behaviour." (without naming
+the LLM mode and the calibration provenance).
+
+### Labelling SDK v3.13 the "synthetic→real-LLM transfer is closed"
+
+> *"SDK v3.13 closes the synthetic→real-LLM transfer gap."*
+
+Forbidden. The honest reading is two-layered:
+
+* SDK v3.13 closes the synthetic→real-LLM transfer gap *under the
+  bounded-producer-noise channel* the synthetic noisy extractor
+  models. The closure property (every variant the extractor can
+  emit is in the normalisation table) is mechanically verified.
+* SDK v3.13 does **not** measure transfer to a real Ollama-served
+  LLM. The W12-C2 conjecture targets that next move; until it is
+  measured (with the ``ollama`` opt-in mode, on Mac 1 or Mac 2),
+  the *real* real-LLM transfer reading is open. The synthetic side
+  of the bound is the *honest cap* on the SDK v3.13 advance; over-
+  claiming is the failure mode this section guards against.
+
+Permitted: "SDK v3.13 closes the synthetic→synthetic-noisy-LLM
+transfer gap by adding a closed-vocabulary normalisation layer
+ahead of the W11 multi-round bundle decoder; the closure property
+on the noise channel is the load-bearing premise; the real-Ollama
+transfer (W12-C2) is the next data point."
+
 ## Change log
 
 - **2026-04-26 (SDK v3.3).** Initial canonical version. Adds
@@ -403,6 +487,19 @@ via ``from_candidate_payloads``) is the SDK v3.8 win."
   decoy); "W8 was wrong" — W8 is *unchanged* and still wins on
   Phase 55, W9 is a strict generalisation that adds Phase 56,
   not a refutation.
+- **2026-04-26 (SDK v3.13).** Adds W12 rules: forbidden phrases
+  "robust multi-round bundle decoding solves real-LLM multi-agent
+  context" without the bench-shape + closure-property conditions;
+  "Phase-59 evaluates Wevra on a real LLM" without naming the
+  LLM mode (synthetic_noisy_llm vs ollama); "SDK v3.13 closes the
+  synthetic→real-LLM transfer gap" without the bounded-producer-
+  noise-channel disclosure; "we solved multi-agent context" still
+  forbidden after the Phase-59 result — the strongest cross-regime
+  win now spans **six** named regimes (R-54..R-58 + R-59 default)
+  AND a real-LLM-shaped stream, but is conditional on the closure
+  property and on a synthetic noise channel; "W11 was wrong" —
+  W11 is *unchanged* and still wins on R-58 + R-59-clean, W12 is a
+  strict additive layer that adds R-59-noisy, not a refutation.
 
 ### Labelling the W8-1 win "the W8 multi-service-gold falsifier" (named for SDK v3.10)
 

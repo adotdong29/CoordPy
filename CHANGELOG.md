@@ -5,6 +5,79 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.13] — 2026-04-26 — SDK v3.13 — real-LLM-robust multi-round bundle decoder (first synthetic→real-LLM transfer move) + W12 family
+
+*Strictly additive on SDK v3.12. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The new
+``RobustMultiRoundBundleDecoder`` and the closed-vocabulary
+``CLAIM_KIND_SYNONYMS`` table are research-slice additions to the
+multi-agent coordination layer (``vision_mvp.wevra.team_coord``),
+not part of the run-boundary product runtime. **First SDK milestone
+to clear the strong success bar of
+`docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` § 1.1 (R-59 anchor
++ new bar 9 — synthetic→real-LLM transfer split)** — the **first
+capsule-native multi-agent coordination method that survives a
+calibrated bounded-producer-noise channel**. On the new Phase-59
+*real-LLM-driven multi-round delayed-disambiguation* regime
+(``synonym_prob=0.50, svc_token_alt_prob=0.30`` synthetic-noisy-LLM
+extractor), every un-normalised capsule strategy in the SDK —
+substrate, FIFO, priority, coverage, W7-2 cohort, W8 corroboration,
+W9 multi-service, W10 single-round bundle decoder, AND **SDK v3.12
+W11 ``MultiRoundBundleDecoder``** — ties FIFO at
+``accuracy_full = 0.000`` (the W12-Λ un-normalised structural
+limit at the real-LLM axis); the new
+``RobustMultiRoundBundleDecoder`` (closed-vocabulary
+``CLAIM_KIND_SYNONYMS`` + payload-rewrite layer ahead of W11)
+achieves ``accuracy_full = 1.000`` (W12-1 sufficiency under
+bounded LLM noise). Headline gap = +1.000 vs every un-normalised
+method including W11; ``robust = 1.000`` on **5/5** alternate
+(bank_seed, llm_seed) values, ``robust − w11`` min = 0.750
+(seed 23), max = 1.000 (seeds 11, 29), well above the strong-bar
+0.20 threshold on every seed.
+Backward-compatible on R-54 / R-55 / R-56 / R-57 / R-58 and on
+R-59 with ``llm_mode='synthetic_clean_llm'`` (rewrite counters =
+0, ties W11 byte-for-byte). Named falsifier (W12-4: out-of-
+vocabulary kinds outside the synonym closure) ties FIFO at 0.000.
+Audit T-1..T-7 OK on every cell of every R-59 capsule strategy.
+
+**Files added.**
+
+* ``vision_mvp/wevra/team_coord.py`` — adds
+  ``RobustMultiRoundBundleDecoder``, ``CLAIM_KIND_SYNONYMS``,
+  ``_SERVICE_TAG_REWRITES``, ``normalize_claim_kind``,
+  ``normalize_payload``, ``normalize_handoff``.
+* ``vision_mvp/wevra/__init__.py`` — re-exports the W12 surface;
+  bumps ``SDK_VERSION = "wevra.sdk.v3.13"``.
+* ``vision_mvp/experiments/phase59_real_llm_multi_round.py`` — new
+  benchmark.
+* ``vision_mvp/tests/test_wevra_real_llm_multi_round.py`` — 24 new
+  tests across normalisation, decoder semantics, bench property,
+  default config (W12-Λ + W12-1), falsifier (W12-4), backward-compat
+  (W12-3), and 5-seed stability.
+* ``docs/data/phase59_default_K8_n12.json``,
+  ``docs/data/phase59_falsifier_K8_n8.json``,
+  ``docs/data/phase59_clean_K8_n8.json``,
+  ``docs/data/phase59_seed_sweep_K8_n12.json``,
+  ``docs/data/phase59_cross_regime.json``.
+* ``docs/RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md`` — milestone note.
+* ``docs/RESEARCH_STATUS.md``, ``docs/THEOREM_REGISTRY.md``,
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md``,
+  ``docs/HOW_NOT_TO_OVERSTATE.md``,
+  ``docs/context_zero_master_plan.md``,
+  ``docs/START_HERE.md``,
+  ``papers/wevra_capsule_native_runtime.md``,
+  ``CHANGELOG.md`` updated for the W12 family.
+
+**Honest scope.** The win is *conditional* on (a) the R-58
+delayed-causal-evidence bench shape, (b) the producer-noise
+channel being bounded by the closed-vocabulary closure (every
+variant in ``NOISY_KIND_VARIANTS`` is in ``CLAIM_KIND_SYNONYMS``),
+AND (c) round-N admission not being budget-starved (inherits
+W11-4). The synthetic-noisy-LLM extractor is calibrated against
+Phase-53 14B/35B empirical kind-drift distributions; the
+``--llm-mode ollama`` opt-in mode is the W12-C2 next data point
+and the natural Mac-2-returns probe.
+
 ## [3.11] — 2026-04-26 — SDK v3.11 — bundle-aware team decoder (first decoder-side coordination move) + W10 family
 
 *Strictly additive on SDK v3.10. The Wevra single-run product

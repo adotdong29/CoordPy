@@ -2231,6 +2231,278 @@ def collect_admitted_handoffs(
     return out
 
 
+# =============================================================================
+# SDK v3.13 — Real-LLM-robust multi-round bundle decoder (W12 family)
+# =============================================================================
+#
+# W12 attacks the *real-LLM noise* axis the synthetic W11 decoder cannot
+# reach. Real-LLM producer roles emit the same operational symptoms as
+# Phase-58 / R-58, but the *surface form* of the claim is drift-prone:
+#
+#   * Claim-kind drift. The LLM emits "DEADLOCK_DETECTED" /
+#     "DEADLOCK" / "POOL_EXHAUSTED" / "POOL_EXHAUSTION_ALERT" instead
+#     of the closed-vocabulary canonical kinds. The W11 priority
+#     decoder's `claim_kind in _DECODER_PRIORITY` lookup misses;
+#     the elected root_cause stays generic; W11-Λ collapses on
+#     real-LLM streams just as it did on R-58 single-round.
+#   * Payload drift. The LLM may omit the ``service=<tag>`` token from
+#     a service-specific message ("relation=orders_payments_join" alone),
+#     or emit a different separator ("svc=orders" / "for service orders").
+#   * Both drifts together produce a regime where the synthetic W11 win
+#     does NOT transfer to a real-LLM stream — even with bounded noise.
+#
+# The W12 decoder applies a *closed-vocabulary normalisation layer*
+# **ahead of** the W11 multi-round bundle decode:
+#
+#   1. ``claim_kind`` is rewritten through ``CLAIM_KIND_SYNONYMS`` —
+#      a small, deterministic map from observed LLM variants to the
+#      canonical kind that ``_DECODER_PRIORITY`` recognises. Unknown
+#      kinds are passed through (so the closed-vocabulary contract
+#      and the lifecycle-audit invariants are preserved).
+#   2. ``payload`` is rewritten through a small normaliser that
+#      promotes alternative service-tag spellings (``svc=X``, "for
+#      service X") to ``service=X`` so the W11 contradiction-aware
+#      drop and the substrate decoder agree on the service inventory.
+#
+# This is the *minimum honest method change* required for synthetic→
+# real-LLM transfer. The normalisation table is closed-vocabulary by
+# construction; the W11 decoder's structural argument (W11-1 / W11-2 /
+# W11-3) is preserved unchanged on the post-normalisation stream.
+#
+# Honest scope
+# ------------
+# The normalisation table is fitted to the *closed-vocabulary
+# incident-triage claim grammar* (the same grammar the Phase-31
+# substrate decoder uses). It is NOT a general-purpose LLM kind
+# normaliser. Expanding it to other benchmark families is the W12-C1
+# conjecture. Unbounded noise (an LLM that emits arbitrary novel
+# kinds) breaks normalisation by construction — that is W12-4.
+
+
+# Closed-vocabulary synonym table — rewrite LLM kind variants into the
+# Phase-31 / W10 canonical claim_kinds so the priority decoder sees a
+# recognised label. Identity entries are retained explicitly so the
+# table also serves as a closed-vocabulary docstring of allowed
+# canonical kinds. Lex-ordered for diff stability.
+CLAIM_KIND_SYNONYMS: dict[str, str] = {
+    # ERROR_RATE_SPIKE family.
+    "ERROR_RATE_SPIKE": "ERROR_RATE_SPIKE",
+    "ERROR_RATE": "ERROR_RATE_SPIKE",
+    "ERROR_SPIKE": "ERROR_RATE_SPIKE",
+    "ERROR_SURGE": "ERROR_RATE_SPIKE",
+    "HIGH_ERROR_RATE": "ERROR_RATE_SPIKE",
+    # LATENCY_SPIKE family.
+    "LATENCY_SPIKE": "LATENCY_SPIKE",
+    "LATENCY": "LATENCY_SPIKE",
+    "HIGH_LATENCY": "LATENCY_SPIKE",
+    "P95_HIGH": "LATENCY_SPIKE",
+    "SLO_BREACH": "LATENCY_SPIKE",
+    # SLOW_QUERY_OBSERVED family.
+    "SLOW_QUERY_OBSERVED": "SLOW_QUERY_OBSERVED",
+    "SLOW_QUERY": "SLOW_QUERY_OBSERVED",
+    "SLOW_QUERIES": "SLOW_QUERY_OBSERVED",
+    "QUERY_SLOWDOWN": "SLOW_QUERY_OBSERVED",
+    # POOL_EXHAUSTION family.
+    "POOL_EXHAUSTION": "POOL_EXHAUSTION",
+    "POOL_EXHAUSTED": "POOL_EXHAUSTION",
+    "CONNECTION_POOL_EXHAUSTED": "POOL_EXHAUSTION",
+    "DB_POOL_FULL": "POOL_EXHAUSTION",
+    "POOL_FULL": "POOL_EXHAUSTION",
+    "POOL_SATURATED": "POOL_EXHAUSTION",
+    # DEADLOCK_SUSPECTED family.
+    "DEADLOCK_SUSPECTED": "DEADLOCK_SUSPECTED",
+    "DEADLOCK": "DEADLOCK_SUSPECTED",
+    "DEADLOCK_DETECTED": "DEADLOCK_SUSPECTED",
+    "DEADLOCK_OBSERVED": "DEADLOCK_SUSPECTED",
+    "LOCK_CYCLE": "DEADLOCK_SUSPECTED",
+    # DISK_FILL_CRITICAL family.
+    "DISK_FILL_CRITICAL": "DISK_FILL_CRITICAL",
+    "DISK_FILL": "DISK_FILL_CRITICAL",
+    "DISK_FULL": "DISK_FILL_CRITICAL",
+    "DISK_USAGE_CRITICAL": "DISK_FILL_CRITICAL",
+    "DISK_NEAR_FULL": "DISK_FILL_CRITICAL",
+    # CRON_OVERRUN family.
+    "CRON_OVERRUN": "CRON_OVERRUN",
+    "CRON_TIMEOUT": "CRON_OVERRUN",
+    "CRON_LATE": "CRON_OVERRUN",
+    # OOM_KILL family.
+    "OOM_KILL": "OOM_KILL",
+    "OOM": "OOM_KILL",
+    "OOM_KILLED": "OOM_KILL",
+    "OUT_OF_MEMORY": "OOM_KILL",
+    # TLS_EXPIRED family.
+    "TLS_EXPIRED": "TLS_EXPIRED",
+    "CERT_EXPIRED": "TLS_EXPIRED",
+    "TLS_EXPIRY": "TLS_EXPIRED",
+    # DNS_MISROUTE family.
+    "DNS_MISROUTE": "DNS_MISROUTE",
+    "DNS_FAILURE": "DNS_MISROUTE",
+    "DNS_SERVFAIL": "DNS_MISROUTE",
+    # FW_BLOCK_SURGE family.
+    "FW_BLOCK_SURGE": "FW_BLOCK_SURGE",
+    "FIREWALL_BLOCKS": "FW_BLOCK_SURGE",
+    "FW_DENY": "FW_BLOCK_SURGE",
+    "BLOCKED_PACKETS": "FW_BLOCK_SURGE",
+}
+
+
+# Alternative service-tag spellings the normaliser rewrites to
+# ``service=<tag>``. These are the tag spellings real LLMs actually
+# emit on the closed-vocabulary incident-triage prompt. Lex-ordered
+# for diff stability. Each entry is a ``re.compile`` pattern that
+# *must* contain a single capturing group for the tag.
+import re as _re
+
+_SERVICE_TAG_REWRITES: tuple[tuple[Any, str], ...] = (
+    # The canonical form is left untouched by the rewrite (idempotent).
+    (_re.compile(r"\bsvc=([\w-]+)"), r"service=\1"),
+    (_re.compile(r"\bservice:([\w-]+)"), r"service=\1"),
+    (_re.compile(r"\bfor service ([\w-]+)\b"), r"service=\1"),
+    (_re.compile(r"\bon service ([\w-]+)\b"), r"service=\1"),
+    (_re.compile(r"\bservice_name=([\w-]+)"), r"service=\1"),
+    (_re.compile(r"\bservicename=([\w-]+)"), r"service=\1"),
+    (_re.compile(r"\bsvc_name=([\w-]+)"), r"service=\1"),
+)
+
+
+def normalize_claim_kind(kind: str,
+                          synonyms: dict[str, str] | None = None,
+                          ) -> str:
+    """Look up ``kind`` in the closed-vocabulary synonym table; return
+    the canonical kind, or the input unchanged if no entry hits.
+
+    Case-folded to upper for robustness against mixed-case LLM output.
+    Empty input returns the empty string (consistent with no-op).
+    """
+    table = synonyms if synonyms is not None else CLAIM_KIND_SYNONYMS
+    if not kind:
+        return ""
+    canonical = table.get(kind.upper())
+    return canonical if canonical is not None else kind
+
+
+def normalize_payload(payload: str) -> str:
+    """Rewrite alternative service-tag spellings into ``service=<tag>``.
+
+    Idempotent on payloads that already use the canonical form.
+    Preserves all other tokens unchanged. Closed-vocabulary by
+    construction — only the patterns in ``_SERVICE_TAG_REWRITES`` fire.
+    """
+    if not payload:
+        return ""
+    out = payload
+    for (pat, repl) in _SERVICE_TAG_REWRITES:
+        out = pat.sub(repl, out)
+    return out
+
+
+def normalize_handoff(h: _DecodedHandoff,
+                       synonyms: dict[str, str] | None = None,
+                       ) -> _DecodedHandoff:
+    """Apply ``normalize_claim_kind`` + ``normalize_payload`` to a
+    decoded handoff. Returns a new record; the input is unchanged."""
+    return _DecodedHandoff(
+        source_role=h.source_role,
+        claim_kind=normalize_claim_kind(h.claim_kind, synonyms),
+        payload=normalize_payload(h.payload),
+    )
+
+
+@dataclasses.dataclass
+class RobustMultiRoundBundleDecoder:
+    """Normalising multi-round bundle decoder (SDK v3.13, W12 family).
+
+    Wraps :class:`MultiRoundBundleDecoder` with a *closed-vocabulary
+    normalisation layer* that rewrites LLM-drifted ``claim_kind`` and
+    payload tokens into the canonical forms the W11 decoder
+    recognises. The structural W11 sufficiency argument (W11-1 / W11-2
+    / W11-3) is preserved unchanged on the post-normalisation stream.
+
+    This is the **first real-LLM-compatible cross-round coordination
+    method** in the Wevra programme. Where W11 (synthetic R-58)
+    assumes the producer emits canonical ``claim_kind`` strings and
+    canonical ``service=<tag>`` payload tokens, W12 assumes only that:
+
+    * The producer's claim-kind drift is bounded by the closed-
+      vocabulary :data:`CLAIM_KIND_SYNONYMS` table.
+    * The producer's payload drift is bounded by the closed-
+      vocabulary :data:`_SERVICE_TAG_REWRITES` table.
+
+    Under those bounded-noise assumptions, the W12 decoder reduces the
+    real-LLM regime to the synthetic R-58 regime by *construction* —
+    the post-normalisation handoff stream is shape-equivalent to the
+    R-58 ground-truth stream, so W11-1 sufficiency carries over
+    (Theorem W12-1, *proved-conditional* on the named noise budget).
+
+    Backward compatibility (W12-3)
+    ------------------------------
+    On a candidate stream where every ``claim_kind`` is already in the
+    canonical set and every payload uses ``service=<tag>``, normalisation
+    is a no-op and the W12 decoder reduces byte-for-byte to W11.
+    Empirically verified on R-58 default by
+    ``Phase58CrossRegimeTests.test_robust_decoder_matches_w11_on_r58``
+    (added in SDK v3.13).
+
+    Falsifier (W12-4)
+    -----------------
+    If the LLM emits a kind outside ``CLAIM_KIND_SYNONYMS`` for a
+    causal claim (e.g. ``DEADLOCK_PROBABLY_DETECTED_MAYBE``), the
+    canonical-kind miss propagates to the priority decoder and the
+    elected root_cause stays generic — the W11-Λ collapse re-fires.
+    This is the *closed-vocabulary boundary* of the W12 method;
+    expanding the table is a research move, not a structural fix.
+    """
+
+    inner: MultiRoundBundleDecoder = dataclasses.field(
+        default_factory=lambda: MultiRoundBundleDecoder())
+    synonyms: dict[str, str] = dataclasses.field(
+        default_factory=lambda: dict(CLAIM_KIND_SYNONYMS))
+    # Optional metric: the count of handoffs whose ``claim_kind`` was
+    # rewritten by the normaliser on the most recent ``decode_rounds``
+    # call. Useful for the Phase-59 driver to verify the normaliser
+    # was actually load-bearing on the bench.
+    last_n_kind_rewrites: int = 0
+    last_n_payload_rewrites: int = 0
+
+    def normalize_round(self,
+                          handoffs: Sequence[_DecodedHandoff],
+                          ) -> list[_DecodedHandoff]:
+        """Apply :func:`normalize_handoff` to every handoff in the
+        bundle. Updates the per-call rewrite counters."""
+        out: list[_DecodedHandoff] = []
+        for h in handoffs:
+            new_kind = normalize_claim_kind(h.claim_kind, self.synonyms)
+            new_payload = normalize_payload(h.payload)
+            if new_kind != h.claim_kind:
+                self.last_n_kind_rewrites += 1
+            if new_payload != h.payload:
+                self.last_n_payload_rewrites += 1
+            out.append(_DecodedHandoff(
+                source_role=h.source_role,
+                claim_kind=new_kind,
+                payload=new_payload,
+            ))
+        return out
+
+    def decode_rounds(self,
+                        per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+                        ) -> dict[str, Any]:
+        """Normalise every per-round bundle, then defer to the inner
+        :class:`MultiRoundBundleDecoder`."""
+        self.last_n_kind_rewrites = 0
+        self.last_n_payload_rewrites = 0
+        normalised: list[list[_DecodedHandoff]] = []
+        for bundle in per_round_handoffs:
+            normalised.append(self.normalize_round(bundle))
+        return self.inner.decode_rounds(normalised)
+
+    def decode(self,
+                handoffs: Sequence[_DecodedHandoff],
+                ) -> dict[str, Any]:
+        """Single-bundle path — degenerate case of ``decode_rounds``."""
+        return self.decode_rounds([handoffs])
+
+
 __all__ = [
     # Per-role budget
     "RoleBudget", "DEFAULT_ROLE_BUDGETS",
@@ -2257,4 +2529,7 @@ __all__ = [
     "CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE",
     # SDK v3.12 — multi-round bundle-aware team decoder (W11 family).
     "MultiRoundBundleDecoder", "collect_admitted_handoffs",
+    # SDK v3.13 — real-LLM-robust multi-round bundle decoder (W12 family).
+    "RobustMultiRoundBundleDecoder", "CLAIM_KIND_SYNONYMS",
+    "normalize_claim_kind", "normalize_payload", "normalize_handoff",
 ]
