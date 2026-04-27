@@ -1,0 +1,305 @@
+{
+  "rows": [
+    {
+      "accuracy_full": {
+        "capsule_fifo": 0.0,
+        "capsule_layered_multi_round": null,
+        "capsule_multi_round": 1.0,
+        "capsule_robust_multi_round": null,
+        "substrate": 0.0
+      },
+      "audit_ok_grid": {
+        "capsule_bundle_decoder": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "substrate": false
+      },
+      "n_scenarios": 8,
+      "regime": "R-58-default",
+      "scenarios_with_decoy_corroborated": 8,
+      "scenarios_with_property": 8
+    },
+    {
+      "accuracy_full": {
+        "capsule_fifo": 0.0,
+        "capsule_layered_multi_round": null,
+        "capsule_multi_round": 0.0,
+        "capsule_robust_multi_round": 1.0,
+        "substrate": 0.0
+      },
+      "audit_ok_grid": {
+        "capsule_bundle_decoder": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "extractor_stats": {
+        "llm_mode": "synthetic_noisy_llm"
+      },
+      "n_scenarios": 12,
+      "regime": "R-59-noisy",
+      "scenarios_with_decoy_corroborated": 12,
+      "scenarios_with_property": 12
+    },
+    {
+      "accuracy_full": {
+        "capsule_fifo": 0.0,
+        "capsule_layered_multi_round": 1.0,
+        "capsule_multi_round": 0.0,
+        "capsule_robust_multi_round": 0.0,
+        "substrate": 0.0
+      },
+      "audit_ok_grid": {
+        "capsule_bundle_decoder": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "extractor_stats": {
+        "llm_mode": "synthetic_wide_oov_llm"
+      },
+      "n_scenarios": 12,
+      "regime": "R-60-wide-OOV",
+      "scenarios_with_decoy_corroborated": 12,
+      "scenarios_with_property": 12
+    },
+    {
+      "accuracy_full": {
+        "capsule_fifo": 0.0,
+        "capsule_layered_multi_round": 0.0,
+        "capsule_multi_round": 0.0,
+        "capsule_robust_multi_round": 0.0,
+        "substrate": 0.0
+      },
+      "audit_ok_grid": {
+        "capsule_bundle_decoder": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "extractor_stats": {
+        "llm_mode": "synthetic_cosmic_oov_llm"
+      },
+      "n_scenarios": 8,
+      "regime": "R-60-cosmic-OOV",
+      "scenarios_with_decoy_corroborated": 8,
+      "scenarios_with_property": 8
+    },
+    {
+      "accuracy_full": {
+        "capsule_fifo": 0.0,
+        "capsule_layered_multi_round": 0.25,
+        "capsule_multi_round": 0.25,
+        "capsule_robust_multi_round": 0.25,
+        "substrate": 0.25
+      },
+      "audit_ok_grid": {
+        "capsule_bundle_decoder": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "extractor_stats": {
+        "llm_mode": "ollama",
+        "n_failed_calls": 0,
+        "n_real_calls": 12,
+        "total_wall_s": 45.041
+      },
+      "n_scenarios": 4,
+      "regime": "R-60-ollama-n4",
+      "scenarios_with_decoy_corroborated": 0,
+      "scenarios_with_property": 0
+    },
+    {
+      "accuracy_full": {
+        "capsule_fifo": 0.0,
+        "capsule_layered_multi_round": 1.0,
+        "capsule_multi_round": 1.0,
+        "capsule_robust_multi_round": 1.0,
+        "substrate": 0.0
+      },
+      "audit_ok_grid": {
+        "capsule_bundle_decoder": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "extractor_stats": {
+        "extractor": "identity",
+        "prompt_mode": "naive"
+      },
+      "n_scenarios": 8,
+      "regime": "R-61-default",
+      "scenarios_with_decoy_corroborated": 8,
+      "scenarios_with_property": 8
+    },
+    {
+      "accuracy_full": {
+        "capsule_fifo": 0.0,
+        "capsule_layered_multi_round": 0.0,
+        "capsule_multi_round": 0.0,
+        "capsule_robust_multi_round": 0.0,
+        "substrate": 0.0
+      },
+      "audit_ok_grid": {
+        "capsule_bundle_decoder": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "extractor_stats": {
+        "extractor": "magnitude_filter",
+        "prompt_mode": "naive"
+      },
+      "n_scenarios": 8,
+      "regime": "R-61-naive-prompt",
+      "scenarios_with_decoy_corroborated": 0,
+      "scenarios_with_property": 0
+    },
+    {
+      "accuracy_full": {
+        "capsule_fifo": 0.0,
+        "capsule_layered_multi_round": 1.0,
+        "capsule_multi_round": 1.0,
+        "capsule_robust_multi_round": 1.0,
+        "substrate": 0.0
+      },
+      "audit_ok_grid": {
+        "capsule_bundle_decoder": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "extractor_stats": {
+        "extractor": "magnitude_filter",
+        "prompt_mode": "structured"
+      },
+      "n_scenarios": 8,
+      "regime": "R-61-structured-prompt",
+      "scenarios_with_decoy_corroborated": 8,
+      "scenarios_with_property": 8
+    },
+    {
+      "accuracy_full": {
+        "capsule_fifo": 0.0,
+        "capsule_layered_multi_round": 0.0,
+        "capsule_multi_round": 0.0,
+        "capsule_robust_multi_round": 0.0,
+        "substrate": 0.0
+      },
+      "audit_ok_grid": {
+        "capsule_bundle_decoder": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "extractor_stats": {
+        "extractor": "ollama",
+        "model": "qwen2.5:14b-32k",
+        "n_failed_calls": 0,
+        "n_real_calls": 24,
+        "prompt_mode": "naive",
+        "total_wall_s": 79.858
+      },
+      "n_scenarios": 8,
+      "regime": "R-61-ollama-naive-n8",
+      "scenarios_with_decoy_corroborated": 0,
+      "scenarios_with_property": 0
+    },
+    {
+      "accuracy_full": {
+        "capsule_fifo": 0.0,
+        "capsule_layered_multi_round": 0.5,
+        "capsule_multi_round": 0.5,
+        "capsule_robust_multi_round": 0.5,
+        "substrate": 0.0
+      },
+      "audit_ok_grid": {
+        "capsule_bundle_decoder": true,
+        "capsule_cohort_buffered": true,
+        "capsule_corroboration": true,
+        "capsule_coverage": true,
+        "capsule_fifo": true,
+        "capsule_layered_multi_round": true,
+        "capsule_multi_round": true,
+        "capsule_multi_service": true,
+        "capsule_priority": true,
+        "capsule_robust_multi_round": true,
+        "substrate": false
+      },
+      "extractor_stats": {
+        "extractor": "ollama",
+        "model": "qwen2.5:14b-32k",
+        "n_failed_calls": 0,
+        "n_real_calls": 24,
+        "prompt_mode": "structured",
+        "total_wall_s": 111.446
+      },
+      "n_scenarios": 8,
+      "regime": "R-61-ollama-structured-n8",
+      "scenarios_with_decoy_corroborated": 7,
+      "scenarios_with_property": 7
+    }
+  ],
+  "schema": "phase61.cross_regime_full.v1"
+}

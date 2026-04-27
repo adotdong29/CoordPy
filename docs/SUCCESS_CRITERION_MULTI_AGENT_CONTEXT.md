@@ -1,11 +1,12 @@
-# Success criterion — solving multi-agent context (SDK v3.14 bar)
+# Success criterion — solving multi-agent context (SDK v3.15 bar)
 
 > Pre-committed, falsifiable bar for what counts as a *real* advance
 > on "solving multi-agent context" in the Context Zero / Wevra
 > programme. This document is the **referee** for SDK v3.9 / v3.10 /
-> v3.11 / v3.12 / v3.13 / v3.14 (and later milestones). Any milestone
-> note that claims an advance must name the bar it cleared and cite
-> the code-anchored evidence. Last touched: SDK v3.14, 2026-04-26.
+> v3.11 / v3.12 / v3.13 / v3.14 / v3.15 (and later milestones). Any
+> milestone note that claims an advance must name the bar it cleared
+> and cite the code-anchored evidence. Last touched: SDK v3.15,
+> 2026-04-27.
 >
 > The history of this programme is full of moves where a partial
 > result was written up too strongly and later had to be sharpened
@@ -108,6 +109,63 @@ The **named regimes** the bar refers to (anchored in code):
   Anchor:
   `vision_mvp/experiments/phase60_open_world_normalization.py`.
 
+* **R-61** — Phase-61 *producer-side ambiguity-preservation* regime,
+  the *new harder regime* SDK v3.15 introduces, anchored on the
+  W13-Λ-real diagnosis. R-58..R-60's bottleneck under a real LLM is
+  **not** kind drift but *upstream filtering*: the producer LLM
+  silently discards low-magnitude decoy events as noise and
+  compresses the round-1 stream toward a single best diagnosis. R-61
+  attacks this directly via two paired moves:
+    - **Comparable-magnitude events.** The decoy storm service is no
+      longer a deliberately *low-magnitude* impostor: it is a real
+      collateral-damage service whose round-1 spikes have the same
+      operational magnitudes as the gold services (``p95_ms``,
+      ``error_rate``, firewall-deny counts). The disambiguation is
+      *only* recoverable from the round-2 specific causal claim, not
+      from magnitude. Formal property in §§ 2.10. Mechanically
+      verified by ``Phase61BankShapeTests``.
+    - **Structured producer protocol.** An opt-in prompt mode
+      (``StructuredProducerProtocol``) splits round 1 (operational
+      *observation*: "list every distinct event you see — describe,
+      do not diagnose") from round 2 (specific *diagnosis*: "what is
+      the underlying cause?"), AND requires the LLM to emit one
+      claim per listed event with no compressed summarisation.
+      The protocol is the W14-1 candidate for closing the
+      W13-Λ-real producer-filtering gap.
+  Three pre-committed sub-banks plus an opt-in real-LLM extension:
+    - **R-61-default** (synthetic-comparable-magnitude). Same
+      bench-property witness checks as R-58 / R-60 (delayed-causal-
+      evidence + cross-role decoy corroboration), but with
+      magnitude-balanced decoy events. The W11/W12/W13 decoders all
+      win at synthetic — R-61-default is the *baseline* / sanity
+      anchor (W14-3 backward-compat target) showing the redesigned
+      events do not break the synthetic property.
+    - **R-61-naive-prompt** (synthetic, magnitude-filter simulation).
+      A deterministic "magnitude-filter" extractor mimics the
+      observed real-LLM behaviour on the *original* prompt:
+      magnitude < threshold ⇒ emit NONE; round-1 best-claim
+      compression ⇒ emit only the highest-magnitude observation.
+      Bench property holds in 0/8 by construction; W11/W12/W13 tie
+      FIFO. **W14-Λ-prompt:** any decoder is structurally
+      insufficient when the producer collapses ambiguity upstream.
+      This is the synthetic counterpart of W13-Λ-real.
+    - **R-61-structured-prompt** (synthetic, structured-protocol
+      simulation). Same magnitude-filter extractor wired to the
+      structured protocol's prompt-side schema (every listed event
+      ⇒ one claim, observation ≠ diagnosis). Bench property holds
+      in N/8; the W11..W13 decoders' headroom returns. **W14-1
+      candidate.**
+    - **R-61-ollama** (opt-in real-LLM probe; W14-Λ-real anchor).
+      Talks Mac-1 ``qwen2.5:14b-32k`` on the redesigned events under
+      the structured protocol; raw producer responses captured into
+      the report. Honest 4-tier grading mirrors § 1.4 — see § 1.5.
+      The protocol's contribution is *measured*, not *claimed*: if
+      the real LLM still filters or compresses, the structural
+      diagnosis sharpens; if the real LLM preserves observation,
+      W13-C3 advances toward discharge.
+  Anchor:
+  `vision_mvp/experiments/phase61_producer_ambiguity_preservation.py`.
+
 * **R-59** — Phase-59 *real-LLM-driven multi-round delayed-
   disambiguation* regime, the *new harder regime* SDK v3.13
   introduces. Same two-round structural shape as R-58 but the
@@ -129,7 +187,7 @@ The **named regimes** the bar refers to (anchored in code):
 
 ## 1. Three pre-committed bars
 
-> **SDK v3.14 anchors the bar to R-60.** Each version of this
+> **SDK v3.15 anchors the bar to R-61.** Each version of this
 > document anchors the *strict-gain regime* to the milestone-
 > specific harder regime. SDK v3.9 anchored to R-55; SDK v3.10
 > anchored to R-56; SDK v3.11 anchored to **R-57** AND introduced
@@ -137,16 +195,22 @@ The **named regimes** the bar refers to (anchored in code):
 > introduced bar 8 (temporal/structural split). SDK v3.13 anchored
 > to R-59 AND introduced bar 9 (synthetic→real-LLM transfer split
 > under bounded *fixed-vocabulary* producer noise). SDK v3.14
-> anchors the bar to **R-60** below AND introduces **bar 10**
-> (open-world normalisation split: a method must survive a producer-
-> noise channel that *exceeds* the fixed-vocabulary closure when the
-> drift remains inside the heuristic abstraction closure). Earlier
-> R-55..R-59-anchored bars remain valid as historical bars; the
-> *current* bar is R-60-anchored.
+> anchored to **R-60** AND introduced bar 10 (open-world
+> normalisation split: a method must survive a producer-noise
+> channel that *exceeds* the fixed-vocabulary closure when the drift
+> remains inside the heuristic abstraction closure). SDK v3.15
+> anchors the bar to **R-61** below AND introduces **bar 11**
+> (producer-side ambiguity-preservation split: a method must clear
+> the *prompt-side discipline* gate that W13-Λ-real identified as
+> the dominant blocker on real-LLM transfer; a downstream-only
+> method that does not address producer-side compression of the
+> bench property does NOT clear bar 11). Earlier R-55..R-60-anchored
+> bars remain valid as historical bars; the *current* bar is
+> R-61-anchored.
 
 ### 1.1 Strong success bar (a "real" advance)
 
-A milestone *strongly advances* the thesis iff **all ten** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14):
+A milestone *strongly advances* the thesis iff **all eleven** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15):
 
 1. **Code anchor.** A new admission/decoder/coordination method
    ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
@@ -212,6 +276,34 @@ A milestone *strongly advances* the thesis iff **all ten** hold (bars 1–6 alwa
    predicate-based normaliser; widening it is a research move
    (W13-C2 / W13-C3), not a structural fix.
 
+11. **(SDK v3.15+) Producer-side ambiguity-preservation split.** The
+   milestone-anchored harder regime (R-61-naive-prompt) is
+   **provably insufficient for any decoder, normaliser, or admission
+   policy** (W14-Λ-prompt: when the producer collapses the bench
+   property upstream — by magnitude-filtering low-magnitude decoy
+   events and/or by compressing round-1 toward a single best
+   diagnosis — the auditor's stream loses the cross-role decoy
+   corroboration AND the round-1 generic-noise property; every
+   capsule strategy in the SDK ties FIFO at 0.000 on R-61-naive-
+   prompt default). The new method must include an explicit
+   *producer-protocol layer*: a prompt schema that (a) requires the
+   producer to emit one claim per listed event with no compressed
+   summarisation AND (b) splits round-1 *observation* from round-2
+   *diagnosis* AND (c) optionally permits multiple-hypothesis
+   listings instead of premature collapse. A pure downstream method
+   (decoder / normaliser / admission policy) does NOT clear bar 11
+   on SDK v3.15. **Pre-committed bench property:** under the
+   structured protocol, the synthetic magnitude-filter extractor
+   restores ``round1_decoy_corroborated`` ≥ 75 % across the
+   pre-committed bank seeds (mechanically verified by
+   ``Phase61StructuredPromptBenchTests``). **Pre-committed
+   falsifier:** the same magnitude-filter extractor under the
+   *naive* prompt yields ``round1_decoy_corroborated`` = 0 / N AND
+   every decoder ties FIFO at 0.000 (W14-Λ-prompt; the synthetic
+   counterpart of W13-Λ-real). The naive-prompt regime is the
+   *structural counterexample* showing that downstream methods
+   alone cannot rescue producer-side erasure.
+
 9. **(SDK v3.13 only) Real-LLM transfer / bounded-producer-noise
    split.** The milestone-anchored harder regime (R-59) is
    **provably insufficient for any un-normalised single-round /
@@ -275,6 +367,28 @@ For SDK v3.11 specifically, the canonical phrasing instantiates as:
 > Phase-57-falsifier regime where the decoy is corroborated AND
 > mentioned via a causal claim_kind for the chosen root_cause
 > (W10-4)."*
+
+For SDK v3.15 specifically, the canonical phrasing instantiates as:
+
+> *"On R-61-naive-prompt (synthetic magnitude-filter extractor
+> simulating real-LLM producer-side compression on the W13-Λ-real
+> Phase-58 events), no capsule strategy in the SDK (FIFO, priority,
+> coverage, W7-2 cohort, W8 corroboration, W9 multi-service, W10
+> bundle decoder, W11 multi-round, W12 robust-multi-round, **and SDK
+> v3.14 W13 layered-multi-round**) improves accuracy_full above
+> 0.000 — this is the structural producer-side limit (W14-Λ-prompt:
+> the bench property is erased upstream, no downstream layer can
+> rescue it). The new ``StructuredProducerProtocol`` (SDK v3.15) — a
+> prompt schema that splits observation (round 1) from diagnosis
+> (round 2) and requires one claim per listed event — restores the
+> bench property on the same magnitude-filter extractor; pairing it
+> with W13 layered normalisation achieves accuracy_full = 1.000 on
+> R-61-structured-prompt default, strictly improving over the naive-
+> prompt regime (+1.000) and over substrate FIFO (+1.000), stable
+> across 5/5 alternate (bank_seed, llm_seed) values, with no
+> regression on R-53..R-60 / R-61-default and audit T-1..T-7
+> preserved on every cell. R-61-ollama is graded on the same 4-tier
+> ladder as R-60-ollama (§ 1.5)."*
 
 For SDK v3.14 specifically, the canonical phrasing instantiates as:
 
@@ -352,6 +466,48 @@ A milestone *partially advances* the thesis iff **all four** hold:
 The canonical phrasing for partial success names the trade-off
 explicitly: *"...wins R-55 by +X but trades R-54 by −Y; net
 mean across the three regimes is +Z..."*. No "broad win" framing.
+
+### 1.5 R-61-ollama 4-tier grading (SDK v3.15)
+
+R-61-ollama is the **second real-LLM probe in the programme** (after
+R-60-ollama) and the **first real-LLM probe with a producer-side
+protocol intervention**. Like R-60-ollama, it is graded *separately*
+from R-61-structured-prompt because real-LLM behaviour is empirically
+observed (not designed). The grading has four pre-committed tiers:
+
+* **R-61-OLLAMA-A (strong real transfer).** On the redesigned
+  comparable-magnitude events under the structured producer protocol,
+  the bench property holds in ≥ 75 % of scenarios under the real LLM
+  AND the round-1 cross-role decoy corroboration assumption holds
+  in ≥ 75 % of scenarios AND the W13 layered method strictly improves
+  over substrate FIFO by ≥ 0.50 pooled accuracy_full on the real-
+  LLM stream (n_eval ≥ 8). Anchor: ``run_phase61(llm_mode='ollama',
+  protocol_mode='structured', n_eval=8, model='qwen2.5:14b-32k',
+  endpoint=...)``.
+* **R-61-OLLAMA-B (partial real transfer).** Bench property holds in
+  ≥ 50 % AND either (i) accuracy_full advance over FIFO ≥ 0.20 OR
+  (ii) decoy corroboration is restored AND drift inside the W13
+  closure is non-zero (the protocol intervention worked but the W13
+  closure-widening was not the load-bearing layer; W12 already
+  saturates).
+* **R-61-OLLAMA-C (null real transfer; honest negative).** Bench
+  property holds in < 50 % of scenarios. The structured producer
+  protocol has not closed the W13-Λ-real gap; the real-LLM
+  bottleneck is *not just* prompt-side discipline. The honest reading
+  is that the dominant blocker is deeper than the protocol —
+  examples include: the LLM compresses *across* rounds (W14-Λ-cross),
+  the LLM emits drift outside the heuristic closure (intersects
+  W13-4 cosmic), or the model class itself lacks the
+  observation/diagnosis distinction in its training distribution.
+* **R-61-OLLAMA-D (failure).** Audit breaks on any cell, OR the LLM
+  endpoint fails on > 50 % of producer calls.
+
+R-61-OLLAMA-A clears bar 11 *and* clears the historical bar 9 (W12-
+C2) end-to-end and is the strongest possible empirical anchor for
+the producer-protocol axis. **The honest current reading** for SDK
+v3.15 is reported in
+``docs/RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`` § 4 — see that file for
+the per-tier outcome.
 
 ### 1.4 R-60-ollama 4-tier grading (SDK v3.14 only)
 
@@ -622,6 +778,59 @@ are provably insufficient — must combine:
 
 A regime missing any of these is *not* R-60 — it does not test
 the SDK v3.14 hypothesis.
+
+## 2.10. Required ingredients of R-61 (SDK v3.15)
+
+The "harder fair regime" introduced by SDK v3.15 — the *current*
+strict-gain anchor and the regime where producer-side ambiguity-
+preservation is provably load-bearing — must combine:
+
+* **All R-58 structural ingredients.** Two-round delayed-causal-
+  evidence shape, generic-noise round 1, specific-tier round 2 with
+  no ``service=`` token. The bench-property post-normalisation
+  witnesses (``round1_only_generic_noise``,
+  ``round2_only_specific``, ``decoy_only_in_round1``,
+  ``round1_decoy_corroborated``) are mechanically tested.
+* **Comparable-magnitude decoy events** (R-61-default): the decoy
+  storm service emits round-1 events whose operational magnitudes
+  (``p95_ms``, ``error_rate``, firewall-deny counts) lie in the
+  *same range* as the gold services'. Mechanically verified by
+  ``Phase61BankShapeTests::test_decoy_magnitudes_within_gold_range``
+  and named in code as the W14-1 closure property. A magnitude-
+  filter producer that retains only events above a single
+  threshold cannot distinguish gold from decoy.
+* **Magnitude-filter producer simulation** (R-61-naive-prompt):
+  A deterministic ``MagnitudeFilteringExtractor`` calibrated against
+  the W13-Λ-real Mac-1 14B observation. On the Phase-58 (low-
+  magnitude-decoy) events under the *naive* prompt, its outputs
+  match the real-LLM observation in
+  ``docs/data/phase60_real_ollama_qwen2_5_14b_n4.json`` byte-for-
+  byte on ``round1_decoy_corroborated`` (= 0/4 in both). On the
+  Phase-61 (comparable-magnitude) events it produces non-trivially
+  different output depending on prompt mode (naive vs structured).
+* **Structured producer protocol** (R-61-structured-prompt): the
+  ``StructuredProducerProtocol`` schema renders prompts that (a)
+  ask for *observation* in round 1 ("describe what you see — do
+  not diagnose"), (b) ask for *diagnosis* in round 2 ("what is the
+  underlying cause?"), AND (c) require one claim per listed event
+  with no compression. Mechanically verified that the protocol's
+  prompt rendering is byte-for-byte deterministic given the
+  ``RoleExtractionSchema`` inputs.
+* **Audit-preserving.** T-1..T-7 holds on every cell of every
+  capsule strategy on every (LLM mode, prompt mode, bank_seed)
+  cell.
+* **Determinism.** The synthetic magnitude-filter extractor is
+  RNG-deterministic given ``(bank_seed, llm_seed, scenario_id,
+  round_idx)``. The real-Ollama extractor is best-effort
+  deterministic via ``temperature=0`` and is opt-in only.
+* **No regression on R-54..R-60.** The structured producer protocol
+  is *additive*; on R-58 / R-59-clean / R-60-clean / R-60-wide /
+  R-60-cosmic, plugging the protocol into the synthetic extractor
+  produces the *same* downstream outcomes as the original prompt
+  (the decoder still wins / still ties / still fails identically).
+
+A regime missing any of these is *not* R-61 — it does not test
+the SDK v3.15 hypothesis.
 
 ## 3. What we are explicitly NOT testing
 

@@ -5,12 +5,12 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.14,
-> 2026-04-26.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.15,
+> 2026-04-27.
 
 ## TL;DR
 
-The programme now has **ten** coupled research axes, each with a
+The programme now has **eleven** coupled research axes, each with a
 sharp status:
 
 1. **Capsule contract / runtime** — *active, advancing*. The
@@ -201,7 +201,149 @@ sharp status:
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.14, 2026-04-26)
+## Current frontier (SDK v3.15, 2026-04-27)
+
+### Active moves (SDK v3.15 — structured producer protocol + W14 family — *first producer-protocol move + first real-LLM strict gain ≥ 0.50 over substrate FIFO*)
+
+- **Phase-61 producer-side ambiguity-preservation benchmark.**
+  ``vision_mvp.experiments.phase61_producer_ambiguity_preservation``
+  ships three pre-committed sub-banks plus an opt-in real-Ollama
+  extension:
+  (i) ``identity`` — the R-61-default sanity anchor; the synthetic
+  extractor passes every emission through verbatim. Bench property
+  holds in 8/8; W11/W12/W13 cross-round decoders all hit 1.000.
+  (ii) ``magnitude_filter`` + ``naive`` prompt — the W14-Λ-prompt
+  anchor; the magnitude-filter extractor calibrated against the
+  W13-Λ-real real-Ollama observation collapses round-1 by top-N-
+  per-(role, kind) by magnitude. On the redesigned comparable-
+  magnitude events the threshold filter does not fire (the events
+  are designed to clear it) but the prompt-induced compression
+  drops monitor's decoy-side mentions; the bench property holds in
+  0/8 and every capsule strategy ties FIFO at 0.000.
+  (iii) ``magnitude_filter`` + ``structured`` prompt — the W14-1
+  anchor; the structured prompt's per-event mandate disables the
+  compression. Bench property holds in 8/8; the cross-round capsule
+  pipeline achieves ``accuracy_full = 1.000``; +1.000 strict
+  separation vs the naive-prompt counterpart, stable across 5/5
+  alternate ``bank_seed`` values.
+  (iv) ``ollama`` (opt-in) — the R-61-ollama probe; talks Mac-1
+  ``qwen2.5:14b-32k`` with the structured prompt; raw producer
+  responses captured into the report. **R-61-OLLAMA-A tier** (the
+  strong-real-transfer tier of `docs/SUCCESS_CRITERION_MULTI_AGENT_
+  CONTEXT.md` § 1.5): bench property holds in 7/8 scenarios;
+  cross-round decoders achieve ``accuracy_full = 0.500``;
+  ``layered − fifo = +0.500`` at exactly the 0.50 threshold; audit
+  T-1..T-7 preserved on every cell. Anchor:
+  ``docs/data/phase61_real_ollama_structured_qwen2_5_14b_n8.json``.
+- **``StructuredProducerProtocol`` + ``RoleExtractionSchema`` (new).**
+  ``vision_mvp/wevra/team_coord.py``. A prompt-rendering surface
+  with two modes: ``naive`` (legacy Phase-58/59/60 byte-for-byte)
+  and ``structured`` (W14: tier banner observation/diagnosis split +
+  per-tier kind whitelist + per-event mandate). The protocol
+  consumes a deterministic ``RoleExtractionSchema`` (allowed kinds
+  + observation/diagnosis partition); ``incident_triage_role_
+  schemas()`` ships the schema table for the Phase-58..Phase-61
+  bench family. A new structured-aware response parser
+  (``_parse_structured_response``) dedupes by ``(kind, payload)``
+  rather than ``kind`` alone so the per-event mandate survives
+  parsing. Re-exported via ``__all__``.
+- **Theorem family W14.** W14-Λ-prompt (producer-side ambiguity-
+  erasure structural limit on R-61-naive-prompt, proved-empirical
+  n=40 saturated × 5 seeds + structural sketch via W7-3 extension),
+  W14-1 (StructuredProducerProtocol sufficiency under bounded
+  producer compression, proved-conditional + proved-empirical
+  synthetic n=40 + real Ollama n=8), W14-2 (schema soundness +
+  protocol determinism, proved by inspection + mechanically-
+  checked), W14-3 (backward-compat with R-54..R-60, proved-empirical
+  full programme-wide regression 393/393), W14-4 (combined-
+  intervention falsifier on R-61-ollama-naive, proved-empirical
+  n=8), W14-Λ-real (real Ollama 14B prompt-protocol transfer,
+  empirical-research n=8 × 24 producer calls). The W14-C family
+  (W14-C1..W14-C5) makes cross-bench, model-side calibration,
+  multi-round generalisation, cross-model transfer, and multi-
+  hypothesis variant extensions falsifiable.
+- **Pre-committed success criterion** in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-61 anchor +
+  bar 11 — producer-side ambiguity-preservation split + § 1.5
+  R-61-ollama 4-tier grading). The SDK v3.15 result clears the
+  **strong success bar** § 1.1 on R-61-structured-prompt synthetic
+  (strict gain ≥ 0.20 vs every prior anchor including SDK v3.14
+  W13 alone, stable across ≥ 3 (bank_seed) values, no regression on
+  R-53..R-60, audit T-1..T-7 preserved on every cell, named bench
+  property + named falsifier regime W14-4, AND producer-side
+  ambiguity-preservation split bar 11 satisfied — the new method
+  includes a load-bearing prompt-side intervention beyond every
+  prior downstream layer). The R-61-ollama probe lands at the
+  **R-61-OLLAMA-A tier** (the strongest real-transfer tier): the
+  milestone is therefore a *strong-success on R-61 synthetic + a
+  strong-success / OLLAMA-A on R-61-ollama*, the **first strong-
+  success on a real-LLM stream in the programme** (R-60-OLLAMA-C
+  was honest null; R-61-OLLAMA-A is +0.500 strict gain at the
+  threshold).
+- **Honest scope.** The W14-1 win is *conditional* on (a) the
+  redesigned comparable-magnitude events (R-61 closure property),
+  (b) the structured producer protocol being in effect, AND (c) the
+  cross-round capsule pipeline (admission + multi-round decoder).
+  The W14-4 falsifier regime (real Ollama + comparable-magnitude
+  events + naive prompt) is the explicit counterexample showing
+  *both* interventions are required. The W13 closure-widening is
+  structurally invisible on R-61-ollama because the real LLM emits
+  canonical kinds (zero drift); on the structured prompt the
+  load-bearing layer is W14, not W13. The W13 layer is dormant on
+  this regime, not refuted.
+
+### Active observations (SDK v3.15)
+
+- **W14-Λ-real (honest positive).** Real Mac-1
+  ``qwen2.5:14b-32k`` at ``temperature=0`` on the Phase-61
+  redesigned comparable-magnitude events:
+  - Under naive prompt: bench property holds 0/8; every method
+    ties FIFO at 0.000 (empirical confirmation of W14-Λ-prompt on
+    real LLM).
+  - Under structured prompt: bench property holds 7/8; W11/W12/W13
+    cross-round decoders all achieve ``accuracy_full = 0.500``;
+    +0.500 strict gain vs FIFO at the R-61-OLLAMA-A threshold.
+  - The 1/8 model-error failure is on the LLM (slow_query
+    scenario: LLM judged ``error_rate=0.15`` not to qualify as
+    ``ERROR_RATE_SPIKE``), not on the protocol — the structured
+    prompt + comparable-magnitude events restore the bench
+    property in every other scenario. The W14-C2 conjecture
+    (magnitude-hinted prompt extension) is the natural next move.
+
+### Active conjectures (SDK v3.15)
+
+- **W14-C1**: cross-bench transfer of the W14 protocol to non-
+  incident-triage benchmark families. Conjectural.
+- **W14-C2**: model-side magnitude calibration via a *magnitude
+  hint* extension to the structured prompt. Conjectural; the W14-
+  Λ-real 7/8 anchor is the candidate falsifier.
+- **W14-C3**: multi-round generalisation to N ≥ 3 rounds with a
+  graded tier hierarchy. Conjectural.
+- **W14-C4**: cross-model transfer to qwen3.5:35b-MoE and to non-
+  Ollama backends (MLX-distributed). Conjectural; requires Mac 2
+  reachable.
+- **W14-C5**: multi-hypothesis variant of the protocol that permits
+  2-3 candidate kinds per event. Conjectural.
+
+### Discharged / partially-discharged conjectures (SDK v3.15)
+
+- **W13-C3** (SDK v3.14; real-Ollama transfer of W13-1 with a
+  redesigned event stream + a prompt that instructs the LLM to
+  emit one claim per distinct event). **PARTIALLY DISCHARGED-
+  empirical** by W14-1 + W14-Λ-real: the *combination* of
+  comparable-magnitude events + structured producer protocol
+  clears the strict-gain bar on real Ollama 14B (n=8, +0.500 vs
+  FIFO at exactly the R-61-OLLAMA-A threshold), BUT the gain is on
+  the **W11/W12/W13 cross-round pipeline as a whole** — not
+  specifically on the W13 closure-widening, which is structurally
+  invisible because the real LLM still emits canonical kinds. The
+  honest revised reading: prompt-side discipline + comparable-
+  magnitude events restore the bench property; W13's *normalisation*
+  contribution remains dormant on this regime. The cross-round
+  structural bar is cleared at +0.500 by the combined intervention
+  (W14).
+
+## Previous frontier (SDK v3.14, 2026-04-26)
 
 ### Active moves (SDK v3.14 — layered open-world normalisation + real-Ollama probe + W13 family — *first open-world normalisation move and first real-Ollama transfer measurement*)
 

@@ -2920,6 +2920,366 @@ class LayeredRobustMultiRoundBundleDecoder:
         }
 
 
+# =============================================================================
+# SDK v3.15 — structured producer protocol (W14 family)
+# =============================================================================
+#
+# The W13 closure-widening contract closed the *open-world normalisation*
+# axis: a layered exact + heuristic normaliser strictly widens the W12
+# closed-vocabulary closure on R-60-wide. But on real Ollama 14B the
+# observed bottleneck (W13-Λ-real) is *upstream*: the producer LLM
+# silently filters low-magnitude decoy events as noise AND compresses
+# round-1 toward a single best diagnosis. Normalisation has nothing to
+# rescue when the bench property is erased *before* the candidate
+# stream reaches the auditor.
+#
+# The W14 layer attacks this directly via *prompt-side discipline*. It
+# is purely additive — a new prompt-rendering surface that any
+# extractor (synthetic or real-Ollama) can use in place of the legacy
+# free-form prompt. The Wevra single-run product runtime contract is
+# byte-for-byte unchanged; this is research-grade SDK code on the team-
+# coord surface only.
+#
+# Two modes:
+#
+# * **Naive** — the legacy Phase-58/59/60 prompt rendering. Preserves
+#   backward-compat: any extractor that opts in to ``ProducerPromptMode
+#   .NAIVE`` produces byte-identical output to the legacy
+#   ``_round_ollama_prompt`` helpers.
+# * **Structured** — splits round 1 (operational *observation*: "list
+#   every distinct event you see — describe, do not diagnose") from
+#   round 2 (specific *diagnosis*: "what is the underlying cause?")
+#   AND requires one claim per listed event with no compressed
+#   summarisation. The protocol's contribution is to *preserve* the
+#   bench property's cross-role decoy corroboration assumption when the
+#   producer LLM would otherwise filter or compress.
+#
+# This file ships only the *protocol* (prompt rendering + role schema +
+# claim parser). The benchmark driver (``Phase61``) and the magnitude-
+# filtering synthetic extractor live in
+# ``vision_mvp/experiments/phase61_producer_ambiguity_preservation.py``.
+
+
+# Producer-prompt mode names — closed vocabulary, one per element.
+PRODUCER_PROMPT_NAIVE = "naive"
+PRODUCER_PROMPT_STRUCTURED = "structured"
+ALL_PRODUCER_PROMPT_MODES: tuple[str, ...] = (
+    PRODUCER_PROMPT_NAIVE,
+    PRODUCER_PROMPT_STRUCTURED,
+)
+
+
+@dataclasses.dataclass(frozen=True)
+class RoleExtractionSchema:
+    """Declarative per-role extraction schema for the W14 protocol.
+
+    The schema is the *load-bearing structural input* to
+    :class:`StructuredProducerProtocol`'s prompt rendering. It captures
+    everything the LLM needs to know to emit one claim per listed
+    event without compressing toward a single diagnosis:
+
+    * ``role`` — the producer role name (``monitor`` / ``db_admin`` /
+      ``sysadmin`` / ``network`` / …). Must match the role used in the
+      ``TeamCoordinator``.
+    * ``allowed_kinds`` — the role-local closed vocabulary of claim
+      kinds. Same as the legacy ``incident_triage_known_kinds`` table
+      but threaded explicitly so non-incident-triage benches can plug
+      in without touching the team-coord module.
+    * ``observation_kinds`` — subset of ``allowed_kinds`` the LLM is
+      allowed to emit in *round 1* (observation mode). This is the
+      *generic-noise* tier in the incident-triage benchmark
+      (``LATENCY_SPIKE``, ``ERROR_RATE_SPIKE``, ``FW_BLOCK_SURGE``).
+      Round 1 prompt explicitly forbids diagnostic kinds.
+    * ``diagnosis_kinds`` — subset of ``allowed_kinds`` the LLM is
+      allowed to emit in *round 2* (diagnosis mode). This is the
+      *specific-tier* causal kind set (``DEADLOCK_SUSPECTED``,
+      ``POOL_EXHAUSTION``, ``DISK_FILL_CRITICAL``,
+      ``SLOW_QUERY_OBSERVED``). Round 2 prompt explicitly forbids
+      generic-noise kinds.
+
+    The two-set partition is what makes the structured protocol
+    structurally distinct from the naive prompt: the LLM is told *up
+    front* which tier the round expects, removing the temptation to
+    pre-collapse round-1 observation into round-2 diagnosis.
+    """
+    role: str
+    allowed_kinds: tuple[str, ...]
+    observation_kinds: tuple[str, ...]
+    diagnosis_kinds: tuple[str, ...]
+
+    def kinds_for_round(self, round_idx: int) -> tuple[str, ...]:
+        """Return the role's allowed kinds for the given round under
+        the structured protocol. Round 1 = observation, round 2 =
+        diagnosis. Round indices outside {1, 2} fall back to
+        ``allowed_kinds`` (naive prompt parity)."""
+        if round_idx == 1:
+            return self.observation_kinds or self.allowed_kinds
+        if round_idx == 2:
+            return self.diagnosis_kinds or self.allowed_kinds
+        return self.allowed_kinds
+
+
+@dataclasses.dataclass(frozen=True)
+class ProducerPromptResult:
+    """Bundle returned by :func:`StructuredProducerProtocol.render_prompt`
+    so the bench driver can record which exact mode + schema was in
+    effect for forensic audit."""
+    mode: str
+    role: str
+    round_idx: int
+    text: str
+    kinds_in_scope: tuple[str, ...]
+
+
+@dataclasses.dataclass
+class StructuredProducerProtocol:
+    """W14 producer protocol: a prompt-rendering surface that splits
+    observation from diagnosis and requires exhaustive per-event
+    extraction.
+
+    The protocol has two modes:
+
+    * ``mode = PRODUCER_PROMPT_NAIVE`` reproduces the legacy
+      Phase-58/59/60 prompt byte-for-byte (see
+      :func:`_render_naive_prompt`); this is the W14-3 backward-compat
+      anchor.
+    * ``mode = PRODUCER_PROMPT_STRUCTURED`` renders the new prompt
+      with three reinforcing instructions:
+        1. Round-tier banner: "Round 1 = OBSERVATION; Round 2 =
+           DIAGNOSIS". The banner is the load-bearing instruction —
+           it gives the LLM permission to emit observational claims
+           without committing to a cause.
+        2. Per-tier kind whitelist: only ``observation_kinds`` /
+           ``diagnosis_kinds`` are permitted on the respective round.
+           Diagnostic kinds in round 1 are forbidden ("treat round 1
+           as monitoring data only"); generic-noise kinds in round 2
+           are forbidden ("the cause has already been signalled —
+           emit the specific diagnosis").
+        3. One-claim-per-event mandate: "EMIT ONE CLAIM PER LISTED
+           EVENT BELOW. DO NOT SKIP, DEDUPLICATE, OR COMPRESS EVENTS
+           EVEN IF THEY APPEAR SIMILAR." The mandate is the W14
+           anti-compression invariant.
+
+    The structured prompt is *purely additive*. The wire shape, the
+    closed-vocabulary kind whitelist, and the parser are unchanged
+    from the legacy path; only the rendered prompt text differs.
+
+    A benchmark driver constructs one protocol per scenario / role /
+    round, calls :meth:`render_prompt`, sends the text to the LLM
+    backend, and parses the response with the same closed-vocabulary
+    parser as Phase 59 (``_parse_ollama_response``). The protocol
+    object holds no per-call state beyond the deterministic config.
+    """
+
+    mode: str = PRODUCER_PROMPT_STRUCTURED
+
+    def __post_init__(self) -> None:
+        if self.mode not in ALL_PRODUCER_PROMPT_MODES:
+            raise ValueError(
+                f"unknown producer prompt mode {self.mode!r}; "
+                f"valid: {ALL_PRODUCER_PROMPT_MODES}")
+
+    def render_prompt(self,
+                       *,
+                       role: str,
+                       round_idx: int,
+                       events: Sequence[tuple[str, str]],
+                       schema: RoleExtractionSchema,
+                       ) -> ProducerPromptResult:
+        """Render the producer prompt for one (role, round, events,
+        schema) tuple.
+
+        Parameters
+        ----------
+        role
+            The producer role (must equal ``schema.role`` for the
+            structured prompt; this is enforced).
+        round_idx
+            ``1`` for observation, ``2`` for diagnosis. Other indices
+            are accepted but render the naive prompt regardless of
+            ``mode`` (the structured prompt has no defined behaviour
+            for non-{1,2} rounds and falls back to the naive path).
+        events
+            Pairs ``(canonical_kind_hint, payload)`` describing the
+            operational events the role observed. The structured
+            prompt uses these for the per-event enumeration; the
+            naive prompt uses the same enumeration shape so the two
+            modes differ only in the surrounding instructions.
+        schema
+            The role-local extraction schema. Must satisfy
+            ``schema.role == role`` and the mode-specific kind
+            partition (observation_kinds for round 1, diagnosis_kinds
+            for round 2 under the structured prompt).
+        """
+        if schema.role != role:
+            raise ValueError(
+                f"schema.role={schema.role!r} != role={role!r}")
+        kinds = schema.kinds_for_round(round_idx)
+        if (self.mode == PRODUCER_PROMPT_NAIVE
+                or round_idx not in (1, 2)):
+            text = _render_naive_prompt(
+                role=role, round_idx=round_idx,
+                events=events, allowed_kinds=kinds)
+            return ProducerPromptResult(
+                mode=PRODUCER_PROMPT_NAIVE, role=role,
+                round_idx=int(round_idx), text=text,
+                kinds_in_scope=tuple(kinds))
+        text = _render_structured_prompt(
+            role=role, round_idx=round_idx,
+            events=events, schema=schema)
+        return ProducerPromptResult(
+            mode=PRODUCER_PROMPT_STRUCTURED, role=role,
+            round_idx=int(round_idx), text=text,
+            kinds_in_scope=tuple(kinds))
+
+
+def _render_naive_prompt(*,
+                           role: str,
+                           round_idx: int,
+                           events: Sequence[tuple[str, str]],
+                           allowed_kinds: Sequence[str]) -> str:
+    """Render the legacy Phase-58/59/60 prompt. Byte-for-byte equal
+    to ``vision_mvp.experiments.phase59_real_llm_multi_round.
+    _round_ollama_prompt`` (W14-3 backward-compat anchor).
+
+    The rendered text is reproduced here so the W14 protocol module
+    has *no* import dependency on the experiments package — a
+    Phase-N+1 driver can render the naive prompt without touching
+    Phase-59 at all.
+    """
+    kind_lines = "\n".join(f"  - {k}" for k in allowed_kinds)
+    event_lines: list[str] = []
+    for i, (_canon, payload) in enumerate(events, start=1):
+        event_lines.append(f"  [{i}] body=\"{payload}\"")
+    if not event_lines:
+        event_lines = ["  (none)"]
+    round_hint = ("operational symptoms (latency/error/firewall)"
+                   if round_idx == 1
+                   else "specific diagnostic clues (deadlock/pool/disk/query)")
+    return (
+        f"You are the {role!r} agent in an incident-response team. "
+        f"This is round {round_idx}: {round_hint}.\n\n"
+        f"Allowed claim kinds for {role!r}:\n{kind_lines}\n\n"
+        f"Events you observed:\n"
+        + "\n".join(event_lines) + "\n\n"
+        f"For each event, emit ONE LINE in the format\n"
+        f"  KIND | one-line evidence including any service token\n"
+        f"Output rules: only KINDs from the list. One claim per line. "
+        f"Maximum 6 lines. If no claim, output NONE.\n\n"
+        f"Begin output now:\n"
+    )
+
+
+def _render_structured_prompt(*,
+                                role: str,
+                                round_idx: int,
+                                events: Sequence[tuple[str, str]],
+                                schema: RoleExtractionSchema) -> str:
+    """Render the W14 structured prompt. Three load-bearing parts:
+
+    1. Round-tier banner (OBSERVATION vs DIAGNOSIS).
+    2. Per-tier kind whitelist (observation_kinds in round 1,
+       diagnosis_kinds in round 2).
+    3. One-claim-per-event mandate.
+
+    The structured prompt also reminds the LLM that the auditor
+    *needs* the corroboration evidence on every listed service even
+    if the LLM thinks the event is small or coincidental — this is
+    the explicit anti-magnitude-filter clause that closes the
+    W13-Λ-real gap synthetically.
+    """
+    if round_idx == 1:
+        tier_banner = (
+            "ROUND 1 — OBSERVATION MODE.\n"
+            "Your job is to DESCRIBE what you observe, not to diagnose.\n"
+            "Even small / borderline / coincidental signals must be "
+            "reported — the auditor will combine evidence across "
+            "rounds and across roles. DO NOT compress observations "
+            "toward a single best explanation; that is a later step."
+        )
+        allowed = schema.observation_kinds or schema.allowed_kinds
+        forbidden = schema.diagnosis_kinds
+    else:  # round 2
+        tier_banner = (
+            "ROUND 2 — DIAGNOSIS MODE.\n"
+            "Round-1 observations have been recorded. Your job here "
+            "is to emit the SPECIFIC underlying cause as a single "
+            "diagnostic claim. Do NOT re-emit generic latency / error "
+            "/ firewall observations in this round — those belong "
+            "to round 1."
+        )
+        allowed = schema.diagnosis_kinds or schema.allowed_kinds
+        forbidden = schema.observation_kinds
+    kind_lines = "\n".join(f"  - {k}" for k in allowed)
+    forbidden_lines = (
+        "\n".join(f"  - {k}" for k in forbidden)
+        if forbidden else "  (none)")
+    event_lines: list[str] = []
+    for i, (_canon, payload) in enumerate(events, start=1):
+        event_lines.append(f"  [{i}] body=\"{payload}\"")
+    if not event_lines:
+        event_lines = ["  (none)"]
+    return (
+        f"You are the {role!r} agent in an incident-response team.\n\n"
+        f"{tier_banner}\n\n"
+        f"Allowed claim kinds for this round:\n{kind_lines}\n\n"
+        f"FORBIDDEN claim kinds for this round (these belong to the "
+        f"OTHER round):\n{forbidden_lines}\n\n"
+        f"Events you observed:\n"
+        + "\n".join(event_lines) + "\n\n"
+        f"OUTPUT INSTRUCTIONS:\n"
+        f"  * EMIT ONE CLAIM PER LISTED EVENT ABOVE. Do NOT skip, "
+        f"deduplicate, or compress events even if they look similar "
+        f"or appear to share a single cause.\n"
+        f"  * Each claim is ONE LINE in the format\n"
+        f"      KIND | one-line evidence including any service token\n"
+        f"  * Use only KINDs from the allowed list. If a listed event "
+        f"truly does not warrant any allowed kind for this round "
+        f"(e.g. round-1 with a non-symptom body), emit "
+        f"\"NONE | <why>\" on a line of its own — but emitting NONE "
+        f"on every event is a sign you have collapsed observation "
+        f"and is discouraged.\n"
+        f"  * Maximum {max(8, len(event_lines) + 2)} lines.\n\n"
+        f"Begin output now:\n"
+    )
+
+
+# Default schemas for the bundled incident-triage benchmark family.
+# Other benchmarks should construct their own ``RoleExtractionSchema``
+# table; this one ships as a convenience for Phase-58..Phase-61
+# drivers and is mechanically aligned with
+# ``vision_mvp.core.extractor_noise.incident_triage_known_kinds``.
+INCIDENT_TRIAGE_OBSERVATION_KINDS: tuple[str, ...] = (
+    "LATENCY_SPIKE", "ERROR_RATE_SPIKE", "FW_BLOCK_SURGE",
+)
+
+
+def incident_triage_role_schemas() -> dict[str, RoleExtractionSchema]:
+    """Return the W14 default schema table for the incident-triage
+    benchmark family. Each role's ``observation_kinds`` is the
+    intersection of its ``allowed_kinds`` with the closed-vocabulary
+    generic-noise tier (``INCIDENT_TRIAGE_OBSERVATION_KINDS``);
+    ``diagnosis_kinds`` is the complement on the same allowed-kind
+    set.
+
+    Mechanically verified by ``IncidentTriageSchemaTests`` in
+    ``test_wevra_producer_ambiguity.py``.
+    """
+    from vision_mvp.core.extractor_noise import (
+        incident_triage_known_kinds)
+    out: dict[str, RoleExtractionSchema] = {}
+    obs_set = set(INCIDENT_TRIAGE_OBSERVATION_KINDS)
+    for role, allowed in incident_triage_known_kinds().items():
+        allowed_t = tuple(allowed)
+        observation = tuple(k for k in allowed_t if k in obs_set)
+        diagnosis = tuple(k for k in allowed_t if k not in obs_set)
+        out[role] = RoleExtractionSchema(
+            role=role, allowed_kinds=allowed_t,
+            observation_kinds=observation,
+            diagnosis_kinds=diagnosis)
+    return out
+
+
 __all__ = [
     # Per-role budget
     "RoleBudget", "DEFAULT_ROLE_BUDGETS",
@@ -2953,4 +3313,11 @@ __all__ = [
     "HeuristicAbstractionRule", "LayeredClaimNormalizer",
     "LayeredRobustMultiRoundBundleDecoder",
     "LAYERED_NORMALIZER_ABSTAIN",
+    # SDK v3.15 — structured producer protocol (W14 family).
+    "PRODUCER_PROMPT_NAIVE", "PRODUCER_PROMPT_STRUCTURED",
+    "ALL_PRODUCER_PROMPT_MODES",
+    "RoleExtractionSchema", "ProducerPromptResult",
+    "StructuredProducerProtocol",
+    "INCIDENT_TRIAGE_OBSERVATION_KINDS",
+    "incident_triage_role_schemas",
 ]

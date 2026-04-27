@@ -1,0 +1,518 @@
+{
+  "audit_ok_grid": {
+    "capsule_bundle_decoder": true,
+    "capsule_cohort_buffered": true,
+    "capsule_corroboration": true,
+    "capsule_coverage": true,
+    "capsule_fifo": true,
+    "capsule_layered_multi_round": true,
+    "capsule_multi_round": true,
+    "capsule_multi_service": true,
+    "capsule_priority": true,
+    "capsule_robust_multi_round": true,
+    "substrate": false
+  },
+  "bench_property_per_scenario": {
+    "p61_deadlock_orders_payments__compmag_cache__rep0": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 6,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    },
+    "p61_disk_storage_logs__compmag_cache__rep0": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 5,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    },
+    "p61_pool_api_db__compmag_archival__rep0": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 6,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    },
+    "p61_slow_query_web_db__compmag_metrics__rep0": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 5,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    }
+  },
+  "bench_summary": {
+    "K_auditor": 8,
+    "n_scenarios": 4,
+    "scenarios_with_decoy_corroboration": 4,
+    "scenarios_with_property": 4
+  },
+  "config": {
+    "K_auditor": 8,
+    "K_producer": 6,
+    "T_auditor": 256,
+    "T_producer": 96,
+    "bank_replicates": 1,
+    "bank_seed": 11,
+    "endpoint": "http://192.168.12.191:11434",
+    "extractor": "ollama",
+    "inbox_capacity": 8,
+    "model": "qwen2.5:14b-32k",
+    "n_eval": 4,
+    "prompt_mode": "structured",
+    "threshold_error_rate": 0.1,
+    "threshold_fw_count": 5,
+    "threshold_p95_ms": 1000.0
+  },
+  "extractor_stats": {
+    "endpoint": "http://192.168.12.191:11434",
+    "extractor": "ollama",
+    "model": "qwen2.5:14b-32k",
+    "n_failed_calls": 0,
+    "n_real_calls": 12,
+    "n_synthetic_fallbacks": 0,
+    "prompt_mode": "structured",
+    "threshold_error_rate": 0.1,
+    "threshold_fw_count": 5,
+    "threshold_p95_ms": 1000.0,
+    "total_wall_s": 55.801
+  },
+  "headline_gap": {
+    "layered_minus_fifo": 0.75,
+    "layered_minus_multi_round": 0.0,
+    "layered_minus_robust": 0.0,
+    "max_non_layered_accuracy_full": 0.75,
+    "robust_minus_fifo": 0.75,
+    "robust_minus_multi_round": 0.0
+  },
+  "n_results": 44,
+  "pooled": {
+    "capsule_bundle_decoder": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 3,
+        "missing_handoff": 1
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 6.75,
+      "mean_tokens_admitted": 3.5,
+      "n": 4,
+      "strategy": "capsule_bundle_decoder"
+    },
+    "capsule_cohort_buffered": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 3,
+        "missing_handoff": 1
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 6.75,
+      "mean_tokens_admitted": 3.5,
+      "n": 4,
+      "strategy": "capsule_cohort_buffered"
+    },
+    "capsule_corroboration": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 3,
+        "missing_handoff": 1
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 6.75,
+      "mean_tokens_admitted": 3.5,
+      "n": 4,
+      "strategy": "capsule_corroboration"
+    },
+    "capsule_coverage": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 6.75,
+      "mean_tokens_admitted": 3.5,
+      "n": 4,
+      "strategy": "capsule_coverage"
+    },
+    "capsule_fifo": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 6.75,
+      "mean_tokens_admitted": 3.5,
+      "n": 4,
+      "strategy": "capsule_fifo"
+    },
+    "capsule_layered_multi_round": {
+      "accuracy_full": 0.75,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.75,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 1,
+        "none": 3
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 6.75,
+      "mean_tokens_admitted": 3.5,
+      "n": 4,
+      "strategy": "capsule_layered_multi_round"
+    },
+    "capsule_multi_round": {
+      "accuracy_full": 0.75,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.75,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 1,
+        "none": 3
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 6.75,
+      "mean_tokens_admitted": 3.5,
+      "n": 4,
+      "strategy": "capsule_multi_round"
+    },
+    "capsule_multi_service": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 3,
+        "missing_handoff": 1
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 6.75,
+      "mean_tokens_admitted": 3.5,
+      "n": 4,
+      "strategy": "capsule_multi_service"
+    },
+    "capsule_priority": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 6.75,
+      "mean_tokens_admitted": 3.5,
+      "n": 4,
+      "strategy": "capsule_priority"
+    },
+    "capsule_robust_multi_round": {
+      "accuracy_full": 0.75,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.75,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 1,
+        "none": 3
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 6.75,
+      "mean_tokens_admitted": 3.5,
+      "n": 4,
+      "strategy": "capsule_robust_multi_round"
+    },
+    "substrate": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 0.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 6.5,
+      "mean_n_role_view": 0.0,
+      "mean_n_team_handoff": 0.0,
+      "mean_tokens_admitted": 16.5,
+      "n": 4,
+      "strategy": "substrate"
+    }
+  },
+  "prompt_records": [
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "dcf220844cdbc105",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+    },
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "76635d947d1fb73a",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+    },
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "83d91d19df8aca7c",
+      "role": "db_admin",
+      "round_idx": 2,
+      "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+    },
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "15131a1e0cf3328a",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_pool_api_db__compmag_archival__rep0"
+    },
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "def209afbde268cd",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_pool_api_db__compmag_archival__rep0"
+    },
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "23e6f1ad3fbbd005",
+      "role": "db_admin",
+      "round_idx": 2,
+      "scenario_id": "p61_pool_api_db__compmag_archival__rep0"
+    },
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "0ed0b3a513769d3a",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_disk_storage_logs__compmag_cache__rep0"
+    },
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "b968d385091ba7cc",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_disk_storage_logs__compmag_cache__rep0"
+    },
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "eccd69b72e8cc054",
+      "role": "sysadmin",
+      "round_idx": 2,
+      "scenario_id": "p61_disk_storage_logs__compmag_cache__rep0"
+    },
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "aac5ac6a46ced7f9",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+    },
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "00b4f86814f5ddc5",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+    },
+    {
+      "mode": "structured",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "ebcb1b45740ae33b",
+      "role": "db_admin",
+      "round_idx": 2,
+      "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+    }
+  ],
+  "raw_responses_per_scenario": {
+    "p61_deadlock_orders_payments__compmag_cache__rep0": [
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "dcf220844cdbc105",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0",
+        "text": "LATENCY_SPIKE | p95_ms=2100 service=orders\nERROR_RATE_SPIKE | error_rate=0.22 service=payments\nLATENCY_SPIKE | p95_ms=1850 service=cache\nERROR_RATE_SPIKE | error_rate=0.15 service=cache",
+        "wall_s": 6.978
+      },
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "76635d947d1fb73a",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0",
+        "text": "FW_BLOCK_SURGE | rule=deny count=10 service=cache\nFW_BLOCK_SURGE | rule=deny count=11 service=cache",
+        "wall_s": 3.893
+      },
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "83d91d19df8aca7c",
+        "raw_kind": "ollama_response",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0",
+        "text": "DEADLOCK_SUSPECTED | deadlock relation=orders_payments_join wait_chain=2",
+        "wall_s": 3.021
+      }
+    ],
+    "p61_disk_storage_logs__compmag_cache__rep0": [
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "0ed0b3a513769d3a",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_cache__rep0",
+        "text": "ERROR_RATE_SPIKE | error_rate=0.41 service=storage\nLATENCY_SPIKE | p95_ms=4500 service=logs_pipeline\nNONE | p95_ms=3100 service=cache (within normal range)\nERROR_RATE_SPIKE | error_rate=0.21 service=cache",
+        "wall_s": 6.729
+      },
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "b968d385091ba7cc",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_cache__rep0",
+        "text": "FW_BLOCK_SURGE | rule=deny count=7 service=cache\nFW_BLOCK_SURGE | rule=deny count=8 service=cache",
+        "wall_s": 3.779
+      },
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "eccd69b72e8cc054",
+        "raw_kind": "ollama_response",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_cache__rep0",
+        "text": "DISK_FILL_CRITICAL | /var/log used=99% fs=/ host=primary",
+        "wall_s": 2.882
+      }
+    ],
+    "p61_pool_api_db__compmag_archival__rep0": [
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "15131a1e0cf3328a",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_archival__rep0",
+        "text": "LATENCY_SPIKE | p95_ms=4200 service=api\nERROR_RATE_SPIKE | error_rate=0.18 service=db\nLATENCY_SPIKE | p95_ms=2400 service=archival\nERROR_RATE_SPIKE | error_rate=0.13 service=archival",
+        "wall_s": 6.567
+      },
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "def209afbde268cd",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_archival__rep0",
+        "text": "FW_BLOCK_SURGE | rule=deny count=12 service=archival\nFW_BLOCK_SURGE | rule=deny count=14 service=archival",
+        "wall_s": 4.048
+      },
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "23e6f1ad3fbbd005",
+        "raw_kind": "ollama_response",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_archival__rep0",
+        "text": "POOL_EXHAUSTION | pool active=200/200 waiters=145 cluster=primary",
+        "wall_s": 3.541
+      }
+    ],
+    "p61_slow_query_web_db__compmag_metrics__rep0": [
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "aac5ac6a46ced7f9",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0",
+        "text": "LATENCY_SPIKE | p95_ms=4100 service=web\nNONE | error_rate=0.15 service=db (not an allowed claim kind for this round)\nLATENCY_SPIKE | p95_ms=2900 service=metrics\nERROR_RATE_SPIKE | error_rate=0.13 service=metrics",
+        "wall_s": 6.871
+      },
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "00b4f86814f5ddc5",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0",
+        "text": "FW_BLOCK_SURGE | rule=deny count=9 service=metrics\nFW_BLOCK_SURGE | rule=deny count=10 service=metrics",
+        "wall_s": 4.019
+      },
+      {
+        "prompt_mode": "structured",
+        "prompt_sha256": "ebcb1b45740ae33b",
+        "raw_kind": "ollama_response",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0",
+        "text": "SLOW_QUERY_OBSERVED | q#9 mean_ms=4100 cluster=primary",
+        "wall_s": 3.472
+      }
+    ]
+  },
+  "scenarios_evaluated": [
+    "p61_deadlock_orders_payments__compmag_cache__rep0",
+    "p61_pool_api_db__compmag_archival__rep0",
+    "p61_disk_storage_logs__compmag_cache__rep0",
+    "p61_slow_query_web_db__compmag_metrics__rep0"
+  ],
+  "schema": "phase61.producer_ambiguity_preservation.v1"
+}

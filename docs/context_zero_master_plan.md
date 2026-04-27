@@ -7422,6 +7422,144 @@ property; over-claiming is the failure mode the
 ``HOW_NOT_TO_OVERSTATE.md`` § "Labelling the W13-1 win as
 unconditional" rules guard against.
 
+### 4.32 SDK v3.15 — structured producer protocol + W14 family (Phase-61 producer-side ambiguity-preservation benchmark)
+
+SDK v3.15 attacks the SDK v3.14 W13-Λ-real real-Ollama bottleneck
+directly via prompt-side discipline. The SDK v3.14 honest negative
+diagnosed the bottleneck: real Ollama 14B at default settings emits
+canonical kinds (zero drift) AND filters low-magnitude decoy events
+as noise, so the bench property holds in 0/4 scenarios and W12 / W13
+have nothing to rescue. The dominant blocker on real-LLM transfer
+is **producer-side ambiguity erasure**, not normalisation.
+
+The SDK v3.15 mint:
+
+1. **Comparable-magnitude event redesign** (Phase-61). The decoy
+   storm service's round-1 spikes have operational magnitudes inside
+   the gold range (``p95_ms ∈ [1700, 3200]``,
+   ``error_rate ∈ [0.10, 0.30]``, ``count ∈ [6, 14]``). Magnitude
+   alone cannot discriminate; disambiguation must come from the
+   round-2 specific causal claim.
+2. **StructuredProducerProtocol** (W14). A prompt-rendering surface
+   with two modes: ``naive`` (legacy byte-for-byte) and ``structured``
+   (W14: tier banner observation/diagnosis split + per-tier kind
+   whitelist + per-event mandate). The protocol consumes a
+   declarative ``RoleExtractionSchema`` (allowed kinds + observation/
+   diagnosis partition); ``incident_triage_role_schemas()`` ships the
+   schema for the Phase-58..Phase-61 family.
+3. **Magnitude-filter synthetic counterpart**
+   (``MagnitudeFilteringExtractor``). Calibrated against the
+   W13-Λ-real real-Ollama observation; reproduces the producer-side
+   compression deterministically so the W14-Λ-prompt synthetic
+   counterpart fires cleanly without requiring a live LLM.
+
+The W14 family's six theorems span the four structural axes named
+by the milestone:
+
+* **W14-Λ-prompt** (proved-empirical n=40 saturated × 5 seeds +
+  structural sketch via W7-3 extension): on R-61-naive-prompt
+  default, every capsule strategy ties FIFO at 0.000 — the bench
+  property is erased upstream by producer compression.
+* **W14-1** (proved-conditional + proved-empirical): pairing the
+  structured protocol with the same magnitude-filter extractor +
+  the cross-round capsule pipeline achieves ``accuracy_full = 1.000``
+  on synthetic R-61-structured-prompt (5/5 seeds, +1.000 vs naive)
+  and ``accuracy_full = 0.500`` on real Ollama 14B at n=8 (+0.500
+  vs FIFO at exactly the R-61-OLLAMA-A threshold).
+* **W14-2** (proved + mechanically-checked): schema soundness +
+  protocol determinism.
+* **W14-3** (proved-empirical full programme-wide regression):
+  393/393 prior tests pass; R-54..R-60 anchors preserved.
+* **W14-4** (proved-empirical n=8 saturated): on R-61-ollama-naive
+  the bench property holds 0/8 even on the redesigned events —
+  *both* the comparable-magnitude events AND the structured prompt
+  are required for W14-1.
+* **W14-Λ-real** (empirical-research, n=8 × 24 real Ollama calls):
+  the R-61-OLLAMA-A tier of the success criterion § 1.5 is cleared
+  at +0.500.
+
+**Master-plan post-v3.15 reading.** After SDK v3.15:
+
+1. **Post-v3.14 success bar.** R-61-structured-prompt (R-58 shape +
+   comparable-magnitude events + structured prompt) instantiates the
+   strong-bar regime: a method must improve ``accuracy_full`` by
+   ≥ 0.20 on R-61-structured vs every prior anchor including SDK
+   v3.14 W13 alone, stable across ≥ 3 ``bank_seed`` values. The
+   W14 protocol clears this bar with synthetic gap +1.000 (5/5
+   seeds) and real-Ollama gap +0.500 (n=8).
+2. **W14-Λ-prompt sharpens W13-Λ-real.** The synthetic magnitude-
+   filter extractor calibrated against the real-Ollama observation
+   reproduces W13-Λ-real byte-for-byte: ``round1_decoy_corroborated``
+   = 0/4 on the original Phase-58 events. The synthetic counterpart
+   makes producer-side compression *mechanically* tractable in CI
+   without requiring a live LLM.
+3. **What is the next benchmark?** Phase-61 is anchored as the
+   *producer-side ambiguity-preservation* benchmark. The next
+   milestone could attack:
+   * **W14-C2** — model-side magnitude calibration: extend the
+     structured prompt with a *magnitude hint* tier banner
+     (enumerate the magnitude thresholds qualifying as
+     ``ERROR_RATE_SPIKE`` / ``LATENCY_SPIKE`` / ``FW_BLOCK_SURGE``)
+     and measure whether the 1/8 R-61-ollama-structured failure
+     closes.
+   * **W14-C4** — cross-model transfer: re-run R-61-ollama-
+     structured against ``qwen3.5:35b`` (the W5-1 cross-model
+     probe) and against MLX-distributed when Mac 2 is reachable.
+   * **W14-C1** — cross-bench: build security-incident /
+     compliance-review schema partitions and verify the protocol's
+     bench-property recovery generalises.
+   * **W14-C5** — multi-hypothesis variant: extend the protocol
+     to permit "if uncertain, list 2-3 candidate kinds comma-
+     separated"; measure whether ambiguous round-1 events
+     (low-confidence spikes) preserve corroboration further.
+4. **Is the structural win materially stronger than v3.14?**
+   **Yes — materially, and on a real-LLM stream where SDK v3.14
+   produced an honest negative.** The W14-1 win clears
+   the R-61-OLLAMA-A tier (+0.500 strict gain over substrate FIFO
+   on real Mac-1 ``qwen2.5:14b-32k`` at n=8); SDK v3.14 only
+   reached the R-60-OLLAMA-C tier (honest null). The Wevra
+   programme now has **six** coupled structural axes with named
+   limit theorems on each, and the **W14 layer is the first to
+   materially advance the programme on a real-LLM stream**.
+
+The defensible "thesis-after-SDK-v3.15" is that the synthetic→real-
+LLM transfer story has **six layers**:
+
+* **Layer 1 (W6-C2 falsified):** un-normalised admission cannot
+  transfer.
+* **Layer 2 (W12-Λ at the real-LLM axis):** un-normalised cross-
+  round decoding cannot transfer.
+* **Layer 3 (SDK v3.13, W12-1):** fixed-vocabulary normalised
+  cross-round decoding DOES transfer, conditional on the closed-
+  vocabulary closure.
+* **Layer 4 (SDK v3.14, W13-1):** layered (exact + heuristic)
+  normalised cross-round decoding DOES transfer on a strictly
+  *wider* drift channel, conditional on the heuristic predicate
+  closure.
+* **Layer 5 (SDK v3.14, W13-Λ-real, empirical):** real Ollama 14B
+  at default settings does not produce the drift OR the cross-role
+  decoy corroboration shape — the gating axis on real Ollama is
+  *event-shape design + prompt-side discipline*, not normalisation.
+* **Layer 6 (SDK v3.15, W14-1 + W14-Λ-real, conditional):** the
+  structured producer protocol + comparable-magnitude events
+  combined with the cross-round capsule pipeline DOES transfer on
+  a real-LLM stream at +0.500 strict gain over substrate FIFO,
+  conditional on (a) the redesigned events, (b) the structured
+  prompt, (c) the cross-round pipeline. The W14 layer is the
+  **first** to clear the R-61-OLLAMA-A tier; the W13 closure-
+  widening is dormant on this regime because the real LLM emits
+  canonical kinds.
+
+The W14-4 falsifier sharpens the structural composition: *both*
+the redesigned events AND the structured prompt are required for
+the W14-1 win — either alone collapses the bench property to 0/8
+on real Ollama. The interventions compose multiplicatively, not
+additively. The **honest cap** on the SDK v3.15 advance is therefore
+the model-side calibration limit (the 1/8 failure on R-61-ollama-
+structured was a model judgment error, not a protocol failure);
+over-claiming is the failure mode the ``HOW_NOT_TO_OVERSTATE.md``
+§ "Solved real-LLM transfer" rules guard against.
+
 ---
 
 ## 5. End goals

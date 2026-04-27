@@ -3,7 +3,7 @@
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
 > README-of-README must satisfy these rules. Last touched: SDK
-> v3.14, 2026-04-26.
+> v3.15, 2026-04-27.
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or
@@ -108,6 +108,41 @@ theorem still says what you remember. Theorems can be sharpened
 (W3-32 → W3-32-extended), conditional premises can be added or
 removed, and conjectures can be promoted or retracted. Always
 check `THEOREM_REGISTRY.md` first.
+
+### "Solved real-LLM transfer" or "the structured prompt closes the W13-Λ-real gap"
+
+> *"The W14 prompt protocol solved real-LLM transfer."*
+
+Forbidden. The honest reading on R-61-ollama-structured at n=8 is:
+
+* the bench property holds in 7/8 scenarios (one model-side
+  judgment failure);
+* the cross-round capsule pipeline achieves
+  ``accuracy_full = 0.500``;
+* ``layered − fifo = +0.500`` at *exactly* the R-61-OLLAMA-A
+  threshold;
+* W13 ties W12 ties W11 because the real LLM emits canonical kinds
+  (no drift to widen).
+
+This is a strong real-transfer result, but it is **not** "real-LLM
+transfer solved." Permitted phrasings: *"clears the R-61-OLLAMA-A
+tier"*, *"first real-LLM strict gain ≥ 0.50 over substrate FIFO in
+the programme"*, *"W14 closes the W13-Λ-real producer-side gap on
+the redesigned comparable-magnitude events"*. Forbidden: *"solves
+real-LLM transfer"*, *"the structured prompt is universal"*,
+*"W14-1 holds for any LLM"*. The W14-1 win is conditional on (a)
+comparable-magnitude events, (b) structured prompt, (c) the cross-
+round capsule pipeline; if any of the three is removed, W14-Λ-prompt
+fires and the result collapses to 0.000.
+
+### "W14 makes the W13 normaliser obsolete"
+
+Forbidden. W13's contribution is *structurally invisible* on
+R-61-ollama because the real LLM emits canonical kinds (zero drift).
+On a *different* model class (e.g. qwen3.5:35b under W14-C4) or
+under a *different* prompt, the drift channel may reopen and W13's
+closure-widening will be load-bearing again. The W13 layer is
+dormant on this regime, not refuted.
 
 ### Labelling the runtime "fully capsule-native"
 

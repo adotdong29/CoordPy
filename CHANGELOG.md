@@ -5,6 +5,111 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.15] — 2026-04-27 — SDK v3.15 — structured producer protocol (first producer-protocol move + first real-LLM strict gain ≥ 0.50 over substrate FIFO) + W14 family
+
+*Strictly additive on SDK v3.14. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The new
+``StructuredProducerProtocol`` + ``RoleExtractionSchema`` ship in
+``vision_mvp.wevra.team_coord`` as research-slice additions to the
+multi-agent coordination layer, not part of the run-boundary
+product runtime. **First SDK milestone to clear the R-61-OLLAMA-A
+tier of `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` § 1.5** —
+the **first capsule-native multi-agent coordination method that
+strictly improves over substrate FIFO on a real-LLM stream by ≥
+0.50 pooled accuracy_full in the programme**.
+
+On the new Phase-61 *producer-side ambiguity-preservation* benchmark:
+
+* **R-61-default** (synthetic, identity extractor, naive prompt):
+  bench property holds 8/8; W11/W12/W13 cross-round decoders all
+  achieve ``accuracy_full = 1.000``. Sanity anchor.
+* **R-61-naive-prompt** (synthetic, magnitude-filter, naive prompt;
+  W14-Λ-prompt anchor): the magnitude-filter extractor calibrated
+  against the W13-Λ-real real-Ollama observation collapses round-1
+  by top-N-per-(role, kind) by magnitude; bench property holds 0/8;
+  every capsule strategy ties FIFO at 0.000. The synthetic
+  counterpart of W13-Λ-real, mechanically tractable in CI.
+* **R-61-structured-prompt** (synthetic, magnitude-filter,
+  structured prompt; W14-1 anchor): the structured prompt's per-
+  event mandate disables the compression; bench property holds 8/8;
+  W11/W12/W13 achieve ``accuracy_full = 1.000``; +1.000 strict
+  separation vs naive-prompt counterpart, stable across **5/5**
+  alternate ``bank_seed`` values.
+* **R-61-ollama-naive** (real Mac-1 ``qwen2.5:14b-32k`` at
+  ``temperature=0`` on the redesigned events under the *naive*
+  prompt; W14-Λ-real-naive falsifier): bench property holds 0/8;
+  every method ties FIFO at 0.000 — the W14-Λ-prompt prediction
+  *empirically confirmed* on real Ollama.
+* **R-61-ollama-structured** (real Mac-1 ``qwen2.5:14b-32k`` at
+  ``temperature=0`` on the redesigned events under the *structured*
+  prompt; W14-Λ-real anchor at the R-61-OLLAMA-A tier): bench
+  property holds **7/8**; W11/W12/W13 cross-round decoders all
+  achieve ``accuracy_full = 0.500``; ``layered − fifo = +0.500`` at
+  exactly the 0.50 threshold; audit T-1..T-7 preserved on every
+  cell. n_eval=8 × 24 producer calls, 0 endpoint failures, 111.4 s
+  wall on Mac 1.
+
+The W13 closure-widening (SDK v3.14) is structurally invisible on
+R-61-ollama because the real LLM emits canonical kinds (zero kind
+drift); the load-bearing layer on this regime is the W14 producer
+protocol, not the W13 normaliser. The W13 layer is dormant on this
+regime, not refuted; it remains the load-bearing layer on
+R-60-wide.
+
+Backward-compatible on R-54 / R-55 / R-56 / R-57 / R-58 / R-59 /
+R-60 (default + falsifier). 393/393 prior wevra tests pass byte-for-
+byte. Named falsifier (W14-4: real Ollama + comparable-magnitude
+events + naive prompt) ties FIFO at 0.000 on 8/8 — *both* the
+event redesign AND the structured prompt are required for W14-1.
+
+**Files added.**
+
+* ``vision_mvp/wevra/team_coord.py`` — adds
+  ``RoleExtractionSchema``, ``ProducerPromptResult``,
+  ``StructuredProducerProtocol``, ``PRODUCER_PROMPT_NAIVE``,
+  ``PRODUCER_PROMPT_STRUCTURED``, ``ALL_PRODUCER_PROMPT_MODES``,
+  ``INCIDENT_TRIAGE_OBSERVATION_KINDS``,
+  ``incident_triage_role_schemas``.
+* ``vision_mvp/wevra/__init__.py`` — re-exports the W14 surface;
+  bumps ``SDK_VERSION = "wevra.sdk.v3.15"``.
+* ``vision_mvp/experiments/phase61_producer_ambiguity_preservation.py``
+  — new benchmark.
+* ``vision_mvp/tests/test_wevra_producer_ambiguity.py`` — 27 new
+  tests across schema soundness, protocol determinism, magnitude-
+  filter calibration, Phase-61 default config (W14-Λ-prompt +
+  W14-1), 5-seed stability, and cross-regime separation.
+* ``docs/data/phase61_default_K8_n8.json``,
+  ``docs/data/phase61_naive_prompt_K8_n8.json``,
+  ``docs/data/phase61_structured_prompt_K8_n8.json``,
+  ``docs/data/phase61_seed_sweep_naive_K8_n8.json``,
+  ``docs/data/phase61_seed_sweep_structured_K8_n8.json``,
+  ``docs/data/phase61_cross_regime.json``,
+  ``docs/data/phase61_cross_regime_full.json``,
+  ``docs/data/phase61_real_ollama_naive_qwen2_5_14b_n4.json``,
+  ``docs/data/phase61_real_ollama_naive_qwen2_5_14b_n8.json``,
+  ``docs/data/phase61_real_ollama_structured_qwen2_5_14b_n4.json``,
+  ``docs/data/phase61_real_ollama_structured_qwen2_5_14b_n8.json``.
+* ``docs/RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`` — milestone results
+  note (theory-forward, six-layer thesis, W14 theorem family, W14-C
+  conjectures).
+
+**Files updated.**
+
+* ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` — R-61 anchor +
+  bar 11 (producer-side ambiguity-preservation split) + § 1.5
+  R-61-OLLAMA 4-tier grading + § 2.10 R-61 ingredients.
+* ``docs/RESEARCH_STATUS.md`` — eleven-axis status, W14 active
+  moves / observations / conjectures.
+* ``docs/THEOREM_REGISTRY.md`` — W14 family (Λ-prompt, 1, 2, 3, 4,
+  Λ-real) + W14-C conjectures + W13-C3 partial-discharge update.
+* ``docs/HOW_NOT_TO_OVERSTATE.md`` — W14 framing rules ("solved
+  real-LLM transfer" forbidden, "W14 makes W13 obsolete"
+  forbidden).
+* ``docs/context_zero_master_plan.md`` — § 4.32 SDK v3.15 + post-
+  v3.15 master-plan reading + six-layer transfer story.
+* ``docs/START_HERE.md`` — current-milestone pointer + SDK v3.15
+  TL;DR paragraph.
+
 ## [3.13] — 2026-04-26 — SDK v3.13 — real-LLM-robust multi-round bundle decoder (first synthetic→real-LLM transfer move) + W12 family
 
 *Strictly additive on SDK v3.12. The Wevra single-run product

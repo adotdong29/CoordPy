@@ -222,6 +222,13 @@ from .team_coord import (
     HeuristicAbstractionRule, LayeredClaimNormalizer,
     LayeredRobustMultiRoundBundleDecoder,
     LAYERED_NORMALIZER_ABSTAIN,
+    # SDK v3.15 — structured producer protocol (W14 family).
+    PRODUCER_PROMPT_NAIVE, PRODUCER_PROMPT_STRUCTURED,
+    ALL_PRODUCER_PROMPT_MODES,
+    RoleExtractionSchema, ProducerPromptResult,
+    StructuredProducerProtocol,
+    INCIDENT_TRIAGE_OBSERVATION_KINDS,
+    incident_triage_role_schemas,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -235,7 +242,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.14"
+SDK_VERSION = "wevra.sdk.v3.15"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -333,6 +340,13 @@ __all__ = [
     "HeuristicAbstractionRule", "LayeredClaimNormalizer",
     "LayeredRobustMultiRoundBundleDecoder",
     "LAYERED_NORMALIZER_ABSTAIN",
+    # SDK v3.15 — structured producer protocol (W14 family).
+    "PRODUCER_PROMPT_NAIVE", "PRODUCER_PROMPT_STRUCTURED",
+    "ALL_PRODUCER_PROMPT_MODES",
+    "RoleExtractionSchema", "ProducerPromptResult",
+    "StructuredProducerProtocol",
+    "INCIDENT_TRIAGE_OBSERVATION_KINDS",
+    "incident_triage_role_schemas",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

@@ -17,7 +17,8 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.14)         | [`RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md`](RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md) |
+> | Latest milestone (SDK v3.15)         | [`RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`](RESULTS_WEVRA_PRODUCER_AMBIGUITY.md) |
+> | Previous milestone (SDK v3.14)       | [`RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md`](RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md) |
 > | Previous milestone (SDK v3.13)       | [`RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md`](RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md) |
 > | Previous milestone (SDK v3.12)       | [`RESULTS_WEVRA_MULTI_ROUND_DECODER.md`](RESULTS_WEVRA_MULTI_ROUND_DECODER.md) |
 > | Previous milestone (SDK v3.11)       | [`RESULTS_WEVRA_BUNDLE_DECODER.md`](RESULTS_WEVRA_BUNDLE_DECODER.md) |
@@ -37,7 +38,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.14 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.15 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
@@ -69,6 +70,36 @@ limit), while pairing W9 admission with the new
 achieves 1.000 — the first capsule-native multi-agent coordination
 method that crosses the admission/decoding split** (W10 family,
 SDK v3.11).
+SDK v3.15's headline result is the **first producer-protocol move**
+in the programme — and the **first real-Ollama benchmark in which a
+Wevra cross-round capsule decoder produces a strict +0.50 gain over
+substrate FIFO under a real LLM**. SDK v3.14 closed the synthetic
+open-world normalisation axis (W13-1) but produced an honest
+negative on real Ollama 14B (W13-Λ-real): the bench property was
+being erased *upstream* by producer-side magnitude filtering and
+compression, so normalisation had nothing to rescue. SDK v3.15
+attacks that producer-side bottleneck directly via the
+:class:`StructuredProducerProtocol` (a prompt-rendering surface that
+splits round-1 *observation* from round-2 *diagnosis* and mandates
+one claim per listed event). On the redesigned comparable-magnitude
+events under the structured prompt, real Mac-1 ``qwen2.5:14b-32k``
+at temperature 0 produces the bench property in **7/8 scenarios**;
+the W11/W12/W13 cross-round bundle decoders all achieve
+``accuracy_full = 0.500`` (vs 0.000 under naive prompt) — a +0.500
+strict separation at exactly the R-61-OLLAMA-A tier threshold of
+`docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` § 1.5. The
+synthetic counterpart (R-61-naive vs R-61-structured) is +1.000
+strict, stable across 5/5 seeds. The W13 closure-widening is
+*structurally invisible* on this regime because the real LLM emits
+canonical kinds (zero drift) — the load-bearing layer is W14, not
+W13. The synthetic→real-LLM transfer story now has six layers
+named, each with a structurally-distinct failure mode and a sharp
+limit theorem; the W14 layer is the **first** layer to materially
+advance the programme on a real-LLM stream. Backward-compat
+preserved: R-58 / R-59 / R-60 default + falsifier banks, R-54..R-57
+anchors, and 393/393 prior tests pass byte-for-byte. Wevra's
+single-run product runtime contract is unchanged.
+
 SDK v3.14's headline result is the **first open-world
 normalisation move** in the programme: on the new Phase-60
 ``synthetic_wide_oov_llm`` regime (R-60-wide; producer emits LLM

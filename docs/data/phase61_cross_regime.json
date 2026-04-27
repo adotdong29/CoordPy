@@ -1,0 +1,1548 @@
+{
+  "config": {
+    "bank_seed": 11,
+    "n_eval": 8
+  },
+  "r61_default_identity": {
+    "audit_ok_grid": {
+      "capsule_bundle_decoder": true,
+      "capsule_cohort_buffered": true,
+      "capsule_corroboration": true,
+      "capsule_coverage": true,
+      "capsule_fifo": true,
+      "capsule_layered_multi_round": true,
+      "capsule_multi_round": true,
+      "capsule_multi_service": true,
+      "capsule_priority": true,
+      "capsule_robust_multi_round": true,
+      "substrate": false
+    },
+    "bench_property_per_scenario": {
+      "p61_deadlock_orders_payments__compmag_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_deadlock_orders_payments__compmag_metrics__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_disk_storage_logs__compmag_search_index__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_disk_storage_logs__compmag_telemetry__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_pool_api_db__compmag_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_pool_api_db__compmag_telemetry__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_slow_query_web_db__compmag_archival__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_slow_query_web_db__compmag_metrics__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      }
+    },
+    "bench_summary": {
+      "K_auditor": 8,
+      "n_scenarios": 8,
+      "scenarios_with_decoy_corroboration": 8,
+      "scenarios_with_property": 8
+    },
+    "config": {
+      "K_auditor": 8,
+      "K_producer": 6,
+      "T_auditor": 256,
+      "T_producer": 96,
+      "bank_replicates": 2,
+      "bank_seed": 11,
+      "endpoint": "http://192.168.12.191:11434",
+      "extractor": "identity",
+      "inbox_capacity": 8,
+      "model": "qwen2.5:14b-32k",
+      "n_eval": 8,
+      "prompt_mode": "naive",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "extractor_stats": {
+      "extractor": "identity",
+      "prompt_mode": "naive",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "headline_gap": {
+      "layered_minus_fifo": 1.0,
+      "layered_minus_multi_round": 0.0,
+      "layered_minus_robust": 0.0,
+      "max_non_layered_accuracy_full": 1.0,
+      "robust_minus_fifo": 1.0,
+      "robust_minus_multi_round": 0.0
+    },
+    "n_results": 88,
+    "pooled": {
+      "capsule_bundle_decoder": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_bundle_decoder"
+      },
+      "capsule_cohort_buffered": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_cohort_buffered"
+      },
+      "capsule_corroboration": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_corroboration"
+      },
+      "capsule_coverage": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_coverage"
+      },
+      "capsule_fifo": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_fifo"
+      },
+      "capsule_layered_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_layered_multi_round"
+      },
+      "capsule_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_round"
+      },
+      "capsule_multi_service": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_service"
+      },
+      "capsule_priority": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_priority"
+      },
+      "capsule_robust_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_robust_multi_round"
+      },
+      "substrate": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 0.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 7.0,
+        "mean_n_role_view": 0.0,
+        "mean_n_team_handoff": 0.0,
+        "mean_tokens_admitted": 17.5,
+        "n": 8,
+        "strategy": "substrate"
+      }
+    },
+    "prompt_records": [
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "82ba8d2342e9f9bd",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "227dbd8e29d0d25f",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "beab9302f519e50b",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "d2cca30ab630dc31",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "0bf458659e3b985f",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "beab9302f519e50b",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "34f707f0fa7a25ca",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "475caea16bc2500a",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "c8528784cd34515a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "24ff7e60b3250585",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "3ee331bae0dcd76c",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "c8528784cd34515a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "2207877adff50461",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "a6fc9a619a1daaec",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "1f74517f4481cd96",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "072e24e9b59c939f",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "cf0ab0e3e5c185fd",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "1f74517f4481cd96",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "3a72f3ac88fc2f50",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "b5518c9f7786f039",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "5e1d2e8ac6dd6fde",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "5824e5ce13a15222",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "97ec5fbb6ea105f7",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "5e1d2e8ac6dd6fde",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      }
+    ],
+    "scenarios_evaluated": [
+      "p61_deadlock_orders_payments__compmag_cache__rep0",
+      "p61_deadlock_orders_payments__compmag_metrics__rep1",
+      "p61_pool_api_db__compmag_cache__rep0",
+      "p61_pool_api_db__compmag_telemetry__rep1",
+      "p61_disk_storage_logs__compmag_telemetry__rep0",
+      "p61_disk_storage_logs__compmag_search_index__rep1",
+      "p61_slow_query_web_db__compmag_metrics__rep0",
+      "p61_slow_query_web_db__compmag_archival__rep1"
+    ],
+    "schema": "phase61.producer_ambiguity_preservation.v1"
+  },
+  "r61_naive_prompt": {
+    "audit_ok_grid": {
+      "capsule_bundle_decoder": true,
+      "capsule_cohort_buffered": true,
+      "capsule_corroboration": true,
+      "capsule_coverage": true,
+      "capsule_fifo": true,
+      "capsule_layered_multi_round": true,
+      "capsule_multi_round": true,
+      "capsule_multi_service": true,
+      "capsule_priority": true,
+      "capsule_robust_multi_round": true,
+      "substrate": false
+    },
+    "bench_property_per_scenario": {
+      "p61_deadlock_orders_payments__compmag_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": false,
+        "n_round1_to_auditor": 3,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": false,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_deadlock_orders_payments__compmag_metrics__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": false,
+        "n_round1_to_auditor": 3,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": false,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_disk_storage_logs__compmag_search_index__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": false,
+        "n_round1_to_auditor": 3,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": false,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_disk_storage_logs__compmag_telemetry__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": false,
+        "n_round1_to_auditor": 3,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": false,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_pool_api_db__compmag_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": false,
+        "n_round1_to_auditor": 3,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": false,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_pool_api_db__compmag_telemetry__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": false,
+        "n_round1_to_auditor": 3,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": false,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_slow_query_web_db__compmag_archival__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": false,
+        "n_round1_to_auditor": 3,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": false,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_slow_query_web_db__compmag_metrics__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": false,
+        "n_round1_to_auditor": 3,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": false,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      }
+    },
+    "bench_summary": {
+      "K_auditor": 8,
+      "n_scenarios": 8,
+      "scenarios_with_decoy_corroboration": 0,
+      "scenarios_with_property": 0
+    },
+    "config": {
+      "K_auditor": 8,
+      "K_producer": 6,
+      "T_auditor": 256,
+      "T_producer": 96,
+      "bank_replicates": 2,
+      "bank_seed": 11,
+      "endpoint": "http://192.168.12.191:11434",
+      "extractor": "magnitude_filter",
+      "inbox_capacity": 8,
+      "model": "qwen2.5:14b-32k",
+      "n_eval": 8,
+      "prompt_mode": "naive",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "extractor_stats": {
+      "extractor": "magnitude_filter",
+      "n_compressed_by_prompt": 24,
+      "n_emitted": 34,
+      "n_emitted_under_protocol": 0,
+      "n_filtered_by_threshold": 0,
+      "prompt_mode": "naive",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "headline_gap": {
+      "layered_minus_fifo": 0.0,
+      "layered_minus_multi_round": 0.0,
+      "layered_minus_robust": 0.0,
+      "max_non_layered_accuracy_full": 0.0,
+      "robust_minus_fifo": 0.0,
+      "robust_minus_multi_round": 0.0
+    },
+    "n_results": 88,
+    "pooled": {
+      "capsule_bundle_decoder": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "missing_handoff": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 4.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_bundle_decoder"
+      },
+      "capsule_cohort_buffered": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "missing_handoff": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 4.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_cohort_buffered"
+      },
+      "capsule_corroboration": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "missing_handoff": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 4.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_corroboration"
+      },
+      "capsule_coverage": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 4.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_coverage"
+      },
+      "capsule_fifo": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 4.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_fifo"
+      },
+      "capsule_layered_multi_round": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 4.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_layered_multi_round"
+      },
+      "capsule_multi_round": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 4.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_round"
+      },
+      "capsule_multi_service": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "missing_handoff": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 4.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_service"
+      },
+      "capsule_priority": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 4.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_priority"
+      },
+      "capsule_robust_multi_round": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 4.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_robust_multi_round"
+      },
+      "substrate": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 0.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 4.0,
+        "mean_n_role_view": 0.0,
+        "mean_n_team_handoff": 0.0,
+        "mean_tokens_admitted": 10.5,
+        "n": 8,
+        "strategy": "substrate"
+      }
+    },
+    "prompt_records": [
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "82ba8d2342e9f9bd",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "227dbd8e29d0d25f",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "beab9302f519e50b",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "d2cca30ab630dc31",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "0bf458659e3b985f",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "beab9302f519e50b",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "34f707f0fa7a25ca",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "475caea16bc2500a",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "c8528784cd34515a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "24ff7e60b3250585",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "3ee331bae0dcd76c",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "c8528784cd34515a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "2207877adff50461",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "a6fc9a619a1daaec",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "1f74517f4481cd96",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "072e24e9b59c939f",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "cf0ab0e3e5c185fd",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "1f74517f4481cd96",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "3a72f3ac88fc2f50",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "b5518c9f7786f039",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "5e1d2e8ac6dd6fde",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "5824e5ce13a15222",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "97ec5fbb6ea105f7",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      },
+      {
+        "mode": "naive",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "5e1d2e8ac6dd6fde",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      }
+    ],
+    "scenarios_evaluated": [
+      "p61_deadlock_orders_payments__compmag_cache__rep0",
+      "p61_deadlock_orders_payments__compmag_metrics__rep1",
+      "p61_pool_api_db__compmag_cache__rep0",
+      "p61_pool_api_db__compmag_telemetry__rep1",
+      "p61_disk_storage_logs__compmag_telemetry__rep0",
+      "p61_disk_storage_logs__compmag_search_index__rep1",
+      "p61_slow_query_web_db__compmag_metrics__rep0",
+      "p61_slow_query_web_db__compmag_archival__rep1"
+    ],
+    "schema": "phase61.producer_ambiguity_preservation.v1"
+  },
+  "r61_structured_prompt": {
+    "audit_ok_grid": {
+      "capsule_bundle_decoder": true,
+      "capsule_cohort_buffered": true,
+      "capsule_corroboration": true,
+      "capsule_coverage": true,
+      "capsule_fifo": true,
+      "capsule_layered_multi_round": true,
+      "capsule_multi_round": true,
+      "capsule_multi_service": true,
+      "capsule_priority": true,
+      "capsule_robust_multi_round": true,
+      "substrate": false
+    },
+    "bench_property_per_scenario": {
+      "p61_deadlock_orders_payments__compmag_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_deadlock_orders_payments__compmag_metrics__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_disk_storage_logs__compmag_search_index__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_disk_storage_logs__compmag_telemetry__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_pool_api_db__compmag_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_pool_api_db__compmag_telemetry__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_slow_query_web_db__compmag_archival__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_slow_query_web_db__compmag_metrics__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      }
+    },
+    "bench_summary": {
+      "K_auditor": 8,
+      "n_scenarios": 8,
+      "scenarios_with_decoy_corroboration": 8,
+      "scenarios_with_property": 8
+    },
+    "config": {
+      "K_auditor": 8,
+      "K_producer": 6,
+      "T_auditor": 256,
+      "T_producer": 96,
+      "bank_replicates": 2,
+      "bank_seed": 11,
+      "endpoint": "http://192.168.12.191:11434",
+      "extractor": "magnitude_filter",
+      "inbox_capacity": 8,
+      "model": "qwen2.5:14b-32k",
+      "n_eval": 8,
+      "prompt_mode": "structured",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "extractor_stats": {
+      "extractor": "magnitude_filter",
+      "n_compressed_by_prompt": 0,
+      "n_emitted": 58,
+      "n_emitted_under_protocol": 56,
+      "n_filtered_by_threshold": 0,
+      "prompt_mode": "structured",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "headline_gap": {
+      "layered_minus_fifo": 1.0,
+      "layered_minus_multi_round": 0.0,
+      "layered_minus_robust": 0.0,
+      "max_non_layered_accuracy_full": 1.0,
+      "robust_minus_fifo": 1.0,
+      "robust_minus_multi_round": 0.0
+    },
+    "n_results": 88,
+    "pooled": {
+      "capsule_bundle_decoder": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_bundle_decoder"
+      },
+      "capsule_cohort_buffered": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_cohort_buffered"
+      },
+      "capsule_corroboration": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_corroboration"
+      },
+      "capsule_coverage": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_coverage"
+      },
+      "capsule_fifo": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_fifo"
+      },
+      "capsule_layered_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_layered_multi_round"
+      },
+      "capsule_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_round"
+      },
+      "capsule_multi_service": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_service"
+      },
+      "capsule_priority": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_priority"
+      },
+      "capsule_robust_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_robust_multi_round"
+      },
+      "substrate": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 0.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 7.0,
+        "mean_n_role_view": 0.0,
+        "mean_n_team_handoff": 0.0,
+        "mean_tokens_admitted": 17.5,
+        "n": 8,
+        "strategy": "substrate"
+      }
+    },
+    "prompt_records": [
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "dcf220844cdbc105",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "76635d947d1fb73a",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "83d91d19df8aca7c",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "a617c03cfecf772f",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "6d99ea599f58be49",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "83d91d19df8aca7c",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "e76ea5292f742a28",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "390dfa0a52830fde",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "23e6f1ad3fbbd005",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "537fb2e86bc55a6e",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "74ecefd7f93acb80",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "23e6f1ad3fbbd005",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "05d1d596015aa51c",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "b6ef9129f4f408a0",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "eccd69b72e8cc054",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "6c9122bf38f4caed",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "c79203b7821dbe41",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "eccd69b72e8cc054",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "aac5ac6a46ced7f9",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "00b4f86814f5ddc5",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "ebcb1b45740ae33b",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "a60f48ee86b592a6",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "786f3b8a4cb563b7",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      },
+      {
+        "mode": "structured",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "ebcb1b45740ae33b",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      }
+    ],
+    "scenarios_evaluated": [
+      "p61_deadlock_orders_payments__compmag_cache__rep0",
+      "p61_deadlock_orders_payments__compmag_metrics__rep1",
+      "p61_pool_api_db__compmag_cache__rep0",
+      "p61_pool_api_db__compmag_telemetry__rep1",
+      "p61_disk_storage_logs__compmag_telemetry__rep0",
+      "p61_disk_storage_logs__compmag_search_index__rep1",
+      "p61_slow_query_web_db__compmag_metrics__rep0",
+      "p61_slow_query_web_db__compmag_archival__rep1"
+    ],
+    "schema": "phase61.producer_ambiguity_preservation.v1"
+  },
+  "schema": "phase61.cross_regime.v1"
+}
