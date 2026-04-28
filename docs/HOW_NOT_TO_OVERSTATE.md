@@ -165,6 +165,94 @@ structural axes the programme has identified; "multi-agent context
 solved" requires resolving every named limit theorem on every axis,
 which the programme has not done.
 
+### "W16 solves multi-agent context end-to-end" or "the composition is universal"
+
+> *"The W14+W15 composition solved multi-agent context end-to-end."*
+
+Forbidden. The honest reading on R-63-COMPOSED-TIGHT at n=8 × 5
+seeds (synthetic) is:
+
+* the composed method (W14 structured prompt + W15 attention-aware
+  packer over a magnitude-filter-simulated producer) achieves
+  ``accuracy_full = 1.000``;
+* every non-composed baseline (W14-only-budgeted, W15-only-without-
+  W14, substrate FIFO) ties at ``accuracy_full = 0.000``;
+* ``composed - fifo_packed_layered = +1.000`` strict separation on
+  every seed.
+
+This is a strong synthetic result, but it is **not** "multi-agent
+context solved end-to-end." Permitted phrasings: *"clears bar 13
+of the SDK-v3.17-anchored success criterion"*, *"first end-to-end
+W14+W15 composition strict gain in the programme"*, *"closes the
+W16-Λ-compose gap on R-63-COMPOSED-TIGHT under the named bench
+property"*. Forbidden: *"solves multi-agent context end-to-end"*,
+*"the W16 composition is universal"*, *"W16-1 holds for any
+producer + any decoder budget"*. The W16-1 win is conditional on
+(a) the comparable-magnitude multi-hypothesis events, (b) the
+structured producer protocol, (c) ``T_decoder`` strictly between
+the round-2 disambiguator's token cost and the admitted union's
+token sum, AND (d) the asymmetric corroboration shape (decoys ≥ 2
+distinct roles, golds = 1 distinct role); if any condition is
+removed, W16-Λ-compose / W16-Λ-degenerate / W15-C-SYMMETRIC fires
+and the result collapses.
+
+The W14+W15 composition is *one of eight* structural axes the
+programme has identified; "multi-agent context solved end-to-end"
+requires resolving every named limit theorem on every axis, which
+the programme has not done.
+
+### "W16 demonstrates real-LLM transfer is solved" or "the replay path is a real probe"
+
+> *"The W16-Λ-real-replay anchor proves the composition transfers
+> to real LLMs."*
+
+Forbidden. The W16-Λ-real-replay anchor is a *measurement* over
+**recorded** Phase-61 ``qwen2.5:14b-32k`` bytes — not a fresh live
+LLM probe. The Mac-1 endpoint at 192.168.12.191:11434 was offline
+(``HTTP=000`` connection refused) at SDK v3.17 milestone capture
+time; the Phase-61 capture from SDK v3.15 is the source of truth.
+
+Permitted phrasings: *"the recorded qwen2.5:14b-32k bytes show the
+composed method delivers a strict +0.500 gain over FIFO-packed-W14
+under T_decoder=14"*, *"the W16-Λ-real-replay anchor confirms the
+composition recovers the W14-only loose-budget accuracy under
+tight budget pressure on recorded real-LLM bytes"*, *"the budget
+band where the gain holds on the recorded stream is T_decoder ∈
+[13, 16]"*. Forbidden: *"the composition transfers to a fresh
+live LLM"* (untested; W16-C-LIVE-OLLAMA conjectural), *"the replay
+result is a real-time win"* (replay is offline replay over
+byte-stable JSON), *"W16 closes the model-side judgment gap"* (the
+1/8 model-side failure persists on the recorded bytes).
+
+The replay path's contribution is *bounding* the W16 result by the
+empirical envelope of the prior milestone's real-LLM probe — it is
+honest measurement, not an extrapolation. Treat it the way you
+treat the W4-1 lifecycle audit: a tool that surfaces what is true
+about the recorded run, not a substitute for a fresh probe.
+
+### "W16 makes the W14 or W15 layers obsolete"
+
+Forbidden. W16 is *not* a new mechanism — it is the demonstration
+that the existing W14 and W15 layers compose on a single regime
+where both are individually load-bearing. On R-63-naive-tight the
+composed pipeline ties FIFO at 0.000 (W16-Λ-compose), so neither
+layer alone produces the win; on R-63-COMPOSED-TIGHT the
+composition ties identical to W14 + W15 stacked. Removing the W14
+layer (replacing structured prompt with naive prompt) collapses
+the result to 0.000; removing the W15 layer (replacing salience
+pack with FIFO pack at the same T_decoder) collapses it to 0.000.
+
+Permitted phrasings: *"W14 + W15 are jointly necessary on R-63"*,
+*"the composition recovers correctness when both upstream emission
+and downstream retention bottlenecks are present"*, *"W16 is the
+coupling statement; it does not subsume the prior layers"*.
+Forbidden: *"W16 replaces W14"*, *"W16 makes W15 dispensable"*,
+*"the composition is a new mechanism"*. The runtime contract is
+unchanged; the SDK ships no new W16 class — the composition is
+demonstrated by composing existing ``StructuredProducerProtocol``
++ ``AttentionAwareBundleDecoder`` calls in
+``vision_mvp.experiments.phase63_composed_real_llm``.
+
 ### "W15 makes the W14 producer protocol obsolete"
 
 Forbidden. W15 is a *decoder-side* intervention; W14 is a

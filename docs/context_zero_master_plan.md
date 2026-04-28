@@ -7736,6 +7736,190 @@ Over-claiming is the failure mode the ``HOW_NOT_TO_OVERSTATE.md``
 § "W15 shapes transformer attention" and § "W15 solves multi-agent
 context" rules guard against.
 
+### 4.34 SDK v3.17 — end-to-end W14 + W15 composition + W16 family (Phase-63 composed real-LLM benchmark)
+
+SDK v3.17 attacks the *coupling* question that SDK v3.16 left
+unaddressed. SDK v3.15 (W14) closed the producer-side gap on R-61
+under a structured prompt at +0.500 vs FIFO on a real Ollama 14B.
+SDK v3.16 (W15) closed the decoder-side gap on R-62-tightbudget at
++1.000 vs FIFO-packed-W13 under a *deterministic identity*
+producer. But the two layers had not been stress-tested *together*
+on a single regime where:
+
+* the producer compresses ambiguity upstream (so the W14 layer
+  alone gates whether the bench property survives), AND
+* the decoder is bounded by a strict ``T_decoder`` token budget
+  (so the W15 layer alone gates whether the round-2 disambiguator
+  survives FIFO truncation).
+
+Phase-63 attacks that exact composition. The events are R-62's
+multi-hypothesis comparable-magnitude shape (2 gold + 2 decoy
+services, asymmetric corroboration). The producer is Phase-61's
+deterministic ``MagnitudeFilteringExtractor`` with its
+``prompt_mode`` knob (naive collapses round-1 toward top-N events
+per (role, kind); structured preserves the per-event mandate),
+wired through the W14 ``StructuredProducerProtocol``. The decoder
+consumes the cross-round bundle under a strict ``T_decoder`` and
+applies the W15 ``AttentionAwareBundleDecoder`` (when the
+composition is enabled) or the FIFO pack baseline (when the
+composition is disabled).
+
+The SDK v3.17 mint:
+
+1. **R-63 multi-cell cross-regime** — six synthetic sub-banks plus
+   three ollama-replay cells covering the 2×2×2 grid of
+   {identity / mag-filter naive / mag-filter structured} ×
+   {T_decoder=None / T_decoder=24} plus the W16-Λ-degenerate
+   falsifier (T_decoder=2) and the W16-Λ-real-replay anchor over
+   recorded Phase-61 ``qwen2.5:14b-32k`` bytes. Mechanically
+   verified by ``Phase63CrossRegimeTests``.
+2. **W16-1 strict-gain on R-63-COMPOSED-TIGHT** (synthetic, n=8 ×
+   5 seeds saturated). The composed method achieves
+   ``accuracy_full = 1.000`` while every non-composed baseline
+   collapses to 0.000 — +1.000 strict separation, stable across
+   5/5 alternate ``bank_seed`` values. The composition is
+   *strictly multiplicative*: each layer alone produces 0.000 on
+   R-63-COMPOSED-TIGHT.
+3. **W16-Λ-real-replay strict gain on recorded real-LLM bytes**.
+   At ``T_decoder = 14, K_auditor = 8`` on the recorded
+   structured-prompt bytes from
+   ``docs/data/phase61_real_ollama_structured_qwen2_5_14b_n8.json``,
+   the composed method achieves ``capsule_attention_aware = 0.500``
+   while ``capsule_layered_fifo_packed = 0.000`` — **+0.500 strict
+   gain** over the strongest non-composed baseline on a *real-LLM
+   stream*. The budget band where this gain holds is
+   ``T_decoder ∈ [13, 16]``; outside the band, both packers either
+   fail jointly or both succeed.
+4. **W16-Λ-compose joint-failure anchor** on R-63-naive-tight and
+   the recorded naive-prompt bytes. Both W14-Λ-prompt (bench
+   property erased upstream) and W15-Λ-budget (disambiguator
+   dropped under FIFO truncation) fire on the same regime; every
+   capsule strategy ties FIFO at 0.000.
+5. **W16-Λ-degenerate falsifier** on R-63-degen-budget
+   (``T_decoder = 2``). Even with the structured prompt, an extreme
+   budget drops the disambiguator's tokens; both packers collapse.
+   The W16-1 win is conditional on ``T_decoder`` strictly between
+   the round-2 disambiguator's token cost and the admitted union's
+   token sum.
+
+The W16 family's six theorems span the three structural axes named
+by the milestone:
+
+* **W16-Λ-compose** (proved-empirical on R-63-naive-tight n=8 +
+  recorded n=8 × 24 real-LLM bytes; structural sketch via
+  composition of W14-Λ-prompt and W15-Λ-budget).
+* **W16-1** (proved-conditional + proved-empirical, synthetic n=40
+  saturated × 5 seeds): composition strictly improves over every
+  non-composed baseline by +1.000 on R-63-COMPOSED-TIGHT.
+* **W16-2** (proved-empirical, sub-additivity / multiplicative
+  composition): each layer alone produces 0.000; only the
+  composition produces 1.000.
+* **W16-3** (proved-empirical full programme regression): 442/442
+  tests pass; backward-compat preserved on R-54..R-62.
+* **W16-Λ-degenerate** (proved-empirical, n=8): under
+  ``T_decoder = 2`` both packers collapse; W16-1 conditional on
+  budget admitting the disambiguator.
+* **W16-Λ-real-replay** (empirical-research over recorded
+  byte-stable Phase-61 capture): +0.500 strict gain on real-LLM
+  bytes at T_decoder=14.
+
+**Master-plan post-v3.17 reading.** After SDK v3.17:
+
+1. **Post-v3.16 success bar.** R-63-COMPOSED-TIGHT instantiates
+   the strong-bar regime: a method must improve ``accuracy_full``
+   by ≥ 0.20 vs every non-composed baseline (W14-only-budgeted,
+   W15-only-without-W14, substrate FIFO), stable across ≥ 3
+   ``bank_seed`` values, AND clear bar 13 (end-to-end composition
+   split). The W16 method clears this bar with synthetic gap
+   +1.000 (5/5 seeds) AND clears the W16-Λ-real-replay anchor at
+   +0.500 on recorded real-LLM bytes.
+2. **W16-Λ-compose makes the joint structural argument explicit.**
+   The producer-side limit (W14-Λ-prompt) and the decoder-side
+   limit (W15-Λ-budget) compose multiplicatively on R-63-naive-
+   tight: every capsule strategy ties FIFO at 0.000 when *both*
+   upstream emission and downstream retention fail. This is not a
+   refutation of either layer — it is the named counterexample
+   regime where both prior limits fire simultaneously.
+3. **What is the next benchmark?** Phase-63 is anchored as the
+   *end-to-end W14+W15 composition* benchmark. The next milestone
+   could attack:
+   * **W16-C-LIVE-OLLAMA** — a fresh live Ollama probe under
+     R-63-COMPOSED-TIGHT with the structured prompt + tight
+     ``T_decoder``. Falsifier: a live probe where the composed
+     accuracy ties or loses to the W14-only loose-budget result
+     (≤ 0.500). Requires Mac-1 endpoint reachable.
+   * **W16-C-CROSS-MODEL** — qwen3.5:35b under MLX-distributed.
+     Requires Mac-2 reachable.
+   * **W15-C-SYMMETRIC / W16-C-SYMMETRIC** — symmetric-corroboration
+     limit on the composed regime. The natural next-axis open
+     question for SDK v3.18+.
+   * **W16-C1** — cross-bench transfer of the composition to
+     security-incident, robotics, or compliance-review families.
+4. **Is the structural win materially stronger than v3.16?**
+   **Yes — it adds a structurally-orthogonal eighth axis (the
+   *coupling* statement).** The W14 layer is a *producer-side*
+   intervention; the W15 layer is a *decoder-side* intervention.
+   They compose additively in code (no new SDK class) AND
+   multiplicatively in effect (each layer is necessary on the
+   regime where the other layer's limit fires). The Wevra
+   programme now has eight coupled structural moves with named
+   limit theorems on each, and the W16 layer is the **first** to
+   make *joint upstream-and-downstream necessity* the strict-gain
+   anchor — AND the **first** to deliver an end-to-end real-LLM
+   strict advance over the strongest non-composed baseline (on
+   recorded bytes; live probe is W16-C-LIVE-OLLAMA, conjectural).
+
+The defensible "thesis-after-SDK-v3.17" is that the synthetic→
+real-LLM-and-bounded-context transfer story now has **eight
+layers**, where the eighth layer is the *composition* of the prior
+two real-LLM-relevant layers (W14 + W15):
+
+* **Layer 1 (W6-C2 falsified):** un-normalised admission cannot
+  transfer.
+* **Layer 2 (W12-Λ at the real-LLM axis):** un-normalised cross-
+  round decoding cannot transfer.
+* **Layer 3 (SDK v3.13, W12-1):** fixed-vocabulary normalised
+  cross-round decoding DOES transfer, conditional on the closed-
+  vocabulary closure.
+* **Layer 4 (SDK v3.14, W13-1):** layered (exact + heuristic)
+  normalised cross-round decoding DOES transfer on a strictly
+  *wider* drift channel, conditional on the heuristic predicate
+  closure.
+* **Layer 5 (SDK v3.14, W13-Λ-real):** real Ollama 14B at default
+  settings does not produce the drift OR the cross-role decoy
+  corroboration shape — the gating axis is event-shape design +
+  prompt-side discipline, not normalisation.
+* **Layer 6 (SDK v3.15, W14-1):** the structured producer protocol
+  + comparable-magnitude events combined with the cross-round
+  capsule pipeline DOES transfer on a real-LLM stream at +0.500
+  strict gain over substrate FIFO under loose decoder budget.
+* **Layer 7 (SDK v3.16, W15-1):** the attention-aware capsule
+  context packer DOES restore correctness when the cross-round
+  bundle is bounded by a strict decoder-side token budget on
+  *synthetic* events.
+* **Layer 8 (SDK v3.17, W16-1 + W16-Λ-real-replay):** the
+  composition of W14 + W15 is the *first* end-to-end demonstration
+  that producer-side and decoder-side interventions are jointly
+  necessary on a single regime, AND that the composed result
+  *survives* the recorded real-LLM bytes — at +0.500 strict gain
+  over the FIFO-packed-W14-only baseline on recorded ``qwen2.5:14b``
+  bytes. The composition does *not* introduce new SDK code; it
+  is *additive in code* and *multiplicative in effect*.
+
+The W16-Λ-degenerate / W16-Λ-compose falsifier regimes sharpen
+the structural composition: an extreme budget removes the W16
+advantage by construction, AND naive-prompt-with-tight-budget
+removes the W16 advantage by joint failure. These are *not*
+refutations — they are the named counterexample regimes that
+confirm W16-1 is a conditional, not a universal, win. The
+**honest cap** on the SDK v3.17 advance is the recorded-bytes
+scope: real-LLM live transfer (W16-C-LIVE-OLLAMA) and cross-model
+transfer (W16-C-CROSS-MODEL) are conjectural pending Mac-1 / Mac-2
+reachable. Over-claiming is the failure mode the
+``HOW_NOT_TO_OVERSTATE.md`` § "W16 solves multi-agent context
+end-to-end" and § "W16 demonstrates real-LLM transfer is solved"
+rules guard against.
+
 ---
 
 ## 5. End goals

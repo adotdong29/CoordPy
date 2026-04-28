@@ -17,7 +17,8 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.16)         | [`RESULTS_WEVRA_ATTENTION_AWARE.md`](RESULTS_WEVRA_ATTENTION_AWARE.md) |
+> | Latest milestone (SDK v3.17)         | [`RESULTS_WEVRA_COMPOSED_REAL_LLM.md`](RESULTS_WEVRA_COMPOSED_REAL_LLM.md) |
+> | Previous milestone (SDK v3.16)       | [`RESULTS_WEVRA_ATTENTION_AWARE.md`](RESULTS_WEVRA_ATTENTION_AWARE.md) |
 > | Previous milestone (SDK v3.15)       | [`RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`](RESULTS_WEVRA_PRODUCER_AMBIGUITY.md) |
 > | Previous milestone (SDK v3.14)       | [`RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md`](RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md) |
 > | Previous milestone (SDK v3.13)       | [`RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md`](RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md) |
@@ -39,7 +40,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.16 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.17 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
@@ -71,40 +72,50 @@ limit), while pairing W9 admission with the new
 achieves 1.000 — the first capsule-native multi-agent coordination
 method that crosses the admission/decoding split** (W10 family,
 SDK v3.11).
-SDK v3.16's headline result is the **first decoder-side capsule-
-context-packing move** in the programme — and the **first
-synthetic benchmark in which joint correctness AND decoder-side
-context efficiency is the strict-gain anchor**. SDK v3.15 (W14)
-closed the producer-side gap on R-61 (the structured prompt
-restored the bench property's cross-role decoy corroboration
-assumption under a real Ollama 14B producer at +0.500 strict gain
-over substrate FIFO). SDK v3.16 (W15) attacks the symmetric
-*downstream* gap directly: even when the bench property holds and
-the cross-round capsule pipeline is in scope, a strict
-*decoder-side* token budget ``T_decoder`` can drop the round-2
-specific-tier disambiguator under naive FIFO packing of the
-admitted union. The new
+SDK v3.17's headline result is the **first end-to-end W14 + W15
+composition move** in the programme — and the **first end-to-end
+real-LLM strict advance over the strongest non-composed baseline**.
+SDK v3.16 (W15) closed the decoder-side gap on R-62-tightbudget at
++1.000 over FIFO-packed-W13 under a deterministic identity
+producer. SDK v3.17 (W16) attacks the symmetric *coupling*
+question: **does the producer-side W14 layer compose with the
+decoder-side W15 layer on a single regime where both are
+independently load-bearing?** The new
+:mod:`vision_mvp.experiments.phase63_composed_real_llm` driver
+combines R-62 multi-hypothesis events with the Phase-61
+:class:`MagnitudeFilteringExtractor` (its naive-prompt mode
+breaks the bench property upstream; its structured-prompt mode
+restores it) and the W15 salience packer under a strict
+``T_decoder``. On R-63-COMPOSED-TIGHT (mag-filter structured ×
+``T_decoder = 24``) the composition achieves
+``accuracy_full = 1.000`` while every non-composed baseline
+collapses to 0.000 — **+1.000 strict separation, stable across
+5/5 alternate ``bank_seed`` values**. The W16-Λ-compose anchor
+on R-63-naive-tight (mag-filter naive × ``T_decoder = 24``) shows
+W14-Λ-prompt and W15-Λ-budget compose multiplicatively: every
+capsule strategy ties FIFO at 0.000 when *both* upstream emission
+and downstream retention fail. The W16-Λ-real-replay anchor
+replays the recorded Phase-61 ``qwen2.5:14b-32k`` bytes
+(``phase61_real_ollama_structured_qwen2_5_14b_n8.json``, n=8 × 24
+producer calls, byte-stable) through the same pipeline at
+``T_decoder = 14`` and shows the **first end-to-end real-LLM
+strict +0.500 advance over the FIFO-packed-W14-only baseline**;
+the recorded naive-prompt bytes confirm joint failure. The
+runtime contract is byte-for-byte unchanged; W16 is *additive in
+code* (no new SDK class) and *multiplicative in effect*
+(jointly-necessary on R-63). Backward-compat preserved
+byte-for-byte: 442/442 tests pass.
+SDK v3.16's headline result was the **first decoder-side capsule-
+context-packing move** in the programme. The
 :class:`vision_mvp.wevra.team_coord.AttentionAwareBundleDecoder`
-salience-packs the union (CCK + tier + corroboration + magnitude
-+ round) with hypothesis preservation under ``T_decoder`` and
-defeats the FIFO-packed baseline. On the new R-62-tightbudget
-regime (multi-hypothesis comparable-magnitude events with
-asymmetric corroboration shape, 2 gold + 2 decoy services per
-scenario, ``T_decoder = 24``), the W15 method achieves
-``accuracy_full = 1.000`` while every FIFO-packed cross-round
-decoder ties FIFO at ``accuracy_full = 0.000`` — **+1.000 strict
-separation, stable across 5/5 alternate ``bank_seed`` values**.
-The W15-Λ-budget limit theorem extends W7-3 (extraction floor)
-to the decoder-side axis: a never-decoded handoff has no
-influence on the answer. The W15-Λ-degenerate falsifier on
-R-62-saturation (``T_decoder = 9999``) confirms the conditionality:
-without budget pressure, salience reordering is a no-op on the
-answer field. Backward-compat (W15-3) preserved byte-for-byte:
-393/393 prior tests pass; with ``T_decoder = None`` the W15
-decoder ties the W13 layered decoder byte-for-byte on the answer
-field. The Wevra programme now has **seven** coupled structural
-axes with named limit theorems on each. The Wevra single-run
-product runtime contract is byte-for-byte unchanged.
+salience-packs the cross-round union (CCK + tier + corroboration
++ magnitude + round) with hypothesis preservation under
+``T_decoder`` and defeats the FIFO-packed baseline by +1.000 on
+R-62-tightbudget (synthetic). SDK v3.17 carries that decoder-side
+intervention into composition with the W14 producer-side layer —
+the first end-to-end demonstration that producer-side ambiguity
+preservation AND decoder-side capsule context packing are
+jointly necessary on the regime where both fire.
 
 SDK v3.15's headline result was the **first producer-protocol move**
 in the programme — and the **first real-Ollama benchmark in which a
@@ -720,7 +731,7 @@ For the full living stability matrix, see
         ├── Runtime:   wevra.runtime.run_sweep    (mock + real, one path)
         ├── Plugins:   wevra.extensions           (3 Protocols + registry)
         ├── Schemas:   phase45.product_report.v2, wevra.provenance.v1, …
-        ├── Latest milestone: docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md (SDK v3.7)
+        ├── Latest milestone: docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md (SDK v3.17)
         ├── Older milestones: docs/archive/wevra-milestones/ (SDK v3.0 → v3.6)
         └── Legacy:    vision_mvp/product/*       (deprecated-compat)
 ```
@@ -801,8 +812,8 @@ For a real-LLM sweep, set `WEVRA_OLLAMA_URL` and add `--acknowledge-heavy`.
   `VISION_MILLIONS.md`, `MATH_AUDIT.md`).
 - **I want the research diary** → `vision_mvp/RESULTS_PHASE*.md` in
   order; the latest milestone is
-  [`RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](RESULTS_WEVRA_SCALE_VS_STRUCTURE.md)
-  (SDK v3.7); older Wevra milestone notes are under
+  [`RESULTS_WEVRA_COMPOSED_REAL_LLM.md`](RESULTS_WEVRA_COMPOSED_REAL_LLM.md)
+  (SDK v3.17); older Wevra milestone notes are under
   [`archive/wevra-milestones/`](archive/wevra-milestones/).
 
 ---

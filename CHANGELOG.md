@@ -5,6 +5,89 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.17] — 2026-04-27 — SDK v3.17 — end-to-end W14 + W15 composition (first end-to-end real-LLM strict advance over the strongest non-composed baseline) + W16 family
+
+*Strictly additive on SDK v3.16. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. **No new SDK class
+ships** — W16 is the demonstration that the existing W14
+``StructuredProducerProtocol`` and W15
+``AttentionAwareBundleDecoder`` compose on a single regime where
+both are independently load-bearing. The new
+``vision_mvp/experiments/phase63_composed_real_llm.py`` driver
+plus the ``OllamaReplayExtractor`` ship as research-slice
+additions; the runtime contract is unchanged.
+
+On the new Phase-63 *composed end-to-end W14 + W15* benchmark:
+
+* **R-63-COMPOSED-TIGHT** (mag-filter structured, ``T_decoder=24``;
+  **W16-1 anchor**, n=8 × 5 seeds saturated): pairing the W14
+  ``StructuredProducerProtocol`` + W15
+  ``AttentionAwareBundleDecoder`` simultaneously achieves
+  ``accuracy_full = 1.000`` while every non-composed baseline
+  collapses to 0.000 (W14-only-budgeted, W15-only-without-W14,
+  substrate FIFO). **+1.000 strict separation, stable across 5/5
+  alternate ``bank_seed`` values**.
+* **R-63-naive-tight** (mag-filter naive, ``T_decoder=24``;
+  **W16-Λ-compose anchor**): joint failure of W14-Λ-prompt and
+  W15-Λ-budget on the same regime; every capsule strategy ties
+  FIFO at 0.000.
+* **R-63-degen-budget** (mag-filter structured, ``T_decoder=2``;
+  **W16-Λ-degenerate falsifier**): both packers collapse to
+  0.000; the W16-1 win is conditional on a budget that admits
+  *some* of the union.
+* **R-63-OLLAMA-REPLAY-COMPOSED-TIGHT** (replay over recorded
+  Phase-61 ``qwen2.5:14b-32k`` bytes at ``T_decoder=14,
+  K_auditor=8``; **W16-Λ-real-replay anchor**):
+  ``capsule_attention_aware = 0.500`` while
+  ``capsule_layered_fifo_packed = 0.000`` — **+0.500 strict
+  gain** over the FIFO-packed-W14-only baseline on a *real-LLM
+  stream*. The first end-to-end real-LLM strict advance over the
+  strongest non-composed baseline in the programme.
+
+The W16 layer is the eighth structural move in the Wevra programme:
+
+| Layer                            | SDK   | Theorem | Anchor regime                                |
+|----------------------------------|-------|---------|----------------------------------------------|
+| Admission (cohort coherence)     | v3.8  | W7-2    | R-54                                         |
+| Admission (cross-role corrob.)   | v3.9  | W8-1    | R-55                                         |
+| Admission (multi-service)        | v3.10 | W9-1    | R-56                                         |
+| Decoding (intra-round bundle)    | v3.11 | W10-1   | R-57                                         |
+| Decoding (cross-round bundle)    | v3.12 | W11-1   | R-58                                         |
+| Normalisation (fixed-vocabulary) | v3.13 | W12-1   | R-59                                         |
+| Normalisation (open-world)       | v3.14 | W13-1   | R-60-wide                                    |
+| Producer protocol                | v3.15 | W14-1   | R-61 + R-61-OLLAMA-A                         |
+| Decoder context packing          | v3.16 | W15-1   | R-62-tightbudget                             |
+| **End-to-end composition**       | v3.17 | **W16-1** | **R-63-COMPOSED-TIGHT + W16-Λ-real-replay** |
+
+W16 family theorems minted by this milestone:
+
+* **W16-Λ-compose** (proved-empirical + structural sketch via
+  composition of W14-Λ-prompt and W15-Λ-budget).
+* **W16-1** (proved-conditional + proved-empirical synthetic n=40 ×
+  5 seeds).
+* **W16-2** (proved-empirical, multiplicative composition).
+* **W16-3** (proved-empirical, full programme regression: **442/442
+  prior tests pass byte-for-byte**; 22 new tests cover the W16
+  surface).
+* **W16-Λ-degenerate** (proved-empirical falsifier).
+* **W16-Λ-real-replay** (empirical-research, recorded real-LLM
+  bytes).
+
+W15-C-COMPOSE-W14 (SDK v3.16 conjecture) is **PARTIALLY DISCHARGED**
+by W16-Λ-real-replay: the composition delivers a strict +0.500 gain
+on recorded ``qwen2.5:14b-32k`` bytes (recovering the W14-only
+loose-budget accuracy under tight budget pressure) but does NOT
+close the 1/8 model-side judgment failure that W14 alone leaves
+on the same recorded capture.
+
+Honest scope: the Mac-1 endpoint at 192.168.12.191:11434 was
+offline at milestone capture time (``HTTP=000``). A fresh live
+LLM probe (W16-C-LIVE-OLLAMA) is conjectural; cross-model
+transfer (W16-C-CROSS-MODEL) and cross-bench transfer (W16-C1)
+are conjectural. See
+[`docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md`](docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md)
+for the full milestone note.
+
 ## [3.16] — 2026-04-27 — SDK v3.16 — attention-aware capsule context packing (first decoder-side context-packing move + first joint-correctness-and-context-efficiency strict-gain anchor) + W15 family
 
 *Strictly additive on SDK v3.15. The Wevra single-run product

@@ -1,7 +1,16 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Working main-paper draft for the Context Zero programme.
-> Status: SDK v3.14, 2026-04-26.
+> Status: SDK v3.17, 2026-04-27 (this draft was last fully revised
+> at SDK v3.14; SDK v3.15 / v3.16 / v3.17 add the W14 producer
+> protocol, W15 decoder context-packing, and W16 end-to-end
+> composition layers as additional structural axes — see § 8 for
+> the synthesis-after-v3.17 reading and the canonical milestone
+> notes
+> ``docs/RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`` (W14),
+> ``docs/RESULTS_WEVRA_ATTENTION_AWARE.md`` (W15), and
+> ``docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md`` (W16) for the
+> evidence anchors).
 > Scope: this is the main paper draft, not a milestone note. It
 > synthesizes the programme's current runtime, theory, and benchmark
 > results into one publication-shaped argument.
@@ -27,33 +36,50 @@ then extend the same contract to multi-agent coordination, where
 agents exchange typed handoff capsules rather than raw messages.
 
 The paper's main contribution is a decomposition of the multi-agent
-context problem into five structural axes: (1) admission under budget,
-(2) intra-round decoding, (3) cross-round decoding, (4) fixed-table
-normalization of producer drift, and (5) layered open-world
-normalization. For each axis we provide both positive and negative
-results: named regimes where the axis is sufficient, and sharp
-falsifiers where it is not. Across SDK v3.8-v3.14 we build a
-progressive benchmark family (R-54 through R-60) that isolates these
+context problem into eight structural axes (after SDK v3.17): (1)
+admission under budget, (2) intra-round decoding, (3) cross-round
+decoding, (4) fixed-table normalization of producer drift, (5)
+layered open-world normalization, (6) producer-side ambiguity
+preservation under structured prompts (W14, SDK v3.15), (7)
+decoder-side capsule context packing under bounded T_decoder (W15,
+SDK v3.16), and (8) end-to-end composition where producer-side and
+decoder-side interventions are jointly necessary on the same
+regime (W16, SDK v3.17). For each axis we provide both positive and
+negative results: named regimes where the axis is sufficient, and
+sharp falsifiers where it is not. Across SDK v3.8-v3.17 we build a
+progressive benchmark family (R-54 through R-63) that isolates these
 axes. We show that admission alone can win in some regimes but has a
 named structural limit; bundle-aware decoding crosses that ceiling;
-cross-round reasoning crosses a further temporal limit; and layered
+cross-round reasoning crosses a further temporal limit; layered
 normalization crosses a fixed-vocabulary limit under synthetic
-open-world drift. The strongest current positive result is a strict
-decoder-side win over every admission baseline on a decoder-forcing
-regime, followed by a cross-round and normalization extension that
-preserves those wins on harder synthetic regimes. The strongest
-negative result is that a real Ollama producer can collapse the
-benchmark's ambiguity upstream, making downstream reasoning invisible.
+open-world drift; the structured producer protocol closes the
+real-LLM upstream-erasure gap on R-61 at +0.500 vs FIFO on
+recorded ``qwen2.5:14b-32k`` bytes; the attention-aware capsule
+context packer closes the decoder-side budget gap on
+R-62-tightbudget at +1.000 vs FIFO-pack on synthetic events; and
+the W14+W15 composition is the **first end-to-end real-LLM strict
+advance over the strongest non-composed baseline** on R-63 (W16-1
+synthetic +1.000 strict gain; W16-Λ-real-replay +0.500 strict
+gain on recorded ``qwen2.5:14b`` bytes at ``T_decoder = 14``).
+
+The strongest negative result remains that a real Ollama producer
+can collapse the benchmark's ambiguity upstream, making downstream
+reasoning invisible (W14-Λ-prompt). The strongest *coupling* result
+is W16-Λ-compose: when the producer collapses upstream AND the
+decoder is budget-bounded simultaneously, both named limits fire
+jointly and no capsule strategy in the SDK clears the bar.
 
 The paper does **not** claim that multi-agent context is solved in an
 unqualified sense. The honest thesis is narrower and stronger:
 multi-agent context becomes tractable when evidence is represented as
-typed objects and when the runtime explicitly separates producer-side
+typed objects AND when the runtime explicitly separates producer-side
 ambiguity preservation, normalization, admission, intra-round
-decoding, and cross-round decoding. The open problem is no longer
+decoding, cross-round decoding, decoder-side context packing, AND
+the composition of producer- and decoder-side interventions on
+regimes where both fire. The open problem is no longer
 "can capsules help?"; it is "under what real producer conditions do
-these axes remain load-bearing, and how much of the difficulty is
-upstream versus downstream?"
+these axes remain load-bearing under tight context windows, and
+which axes can be replaced or learned away?"
 
 ## 1. Introduction
 
@@ -240,10 +266,22 @@ consistency. This layer gives us a clean separation between:
 
 That separation is what makes the rest of the paper possible.
 
-## 6. A Five-Axis Decomposition of the Context Problem
+## 6. An Eight-Axis Decomposition of the Context Problem
 
 The strongest current contribution of the programme is not any one
 benchmark. It is the decomposition below.
+
+> *Reading note (SDK v3.17).* The original paper draft (SDK v3.14)
+> named five structural axes; SDK v3.15 adds a sixth (W14
+> producer-side ambiguity preservation), SDK v3.16 adds a seventh
+> (W15 decoder-side capsule context packing), and SDK v3.17 adds
+> an eighth (W16 end-to-end W14+W15 composition; this last is a
+> *coupling* statement, not a new mechanism). The five-axis
+> sub-decomposition (sections 6.1–6.5 below) is preserved
+> verbatim as the SDK v3.14 reading; sections 6.6–6.8 below are
+> the SDK v3.15-v3.17 additions; section 6.9 is the
+> "thesis-after-v3.17" synthesis. The runtime contract remains
+> byte-for-byte unchanged across all eight axes.
 
 ### 6.1 Axis 1: Admission under budget
 
@@ -329,6 +367,133 @@ Negative results:
 - W13-4: cosmic OOV is a sharp closure boundary.
 - W13-Λ-real: on the first real-Ollama probe, the bottleneck is not
   normalization but the producer collapsing ambiguity upstream.
+
+### 6.6 Axis 6: Producer-side ambiguity preservation (SDK v3.15)
+
+Question: when the real LLM producer compresses round-1 toward a
+single best diagnosis (the W13-Λ-real observation), can a prompt-side
+intervention restore the bench property's structural ingredients
+*before* admission rather than after the fact?
+
+Positive results:
+
+- W14-1: pairing the ``StructuredProducerProtocol`` (per-event
+  mandate + observation/diagnosis tier banner) with the cross-round
+  capsule pipeline restores the bench property and achieves
+  ``accuracy_full = 1.000`` on R-61-structured-prompt synthetic
+  (vs 0.000 under the naive prompt; +1.000 strict separation,
+  stable across 5/5 seeds).
+- W14-Λ-real: on real Mac-1 ``qwen2.5:14b-32k`` at temperature 0
+  on the redesigned comparable-magnitude events under the
+  structured prompt, the bench property holds in 7/8 scenarios
+  (vs 0/8 under naive); the cross-round pipeline achieves
+  ``accuracy_full = 0.500`` (vs 0.000 under naive) — **+0.500
+  strict gain over substrate FIFO on a real-LLM stream** at
+  exactly the R-61-OLLAMA-A tier threshold.
+
+Negative results:
+
+- W14-Λ-prompt: under producer-side compression, every downstream
+  layer (admission, decoder, normaliser) ties FIFO at 0.000.
+- W14-4: both the comparable-magnitude event redesign AND the
+  structured prompt are required; either alone is insufficient.
+
+### 6.7 Axis 7: Decoder-side capsule context packing (SDK v3.16)
+
+Question: when the cross-round bundle is bounded by a strict
+``T_decoder`` token budget (e.g. an LLM context window), can
+salience-aware capsule context packing keep the round-2 specific-
+tier disambiguator that FIFO truncation would drop?
+
+Positive result:
+
+- W15-1: pairing the ``AttentionAwareBundleDecoder`` (closed-form
+  salience: tier + CCK + corroboration + magnitude + round; with
+  per-(tag, role, tier) hypothesis preservation) with the W13
+  layered decoder achieves ``accuracy_full = 1.000`` on
+  R-62-tightbudget while every FIFO-packed cross-round decoder
+  collapses to 0.000 — +1.000 strict separation, stable across
+  5/5 seeds. The packer puts the round-2 specific claim at rank 0
+  of the kept bundle in 8/8 cells (the proxy attention metric).
+
+Negative results:
+
+- W15-Λ-budget: under FIFO arrival-order packing, ``T_decoder``
+  below the union token sum drops the round-2 disambiguator by
+  construction; extends the W7-3 extraction floor to the
+  decoder-side axis.
+- W15-Λ-degenerate: under no budget pressure, salience reordering
+  is a no-op on the answer field.
+
+### 6.8 Axis 8: End-to-end W14 + W15 composition (SDK v3.17)
+
+Question: do the W14 producer-side and W15 decoder-side
+interventions compose on a single regime where both are
+independently load-bearing? And does the composition deliver a
+strict end-to-end real-LLM gain over the strongest non-composed
+baseline?
+
+Positive results:
+
+- W16-1: pairing the W14 ``StructuredProducerProtocol`` with the
+  W15 ``AttentionAwareBundleDecoder`` simultaneously achieves
+  ``accuracy_full = 1.000`` on R-63-COMPOSED-TIGHT (mag-filter
+  structured prompt + ``T_decoder = 24``) while every non-composed
+  baseline collapses to 0.000 — **+1.000 strict separation,
+  stable across 5/5 seeds**. The composition is *additive in
+  code* (no new SDK class) and *multiplicative in effect* (each
+  layer is necessary on the regime where the other layer's limit
+  fires).
+- W16-Λ-real-replay: on the recorded Phase-61 ``qwen2.5:14b-32k``
+  bytes (n=8 × 24 producer calls, byte-stable) at
+  ``T_decoder = 14``, the composed pipeline achieves
+  ``capsule_attention_aware = 0.500`` while
+  ``capsule_layered_fifo_packed = 0.000`` — **+0.500 strict gain
+  over the FIFO-packed-W14-only baseline on a real-LLM stream**.
+  The first end-to-end real-LLM strict advance over the strongest
+  non-composed baseline in the programme.
+- W16-2: each layer alone produces 0.000 on R-63-COMPOSED-TIGHT
+  (W14-only-budgeted FIFO-pack: 0.000; W15-only-without-W14
+  attention-aware over the naive-prompt stream: 0.000); only the
+  composition produces 1.000. The composition is sub-additive at
+  the failure-mode level — the named limits compose
+  multiplicatively.
+
+Negative results:
+
+- W16-Λ-compose: on R-63-naive-tight (mag-filter naive prompt +
+  ``T_decoder = 24``), W14-Λ-prompt and W15-Λ-budget fire
+  simultaneously; every capsule strategy ties FIFO at 0.000.
+- W16-Λ-degenerate: under ``T_decoder = 2`` (below the round-2
+  disambiguator's token cost), both packers collapse; the W16-1
+  win is conditional on a budget that admits *some* of the union
+  but not *all* of it.
+
+### 6.9 Synthesis after SDK v3.17
+
+The eight axes collectively support a sharper thesis than the
+five-axis reading of SDK v3.14:
+
+1. **Producer-side ambiguity preservation** (W14, axis 6) is
+   load-bearing on real-LLM regimes where the model's natural
+   compression tendency erases the bench property upstream.
+2. **Decoder-side capsule context packing** (W15, axis 7) is
+   load-bearing when the auditor's downstream consumer is bounded
+   by a strict token budget.
+3. **The composition** (W16, axis 8) is load-bearing on regimes
+   where both axes 6 and 7 fire simultaneously — the regime that
+   most resembles a *production* multi-agent system with both a
+   real LLM producer and a context-window-bounded downstream
+   audit agent.
+4. The *runtime contract is unchanged* across all eight axes: each
+   axis is a research-grade SDK extension on the team-coordination
+   surface, opt-in only.
+
+The honest reading after SDK v3.17 is that multi-agent context
+becomes tractable when the runtime separates these eight axes
+*and* couples them on the regimes where the coupling is required.
+The W16 result is the first end-to-end real-LLM evidence that
+the composition holds in practice, not just in theory.
 
 ## 7. Benchmark Family
 

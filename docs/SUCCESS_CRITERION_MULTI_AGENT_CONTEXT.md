@@ -1,12 +1,12 @@
-# Success criterion — solving multi-agent context (SDK v3.16 bar)
+# Success criterion — solving multi-agent context (SDK v3.17 bar)
 
 > Pre-committed, falsifiable bar for what counts as a *real* advance
 > on "solving multi-agent context" in the Context Zero / Wevra
 > programme. This document is the **referee** for SDK v3.9 / v3.10 /
-> v3.11 / v3.12 / v3.13 / v3.14 / v3.15 / v3.16 (and later
+> v3.11 / v3.12 / v3.13 / v3.14 / v3.15 / v3.16 / v3.17 (and later
 > milestones). Any milestone note that claims an advance must name
 > the bar it cleared and cite the code-anchored evidence. Last
-> touched: SDK v3.16, 2026-04-27.
+> touched: SDK v3.17, 2026-04-27.
 >
 > The history of this programme is full of moves where a partial
 > result was written up too strongly and later had to be sharpened
@@ -108,6 +108,63 @@ The **named regimes** the bar refers to (anchored in code):
       § 1.4 for the honest 4-tier grading on R-60-ollama.
   Anchor:
   `vision_mvp/experiments/phase60_open_world_normalization.py`.
+
+* **R-63** — Phase-63 *end-to-end W14 + W15 composition* regime,
+  the *new harder regime* SDK v3.17 introduces. R-63 is the first
+  programme regime where **both** the producer-side ambiguity-
+  preservation layer (W14) AND the decoder-side capsule context-
+  packing layer (W15) are independently load-bearing on the *same*
+  cell. The events are R-62's multi-hypothesis comparable-magnitude
+  shape; the producer is Phase-61's deterministic
+  ``MagnitudeFilteringExtractor`` with its ``prompt_mode`` toggle
+  (naive collapses round-1 toward top-N events per (role, kind);
+  structured preserves the per-event mandate); the decoder
+  consumes the cross-round bundle under a strict ``T_decoder``.
+  Six pre-committed sub-banks plus a falsifier and three
+  ollama-replay cells:
+    - **R-63-baseline-loose** (identity producer, ``T_decoder=None``).
+      Sanity anchor: cross-round capsule decoders saturate at 1.000.
+      W16-3 backward-compat anchor on R-62 events.
+    - **R-63-W15-only** (identity, ``T_decoder=24``). Identical to
+      R-62-tightbudget; isolates the W15 contribution.
+    - **R-63-W14-only** (mag-filter naive, ``T_decoder=None``).
+      Producer-side compression breaks the bench property even on
+      R-62 multi-hypothesis events; every cross-round decoder ties
+      FIFO at 0.000. W14-Λ-prompt extension to R-62 events.
+    - **R-63-naive-tight** (mag-filter naive, ``T_decoder=24``).
+      Joint failure of W14-Λ-prompt and W15-Λ-budget on the same
+      regime; every capsule strategy ties FIFO at 0.000.
+      **W16-Λ-compose anchor.**
+    - **R-63-W14-success** (mag-filter structured, ``T_decoder=None``).
+      W14 alone restores the bench property; cross-round wins return
+      to 1.000. The composed packer ties W13 byte-for-byte.
+    - **R-63-COMPOSED-TIGHT** (mag-filter structured,
+      ``T_decoder=24``). **The W16-1 anchor.** W14 restores the
+      bench property AND the decoder budget bites simultaneously;
+      only the AttentionAwareBundleDecoder over the structured-
+      prompt stream wins at 1.000; FIFO-packed-W13 (the
+      W14-only-budgeted baseline) collapses to 0.000;
+      AttentionAwareBundleDecoder over the *naive*-prompt stream
+      (the W15-only-without-W14 baseline) also collapses to 0.000.
+      **+1.000 strict separation** vs the strongest non-composed
+      baseline, stable across 5/5 alternate ``bank_seed`` values.
+    - **R-63-degen-budget** (mag-filter structured,
+      ``T_decoder=2``). **W16-Λ-degenerate falsifier** — the budget
+      is below the round-2 specific claim's token cost; both
+      packers collapse to 0.000.
+    - **R-63-OLLAMA-REPLAY-LOOSE / -COMPOSED-TIGHT / -NAIVE-TIGHT**
+      (replay extractor over recorded Phase-61
+      ``qwen2.5:14b-32k`` bytes; ``K_auditor = 8``,
+      ``T_decoder ∈ {None, 14}``). **W16-Λ-real-replay anchor.**
+      Replay-loose reproduces the Phase-61 W14-Λ-real anchor at
+      0.500. Replay-composed-tight at ``T_decoder = 14`` shows
+      ``capsule_attention_aware = 0.500`` and
+      ``capsule_layered_fifo_packed = 0.000`` — **+0.500 strict
+      gain** over the FIFO-packed-W14-only baseline on a *real-LLM
+      stream*. Replay-naive-tight reproduces the joint-failure
+      regime on recorded LLM bytes.
+  Anchor:
+  `vision_mvp/experiments/phase63_composed_real_llm.py`.
 
 * **R-62** — Phase-62 *attention-aware capsule context packing under
   decoder-side budget pressure* regime, the *new harder regime* SDK
@@ -231,7 +288,7 @@ The **named regimes** the bar refers to (anchored in code):
 
 ## 1. Three pre-committed bars
 
-> **SDK v3.16 anchors the bar to R-62.** Each version of this
+> **SDK v3.17 anchors the bar to R-63.** Each version of this
 > document anchors the *strict-gain regime* to the milestone-
 > specific harder regime. SDK v3.9 anchored to R-55; SDK v3.10
 > anchored to R-56; SDK v3.11 anchored to **R-57** AND introduced
@@ -248,18 +305,24 @@ The **named regimes** the bar refers to (anchored in code):
 > the *prompt-side discipline* gate that W13-Λ-real identified as
 > the dominant blocker on real-LLM transfer; a downstream-only
 > method that does not address producer-side compression of the
-> bench property does NOT clear bar 11). SDK v3.16 anchors the bar
-> to **R-62** below AND introduces **bar 12**
+> bench property does NOT clear bar 11). SDK v3.16 anchored the bar
+> to **R-62** AND introduced **bar 12**
 > (joint-correctness-and-context-efficiency split: a method must
 > clear *both* an accuracy threshold AND an explicit decoder-side
 > token-budget constraint; a method that wins on accuracy alone
 > while ignoring decoder context budget does NOT clear bar 12).
-> Earlier R-55..R-61-anchored bars remain valid as historical bars;
-> the *current* bar is R-62-anchored.
+> SDK v3.17 anchors the bar to **R-63** below AND introduces
+> **bar 13** (end-to-end composition split: a method must clear
+> a regime where *both* W14 producer-protocol ingredients AND W15
+> decoder-budget ingredients are independently load-bearing; a
+> method that closes one structural axis but leaves the other
+> firing does NOT clear bar 13).
+> Earlier R-55..R-62-anchored bars remain valid as historical
+> bars; the *current* bar is R-63-anchored.
 
 ### 1.1 Strong success bar (a "real" advance)
 
-A milestone *strongly advances* the thesis iff **all twelve** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16):
+A milestone *strongly advances* the thesis iff **all thirteen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17):
 
 1. **Code anchor.** A new admission/decoder/coordination method
    ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
@@ -324,6 +387,46 @@ A milestone *strongly advances* the thesis iff **all twelve** hold (bars 1–6 a
    FIFO at 0.000 (W13-4). The closure boundary is structural for any
    predicate-based normaliser; widening it is a research move
    (W13-C2 / W13-C3), not a structural fix.
+
+13. **(SDK v3.17+) End-to-end composition split.** The milestone-
+   anchored harder regime (R-63-COMPOSED-TIGHT) is **provably
+   insufficient for any method that closes only one of the two
+   structural axes** (W14 producer-side OR W15 decoder-side; both
+   limits W14-Λ-prompt and W15-Λ-budget fire on the regime). On
+   R-63-naive-tight (mag-filter naive prompt + ``T_decoder = 24``)
+   every capsule strategy ties FIFO at 0.000 (W16-Λ-compose); on
+   R-63-COMPOSED-TIGHT (mag-filter structured prompt +
+   ``T_decoder = 24``) the W14-only-budgeted baseline (FIFO-packed-
+   W13) ties FIFO at 0.000 AND the W15-only-without-W14 baseline
+   (AttentionAwareBundleDecoder over the naive-prompt stream) ties
+   FIFO at 0.000. **The new method must wire BOTH the W14
+   structured producer protocol AND the W15 attention-aware
+   decoder simultaneously.** A pure W14-only method (no decoder
+   budget enforcement) does NOT clear bar 13; a pure W15-only
+   method (FIFO-packed decoder over a structured-prompt stream is
+   permitted as the W14-only-budgeted baseline; salience pack over
+   a naive-prompt stream does NOT clear bar 13). **Pre-committed
+   bench property:** under structured prompt + tight ``T_decoder``,
+   the composed pipeline's pack-stats block must show
+   ``position_of_first_causal_claim_avg = 0.0`` AND
+   ``n_with_causal_claim_kept = N`` for n_eval = N cells, AND the
+   bench property must hold in every cell (mechanically verified
+   by ``Phase63ComposedTightTests::test_composed_keeps_round2_specific_claim``
+   and ``Phase63ComposedTightTests::test_composed_property_holds_8_of_8``).
+   **Pre-committed falsifier (W16-Λ-degenerate):** under
+   ``T_decoder = 2`` (below the round-2 specific claim's token
+   cost), both packers collapse to 0.000; the W16-1 win is
+   conditional on a budget that admits *some* but not *all* of
+   the union. **Pre-committed real-LLM anchor (W16-Λ-real-replay):**
+   replaying the recorded ``phase61_real_ollama_structured_qwen2_5_14b_n8.json``
+   bytes through the same pipeline at ``T_decoder = 14, K_auditor = 8``
+   produces ``capsule_attention_aware - capsule_layered_fifo_packed
+   = +0.500`` strict gain on real-LLM bytes; the budget band where
+   this holds is ``T_decoder ∈ [13, 16]``. **Honest scope:** the
+   replay path is *measurement* over recorded bytes, not a fresh
+   live LLM probe; W16-C-LIVE-OLLAMA is conjectural pending a live
+   ``run_phase63 --extractor=ollama --prompt-mode=structured``
+   probe with Mac-1 reachable.
 
 12. **(SDK v3.16+) Joint-correctness-and-context-efficiency split.**
    The milestone-anchored harder regime (R-62-tightbudget) is
@@ -459,6 +562,48 @@ For SDK v3.11 specifically, the canonical phrasing instantiates as:
 > Phase-57-falsifier regime where the decoy is corroborated AND
 > mentioned via a causal claim_kind for the chosen root_cause
 > (W10-4)."*
+
+For SDK v3.17 specifically, the canonical phrasing instantiates as:
+
+> *"On R-63-COMPOSED-TIGHT (Phase-63 composed regime: multi-
+> hypothesis comparable-magnitude events × magnitude-filter
+> structured-prompt producer × ``T_decoder = 24``), every method
+> that closes only one of the two structural axes ties FIFO at
+> ``accuracy_full = 0.000`` — W14-only-budgeted (FIFO-packed-W13
+> over the structured-prompt stream) at 0.000 and
+> W15-only-without-W14 (AttentionAwareBundleDecoder over the
+> naive-prompt stream from R-63-naive-tight) at 0.000. On
+> R-63-naive-tight every capsule strategy ties FIFO at 0.000
+> (W16-Λ-compose: W14-Λ-prompt and W15-Λ-budget compose
+> multiplicatively). Pairing the W14 :class:`StructuredProducerProtocol`
+> + W15 :class:`AttentionAwareBundleDecoder` simultaneously
+> achieves ``accuracy_full = 1.000`` on R-63-COMPOSED-TIGHT
+> (``K_auditor = 12, T_auditor = 256, T_decoder = 24, n_eval = 8,
+> bank_seed = 11``), strictly improving over both substrate FIFO
+> (+1.000) and the W14-only-budgeted baseline (+1.000), stable
+> across 5/5 alternate ``bank_seed`` values (11, 17, 23, 29, 31)
+> with min gap ≥ 1.000 well above the strong-bar 0.50 threshold.
+> The win does not transfer to the R-63-degen-budget falsifier
+> (``T_decoder = 2``, below the round-2 disambiguator's token
+> cost) where both packers tie at 0.000 (W16-Λ-degenerate).
+> Backward-compat preserved: R-54 / R-55 / R-56 / R-57 / R-58 /
+> R-59 / R-60 / R-61 / R-62 default banks all still hit prior
+> anchors; 442/442 prior tests pass byte-for-byte. The
+> W16-Λ-real-replay anchor on the recorded
+> ``phase61_real_ollama_structured_qwen2_5_14b_n8.json`` bytes
+> at ``T_decoder = 14, K_auditor = 8`` shows
+> ``capsule_attention_aware = 0.500`` and
+> ``capsule_layered_fifo_packed = 0.000`` — **+0.500 strict
+> gain** over the FIFO-packed-W14-only baseline on a real-LLM
+> stream. The W16-1 win is conditional on (a) the structured
+> producer protocol AND (b) ``T_decoder`` strictly between the
+> round-2 disambiguator's token cost and the admitted union's
+> token sum AND (c) the asymmetric-corroboration multi-hypothesis
+> bench property; removing any one collapses to W14-Λ-prompt /
+> W15-Λ-budget / W16-Λ-degenerate. The honest cap on the SDK
+> v3.17 advance is the synthetic + recorded-bytes scope: a fresh
+> live LLM probe (W16-C-LIVE-OLLAMA) is conjectural pending Mac-1
+> reachable."*
 
 For SDK v3.16 specifically, the canonical phrasing instantiates as:
 
@@ -902,6 +1047,71 @@ are provably insufficient — must combine:
 
 A regime missing any of these is *not* R-60 — it does not test
 the SDK v3.14 hypothesis.
+
+## 2.12. Required ingredients of R-63 (SDK v3.17)
+
+The "harder fair regime" introduced by SDK v3.17 — the *current*
+strict-gain anchor and the regime where the W14 + W15 composition
+is provably load-bearing — must combine:
+
+* **All R-62 structural ingredients.** Multi-hypothesis comparable-
+  magnitude events with asymmetric corroboration (decoys ≥ 2
+  distinct producer roles, golds = 1 distinct role); 2 gold + 2
+  decoy services per scenario; round-1 generic-noise only; round-2
+  one specific-tier disambiguator with no ``service=`` token.
+  Mechanically verified by ``Phase62BankShapeTests`` on the
+  inherited Phase-62 bank.
+* **Producer-side compression mode** (Phase-61
+  :class:`MagnitudeFilteringExtractor` with the ``prompt_mode``
+  toggle): the naive prompt collapses round-1 toward top-N events
+  per (role, kind), erasing the bench property's
+  ``all_decoys_round1_corroborated`` predicate; the structured
+  prompt's per-event mandate restores it. Mechanically verified
+  by the ``r63_w14_only`` cell (bench property holds in 0/8 under
+  naive prompt) and the ``r63_w14_success`` cell (8/8 under
+  structured prompt) of
+  ``vision_mvp.experiments.phase63_composed_real_llm.run_cross_regime_summary``.
+* **Decoder-side token budget** ``T_decoder`` strictly between the
+  round-2 specific-tier claim's token cost and the admitted-union
+  token sum. The default tight value is ``T_decoder = 24`` on
+  Phase-62 events (mirroring R-62-tightbudget); the
+  W16-Λ-degenerate falsifier sub-bank sets ``T_decoder = 2`` (below
+  the round-2 disambiguator's cost).
+* **Composed-pipeline pack-stats invariant.** Under structured
+  prompt + ``T_decoder = 24``, the
+  :class:`AttentionAwareBundleDecoder` pack-stats block must show
+  ``position_of_first_causal_claim_avg = 0.0``,
+  ``n_with_causal_claim_kept = n_eval``, and
+  ``hypothesis_count_kept = hypothesis_count_input``. Mechanically
+  verified by ``Phase63ComposedTightTests::test_composed_keeps_round2_specific_claim``.
+* **Audit-preserving.** T-1..T-7 holds on every cell of every
+  capsule strategy on every (extractor, prompt_mode, T_decoder,
+  bank_seed) cell. Mechanically verified by
+  ``Phase63ComposedTightTests::test_audit_OK_on_every_capsule_strategy``.
+* **Determinism.** The Phase-62 bank generator is RNG-deterministic
+  given ``bank_seed``; the magnitude-filter extractor is
+  deterministic given ``(seed, prompt_mode)``; the W15 salience
+  pack is byte-deterministic given ``(input handoffs, root_cause,
+  T_decoder, round_index_hint)``. The
+  :class:`OllamaReplayExtractor` is byte-deterministic given the
+  recorded JSON.
+* **No regression on R-54..R-62.** Every prior anchor remains
+  green; the composed pipeline ties the W13 layered decoder
+  byte-for-byte under ``T_decoder = None`` and identity producer;
+  the composed pipeline ties the W14 anchor byte-for-byte under
+  ``T_decoder = None`` and structured-prompt producer; 442/442
+  prior tests pass.
+* **Honest real-LLM scope.** The replay path uses recorded
+  Phase-61 ``qwen2.5:14b-32k`` bytes from
+  ``docs/data/phase61_real_ollama_structured_qwen2_5_14b_n8.json``
+  (the W14-Λ-real anchor's source). The replay extractor is
+  byte-stable; the budget band where the W16 strict gain holds on
+  the recorded stream is ``T_decoder ∈ [13, 16]``; a fresh live
+  LLM probe (W16-C-LIVE-OLLAMA) is conjectural pending Mac-1
+  reachable.
+
+A regime missing any of these is *not* R-63 — it does not test
+the SDK v3.17 hypothesis.
 
 ## 2.11. Required ingredients of R-62 (SDK v3.16)
 

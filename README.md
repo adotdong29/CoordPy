@@ -7,13 +7,70 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**As of SDK v3.8 (April 2026), capsules are load-bearing
+**As of SDK v3.17 (April 2026), capsules are load-bearing
+*inside one Wevra run*, *between agents in a team*, *across the
+model-class gradient*, *across the model regime × admission
+strategy grid on a real-LLM benchmark*, *across cross-role
+coherence / corroboration / multi-service / decoder-forcing /
+multi-round / open-world-normalisation / producer-protocol /
+decoder-context-packing axes*, and — most sharply — *across the
+first end-to-end composition where the producer-side W14
+ambiguity-preservation layer and the decoder-side W15 capsule
+context-packing layer must fire jointly (W16-1 strict +1.000
+synthetic gain; W16-Λ-real-replay strict +0.500 gain on recorded
+``qwen2.5:14b-32k`` bytes — the first end-to-end real-LLM strict
+advance over the strongest non-composed baseline in the
+programme).** SDK v3.17's contribution is the
+**Phase-63 composed end-to-end W14 + W15 benchmark**
+([`vision_mvp/experiments/phase63_composed_real_llm.py`](vision_mvp/experiments/phase63_composed_real_llm.py))
+plus the ``OllamaReplayExtractor`` for honest replay over
+recorded real-LLM bytes. The headline (n=8 saturated × 5 seeds
+on R-63-COMPOSED-TIGHT, ``K_auditor=12, T_auditor=256, T_decoder=24,
+bank_seed=11``): pairing the W14 ``StructuredProducerProtocol`` +
+W15 ``AttentionAwareBundleDecoder`` simultaneously achieves
+``accuracy_full = 1.000`` while every non-composed baseline
+collapses to 0.000 — **+1.000 strict separation** vs the
+W14-only-budgeted baseline (FIFO-packed-W13 on the structured-prompt
+stream) and the W15-only-without-W14 baseline (AttentionAware on
+the naive-prompt stream); stable across 5/5 alternate
+``bank_seed`` values. On the recorded Phase-61 ``qwen2.5:14b-32k``
+bytes (``docs/data/phase61_real_ollama_structured_qwen2_5_14b_n8.json``,
+n=8 × 24 producer calls, byte-stable) at ``T_decoder = 14`` the
+composition delivers a **+0.500 strict gain** over the FIFO-packed-W14-only
+baseline — the **first end-to-end real-LLM strict advance** over the
+strongest non-composed baseline. The W16-Λ-compose anchor on
+R-63-naive-tight (mag-filter naive × ``T_decoder = 24``) shows
+W14-Λ-prompt and W15-Λ-budget compose multiplicatively: every
+capsule strategy ties FIFO at 0.000 when *both* upstream emission
+AND downstream retention fail. The W16-Λ-degenerate falsifier on
+R-63-degen-budget (``T_decoder = 2``) confirms the conditionality.
+Backward-compat (W16-3) preserved byte-for-byte: 442/442 prior
+tests pass; the runtime contract is byte-for-byte unchanged. The
+Mac-1 endpoint at 192.168.12.191:11434 was offline at milestone
+capture time (``HTTP=000``), so a fresh live LLM probe
+(W16-C-LIVE-OLLAMA) is conjectural. See
+[`docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md`](docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md)
+for the full SDK v3.17 milestone note.
+
+The previous milestone (**SDK v3.16**) contributed the **Phase-62
+attention-aware capsule context packing benchmark** — see
+[`docs/RESULTS_WEVRA_ATTENTION_AWARE.md`](docs/RESULTS_WEVRA_ATTENTION_AWARE.md).
+The previous milestone (**SDK v3.15**) contributed the **Phase-61
+producer-side ambiguity-preservation benchmark** — see
+[`docs/RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`](docs/RESULTS_WEVRA_PRODUCER_AMBIGUITY.md).
+The Wevra single-run product runtime contract is byte-for-byte
+unchanged from SDK v3.16.
+
+---
+
+**Historical SDK v3.8 reading (preserved for context).** Capsules
+are load-bearing
 *inside one Wevra run*, *between agents in a team*, *across the
 model-class gradient*, *across the model regime × admission
 strategy grid on a real-LLM benchmark*, and now — most sharply —
 *across a deterministic cross-role cohort-coherence benchmark
 where capsule structure provides a strict +1.000 ``accuracy_full``
-advantage over substrate FIFO under stated bench properties.**
+advantage over substrate FIFO under stated bench properties.*
 SDK v3.8's contribution is the **Phase-54 cross-role
 cohort-coherence benchmark**
 ([`vision_mvp/experiments/phase54_cross_role_coherence.py`](vision_mvp/experiments/phase54_cross_role_coherence.py))

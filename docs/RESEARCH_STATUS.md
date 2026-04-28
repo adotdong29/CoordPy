@@ -5,28 +5,55 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.16,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.17,
 > 2026-04-27.
 
 ## TL;DR
 
-The programme now has **twelve** coupled research axes, each with a
-sharp status. SDK v3.16 mints axis 12: **decoder-side capsule
-context packing**. Under a strict decoder-side token budget on the
-new R-62-tightbudget regime (multi-hypothesis comparable-magnitude
-events with asymmetric corroboration shape), the new
-:class:`AttentionAwareBundleDecoder` (W15) achieves
-``accuracy_full = 1.000`` while every FIFO-packed cross-round
-decoder ties FIFO at ``accuracy_full = 0.000`` — a +1.000 strict
-separation, stable across 5/5 ``bank_seed`` values. The W15-Λ-budget
-limit theorem extends W7-3 (extraction floor) to the decoder-side
-axis: a never-decoded handoff has no influence on the answer.
-Backward-compat (W15-3) preserved byte-for-byte: 393/393 prior
-tests pass; with ``T_decoder = None`` the W15 decoder ties the W13
-layered decoder byte-for-byte on the answer field. The W15 layer
-adds the seventh structural axis to the Wevra programme; the
-runtime contract is byte-for-byte unchanged. See
-`docs/RESULTS_WEVRA_ATTENTION_AWARE.md` for the milestone note.
+The programme now has **thirteen** coupled research axes, each with
+a sharp status. SDK v3.17 mints axis 13: **end-to-end W14 + W15
+composition**. The composition does not introduce new SDK code
+(no new admission policy, decoder, normaliser, packer, or producer
+protocol — the runtime contract is byte-for-byte unchanged). What
+SDK v3.17 *does* mint is the first programme regime where the
+W14 producer-side ambiguity-preservation layer AND the W15
+decoder-side capsule context-packing layer are *independently
+load-bearing on the same cell*.
+
+On the new R-63-COMPOSED-TIGHT regime (Phase-62 multi-hypothesis
+events × Phase-61 magnitude-filter producer simulation under the
+W14 :class:`StructuredProducerProtocol` × ``T_decoder = 24``), the
+W14+W15 composition achieves ``accuracy_full = 1.000`` while every
+non-composed baseline collapses to 0.000 — a **+1.000 strict
+separation** vs the W14-only-budgeted baseline (FIFO-packed-W13
+over the structured-prompt stream) and the W15-only-without-W14
+baseline (AttentionAwareBundleDecoder over the naive-prompt
+stream). The result is stable across 5/5 alternate ``bank_seed``
+values. The W16-Λ-compose joint-failure anchor on R-63-naive-tight
+shows the producer-side limit (W14-Λ-prompt) and the decoder-side
+limit (W15-Λ-budget) compose multiplicatively; closing one alone
+leaves the other firing.
+
+Crucially, the W16-Λ-real-replay anchor on the recorded Phase-61
+``qwen2.5:14b-32k`` bytes (``phase61_real_ollama_structured_qwen2_5_14b_n8.json``,
+n=8 × 24 producer calls, byte-stable, 0 endpoint failures) shows
+the composed pipeline achieves ``capsule_attention_aware = 0.500``
+while ``capsule_layered_fifo_packed = 0.000`` at ``T_decoder = 14``
+on the recorded LLM bytes — a **+0.500 strict gain** over the
+strongest non-composed baseline on a real-LLM stream. This is the
+**first end-to-end real-LLM strict advance** in the programme that
+beats the strongest non-composed baseline. The Mac-1 endpoint at
+192.168.12.191:11434 was offline at milestone capture time
+(``HTTP=000``), so a fresh live LLM probe (W16-C-LIVE-OLLAMA) is
+conjectural.
+
+Backward-compat (W16-3) preserved byte-for-byte: 442/442 prior
+tests pass; with ``T_decoder = None`` and identity producer, the
+composed pipeline ties the W13 layered decoder; with structured
+prompt + ``T_decoder = None`` it ties the W14-1 anchor on R-61.
+The Wevra single-run product runtime contract is byte-for-byte
+unchanged. See `docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md` for the
+milestone note.
 
 1. **Capsule contract / runtime** — *active, advancing*. The
    contract (C1..C6) is settled. SDK v3.4 pushes capsule-native
