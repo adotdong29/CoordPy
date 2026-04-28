@@ -2963,10 +2963,52 @@ class LayeredRobustMultiRoundBundleDecoder:
 # Producer-prompt mode names — closed vocabulary, one per element.
 PRODUCER_PROMPT_NAIVE = "naive"
 PRODUCER_PROMPT_STRUCTURED = "structured"
+# SDK v3.18 / W17 family — magnitude-hinted structured prompt. Adds an
+# explicit per-kind operational-threshold table to the structured
+# prompt and forbids relative-magnitude skipping ("judge each event on
+# its own absolute magnitude, not relative to other events in this
+# round"). Designed to close the 1/8 R-61-OLLAMA-A model-side miss
+# (the slow_query_archival scenario where 14B judged decoy magnitudes
+# "not severe enough" relative to the larger gold spike).
+PRODUCER_PROMPT_MAGNITUDE_HINTED = "magnitude_hinted"
 ALL_PRODUCER_PROMPT_MODES: tuple[str, ...] = (
     PRODUCER_PROMPT_NAIVE,
     PRODUCER_PROMPT_STRUCTURED,
+    PRODUCER_PROMPT_MAGNITUDE_HINTED,
 )
+
+
+@dataclasses.dataclass(frozen=True)
+class OperationalThreshold:
+    """W17 operational-threshold record. Names a closed-vocabulary
+    ``claim_kind``, the numeric field it qualifies on (e.g.
+    ``"p95_ms"``, ``"error_rate"``, ``"count"``), the inclusive
+    qualifying threshold, the unit string for the prompt, and a
+    short human gloss. The magnitude-hinted prompt renders one line
+    per threshold so the LLM has a *named* lower bound for each
+    kind it is allowed to emit in this round.
+
+    The thresholds are *operational definitions*, not answer hints:
+    they are the same numeric values the synthetic
+    :class:`MagnitudeFilteringExtractor` uses (Phase-61 calibration)
+    and would be supplied by the operator who set up the
+    benchmark's monitoring pipeline. The structural property the
+    prompt enforces is "any event satisfying ``field ≥ threshold``
+    qualifies as ``kind`` regardless of the magnitude of *other*
+    events in the same round" — i.e. it removes the model's
+    incentive to make *relative* judgments inside one prompt
+    rendering. Empirically the relative-judgment failure mode is
+    what produced the 1/8 R-61-OLLAMA-A miss
+    (``slow_query_archival``: the monitor dropped the decoy events
+    because the gold ``p95_ms = 4100`` made the decoy
+    ``p95_ms = 2900`` look "small" by comparison, even though
+    2900 ≥ 1000 by the operational definition).
+    """
+    kind: str
+    field: str
+    threshold: float
+    unit: str = ""
+    gloss: str = ""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -3006,6 +3048,14 @@ class RoleExtractionSchema:
     allowed_kinds: tuple[str, ...]
     observation_kinds: tuple[str, ...]
     diagnosis_kinds: tuple[str, ...]
+    # SDK v3.18 / W17. Optional per-role operational-threshold table.
+    # Empty under the SDK v3.15 default (W14-1 anchor); populated by
+    # ``incident_triage_role_schemas(magnitude_hinted=True)`` for the
+    # W17 magnitude-hinted prompt. The schema records the thresholds
+    # *per role* so different roles can have different qualifying
+    # surfaces (e.g. the network role's ``count ≥ 5`` is independent
+    # of the monitor role's ``p95_ms ≥ 1000``).
+    magnitude_thresholds: tuple[OperationalThreshold, ...] = ()
 
     def kinds_for_round(self, round_idx: int) -> tuple[str, ...]:
         """Return the role's allowed kinds for the given round under
@@ -3122,6 +3172,14 @@ class StructuredProducerProtocol:
                 events=events, allowed_kinds=kinds)
             return ProducerPromptResult(
                 mode=PRODUCER_PROMPT_NAIVE, role=role,
+                round_idx=int(round_idx), text=text,
+                kinds_in_scope=tuple(kinds))
+        if self.mode == PRODUCER_PROMPT_MAGNITUDE_HINTED:
+            text = _render_magnitude_hinted_prompt(
+                role=role, round_idx=round_idx,
+                events=events, schema=schema)
+            return ProducerPromptResult(
+                mode=PRODUCER_PROMPT_MAGNITUDE_HINTED, role=role,
                 round_idx=int(round_idx), text=text,
                 kinds_in_scope=tuple(kinds))
         text = _render_structured_prompt(
@@ -3244,6 +3302,145 @@ def _render_structured_prompt(*,
     )
 
 
+def _format_threshold_value(t: OperationalThreshold) -> str:
+    """Render the threshold's numeric value with the unit, in a form
+    that round-trips through the synthetic ``MagnitudeFilteringExtractor``
+    parser. Integers without trailing ``.0``; floats with the
+    minimum number of fractional digits needed to be unambiguous.
+    Mechanically deterministic so the rendered prompt is byte-for-
+    byte stable."""
+    v = float(t.threshold)
+    if v == int(v) and abs(v) < 1e6:
+        s = f"{int(v)}"
+    else:
+        # Trim trailing zeros from a fixed-point representation so
+        # ``0.10`` renders as ``0.10`` (preserving the operational
+        # form) rather than ``0.1``.
+        s = f"{v:.4f}".rstrip("0")
+        if s.endswith("."):
+            s += "0"
+    if t.unit:
+        return f"{s} {t.unit}".strip()
+    return s
+
+
+def _render_magnitude_hinted_prompt(*,
+                                       role: str,
+                                       round_idx: int,
+                                       events: Sequence[tuple[str, str]],
+                                       schema: RoleExtractionSchema,
+                                       ) -> str:
+    """Render the W17 magnitude-hinted structured prompt.
+
+    The magnitude-hinted prompt extends :func:`_render_structured_prompt`
+    with two reinforcing instructions designed to close the 1/8
+    R-61-OLLAMA-A model-side miss:
+
+    1. **Operational threshold table.** Each kind in
+       ``schema.magnitude_thresholds`` whose ``kind`` is in the
+       round's allowed-set is rendered as one line of the form
+
+       ``  - LATENCY_SPIKE qualifies for any p95_ms ≥ 1000 ms``
+
+       so the LLM has a *named* lower bound for each kind it is
+       allowed to emit. The thresholds are *operational definitions*
+       (the same values the synthetic
+       :class:`MagnitudeFilteringExtractor` uses), not answer hints.
+
+    2. **Anti-relative-magnitude clause.** An explicit sentence in
+       the OUTPUT INSTRUCTIONS section forbids relative-magnitude
+       skipping: "Each event is judged on its own *absolute*
+       magnitude. Do NOT skip an event because *another* event in
+       this round looks larger." This removes the model's incentive
+       to make relative judgments inside one prompt rendering — the
+       failure mode that produced the slow_query_archival miss in
+       the SDK v3.15 + v3.17 captures.
+
+    All other invariants of :func:`_render_structured_prompt` are
+    preserved verbatim (the round-tier banner, per-tier kind
+    whitelist, per-event mandate). The magnitude-hint extension is
+    purely additive: with an empty ``schema.magnitude_thresholds``
+    the prompt reduces to the structured prompt with the
+    anti-relative-magnitude clause appended (W17-3 backward-compat
+    on schemas that do not carry thresholds).
+    """
+    if round_idx == 1:
+        tier_banner = (
+            "ROUND 1 — OBSERVATION MODE.\n"
+            "Your job is to DESCRIBE what you observe, not to diagnose.\n"
+            "Even small / borderline / coincidental signals must be "
+            "reported — the auditor will combine evidence across "
+            "rounds and across roles. DO NOT compress observations "
+            "toward a single best explanation; that is a later step."
+        )
+        allowed = schema.observation_kinds or schema.allowed_kinds
+        forbidden = schema.diagnosis_kinds
+    else:  # round 2
+        tier_banner = (
+            "ROUND 2 — DIAGNOSIS MODE.\n"
+            "Round-1 observations have been recorded. Your job here "
+            "is to emit the SPECIFIC underlying cause as a single "
+            "diagnostic claim. Do NOT re-emit generic latency / error "
+            "/ firewall observations in this round — those belong "
+            "to round 1."
+        )
+        allowed = schema.diagnosis_kinds or schema.allowed_kinds
+        forbidden = schema.observation_kinds
+    kind_lines = "\n".join(f"  - {k}" for k in allowed)
+    forbidden_lines = (
+        "\n".join(f"  - {k}" for k in forbidden)
+        if forbidden else "  (none)")
+    allowed_set = set(allowed)
+    threshold_lines: list[str] = []
+    for t in schema.magnitude_thresholds:
+        if t.kind not in allowed_set:
+            continue
+        gloss = f" ({t.gloss})" if t.gloss else ""
+        threshold_lines.append(
+            f"  - {t.kind} qualifies for any "
+            f"{t.field} >= {_format_threshold_value(t)}{gloss}")
+    threshold_block = (
+        "OPERATIONAL QUALIFYING THRESHOLDS for this round:\n"
+        + "\n".join(threshold_lines) + "\n\n"
+        if threshold_lines else "")
+    event_lines: list[str] = []
+    for i, (_canon, payload) in enumerate(events, start=1):
+        event_lines.append(f"  [{i}] body=\"{payload}\"")
+    if not event_lines:
+        event_lines = ["  (none)"]
+    return (
+        f"You are the {role!r} agent in an incident-response team.\n\n"
+        f"{tier_banner}\n\n"
+        f"Allowed claim kinds for this round:\n{kind_lines}\n\n"
+        f"FORBIDDEN claim kinds for this round (these belong to the "
+        f"OTHER round):\n{forbidden_lines}\n\n"
+        f"{threshold_block}"
+        f"Events you observed:\n"
+        + "\n".join(event_lines) + "\n\n"
+        f"OUTPUT INSTRUCTIONS:\n"
+        f"  * EMIT ONE CLAIM PER LISTED EVENT ABOVE. Do NOT skip, "
+        f"deduplicate, or compress events even if they look similar "
+        f"or appear to share a single cause.\n"
+        f"  * Each event is judged on its own ABSOLUTE magnitude. "
+        f"Do NOT skip an event because another event in this round "
+        f"looks larger or more severe — relative comparison is the "
+        f"auditor's job, not yours.\n"
+        f"  * If an event satisfies a qualifying threshold above "
+        f"(e.g. p95_ms >= 1000), emit the matching kind even if you "
+        f"think the event is small compared to others in this round.\n"
+        f"  * Each claim is ONE LINE in the format\n"
+        f"      KIND | one-line evidence including any service token\n"
+        f"  * Use only KINDs from the allowed list. If a listed event "
+        f"truly does not warrant any allowed kind for this round "
+        f"(e.g. round-1 with a non-symptom body), emit "
+        f"\"NONE | <why>\" on a line of its own — but emitting NONE "
+        f"on every event is a sign you have collapsed observation "
+        f"and is discouraged.\n"
+        f"  * Maximum {max(8, len(event_lines) + 2)} lines.\n\n"
+        f"Begin output now:\n"
+    )
+
+
 # Default schemas for the bundled incident-triage benchmark family.
 # Other benchmarks should construct their own ``RoleExtractionSchema``
 # table; this one ships as a convenience for Phase-58..Phase-61
@@ -3254,7 +3451,51 @@ INCIDENT_TRIAGE_OBSERVATION_KINDS: tuple[str, ...] = (
 )
 
 
-def incident_triage_role_schemas() -> dict[str, RoleExtractionSchema]:
+# SDK v3.18 / W17. Default magnitude-hint thresholds for the
+# incident-triage benchmark family. Each threshold is the same
+# numeric value the synthetic ``MagnitudeFilteringExtractor`` uses
+# (Phase-61 calibration anchors). The thresholds are *operational
+# definitions* of "what counts as a qualifying event for this
+# kind", not answer hints — they are intentionally below all gold
+# magnitudes (so structure is preserved) AND below all decoy
+# magnitudes (so the LLM is correctly instructed to emit the
+# decoy events too).
+INCIDENT_TRIAGE_DEFAULT_MAGNITUDE_THRESHOLDS: tuple[
+    OperationalThreshold, ...] = (
+    OperationalThreshold(
+        kind="LATENCY_SPIKE", field="p95_ms", threshold=1000.0,
+        unit="ms",
+        gloss="any p95 above 1 second is operationally meaningful"),
+    OperationalThreshold(
+        kind="ERROR_RATE_SPIKE", field="error_rate",
+        threshold=0.10, unit="",
+        gloss="any error rate >= 10% is operationally meaningful"),
+    OperationalThreshold(
+        kind="FW_BLOCK_SURGE", field="count", threshold=5.0,
+        unit="denials/min",
+        gloss="any sustained denial burst above 5/min is meaningful"),
+)
+
+
+def incident_triage_magnitude_thresholds(
+        ) -> tuple[OperationalThreshold, ...]:
+    """Return the default operational-threshold table for the
+    incident-triage family (W17 magnitude-hint anchor).
+
+    The thresholds are pre-committed at the same numeric values the
+    synthetic :class:`MagnitudeFilteringExtractor` uses (Phase-61
+    calibration). They are operational definitions of "what counts
+    as a qualifying event for this kind" and are below *both* gold
+    and decoy magnitudes in every R-61 / R-64 scenario, so the
+    magnitude-hint extension does NOT leak the answer — it removes
+    the model's *relative* magnitude judgment loophole.
+    """
+    return INCIDENT_TRIAGE_DEFAULT_MAGNITUDE_THRESHOLDS
+
+
+def incident_triage_role_schemas(
+        *, magnitude_hinted: bool = False
+        ) -> dict[str, RoleExtractionSchema]:
     """Return the W14 default schema table for the incident-triage
     benchmark family. Each role's ``observation_kinds`` is the
     intersection of its ``allowed_kinds`` with the closed-vocabulary
@@ -3262,13 +3503,30 @@ def incident_triage_role_schemas() -> dict[str, RoleExtractionSchema]:
     ``diagnosis_kinds`` is the complement on the same allowed-kind
     set.
 
+    Parameters
+    ----------
+    magnitude_hinted
+        SDK v3.18 / W17 opt-in. When ``True``, every returned schema
+        carries the
+        :data:`INCIDENT_TRIAGE_DEFAULT_MAGNITUDE_THRESHOLDS` table.
+        When ``False`` (default), the returned schemas have an empty
+        ``magnitude_thresholds`` field and the structured prompt
+        renders without the W17 threshold block (W14-3 byte-for-byte
+        backward-compat anchor on the SDK v3.15 anchor regimes).
+
     Mechanically verified by ``IncidentTriageSchemaTests`` in
-    ``test_wevra_producer_ambiguity.py``.
+    ``test_wevra_producer_ambiguity.py`` and the W17 surface tests
+    in ``test_wevra_phase64.py``.
     """
     from vision_mvp.core.extractor_noise import (
         incident_triage_known_kinds)
     out: dict[str, RoleExtractionSchema] = {}
     obs_set = set(INCIDENT_TRIAGE_OBSERVATION_KINDS)
+    if magnitude_hinted:
+        thresholds: tuple[OperationalThreshold, ...] = (
+            INCIDENT_TRIAGE_DEFAULT_MAGNITUDE_THRESHOLDS)
+    else:
+        thresholds = ()
     for role, allowed in incident_triage_known_kinds().items():
         allowed_t = tuple(allowed)
         observation = tuple(k for k in allowed_t if k in obs_set)
@@ -3276,7 +3534,8 @@ def incident_triage_role_schemas() -> dict[str, RoleExtractionSchema]:
         out[role] = RoleExtractionSchema(
             role=role, allowed_kinds=allowed_t,
             observation_kinds=observation,
-            diagnosis_kinds=diagnosis)
+            diagnosis_kinds=diagnosis,
+            magnitude_thresholds=thresholds)
     return out
 
 
@@ -4022,6 +4281,11 @@ __all__ = [
     "StructuredProducerProtocol",
     "INCIDENT_TRIAGE_OBSERVATION_KINDS",
     "incident_triage_role_schemas",
+    # SDK v3.18 — magnitude-hinted producer protocol (W17 family).
+    "PRODUCER_PROMPT_MAGNITUDE_HINTED",
+    "OperationalThreshold",
+    "INCIDENT_TRIAGE_DEFAULT_MAGNITUDE_THRESHOLDS",
+    "incident_triage_magnitude_thresholds",
     # SDK v3.16 — attention-aware capsule context packing (W15 family).
     "W15_DEFAULT_TIER_WEIGHT", "W15_DEFAULT_CCK_WEIGHT",
     "W15_DEFAULT_CORROBORATION_WEIGHT", "W15_DEFAULT_MAGNITUDE_WEIGHT",

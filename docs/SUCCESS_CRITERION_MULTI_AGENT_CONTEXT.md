@@ -1,12 +1,12 @@
-# Success criterion — solving multi-agent context (SDK v3.17 bar)
+# Success criterion — solving multi-agent context (SDK v3.18 bar)
 
 > Pre-committed, falsifiable bar for what counts as a *real* advance
 > on "solving multi-agent context" in the Context Zero / Wevra
 > programme. This document is the **referee** for SDK v3.9 / v3.10 /
-> v3.11 / v3.12 / v3.13 / v3.14 / v3.15 / v3.16 / v3.17 (and later
-> milestones). Any milestone note that claims an advance must name
-> the bar it cleared and cite the code-anchored evidence. Last
-> touched: SDK v3.17, 2026-04-27.
+> v3.11 / v3.12 / v3.13 / v3.14 / v3.15 / v3.16 / v3.17 / v3.18
+> (and later milestones). Any milestone note that claims an advance
+> must name the bar it cleared and cite the code-anchored evidence.
+> Last touched: SDK v3.18, 2026-04-27.
 >
 > The history of this programme is full of moves where a partial
 > result was written up too strongly and later had to be sharpened
@@ -166,6 +166,67 @@ The **named regimes** the bar refers to (anchored in code):
   Anchor:
   `vision_mvp/experiments/phase63_composed_real_llm.py`.
 
+* **R-64** — Phase-64 *fresh live-Ollama end-to-end W14 + W15
+  composition + magnitude-hinted producer protocol* regime, the
+  *new harder regime* SDK v3.18 introduces. R-64 is the first
+  programme regime where the W16 composition is exercised against
+  a **fresh live LLM** (not replay) AND where the W14 producer
+  protocol carries an explicit **magnitude-threshold extension**
+  (W17) designed to close the 1/8 R-61-OLLAMA-A model-side
+  judgment miss (the ``slow_query_archival`` scenario where 14B
+  judged decoy magnitudes "not severe enough" *relative* to the
+  larger gold spike on the same role's prompt and skipped them as
+  NONE, breaking ``round1_decoy_corroborated``). The events are
+  R-61's comparable-magnitude single-decoy shape (so the magnitude-
+  hint extension can be tested without Phase-62 multi-hypothesis
+  confounders); the producer is the real Mac-1 Ollama backend under
+  the *magnitude-hinted structured prompt*; the decoder consumes
+  the cross-round bundle under a strict ``T_decoder`` (default
+  tight = ``14`` tokens, mirroring the W16-Λ-real-replay budget
+  band). Five pre-committed sub-banks plus a named falsifier, a
+  cross-model cell, and a symmetric-corroboration wall sub-bank:
+    - **R-64-baseline** (synthetic identity producer, magnitude-
+      hinted prompt, ``T_decoder=None``). Sanity anchor: every
+      cross-round capsule decoder hits 1.000; the magnitude-hint
+      render is byte-stable on the synthetic side.
+    - **R-64-W14H-only** (synthetic mag-filter producer, magnitude-
+      hinted prompt, ``T_decoder=None``). The synthetic counterpart
+      of the W14 anchor under the magnitude hint; under magnitude-
+      hint the bench property still holds (W17-3 backward-compat).
+    - **R-64-LIVE-STRUCT** (real Ollama 14B, *structured* prompt
+      mode, ``T_decoder=14``). Reproduces the W14 anchor's 1/8
+      miss on a fresh probe under the same prompt as Phase-61 +
+      Phase-63 replay (W17-Λ-no-hint structural anchor).
+    - **R-64-LIVE-MAGHINT** (real Ollama 14B, *magnitude-hinted*
+      prompt, ``T_decoder=14``). **The W17-1 anchor.** Replaces
+      the structured prompt with the magnitude-hinted variant and
+      runs the W14 + W15 composition end-to-end on fresh live
+      bytes. Strong success: bench property holds in ≥ 7/8 AND
+      composed accuracy_full strictly improves over both substrate
+      FIFO AND the FIFO-packed-W14-only baseline by ≥ 0.50 on the
+      live stream.
+    - **R-64-LIVE-XMODEL** (real Ollama qwen3.5:35b, *magnitude-
+      hinted* prompt, ``T_decoder=14``). Cross-model probe
+      (W17-C-XMODEL).
+    - **R-64-LIVE-NAIVE** (real Ollama 14B, *naive* prompt,
+      ``T_decoder=14``). Named falsifier — live counterpart of the
+      W14-Λ-prompt + W15-Λ-budget joint-failure regime (W14-4 /
+      W16-Λ-compose at the live axis). Every capsule strategy ties
+      FIFO at 0.000 under the naive prompt because the bench
+      property collapses upstream.
+    - **R-64-SYM** (synthetic, deterministic identity extractor on
+      a *symmetric-corroboration* bank where the decoy is *also*
+      mentioned by ≥ 2 distinct producer roles via the *same* CCK
+      tier as the gold; ``T_decoder ∈ {None, 24}``). **The
+      W17-Λ-symmetric anchor.** Even with the W14 magnitude-hint
+      AND the W15 packer in scope, the bench property's
+      *asymmetric* corroboration ingredient is removed, so neither
+      the W11 contradiction-aware drop nor the W15 hypothesis-
+      preserving pack can distinguish gold from decoy. Every
+      capsule strategy ties FIFO at 0.000 — by construction.
+  Anchor:
+  `vision_mvp/experiments/phase64_live_composition.py`.
+
 * **R-62** — Phase-62 *attention-aware capsule context packing under
   decoder-side budget pressure* regime, the *new harder regime* SDK
   v3.16 introduces. The producer-side gap was closed by W14 on R-61;
@@ -311,18 +372,30 @@ The **named regimes** the bar refers to (anchored in code):
 > clear *both* an accuracy threshold AND an explicit decoder-side
 > token-budget constraint; a method that wins on accuracy alone
 > while ignoring decoder context budget does NOT clear bar 12).
-> SDK v3.17 anchors the bar to **R-63** below AND introduces
+> SDK v3.17 anchors the bar to **R-63** AND introduces
 > **bar 13** (end-to-end composition split: a method must clear
 > a regime where *both* W14 producer-protocol ingredients AND W15
 > decoder-budget ingredients are independently load-bearing; a
 > method that closes one structural axis but leaves the other
 > firing does NOT clear bar 13).
-> Earlier R-55..R-62-anchored bars remain valid as historical
-> bars; the *current* bar is R-63-anchored.
+> SDK v3.18 anchors the bar to **R-64** below AND introduces
+> **bar 14** (live-end-to-end + magnitude-hinted-protocol split:
+> a method that wants to claim "live multi-agent context" must
+> beat both substrate FIFO AND the strongest non-composed
+> baseline on a *fresh* live LLM run — not just on replay — AND
+> must include an explicit operational-threshold layer in the
+> producer protocol when the model is observed to compress
+> ambiguity *relative* rather than absolute; a milestone that
+> remains replay-only does NOT clear bar 14, AND a milestone
+> that closes the live composition gap on the *asymmetric*
+> regime but cannot distinguish symmetric-corroboration cases
+> does not satisfy the W17-Λ-symmetric clarification clause of
+> bar 14). Earlier R-55..R-63-anchored bars remain valid as
+> historical bars; the *current* bar is R-64-anchored.
 
 ### 1.1 Strong success bar (a "real" advance)
 
-A milestone *strongly advances* the thesis iff **all thirteen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17):
+A milestone *strongly advances* the thesis iff **all fourteen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17; bar 14 from SDK v3.18):
 
 1. **Code anchor.** A new admission/decoder/coordination method
    ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
@@ -427,6 +500,77 @@ A milestone *strongly advances* the thesis iff **all thirteen** hold (bars 1–6
    live LLM probe; W16-C-LIVE-OLLAMA is conjectural pending a live
    ``run_phase63 --extractor=ollama --prompt-mode=structured``
    probe with Mac-1 reachable.
+
+14. **(SDK v3.18+) Live-end-to-end + magnitude-hinted-protocol +
+   symmetric-corroboration-wall split.** The milestone-anchored
+   harder regime (R-64-LIVE-MAGHINT) is **provably insufficient
+   for any of (a) replay-only methods, (b) structured-prompt-only
+   methods that do not enumerate operational thresholds, OR (c)
+   downstream-only methods that ignore the symmetric-
+   corroboration counterexample**:
+   * (a) **Live ≠ replay.** A milestone that claims to advance
+     "real-LLM multi-agent context" must produce a *fresh* live
+     measurement on the same regime, with raw producer responses
+     captured and the empirical envelope of the live run reported.
+     A milestone whose only real-LLM evidence is replay over
+     prior recorded bytes does NOT clear bar 14. Pre-committed
+     live anchor: ``run_phase64 --mode live-mag-hint --model
+     qwen2.5:14b-32k --endpoint <Mac-1>`` produces a sealed
+     ``raw_responses_per_scenario`` block, ``n_real_calls > 0``,
+     ``n_failed_calls == 0`` AND
+     ``capsule_attention_aware - capsule_layered_fifo_packed
+     ≥ 0.50`` pooled accuracy_full on the fresh live stream.
+   * (b) **Magnitude-hint required when relative-compression is
+     observed.** When the W14 structured prompt empirically
+     reproduces a model-side miss whose root cause is *relative*
+     magnitude judgment (the model drops a kind-qualifying event
+     because *another* event in the same role's prompt is
+     larger), the new method must include an explicit
+     operational-threshold layer in the prompt: each kind in the
+     allowed-set carries a numeric qualifying threshold AND the
+     prompt explicitly forbids relative-magnitude skipping. A
+     pure W14 structured-prompt method that does not enumerate
+     thresholds does NOT clear bar 14. Pre-committed bench
+     property: under the magnitude-hinted protocol on R-64-LIVE-
+     MAGHINT, the bench property must hold in ≥ 7/8 of scenarios
+     under fresh live qwen2.5:14b-32k AND must strictly improve
+     over the structured-only prompt's bench-property hold-rate
+     on the same scenarios. Mechanically verified by
+     ``Phase64LiveTests::test_maghint_holds_at_least_seven_of_eight``
+     when the live cell is captured (skipped honestly when the
+     endpoint is unreachable).
+   * (c) **Symmetric-corroboration counterexample required.** A
+     milestone that claims a *strong* live composition advance
+     must *also* exhibit the named structural counterexample —
+     the **R-64-SYM** symmetric-corroboration regime where
+     neither the W11 contradiction-aware drop nor the W15
+     hypothesis-preserving pack can distinguish gold from decoy
+     because the bench property's *asymmetric* corroboration
+     ingredient is structurally absent. The new method must tie
+     FIFO at 0.000 on R-64-SYM under both ``T_decoder = None``
+     and ``T_decoder = 24`` — confirming that the W17-Λ-symmetric
+     wall is real and not an artifact of the synthetic regimes.
+     A milestone that claims "we solved live composition" without
+     this counterexample *materially overstates* and does NOT
+     clear bar 14. Mechanically verified by
+     ``Phase64SymWallTests::test_every_capsule_strategy_ties_fifo_on_sym``.
+   * **Pre-committed falsifier (W17-Λ-no-hint):** the
+     R-64-LIVE-STRUCT cell (live qwen2.5:14b-32k under the
+     legacy *structured* prompt + ``T_decoder = 14``) reproduces
+     the Phase-61 structured-prompt 7/8 hold-rate and the
+     W16-Λ-real-replay 0.500 accuracy bound on the live axis —
+     i.e. the magnitude-hint extension is the load-bearing
+     improvement, not a re-run of the same prompt. If the
+     magnitude-hinted prompt does not strictly improve bench-
+     property hold-rate over the structured prompt on the same
+     fresh probe, bar 14 is not cleared on the live axis (the
+     W17-1 strict-gain claim is falsified).
+   * **Honest scope:** if Mac-1 is unreachable at milestone
+     capture, the live cell is *labelled skipped* in the report
+     (not silently replaced by replay) AND the milestone honestly
+     reports R-64 as a partial advance (the synthetic R-64-W14H
+     and R-64-SYM cells still clear; the live + cross-model
+     cells remain conjectural pending endpoint reachability).
 
 12. **(SDK v3.16+) Joint-correctness-and-context-efficiency split.**
    The milestone-anchored harder regime (R-62-tightbudget) is
@@ -562,6 +706,32 @@ For SDK v3.11 specifically, the canonical phrasing instantiates as:
 > Phase-57-falsifier regime where the decoy is corroborated AND
 > mentioned via a causal claim_kind for the chosen root_cause
 > (W10-4)."*
+
+For SDK v3.18 specifically, the canonical phrasing instantiates as:
+
+> *"On R-64-LIVE-MAGHINT (Phase-64 fresh live qwen2.5:14b-32k
+> under the magnitude-hinted structured prompt + ``T_decoder =
+> 14, K_auditor = 8``), the W14H + W15 composition strictly
+> beats both substrate FIFO AND the FIFO-packed-W14H-only
+> baseline on the live stream by ≥ 0.50 pooled accuracy_full
+> (W17-1) **and** the same composition ties FIFO at 0.000 on
+> R-64-SYM under both ``T_decoder = None`` and ``T_decoder =
+> 24`` — confirming the W17-Λ-symmetric wall is real (W17-3).
+> The W17-Λ-no-hint anchor on R-64-LIVE-STRUCT (legacy
+> structured prompt) reproduces the Phase-61 7/8 + W16-Λ-replay
+> 0.500 bound on the *fresh* probe — the magnitude-hint
+> extension, not a prompt re-run, is the load-bearing
+> improvement. The W17-Λ-naive anchor on R-64-LIVE-NAIVE (live
+> naive prompt + ``T_decoder = 14``) ties FIFO at 0.000 — the
+> live counterpart of W14-Λ-prompt + W15-Λ-budget joint failure.
+> Backward-compat preserved: 442/442 prior tests pass byte-for-
+> byte on R-54..R-63 anchors; the magnitude-hinted prompt mode
+> is purely additive on top of the W14 protocol surface. The
+> honest cap is that the cross-model probe (R-64-LIVE-XMODEL on
+> qwen3.5:35b) is empirical-research and not a saturated claim;
+> if Mac-1 is unreachable at any later capture, the live cell
+> is labelled skipped (not replay-replaced) and the milestone
+> reports R-64 as a partial advance."*
 
 For SDK v3.17 specifically, the canonical phrasing instantiates as:
 
@@ -1112,6 +1282,89 @@ is provably load-bearing — must combine:
 
 A regime missing any of these is *not* R-63 — it does not test
 the SDK v3.17 hypothesis.
+
+## 2.13. Required ingredients of R-64 (SDK v3.18)
+
+The "harder fair regime" introduced by SDK v3.18 — the *current*
+strict-gain anchor and the regime where (i) the W14 + W15
+composition is exercised against a **fresh live LLM**, and (ii)
+the W14 producer protocol must include an explicit operational-
+threshold layer (W17 magnitude-hinted prompt) AND (iii) the
+symmetric-corroboration wall is exhibited honestly — must
+combine:
+
+* **All R-61 single-decoy structural ingredients.** Comparable-
+  magnitude decoy events (decoy magnitudes inside the gold
+  magnitude range), two-round delayed-causal-evidence shape,
+  generic-noise round 1, specific-tier round 2 with no
+  ``service=`` token. Mechanically verified by
+  ``Phase61BankShapeTests`` on the inherited Phase-61 bank.
+* **Magnitude-hinted producer protocol.** A new mode of
+  :class:`StructuredProducerProtocol`
+  (``mode = PRODUCER_PROMPT_MAGNITUDE_HINTED``) that renders an
+  *operational threshold table* into the prompt: each kind in
+  ``observation_kinds`` carries a per-kind numeric qualifying
+  threshold AND the prompt explicitly forbids relative-magnitude
+  skipping ("Each event is judged on its own *absolute*
+  magnitude. Do NOT skip an event because another event in this
+  round looks larger."). The threshold values for the incident-
+  triage family are the same operational thresholds the
+  synthetic ``MagnitudeFilteringExtractor`` uses (``p95_ms ≥
+  1000``, ``error_rate ≥ 0.10``, ``count ≥ 5``); they are
+  *operational* definitions, not answer hints. Mechanically
+  verified by ``Phase64MagHintProtocolTests``.
+* **Live Ollama backend reachable** (R-64-LIVE-* cells). The
+  Mac-1 endpoint at ``192.168.12.191:11434`` (or operator
+  override) must be reachable with ``qwen2.5:14b-32k`` for the
+  W17-1 anchor and ideally also ``qwen3.5:35b`` for the
+  cross-model cell (W17-C-XMODEL). When unreachable, the live
+  cells are *labelled skipped* in the report (not replaced by
+  replay).
+* **Decoder-side token budget** ``T_decoder = 14`` (the centre
+  of the W16-Λ-real-replay budget band on Phase-61 single-decoy
+  events). This pre-commits the budget to the value at which the
+  prior milestone observed the W15 packer's strict gain on
+  recorded bytes; the live cell is therefore directly
+  comparable to the W16-Λ-real-replay anchor.
+* **Symmetric-corroboration sub-bank (R-64-SYM).** A
+  deterministic synthetic bank where the decoy is *also*
+  mentioned by ≥ 2 distinct producer roles via the *same* CCK
+  tier as the gold, AND the round-2 specific-tier disambiguator
+  is structurally ambiguous (mentioned for both gold and decoy,
+  or the cross-role corroboration on round-1 generic noise is
+  symmetric). Mechanically verified by
+  ``Phase64SymBankShapeTests::test_every_scenario_is_symmetric``.
+* **Audit-preserving.** T-1..T-7 holds on every cell of every
+  capsule strategy on every (extractor, prompt_mode, T_decoder,
+  bank_seed, llm_model) cell.
+* **Determinism.** The Phase-61 bank generator is RNG-
+  deterministic given ``bank_seed``; the synthetic magnitude-
+  filter extractor is deterministic given
+  ``(seed, prompt_mode)``; the magnitude-hinted prompt rendering
+  is byte-for-byte deterministic given the
+  ``(RoleExtractionSchema, OperationalThreshold table, events,
+  round_idx)`` tuple. The live LLM stream is best-effort
+  deterministic via ``temperature=0`` AND raw responses are
+  captured into the report; the milestone records the
+  empirical envelope (n_real_calls, n_failed_calls, total_wall_s)
+  so a re-run can verify reproducibility within the model's
+  inherent stochasticity.
+* **No regression on R-54..R-63.** Every prior anchor remains
+  green; the magnitude-hinted prompt mode is purely additive on
+  top of the W14 surface; with ``mode = PRODUCER_PROMPT_NAIVE``
+  or ``PRODUCER_PROMPT_STRUCTURED`` the rendering is byte-for-
+  byte equal to the SDK v3.17 path.
+* **Honest live scope.** If the live endpoint is unreachable at
+  capture time, the milestone reports R-64 as a *partial
+  advance*: the synthetic R-64-W14H + R-64-SYM cells still clear
+  the relevant clauses of bar 14 (W17-3 backward-compat,
+  W17-Λ-symmetric wall), but the W17-1 strict-gain claim
+  becomes conjectural pending endpoint reachability. A milestone
+  that silently substitutes replay for the live cell does NOT
+  clear bar 14.
+
+A regime missing any of these is *not* R-64 — it does not test
+the SDK v3.18 hypothesis.
 
 ## 2.11. Required ingredients of R-62 (SDK v3.16)
 

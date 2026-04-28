@@ -1,15 +1,17 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Working main-paper draft for the Context Zero programme.
-> Status: SDK v3.17, 2026-04-27 (this draft was last fully revised
-> at SDK v3.14; SDK v3.15 / v3.16 / v3.17 add the W14 producer
-> protocol, W15 decoder context-packing, and W16 end-to-end
-> composition layers as additional structural axes — see § 8 for
-> the synthesis-after-v3.17 reading and the canonical milestone
-> notes
+> Status: SDK v3.18, 2026-04-27 (this draft was last fully revised
+> at SDK v3.14; SDK v3.15 / v3.16 / v3.17 / v3.18 add the W14
+> producer protocol, W15 decoder context-packing, W16 end-to-end
+> composition, and W17 magnitude-hinted producer + fresh-live
+> composition + symmetric-corroboration limit theorem layers as
+> additional structural axes — see § 8 for the synthesis-after-
+> v3.18 reading and the canonical milestone notes
 > ``docs/RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`` (W14),
-> ``docs/RESULTS_WEVRA_ATTENTION_AWARE.md`` (W15), and
-> ``docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md`` (W16) for the
+> ``docs/RESULTS_WEVRA_ATTENTION_AWARE.md`` (W15),
+> ``docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md`` (W16), and
+> ``docs/RESULTS_WEVRA_LIVE_COMPOSITION.md`` (W17) for the
 > evidence anchors).
 > Scope: this is the main paper draft, not a milestone note. It
 > synthesizes the programme's current runtime, theory, and benchmark
@@ -36,38 +38,68 @@ then extend the same contract to multi-agent coordination, where
 agents exchange typed handoff capsules rather than raw messages.
 
 The paper's main contribution is a decomposition of the multi-agent
-context problem into eight structural axes (after SDK v3.17): (1)
+context problem into nine structural axes (after SDK v3.18): (1)
 admission under budget, (2) intra-round decoding, (3) cross-round
 decoding, (4) fixed-table normalization of producer drift, (5)
 layered open-world normalization, (6) producer-side ambiguity
 preservation under structured prompts (W14, SDK v3.15), (7)
 decoder-side capsule context packing under bounded T_decoder (W15,
-SDK v3.16), and (8) end-to-end composition where producer-side and
+SDK v3.16), (8) end-to-end composition where producer-side and
 decoder-side interventions are jointly necessary on the same
-regime (W16, SDK v3.17). For each axis we provide both positive and
-negative results: named regimes where the axis is sufficient, and
-sharp falsifiers where it is not. Across SDK v3.8-v3.17 we build a
-progressive benchmark family (R-54 through R-63) that isolates these
-axes. We show that admission alone can win in some regimes but has a
-named structural limit; bundle-aware decoding crosses that ceiling;
-cross-round reasoning crosses a further temporal limit; layered
-normalization crosses a fixed-vocabulary limit under synthetic
-open-world drift; the structured producer protocol closes the
-real-LLM upstream-erasure gap on R-61 at +0.500 vs FIFO on
-recorded ``qwen2.5:14b-32k`` bytes; the attention-aware capsule
-context packer closes the decoder-side budget gap on
-R-62-tightbudget at +1.000 vs FIFO-pack on synthetic events; and
-the W14+W15 composition is the **first end-to-end real-LLM strict
-advance over the strongest non-composed baseline** on R-63 (W16-1
-synthetic +1.000 strict gain; W16-Λ-real-replay +0.500 strict
-gain on recorded ``qwen2.5:14b`` bytes at ``T_decoder = 14``).
+regime (W16, SDK v3.17), and (9) magnitude-hinted producer protocol
++ fresh-live end-to-end composition + symmetric-corroboration
+limit theorem (W17, SDK v3.18). For each axis we provide both
+positive and negative results: named regimes where the axis is
+sufficient, and sharp falsifiers where it is not. Across SDK
+v3.8-v3.18 we build a progressive benchmark family (R-54 through
+R-64) that isolates these axes. We show that admission alone can
+win in some regimes but has a named structural limit; bundle-aware
+decoding crosses that ceiling; cross-round reasoning crosses a
+further temporal limit; layered normalization crosses a
+fixed-vocabulary limit under synthetic open-world drift; the
+structured producer protocol closes the real-LLM upstream-erasure
+gap on R-61 at +0.500 vs FIFO on recorded ``qwen2.5:14b-32k``
+bytes; the attention-aware capsule context packer closes the
+decoder-side budget gap on R-62-tightbudget at +1.000 vs FIFO-pack
+on synthetic events; the W14+W15 composition is the **first
+end-to-end real-LLM strict advance over the strongest non-composed
+baseline** on R-63 (W16-1 synthetic +1.000 strict gain;
+W16-Λ-real-replay +0.500 strict gain on recorded ``qwen2.5:14b``
+bytes at ``T_decoder = 14``); and the W17 magnitude-hinted
+producer protocol takes that result to the **first fresh-live
+end-to-end real-LLM strict +1.000 advance** in the programme on
+R-64 (W17-1: bench property holds in 8/8 — closing the prior 1/8
+model-side judgment miss — and ``capsule_attention_aware = 1.000``,
++1.000 strict gain over both substrate FIFO and the FIFO-packed-
+W14H-only baseline on a *fresh* live ``qwen2.5:14b-32k`` Mac-1
+probe). The same protocol transfers cross-model: a fresh live
+``qwen3.5:35b`` MoE probe shows bench property 8/8 + +0.750 strict
+gain (W17-C-XMODEL).
 
-The strongest negative result remains that a real Ollama producer
-can collapse the benchmark's ambiguity upstream, making downstream
-reasoning invisible (W14-Λ-prompt). The strongest *coupling* result
-is W16-Λ-compose: when the producer collapses upstream AND the
-decoder is budget-bounded simultaneously, both named limits fire
-jointly and no capsule strategy in the SDK clears the bar.
+The strongest negative result is now W17-Λ-symmetric: **the first
+explicit symmetric-corroboration limit theorem in the programme**.
+On the synthetic ``build_phase64_sym_bank`` (every service
+mentioned by exactly 2 distinct routed producer roles via
+generic-noise kinds with comparable magnitudes), every capsule
+strategy in the SDK ties FIFO at 0.000 under both
+``T_decoder ∈ {None, 24}`` by construction. The structural
+argument is that ``services_correct`` set-equality is an
+asymmetric oracle: when the bipartite ``(role × tag, kind,
+magnitude)`` multiset is symmetric for gold and decoy, no
+service-blind admission AND no closed-form salience packer can
+prefer one over the other. **W17-Λ-symmetric discharges the
+prior W15-C-SYMMETRIC / W16-C-SYMMETRIC conjectures as a
+negative theorem** and names the next research frontier
+constructively: a learned or LLM-distilled
+semantic-disambiguator beyond the closed-form capsule surface
+(W17-C-DISAMBIGUATOR, conjectural).
+
+The strongest *coupling* result remains W16-Λ-compose: when the
+producer collapses upstream AND the decoder is budget-bounded
+simultaneously, both named limits fire jointly and no capsule
+strategy in the SDK clears the bar. W17-Λ-naive on the live axis
+confirms this on a *fresh* live LLM probe: under naive prompt +
+tight T_decoder, every capsule strategy ties FIFO at 0.000.
 
 The paper does **not** claim that multi-agent context is solved in an
 unqualified sense. The honest thesis is narrower and stronger:
@@ -661,15 +693,31 @@ No single axis is sufficient in general:
 
 ### 10.3 Strongest current thesis
 
-The strongest defensible current thesis is therefore:
+The strongest defensible current thesis (after SDK v3.18) is
+therefore:
 
 > **Solving multi-agent context requires an explicitly layered
-> architecture in which producer ambiguity preservation,
-> normalization, admission, intra-round decoding, and cross-round
-> decoding are all first-class and separately testable.**
+> architecture in which producer ambiguity preservation
+> (with relative-magnitude discipline under real LLMs), the
+> closed-vocabulary kind / payload normalization, admission,
+> intra-round decoding, cross-round decoding, decoder-side
+> context packing under bounded T_decoder, and the end-to-end
+> composition of producer-side and decoder-side interventions are
+> all first-class and separately testable. The asymmetric-
+> corroboration shape of the bench property is structurally
+> necessary for any closed-form capsule strategy to clear the
+> services_correct oracle; symmetric corroboration is a named
+> negative wall (W17-Λ-symmetric) that requires a learned or
+> LLM-distilled semantic-disambiguator to cross.**
 
-This is materially stronger than anything the programme could claim at
-SDK v3.7, v3.8, or even v3.10.
+This is materially stronger than anything the programme could
+claim at SDK v3.7, v3.8, or even v3.17. The SDK v3.18 milestone
+adds two qualitatively new pieces: (i) the **first fresh-live
+end-to-end real-LLM strict +1.000 advance** in the programme
+over the strongest non-composed baseline (W17-1 on R-64-LIVE-
+MAGHINT), and (ii) the **first explicit symmetric-corroboration
+limit theorem** (W17-Λ-symmetric on R-64-SYM) that names what
+no closed-form capsule strategy can do.
 
 ## 11. Why This Matters Beyond the Benchmarks
 

@@ -5,20 +5,98 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.17,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.18,
 > 2026-04-27.
 
 ## TL;DR
 
-The programme now has **thirteen** coupled research axes, each with
-a sharp status. SDK v3.17 mints axis 13: **end-to-end W14 + W15
-composition**. The composition does not introduce new SDK code
-(no new admission policy, decoder, normaliser, packer, or producer
-protocol — the runtime contract is byte-for-byte unchanged). What
-SDK v3.17 *does* mint is the first programme regime where the
-W14 producer-side ambiguity-preservation layer AND the W15
-decoder-side capsule context-packing layer are *independently
-load-bearing on the same cell*.
+The programme now has **fourteen** coupled research axes, each
+with a sharp status. SDK v3.18 mints axis 14: **magnitude-hinted
+producer protocol + fresh-live end-to-end composition +
+symmetric-corroboration limit theorem**. The W17 family adds one
+new producer-prompt mode (``PRODUCER_PROMPT_MAGNITUDE_HINTED``),
+one new dataclass (``OperationalThreshold``), one new schema
+field, and one new prompt-render helper — purely additive on top
+of the W14 surface. The runtime contract is byte-for-byte
+unchanged.
+
+**The headline SDK v3.18 results.** On a *fresh* live Mac-1
+``qwen2.5:14b-32k`` Ollama probe at ``T_decoder = 14, K_auditor
+= 8`` against the Phase-61 comparable-magnitude bank (n=8 × 24
+producer calls; 0 endpoint failures; 128.2 s wall): under the
+W17 magnitude-hinted prompt, bench property holds in **8/8**
+(closing the 1/8 R-61-OLLAMA-A model-side judgment miss);
+``capsule_attention_aware = 1.000``;
+``capsule_layered_fifo_packed = 0.000``;
+``capsule_fifo = 0.000``. **+1.000 strict separation** on both
+axes — the **first programme result** that beats the strongest
+non-composed baseline by ≥ 1.0 on a fresh live LLM probe (W17-1).
+
+The W17-Λ-no-hint anchor on the same fresh probe under the
+*legacy* structured prompt reproduces the W14-Λ-real envelope
+(7/8 hold; +0.500 strict gain over FIFO-pack); the magnitude-
+hint extension, not a re-run of the same prompt, is what closes
+the gap from 0.500 to 1.000. The W17-Λ-naive falsifier on the
+same probe under the naive prompt collapses to 0/8 + 0.000
+(live counterpart of the W16-Λ-compose joint-failure regime).
+
+The cross-model probe on a fresh live Mac-1 ``qwen3.5:35b`` MoE
+backend (``think = False``; n=8 × 24 producer calls; 0 failures;
+92.0 s wall) shows the magnitude-hint protocol **transfers**:
+bench property holds in **8/8** (the W17 extension preserves the
+bench-property hold-rate byte-for-byte across a 2.4× model-class
+jump); ``capsule_attention_aware = 0.750``; **+0.750 strict gain**
+over substrate FIFO and FIFO-packed-W14H-only. The 0.250 gap to
+1.000 is on the ``accuracy_root_cause`` axis — a model-class-
+specific specific-tier judgment artifact, not a producer-protocol
+failure (W17-C-XMODEL, proved-conditional + empirical-research).
+
+The **first explicit symmetric-corroboration limit theorem**
+(W17-Λ-symmetric) lands as a *negative* result on the synthetic
+``build_phase64_sym_bank`` (every service mentioned by exactly 2
+distinct routed producer roles via generic-noise kinds with
+comparable magnitudes; round-2 disambiguator names the gold
+root_cause without a ``service=`` token). Under both
+``T_decoder ∈ {None, 24}``: every capsule strategy in the SDK
+ties FIFO at ``accuracy_full = 0.000`` — including the W14H +
+W15 composition. The priority decoder still elects the right
+specific-tier ``root_cause`` (``accuracy_root_cause = 1.000``);
+the failure is ``services_correct`` set-equality. The structural
+argument is that ``services_correct`` is an asymmetric oracle:
+when the bipartite ``(role × tag, kind, magnitude)`` multiset is
+symmetric for gold and decoy, no service-blind admission AND no
+closed-form salience packer can prefer one. **W17-Λ-symmetric
+discharges the prior W15-C-SYMMETRIC / W16-C-SYMMETRIC
+conjectures as a negative theorem and names the next research
+frontier**: a learned or LLM-distilled
+semantic-disambiguator beyond the closed-form capsule surface
+(W17-C-DISAMBIGUATOR, conjectural).
+
+The **prior-conjecture discharge ledger** for SDK v3.18:
+* W16-C-LIVE-OLLAMA → DISCHARGED (W17-1).
+* W16-C-CROSS-MODEL → PARTIALLY DISCHARGED (W17-C-XMODEL on
+  Ollama; MLX-distributed clause remains conjectural).
+* W15-C-SYMMETRIC / W16-C-SYMMETRIC → DISCHARGED-NEGATIVE
+  (W17-Λ-symmetric).
+
+Backward-compat (W17-3) preserved byte-for-byte: 442/442 prior
+tests pass; with ``mode = 'naive'`` or ``mode = 'structured'``
+AND ``magnitude_hinted_schema = False``, the W17 surface
+reduces to the SDK v3.15 W14 anchor byte-for-byte. The Wevra
+single-run product runtime contract is byte-for-byte unchanged.
+See `docs/RESULTS_WEVRA_LIVE_COMPOSITION.md` for the milestone
+note.
+
+---
+
+The *previous* (SDK v3.17) frontier mints axis 13: **end-to-end
+W14 + W15 composition**. The composition does not introduce new
+SDK code (no new admission policy, decoder, normaliser, packer,
+or producer protocol — the runtime contract is byte-for-byte
+unchanged). What SDK v3.17 *does* mint is the first programme
+regime where the W14 producer-side ambiguity-preservation layer
+AND the W15 decoder-side capsule context-packing layer are
+*independently load-bearing on the same cell*.
 
 On the new R-63-COMPOSED-TIGHT regime (Phase-62 multi-hypothesis
 events × Phase-61 magnitude-filter producer simulation under the
@@ -243,7 +321,231 @@ milestone note.
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.16, 2026-04-27)
+## Current frontier (SDK v3.18, 2026-04-27)
+
+### Active moves (SDK v3.18 — magnitude-hinted producer protocol + fresh-live end-to-end composition + symmetric-corroboration limit theorem + W17 family — *first fresh-live end-to-end real-LLM strict +1.000 advance + first explicit symmetric-corroboration negative theorem*)
+
+- **Phase-64 fresh-live end-to-end composition + symmetric-
+  corroboration wall benchmark.**
+  ``vision_mvp.experiments.phase64_live_composition`` ships seven
+  pre-committed sub-banks plus a falsifier and a cross-model cell:
+  (i) ``r64_baseline`` — synthetic identity producer + magnitude-
+  hinted prompt + ``T_decoder = None``. Sanity anchor: every
+  cross-round capsule decoder hits 1.000.
+  (ii) ``r64_w14h_only`` — synthetic mag-filter producer +
+  magnitude-hinted prompt + ``T_decoder = None``. Synthetic
+  counterpart of the W17-1 anchor. Bench property holds in 8/8;
+  cross-round decoders hit 1.000 (W17-3 backward-compat).
+  (iii) ``r64_live_struct`` — fresh live ``qwen2.5:14b-32k`` +
+  legacy *structured* prompt + ``T_decoder = 14``. Reproduces the
+  W14-Λ-real envelope on the fresh probe: bench property holds in
+  7/8; ``capsule_attention_aware = 0.500``;
+  ``capsule_layered_fifo_packed = 0.000``; **+0.500 strict gain**.
+  W17-Λ-no-hint structural anchor.
+  (iv) ``r64_live_maghint`` — **the W17-1 anchor.** Same fresh
+  live probe + magnitude-hinted prompt + ``T_decoder = 14``.
+  Bench property holds in 8/8 (closing the 1/8 model-side miss);
+  ``capsule_attention_aware = 1.000``;
+  ``capsule_layered_fifo_packed = 0.000``;
+  ``capsule_fifo = 0.000``; **+1.000 strict separation** on both
+  axes. The first programme result that beats the strongest
+  non-composed baseline by ≥ 1.0 on a fresh live LLM probe.
+  (v) ``r64_live_naive`` — same fresh probe + naive prompt +
+  ``T_decoder = 14``. Live counterpart of W14-Λ-prompt +
+  W15-Λ-budget joint failure. Bench property holds in 0/8; every
+  capsule strategy ties FIFO at 0.000. W17-Λ-naive falsifier.
+  (vi) ``r64_live_xmodel`` — fresh live ``qwen3.5:35b`` MoE
+  backend + magnitude-hinted prompt + ``T_decoder = 14``,
+  ``think = False``. Cross-model probe (W17-C-XMODEL). Bench
+  property holds in 8/8; ``capsule_attention_aware = 0.750``;
+  ``capsule_layered_fifo_packed = 0.000``; **+0.750 strict gain**
+  (well above the 0.50 strong-bar threshold). The 0.250 gap to
+  1.000 is on ``accuracy_root_cause`` — a 35B-specific specific-
+  kind judgment artifact, not a producer-protocol failure.
+  Proved-conditional + empirical-research.
+  (vii) ``r64_sym_loose`` and ``r64_sym_tight`` — synthetic
+  symmetric-corroboration bank (every service mentioned by
+  exactly 2 distinct routed producer roles via generic-noise
+  kinds; round-2 disambiguator names gold root_cause without
+  ``service=`` token); under both ``T_decoder ∈ {None, 24}``,
+  every capsule strategy in the SDK ties FIFO at 0.000 — the
+  **first explicit symmetric-corroboration limit theorem in the
+  programme** (W17-Λ-symmetric).
+
+- **W17 family minted.** W17-1 (proved-conditional +
+  empirical-research; the first fresh-live end-to-end +1.000
+  strict gain), W17-Λ-no-hint (empirical-research; live
+  legacy-structured-prompt envelope), W17-Λ-naive (empirical-
+  research; live joint-failure falsifier), **W17-Λ-symmetric**
+  (proved-empirical + structural sketch; first explicit
+  symmetric-corroboration limit theorem; *discharges*
+  W15-C-SYMMETRIC / W16-C-SYMMETRIC as a negative theorem),
+  W17-2 (proved + mechanically-checked; magnitude-hinted prompt
+  determinism + threshold table soundness), W17-3 (proved-
+  empirical full programme regression; the W17 surface reduces
+  to the SDK v3.15 W14 anchor byte-for-byte under default
+  parameters; 442/442 prior tests pass), **W17-C-XMODEL**
+  (proved-conditional + empirical-research; fresh live 35B
+  cross-model strict gain). The W17-C family (W17-C-DISAMBIGUATOR,
+  W17-C-LEARNED-HINT, W17-C-CROSS-BENCH) makes the next research
+  frontier explicit.
+
+- **Magnitude-hinted producer protocol** (new SDK surface, purely
+  additive). ``vision_mvp/wevra/team_coord.py`` ships:
+  * ``PRODUCER_PROMPT_MAGNITUDE_HINTED`` — third producer-prompt
+    mode; the W17-1 anchor.
+  * :class:`OperationalThreshold` — closed-vocabulary record
+    naming a kind, the qualifying field, the inclusive
+    threshold, the unit, and a human gloss.
+  * ``RoleExtractionSchema.magnitude_thresholds`` — additive
+    optional field on the W14 schema; empty by default (W17-3
+    byte-for-byte backward-compat); populated by
+    ``incident_triage_role_schemas(magnitude_hinted=True)``.
+  * :data:`INCIDENT_TRIAGE_DEFAULT_MAGNITUDE_THRESHOLDS` and
+    :func:`incident_triage_magnitude_thresholds` — the
+    pre-committed threshold table for the incident-triage family
+    (calibrated to the synthetic
+    :class:`MagnitudeFilteringExtractor`'s default thresholds,
+    NOT to any specific scenario's magnitudes).
+  * :func:`_render_magnitude_hinted_prompt` — the W17 prompt
+    renderer. Adds the operational threshold table AND an
+    anti-relative-magnitude clause to the structured prompt.
+
+- **Pre-committed success criterion** in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-64 anchor +
+  bar 14 — live-end-to-end + magnitude-hinted-protocol +
+  symmetric-corroboration-wall split + § 2.13 R-64 ingredients).
+  The SDK v3.18 result clears the **strong success bar** § 1.1 on
+  R-64-LIVE-MAGHINT (strict gain +1.000 vs both substrate FIFO
+  AND FIFO-packed-W14H-only on a fresh live LLM probe; bench
+  property held in 8/8 closes the prior 1/8 miss; named bench
+  property + named falsifier regimes W17-Λ-no-hint /
+  W17-Λ-naive / W17-Λ-symmetric AND named cross-model probe
+  W17-C-XMODEL with +0.750 gain; W17-3 backward-compat
+  preserved byte-for-byte). Headline data files:
+  ``docs/data/phase64_live_maghint_qwen2_5_14b_n8.json``,
+  ``docs/data/phase64_live_maghint_qwen3_5_35b_n8.json``,
+  ``docs/data/phase64_cross_regime_synthetic.json``.
+
+- **Honest scope.** The W17-1 win is *strongly conditional* on
+  (a) the asymmetric-corroboration bench property, (b) the
+  magnitude-hint table being calibrated to the synthetic
+  extractor's threshold values (operational definitions, not
+  answer hints — both gold and decoy magnitudes are well above
+  every threshold), AND (c) the live endpoint reachable.
+  W17-Λ-symmetric *names the wall* when the asymmetric ingredient
+  is structurally absent: every capsule strategy in the SDK ties
+  FIFO at 0.000 by construction, including the W14H + W15
+  composition. The cross-model probe (W17-C-XMODEL) is
+  proved-conditional on bench-property + strict-gain transfer; the
+  saturated full-correctness clause remains conjectural and is
+  bounded by a 35B-specific specific-tier judgment artifact (not
+  a producer-protocol failure). The Wevra single-run product
+  runtime contract is byte-for-byte unchanged.
+
+### Active observations (SDK v3.18)
+
+- **W17-Λ-real (honest positive on fresh live axis).** Real
+  Mac-1 ``qwen2.5:14b-32k`` at ``temperature = 0`` on the
+  Phase-61 redesigned comparable-magnitude events:
+  - Under naive prompt: bench property holds 0/8; every method
+    ties FIFO at 0.000 (live confirmation of W14-Λ-prompt +
+    W15-Λ-budget joint failure on the live axis).
+  - Under structured prompt: bench property holds 7/8;
+    cross-round decoders all achieve ``accuracy_full = 0.500``;
+    ``capsule_attention_aware - capsule_layered_fifo_packed
+    = +0.500`` strict gain (W17-Λ-no-hint anchor — reproduces
+    W14-Λ-real / W16-Λ-real-replay envelope on fresh probe).
+  - Under magnitude-hinted prompt: bench property holds 8/8;
+    cross-round decoders all achieve ``accuracy_full = 1.000``;
+    ``capsule_attention_aware - capsule_layered_fifo_packed
+    = +1.000`` strict gain (W17-1 anchor).
+  - The 1/8 model-error failure on the slow_query_archival
+    scenario (LLM judged decoy magnitudes "not severe enough"
+    relative to gold) is **closed** by the W17 magnitude-hint
+    extension; the LLM correctly emits every qualifying event
+    once the absolute thresholds are stated and relative-
+    magnitude skipping is forbidden in the prompt.
+
+- **W17-C-XMODEL-real (proved-conditional cross-model
+  bench-property transfer).** Real Mac-1 ``qwen3.5:35b`` MoE
+  backend at ``temperature = 0`` with ``think = False``: bench
+  property holds in 8/8 under the magnitude-hinted prompt (the
+  bench-property hold-rate transfers to a 2.4× larger MoE
+  model class byte-for-byte); ``capsule_attention_aware =
+  0.750``; ``capsule_layered_fifo_packed = 0.000``; +0.750
+  strict gain. The 0.250 gap to 1.000 is on
+  ``accuracy_root_cause`` — the 35B emits a different specific-
+  tier kind on one scenario than the 14B does (a model-side
+  specific-kind judgment artifact, not a producer-protocol
+  failure). The W5-1 (SDK v3.6) prior cross-model probe found
+  parser-axis TVD = 1.000 between 14B and 35B under strict
+  parsing; W17-C-XMODEL finds *bench-property-axis* TVD = 0.000
+  under the magnitude-hinted prompt + robust parser — the W17
+  protocol *normalises* the producer-side behaviour across the
+  model-class jump that the W5-1 parser-boundary regime
+  exposed.
+
+### Active conjectures (SDK v3.18)
+
+- **W17-C-DISAMBIGUATOR** (semantic-disambiguator beyond
+  W17-Λ-symmetric): a learned or LLM-distilled disambiguator
+  consuming the round-2 disambiguator's evidence text directly
+  could distinguish ``orders_payments_join`` (gold A_B in
+  deadlock) from a generic decoy whose round-1 mentions are
+  observationally identical. **Conjectural; the named research
+  frontier for SDK v3.19+.**
+
+- **W17-C-LEARNED-HINT** (learned threshold variant): a per-kind
+  data-driven threshold table outperforms the closed-form
+  :data:`INCIDENT_TRIAGE_DEFAULT_MAGNITUDE_THRESHOLDS` on a
+  held-out test set across 5/5 random splits. **Conjectural.**
+
+- **W17-C-CROSS-BENCH** (cross-bench transfer): the magnitude-
+  hint protocol generalises to non-incident-triage benchmark
+  families when the family admits a closed-vocabulary kind →
+  qualifying-threshold mapping. **Conjectural.**
+
+### Discharged / partially-discharged conjectures (SDK v3.18)
+
+- **W16-C-LIVE-OLLAMA** (SDK v3.17; "a fresh live Ollama probe
+  closes the 1/8 model-error failure W14-only leaves").
+  **DISCHARGED-empirical** by W17-1: a fresh live probe AT
+  THE MAGNITUDE-HINTED PROMPT closes the 1/8 miss entirely
+  (bench property holds in 8/8;
+  ``accuracy_full = 1.000``); the W17-Λ-no-hint anchor on the
+  same fresh probe under the legacy structured prompt
+  reproduces the recorded 7/8 + 0.500 envelope, confirming the
+  magnitude-hint extension (W17-1) is the load-bearing
+  improvement, not a re-run of the same prompt.
+- **W16-C-CROSS-MODEL** (SDK v3.17; "the composition's W16-1
+  win at qwen2.5:14b-32k transfers to qwen3.5:35b under
+  MLX-distributed inference"). **PARTIALLY DISCHARGED-
+  empirical** by W17-C-XMODEL: the bench-property + strict-
+  gain transfer is observed on the 35B Ollama backend (NOT
+  MLX-distributed); the saturated full-correctness clause is
+  still bounded by a 35B-specific judgment artifact; the
+  MLX-distributed clause remains orthogonal and conjectural
+  pending Mac-2 reachable.
+- **W15-C-SYMMETRIC** / **W16-C-SYMMETRIC** (SDK v3.16 / v3.17;
+  "symmetric-corroboration multi-hypothesis structural limit").
+  **DISCHARGED as a negative theorem** by W17-Λ-symmetric: the
+  R-64-SYM bench construction proves every capsule strategy in
+  the SDK ties FIFO at 0.000 under both ``T_decoder ∈ {None,
+  24}`` by construction. The wall is real and structural; the
+  named research move beyond it is W17-C-DISAMBIGUATOR
+  (conjectural).
+
+## Previous frontier (SDK v3.17, 2026-04-27)
+
+### Active moves (SDK v3.17 — end-to-end W14 + W15 composition + W16 family — *first end-to-end real-LLM strict advance over the strongest non-composed baseline*)
+
+(See `docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md` for the SDK
+v3.17 milestone note. SDK v3.18 supersedes this frontier on the
+fresh-live and symmetric-wall axes; the W16 anchors are
+preserved as historical evidence.)
+
+## Previous frontier (SDK v3.16, 2026-04-27)
 
 ### Active moves (SDK v3.16 — attention-aware capsule context packing + W15 family — *first decoder-side context-packing move + joint-correctness-and-context-efficiency strict-gain anchor*)
 

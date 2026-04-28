@@ -17,7 +17,8 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.17)         | [`RESULTS_WEVRA_COMPOSED_REAL_LLM.md`](RESULTS_WEVRA_COMPOSED_REAL_LLM.md) |
+> | Latest milestone (SDK v3.18)         | [`RESULTS_WEVRA_LIVE_COMPOSITION.md`](RESULTS_WEVRA_LIVE_COMPOSITION.md) |
+> | Previous milestone (SDK v3.17)       | [`RESULTS_WEVRA_COMPOSED_REAL_LLM.md`](RESULTS_WEVRA_COMPOSED_REAL_LLM.md) |
 > | Previous milestone (SDK v3.16)       | [`RESULTS_WEVRA_ATTENTION_AWARE.md`](RESULTS_WEVRA_ATTENTION_AWARE.md) |
 > | Previous milestone (SDK v3.15)       | [`RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`](RESULTS_WEVRA_PRODUCER_AMBIGUITY.md) |
 > | Previous milestone (SDK v3.14)       | [`RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md`](RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md) |
@@ -40,7 +41,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.17 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.18 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
@@ -72,9 +73,37 @@ limit), while pairing W9 admission with the new
 achieves 1.000 — the first capsule-native multi-agent coordination
 method that crosses the admission/decoding split** (W10 family,
 SDK v3.11).
-SDK v3.17's headline result is the **first end-to-end W14 + W15
-composition move** in the programme — and the **first end-to-end
-real-LLM strict advance over the strongest non-composed baseline**.
+SDK v3.18's headline result is the **first fresh-live end-to-end
+real-LLM strict +1.000 advance** in the programme over the
+strongest non-composed baseline AND **the first explicit
+symmetric-corroboration limit theorem**. The W17 family ships a
+*magnitude-hinted* extension to the W14 producer protocol (one
+new prompt-mode + one operational-threshold table) that, on a
+*fresh* live ``qwen2.5:14b-32k`` Mac-1 probe at
+``T_decoder = 14``, takes the W14 + W15 composition from 7/8 +
+0.500 (the W14 / W16-Λ-real-replay envelope) to **8/8 + 1.000**:
++1.000 strict gain over both substrate FIFO AND the FIFO-packed-
+W14H-only baseline (W17-1, ``docs/data/phase64_live_maghint_qwen2_5_14b_n8.json``).
+The W17-Λ-no-hint anchor on the same fresh probe under the legacy
+structured prompt reproduces the recorded 7/8 + 0.500 envelope —
+the magnitude-hint extension, not a re-run of the same prompt, is
+the load-bearing improvement. Cross-model probe on a fresh live
+``qwen3.5:35b`` MoE backend transfers: bench property holds in
+8/8; +0.750 strict gain (W17-C-XMODEL,
+``docs/data/phase64_live_maghint_qwen3_5_35b_n8.json``). The
+**first explicit symmetric-corroboration limit theorem**
+(W17-Λ-symmetric) lands as a *negative* result on the synthetic
+``build_phase64_sym_bank``: every capsule strategy in the SDK
+ties FIFO at 0.000 under both ``T_decoder ∈ {None, 24}`` by
+construction — discharges W15-C-SYMMETRIC / W16-C-SYMMETRIC as a
+negative theorem and names the next research frontier
+(W17-C-DISAMBIGUATOR, conjectural). Backward-compat preserved
+byte-for-byte: 442/442 prior tests pass; with default parameters
+the W17 surface reduces to the SDK v3.15 W14 anchor (W17-3).
+SDK v3.17's prior headline result is the **first end-to-end
+W14 + W15 composition move** in the programme — and the **first
+end-to-end real-LLM strict advance over the strongest non-
+composed baseline**.
 SDK v3.16 (W15) closed the decoder-side gap on R-62-tightbudget at
 +1.000 over FIFO-packed-W13 under a deterministic identity
 producer. SDK v3.17 (W16) attacks the symmetric *coupling*
@@ -731,7 +760,7 @@ For the full living stability matrix, see
         ├── Runtime:   wevra.runtime.run_sweep    (mock + real, one path)
         ├── Plugins:   wevra.extensions           (3 Protocols + registry)
         ├── Schemas:   phase45.product_report.v2, wevra.provenance.v1, …
-        ├── Latest milestone: docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md (SDK v3.17)
+        ├── Latest milestone: docs/RESULTS_WEVRA_LIVE_COMPOSITION.md (SDK v3.18)
         ├── Older milestones: docs/archive/wevra-milestones/ (SDK v3.0 → v3.6)
         └── Legacy:    vision_mvp/product/*       (deprecated-compat)
 ```

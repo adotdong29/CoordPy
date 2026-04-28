@@ -1,0 +1,832 @@
+{
+  "audit_ok_grid": {
+    "capsule_attention_aware": true,
+    "capsule_cohort_buffered": true,
+    "capsule_corroboration": true,
+    "capsule_coverage": true,
+    "capsule_fifo": true,
+    "capsule_layered_fifo_packed": true,
+    "capsule_layered_multi_round": true,
+    "capsule_multi_round": true,
+    "capsule_multi_service": true,
+    "capsule_priority": true,
+    "capsule_robust_multi_round": true,
+    "substrate": false
+  },
+  "bench_property_per_scenario": {
+    "p61_deadlock_orders_payments__compmag_cache__rep0": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 6,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    },
+    "p61_deadlock_orders_payments__compmag_metrics__rep1": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 6,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    },
+    "p61_disk_storage_logs__compmag_search_index__rep1": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 6,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    },
+    "p61_disk_storage_logs__compmag_telemetry__rep0": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 6,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    },
+    "p61_pool_api_db__compmag_cache__rep0": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 6,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    },
+    "p61_pool_api_db__compmag_telemetry__rep1": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 6,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    },
+    "p61_slow_query_web_db__compmag_archival__rep1": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 6,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    },
+    "p61_slow_query_web_db__compmag_metrics__rep0": {
+      "decoy_only_in_round1": true,
+      "delayed_causal_evidence_property_holds": true,
+      "n_round1_to_auditor": 6,
+      "n_round2_to_auditor": 1,
+      "round1_decoy_corroborated": true,
+      "round1_only_generic_noise": true,
+      "round2_only_specific": true
+    }
+  },
+  "bench_summary": {
+    "K_auditor": 8,
+    "T_decoder": 14,
+    "bank": "phase61",
+    "n_scenarios": 8,
+    "scenarios_with_decoy_corroboration": 8,
+    "scenarios_with_property": 8
+  },
+  "config": {
+    "K_auditor": 8,
+    "K_producer": 6,
+    "T_auditor": 256,
+    "T_decoder": 14,
+    "T_producer": 96,
+    "bank": "phase61",
+    "bank_replicates": 2,
+    "bank_seed": 11,
+    "endpoint": "http://192.168.12.191:11434",
+    "extractor": "ollama",
+    "inbox_capacity": 8,
+    "magnitude_hinted_schema": true,
+    "model": "qwen3.5:35b",
+    "n_eval": 8,
+    "prompt_mode": "magnitude_hinted",
+    "threshold_error_rate": 0.1,
+    "threshold_fw_count": 5,
+    "threshold_p95_ms": 1000.0
+  },
+  "extractor_stats": {
+    "T_decoder": 14,
+    "endpoint": "http://192.168.12.191:11434",
+    "extractor": "ollama",
+    "magnitude_hinted_schema": true,
+    "model": "qwen3.5:35b",
+    "n_failed_calls": 0,
+    "n_real_calls": 24,
+    "n_synthetic_fallbacks": 0,
+    "prompt_mode": "magnitude_hinted",
+    "threshold_error_rate": 0.1,
+    "threshold_fw_count": 5,
+    "threshold_p95_ms": 1000.0,
+    "total_wall_s": 92.004
+  },
+  "headline_gap": {
+    "composed_minus_fifo": 0.75,
+    "composed_minus_fifo_packed": 0.75,
+    "composed_minus_layered": 0.0,
+    "fifo_packed_minus_layered": -0.75,
+    "max_non_attention_accuracy_full": 0.75
+  },
+  "n_results": 96,
+  "pack_stats_summary": {
+    "capsule_attention_aware": {
+      "fraction_handoffs_kept": 0.7857,
+      "handoffs_admitted_sum": 56,
+      "handoffs_decoder_input_sum": 44,
+      "hypothesis_count_input_avg": 3.0,
+      "hypothesis_count_kept_avg": 3.0,
+      "n_cells": 8,
+      "n_dropped_budget_sum": 12,
+      "n_with_causal_claim_kept": 8,
+      "position_of_first_causal_claim_avg": 0.0,
+      "tokens_input_sum": 140,
+      "tokens_kept_over_input": 0.7714,
+      "tokens_kept_sum": 108
+    },
+    "capsule_layered_fifo_packed": {
+      "fraction_handoffs_kept": 0.8571,
+      "handoffs_admitted_sum": 56,
+      "handoffs_decoder_input_sum": 48,
+      "hypothesis_count_input_avg": 3.0,
+      "hypothesis_count_kept_avg": 3.0,
+      "n_cells": 8,
+      "n_dropped_budget_sum": 8,
+      "n_with_causal_claim_kept": 0,
+      "position_of_first_causal_claim_avg": -1.0,
+      "tokens_input_sum": 140,
+      "tokens_kept_over_input": 0.8,
+      "tokens_kept_sum": 112
+    }
+  },
+  "pooled": {
+    "capsule_attention_aware": {
+      "accuracy_full": 0.75,
+      "accuracy_remediation": 0.75,
+      "accuracy_root_cause": 0.75,
+      "accuracy_services": 1.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 2,
+        "none": 6
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 7.25,
+      "mean_tokens_admitted": 3.5,
+      "n": 8,
+      "strategy": "capsule_attention_aware"
+    },
+    "capsule_cohort_buffered": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 0.75,
+      "accuracy_root_cause": 0.75,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 7.25,
+      "mean_tokens_admitted": 3.5,
+      "n": 8,
+      "strategy": "capsule_cohort_buffered"
+    },
+    "capsule_corroboration": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 0.75,
+      "accuracy_root_cause": 0.75,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 7.25,
+      "mean_tokens_admitted": 3.5,
+      "n": 8,
+      "strategy": "capsule_corroboration"
+    },
+    "capsule_coverage": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 0.75,
+      "accuracy_root_cause": 0.75,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 7.25,
+      "mean_tokens_admitted": 3.5,
+      "n": 8,
+      "strategy": "capsule_coverage"
+    },
+    "capsule_fifo": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 0.75,
+      "accuracy_root_cause": 0.75,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 7.25,
+      "mean_tokens_admitted": 3.5,
+      "n": 8,
+      "strategy": "capsule_fifo"
+    },
+    "capsule_layered_fifo_packed": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 0.0,
+      "accuracy_root_cause": 0.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 7.25,
+      "mean_tokens_admitted": 3.5,
+      "n": 8,
+      "strategy": "capsule_layered_fifo_packed"
+    },
+    "capsule_layered_multi_round": {
+      "accuracy_full": 0.75,
+      "accuracy_remediation": 0.75,
+      "accuracy_root_cause": 0.75,
+      "accuracy_services": 1.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 2,
+        "none": 6
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 7.25,
+      "mean_tokens_admitted": 3.5,
+      "n": 8,
+      "strategy": "capsule_layered_multi_round"
+    },
+    "capsule_multi_round": {
+      "accuracy_full": 0.75,
+      "accuracy_remediation": 0.75,
+      "accuracy_root_cause": 0.75,
+      "accuracy_services": 1.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 2,
+        "none": 6
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 7.25,
+      "mean_tokens_admitted": 3.5,
+      "n": 8,
+      "strategy": "capsule_multi_round"
+    },
+    "capsule_multi_service": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 0.75,
+      "accuracy_root_cause": 0.75,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 7.25,
+      "mean_tokens_admitted": 3.5,
+      "n": 8,
+      "strategy": "capsule_multi_service"
+    },
+    "capsule_priority": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 0.75,
+      "accuracy_root_cause": 0.75,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 7.25,
+      "mean_tokens_admitted": 3.5,
+      "n": 8,
+      "strategy": "capsule_priority"
+    },
+    "capsule_robust_multi_round": {
+      "accuracy_full": 0.75,
+      "accuracy_remediation": 0.75,
+      "accuracy_root_cause": 0.75,
+      "accuracy_services": 1.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 2,
+        "none": 6
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 7.25,
+      "mean_tokens_admitted": 3.5,
+      "n": 8,
+      "strategy": "capsule_robust_multi_round"
+    },
+    "substrate": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 0.75,
+      "accuracy_root_cause": 0.75,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 0.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 7.0,
+      "mean_n_role_view": 0.0,
+      "mean_n_team_handoff": 0.0,
+      "mean_tokens_admitted": 17.5,
+      "n": 8,
+      "strategy": "substrate"
+    }
+  },
+  "prompt_records": [
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "8de8929d47dec5d1",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "623aba06c1f0164f",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "fac23f21cd3dea97",
+      "role": "db_admin",
+      "round_idx": 2,
+      "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "2bc9dcacb35737ed",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "d481da61cbf95f28",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "fac23f21cd3dea97",
+      "role": "db_admin",
+      "round_idx": 2,
+      "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "135cbdb5c91d7996",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "2c1ad0c561bd3142",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "b90e5a8de12fea9a",
+      "role": "db_admin",
+      "round_idx": 2,
+      "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "6f687ff673a573d5",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "d48264d10d8c1838",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "b90e5a8de12fea9a",
+      "role": "db_admin",
+      "round_idx": 2,
+      "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "28a77db27b5bdbdc",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "264531b74f754f0a",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "4b0993f112c866ac",
+      "role": "sysadmin",
+      "round_idx": 2,
+      "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "39cdae362625c036",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "7f9972b8b30bed2e",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "4b0993f112c866ac",
+      "role": "sysadmin",
+      "round_idx": 2,
+      "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "ee50262aa0c720ce",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "2571f5e800ea6486",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "56772164f5505d0f",
+      "role": "db_admin",
+      "round_idx": 2,
+      "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 2,
+      "prompt_sha256": "614298dd28a694b9",
+      "role": "monitor",
+      "round_idx": 1,
+      "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 1,
+      "prompt_sha256": "fb978f3cb8f0d19c",
+      "role": "network",
+      "round_idx": 1,
+      "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+    },
+    {
+      "mode": "magnitude_hinted",
+      "n_kinds_in_scope": 3,
+      "prompt_sha256": "56772164f5505d0f",
+      "role": "db_admin",
+      "round_idx": 2,
+      "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+    }
+  ],
+  "raw_responses_per_scenario": {
+    "p61_deadlock_orders_payments__compmag_cache__rep0": [
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "8de8929d47dec5d1",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0",
+        "text": "ERROR_RATE_SPIKE | error_rate=0.22 service=payments\nERROR_RATE_SPIKE | error_rate=0.15 service=cache\nLATENCY_SPIKE | p95_ms=2100 service=orders\nLATENCY_SPIKE | p95_ms=1850 service=cache",
+        "wall_s": 15.318
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "623aba06c1f0164f",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0",
+        "text": "FW_BLOCK_SURGE | rule=deny count=10 service=cache\nFW_BLOCK_SURGE | rule=deny count=11 service=cache",
+        "wall_s": 2.909
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "fac23f21cd3dea97",
+        "raw_kind": "ollama_response",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0",
+        "text": "SLOW_QUERY_OBSERVED | deadlock relation=orders_payments_join wait_chain=2",
+        "wall_s": 2.133
+      }
+    ],
+    "p61_deadlock_orders_payments__compmag_metrics__rep1": [
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "2bc9dcacb35737ed",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1",
+        "text": "ERROR_RATE_SPIKE | error_rate=0.22 service=payments\nLATENCY_SPIKE | p95_ms=2100 service=orders\nLATENCY_SPIKE | p95_ms=1850 service=metrics\nERROR_RATE_SPIKE | error_rate=0.15 service=metrics",
+        "wall_s": 4.925
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "d481da61cbf95f28",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1",
+        "text": "FW_BLOCK_SURGE | rule=deny count=10 service=metrics\nFW_BLOCK_SURGE | rule=deny count=11 service=metrics",
+        "wall_s": 2.922
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "fac23f21cd3dea97",
+        "raw_kind": "ollama_response",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1",
+        "text": "SLOW_QUERY_OBSERVED | deadlock relation=orders_payments_join wait_chain=2",
+        "wall_s": 2.071
+      }
+    ],
+    "p61_disk_storage_logs__compmag_search_index__rep1": [
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "39cdae362625c036",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1",
+        "text": "ERROR_RATE_SPIKE | error_rate=0.41 service=storage\nLATENCY_SPIKE | p95_ms=4500 service=logs_pipeline\nLATENCY_SPIKE | p95_ms=3100 service=search_index\nERROR_RATE_SPIKE | error_rate=0.21 service=search_index",
+        "wall_s": 4.956
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "7f9972b8b30bed2e",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1",
+        "text": "FW_BLOCK_SURGE | rule=deny count=7 service=search_index\nFW_BLOCK_SURGE | rule=deny count=8 service=search_index",
+        "wall_s": 2.849
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "4b0993f112c866ac",
+        "raw_kind": "ollama_response",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1",
+        "text": "DISK_FILL_CRITICAL | body=\"/var/log used=99% fs=/ host=primary\"",
+        "wall_s": 2.324
+      }
+    ],
+    "p61_disk_storage_logs__compmag_telemetry__rep0": [
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "28a77db27b5bdbdc",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0",
+        "text": "ERROR_RATE_SPIKE | error_rate=0.41 service=storage\nLATENCY_SPIKE | p95_ms=4500 service=logs_pipeline\nLATENCY_SPIKE | p95_ms=3100 service=telemetry\nERROR_RATE_SPIKE | error_rate=0.21 service=telemetry",
+        "wall_s": 5.08
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "264531b74f754f0a",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0",
+        "text": "FW_BLOCK_SURGE | rule=deny count=7 service=telemetry\nFW_BLOCK_SURGE | rule=deny count=8 service=telemetry",
+        "wall_s": 2.988
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "4b0993f112c866ac",
+        "raw_kind": "ollama_response",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0",
+        "text": "DISK_FILL_CRITICAL | body=\"/var/log used=99% fs=/ host=primary\"",
+        "wall_s": 2.354
+      }
+    ],
+    "p61_pool_api_db__compmag_cache__rep0": [
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "135cbdb5c91d7996",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0",
+        "text": "ERROR_RATE_SPIKE | error_rate=0.18 service=db\nERROR_RATE_SPIKE | error_rate=0.13 service=cache\nLATENCY_SPIKE | p95_ms=4200 service=api\nLATENCY_SPIKE | p95_ms=2400 service=cache",
+        "wall_s": 4.827
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "2c1ad0c561bd3142",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0",
+        "text": "FW_BLOCK_SURGE | rule=deny count=12 service=cache\nFW_BLOCK_SURGE | rule=deny count=14 service=cache",
+        "wall_s": 2.976
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "b90e5a8de12fea9a",
+        "raw_kind": "ollama_response",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0",
+        "text": "POOL_EXHAUSTION | pool active=200/200 waiters=145 cluster=primary",
+        "wall_s": 2.485
+      }
+    ],
+    "p61_pool_api_db__compmag_telemetry__rep1": [
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "6f687ff673a573d5",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1",
+        "text": "ERROR_RATE_SPIKE | error_rate=0.18 service=db\nLATENCY_SPIKE | p95_ms=4200 service=api\nLATENCY_SPIKE | p95_ms=2400 service=telemetry\nERROR_RATE_SPIKE | error_rate=0.13 service=telemetry",
+        "wall_s": 4.969
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "d48264d10d8c1838",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1",
+        "text": "FW_BLOCK_SURGE | rule=deny count=12 service=telemetry\nFW_BLOCK_SURGE | rule=deny count=14 service=telemetry",
+        "wall_s": 3.175
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "b90e5a8de12fea9a",
+        "raw_kind": "ollama_response",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1",
+        "text": "POOL_EXHAUSTION | pool active=200/200 waiters=145 cluster=primary",
+        "wall_s": 2.659
+      }
+    ],
+    "p61_slow_query_web_db__compmag_archival__rep1": [
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "614298dd28a694b9",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1",
+        "text": "ERROR_RATE_SPIKE | error_rate=0.15 service=db\nERROR_RATE_SPIKE | error_rate=0.13 service=archival\nLATENCY_SPIKE | p95_ms=4100 service=web\nLATENCY_SPIKE | p95_ms=2900 service=archival",
+        "wall_s": 4.925
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "fb978f3cb8f0d19c",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1",
+        "text": "FW_BLOCK_SURGE | rule=deny count=9 service=archival\nFW_BLOCK_SURGE | rule=deny count=10 service=archival",
+        "wall_s": 2.971
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "56772164f5505d0f",
+        "raw_kind": "ollama_response",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1",
+        "text": "SLOW_QUERY_OBSERVED | q#9 mean_ms=4100 cluster=primary",
+        "wall_s": 2.221
+      }
+    ],
+    "p61_slow_query_web_db__compmag_metrics__rep0": [
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "ee50262aa0c720ce",
+        "raw_kind": "ollama_response",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0",
+        "text": "ERROR_RATE_SPIKE | error_rate=0.15 service=db\nERROR_RATE_SPIKE | error_rate=0.13 service=metrics\nLATENCY_SPIKE | p95_ms=4100 service=web\nLATENCY_SPIKE | p95_ms=2900 service=metrics",
+        "wall_s": 4.808
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "2571f5e800ea6486",
+        "raw_kind": "ollama_response",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0",
+        "text": "FW_BLOCK_SURGE | rule=deny count=9 service=metrics\nFW_BLOCK_SURGE | rule=deny count=10 service=metrics",
+        "wall_s": 2.88
+      },
+      {
+        "prompt_mode": "magnitude_hinted",
+        "prompt_sha256": "56772164f5505d0f",
+        "raw_kind": "ollama_response",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0",
+        "text": "SLOW_QUERY_OBSERVED | q#9 mean_ms=4100 cluster=primary",
+        "wall_s": 2.278
+      }
+    ]
+  },
+  "scenarios_evaluated": [
+    "p61_deadlock_orders_payments__compmag_cache__rep0",
+    "p61_deadlock_orders_payments__compmag_metrics__rep1",
+    "p61_pool_api_db__compmag_cache__rep0",
+    "p61_pool_api_db__compmag_telemetry__rep1",
+    "p61_disk_storage_logs__compmag_telemetry__rep0",
+    "p61_disk_storage_logs__compmag_search_index__rep1",
+    "p61_slow_query_web_db__compmag_metrics__rep0",
+    "p61_slow_query_web_db__compmag_archival__rep1"
+  ],
+  "schema": "phase64.live_composition.v1"
+}

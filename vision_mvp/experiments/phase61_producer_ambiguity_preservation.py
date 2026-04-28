@@ -178,6 +178,7 @@ from vision_mvp.wevra.team_coord import (
     LayeredRobustMultiRoundBundleDecoder,
     MultiRoundBundleDecoder,
     MultiServiceCorroborationAdmissionPolicy,
+    PRODUCER_PROMPT_MAGNITUDE_HINTED,
     PRODUCER_PROMPT_NAIVE, PRODUCER_PROMPT_STRUCTURED,
     ProducerPromptResult,
     RobustMultiRoundBundleDecoder, RoleBudget,
@@ -935,7 +936,8 @@ class CapturingOllamaExtractor:
                 self.n_synthetic_fallbacks += 1
                 out.extend(role_out)
                 continue
-            if prompt_res.mode == PRODUCER_PROMPT_STRUCTURED:
+            if prompt_res.mode in (PRODUCER_PROMPT_STRUCTURED,
+                                     PRODUCER_PROMPT_MAGNITUDE_HINTED):
                 parsed = _parse_structured_response(
                     resp, prompt_res.kinds_in_scope)
             else:

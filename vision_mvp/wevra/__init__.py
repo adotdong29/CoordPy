@@ -229,6 +229,11 @@ from .team_coord import (
     StructuredProducerProtocol,
     INCIDENT_TRIAGE_OBSERVATION_KINDS,
     incident_triage_role_schemas,
+    # SDK v3.18 — magnitude-hinted producer protocol (W17 family).
+    PRODUCER_PROMPT_MAGNITUDE_HINTED,
+    OperationalThreshold,
+    INCIDENT_TRIAGE_DEFAULT_MAGNITUDE_THRESHOLDS,
+    incident_triage_magnitude_thresholds,
     # SDK v3.16 — attention-aware capsule context packing (W15 family).
     W15_DEFAULT_TIER_WEIGHT, W15_DEFAULT_CCK_WEIGHT,
     W15_DEFAULT_CORROBORATION_WEIGHT, W15_DEFAULT_MAGNITUDE_WEIGHT,
@@ -249,7 +254,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.17"
+SDK_VERSION = "wevra.sdk.v3.18"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -350,6 +355,10 @@ __all__ = [
     # SDK v3.15 — structured producer protocol (W14 family).
     "PRODUCER_PROMPT_NAIVE", "PRODUCER_PROMPT_STRUCTURED",
     "ALL_PRODUCER_PROMPT_MODES",
+    "PRODUCER_PROMPT_MAGNITUDE_HINTED",
+    "OperationalThreshold",
+    "INCIDENT_TRIAGE_DEFAULT_MAGNITUDE_THRESHOLDS",
+    "incident_triage_magnitude_thresholds",
     "RoleExtractionSchema", "ProducerPromptResult",
     "StructuredProducerProtocol",
     "INCIDENT_TRIAGE_OBSERVATION_KINDS",

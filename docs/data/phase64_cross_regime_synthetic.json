@@ -1,0 +1,2442 @@
+{
+  "config": {
+    "K_auditor": 8,
+    "T_auditor": 256,
+    "T_decoder_tight": 14,
+    "bank_seed": 11,
+    "n_eval": 8
+  },
+  "headline_summary": {
+    "r64_baseline_attention_aware": 1.0,
+    "r64_sym_loose_max_capsule": 0.0,
+    "r64_sym_tight_max_capsule": 0.0,
+    "r64_w14h_only_attention_aware": 1.0
+  },
+  "r64_baseline": {
+    "audit_ok_grid": {
+      "capsule_attention_aware": true,
+      "capsule_cohort_buffered": true,
+      "capsule_corroboration": true,
+      "capsule_coverage": true,
+      "capsule_fifo": true,
+      "capsule_layered_fifo_packed": true,
+      "capsule_layered_multi_round": true,
+      "capsule_multi_round": true,
+      "capsule_multi_service": true,
+      "capsule_priority": true,
+      "capsule_robust_multi_round": true,
+      "substrate": false
+    },
+    "bench_property_per_scenario": {
+      "p61_deadlock_orders_payments__compmag_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_deadlock_orders_payments__compmag_metrics__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_disk_storage_logs__compmag_search_index__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_disk_storage_logs__compmag_telemetry__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_pool_api_db__compmag_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_pool_api_db__compmag_telemetry__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_slow_query_web_db__compmag_archival__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_slow_query_web_db__compmag_metrics__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      }
+    },
+    "bench_summary": {
+      "K_auditor": 8,
+      "T_decoder": null,
+      "bank": "phase61",
+      "n_scenarios": 8,
+      "scenarios_with_decoy_corroboration": 8,
+      "scenarios_with_property": 8
+    },
+    "config": {
+      "K_auditor": 8,
+      "K_producer": 6,
+      "T_auditor": 256,
+      "T_decoder": null,
+      "T_producer": 96,
+      "bank": "phase61",
+      "bank_replicates": 2,
+      "bank_seed": 11,
+      "endpoint": "http://192.168.12.191:11434",
+      "extractor": "identity",
+      "inbox_capacity": 8,
+      "magnitude_hinted_schema": true,
+      "model": "qwen2.5:14b-32k",
+      "n_eval": 8,
+      "prompt_mode": "magnitude_hinted",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "extractor_stats": {
+      "T_decoder": null,
+      "extractor": "identity",
+      "magnitude_hinted_schema": true,
+      "prompt_mode": "magnitude_hinted",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "headline_gap": {
+      "composed_minus_fifo": 1.0,
+      "composed_minus_fifo_packed": 0.0,
+      "composed_minus_layered": 0.0,
+      "fifo_packed_minus_layered": 0.0,
+      "max_non_attention_accuracy_full": 1.0
+    },
+    "n_results": 96,
+    "pack_stats_summary": {
+      "capsule_attention_aware": {
+        "fraction_handoffs_kept": 1.0,
+        "handoffs_admitted_sum": 56,
+        "handoffs_decoder_input_sum": 56,
+        "hypothesis_count_input_avg": 3.0,
+        "hypothesis_count_kept_avg": 3.0,
+        "n_cells": 8,
+        "n_dropped_budget_sum": 0,
+        "n_with_causal_claim_kept": 8,
+        "position_of_first_causal_claim_avg": 0.0,
+        "tokens_input_sum": 140,
+        "tokens_kept_over_input": 1.0,
+        "tokens_kept_sum": 140
+      },
+      "capsule_layered_fifo_packed": {
+        "fraction_handoffs_kept": 1.0,
+        "handoffs_admitted_sum": 56,
+        "handoffs_decoder_input_sum": 56,
+        "hypothesis_count_input_avg": 3.0,
+        "hypothesis_count_kept_avg": 3.0,
+        "n_cells": 8,
+        "n_dropped_budget_sum": 0,
+        "n_with_causal_claim_kept": 8,
+        "position_of_first_causal_claim_avg": 6.0,
+        "tokens_input_sum": 140,
+        "tokens_kept_over_input": 1.0,
+        "tokens_kept_sum": 140
+      }
+    },
+    "pooled": {
+      "capsule_attention_aware": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_attention_aware"
+      },
+      "capsule_cohort_buffered": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_cohort_buffered"
+      },
+      "capsule_corroboration": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_corroboration"
+      },
+      "capsule_coverage": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_coverage"
+      },
+      "capsule_fifo": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_fifo"
+      },
+      "capsule_layered_fifo_packed": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_layered_fifo_packed"
+      },
+      "capsule_layered_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_layered_multi_round"
+      },
+      "capsule_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_round"
+      },
+      "capsule_multi_service": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_service"
+      },
+      "capsule_priority": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_priority"
+      },
+      "capsule_robust_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_robust_multi_round"
+      },
+      "substrate": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 0.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 7.0,
+        "mean_n_role_view": 0.0,
+        "mean_n_team_handoff": 0.0,
+        "mean_tokens_admitted": 17.5,
+        "n": 8,
+        "strategy": "substrate"
+      }
+    },
+    "prompt_records": [
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "8de8929d47dec5d1",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "623aba06c1f0164f",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "fac23f21cd3dea97",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "2bc9dcacb35737ed",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "d481da61cbf95f28",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "fac23f21cd3dea97",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "135cbdb5c91d7996",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "2c1ad0c561bd3142",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "b90e5a8de12fea9a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "6f687ff673a573d5",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "d48264d10d8c1838",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "b90e5a8de12fea9a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "28a77db27b5bdbdc",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "264531b74f754f0a",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "4b0993f112c866ac",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "39cdae362625c036",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "7f9972b8b30bed2e",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "4b0993f112c866ac",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "ee50262aa0c720ce",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "2571f5e800ea6486",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "56772164f5505d0f",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "614298dd28a694b9",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "fb978f3cb8f0d19c",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "56772164f5505d0f",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      }
+    ],
+    "scenarios_evaluated": [
+      "p61_deadlock_orders_payments__compmag_cache__rep0",
+      "p61_deadlock_orders_payments__compmag_metrics__rep1",
+      "p61_pool_api_db__compmag_cache__rep0",
+      "p61_pool_api_db__compmag_telemetry__rep1",
+      "p61_disk_storage_logs__compmag_telemetry__rep0",
+      "p61_disk_storage_logs__compmag_search_index__rep1",
+      "p61_slow_query_web_db__compmag_metrics__rep0",
+      "p61_slow_query_web_db__compmag_archival__rep1"
+    ],
+    "schema": "phase64.live_composition.v1"
+  },
+  "r64_sym_loose": {
+    "audit_ok_grid": {
+      "capsule_attention_aware": true,
+      "capsule_cohort_buffered": true,
+      "capsule_corroboration": true,
+      "capsule_coverage": true,
+      "capsule_fifo": true,
+      "capsule_layered_fifo_packed": true,
+      "capsule_layered_multi_round": true,
+      "capsule_multi_round": true,
+      "capsule_multi_service": true,
+      "capsule_priority": true,
+      "capsule_robust_multi_round": true,
+      "substrate": false
+    },
+    "bench_property_per_scenario": {
+      "p64sym_deadlock_orders_payments__sym_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_deadlock_orders_payments__sym_metrics__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_disk_storage_logs__sym_search_index__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_disk_storage_logs__sym_telemetry__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_pool_api_db__sym_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_pool_api_db__sym_telemetry__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_slow_query_web_db__sym_archival__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_slow_query_web_db__sym_metrics__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      }
+    },
+    "bench_summary": {
+      "K_auditor": 12,
+      "T_decoder": null,
+      "bank": "symmetric",
+      "n_scenarios": 8,
+      "scenarios_with_decoy_corroboration": 8,
+      "scenarios_with_property": 8,
+      "scenarios_with_symmetric_corroboration": 8
+    },
+    "config": {
+      "K_auditor": 12,
+      "K_producer": 6,
+      "T_auditor": 256,
+      "T_decoder": null,
+      "T_producer": 96,
+      "bank": "symmetric",
+      "bank_replicates": 2,
+      "bank_seed": 11,
+      "endpoint": "http://192.168.12.191:11434",
+      "extractor": "identity",
+      "inbox_capacity": 12,
+      "magnitude_hinted_schema": true,
+      "model": "qwen2.5:14b-32k",
+      "n_eval": 8,
+      "prompt_mode": "magnitude_hinted",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "extractor_stats": {
+      "T_decoder": null,
+      "extractor": "identity",
+      "magnitude_hinted_schema": true,
+      "prompt_mode": "magnitude_hinted",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "headline_gap": {
+      "composed_minus_fifo": 0.0,
+      "composed_minus_fifo_packed": 0.0,
+      "composed_minus_layered": 0.0,
+      "fifo_packed_minus_layered": 0.0,
+      "max_non_attention_accuracy_full": 0.0
+    },
+    "n_results": 96,
+    "pack_stats_summary": {
+      "capsule_attention_aware": {
+        "fraction_handoffs_kept": 1.0,
+        "handoffs_admitted_sum": 72,
+        "handoffs_decoder_input_sum": 72,
+        "hypothesis_count_input_avg": 3.0,
+        "hypothesis_count_kept_avg": 3.0,
+        "n_cells": 8,
+        "n_dropped_budget_sum": 0,
+        "n_with_causal_claim_kept": 8,
+        "position_of_first_causal_claim_avg": 0.0,
+        "tokens_input_sum": 188,
+        "tokens_kept_over_input": 1.0,
+        "tokens_kept_sum": 188
+      },
+      "capsule_layered_fifo_packed": {
+        "fraction_handoffs_kept": 1.0,
+        "handoffs_admitted_sum": 72,
+        "handoffs_decoder_input_sum": 72,
+        "hypothesis_count_input_avg": 3.0,
+        "hypothesis_count_kept_avg": 3.0,
+        "n_cells": 8,
+        "n_dropped_budget_sum": 0,
+        "n_with_causal_claim_kept": 8,
+        "position_of_first_causal_claim_avg": 8.0,
+        "tokens_input_sum": 188,
+        "tokens_kept_over_input": 1.0,
+        "tokens_kept_sum": 188
+      }
+    },
+    "pooled": {
+      "capsule_attention_aware": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_attention_aware"
+      },
+      "capsule_cohort_buffered": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_cohort_buffered"
+      },
+      "capsule_corroboration": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_corroboration"
+      },
+      "capsule_coverage": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_coverage"
+      },
+      "capsule_fifo": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_fifo"
+      },
+      "capsule_layered_fifo_packed": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_layered_fifo_packed"
+      },
+      "capsule_layered_multi_round": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_layered_multi_round"
+      },
+      "capsule_multi_round": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_round"
+      },
+      "capsule_multi_service": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_service"
+      },
+      "capsule_priority": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "missing_handoff": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_priority"
+      },
+      "capsule_robust_multi_round": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_robust_multi_round"
+      },
+      "substrate": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 0.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 9.0,
+        "mean_n_role_view": 0.0,
+        "mean_n_team_handoff": 0.0,
+        "mean_tokens_admitted": 23.5,
+        "n": 8,
+        "strategy": "substrate"
+      }
+    },
+    "prompt_records": [
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "8a682aae2e121d09",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "8fc701ee43caf999",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "fac23f21cd3dea97",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "01d960f23a72853f",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "3481cbaf3922f5fd",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "fac23f21cd3dea97",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "c2251c34663ad5a5",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_pool_api_db__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "702f41c31441f1f2",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_pool_api_db__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "b90e5a8de12fea9a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_pool_api_db__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "c426196382e0ca3d",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_pool_api_db__sym_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "3f41d4131fba2362",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_pool_api_db__sym_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "b90e5a8de12fea9a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_pool_api_db__sym_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "7dc69d27710b494a",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_disk_storage_logs__sym_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "4d4b2b131e5e47ad",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_disk_storage_logs__sym_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "4b0993f112c866ac",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_disk_storage_logs__sym_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "c328aedd1867311f",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_disk_storage_logs__sym_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "a07d42ba21240189",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_disk_storage_logs__sym_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "4b0993f112c866ac",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_disk_storage_logs__sym_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "68cf9ef8a2506856",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_slow_query_web_db__sym_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "b008ad9c4fd215b3",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_slow_query_web_db__sym_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "56772164f5505d0f",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_slow_query_web_db__sym_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "988a50c3435d7a68",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_slow_query_web_db__sym_archival__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "f3d5db30fdf7cf64",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_slow_query_web_db__sym_archival__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "56772164f5505d0f",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_slow_query_web_db__sym_archival__rep1"
+      }
+    ],
+    "scenarios_evaluated": [
+      "p64sym_deadlock_orders_payments__sym_cache__rep0",
+      "p64sym_deadlock_orders_payments__sym_metrics__rep1",
+      "p64sym_pool_api_db__sym_cache__rep0",
+      "p64sym_pool_api_db__sym_telemetry__rep1",
+      "p64sym_disk_storage_logs__sym_telemetry__rep0",
+      "p64sym_disk_storage_logs__sym_search_index__rep1",
+      "p64sym_slow_query_web_db__sym_metrics__rep0",
+      "p64sym_slow_query_web_db__sym_archival__rep1"
+    ],
+    "schema": "phase64.live_composition.v1",
+    "sym_property_per_scenario": {
+      "p64sym_deadlock_orders_payments__sym_cache__rep0": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_deadlock_orders_payments__sym_metrics__rep1": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_disk_storage_logs__sym_search_index__rep1": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_disk_storage_logs__sym_telemetry__rep0": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_pool_api_db__sym_cache__rep0": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_pool_api_db__sym_telemetry__rep1": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_slow_query_web_db__sym_archival__rep1": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_slow_query_web_db__sym_metrics__rep0": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      }
+    }
+  },
+  "r64_sym_tight": {
+    "audit_ok_grid": {
+      "capsule_attention_aware": true,
+      "capsule_cohort_buffered": true,
+      "capsule_corroboration": true,
+      "capsule_coverage": true,
+      "capsule_fifo": true,
+      "capsule_layered_fifo_packed": true,
+      "capsule_layered_multi_round": true,
+      "capsule_multi_round": true,
+      "capsule_multi_service": true,
+      "capsule_priority": true,
+      "capsule_robust_multi_round": true,
+      "substrate": false
+    },
+    "bench_property_per_scenario": {
+      "p64sym_deadlock_orders_payments__sym_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_deadlock_orders_payments__sym_metrics__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_disk_storage_logs__sym_search_index__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_disk_storage_logs__sym_telemetry__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_pool_api_db__sym_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_pool_api_db__sym_telemetry__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_slow_query_web_db__sym_archival__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p64sym_slow_query_web_db__sym_metrics__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      }
+    },
+    "bench_summary": {
+      "K_auditor": 12,
+      "T_decoder": 24,
+      "bank": "symmetric",
+      "n_scenarios": 8,
+      "scenarios_with_decoy_corroboration": 8,
+      "scenarios_with_property": 8,
+      "scenarios_with_symmetric_corroboration": 8
+    },
+    "config": {
+      "K_auditor": 12,
+      "K_producer": 6,
+      "T_auditor": 256,
+      "T_decoder": 24,
+      "T_producer": 96,
+      "bank": "symmetric",
+      "bank_replicates": 2,
+      "bank_seed": 11,
+      "endpoint": "http://192.168.12.191:11434",
+      "extractor": "identity",
+      "inbox_capacity": 12,
+      "magnitude_hinted_schema": true,
+      "model": "qwen2.5:14b-32k",
+      "n_eval": 8,
+      "prompt_mode": "magnitude_hinted",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "extractor_stats": {
+      "T_decoder": 24,
+      "extractor": "identity",
+      "magnitude_hinted_schema": true,
+      "prompt_mode": "magnitude_hinted",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "headline_gap": {
+      "composed_minus_fifo": 0.0,
+      "composed_minus_fifo_packed": 0.0,
+      "composed_minus_layered": 0.0,
+      "fifo_packed_minus_layered": 0.0,
+      "max_non_attention_accuracy_full": 0.0
+    },
+    "n_results": 96,
+    "pack_stats_summary": {
+      "capsule_attention_aware": {
+        "fraction_handoffs_kept": 1.0,
+        "handoffs_admitted_sum": 72,
+        "handoffs_decoder_input_sum": 72,
+        "hypothesis_count_input_avg": 3.0,
+        "hypothesis_count_kept_avg": 3.0,
+        "n_cells": 8,
+        "n_dropped_budget_sum": 0,
+        "n_with_causal_claim_kept": 8,
+        "position_of_first_causal_claim_avg": 0.0,
+        "tokens_input_sum": 188,
+        "tokens_kept_over_input": 1.0,
+        "tokens_kept_sum": 188
+      },
+      "capsule_layered_fifo_packed": {
+        "fraction_handoffs_kept": 1.0,
+        "handoffs_admitted_sum": 72,
+        "handoffs_decoder_input_sum": 72,
+        "hypothesis_count_input_avg": 3.0,
+        "hypothesis_count_kept_avg": 3.0,
+        "n_cells": 8,
+        "n_dropped_budget_sum": 0,
+        "n_with_causal_claim_kept": 8,
+        "position_of_first_causal_claim_avg": 8.0,
+        "tokens_input_sum": 188,
+        "tokens_kept_over_input": 1.0,
+        "tokens_kept_sum": 188
+      }
+    },
+    "pooled": {
+      "capsule_attention_aware": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_attention_aware"
+      },
+      "capsule_cohort_buffered": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_cohort_buffered"
+      },
+      "capsule_corroboration": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_corroboration"
+      },
+      "capsule_coverage": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_coverage"
+      },
+      "capsule_fifo": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_fifo"
+      },
+      "capsule_layered_fifo_packed": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_layered_fifo_packed"
+      },
+      "capsule_layered_multi_round": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_layered_multi_round"
+      },
+      "capsule_multi_round": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_round"
+      },
+      "capsule_multi_service": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_service"
+      },
+      "capsule_priority": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "missing_handoff": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_priority"
+      },
+      "capsule_robust_multi_round": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 9.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_robust_multi_round"
+      },
+      "substrate": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 0.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 9.0,
+        "mean_n_role_view": 0.0,
+        "mean_n_team_handoff": 0.0,
+        "mean_tokens_admitted": 23.5,
+        "n": 8,
+        "strategy": "substrate"
+      }
+    },
+    "prompt_records": [
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "8a682aae2e121d09",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "8fc701ee43caf999",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "fac23f21cd3dea97",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "01d960f23a72853f",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "3481cbaf3922f5fd",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "fac23f21cd3dea97",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_deadlock_orders_payments__sym_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "c2251c34663ad5a5",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_pool_api_db__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "702f41c31441f1f2",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_pool_api_db__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "b90e5a8de12fea9a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_pool_api_db__sym_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "c426196382e0ca3d",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_pool_api_db__sym_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "3f41d4131fba2362",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_pool_api_db__sym_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "b90e5a8de12fea9a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_pool_api_db__sym_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "7dc69d27710b494a",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_disk_storage_logs__sym_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "4d4b2b131e5e47ad",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_disk_storage_logs__sym_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "4b0993f112c866ac",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_disk_storage_logs__sym_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "c328aedd1867311f",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_disk_storage_logs__sym_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "a07d42ba21240189",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_disk_storage_logs__sym_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "4b0993f112c866ac",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_disk_storage_logs__sym_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "68cf9ef8a2506856",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_slow_query_web_db__sym_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "b008ad9c4fd215b3",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_slow_query_web_db__sym_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "56772164f5505d0f",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_slow_query_web_db__sym_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "988a50c3435d7a68",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p64sym_slow_query_web_db__sym_archival__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "f3d5db30fdf7cf64",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p64sym_slow_query_web_db__sym_archival__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "56772164f5505d0f",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p64sym_slow_query_web_db__sym_archival__rep1"
+      }
+    ],
+    "scenarios_evaluated": [
+      "p64sym_deadlock_orders_payments__sym_cache__rep0",
+      "p64sym_deadlock_orders_payments__sym_metrics__rep1",
+      "p64sym_pool_api_db__sym_cache__rep0",
+      "p64sym_pool_api_db__sym_telemetry__rep1",
+      "p64sym_disk_storage_logs__sym_telemetry__rep0",
+      "p64sym_disk_storage_logs__sym_search_index__rep1",
+      "p64sym_slow_query_web_db__sym_metrics__rep0",
+      "p64sym_slow_query_web_db__sym_archival__rep1"
+    ],
+    "schema": "phase64.live_composition.v1",
+    "sym_property_per_scenario": {
+      "p64sym_deadlock_orders_payments__sym_cache__rep0": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_deadlock_orders_payments__sym_metrics__rep1": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_disk_storage_logs__sym_search_index__rep1": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_disk_storage_logs__sym_telemetry__rep0": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_pool_api_db__sym_cache__rep0": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_pool_api_db__sym_telemetry__rep1": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_slow_query_web_db__sym_archival__rep1": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      },
+      "p64sym_slow_query_web_db__sym_metrics__rep0": {
+        "both_golds_cross_role_corroborated": true,
+        "decoy_cross_role_corroborated": true,
+        "decoy_role_count": 2,
+        "gold_a_role_count": 2,
+        "gold_b_role_count": 2,
+        "n_round1_to_auditor": 8,
+        "n_round2_to_auditor": 1,
+        "symmetric_corroboration_holds": true
+      }
+    }
+  },
+  "r64_w14h_only": {
+    "audit_ok_grid": {
+      "capsule_attention_aware": true,
+      "capsule_cohort_buffered": true,
+      "capsule_corroboration": true,
+      "capsule_coverage": true,
+      "capsule_fifo": true,
+      "capsule_layered_fifo_packed": true,
+      "capsule_layered_multi_round": true,
+      "capsule_multi_round": true,
+      "capsule_multi_service": true,
+      "capsule_priority": true,
+      "capsule_robust_multi_round": true,
+      "substrate": false
+    },
+    "bench_property_per_scenario": {
+      "p61_deadlock_orders_payments__compmag_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_deadlock_orders_payments__compmag_metrics__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_disk_storage_logs__compmag_search_index__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_disk_storage_logs__compmag_telemetry__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_pool_api_db__compmag_cache__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_pool_api_db__compmag_telemetry__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_slow_query_web_db__compmag_archival__rep1": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      },
+      "p61_slow_query_web_db__compmag_metrics__rep0": {
+        "decoy_only_in_round1": true,
+        "delayed_causal_evidence_property_holds": true,
+        "n_round1_to_auditor": 6,
+        "n_round2_to_auditor": 1,
+        "round1_decoy_corroborated": true,
+        "round1_only_generic_noise": true,
+        "round2_only_specific": true
+      }
+    },
+    "bench_summary": {
+      "K_auditor": 8,
+      "T_decoder": null,
+      "bank": "phase61",
+      "n_scenarios": 8,
+      "scenarios_with_decoy_corroboration": 8,
+      "scenarios_with_property": 8
+    },
+    "config": {
+      "K_auditor": 8,
+      "K_producer": 6,
+      "T_auditor": 256,
+      "T_decoder": null,
+      "T_producer": 96,
+      "bank": "phase61",
+      "bank_replicates": 2,
+      "bank_seed": 11,
+      "endpoint": "http://192.168.12.191:11434",
+      "extractor": "magnitude_filter",
+      "inbox_capacity": 8,
+      "magnitude_hinted_schema": true,
+      "model": "qwen2.5:14b-32k",
+      "n_eval": 8,
+      "prompt_mode": "magnitude_hinted",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "extractor_stats": {
+      "T_decoder": null,
+      "extractor": "magnitude_filter",
+      "magnitude_hinted_schema": true,
+      "n_compressed_by_prompt": 0,
+      "n_emitted": 58,
+      "n_emitted_under_protocol": 0,
+      "n_filtered_by_threshold": 0,
+      "prompt_mode": "magnitude_hinted",
+      "threshold_error_rate": 0.1,
+      "threshold_fw_count": 5,
+      "threshold_p95_ms": 1000.0
+    },
+    "headline_gap": {
+      "composed_minus_fifo": 1.0,
+      "composed_minus_fifo_packed": 0.0,
+      "composed_minus_layered": 0.0,
+      "fifo_packed_minus_layered": 0.0,
+      "max_non_attention_accuracy_full": 1.0
+    },
+    "n_results": 96,
+    "pack_stats_summary": {
+      "capsule_attention_aware": {
+        "fraction_handoffs_kept": 1.0,
+        "handoffs_admitted_sum": 56,
+        "handoffs_decoder_input_sum": 56,
+        "hypothesis_count_input_avg": 3.0,
+        "hypothesis_count_kept_avg": 3.0,
+        "n_cells": 8,
+        "n_dropped_budget_sum": 0,
+        "n_with_causal_claim_kept": 8,
+        "position_of_first_causal_claim_avg": 0.0,
+        "tokens_input_sum": 140,
+        "tokens_kept_over_input": 1.0,
+        "tokens_kept_sum": 140
+      },
+      "capsule_layered_fifo_packed": {
+        "fraction_handoffs_kept": 1.0,
+        "handoffs_admitted_sum": 56,
+        "handoffs_decoder_input_sum": 56,
+        "hypothesis_count_input_avg": 3.0,
+        "hypothesis_count_kept_avg": 3.0,
+        "n_cells": 8,
+        "n_dropped_budget_sum": 0,
+        "n_with_causal_claim_kept": 8,
+        "position_of_first_causal_claim_avg": 6.0,
+        "tokens_input_sum": 140,
+        "tokens_kept_over_input": 1.0,
+        "tokens_kept_sum": 140
+      }
+    },
+    "pooled": {
+      "capsule_attention_aware": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_attention_aware"
+      },
+      "capsule_cohort_buffered": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_cohort_buffered"
+      },
+      "capsule_corroboration": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_corroboration"
+      },
+      "capsule_coverage": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_coverage"
+      },
+      "capsule_fifo": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_fifo"
+      },
+      "capsule_layered_fifo_packed": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_layered_fifo_packed"
+      },
+      "capsule_layered_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_layered_multi_round"
+      },
+      "capsule_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_round"
+      },
+      "capsule_multi_service": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_multi_service"
+      },
+      "capsule_priority": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_priority"
+      },
+      "capsule_robust_multi_round": {
+        "accuracy_full": 1.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 1.0,
+        "audit_ok_rate": 1.0,
+        "failure_hist": {
+          "none": 8
+        },
+        "mean_n_admitted_auditor": 1.0,
+        "mean_n_role_view": 10.0,
+        "mean_n_team_handoff": 7.25,
+        "mean_tokens_admitted": 3.5,
+        "n": 8,
+        "strategy": "capsule_robust_multi_round"
+      },
+      "substrate": {
+        "accuracy_full": 0.0,
+        "accuracy_remediation": 1.0,
+        "accuracy_root_cause": 1.0,
+        "accuracy_services": 0.0,
+        "audit_ok_rate": 0.0,
+        "failure_hist": {
+          "decoder_error": 8
+        },
+        "mean_n_admitted_auditor": 7.0,
+        "mean_n_role_view": 0.0,
+        "mean_n_team_handoff": 0.0,
+        "mean_tokens_admitted": 17.5,
+        "n": 8,
+        "strategy": "substrate"
+      }
+    },
+    "prompt_records": [
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "8de8929d47dec5d1",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "623aba06c1f0164f",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "fac23f21cd3dea97",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "2bc9dcacb35737ed",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "d481da61cbf95f28",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "fac23f21cd3dea97",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_deadlock_orders_payments__compmag_metrics__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "135cbdb5c91d7996",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "2c1ad0c561bd3142",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "b90e5a8de12fea9a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_cache__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "6f687ff673a573d5",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "d48264d10d8c1838",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "b90e5a8de12fea9a",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_pool_api_db__compmag_telemetry__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "28a77db27b5bdbdc",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "264531b74f754f0a",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "4b0993f112c866ac",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_telemetry__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "39cdae362625c036",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "7f9972b8b30bed2e",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "4b0993f112c866ac",
+        "role": "sysadmin",
+        "round_idx": 2,
+        "scenario_id": "p61_disk_storage_logs__compmag_search_index__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "ee50262aa0c720ce",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "2571f5e800ea6486",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "56772164f5505d0f",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_metrics__rep0"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 2,
+        "prompt_sha256": "614298dd28a694b9",
+        "role": "monitor",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 1,
+        "prompt_sha256": "fb978f3cb8f0d19c",
+        "role": "network",
+        "round_idx": 1,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      },
+      {
+        "mode": "magnitude_hinted",
+        "n_kinds_in_scope": 3,
+        "prompt_sha256": "56772164f5505d0f",
+        "role": "db_admin",
+        "round_idx": 2,
+        "scenario_id": "p61_slow_query_web_db__compmag_archival__rep1"
+      }
+    ],
+    "scenarios_evaluated": [
+      "p61_deadlock_orders_payments__compmag_cache__rep0",
+      "p61_deadlock_orders_payments__compmag_metrics__rep1",
+      "p61_pool_api_db__compmag_cache__rep0",
+      "p61_pool_api_db__compmag_telemetry__rep1",
+      "p61_disk_storage_logs__compmag_telemetry__rep0",
+      "p61_disk_storage_logs__compmag_search_index__rep1",
+      "p61_slow_query_web_db__compmag_metrics__rep0",
+      "p61_slow_query_web_db__compmag_archival__rep1"
+    ],
+    "schema": "phase64.live_composition.v1"
+  },
+  "schema": "phase64.cross_regime_synthetic.v1"
+}

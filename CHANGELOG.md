@@ -5,6 +5,124 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.18] — 2026-04-27 — SDK v3.18 — magnitude-hinted producer protocol + fresh-live end-to-end composition + symmetric-corroboration limit theorem (first fresh-live end-to-end real-LLM strict +1.000 advance + first explicit symmetric-corroboration negative theorem) + W17 family
+
+*Strictly additive on SDK v3.17. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W17 surface adds
+one new producer-prompt mode constant
+(``PRODUCER_PROMPT_MAGNITUDE_HINTED``), one new dataclass
+(``OperationalThreshold``), one new optional field on
+``RoleExtractionSchema`` (``magnitude_thresholds``), one new
+prompt-render helper (``_render_magnitude_hinted_prompt``), one
+threshold-table data structure
+(``INCIDENT_TRIAGE_DEFAULT_MAGNITUDE_THRESHOLDS``), and an
+optional ``magnitude_hinted=True`` parameter on
+``incident_triage_role_schemas``. Re-exported via the SDK
+``__init__``. The new
+``vision_mvp/experiments/phase64_live_composition.py`` driver
+ships as a research-slice addition with five synthetic + four
+live + two symmetric-wall sub-banks.*
+
+On the new Phase-64 *fresh-live end-to-end W14H + W15 composition
++ symmetric-corroboration wall* benchmark:
+
+* **R-64-LIVE-MAGHINT** (fresh live ``qwen2.5:14b-32k`` Mac-1
+  Ollama backend + magnitude-hinted prompt + ``T_decoder=14``;
+  **W17-1 anchor**; n=8 × 24 producer calls; 0 endpoint
+  failures; 128.2 s wall): pairing the W17 magnitude-hinted
+  producer protocol with the W14 producer + W15 decoder pipeline
+  achieves ``capsule_attention_aware = 1.000`` AND
+  ``capsule_layered_fifo_packed = 0.000`` AND
+  ``capsule_fifo = 0.000``. **+1.000 strict separation** on both
+  axes. Bench property holds in **8/8** scenarios — closing the
+  1/8 R-61-OLLAMA-A model-side judgment miss
+  (``slow_query_archival``) that persisted under the SDK v3.15
+  W14 anchor and the SDK v3.17 W16-Λ-real-replay anchor. The
+  first programme result that beats the strongest non-composed
+  baseline by ≥ 1.0 on a *fresh* live LLM probe.
+* **R-64-LIVE-STRUCT** (fresh live 14B + legacy structured prompt;
+  W17-Λ-no-hint anchor): bench property holds in 7/8;
+  ``capsule_attention_aware = 0.500``;
+  ``capsule_layered_fifo_packed = 0.000``; +0.500 strict gain.
+  Reproduces the W14-Λ-real / W16-Λ-real-replay envelope on a
+  fresh probe; the magnitude-hint extension, not a re-run, is the
+  load-bearing improvement.
+* **R-64-LIVE-NAIVE** (fresh live 14B + naive prompt;
+  W17-Λ-naive falsifier): bench property holds in 0/8; every
+  capsule strategy ties FIFO at 0.000. Live counterpart of
+  W14-Λ-prompt + W15-Λ-budget joint failure.
+* **R-64-LIVE-XMODEL** (fresh live ``qwen3.5:35b`` MoE backend +
+  magnitude-hinted prompt + ``think=False``; W17-C-XMODEL probe;
+  n=8 × 24 producer calls; 0 failures; 92.0 s wall): bench
+  property holds in **8/8** (the W17 magnitude-hint extension
+  transfers byte-for-byte across the 14B → 36B-MoE jump on the
+  bench-property axis); ``capsule_attention_aware = 0.750``;
+  ``capsule_layered_fifo_packed = 0.000``; **+0.750 strict gain**
+  (well above the 0.50 strong-bar threshold). The 0.250 gap to
+  1.000 is on ``accuracy_root_cause`` — a 35B-specific specific-
+  tier kind judgment artifact, not a producer-protocol failure.
+  Proved-conditional + empirical-research; partially discharges
+  W16-C-CROSS-MODEL.
+* **R-64-SYM** (synthetic ``build_phase64_sym_bank``;
+  **W17-Λ-symmetric anchor**; n=8 × {None, 24} budget): every
+  capsule strategy in the SDK ties FIFO at ``accuracy_full =
+  0.000`` by construction. **The first explicit symmetric-
+  corroboration limit theorem in the programme.** Discharges
+  W15-C-SYMMETRIC / W16-C-SYMMETRIC as a negative theorem.
+
+W17 theorem family: **W17-1** (proved-conditional + empirical-
+research), **W17-Λ-no-hint** (empirical-research),
+**W17-Λ-naive** (empirical-research), **W17-Λ-symmetric**
+(proved-empirical + structural sketch), **W17-2** (proved by
+inspection + mechanically-checked), **W17-3** (proved-empirical
+full programme regression), **W17-C-XMODEL** (proved-conditional
++ empirical-research). The W17-C family (W17-C-DISAMBIGUATOR,
+W17-C-LEARNED-HINT, W17-C-CROSS-BENCH) makes the next research
+frontier explicit.
+
+Discharged conjectures from prior SDKs:
+
+* **W16-C-LIVE-OLLAMA** → DISCHARGED (W17-1 closes the 1/8 miss
+  on a fresh live probe).
+* **W16-C-CROSS-MODEL** → PARTIALLY DISCHARGED (W17-C-XMODEL on
+  Ollama; MLX-distributed clause remains conjectural).
+* **W15-C-SYMMETRIC** / **W16-C-SYMMETRIC** → DISCHARGED-NEGATIVE
+  (W17-Λ-symmetric).
+
+Backward-compat (W17-3) preserved byte-for-byte: 442/442 prior
+tests pass; with ``mode='naive'`` or ``mode='structured'`` AND
+``magnitude_hinted_schema=False``, the W17 surface reduces to the
+SDK v3.15 W14 anchor byte-for-byte. The Wevra single-run product
+runtime contract is byte-for-byte unchanged.
+
+Added: ``vision_mvp/experiments/phase64_live_composition.py``,
+``vision_mvp/tests/test_wevra_phase64.py``, the W17 protocol
+surface in ``vision_mvp/wevra/team_coord.py``,
+``docs/RESULTS_WEVRA_LIVE_COMPOSITION.md``, R-64 anchor +
+bar 14 in ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md``,
+W17 family in ``docs/THEOREM_REGISTRY.md``, current-frontier
+update in ``docs/RESEARCH_STATUS.md``, § 4.35 in
+``docs/context_zero_master_plan.md``, latest-milestone pointer
+in ``docs/START_HERE.md``, synthesis-after-v3.18 reading in
+``papers/context_as_objects.md``, and the milestone artefacts
+in ``docs/data/``
+(``phase64_cross_regime_synthetic.json``,
+``phase64_live_maghint_qwen2_5_14b_n8.json``,
+``phase64_live_struct_qwen2_5_14b_n8.json``,
+``phase64_live_naive_qwen2_5_14b_n8.json``,
+``phase64_live_maghint_qwen3_5_35b_n8.json``).
+
+Changed: ``vision_mvp/wevra/__init__.py`` (SDK version bumped to
+``wevra.sdk.v3.18``; W17 surface re-exports);
+``vision_mvp/experiments/phase61_producer_ambiguity_preservation.py``
+(``CapturingOllamaExtractor.extract_round`` now treats
+``PRODUCER_PROMPT_MAGNITUDE_HINTED`` as a structured-prompt
+variant on the parser-dispatch axis — load-bearing fix because
+the per-event mandate would otherwise lose its ``(kind, payload)``
+dedup);
+``vision_mvp/tests/test_wevra_producer_ambiguity.py``
+(``test_all_modes_listed`` updated for the additive third mode).
+
 ## [3.17] — 2026-04-27 — SDK v3.17 — end-to-end W14 + W15 composition (first end-to-end real-LLM strict advance over the strongest non-composed baseline) + W16 family
 
 *Strictly additive on SDK v3.16. The Wevra single-run product

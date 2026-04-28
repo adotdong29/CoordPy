@@ -134,9 +134,16 @@ class StructuredProtocolDeterminismTests(unittest.TestCase):
                                   schema=sch["db_admin"])
 
     def test_all_modes_listed(self):
-        self.assertEqual(set(ALL_PRODUCER_PROMPT_MODES),
-                          {PRODUCER_PROMPT_NAIVE,
-                           PRODUCER_PROMPT_STRUCTURED})
+        # W17 (SDK v3.18) added PRODUCER_PROMPT_MAGNITUDE_HINTED as
+        # an additive third mode. The W14 surface (naive +
+        # structured) remains a strict subset.
+        from vision_mvp.wevra.team_coord import (
+            PRODUCER_PROMPT_MAGNITUDE_HINTED)
+        self.assertEqual(
+            set(ALL_PRODUCER_PROMPT_MODES),
+            {PRODUCER_PROMPT_NAIVE,
+              PRODUCER_PROMPT_STRUCTURED,
+              PRODUCER_PROMPT_MAGNITUDE_HINTED})
 
 
 # =============================================================================

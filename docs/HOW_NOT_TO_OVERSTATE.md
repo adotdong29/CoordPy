@@ -3,7 +3,7 @@
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
 > README-of-README must satisfy these rules. Last touched: SDK
-> v3.16, 2026-04-27.
+> v3.18, 2026-04-27.
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or
@@ -229,6 +229,106 @@ empirical envelope of the prior milestone's real-LLM probe — it is
 honest measurement, not an extrapolation. Treat it the way you
 treat the W4-1 lifecycle audit: a tool that surfaces what is true
 about the recorded run, not a substitute for a fresh probe.
+
+### "W17 solves multi-agent context" or "the magnitude-hint is universal"
+
+> *"The W17 magnitude-hinted prompt solves the producer-side
+> ambiguity-erasure problem."*
+
+Forbidden as stated. The W17 magnitude-hinted prompt closes the
+*relative-magnitude* failure mode that the W14 structured prompt
+left open on R-61-OLLAMA-A's ``slow_query_archival`` scenario,
+producing an 8/8 bench-property hold-rate AND
+``capsule_attention_aware = 1.000`` on a fresh live qwen2.5:14b-32k
+probe at ``T_decoder = 14``. **But the win is conditional on three
+things**: (a) the asymmetric-corroboration bench property
+(W17-Λ-symmetric is the named wall when this is absent),
+(b) the magnitude-hint table being calibrated to the synthetic
+extractor's threshold values (operational definitions, not answer
+hints — both gold AND decoy magnitudes are above every threshold),
+AND (c) the live endpoint reachable.
+
+Permitted phrasings: *"the W17 magnitude-hinted prompt closes the
+1/8 R-61-OLLAMA-A model-side judgment miss"*, *"the magnitude-hint
+extension is the load-bearing improvement on the fresh live
+probe"*, *"the W17-1 anchor produces +1.000 strict gain over both
+substrate FIFO and the FIFO-packed-W14H-only baseline on a fresh
+live qwen2.5:14b-32k Mac-1 probe"*. Forbidden: *"W17 solves
+multi-agent context"*, *"the magnitude-hint extension makes the
+W14 protocol universal"*, *"W17 transfers to every benchmark
+family"* (W17-C-CROSS-BENCH is conjectural).
+
+### "W17-Λ-symmetric is just another conjecture"
+
+Forbidden. **W17-Λ-symmetric is a *negative theorem*, not a
+conjecture.** It is constructed: every capsule strategy in the
+SDK ties FIFO at 0.000 on R-64-SYM under both
+``T_decoder ∈ {None, 24}`` by direct measurement on n=8
+saturated. The structural argument is the asymmetric-oracle
+property of ``services_correct`` set-equality: when the bipartite
+``(role × tag, kind, magnitude)`` multiset is symmetric for gold
+and decoy, no service-blind admission AND no closed-form salience
+packer can prefer one over the other.
+
+Permitted phrasings: *"W17-Λ-symmetric is the first explicit
+symmetric-corroboration limit theorem in the programme"*,
+*"W17-Λ-symmetric discharges the prior W15-C-SYMMETRIC and
+W16-C-SYMMETRIC conjectures as a negative theorem"*,
+*"W17-Λ-symmetric names the next research frontier
+(W17-C-DISAMBIGUATOR, conjectural)"*. Forbidden: *"the
+symmetric-corroboration wall is still open"* (it is closed as a
+negative theorem on the closed-form capsule surface; only the
+disambiguator escape route is open), *"W17-Λ-symmetric is a
+conditional conjecture"* (it is proved-empirical + structural
+sketch).
+
+### "The W17-C-XMODEL probe is saturated to 1.000 on 35B"
+
+Forbidden. The R-64-LIVE-XMODEL fresh probe achieves
+``capsule_attention_aware = 0.750`` on qwen3.5:35b — bench
+property holds in 8/8 (transfer of the magnitude-hint extension
+across the 14B → 36B-MoE jump is byte-for-byte on the
+bench-property axis), but ``accuracy_root_cause = 0.750`` (the
+35B emits a different specific-tier kind on one scenario than
+the 14B does). The strict-gain claim against FIFO-pack and
+substrate FIFO holds at +0.750 (well above the 0.50 strong-bar
+threshold), but the saturated full-correctness clause (1.000 on
+35B) is **not** demonstrated.
+
+Permitted phrasings: *"the W17 magnitude-hint extension transfers
+to qwen3.5:35b on the bench-property axis"*, *"the strict-gain
+claim against substrate FIFO and FIFO-packed-W14H-only holds on
+the 35B at +0.750"*, *"the 0.250 gap to 1.000 on 35B is a
+model-class-specific specific-tier judgment artifact"*.
+Forbidden: *"W17 transfers fully to 35B"*, *"the cross-model
+result saturates"*, *"35B closes the gap"* (one specific-tier
+judgment artifact remains; W17-C-XMODEL is proved-conditional +
+empirical-research, not a saturated full-correctness claim).
+
+### "The W17 magnitude-hint table is answer-leaking"
+
+Forbidden. The :data:`INCIDENT_TRIAGE_DEFAULT_MAGNITUDE_THRESHOLDS`
+table values (``LATENCY_SPIKE p95_ms ≥ 1000``,
+``ERROR_RATE_SPIKE error_rate ≥ 0.10``,
+``FW_BLOCK_SURGE count ≥ 5``) are *operational definitions* —
+the same numeric values the synthetic
+``MagnitudeFilteringExtractor`` uses (Phase-61 calibration
+anchors). They are below *every* gold AND decoy magnitude in
+the R-61 / R-64 banks. The magnitude-hint extension does NOT
+tell the LLM which service is gold; it removes the LLM's
+*relative* magnitude judgment loophole (the failure mode that
+produced the slow_query_archival miss).
+
+Permitted phrasings: *"the magnitude-hint table is calibrated to
+operational definitions, not to answer hints"*, *"the threshold
+values are below every gold and decoy magnitude in the R-61 / R-64
+banks"*, *"the W17 extension removes the LLM's relative-magnitude
+judgment loophole, not its discrimination ability"*. Forbidden:
+*"the magnitude-hint tells the LLM which service is gold"* (it
+does not — gold and decoy both exceed every threshold), *"W17 is
+prompt-engineering the answer"* (it is enforcing operational
+discipline; the synthetic side confirms the same downstream
+answer with and without the magnitude-hint, W17-3).
 
 ### "W16 makes the W14 or W15 layers obsolete"
 
