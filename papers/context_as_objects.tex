@@ -1,0 +1,124 @@
+% Auto-generated LaTeX wrapper for the main Context Zero paper.
+% Build with:
+%   latexmk -xelatex -shell-escape papers/context_as_objects.tex
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{fontspec}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{bookmark}
+\usepackage[pipeTables,hashEnumerators]{markdown}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue,
+  pdftitle={Context as Objects: Capsule-Native Coordination for Multi-Agent Teams},
+  pdfauthor={Context Zero / Wevra Programme Draft}
+}
+
+\setstretch{1.05}
+\setlength{\parskip}{0.55em}
+\setlength{\parindent}{0pt}
+\setlength{\emergencystretch}{3em}
+\setlist[itemize]{topsep=0.35em,itemsep=0.15em,leftmargin=1.5em}
+\setlist[enumerate]{topsep=0.35em,itemsep=0.15em,leftmargin=1.7em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Context as Objects}
+\fancyhead[R]{Context Zero / Wevra}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14pt}
+
+\title{\textbf{Context as Objects: Capsule-Native Coordination for Multi-Agent Teams}\\
+\large Main paper draft for the Context Zero programme}
+\author{Context Zero / Wevra Programme Draft}
+\date{Updated through SDK v3.18\\2026-04-27}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Multi-agent LLM systems usually treat context as text: prompts, JSON
+records, message logs, tool traces, and free-form summaries passed
+between roles. That design conflates several distinct problems:
+preserving ambiguity, normalizing producer drift, admitting evidence
+under budget, decoding evidence jointly, carrying information across
+rounds, and deciding which evidence a downstream model should spend
+its limited context window on. We argue that this is the wrong
+abstraction. The unit of context should be a typed, immutable,
+lifecycle-bounded object with explicit budget and provenance.
+
+We implement this view in Wevra, a capsule-native runtime and
+research harness produced by the Context Zero programme. A
+capsule is a content-addressed object satisfying six invariants:
+identity, type, lifecycle, budget, provenance, and immutability. The
+runtime first makes capsules load-bearing in execution rather than
+merely post-hoc metadata: capsules are sealed from run setup through
+the LLM byte boundary, artifacts are content-addressed at write time,
+and lifecycles are mechanically audited. We then extend the same
+contract to multi-agent coordination, where agents exchange typed
+handoff capsules rather than raw messages.
+
+The paper's main scientific contribution is a decomposition of the
+multi-agent context problem into eight coupled structural axes:
+(1) admission under budget, (2) intra-round bundle decoding,
+(3) cross-round bundle decoding, (4) fixed-vocabulary normalization
+of producer drift, (5) layered open-world normalization,
+(6) producer-side ambiguity preservation, (7) decoder-side context
+packing under bounded token budgets, and (8) end-to-end
+producer-plus-decoder composition. Across SDK v3.8-v3.18 we build a
+progressive benchmark ladder, R-54 through R-64, that isolates these
+axes one by one. Admission alone wins in some regimes but has a named
+ceiling. Bundle-aware decoding crosses that ceiling. Cross-round
+decoding crosses a further temporal ceiling. Fixed-table
+normalization closes a bounded producer-drift gap; layered
+normalization closes a wider but still finite open-world gap.
+Structured producer protocols close the first real-LLM upstream
+ambiguity-erasure gap. Attention-aware capsule context packing closes
+a downstream bounded-context gap. End-to-end composition then yields
+the first fresh live real-LLM strict +1.000 advance over the
+strongest non-composed baseline in the programme.
+
+The strongest positive result in the paper is SDK v3.18's W17
+family: on a fresh live \texttt{qwen2.5:14b-32k} probe, a magnitude-hinted
+structured producer protocol plus attention-aware capsule packing
+yields \texttt{accuracy\_full = 1.000}, while both substrate/FIFO and the
+strongest non-composed baseline remain at 0.000 on the same live
+benchmark. The same producer-side intervention transfers partially
+across model class to a fresh live \texttt{qwen3.5:35b} MoE probe,
+preserving the benchmark property 8/8 and yielding a +0.750 strict
+gain. The strongest negative result is equally important: SDK v3.18
+also proves the programme's first explicit symmetric-corroboration
+limit theorem. When gold and decoy are symmetrically corroborated
+under the current feature surface, every current closed-form
+capsule-native method in the SDK ties FIFO at 0.000 by construction.
+This names the next wall sharply rather than leaving it rhetorical.
+
+The paper does not claim that multi-agent context is solved in an
+unqualified sense. The strongest honest claim is narrower and more
+useful: multi-agent context becomes tractable when evidence is
+represented as typed objects and when the runtime explicitly
+separates producer-side ambiguity preservation, normalization,
+admission, intra-round decoding, cross-round decoding, and
+decoder-side bounded-context packing. The next open problem is no
+longer "can capsules help?" It is "what richer semantics or learned
+disambiguators are required once corroboration, magnitude, round
+structure, normalization, and bounded packing are all exhausted?"
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\markdownInput{papers/context_as_objects_body.md}
+
+\end{document}
