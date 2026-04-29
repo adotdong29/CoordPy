@@ -5,13 +5,80 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.18,
-> 2026-04-27.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.19,
+> 2026-04-28.
 
 ## TL;DR
 
-The programme now has **fourteen** coupled research axes, each
-with a sharp status. SDK v3.18 mints axis 14: **magnitude-hinted
+The programme now has **fifteen** coupled research axes, each
+with a sharp status. SDK v3.19 mints axis 15: **bundle-relational
+compatibility disambiguation under symmetric corroboration**. The
+W18 family adds one new dataclass (``W18CompatibilityResult``),
+one tokeniser (``_disambiguator_payload_tokens``), one closed-form
+scorer (``_relational_compatibility_score``) with contiguous-
+subsequence semantics for compound targets, and one wrapping
+decoder (``RelationalCompatibilityDisambiguator``) — purely
+additive on top of the W15 surface. The SDK v3.18 runtime contract
+is byte-for-byte unchanged.
+
+**The headline SDK v3.19 results.** On a synthetic R-65-COMPAT
+regime (every gold service AND the decoy mentioned by ≥ 2 distinct
+routed roles via generic-noise kinds with comparable magnitudes —
+symmetric-corroboration; round-2 specific-tier disambiguator
+carries a relational-compound mention of every gold service AND
+no decoy service), every closed-form salience scorer in the SDK
+ties FIFO at ``accuracy_full = 0.000`` (W17-Λ-symmetric extended
+to R-65 verbatim by W18-Λ-sym). The new
+:class:`RelationalCompatibilityDisambiguator` (W18) achieves
+``capsule_relational_compat = 1.000`` at both ``T_decoder = None``
+(R-65-COMPAT-LOOSE) AND ``T_decoder = 24`` (R-65-COMPAT-TIGHT),
+strictly improving over every non-W18 capsule baseline by
+**+1.000**, stable across **5/5** alternate ``bank_seed`` values
+(11, 17, 23, 29, 31). **First capsule-native multi-agent-
+coordination method that crosses the symmetric-corroboration wall
+on a regime where the wall actually applies (W18-1).** Three
+named falsifiers make the conditionality sharp: R-65-NO-COMPAT
+(no signal — W18 abstains, ties FIFO; W18-Λ-no-compat),
+R-65-CONFOUND (symmetric signal — W18 abstains, ties FIFO;
+W18-Λ-confound), R-65-DECEIVE (adversarial signal — W18 trusts
+evidence, picks decoy, fails at 0.000; W18-Λ-deceive). Token-
+budget honesty: the W18 method consumes only the W15-packed
+bundle; ``tokens_kept_sum`` is byte-for-byte identical to W15's
+on R-65-COMPAT-TIGHT. Backward-compat (W18-3) preserved byte-
+for-byte: on R-58 default the W18 method ties W15 byte-for-byte
+on the answer field; on R-64-SYM the W18 method partially
+recovers (only the deadlock scenarios carry a relational mention;
+on pool / disk / slow_query the W18 method abstains and ties
+FIFO).
+
+**Honest scope.** R-65-COMPAT is a *synthetic* regime — the
+producer is :class:`IdentityExtractor`. Real-LLM transfer of the
+W18 method is **W18-Λ-real** (proved-conditional + empirical-
+research): the LLM must emit the same closed-vocabulary
+relational-compound forms the synthetic bench uses; if the LLM
+emits free-form natural-language relational mentions, the W18
+exact-match layer misses by construction. The natural extension
+is **W18-C-LEARNED** (a small distilled compatibility scorer over
+capsule bundles), conjectural. The W18-Λ-deceive falsifier names
+the structural limit of *any* closed-form bundle-relational
+scorer that trusts its evidence; the natural escape is
+**W18-C-OUTSIDE** (an outside-information axis to detect
+deceptive round-2 mentions), conjectural.
+
+The **prior-conjecture discharge ledger** for SDK v3.19:
+* **W17-C-DISAMBIGUATOR** (SDK v3.18; "a learned or LLM-distilled
+  semantic disambiguator beyond the closed-form capsule surface
+  could distinguish gold from decoy on R-64-SYM-deadlock-style
+  scenarios"). **DISCHARGED-empirical** by W18-1 in the
+  *closed-form* direction: a deterministic training-free bundle-
+  relational scorer is sufficient on R-65-COMPAT. The
+  *learned-disambiguator* clause remains conjectural under
+  W18-C-LEARNED (relevant when the LLM emits free-form mentions
+  outside the closed-vocabulary closure).
+
+---
+
+The *previous* (SDK v3.18) frontier mints axis 14: **magnitude-hinted
 producer protocol + fresh-live end-to-end composition +
 symmetric-corroboration limit theorem**. The W17 family adds one
 new producer-prompt mode (``PRODUCER_PROMPT_MAGNITUDE_HINTED``),
@@ -321,7 +388,141 @@ milestone note.
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.18, 2026-04-27)
+## Current frontier (SDK v3.19, 2026-04-28)
+
+### Active moves (SDK v3.19 — bundle-relational compatibility disambiguator + symmetric-ambiguity benchmark family + W18 family — *first capsule-native move beyond the W17-Λ-symmetric wall on a regime where it applies*)
+
+- **Phase-65 relational-compatibility disambiguation under
+  symmetric-corroboration benchmark family.**
+  ``vision_mvp.experiments.phase65_relational_disambiguation``
+  ships four pre-committed sub-banks (one positive-anchor + three
+  named falsifiers) plus a cross-regime synthetic summary:
+  (i) ``r65_compat_loose`` — synthetic identity producer, R-65-COMPAT
+  bench, ``T_decoder = None``. The W18-1 anchor: W18 = 1.000;
+  every other capsule strategy = 0.000. **+1.000 strict separation**.
+  (ii) ``r65_compat_tight`` — same regime under
+  decoder-side budget pressure ``T_decoder = 24``. W18 composes
+  cleanly with W15 attention-aware pack; ``tokens_kept_sum`` is
+  byte-for-byte identical to W15's. **+1.000 strict separation.**
+  (iii) ``r65_no_compat`` — W18-Λ-no-compat falsifier. Round-2
+  disambiguator carries no service-tag mention; W18 abstains;
+  ties FIFO at 0.000.
+  (iv) ``r65_confound`` — W18-Λ-confound falsifier. Round-2
+  disambiguator mentions both gold AND decoy; W18 abstains;
+  ties FIFO at 0.000.
+  (v) ``r65_deceive`` — W18-Λ-deceive falsifier. Round-2
+  disambiguator mentions decoy but NOT gold; W18 trusts its
+  evidence and picks decoy; fails at 0.000.
+
+- **W18 family minted.** W18-Λ-sym (proved-empirical n=8 saturated
+  × 5 seeds + structural sketch; W17-Λ-symmetric extends to R-65-
+  COMPAT verbatim for every method pre-W18), W18-1 (proved-
+  conditional + proved-empirical n=40 saturated across 5 seeds × 2
+  budgets; the first capsule-native method to cross the
+  symmetric-corroboration wall), W18-2 (proved by inspection +
+  mechanically-checked; W18 determinism + closed-form correctness),
+  W18-3 (proved-empirical full programme regression; backward-
+  compat with R-54..R-64 byte-for-byte), W18-Λ-no-compat /
+  -confound / -deceive (proved-empirical n=8 saturated each;
+  three named structural limits), W18-C-LEARNED (conjectural;
+  learned scorer for free-form relational mentions),
+  W18-C-OUTSIDE (conjectural; outside-information axis to detect
+  deceptive mentions), W18-Λ-real (proved-conditional + empirical-
+  research; real-LLM transfer is conditional on closed-vocabulary
+  relational compounds), W18-C-CROSS-BENCH (conjectural; transfer
+  to non-incident-triage benchmark families).
+
+- **Bundle-relational compatibility disambiguator** (new SDK
+  surface, purely additive). ``vision_mvp/wevra/team_coord.py``
+  ships:
+  * :class:`RelationalCompatibilityDisambiguator` — the W18 four-
+    stage pipeline (inner W15 decode + disambiguator selection +
+    tokenise + score + project).
+  * :class:`W18CompatibilityResult` — the per-decode audit record
+    carrying the projected answer, the inner answer, the
+    disambiguator payload, the per-tag scores, and the abstention
+    flag.
+  * :func:`_disambiguator_payload_tokens` — closed-form
+    deterministic tokeniser (lower-case, split on non-identifier
+    chars, compound identifiers preserved).
+  * :func:`_relational_compatibility_score` — closed-form
+    deterministic scorer with contiguous-subsequence semantics
+    for compound targets (handles ``db_query`` matching inside
+    ``svc_web_then_svc_db_query``).
+
+- **Pre-committed success criterion** in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-65 anchor +
+  bar 15 — relational-compatibility-disambiguation under
+  symmetric-corroboration split + § 2.14 R-65 ingredients). The
+  SDK v3.19 result clears the **strong success bar** § 1.1 on
+  R-65-COMPAT-LOOSE (strict gain +1.000 vs every non-W18 capsule
+  baseline; bench property held in 8/8; named falsifier regimes
+  W18-Λ-no-compat / -confound / -deceive AND named bench-shape
+  conditionality W18-Λ-sym; W18-3 backward-compat preserved
+  byte-for-byte). Headline data files:
+  ``docs/data/phase65_cross_regime_synthetic.json``,
+  ``docs/data/phase65_seed_sweep_loose.json``,
+  ``docs/data/phase65_seed_sweep_tight.json``.
+
+- **Honest scope.** The W18-1 win is *strongly conditional* on
+  (a) the symmetric-corroboration bench property (R-65-COMPAT),
+  (b) the round-2 disambiguator's payload carrying a relational-
+  compound mention of *every* gold service tag AND *no* decoy
+  service tag, AND (c) the relational-mention convention being
+  closed-vocabulary (the synthetic bench's exact-match closure).
+  Real-LLM transfer (W18-Λ-real) is conditional on the LLM
+  emitting closed-vocabulary relational compounds. The Wevra
+  single-run product runtime contract is byte-for-byte unchanged.
+
+### Active observations (SDK v3.19)
+
+- **W18-Λ-sym holds on R-65-COMPAT.** Every closed-form salience
+  scorer in the SDK ties FIFO at ``accuracy_full = 0.000`` on
+  R-65-COMPAT (loose AND tight). The bipartite ``(role × tag,
+  kind, magnitude)`` multiset is identical for gold and decoy by
+  construction; only the round-2 disambiguator's payload-text
+  channel breaks the tie.
+
+- **W18-3 partial recovery on R-64-SYM.** Of the 8 R-64-SYM
+  scenarios, only the 2 deadlock-flavored ones carry a round-2
+  relational mention (``relation=orders_payments_join``). On
+  those, W18 recovers gold; on the others, W18 abstains and ties
+  FIFO. R-65-COMPAT generalises the relational-mention convention
+  to all four scenario families (deadlock / pool / disk /
+  slow_query) so the W18-1 strict gain is uniform.
+
+### Active conjectures (SDK v3.19)
+
+- **W18-C-LEARNED** (free-form relational-mention transfer): a
+  small distilled bundle-relational scorer outperforms the
+  closed-form rule on free-form natural-language relational
+  mentions. **Conjectural.**
+- **W18-C-OUTSIDE** (outside-information escape from W18-Λ-deceive):
+  a scorer with access to an outside-information axis can detect
+  the W18-Λ-deceive regime by cross-reference. **Conjectural.**
+- **W18-Λ-real** (real-LLM transfer): partially-discharged when
+  the LLM emits closed-vocabulary relational compounds; conjectural
+  otherwise.
+- **W18-C-CROSS-BENCH** (cross-bench transfer): the W18 method
+  generalises to non-incident-triage families with a closed-
+  vocabulary relational-mention convention. **Conjectural.**
+
+### Discharged / partially-discharged conjectures (SDK v3.19)
+
+- **W17-C-DISAMBIGUATOR** (SDK v3.18; "a learned or LLM-distilled
+  semantic disambiguator beyond the closed-form capsule surface
+  could distinguish ``orders_payments_join`` (gold A_B in
+  deadlock) from a generic decoy whose round-1 mentions are
+  observationally identical"). **DISCHARGED-empirical in the
+  closed-form direction** by W18-1: a deterministic training-free
+  bundle-relational scorer is sufficient on R-65-COMPAT (loose
+  AND tight). The *learned* clause remains conjectural under
+  W18-C-LEARNED (relevant when free-form mentions fall outside
+  the closure).
+
+---
+
+## Previous frontier (SDK v3.18, 2026-04-27)
 
 ### Active moves (SDK v3.18 — magnitude-hinted producer protocol + fresh-live end-to-end composition + symmetric-corroboration limit theorem + W17 family — *first fresh-live end-to-end real-LLM strict +1.000 advance + first explicit symmetric-corroboration negative theorem*)
 

@@ -1,12 +1,12 @@
-# Success criterion — solving multi-agent context (SDK v3.18 bar)
+# Success criterion — solving multi-agent context (SDK v3.19 bar)
 
 > Pre-committed, falsifiable bar for what counts as a *real* advance
 > on "solving multi-agent context" in the Context Zero / Wevra
 > programme. This document is the **referee** for SDK v3.9 / v3.10 /
-> v3.11 / v3.12 / v3.13 / v3.14 / v3.15 / v3.16 / v3.17 / v3.18
-> (and later milestones). Any milestone note that claims an advance
-> must name the bar it cleared and cite the code-anchored evidence.
-> Last touched: SDK v3.18, 2026-04-27.
+> v3.11 / v3.12 / v3.13 / v3.14 / v3.15 / v3.16 / v3.17 / v3.18 /
+> v3.19 (and later milestones). Any milestone note that claims an
+> advance must name the bar it cleared and cite the code-anchored
+> evidence. Last touched: SDK v3.19, 2026-04-28.
 >
 > The history of this programme is full of moves where a partial
 > result was written up too strongly and later had to be sharpened
@@ -227,6 +227,75 @@ The **named regimes** the bar refers to (anchored in code):
   Anchor:
   `vision_mvp/experiments/phase64_live_composition.py`.
 
+* **R-65** — Phase-65 *relational-compatibility disambiguation under
+  symmetric corroboration* regime, the *new harder regime* SDK v3.19
+  introduces. R-65 directly attacks the W17-Λ-symmetric wall on
+  regimes where corroboration, magnitude, round structure, AND
+  packing are all simultaneously insufficient — but where the
+  round-2 disambiguator's payload **text** carries an explicit
+  *relational mention* (``relation=A_B_join``,
+  ``query_path=svc:A→svc:B``, ``mount=/storage/A/B``,
+  ``cron=A_B_pipeline``, etc.) that names the gold service tags
+  while *not* naming the decoy. The bench shape is R-64-SYM's
+  symmetric-corroboration (gold A/B AND decoy mentioned by ≥ 2
+  distinct routed roles via generic-noise kinds with comparable
+  magnitudes, so W17-Λ-symmetric *applies*); what R-65 adds is a
+  pre-committed *relational-mention convention* in the round-2
+  disambiguator that the W18 method exploits. **No closed-form
+  salience packer can win on R-65-COMPAT by construction
+  (W17-Λ-symmetric extends to R-65 verbatim** — both gold and
+  decoy survive every cross-role corroboration metric the SDK
+  tracks**).** A *bundle-relational compatibility scorer*
+  (``RelationalCompatibilityDisambiguator``: tokenises the
+  surviving round-2 specific-tier disambiguator's payload, scores
+  each admitted service tag by mention-and-relational-compound
+  match, and projects the W11/W15 admitted set through the
+  compatibility filter) closes the gap (W18-1). Five pre-committed
+  sub-banks plus three named falsifiers:
+    - **R-65-COMPAT-LOOSE** (synthetic identity producer,
+      ``T_decoder = None``). The W18-1 anchor: round-2
+      disambiguator's payload contains a relational mention of the
+      gold tags only; W18 strictly beats every W11..W17 method
+      ``accuracy_full = 0.000 → 1.000``. ``+1.000`` strict
+      separation, stable across 5/5 alternate ``bank_seed`` values.
+    - **R-65-COMPAT-TIGHT** (synthetic identity producer,
+      ``T_decoder = 24``). Composes the W15 attention-aware pack
+      AND the W18 disambiguator. The W18 scorer reads only the
+      W15 *kept* bundle; bounded-context efficiency preserved
+      byte-for-byte (``tokens_kept ≤ T_decoder`` strict).
+    - **R-65-NO-COMPAT** (W18-Λ-no-compat falsifier; synthetic,
+      ``T_decoder = None``). Round-2 disambiguator's payload
+      carries the kind token + numeric magnitudes only — *no*
+      service-tag mention. W18 has no relational signal; ties
+      FIFO at ``accuracy_full = 0.000`` by construction. Names
+      the structural limit when round-2 evidence carries no
+      relational compatibility cue.
+    - **R-65-CONFOUND** (W18-Λ-confound falsifier; synthetic,
+      ``T_decoder = None``). Round-2 disambiguator's payload
+      mentions BOTH gold AND decoy service tags (relationally-
+      symmetric round-2 evidence). W18's compatibility score is
+      tied; W18 abstains and falls through to the W11 / W15
+      output, which itself ties FIFO at 0.000 by W17-Λ-symmetric.
+    - **R-65-DECEIVE** (W18-Λ-deceive falsifier; synthetic,
+      ``T_decoder = None``). Round-2 disambiguator's payload
+      mentions DECOY service tags but NOT gold (round-2 evidence
+      "lies" about the relation). W18 picks decoy and FAILS at
+      0.000. Names the structural limit when round-2 evidence is
+      adversarially-relational; no relational scorer that
+      *trusts* the disambiguator's payload can escape this regime
+      without an outside-information axis (W18-C-OUTSIDE).
+  **Honest scope.** R-65-COMPAT is a *synthetic* regime — the
+  producer is :class:`IdentityExtractor`, not a real LLM. Real-LLM
+  transfer of the relational-mention convention is **W18-Λ-real**
+  (proved-conditional + empirical-research): the LLM must emit the
+  same relational-compound forms the synthetic bench uses. If the
+  LLM emits a different form (e.g. natural-language "the join
+  between orders and payments"), the W18 scorer's *exact-match*
+  layer misses; the W18 closure is bounded by the same
+  closed-vocabulary discipline that bounds W12 / W13 (W18-C-LEARNED
+  is the natural learned-scorer extension). Anchor:
+  `vision_mvp/experiments/phase65_relational_disambiguation.py`.
+
 * **R-62** — Phase-62 *attention-aware capsule context packing under
   decoder-side budget pressure* regime, the *new harder regime* SDK
   v3.16 introduces. The producer-side gap was closed by W14 on R-61;
@@ -378,6 +447,31 @@ The **named regimes** the bar refers to (anchored in code):
 > decoder-budget ingredients are independently load-bearing; a
 > method that closes one structural axis but leaves the other
 > firing does NOT clear bar 13).
+> SDK v3.19 anchors the bar to **R-65** below AND introduces
+> **bar 15** (relational-compatibility disambiguation under
+> symmetric-corroboration split: a method that wants to claim
+> "true ambiguity resolution beyond W17" must (i) name the
+> structural ingredient — a *relational-mention* compatibility
+> cue in the round-2 disambiguator that closed-form
+> corroboration / magnitude / packing CANNOT see — AND (ii)
+> introduce a *bundle-relational scorer* that reads the round-2
+> disambiguator's payload text and projects the admitted set
+> through it AND (iii) preserve bounded-context efficiency
+> (the new scorer must consume *only* the W15 packed bundle,
+> not extra capsules) AND (iv) ship at least three named
+> falsifier regimes — R-65-NO-COMPAT (no relational signal),
+> R-65-CONFOUND (symmetric relational signal),
+> R-65-DECEIVE (adversarial relational signal) — where the
+> new method ties FIFO or fails by construction. A milestone
+> that wins on R-65-COMPAT but does not exhibit R-65-NO-COMPAT
+> / R-65-CONFOUND / R-65-DECEIVE materially overstates and
+> does NOT clear bar 15. The R-65-COMPAT win is *strongly
+> conditional* on the relational-mention convention being
+> emitted at the round-2 boundary; the W17-Λ-symmetric wall
+> remains real wherever round-2 carries no asymmetric cue.
+> Earlier R-55..R-64-anchored bars remain valid as historical
+> bars; the *current* bar is R-65-anchored.
+>
 > SDK v3.18 anchors the bar to **R-64** below AND introduces
 > **bar 14** (live-end-to-end + magnitude-hinted-protocol split:
 > a method that wants to claim "live multi-agent context" must
@@ -395,7 +489,7 @@ The **named regimes** the bar refers to (anchored in code):
 
 ### 1.1 Strong success bar (a "real" advance)
 
-A milestone *strongly advances* the thesis iff **all fourteen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17; bar 14 from SDK v3.18):
+A milestone *strongly advances* the thesis iff **all fifteen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17; bar 14 from SDK v3.18; bar 15 from SDK v3.19):
 
 1. **Code anchor.** A new admission/decoder/coordination method
    ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
@@ -500,6 +594,58 @@ A milestone *strongly advances* the thesis iff **all fourteen** hold (bars 1–6
    live LLM probe; W16-C-LIVE-OLLAMA is conjectural pending a live
    ``run_phase63 --extractor=ollama --prompt-mode=structured``
    probe with Mac-1 reachable.
+
+15. **(SDK v3.19+) Relational-compatibility disambiguation under
+   symmetric-corroboration split.** The milestone-anchored harder
+   regime (R-65-COMPAT) is **provably insufficient for any
+   closed-form salience packer** (W17-Λ-symmetric extends to R-65-
+   COMPAT verbatim: every cross-role corroboration metric the SDK
+   tracks — bipartite (role × tag, kind, magnitude) multiset count,
+   distinct-role count, raw-mention count, magnitude rank, round
+   index — is identical for gold and decoy by construction; the
+   W11 contradiction-aware drop fires symmetrically; the W15
+   hypothesis-preserving pack preserves both gold and decoy
+   representatives; the W14H magnitude-hint is silent on the
+   symmetric ambiguity). The new method must include an explicit
+   **bundle-relational compatibility layer**: a deterministic,
+   training-free scorer that
+   (i) tokenises the round-2 specific-tier disambiguator's
+   payload text (the round-2 evidence the W11 union admits AND
+   the W15 packer keeps),
+   (ii) scores each admitted service tag by mention-and-relational-
+   compound match (exact occurrence, ``A_B_*`` / ``*_A_B_*``
+   relational-compound patterns, optional synonym expansion), and
+   (iii) projects the W11/W15 answer through the compatibility
+   filter (keep tags whose relational score ≥ floor; abstain on
+   ties; fall through to the W15 answer when no tag passes —
+   W18-3 backward-compat).
+   A pure W14+W15 composition that does not include the relational-
+   compatibility step does NOT clear bar 15. **Pre-committed bench
+   property:** under R-65-COMPAT, ``relational_compatibility_holds
+   = True`` for every cell — the disambiguator payload contains a
+   relational mention of *every* gold service tag AND no decoy
+   service tag (mechanically verified by ``Phase65BenchPropertyTests
+   ::test_compat_round2_mentions_gold_only``). **Pre-committed
+   token-budget honesty:** the W18 disambiguator MUST consume only
+   the W15-packed bundle (no extra capsule reads); the
+   ``tokens_kept`` accounting is unchanged byte-for-byte from W15
+   (mechanically verified by ``Phase65TokenEfficiencyTests
+   ::test_w18_does_not_inflate_tokens_kept``). **Pre-committed
+   falsifiers:** R-65-NO-COMPAT (no signal — W18-Λ-no-compat ties
+   FIFO at 0.000), R-65-CONFOUND (symmetric signal — W18-Λ-confound
+   ties FIFO at 0.000), R-65-DECEIVE (adversarial signal —
+   W18-Λ-deceive picks decoy and FAILS at 0.000). On all three,
+   the W18 method ties FIFO or fails by construction; the W18-1
+   conditionality is sharp. **Honest scope:** R-65-COMPAT is a
+   *synthetic* regime — the producer is :class:`IdentityExtractor`.
+   Real-LLM transfer of the relational-mention convention is
+   W18-Λ-real (proved-conditional + empirical-research): the LLM
+   must emit the same relational-compound forms the synthetic bench
+   uses; if the LLM emits a free-form relational mention (e.g.
+   "the join between orders and payments"), the W18 exact-match
+   layer misses by construction (the natural extension is
+   W18-C-LEARNED — a small distilled compatibility scorer over
+   capsule bundles).
 
 14. **(SDK v3.18+) Live-end-to-end + magnitude-hinted-protocol +
    symmetric-corroboration-wall split.** The milestone-anchored
@@ -706,6 +852,48 @@ For SDK v3.11 specifically, the canonical phrasing instantiates as:
 > Phase-57-falsifier regime where the decoy is corroborated AND
 > mentioned via a causal claim_kind for the chosen root_cause
 > (W10-4)."*
+
+For SDK v3.19 specifically, the canonical phrasing instantiates as:
+
+> *"On R-65-COMPAT (Phase-65 symmetric-corroboration regime where
+> gold A/B AND decoy are all mentioned by ≥ 2 distinct routed
+> producer roles via generic-noise kinds with comparable magnitudes
+> AND round-2 specific-tier disambiguator's payload text contains a
+> relational-compound mention of the gold service tags only), every
+> closed-form salience packer in the SDK — substrate FIFO,
+> ``capsule_fifo``, ``capsule_priority``, ``capsule_coverage``,
+> W7-2 cohort, W8 corroboration, W9 multi-service, W11 multi-round,
+> W12 robust-multi-round, W13 layered, W14H magnitude-hinted
+> producer simulation, W15 :class:`AttentionAwareBundleDecoder` AND
+> the W14H + W15 composition — ties FIFO at ``accuracy_full =
+> 0.000`` (W17-Λ-symmetric extended to R-65-COMPAT). The new
+> :class:`RelationalCompatibilityDisambiguator` (W18) — a
+> deterministic, training-free bundle-relational scorer that
+> tokenises the surviving round-2 disambiguator's payload, scores
+> each admitted service tag by mention-and-relational-compound
+> match, and projects the W11 / W15 answer through the
+> compatibility filter — achieves ``accuracy_full = 1.000`` on
+> R-65-COMPAT-LOOSE (``T_decoder = None``) AND on R-65-COMPAT-TIGHT
+> (``T_decoder = 24``), strictly improving over the W14H + W15
+> composition by ``+1.000`` on both, stable across 5/5 alternate
+> ``bank_seed`` values (11, 17, 23, 29, 31). Token-budget honesty:
+> on R-65-COMPAT-TIGHT, the W18 method consumes only the W15-packed
+> bundle; ``tokens_kept`` is byte-for-byte equal to W15's
+> ``tokens_kept`` (W18 reads the same bytes; it does not re-admit
+> any handoff). The win does NOT transfer to the three named
+> falsifier regimes: R-65-NO-COMPAT (round-2 carries no relational
+> mention; W18-Λ-no-compat ties FIFO at 0.000); R-65-CONFOUND
+> (round-2 mentions both gold and decoy; W18-Λ-confound ties FIFO
+> at 0.000); R-65-DECEIVE (round-2 mentions decoy but not gold;
+> W18-Λ-deceive picks decoy and fails at 0.000). Backward-compat
+> preserved: R-54 / R-55 / R-56 / R-57 / R-58 / R-59 / R-60 / R-61 /
+> R-62 / R-63 / R-64 default banks all still hit prior anchors
+> byte-for-byte; the W18 surface is purely additive on top of the
+> W15 surface (W18-3). The honest cap on the SDK v3.19 advance is
+> the *synthetic* scope: the relational-mention convention is a
+> closed-vocabulary contract the synthetic bench enforces; real-LLM
+> transfer (W18-Λ-real) is conjectural pending Mac-1 reachable +
+> the LLM's relational-mention emission style observed."*
 
 For SDK v3.18 specifically, the canonical phrasing instantiates as:
 

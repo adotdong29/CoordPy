@@ -241,6 +241,9 @@ from .team_coord import (
     W15PackedHandoff, W15PackResult,
     FifoContextPacker, CapsuleContextPacker,
     AttentionAwareBundleDecoder,
+    # SDK v3.19 — bundle-relational compatibility disambiguator (W18 family).
+    W18CompatibilityResult,
+    RelationalCompatibilityDisambiguator,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -254,7 +257,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.18"
+SDK_VERSION = "wevra.sdk.v3.19"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -370,6 +373,8 @@ __all__ = [
     "W15PackedHandoff", "W15PackResult",
     "FifoContextPacker", "CapsuleContextPacker",
     "AttentionAwareBundleDecoder",
+    # SDK v3.19 — W18 family.
+    "W18CompatibilityResult", "RelationalCompatibilityDisambiguator",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

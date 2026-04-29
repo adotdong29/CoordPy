@@ -1,7 +1,7 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
-> Updated through SDK v3.18, 2026-04-27.
+> Updated through SDK v3.19, 2026-04-28.
 > This file is intended to be the primary publication-grade paper
 > draft for the programme's multi-agent context thesis. It is not a
 > milestone diary. It is a paper-shaped synthesis of the system,
@@ -32,26 +32,29 @@ contract to multi-agent coordination, where agents exchange typed
 handoff capsules rather than raw messages.
 
 The paper's main scientific contribution is a decomposition of the
-multi-agent context problem into eight coupled structural axes:
+multi-agent context problem into nine coupled structural axes:
 (1) admission under budget, (2) intra-round bundle decoding,
 (3) cross-round bundle decoding, (4) fixed-vocabulary normalization
 of producer drift, (5) layered open-world normalization,
 (6) producer-side ambiguity preservation, (7) decoder-side context
-packing under bounded token budgets, and (8) end-to-end
-producer-plus-decoder composition. Across SDK v3.8-v3.18 we build a
-progressive benchmark ladder, R-54 through R-64, that isolates these
-axes one by one. Admission alone wins in some regimes but has a named
-ceiling. Bundle-aware decoding crosses that ceiling. Cross-round
-decoding crosses a further temporal ceiling. Fixed-table
+packing under bounded token budgets, (8) end-to-end producer-plus-
+decoder composition, and (9) bundle-relational compatibility
+disambiguation under symmetric corroboration. Across SDK v3.8-v3.19
+we build a progressive benchmark ladder, R-54 through R-65, that
+isolates these axes one by one. Admission alone wins in some regimes
+but has a named ceiling. Bundle-aware decoding crosses that ceiling.
+Cross-round decoding crosses a further temporal ceiling. Fixed-table
 normalization closes a bounded producer-drift gap; layered
 normalization closes a wider but still finite open-world gap.
 Structured producer protocols close the first real-LLM upstream
 ambiguity-erasure gap. Attention-aware capsule context packing closes
 a downstream bounded-context gap. End-to-end composition then yields
 the first fresh live real-LLM strict +1.000 advance over the
-strongest non-composed baseline in the programme.
+strongest non-composed baseline in the programme. A bundle-relational
+compatibility disambiguator finally crosses the symmetric-corroboration
+wall on a regime where the wall actually applies.
 
-The strongest positive result in the paper is SDK v3.18's W17
+The strongest *live* positive result in the paper is SDK v3.18's W17
 family: on a fresh live `qwen2.5:14b-32k` probe, a magnitude-hinted
 structured producer protocol plus attention-aware capsule packing
 yields `accuracy_full = 1.000`, while both substrate/FIFO and the
@@ -59,12 +62,26 @@ strongest non-composed baseline remain at 0.000 on the same live
 benchmark. The same producer-side intervention transfers partially
 across model class to a fresh live `qwen3.5:35b` MoE probe,
 preserving the benchmark property 8/8 and yielding a +0.750 strict
-gain. The strongest negative result is equally important: SDK v3.18
-also proves the programme's first explicit **symmetric-corroboration
-limit theorem**. When gold and decoy are symmetrically corroborated
-under the current feature surface, every current closed-form
-capsule-native method in the SDK ties FIFO at 0.000 by construction.
-This names the next wall sharply rather than leaving it rhetorical.
+gain. The strongest *closed-form-disambiguation* positive result is
+SDK v3.19's W18 family: on the synthetic R-65-COMPAT regime (every
+gold service AND the decoy mentioned by ≥ 2 distinct routed roles
+via generic-noise kinds with comparable magnitudes — symmetric-
+corroboration; round-2 specific-tier disambiguator carries a
+relational-compound mention of every gold service AND no decoy
+service), every closed-form salience scorer in the SDK ties FIFO at
+0.000 (W17-Λ-symmetric extends verbatim); the new
+:class:`RelationalCompatibilityDisambiguator` achieves
+`accuracy_full = 1.000` at both `T_decoder ∈ {None, 24}`, +1.000
+strict separation, stable across 5/5 alternate `bank_seed` values.
+The strongest *negative* result is equally important: SDK v3.18
+proves the programme's first explicit **symmetric-corroboration
+limit theorem**, and SDK v3.19 names three further structural
+limits — W18-Λ-no-compat (no relational signal → abstain), W18-Λ-
+confound (symmetric relational signal → abstain), and W18-Λ-deceive
+(adversarial relational signal → trust evidence and fail). The W18-
+Λ-deceive falsifier names the structural limit *no closed-form
+bundle-relational scorer that trusts its evidence can escape*
+without an outside-information axis (W18-C-OUTSIDE, conjectural).
 
 The paper does **not** claim that multi-agent context is solved in an
 unqualified sense. The strongest honest claim is narrower and more
@@ -198,7 +215,7 @@ unsolved.
 
 The paper is organized as follows. Sections 2 through 5 define the
 setting, the capsule contract, the runtime, and the team-level object
-model. Section 6 introduces the eight structural axes that emerged
+model. Section 6 introduces the nine structural axes that emerged
 from the programme. Sections 7 through 9 describe the benchmark
 ladder, the method families, and the evaluation discipline. Section 10
 reports the main empirical and theorem-level results. Sections 11
@@ -632,19 +649,83 @@ This is the strongest evidence so far for the original Context Zero
 thesis: the context problem is neither purely upstream nor purely
 downstream.
 
-### 6.9 The new wall: symmetric ambiguity
+### 6.9 The symmetric-ambiguity wall and the bundle-relational compatibility move (axis 9)
 
-The strongest current negative theorem is:
+The strongest current negative theorem the programme had as of
+SDK v3.18 was:
 
 - **W17-Λ-symmetric.** When gold and decoy are symmetrically
-  corroborated under comparable magnitudes, every current
-  capsule-native strategy in the SDK ties FIFO at 0.000, even though
-  the root-cause label itself can still be correct.
+  corroborated under comparable magnitudes, every closed-form
+  salience scorer in the SDK ties FIFO at 0.000, even though the
+  root-cause label itself can still be correct.
 
-This wall names the next frontier: richer semantic disambiguation
-beyond the current closed-form feature surface.
+SDK v3.19 takes the smallest move beyond this wall on a regime
+where the wall actually applies. The structural observation is
+that every prior decoder layer (W11..W17) consumed only
+*closed-vocabulary* fields of the admitted bundle: ``claim_kind``,
+service tag, bipartite role × tag corroboration, operational
+magnitudes, round index. None consumed the *relational text* of
+the round-2 specific-tier disambiguator's payload — the substring
+``relation=A_B_join`` in
+``"deadlock relation=orders_payments_join wait_chain=2"``. On
+R-64-SYM only the deadlock scenarios carried such a relational
+mention; on the others, no asymmetric channel existed. R-65-COMPAT
+is the *consistent* relational-mention regime: every scenario
+family (deadlock / pool / disk / slow_query) carries a closed-
+vocabulary relational compound naming the gold services in
+round-2.
 
-## 7. Benchmark Ladder: R-53 to R-64
+The W18 :class:`RelationalCompatibilityDisambiguator` is a
+deterministic, training-free, closed-form scorer:
+
+  1. Tokenise the round-2 disambiguator's payload (lower-cased,
+     split on non-identifier chars, compound identifiers preserved).
+  2. Score each admitted service tag in the union of admitted
+     handoffs by direct-match + contiguous-subsequence compound
+     match against the tokens.
+  3. Apply the strict-asymmetric branch: keep positive-score tags
+     iff at least one but not all admitted tags have positive
+     score; otherwise abstain (fall through to the W15 inner
+     answer byte-for-byte).
+
+The W18 method clears the strong success bar on R-65-COMPAT:
+
+- **W18-1 / R-65-COMPAT.** W18 = 1.000; every other capsule
+  strategy = 0.000. **+1.000 strict separation** at both
+  ``T_decoder = None`` (loose) AND ``T_decoder = 24`` (tight),
+  stable across 5/5 alternate ``bank_seed`` values. The W18
+  method consumes only the W15-packed bundle; ``tokens_kept_sum``
+  is byte-for-byte identical to W15's. Bounded-context honesty
+  preserved.
+
+The conditionality is sharp on three named falsifiers:
+
+- **W18-Λ-no-compat / R-65-NO-COMPAT.** Round-2 carries no
+  service-tag mention; W18 abstains; ties FIFO at 0.000.
+- **W18-Λ-confound / R-65-CONFOUND.** Round-2 mentions BOTH gold
+  AND decoy; W18 abstains (every admitted tag has positive
+  score); ties FIFO at 0.000.
+- **W18-Λ-deceive / R-65-DECEIVE.** Round-2 mentions DECOY but
+  NOT gold; W18 trusts its evidence and picks decoy; fails at
+  0.000.
+
+The named structural limit *no closed-form bundle-relational
+scorer that trusts its evidence can escape* is W18-Λ-deceive.
+The natural research move beyond it — an outside-information axis
+to detect adversarial round-2 mentions — is named
+**W18-C-OUTSIDE** and remains conjectural.
+
+The W18 result strengthens the original thesis on the relational-
+compatibility axis without retracting any prior axis. It is *not*
+"ambiguity resolution solved": the W18-Λ-deceive falsifier names
+a genuine structural limit; the W18-Λ-real conjecture names the
+real-LLM transfer condition (closed-vocabulary relational
+compounds emitted at the round-2 boundary). The defensible reading
+is that *one named structural axis the prior milestone left
+explicit* is now broken on a regime where it actually applies,
+while the deeper adversarial-relational axis remains open.
+
+## 7. Benchmark Ladder: R-53 to R-65
 
 The benchmark family is cumulative. Each regime was built because the
 previous one exposed a specific failure mode.
@@ -663,6 +744,7 @@ previous one exposed a specific failure mode.
 | R-62 | Decoder-side bounded context packing | W15 | FIFO packing wall |
 | R-63 | End-to-end composition | W16 | joint producer+decoder failure |
 | R-64 | Fresh live composition + symmetric wall | W17 | symmetric ambiguity |
+| R-65 | Relational-compatibility disambiguation under symmetric corroboration | W18 | adversarial-relational round-2 (W18-Λ-deceive) |
 
 ### 7.1 Benchmark design principles
 
@@ -694,6 +776,11 @@ The ladder can also be read narratively:
   the full admitted union.
 - **R-63** asks whether those two difficulties interact.
 - **R-64** asks what happens when every current asymmetry is removed.
+- **R-65** asks whether a single new information channel — the
+  round-2 disambiguator's payload text — is enough to break the
+  symmetric wall when the channel itself is asymmetric (R-65-COMPAT)
+  AND what happens when the channel is silent (NO-COMPAT),
+  symmetric (CONFOUND), or adversarial (DECEIVE).
 
 This narrative is the actual research arc of the programme.
 

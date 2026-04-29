@@ -4241,6 +4241,489 @@ class AttentionAwareBundleDecoder:
         return self._last_pack_result.as_dict()
 
 
+# =============================================================================
+# SDK v3.19 — Bundle-relational compatibility disambiguator (W18 family)
+# =============================================================================
+#
+# W18 attacks the *symmetric-corroboration wall* (W17-Λ-symmetric, named in
+# SDK v3.18). On the W17-Λ-symmetric regime, every closed-form salience
+# packer + admission policy in the SDK ties FIFO at 0.000 by construction:
+# the bipartite ``(role × tag, kind, magnitude)`` multiset is identical for
+# gold and decoy, so no service-blind admission AND no closed-form salience
+# scorer can prefer one over the other. The W17 milestone named the next
+# move explicitly: a *richer disambiguator* that consumes information
+# *beyond* the bipartite multiset — specifically, the round-2 specific-tier
+# disambiguator's *payload text* itself.
+#
+# The W18 :class:`RelationalCompatibilityDisambiguator` is the smallest
+# move in that direction. It sits *after* the W11 / W15 cross-round
+# decoder (so it sees the same admitted/packed bundle the auditor would
+# decode), reads the round-2 specific-tier disambiguator's payload text,
+# and projects the W11/W15 answer through a *bundle-relational
+# compatibility* filter: keep service tags whose mention-and-relational-
+# compound match score is non-zero; drop tags that the round-2 evidence
+# does not name. Three structural properties matter:
+#
+#   1. **Closed-form, training-free.** The compatibility scorer is a
+#      deterministic O(|union|) tokeniser over the disambiguator payload
+#      plus an O(|admitted_tags| · |tokens|) match loop. Every score is
+#      reproducible from the bytes of the surviving capsule bundle alone.
+#   2. **Bounded-context honest.** The scorer reads *only* the W15-packed
+#      bundle (or the un-packed admitted union when ``T_decoder`` is None)
+#      — no extra capsule reads, no global state. Token-budget accounting
+#      from W15 is byte-for-byte preserved.
+#   3. **Backward-compat (W18-3).** When the round-2 disambiguator's
+#      payload mentions every admitted service tag (or none of them), the
+#      compatibility filter is a no-op on the answer set — W18 ties W15
+#      byte-for-byte. The R-54..R-64 anchors remain at their prior values.
+#
+# Why W18 is not "just another decoder"
+# -------------------------------------
+# Every prior decoder layer (W11..W17) consumed only *closed-vocabulary*
+# fields of the admitted bundle: ``claim_kind`` (W11/W12/W13), service
+# tag (W11), bipartite role × tag corroboration (W7/W8/W9/W10),
+# operational magnitudes (W15 salience, W17 magnitude-hint). W18 is the
+# first decoder that consumes the *relational text* of a payload — i.e.,
+# the substring ``relation=A_B_join`` in
+# ``"deadlock relation=orders_payments_join wait_chain=2"``.
+#
+# The W17-Λ-symmetric wall is exactly the regime where this *additional*
+# information channel is the only signal that breaks the tie. R-65-COMPAT
+# (Phase-65) pre-commits the regime where this channel is consistently
+# present; the named falsifiers R-65-NO-COMPAT / -CONFOUND / -DECEIVE
+# pre-commit the structural limits.
+#
+# Honest scope (W18)
+# ------------------
+# * **W18-1 is conditional** on (a) the symmetric-corroboration bench
+#   property (R-65-COMPAT), (b) the round-2 disambiguator's payload
+#   carrying a relational-compound mention of *every* gold service tag
+#   AND *no* decoy service tag.
+# * **W18-Λ-no-compat** (R-65-NO-COMPAT) is the named structural limit
+#   when the round-2 disambiguator carries no service-tag mentions: W18
+#   ties FIFO at 0.000 — the relational scorer has no signal.
+# * **W18-Λ-confound** (R-65-CONFOUND) is the named structural limit
+#   when the round-2 disambiguator mentions BOTH gold AND decoy: W18's
+#   compatibility score is tied; the policy abstains and falls through
+#   to the W15 answer (which itself ties FIFO by W17-Λ-symmetric).
+# * **W18-Λ-deceive** (R-65-DECEIVE) is the named structural limit
+#   when the round-2 disambiguator mentions DECOY but not gold: W18
+#   trusts its evidence and FAILS at 0.000. No closed-form bundle-
+#   relational scorer can escape this regime without an outside-
+#   information axis (W18-C-OUTSIDE, conjectural).
+# * **Real-LLM transfer (W18-Λ-real)** depends on the LLM emitting the
+#   relational-compound forms the synthetic bench uses. Free-form
+#   natural-language relational mentions (e.g. "the join between orders
+#   and payments") fall outside the exact-match layer — W18-C-LEARNED
+#   names the natural learned-scorer extension.
+
+
+# Closed-vocabulary set of relational-compound separators the W18
+# scorer recognises. Each pattern names the *binary* relational form
+# ``A<sep>B`` between two service tags. Lex-ordered for diff stability.
+# The patterns are consumed in order; the first hit wins.
+_RELATIONAL_COMPOUND_SEPARATORS: tuple[str, ...] = (
+    "_",        # A_B_join, orders_payments_pipeline
+    ".",        # A.B
+    "/",        # /storage/A/B/, mount=/storage/A/B
+    "-",        # A-B-join (rare but real in service names)
+    ":",        # A:B (e.g. svc:A→svc:B compounds)
+)
+
+
+def _disambiguator_payload_tokens(payload: str) -> tuple[str, ...]:
+    """Tokenise a round-2 disambiguator payload text into a flat,
+    lower-cased token sequence over identifier chars.
+
+    The round-2 disambiguator's payload is closed-vocabulary by W18's
+    contract: kind-token + numeric magnitudes + relational-compound
+    mention. We split on whitespace AND on every non-identifier char
+    (``[^A-Za-z0-9_]``) so identifiers like ``orders_payments_join``
+    decompose into ``("orders", "payments", "join")`` AND so
+    ``mount=/storage/A/B`` decomposes into
+    ``("mount", "storage", "a", "b")``. Lower-case folding for case-
+    insensitive match.
+
+    Returns a tuple of non-empty lower-cased identifier tokens.
+    """
+    if not payload:
+        return ()
+    out: list[str] = []
+    cur: list[str] = []
+    for ch in payload:
+        if ch.isalnum() or ch == "_":
+            cur.append(ch.lower())
+        else:
+            if cur:
+                out.append("".join(cur))
+                cur = []
+    if cur:
+        out.append("".join(cur))
+    # Further split on '_' so compound identifiers decompose:
+    final: list[str] = []
+    for t in out:
+        if "_" in t:
+            final.extend([sub for sub in t.split("_") if sub])
+            # Also keep the compound itself (so ``orders_payments_join``
+            # matches both individual-tag and compound-tag scorers).
+            final.append(t)
+        else:
+            final.append(t)
+    return tuple(final)
+
+
+def _relational_compatibility_score(
+        service_tag: str,
+        disambiguator_tokens: Sequence[str],
+        ) -> tuple[int, int]:
+    """Score a service tag against a tokenised disambiguator payload.
+
+    Returns ``(direct_hits, compound_hits)`` where:
+      * ``direct_hits`` — number of times ``service_tag`` (lower-cased)
+        appears as a standalone identifier in the tokens. Each hit is
+        evidence that the round-2 disambiguator names this service.
+      * ``compound_hits`` — number of times ``service_tag`` appears
+        as a contiguous-subsequence inside a compound identifier in
+        the tokens (e.g. ``orders`` inside ``orders_payments_join``,
+        or ``db_query`` as a contiguous subsequence of
+        ``svc_web_then_svc_db_query``). Each hit is evidence that
+        the round-2 disambiguator names this service as part of a
+        relational compound.
+
+    Both scores are non-negative integers; their sum is the W18
+    compatibility score. The split is preserved for audit clarity
+    (so the bench driver can verify the relational-compound layer
+    is the load-bearing channel on R-65-COMPAT).
+
+    Compound-target handling: a service tag that itself contains an
+    underscore (e.g. ``logs_pipeline``, ``db_query``) is matched as
+    a *contiguous subsequence* of underscore-separated parts in any
+    compound token. This is the load-bearing semantic property: a
+    compound service name like ``svc_web_then_svc_db_query`` mentions
+    ``db_query`` iff ``["db", "query"]`` appears contiguously in its
+    parts list.
+    """
+    if not service_tag:
+        return (0, 0)
+    target = service_tag.lower()
+    target_parts = target.split("_")
+    n_target = len(target_parts)
+    direct = 0
+    compound = 0
+    for tok in disambiguator_tokens:
+        if not tok:
+            continue
+        if tok == target:
+            direct += 1
+            continue
+        if "_" not in tok:
+            continue
+        tok_parts = tok.split("_")
+        n_tok = len(tok_parts)
+        if n_target == 1:
+            # Single-part target: match if it equals any compound part.
+            if target in tok_parts:
+                compound += 1
+            continue
+        # Multi-part target: contiguous-subsequence search.
+        if n_tok < n_target:
+            continue
+        for i in range(n_tok - n_target + 1):
+            if tok_parts[i:i + n_target] == target_parts:
+                compound += 1
+                break
+    return (direct, compound)
+
+
+@dataclasses.dataclass(frozen=True)
+class W18CompatibilityResult:
+    """The output of one ``RelationalCompatibilityDisambiguator.apply``
+    call. Carries the projected answer plus the per-tag compatibility
+    scores so the bench driver can audit the relational channel.
+
+    Fields
+    ------
+    answer
+        ``{"root_cause", "services", "remediation"}`` — same shape as
+        every other capsule decoder. The ``services`` field is the
+        W11/W15 answer projected through the compatibility filter
+        (gold-only on R-65-COMPAT; unchanged on R-54..R-64; abstained
+        on R-65-CONFOUND).
+    base_services
+        The pre-projection answer from the inner (W11/W15) decoder —
+        useful for falsifier audit (W18-Λ-confound's abstention
+        falls back to this exactly).
+    disambiguator_payload
+        The round-2 specific-tier disambiguator's payload text (the
+        relational-evidence source). ``""`` when no specific-tier
+        claim is present in the bundle.
+    per_tag_scores
+        ``{service_tag: (direct, compound)}`` for every admitted
+        service tag in the inner answer. Sum = compatibility score.
+    abstained
+        True when the projection abstained (every admitted tag's
+        score is non-zero AND scores are tied OR every tag's score
+        is zero). Abstention falls back to ``base_services``.
+    """
+    answer: dict[str, Any]
+    base_services: tuple[str, ...]
+    disambiguator_payload: str
+    per_tag_scores: dict[str, tuple[int, int]]
+    abstained: bool
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get("remediation",
+                                                 "investigate")),
+            "base_services": tuple(self.base_services),
+            "disambiguator_payload": str(self.disambiguator_payload),
+            "per_tag_scores": {
+                tag: [int(d), int(c)]
+                for tag, (d, c) in self.per_tag_scores.items()
+            },
+            "abstained": bool(self.abstained),
+        }
+
+
+@dataclasses.dataclass
+class RelationalCompatibilityDisambiguator:
+    """Bundle-relational compatibility disambiguator (SDK v3.19, W18 family).
+
+    The first decoder in the programme that consumes the *relational
+    text* of a round-2 specific-tier disambiguator's payload — beyond
+    the closed-vocabulary fields (``claim_kind``, ``service=`` token,
+    bipartite corroboration, magnitude) every prior decoder consumed.
+    The W18 method is the named research move beyond W17-Λ-symmetric
+    (the symmetric-corroboration wall named in SDK v3.18); it does NOT
+    introduce a new admission policy or context packer. It is purely
+    additive on top of the W11 / W15 surface.
+
+    Pipeline (deterministic, training-free)
+    ----------------------------------------
+    1. Run an inner cross-round decoder (default
+       :class:`AttentionAwareBundleDecoder`, the W15 layer) over the
+       admitted bundle. Capture the inner ``(root_cause, services,
+       remediation)`` answer AND the W15 pack-stats block.
+    2. Identify the round-2 specific-tier disambiguator(s) in the
+       bundle (any handoff whose ``claim_kind`` is in
+       :data:`_SPECIFIC_TIER_CLAIM_KINDS`). When multiple specific-
+       tier disambiguators exist, concatenate their payloads in
+       canonical (round, source_role, claim_kind, payload_sha) order.
+    3. Tokenise the disambiguator payload via
+       :func:`_disambiguator_payload_tokens` (lower-cased, split on
+       non-identifier chars, compound identifiers preserved).
+    4. For each admitted service tag in the inner answer, compute the
+       compatibility score via :func:`_relational_compatibility_score`
+       and record ``(direct_hits, compound_hits)``.
+    5. Project the inner ``services`` set through the compatibility
+       filter:
+         * If at least one admitted tag has score > 0 AND not every
+           admitted tag has score > 0, keep only the tags with
+           score > 0 (the **strict-asymmetric** branch — gold-only
+           on R-65-COMPAT; gold-only on the W17-Λ-symmetric
+           regime when the disambiguator names gold but not decoy).
+         * Else, abstain: return the inner ``services`` unchanged
+           (W18-3 backward-compat on R-54..R-64; W18-Λ-confound /
+           W18-Λ-no-compat fallback on R-65 falsifiers; W18-Λ-deceive
+           is *NOT* abstention — when the disambiguator names decoy
+           but not gold, decoy has score > 0 and gold has score = 0,
+           so the strict-asymmetric branch fires and elects decoy,
+           which fails by construction — the named falsifier).
+    6. Return a :class:`W18CompatibilityResult` with the projected
+       answer, the base inner answer, the disambiguator payload, the
+       per-tag score map, and the abstention flag.
+
+    Honest scope (W18)
+    ------------------
+    See the file-level W18 commentary block above. The W18-1 win is
+    *strongly conditional* on the bench property (R-65-COMPAT); the
+    three named falsifiers (R-65-NO-COMPAT / -CONFOUND / -DECEIVE)
+    are pre-committed in
+    ``vision_mvp.experiments.phase65_relational_disambiguation`` and
+    mechanically verified by ``Phase65FalsifierTests``.
+
+    Backward-compat (W18-3)
+    ------------------------
+    When (a) the bundle carries no specific-tier disambiguator OR
+    (b) the disambiguator's payload mentions every admitted tag OR
+    (c) the disambiguator's payload mentions no admitted tag, the
+    abstention path fires and the W18 answer equals the inner
+    decoder's answer byte-for-byte. R-54..R-64 anchors are
+    preserved.
+    """
+
+    inner: AttentionAwareBundleDecoder = dataclasses.field(
+        default_factory=lambda: AttentionAwareBundleDecoder())
+    # When True, the W18 projection prefers the strict-asymmetric
+    # branch (gold-only on R-65-COMPAT). When False, the projection
+    # is a pure no-op — the W18 method reduces to its inner. The
+    # default is True; the False knob is exposed for the W18-3
+    # backward-compat anchor.
+    enabled: bool = True
+
+    # Forensic — last applied result, exposed for the bench driver.
+    _last_result: W18CompatibilityResult | None = None
+
+    def decode_rounds(self,
+                       per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+                       ) -> dict[str, Any]:
+        """Run the W18 pipeline. Returns the same shape as the inner
+        decoder plus an additional ``compatibility`` block (W18 audit)
+        and a ``pack_stats`` block (forwarded from the W15 inner)."""
+        base = self.inner.decode_rounds(per_round_handoffs)
+        # Build the same union the inner consumed (post-normalisation).
+        union: list[_DecodedHandoff] = []
+        round_hint: list[int] = []
+        # Re-normalise via the inner's normaliser (idempotent).
+        normalised_per_round: list[list[_DecodedHandoff]] = []
+        for bundle in per_round_handoffs:
+            normalised_per_round.append(
+                self.inner.inner.normalize_round(bundle))
+        for r_idx, bundle in enumerate(normalised_per_round, start=1):
+            for h in bundle:
+                union.append(h)
+                round_hint.append(r_idx)
+        result = self._project_answer(base, union, round_hint)
+        self._last_result = result
+        out = dict(result.answer)
+        if "pack_stats" in base:
+            out["pack_stats"] = base["pack_stats"]
+        if "first_pass_root_cause" in base:
+            out["first_pass_root_cause"] = base["first_pass_root_cause"]
+        out["compatibility"] = result.as_dict()
+        return out
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+               ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    def _select_disambiguator(self,
+                                union: Sequence[_DecodedHandoff],
+                                round_hint: Sequence[int]
+                                ) -> tuple[str, str]:
+        """Pick the round-2 specific-tier disambiguator(s). Returns
+        ``(payload, kind)``: the concatenation of every specific-tier
+        disambiguator's payload (in canonical order) plus the kind
+        of the first such handoff. Empty if no specific-tier
+        disambiguator exists.
+        """
+        # Collect specific-tier handoffs along with deterministic
+        # ordering keys. Round-2 (or higher) preferred; within a round
+        # canonical (source_role, claim_kind, payload_sha) order.
+        candidates: list[tuple[int, str, str, str, str]] = []
+        for i, h in enumerate(union):
+            if h.claim_kind in _SPECIFIC_TIER_CLAIM_KINDS:
+                ridx = (round_hint[i] if i < len(round_hint) else 0)
+                sha = _payload_sha256(h.payload)[:16]
+                candidates.append(
+                    (-ridx, h.source_role, h.claim_kind, sha, h.payload))
+        if not candidates:
+            return ("", "")
+        candidates.sort()
+        payloads = " ".join(c[4] for c in candidates)
+        return (payloads, candidates[0][2])
+
+    def _project_answer(self,
+                         base: dict[str, Any],
+                         union: Sequence[_DecodedHandoff],
+                         round_hint: Sequence[int]
+                         ) -> W18CompatibilityResult:
+        base_services = tuple(base.get("services", ()) or ())
+        if not self.enabled:
+            return W18CompatibilityResult(
+                answer=dict(base),
+                base_services=base_services,
+                disambiguator_payload="",
+                per_tag_scores={},
+                abstained=True)
+        disambiguator_payload, _kind = self._select_disambiguator(
+            union, round_hint)
+        if not disambiguator_payload:
+            return W18CompatibilityResult(
+                answer=dict(base),
+                base_services=base_services,
+                disambiguator_payload="",
+                per_tag_scores={},
+                abstained=True)
+        tokens = _disambiguator_payload_tokens(disambiguator_payload)
+        # The W18 candidate set is the *union* of every service tag in
+        # the admitted bundle — not the inner decoder's filtered set.
+        # On the W17-Λ-symmetric regime the inner W11 contradiction-
+        # aware drop fires symmetrically and drops EVERY service tag,
+        # so ``base_services`` is empty even though the underlying union
+        # carries gold + decoy. The W18 projection has to look past the
+        # inner's drop to recover the gold tags. (On R-54..R-64 default
+        # the union typically includes more tags than the inner's
+        # filtered set; the strict-asymmetric branch still picks the
+        # gold-tag-mentioned subset.)
+        union_tag_set: set[str] = set()
+        for h in union:
+            tag = _service_tag_of(h.payload)
+            if tag:
+                union_tag_set.add(tag)
+        admitted_tags = sorted(union_tag_set)
+        if not admitted_tags:
+            return W18CompatibilityResult(
+                answer=dict(base),
+                base_services=base_services,
+                disambiguator_payload=disambiguator_payload,
+                per_tag_scores={},
+                abstained=True)
+        per_tag: dict[str, tuple[int, int]] = {}
+        for tag in admitted_tags:
+            per_tag[tag] = _relational_compatibility_score(tag, tokens)
+        # Strict-asymmetric branch: at least one tag has positive score
+        # AND not every tag has positive score → keep positive-score
+        # tags only. Otherwise abstain (no signal / symmetric signal /
+        # backward-compat — inner answer is the trusted fallback).
+        positive = [tag for tag in admitted_tags
+                     if (per_tag[tag][0] + per_tag[tag][1]) > 0]
+        if not positive or len(positive) == len(admitted_tags):
+            return W18CompatibilityResult(
+                answer=dict(base),
+                base_services=base_services,
+                disambiguator_payload=disambiguator_payload,
+                per_tag_scores=per_tag,
+                abstained=True)
+        # Project: keep positive-score tags from the union.
+        # Re-derive root_cause + remediation: the inner already elected
+        # them from the union (W11 priority decoder); we only project
+        # the service set. If the inner's services happens to be a
+        # subset of ``positive``, that's a strict refinement (the W18
+        # additional information ratifies the inner). If the inner's
+        # services is disjoint from ``positive`` (the W11 drop killed
+        # the gold tags, e.g. on R-65-COMPAT), W18 *recovers* them.
+        projected_services = tuple(sorted(positive))
+        new_answer = dict(base)
+        new_answer["services"] = projected_services
+        return W18CompatibilityResult(
+            answer=new_answer,
+            base_services=base_services,
+            disambiguator_payload=disambiguator_payload,
+            per_tag_scores=per_tag,
+            abstained=False)
+
+    @property
+    def last_result(self) -> W18CompatibilityResult | None:
+        return self._last_result
+
+    @property
+    def T_decoder(self) -> int | None:
+        return self.inner.T_decoder
+
+    @T_decoder.setter
+    def T_decoder(self, v: int | None) -> None:
+        self.inner.T_decoder = v
+
+    def pack_stats(self) -> dict[str, Any]:
+        """Forward the inner W15 pack-stats so the bench driver can
+        verify token-budget honesty (W18 reads only the W15-packed
+        bundle; ``tokens_kept`` is byte-for-byte identical)."""
+        return self.inner.pack_stats()
+
+
 __all__ = [
     # Per-role budget
     "RoleBudget", "DEFAULT_ROLE_BUDGETS",
@@ -4293,4 +4776,9 @@ __all__ = [
     "W15PackedHandoff", "W15PackResult",
     "FifoContextPacker", "CapsuleContextPacker",
     "AttentionAwareBundleDecoder",
+    # SDK v3.19 — bundle-relational compatibility disambiguator (W18 family).
+    "W18CompatibilityResult",
+    "RelationalCompatibilityDisambiguator",
+    "_disambiguator_payload_tokens",
+    "_relational_compatibility_score",
 ]

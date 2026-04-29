@@ -17,7 +17,8 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.18)         | [`RESULTS_WEVRA_LIVE_COMPOSITION.md`](RESULTS_WEVRA_LIVE_COMPOSITION.md) |
+> | Latest milestone (SDK v3.19)         | [`RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md`](RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md) |
+> | Previous milestone (SDK v3.18)       | [`RESULTS_WEVRA_LIVE_COMPOSITION.md`](RESULTS_WEVRA_LIVE_COMPOSITION.md) |
 > | Previous milestone (SDK v3.17)       | [`RESULTS_WEVRA_COMPOSED_REAL_LLM.md`](RESULTS_WEVRA_COMPOSED_REAL_LLM.md) |
 > | Previous milestone (SDK v3.16)       | [`RESULTS_WEVRA_ATTENTION_AWARE.md`](RESULTS_WEVRA_ATTENTION_AWARE.md) |
 > | Previous milestone (SDK v3.15)       | [`RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`](RESULTS_WEVRA_PRODUCER_AMBIGUITY.md) |
@@ -41,7 +42,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.18 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.19 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
@@ -73,7 +74,39 @@ limit), while pairing W9 admission with the new
 achieves 1.000 — the first capsule-native multi-agent coordination
 method that crosses the admission/decoding split** (W10 family,
 SDK v3.11).
-SDK v3.18's headline result is the **first fresh-live end-to-end
+SDK v3.19's headline result is the **first capsule-native multi-
+agent-coordination method that crosses the symmetric-corroboration
+wall** (W17-Λ-symmetric) **on a regime where the wall actually
+applies**. The W18 family ships the
+:class:`RelationalCompatibilityDisambiguator` — a closed-form
+deterministic bundle-relational scorer that consumes the round-2
+specific-tier disambiguator's *payload text* (the channel every
+prior decoder ignored) and projects the W11 / W15 answer through
+a strict-asymmetric branch that recovers gold-only services on
+the new R-65-COMPAT regime. On R-65-COMPAT (every gold service
+AND the decoy mentioned by ≥ 2 distinct routed roles via generic-
+noise kinds with comparable magnitudes — symmetric-corroboration;
+round-2 disambiguator carries a relational-compound mention of
+every gold service AND no decoy service), every closed-form
+salience scorer in the SDK ties FIFO at 0.000 (W17-Λ-symmetric
+extended verbatim); the W18 method achieves
+``capsule_relational_compat = 1.000`` at both
+``T_decoder ∈ {None, 24}`` (loose AND tight), strictly improving
+over every non-W18 capsule baseline by **+1.000**, stable across
+**5/5** alternate ``bank_seed`` values. Three named falsifiers
+(R-65-NO-COMPAT, R-65-CONFOUND, R-65-DECEIVE) make the W18-1
+conditionality sharp: no signal → abstain → tie FIFO; symmetric
+signal → abstain → tie FIFO; adversarial signal → trust evidence
+→ fail at 0.000. Backward-compat (W18-3) preserved byte-for-byte:
+on R-54..R-64 default banks the W18 method ties W15 byte-for-byte
+on the answer field via abstention or strict-asymmetric projection
+that lands on the same gold subset; with ``enabled = False`` the
+W18 method reduces to W15 byte-for-byte. The W18 surface is purely
+additive on top of the W15 surface (one new dataclass + one
+tokeniser + one closed-form scorer + one wrapping decoder); the
+SDK v3.18 runtime contract is byte-for-byte unchanged. See
+`docs/RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md` for the milestone
+note. SDK v3.18's prior headline result is the **first fresh-live end-to-end
 real-LLM strict +1.000 advance** in the programme over the
 strongest non-composed baseline AND **the first explicit
 symmetric-corroboration limit theorem**. The W17 family ships a

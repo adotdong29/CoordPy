@@ -3,7 +3,7 @@
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
 > README-of-README must satisfy these rules. Last touched: SDK
-> v3.18, 2026-04-27.
+> v3.19, 2026-04-28.
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or
@@ -164,6 +164,75 @@ and the result collapses. The W15 layer is *one of seven*
 structural axes the programme has identified; "multi-agent context
 solved" requires resolving every named limit theorem on every axis,
 which the programme has not done.
+
+### "W18 broke the symmetric-corroboration wall" or "we solved ambiguity resolution"
+
+> *"W18 broke the symmetric-corroboration wall."*
+
+Forbidden as a *general* claim. The W18-1 win is *strongly
+conditional* on the R-65-COMPAT bench property: round-2
+specific-tier disambiguator carries a relational-compound mention
+of *every* gold service AND *no* decoy service. Permitted
+phrasings: *"clears bar 15 of the SDK-v3.19-anchored success
+criterion"*, *"first capsule-native multi-agent-coordination
+method that crosses the symmetric-corroboration wall on a regime
+where the wall actually applies"*, *"closes the W18-Λ-sym
+extension of W17-Λ-symmetric on R-65-COMPAT under the named
+bench property"*. Forbidden: *"W18 broke the symmetric wall"*
+(unqualified), *"we solved ambiguity resolution"*, *"W18-1 holds
+for any decoder bundle"*, *"the relational scorer is universal"*.
+
+The W18-1 win is conditional on:
+* (a) symmetric-corroboration round-1 (R-64-SYM bench shape),
+* (b) round-2 disambiguator carrying a closed-vocabulary
+  relational-compound mention of every gold service AND no decoy
+  service (R-65-COMPAT specifically — not R-65-NO-COMPAT,
+  -CONFOUND, or -DECEIVE),
+* (c) the relational-mention convention being inside the
+  closed-vocabulary closure the W18 exact-match scorer reads.
+
+If any condition fails, W18 ties FIFO or fails by construction:
+* **W18-Λ-no-compat** (no signal): abstain → tie FIFO at 0.000.
+* **W18-Λ-confound** (symmetric signal): abstain → tie FIFO at 0.000.
+* **W18-Λ-deceive** (adversarial signal): trust evidence → fail at 0.000.
+* **W18-Λ-real** (free-form natural-language mentions outside the
+  closure): the closed-form scorer misses by construction.
+
+The W18 method is the *fifteenth* of fifteen named structural
+axes the programme has identified; "ambiguity resolution solved"
+requires resolving every named limit theorem on every axis,
+which the programme has *not* done. The W18-Λ-deceive falsifier
+in particular names a structural limit no closed-form scorer
+that *trusts* its evidence can escape (the named research move
+beyond it is W18-C-OUTSIDE — an outside-information axis to
+detect deceptive round-2 mentions, conjectural).
+
+### "the relational scorer reads transformer attention" or "W18 is a learned model"
+
+> *"The W18 method uses a small learned compatibility model that
+> reads transformer attention to break the symmetric ambiguity."*
+
+Forbidden. The W18 method is a *deterministic, training-free,
+closed-form* bundle-relational scorer:
+* It tokenises the round-2 disambiguator's payload via a
+  closed-form regex-style splitter
+  (:func:`_disambiguator_payload_tokens`).
+* It scores each admitted service tag via an O(|union| ·
+  |tokens|) match loop with contiguous-subsequence semantics for
+  compound targets
+  (:func:`_relational_compatibility_score`).
+* The strict-asymmetric branch fires *iff* at least one but not
+  all admitted tags have positive score; otherwise the W18 method
+  abstains.
+
+There is **no learned model**, no transformer attention reading,
+no embedding lookup. A learned variant is the named
+**W18-C-LEARNED** conjecture, conjectural and out of scope for
+SDK v3.19. Permitted phrasings: *"closed-form bundle-relational
+scorer"*, *"deterministic training-free disambiguator"*, *"the
+W18 scorer reads payload bytes via a closed-form tokeniser +
+contiguous-subsequence scorer"*. Forbidden: *"W18 reads attention
+weights"*, *"the W18 model"*, *"the W18 embedding"*.
 
 ### "W16 solves multi-agent context end-to-end" or "the composition is universal"
 

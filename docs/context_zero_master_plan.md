@@ -9119,6 +9119,108 @@ closed-form capsule surface (W17-C-DISAMBIGUATOR, conjectural).
 
 ---
 
+### 4.36 SDK v3.19 — bundle-relational compatibility disambiguator + symmetric-ambiguity benchmark family + W18 family (Phase-65 R-65-COMPAT + named falsifier triple)
+
+SDK v3.19 attacks the named research frontier SDK v3.18 left
+explicit (W17-C-DISAMBIGUATOR, conjectural): the symmetric-
+corroboration wall (W17-Λ-symmetric) where every closed-form
+salience scorer in the SDK ties FIFO at 0.000 by construction.
+The W17 milestone named the next move: a *richer disambiguator*
+that consumes information beyond the bipartite ``(role × tag,
+kind, magnitude)`` multiset — specifically, the round-2 specific-
+tier disambiguator's payload **text**.
+
+The W18 family is the smallest move in that direction. The
+:class:`RelationalCompatibilityDisambiguator` is a deterministic,
+training-free, closed-form four-stage pipeline:
+
+  1. Run the W15 :class:`AttentionAwareBundleDecoder` over the
+     admitted bundle (capture inner answer + W15 pack stats).
+  2. Identify the round-2 specific-tier disambiguator(s) in the
+     bundle.
+  3. Tokenise the disambiguator payload (lower-cased, split on
+     non-identifier chars, compound identifiers preserved) and
+     score each admitted service tag in the *union* of admitted
+     tags by direct-match + contiguous-subsequence compound
+     match.
+  4. Apply the strict-asymmetric branch: keep positive-score
+     tags iff at least one but not all admitted tags have positive
+     score; otherwise abstain (fall through to the inner answer
+     byte-for-byte).
+
+The SDK v3.19 mint:
+
+* **W18-Λ-sym (proved-empirical n=8 saturated × 5 seeds +
+  structural sketch).** W17-Λ-symmetric extends to R-65-COMPAT
+  verbatim for every method pre-W18.
+* **W18-1 (proved-conditional + proved-empirical n=40 saturated
+  across 5 seeds × 2 budgets).** Pairing the W15 attention-aware
+  decoder with the W18 disambiguator achieves
+  ``capsule_relational_compat = 1.000`` on R-65-COMPAT-LOOSE
+  AND R-65-COMPAT-TIGHT, strictly improving over every non-W18
+  capsule baseline by **+1.000**, stable across 5/5 alternate
+  ``bank_seed`` values.
+* **W18-2 (proved by inspection + mechanically-checked).** W18
+  determinism + closed-form correctness; bounded-context honesty
+  (``tokens_kept_sum`` byte-for-byte identical to W15's).
+* **W18-3 (proved-empirical full programme regression).**
+  Backward-compat with R-54..R-64 byte-for-byte; with
+  ``enabled = False`` the W18 method reduces to W15 byte-for-
+  byte.
+* **W18-Λ-no-compat / -confound / -deceive (proved-empirical
+  n=8 saturated each).** Three named structural limit regimes
+  where W18 ties FIFO or fails by construction.
+* **W18-C-LEARNED, W18-C-OUTSIDE, W18-Λ-real, W18-C-CROSS-BENCH
+  (conjectural).** Named extension axes.
+
+The W18 layer is *additive in code*: one new dataclass +
+one tokeniser + one closed-form scorer + one wrapping decoder.
+The SDK v3.18 runtime contract is byte-for-byte unchanged;
+**all prior tests pass byte-for-byte**; new tests cover the W18
+unit semantics, the Phase-65 bench-property witnesses, the W18-1
+strict-win anchor, the 5-seed stability, the three named
+falsifiers, the backward-compat smoke, the token-budget honesty,
+and the cross-regime synthetic summary.
+
+The defensible "thesis-after-SDK-v3.19" is that the
+synthetic→real-LLM-and-bounded-context transfer story now has
+**ten layers + one named structural wall + three named falsifier
+regimes**. The first capsule-native multi-agent-coordination
+method has crossed the symmetric-corroboration wall on a regime
+where the wall actually applies (R-65-COMPAT). The next research
+frontier is W18-C-LEARNED (free-form natural-language relational
+mentions) and W18-C-OUTSIDE (outside-information axis to detect
+adversarial round-2 mentions).
+
+**For another agent to instantly see the SDK v3.19 state**:
+
+1. **Is the new frontier true ambiguity resolution beyond W17?**
+   *YES.* The W18 family attacks the W17-Λ-symmetric wall
+   directly via the round-2 disambiguator's payload-text channel
+   that every prior decoder ignored.
+2. **Does the new method actually break the symmetric wall?**
+   *YES, on R-65-COMPAT.* W18 = 1.000; every non-W18 capsule
+   strategy = 0.000. **+1.000 strict separation**, stable across
+   5/5 seeds, on both loose AND tight decoder budgets.
+3. **Did bounded-context efficiency survive?** *YES.* The W18
+   method reads only the W15-packed bundle; ``tokens_kept_sum``
+   is byte-for-byte identical to W15's. Bounded-context honesty
+   preserved.
+4. **Is the original thesis materially stronger or still
+   blocked by a deeper semantic wall?** *MATERIALLY STRONGER on
+   the named axis; partially blocked on the deeper axis.* The
+   original Context-Zero thesis — *per-agent minimum-sufficient
+   context for multi-agent teams* — gains its **first capsule-
+   native method to cross the symmetric-corroboration wall on a
+   regime where the wall actually applies**. The deeper wall —
+   adversarial-relational round-2 evidence (W18-Λ-deceive) — is
+   *named* but *not* broken; the named research move beyond it
+   (W18-C-OUTSIDE — outside-information axis) is conjectural.
+   The thesis is materially stronger AND the next research
+   frontier is materially clearer.
+
+---
+
 *End of master plan. Changelog lives in the results notes, not
 here. If this document ever becomes a changelog, delete the
 changelog and restore the plan.*

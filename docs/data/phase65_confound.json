@@ -1,0 +1,402 @@
+{
+  "audit_ok_grid": {
+    "capsule_attention_aware": true,
+    "capsule_cohort_buffered": true,
+    "capsule_corroboration": true,
+    "capsule_coverage": true,
+    "capsule_fifo": true,
+    "capsule_layered_fifo_packed": true,
+    "capsule_layered_multi_round": true,
+    "capsule_multi_round": true,
+    "capsule_multi_service": true,
+    "capsule_priority": true,
+    "capsule_relational_compat": true,
+    "capsule_robust_multi_round": true,
+    "substrate": false
+  },
+  "bench_property_per_scenario": {
+    "p65confound_deadlock_orders_payments__sym_cache__rep0": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 1,
+      "r2_class": "confound",
+      "r2_mentions_decoy": true,
+      "r2_mentions_gold_a": true,
+      "r2_mentions_gold_b": true,
+      "symmetric_corroboration_holds": true
+    },
+    "p65confound_deadlock_orders_payments__sym_metrics__rep1": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 1,
+      "r2_class": "confound",
+      "r2_mentions_decoy": true,
+      "r2_mentions_gold_a": true,
+      "r2_mentions_gold_b": true,
+      "symmetric_corroboration_holds": true
+    },
+    "p65confound_disk_fill_storage_logs_pipeline__sym_search_index__rep1": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 1,
+      "r2_class": "confound",
+      "r2_mentions_decoy": true,
+      "r2_mentions_gold_a": true,
+      "r2_mentions_gold_b": true,
+      "symmetric_corroboration_holds": true
+    },
+    "p65confound_disk_fill_storage_logs_pipeline__sym_telemetry__rep0": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 1,
+      "r2_class": "confound",
+      "r2_mentions_decoy": true,
+      "r2_mentions_gold_a": true,
+      "r2_mentions_gold_b": true,
+      "symmetric_corroboration_holds": true
+    },
+    "p65confound_pool_exhaustion_api_db__sym_cache__rep0": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 1,
+      "r2_class": "confound",
+      "r2_mentions_decoy": true,
+      "r2_mentions_gold_a": true,
+      "r2_mentions_gold_b": true,
+      "symmetric_corroboration_holds": true
+    },
+    "p65confound_pool_exhaustion_api_db__sym_telemetry__rep1": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 1,
+      "r2_class": "confound",
+      "r2_mentions_decoy": true,
+      "r2_mentions_gold_a": true,
+      "r2_mentions_gold_b": true,
+      "symmetric_corroboration_holds": true
+    },
+    "p65confound_slow_query_cascade_web_db_query__sym_archival__rep1": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 1,
+      "r2_class": "confound",
+      "r2_mentions_decoy": true,
+      "r2_mentions_gold_a": true,
+      "r2_mentions_gold_b": true,
+      "symmetric_corroboration_holds": true
+    },
+    "p65confound_slow_query_cascade_web_db_query__sym_metrics__rep0": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 1,
+      "r2_class": "confound",
+      "r2_mentions_decoy": true,
+      "r2_mentions_gold_a": true,
+      "r2_mentions_gold_b": true,
+      "symmetric_corroboration_holds": true
+    }
+  },
+  "bench_summary": {
+    "K_auditor": 12,
+    "T_decoder": null,
+    "bank": "confound",
+    "n_scenarios": 8,
+    "scenarios_r2_class_compat": 0,
+    "scenarios_r2_class_confound": 8,
+    "scenarios_r2_class_deceive": 0,
+    "scenarios_r2_class_no_compat": 0,
+    "scenarios_with_symmetric_corroboration": 8
+  },
+  "config": {
+    "K_auditor": 12,
+    "K_producer": 6,
+    "T_auditor": 256,
+    "T_decoder": null,
+    "T_producer": 96,
+    "bank": "confound",
+    "bank_replicates": 2,
+    "bank_seed": 11,
+    "inbox_capacity": 12,
+    "n_eval": 8
+  },
+  "headline_gap": {
+    "max_non_w18_accuracy_full": 0.0,
+    "w18_minus_attention_aware": 0.0,
+    "w18_minus_fifo": 0.0,
+    "w18_minus_layered": 0.0,
+    "w18_minus_substrate": 0.0
+  },
+  "n_results": 104,
+  "pack_stats_summary": {
+    "capsule_attention_aware": {
+      "fraction_handoffs_kept": 1.0,
+      "handoffs_admitted_sum": 72,
+      "handoffs_decoder_input_sum": 72,
+      "n_cells": 8,
+      "n_dropped_budget_sum": 0,
+      "n_w18_abstain_cells": 0,
+      "tokens_input_sum": 194,
+      "tokens_kept_over_input": 1.0,
+      "tokens_kept_sum": 194
+    },
+    "capsule_layered_fifo_packed": {
+      "fraction_handoffs_kept": 1.0,
+      "handoffs_admitted_sum": 72,
+      "handoffs_decoder_input_sum": 72,
+      "n_cells": 8,
+      "n_dropped_budget_sum": 0,
+      "n_w18_abstain_cells": 0,
+      "tokens_input_sum": 194,
+      "tokens_kept_over_input": 1.0,
+      "tokens_kept_sum": 194
+    },
+    "capsule_relational_compat": {
+      "fraction_handoffs_kept": 1.0,
+      "handoffs_admitted_sum": 72,
+      "handoffs_decoder_input_sum": 72,
+      "n_cells": 8,
+      "n_dropped_budget_sum": 0,
+      "n_w18_abstain_cells": 8,
+      "tokens_input_sum": 194,
+      "tokens_kept_over_input": 1.0,
+      "tokens_kept_sum": 194
+    }
+  },
+  "pooled": {
+    "capsule_attention_aware": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_attention_aware"
+    },
+    "capsule_cohort_buffered": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_cohort_buffered"
+    },
+    "capsule_corroboration": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_corroboration"
+    },
+    "capsule_coverage": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_coverage"
+    },
+    "capsule_fifo": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_fifo"
+    },
+    "capsule_layered_fifo_packed": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_layered_fifo_packed"
+    },
+    "capsule_layered_multi_round": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_layered_multi_round"
+    },
+    "capsule_multi_round": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_multi_round"
+    },
+    "capsule_multi_service": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_multi_service"
+    },
+    "capsule_priority": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "missing_handoff": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_priority"
+    },
+    "capsule_relational_compat": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_relational_compat"
+    },
+    "capsule_robust_multi_round": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 9.25,
+      "mean_tokens_admitted": 4.25,
+      "n": 8,
+      "strategy": "capsule_robust_multi_round"
+    },
+    "substrate": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 0.0,
+      "failure_hist": {
+        "decoder_error": 8
+      },
+      "mean_n_admitted_auditor": 9.0,
+      "mean_n_role_view": 0.0,
+      "mean_n_team_handoff": 0.0,
+      "mean_tokens_admitted": 24.25,
+      "n": 8,
+      "strategy": "substrate"
+    }
+  },
+  "scenarios_evaluated": [
+    "p65confound_deadlock_orders_payments__sym_cache__rep0",
+    "p65confound_deadlock_orders_payments__sym_metrics__rep1",
+    "p65confound_pool_exhaustion_api_db__sym_cache__rep0",
+    "p65confound_pool_exhaustion_api_db__sym_telemetry__rep1",
+    "p65confound_disk_fill_storage_logs_pipeline__sym_telemetry__rep0",
+    "p65confound_disk_fill_storage_logs_pipeline__sym_search_index__rep1",
+    "p65confound_slow_query_cascade_web_db_query__sym_metrics__rep0",
+    "p65confound_slow_query_cascade_web_db_query__sym_archival__rep1"
+  ],
+  "schema": "phase65.relational_disambiguation.v1"
+}

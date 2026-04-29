@@ -5,6 +5,78 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.19] — 2026-04-28 — SDK v3.19 — bundle-relational compatibility disambiguator + symmetric-ambiguity benchmark family + W18 family (first capsule-native multi-agent-coordination method to cross the symmetric-corroboration wall on a regime where the wall actually applies)
+
+*Strictly additive on SDK v3.18. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W18 surface adds
+one new dataclass (``W18CompatibilityResult``), one wrapping
+decoder (``RelationalCompatibilityDisambiguator``), one
+deterministic tokeniser (``_disambiguator_payload_tokens``), and
+one closed-form scorer (``_relational_compatibility_score``) with
+contiguous-subsequence semantics for compound targets. Re-exported
+via the SDK ``__init__``. The new
+``vision_mvp/experiments/phase65_relational_disambiguation.py``
+driver ships as a research-slice addition with one positive-
+anchor sub-bank (R-65-COMPAT under loose AND tight
+``T_decoder``) plus three named falsifier sub-banks
+(R-65-NO-COMPAT, R-65-CONFOUND, R-65-DECEIVE).*
+
+On the new Phase-65 *relational-compatibility disambiguation
+under symmetric corroboration* benchmark:
+
+* **R-65-COMPAT-LOOSE** (synthetic identity producer, magnitude-
+  hinted prompt, ``T_decoder = None``; **W18-1 anchor**; n=8 ×
+  bank_replicates=2): every closed-form salience scorer in the
+  SDK — substrate FIFO, ``capsule_fifo``, ``capsule_priority``,
+  ``capsule_coverage``, W7-2 cohort, W8 corroboration, W9 multi-
+  service, W11 multi-round, W12 robust, W13 layered, W15
+  ``AttentionAwareBundleDecoder``, ``capsule_layered_fifo_packed``
+  — ties FIFO at ``accuracy_full = 0.000`` (W17-Λ-symmetric extends
+  to R-65-COMPAT verbatim by W18-Λ-sym). The new W18
+  ``RelationalCompatibilityDisambiguator`` achieves
+  ``capsule_relational_compat = 1.000``. **+1.000 strict
+  separation** vs every non-W18 capsule baseline.
+* **R-65-COMPAT-TIGHT** (same regime under decoder-side budget
+  pressure ``T_decoder = 24``): same headline as loose. The W18
+  method composes cleanly with the W15 attention-aware pack;
+  ``tokens_kept_sum`` is byte-for-byte identical to W15's
+  (bounded-context honesty preserved).
+* **5-seed stability** on R-65-COMPAT-LOOSE AND R-65-COMPAT-TIGHT:
+  gap ``w18 − attention_aware = +1.000`` on every seed in
+  ``{11, 17, 23, 29, 31}`` (saturated; well above the 0.50
+  strong-bar threshold).
+* **R-65-NO-COMPAT** (W18-Λ-no-compat falsifier): round-2
+  disambiguator carries no service-tag mention; W18 abstains; ties
+  FIFO at 0.000 on 8/8 cells.
+* **R-65-CONFOUND** (W18-Λ-confound falsifier): round-2
+  disambiguator mentions BOTH gold AND decoy; W18 abstains; ties
+  FIFO at 0.000 on 8/8 cells.
+* **R-65-DECEIVE** (W18-Λ-deceive falsifier): round-2 disambiguator
+  mentions DECOY but NOT gold; W18 trusts its evidence and picks
+  decoy; fails at 0.000 on 8/8 cells. Names the structural limit
+  no closed-form bundle-relational scorer that trusts its evidence
+  can escape (the named research move beyond it is W18-C-OUTSIDE,
+  conjectural).
+* **W18-3 backward-compat**: on R-58 default the W18 method ties
+  W15 byte-for-byte on the answer field; on R-64-SYM the W18
+  method partially recovers (only deadlock-flavored scenarios
+  carry a relational mention). With ``enabled = False`` the W18
+  method reduces to W15 byte-for-byte.
+* **Audit T-1..T-7** OK on every capsule strategy of every cell of
+  every regime.
+
+The W18 surface is purely additive on top of the W15 surface (one
+new dataclass + one tokeniser + one closed-form scorer + one
+wrapping decoder). The SDK v3.18 runtime contract is byte-for-byte
+unchanged. New tests cover the W18 unit semantics, the Phase-65
+bench-property witnesses, the W18-1 strict-win anchor on loose
+AND tight, the 5-seed stability, the three named falsifiers, the
+backward-compat smoke, the token-budget honesty, and the
+cross-regime synthetic summary.
+
+See [`docs/RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md`](docs/RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md)
+for the full milestone note.
+
 ## [3.18] — 2026-04-27 — SDK v3.18 — magnitude-hinted producer protocol + fresh-live end-to-end composition + symmetric-corroboration limit theorem (first fresh-live end-to-end real-LLM strict +1.000 advance + first explicit symmetric-corroboration negative theorem) + W17 family
 
 *Strictly additive on SDK v3.17. The Wevra single-run product

@@ -7,7 +7,45 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**As of SDK v3.17 (April 2026), capsules are load-bearing
+**As of SDK v3.19 (April 2026), capsules are load-bearing
+*inside one Wevra run*, *between agents in a team*, *across the
+model-class gradient*, *across the model regime × admission
+strategy grid on a real-LLM benchmark*, *across cross-role
+coherence / corroboration / multi-service / decoder-forcing /
+multi-round / open-world-normalisation / producer-protocol /
+decoder-context-packing / live-end-to-end-composition axes*, and
+— most sharply — *across the first capsule-native multi-agent-
+coordination method that crosses the symmetric-corroboration wall
+(W17-Λ-symmetric, named in SDK v3.18) on a regime where the wall
+actually applies: W18-1 strict +1.000 gain on R-65-COMPAT loose
+AND tight, stable across 5/5 alternate ``bank_seed`` values,
+bounded-context honesty preserved byte-for-byte, with three named
+falsifier regimes — W18-Λ-no-compat / -confound / -deceive — that
+make the W18-1 conditionality sharp.* SDK v3.19's contribution is
+the Phase-65 relational-compatibility disambiguation benchmark
+family
+([`vision_mvp/experiments/phase65_relational_disambiguation.py`](vision_mvp/experiments/phase65_relational_disambiguation.py))
+plus a deterministic, training-free, closed-form
+[`RelationalCompatibilityDisambiguator`](vision_mvp/wevra/team_coord.py)
+that consumes the round-2 specific-tier disambiguator's payload
+text — the channel every prior decoder ignored. On R-65-COMPAT,
+every closed-form salience scorer in the SDK ties FIFO at
+`accuracy_full = 0.000` (W17-Λ-symmetric extends to R-65 verbatim);
+the new W18 method achieves `capsule_relational_compat = 1.000`
+at both `T_decoder ∈ {None, 24}`, **+1.000** strict separation
+vs every non-W18 capsule baseline, stable across 5/5 alternate
+`bank_seed` values. The W18 surface is purely additive on top of
+W15. See
+[`docs/RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md`](docs/RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md)
+for the full SDK v3.19 milestone note.
+
+The previous milestone (**SDK v3.18**) contributed the **Phase-64
+fresh-live composition + magnitude-hinted producer protocol +
+symmetric-corroboration limit theorem** — see
+[`docs/RESULTS_WEVRA_LIVE_COMPOSITION.md`](docs/RESULTS_WEVRA_LIVE_COMPOSITION.md).
+
+**Historical SDK v3.17 reading (preserved for context).** Capsules
+were load-bearing
 *inside one Wevra run*, *between agents in a team*, *across the
 model-class gradient*, *across the model regime × admission
 strategy grid on a real-LLM benchmark*, *across cross-role
@@ -20,7 +58,7 @@ context-packing layer must fire jointly (W16-1 strict +1.000
 synthetic gain; W16-Λ-real-replay strict +0.500 gain on recorded
 ``qwen2.5:14b-32k`` bytes — the first end-to-end real-LLM strict
 advance over the strongest non-composed baseline in the
-programme).** SDK v3.17's contribution is the
+programme).* SDK v3.17's contribution is the
 **Phase-63 composed end-to-end W14 + W15 benchmark**
 ([`vision_mvp/experiments/phase63_composed_real_llm.py`](vision_mvp/experiments/phase63_composed_real_llm.py))
 plus the ``OllamaReplayExtractor`` for honest replay over
