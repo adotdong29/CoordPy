@@ -9449,6 +9449,137 @@ N-oracle compromise.
    integrity + multi-oracle aggregation, not a method-gap
    conjecture.**
 
+### 4.39 SDK v3.22 — trust-weighted multi-oracle adjudicator + R-68 multi-oracle benchmark family + W21 family (Phase-68 R-68-MULTI-MAJORITY + three named falsifiers + live cross-model coalition probes)
+
+SDK v3.22 attacks the named research frontier SDK v3.21 left
+explicitly conjectural: **W20-C-MULTI-ORACLE** — the multi-source
+escape from the W20-Λ-compromised wall. The W21 family ships the
+:class:`TrustWeightedMultiOracleDisambiguator` that, when the
+inner W19 abstains, consults **N registered outside oracles** in
+parallel (one bounded query each, ≤ ``max_response_tokens`` per
+call), counts per-tag votes across non-abstaining oracle replies,
+and projects the answer onto tags with ≥ ``quorum_min`` votes AND
+≥ ``min_trust_sum`` trust mass. The first capsule-native multi-
+agent-coordination method that crosses the W20-Λ-compromised wall
+on a regime where the wall actually applies (R-68-MULTI-MAJORITY).
+
+The SDK v3.22 mint:
+
+* **Phase 68** — driver + bench-property test +
+  ``run_phase68`` + ``run_phase68_seed_stability_sweep`` +
+  ``run_cross_regime_synthetic`` + cross-model live coalition
+  probes.
+* Five sub-banks: ``single_clean``, ``multi_majority``,
+  ``multi_no_quorum``, ``multi_all_compromised``,
+  ``multi_partial``. Bundle shape inherits R-66-OUTSIDE-REQUIRED
+  from Phase-67 (deceptive primary + symmetric secondary witness);
+  the *registered oracle set* is the bank-specific knob.
+* **W21 family**: 11 entries — W21-1 (proved-empirical n=80
+  saturated), W21-2 (proved + mechanically-checked), W21-3-A
+  (proved-empirical full programme regression), W21-3-B
+  (proved-empirical reduces-to-W20), W21-Λ-no-quorum, W21-Λ-all-
+  compromised, W21-Λ-partial (all proved-empirical n=8 saturated),
+  W21-Λ-real (proved-conditional + empirical-research n=4 × 2
+  models), W21-C-CALIBRATED-TRUST + W21-C-LIVE-WITH-REGISTRY
+  (the second partially discharged at n=4 × mixtral 8x7b).
+* **48 new tests** (``test_wevra_multi_oracle_adjudication.py``);
+  full SDK regression: 633 / 633 wevra tests pass.
+
+Headline reading:
+
+* **R-68-MULTI-MAJORITY-LOOSE / TIGHT**: W21 = 1.000; W20 = 0.000;
+  **+1.000 strict separation**, stable across 5/5 seeds.
+  ``W21_BRANCH_QUORUM_RESOLVED`` fires on every cell; gold pair
+  receives 2 votes (service_graph + change_history), decoy
+  receives 1 (compromised_registry).
+* **R-68-MULTI-NO-QUORUM** (W21-Λ-no-quorum): W21 = FIFO = 0.000.
+* **R-68-MULTI-ALL-COMPROMISED** (W21-Λ-all-compromised): W21 =
+  0.000 (quorum forms on decoy by registered-set integrity
+  failure).
+* **R-68-MULTI-PARTIAL** (W21-Λ-partial under default
+  ``quorum_min = 2``): W21 = 0.000. With override ``quorum_min =
+  1`` (W21-C-PARTIAL-RECOVERY discharged): W21 = 1.000.
+* **R-68-LIVE-MIXED-REGISTRY** (4 oracles incl. mixtral 8x7b):
+  W21 = 1.000, +1.000 over W20. W21-C-LIVE-WITH-REGISTRY
+  partially discharged (registry-anchored regime).
+* **R-68-LIVE-COALITION-MIXTRAL** (3 oracles, LLM-vote-required):
+  W21 = 0.750, +0.750 over W20. **W21-Λ-real partial advance**.
+* **R-68-LIVE-COALITION-GEMMA2-9B** (3 oracles, LLM-vote-required):
+  W21 = 0.000. **W21-Λ-real fails on under-scaled model — gemma2
+  lands decoy tokens through the closure**. Cross-model split
+  (47B-MoE / 9.2B-dense) sharp.
+
+The next research frontier is **W21-C-CALIBRATED-TRUST** (low
+trust priors on uncalibrated oracles via ``min_trust_sum`` floor —
+escapes W21-Λ-all-compromised on bounded-corruption regimes) AND
+**W22-* — joint-deception detection** (cross-source consistency
+checks that detect when ALL N registered oracles agree
+suspiciously; the natural escape from W21-Λ-all-compromised when
+no oracle can be a priori distrusted). Both conjectural; both
+bounded above by structural circularity (a learned trust scorer
+trained on historical agreement is itself an N+1-th oracle that
+can be compromised).
+
+**For another agent to instantly see the SDK v3.22 state**:
+
+1. **Is the new frontier multi-source outside-information
+   adjudication beyond W20?** *YES.* The W21 family attacks the
+   W20-Λ-compromised wall directly via the multi-source channel.
+2. **Does the new method actually beat the compromised-source
+   wall?** *YES, on the bundle+single-oracle-insufficient-but-
+   multi-oracle-resolvable case (R-68-MULTI-MAJORITY).* W21 =
+   1.000; W20 = 0.000. **+1.000 strict separation**, stable across
+   5/5 seeds, on both loose AND tight decoder budgets.
+3. **Did bounded-context efficiency survive?** *YES.* The W21
+   layer adds *exactly N* outside queries per cell, each bounded
+   by ``max_response_tokens``; the W15 ``tokens_kept`` is
+   byte-for-byte identical between W19, W20 AND W21. Total context
+   delivered to the final decider on the 3-oracle stack:
+   ``tokens_kept (≤ T_decoder) + 3 × n_outside_tokens (each ≤
+   max_response_tokens)``. On R-68-MULTI-MAJORITY-TIGHT
+   (T_decoder=24): tokens_kept ≤ 24 + 3 × 4 = 36 average per cell.
+4. **Did two-Mac live evaluation materially broaden the
+   evidence?** *NO — Mac 2 remains unreachable (ARP
+   ``incomplete``, same status as the prior 15 milestones). No
+   two-Mac sharded inference.* But the W21 oracle Protocol is
+   *naturally* a producer / multi-adjudicator separation; cross-
+   host deployment (registry on Mac-1, LLM adjudicator on Mac-2)
+   is wire-compatible and waits for Mac-2. **A live multi-source
+   probe on Mac-1 alone — with deterministic registry + change-
+   log + mixtral 8x7b — discharges W21-C-LIVE-WITH-REGISTRY at
+   n=4 (acc_full = 1.000, +1.000 over W20). The harder coalition
+   regime (deterministic insufficient, LLM vote required for
+   quorum) cross-model split: mixtral 0.750 / gemma2 0.000.**
+5. **Were earlier paper loose ends closed?** *PARTIALLY.* (a)
+   **W20-C-MULTI-ORACLE** (named conjectural in SDK v3.21) is
+   **discharged** by W21-1 on R-68-MULTI-MAJORITY. (b)
+   **W20-C-LIVE-WITH-REGISTRY** (named conjectural in SDK v3.21)
+   is **partially discharged** by the live mixed-registry probe
+   on Mac-1 mixtral 8x7b. (c) The cross-model transfer story
+   (W17-C-XMODEL pattern) is sharpened: the live coalition probe
+   shows **scale + general knowledge matter** for the LLM-vote-
+   required regime — mixtral 0.750 / gemma2 0.000. (d) Two-Mac
+   path remains infrastructure-only (15th milestone in a row);
+   the W21 mechanism is naturally cross-host but Mac-2 unavailable.
+6. **Is the original thesis materially stronger or still blocked
+   by a deeper trust / semantics wall?** *MATERIALLY STRONGER on
+   the named axis; the deeper wall is now SHARPER — joint
+   compromise across the entire registered set (W21-Λ-all-
+   compromised) is the named structural limit.* The original
+   Context-Zero thesis gains its **first capsule-native method to
+   adjudicate across multiple outside sources under partial
+   compromise**. The deeper walls (W21-Λ-all-compromised,
+   W21-Λ-no-quorum, W21-Λ-partial-without-q1) are *named* and
+   *proved-empirical* — the natural escape from W21-Λ-all-
+   compromised is W21-C-CALIBRATED-TRUST (calibrated trust priors
+   exclude uncalibrated oracles via the ``min_trust_sum`` floor)
+   and the natural escape from W21-Λ-no-quorum is **W22-* — joint
+   consistency detection** (cross-source consistency checks that
+   detect "too good to be true" agreement); both conjectural.
+   **The thesis is materially stronger AND the next research
+   frontier is precisely articulated as registered-set integrity
+   + cross-source consistency, not a method-gap conjecture.**
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

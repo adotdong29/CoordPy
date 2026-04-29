@@ -17,7 +17,8 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.21)         | [`RESULTS_WEVRA_OUTSIDE_INFORMATION.md`](RESULTS_WEVRA_OUTSIDE_INFORMATION.md) |
+> | Latest milestone (SDK v3.22)         | [`RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md`](RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md) |
+> | Previous milestone (SDK v3.21)       | [`RESULTS_WEVRA_OUTSIDE_INFORMATION.md`](RESULTS_WEVRA_OUTSIDE_INFORMATION.md) |
 > | Previous milestone (SDK v3.20)       | [`RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md`](RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md) |
 > | Previous milestone (SDK v3.19)       | [`RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md`](RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md) |
 > | Previous milestone (SDK v3.18)       | [`RESULTS_WEVRA_LIVE_COMPOSITION.md`](RESULTS_WEVRA_LIVE_COMPOSITION.md) |
@@ -44,7 +45,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.21 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.22 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
@@ -76,6 +77,56 @@ limit), while pairing W9 admission with the new
 achieves 1.000 — the first capsule-native multi-agent coordination
 method that crosses the admission/decoding split** (W10 family,
 SDK v3.11).
+SDK v3.22's headline result is the **first capsule-native multi-
+agent-coordination method that crosses the W20-Λ-compromised
+wall** (named in SDK v3.21) **on a regime where the wall actually
+applies**. The W21 family ships the
+:class:`TrustWeightedMultiOracleDisambiguator` — a deterministic,
+training-free composition of the W19 inner with **N registered
+outside oracles** under bounded context (one query per oracle per
+cell, each ≤ ``max_response_tokens``). On R-68-MULTI-MAJORITY
+(three registered oracles: ``compromised_registry`` first,
+``service_graph``, ``change_history``; W20's single-oracle
+interface picks the first-registered compromised oracle and
+trusts its decoy reply ⇒ FAILS), the W21 method consults all
+three; gold tags receive 2 votes (from the two honest
+deterministic oracles), decoy receives 1; quorum forms on gold;
+W21 projects the answer to the gold pair. **+1.000 strict gain
+over W20** (which fails at 0.000 by trusting the first-registered
+compromised oracle on the same regime), stable across **5/5**
+alternate ``bank_seed`` values, both at ``T_decoder ∈ {None, 24}``
+(loose AND tight). Three named falsifiers (W21-Λ-no-quorum,
+W21-Λ-all-compromised, W21-Λ-partial) make the W21-1
+conditionality sharp; the partial-recovery axis (W21-C-PARTIAL-
+RECOVERY) is empirically discharged at ``quorum_min = 1``. Live
+LLM transfer (W21-Λ-real / W21-C-LIVE-WITH-REGISTRY): on a
+four-oracle live registry pairing deterministic ``service_graph``
++ ``change_history`` with ``ollama_mixtral:8x7b`` (Mac-1, 47B-MoE)
+the W21 method wins at +1.000 over W20 (registry-anchored regime;
+the deterministic two form quorum on gold regardless of LLM
+output). On the **harder coalition regime** (one deterministic
+honest + one LLM + one compromised, ``quorum_min = 2``, LLM vote
+required for quorum), the cross-model split is sharp:
+``mixtral:8x7b`` lands gold tokens ⇒ W21 = **0.750** (+0.750 over
+W20); ``gemma2:9b`` lands decoy tokens ⇒ W21 = 0.000 (+0.000 over
+W20). Backward-compat (W21-3-A / W21-3-B) preserved byte-for-byte:
+on R-54..R-67 default banks W21 ties W19 byte-for-byte via
+``W21_BRANCH_NO_TRIGGER``; on R-67-OUTSIDE-RESOLVES with a single
+oracle and ``quorum_min = 1`` W21 ties W20 byte-for-byte. The W21
+surface is purely additive on top of the W20 surface (one new
+``OracleRegistration`` dataclass + four new oracle adapters
+``ChangeHistoryOracle`` / ``OnCallNotesOracle`` /
+``SingletonAsymmetricOracle`` / ``DisagreeingHonestOracle`` + one
+``W21OracleProbe`` + one ``W21MultiOracleResult`` + one
+``TrustWeightedMultiOracleDisambiguator``); the SDK v3.21 runtime
+contract is byte-for-byte unchanged. See
+`docs/RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md` for the milestone
+note.
+SDK v3.21's prior headline result is the **first capsule-native
+multi-agent-coordination method that crosses the W19-Λ-outside
+wall** by acquiring asymmetric outside information (single-oracle
+:class:`OutsideWitnessAcquisitionDisambiguator` + deterministic
+``ServiceGraphOracle``).
 SDK v3.19's headline result is the **first capsule-native multi-
 agent-coordination method that crosses the symmetric-corroboration
 wall** (W17-Λ-symmetric) **on a regime where the wall actually

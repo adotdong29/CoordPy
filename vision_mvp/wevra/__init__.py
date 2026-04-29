@@ -260,6 +260,15 @@ from .team_coord import (
     W20_BRANCH_OUTSIDE_TRUSTED_ASYMMETRIC,
     W20_BRANCH_OUTSIDE_ABSTAINED, W20_BRANCH_NO_TRIGGER,
     W20_BRANCH_DISABLED, W20_DEFAULT_TRIGGER_BRANCHES,
+    # SDK v3.22 — trust-weighted multi-oracle adjudicator (W21 family).
+    OracleRegistration, ChangeHistoryOracle, OnCallNotesOracle,
+    SingletonAsymmetricOracle, DisagreeingHonestOracle,
+    W21OracleProbe, W21MultiOracleResult,
+    TrustWeightedMultiOracleDisambiguator,
+    W21_ALL_BRANCHES, W21_BRANCH_QUORUM_RESOLVED,
+    W21_BRANCH_NO_QUORUM, W21_BRANCH_SYMMETRIC_QUORUM,
+    W21_BRANCH_NO_ORACLES, W21_BRANCH_NO_TRIGGER,
+    W21_BRANCH_DISABLED, W21_DEFAULT_TRIGGER_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -273,7 +282,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.21"
+SDK_VERSION = "wevra.sdk.v3.22"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -406,6 +415,15 @@ __all__ = [
     "W20_BRANCH_OUTSIDE_TRUSTED_ASYMMETRIC",
     "W20_BRANCH_OUTSIDE_ABSTAINED", "W20_BRANCH_NO_TRIGGER",
     "W20_BRANCH_DISABLED", "W20_DEFAULT_TRIGGER_BRANCHES",
+    # SDK v3.22 — W21 family (trust-weighted multi-oracle adjudicator).
+    "OracleRegistration", "ChangeHistoryOracle", "OnCallNotesOracle",
+    "SingletonAsymmetricOracle", "DisagreeingHonestOracle",
+    "W21OracleProbe", "W21MultiOracleResult",
+    "TrustWeightedMultiOracleDisambiguator",
+    "W21_ALL_BRANCHES", "W21_BRANCH_QUORUM_RESOLVED",
+    "W21_BRANCH_NO_QUORUM", "W21_BRANCH_SYMMETRIC_QUORUM",
+    "W21_BRANCH_NO_ORACLES", "W21_BRANCH_NO_TRIGGER",
+    "W21_BRANCH_DISABLED", "W21_DEFAULT_TRIGGER_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

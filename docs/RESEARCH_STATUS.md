@@ -5,13 +5,74 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.21,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.22,
 > 2026-04-29.
 
-## TL;DR — SDK v3.21
+## TL;DR — SDK v3.22
 
-The programme now has **seventeen** coupled research axes, each
-with a sharp status. SDK v3.21 mints axis 17: **outside-witness
+The programme now has **eighteen** coupled research axes, each
+with a sharp status. SDK v3.22 mints axis 18: **trust-weighted
+multi-oracle adjudication under partial oracle compromise**. The
+W21 family adds one new dataclass (``OracleRegistration``), four
+oracle adapters (``ChangeHistoryOracle`` / ``OnCallNotesOracle`` /
+``SingletonAsymmetricOracle`` / ``DisagreeingHonestOracle``), two
+new audit dataclasses (``W21OracleProbe``, ``W21MultiOracleResult``),
+and one wrapping decoder (``TrustWeightedMultiOracleDisambiguator``)
+— purely additive on top of the W20 surface. The SDK v3.21
+runtime contract is byte-for-byte unchanged.
+
+**The headline SDK v3.22 results.** On a synthetic
+R-68-MULTI-MAJORITY regime (the same R-66-OUTSIDE-REQUIRED bundle
+shape — deceptive primary mentions decoy only AND symmetric
+secondary witness mentions all three — but with **three registered
+oracles**: ``compromised_registry`` first, ``service_graph``,
+``change_history``), every closed-form scorer in the SDK pre-W21
+— substrate FIFO, ``capsule_fifo``, …, **W19
+``BundleContradictionDisambiguator``**, **AND W20
+``OutsideWitnessAcquisitionDisambiguator``** (which trusts the
+first-registered compromised oracle and projects to decoy) —
+ties FIFO at ``accuracy_full = 0.000``. The W21 method, with the
+trust-weighted multi-oracle adjudicator under default
+``quorum_min = 2``, achieves ``accuracy_full = 1.000`` on
+R-68-MULTI-MAJORITY-LOOSE (``T_decoder = None``) AND
+R-68-MULTI-MAJORITY-TIGHT (``T_decoder = 24``), strictly improving
+over every non-W21 capsule baseline including W20 by **+1.000**,
+stable across **5/5** alternate ``bank_seed`` values
+(11, 17, 23, 29, 31). Three named falsifiers (R-68-MULTI-NO-QUORUM,
+R-68-MULTI-ALL-COMPROMISED, R-68-MULTI-PARTIAL) make the W21-1
+conditionality sharp: no quorum → abstain → tie FIFO; all
+compromised → quorum forms on decoy → fail at 0.000; sub-quorum
+honest → abstain at default → tie FIFO. The conditional
+W21-C-PARTIAL-RECOVERY (with override ``quorum_min = 1`` on
+R-68-MULTI-PARTIAL) is empirically discharged at 1.000.
+Bounded-context honesty: the W21 layer issues *exactly N*
+outside queries per cell, each bounded by ``max_response_tokens``;
+the W15 ``tokens_kept`` is byte-for-byte identical between W19,
+W20 AND W21. Backward-compat (W21-3-A / W21-3-B) preserved
+byte-for-byte: 585 / 585 prior wevra tests pass + 48 new W21
+tests pass = **633 / 633**.
+
+**Live LLM transfer (W21-Λ-real / W21-C-LIVE-WITH-REGISTRY,
+empirical n=4 × 2 models).** Two regimes:
+
+* **Mixed-registry (registry-anchored, easy)** — four-oracle
+  registry pairing deterministic ``service_graph`` +
+  ``change_history`` with ``ollama_mixtral:8x7b``: W21 acc_full =
+  **1.000**, +1.000 over W20. **W21-C-LIVE-WITH-REGISTRY
+  partially discharged**.
+* **Coalition (LLM-vote-required, hard)** — three-oracle registry
+  with one honest deterministic + one LLM + one compromised,
+  ``quorum_min = 2`` (LLM vote required for quorum on gold):
+  cross-model split is sharp.
+  - ``mixtral:8x7b`` (47B-MoE): W21 = **0.750**, +0.750 over W20.
+  - ``gemma2:9b`` (9.2B-dense): W21 = **0.000**, +0.000 (gemma2
+    lands decoy tokens through the closure; quorum forms on decoy).
+
+**Scale + general knowledge matter for the W21-Λ-real escape on the
+LLM-vote-required regime**.
+
+The W20 family TL;DR (SDK v3.21) is preserved historically below.
+SDK v3.21 mints axis 17: **outside-witness
 acquisition under bundle-only insufficiency (outside-resolvable
 case)**. The W20 family adds one new Protocol
 (``OutsideWitnessOracle``), four oracle adapters

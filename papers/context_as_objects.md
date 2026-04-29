@@ -1,7 +1,8 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
-> Updated through SDK v3.19, 2026-04-28.
+> Updated through SDK v3.22, 2026-04-29 (W21 multi-oracle
+> adjudicator post-paper escape ladder summarised in § 14.2).
 > This file is intended to be the primary publication-grade paper
 > draft for the programme's multi-agent context thesis. It is not a
 > milestone diary. It is a paper-shaped synthesis of the system,
@@ -93,6 +94,27 @@ decoder-side bounded-context packing. The next open problem is no
 longer "can capsules help?" It is "what richer semantics or learned
 disambiguators are required once corroboration, magnitude, round
 structure, normalization, and bounded packing are all exhausted?"
+
+After this paper's main draft, the programme advanced four further
+layers along exactly that axis (§ 14.2): a bundle-relational
+compatibility disambiguator (W18, SDK v3.19), a bundle-contradiction-
+aware trust-weighted disambiguator (W19, SDK v3.20), a single-source
+outside-witness acquisition disambiguator (W20, SDK v3.21), and a
+trust-weighted multi-source quorum adjudicator (W21, SDK v3.22). Each
+layer crosses the prior layer's named structural wall on a regime
+where it actually applies, ships ≥ 2 named falsifiers that make its
+conditionality sharp, and preserves bounded-context efficiency
+byte-for-byte. The W21 milestone (the first capsule-native multi-
+agent-coordination method that crosses the **W20-Λ-compromised** wall
+via multi-source adjudication under partial oracle compromise) sharpens
+the post-paper deeper wall: the escape is bounded above by the
+*integrity of the registered oracle set*, not by a richer scoring
+rule. **Live LLM transfer (W21-Λ-real / W21-C-LIVE-WITH-REGISTRY) is
+empirically partially discharged on Mac-1 mixtral 8x7b at +1.000 over
+W20 in the registry-anchored regime; in the harder coalition regime
+where the LLM's vote is required for quorum, cross-model split is
+sharp (mixtral 8x7b: +0.750; gemma2:9b: +0.000)** — scale + general
+knowledge matter for the live W21-Λ-real escape.
 
 ## 1. Introduction
 
@@ -1375,7 +1397,7 @@ substantial progress. It has turned multiple previously blurred
 failure modes into explicit theorem/result pairs and has demonstrated
 end-to-end live improvement on at least one real model stream.
 
-## 13. The Strongest Current Thesis After SDK v3.18
+## 13. The Strongest Current Thesis After SDK v3.22
 
 The strongest current thesis is:
 
@@ -1435,6 +1457,107 @@ directions include:
 
 The current paper does not attempt to solve that wall prematurely. It
 earns the right to ask the question precisely.
+
+### 14.2 Subsequent escape ladder (SDK v3.19 → v3.20 → v3.21 → v3.22)
+
+After this paper's main draft, the programme advanced four further
+layers along exactly the axis named above. Each layer is documented
+in its own milestone results note; the canonical references are:
+
+- **W18 — Bundle-relational compatibility disambiguator (SDK v3.19,
+  *RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md*).** The first capsule-
+  native method that crosses the **W17-Λ-symmetric** wall on a
+  regime where it actually applies (R-65-COMPAT). A closed-form
+  scorer reads the round-2 disambiguator's payload text — the
+  channel every prior decoder ignored — and projects W11 / W15's
+  answer through a strict-asymmetric branch. Three named falsifiers
+  (R-65-NO-COMPAT, R-65-CONFOUND, R-65-DECEIVE) make the W18-1
+  conditionality sharp.
+- **W19 — Bundle-contradiction-aware trust-weighted disambiguator
+  (SDK v3.20, *RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md*).** The first
+  capsule-native method that crosses the **W18-Λ-deceive** wall on
+  the bundle-resolvable case (R-66-DECEIVE-NAIVE,
+  R-66-CONFOUND-RESOLVABLE). A closed-form scorer counts independent
+  asymmetric witnesses *excluding* the canonical primary and inverts
+  W18's projection when witnesses contradict the primary. Two named
+  falsifiers (R-66-DECEIVE-TOTAL = no asymmetric witness anywhere;
+  R-66-OUTSIDE-REQUIRED = witnesses are themselves symmetric) make
+  the **W19-Λ-total** and **W19-Λ-outside** walls explicit. The
+  natural escape from both walls — *outside information* — is named
+  W19-C-OUTSIDE.
+- **W20 — Outside-witness acquisition disambiguator (SDK v3.21,
+  *RESULTS_WEVRA_OUTSIDE_INFORMATION.md*).** The first capsule-
+  native method that crosses the **W19-Λ-outside** wall on a regime
+  where it actually applies (R-67-OUTSIDE-RESOLVES). A typed
+  ``OutsideWitnessOracle`` Protocol + a deterministic
+  ``ServiceGraphOracle`` add an evidence-acquisition step (one
+  query per cell, bounded by ``max_response_tokens``) that the
+  bundle-only scorer cannot see. Three named falsifiers
+  (R-67-OUTSIDE-NONE = no signal; R-67-OUTSIDE-COMPROMISED =
+  adversarial signal; R-67-JOINT-DECEPTION = jointly compromised)
+  make **W20-Λ-none / W20-Λ-compromised / W20-Λ-joint-deception**
+  explicit. Live LLM transfer (W20-Λ-real): mixtral 8x7b on Mac-1
+  achieves +0.750 over W19; smaller / coding-specialised models
+  trust the deceptive primary and tie FIFO. The natural escape
+  from W20-Λ-compromised — *multi-oracle aggregation* — is named
+  W20-C-MULTI-ORACLE.
+- **W21 — Trust-weighted multi-oracle adjudicator (SDK v3.22,
+  *RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md*).** The first
+  capsule-native method that crosses the **W20-Λ-compromised**
+  wall on a regime where it actually applies (R-68-MULTI-MAJORITY).
+  A registered set of N typed oracles with prior trust weights;
+  the W21 scorer issues one bounded query per oracle per cell,
+  counts per-tag votes across non-abstaining replies, and
+  projects only when ≥ ``quorum_min`` oracles agree on a
+  non-empty proper asymmetric subset. Three named falsifiers
+  (R-68-MULTI-NO-QUORUM = oracles disagree; R-68-MULTI-ALL-
+  COMPROMISED = jointly compromised registered set;
+  R-68-MULTI-PARTIAL = sub-quorum honest signal) make
+  **W21-Λ-no-quorum / W21-Λ-all-compromised / W21-Λ-partial**
+  explicit. The deeper wall is now sharper: the W21 escape is
+  bounded above by the *integrity of the registered oracle set*,
+  not by a richer scoring rule. The conditional W21-C-PARTIAL-
+  RECOVERY (with ``quorum_min = 1`` on R-68-MULTI-PARTIAL) is
+  empirically discharged at 1.000 — the quorum-strictness trade-
+  off is real. Live LLM transfer (W21-Λ-real / W21-C-LIVE-WITH-
+  REGISTRY): a four-oracle live registry pairing two deterministic
+  registry oracles with mixtral 8x7b achieves +1.000 over W20
+  (registry-anchored regime, partially discharging
+  W20-C-LIVE-WITH-REGISTRY). On the harder coalition regime (LLM
+  vote required for quorum), cross-model split is sharp:
+  mixtral 8x7b achieves +0.750; gemma2:9b lands decoy tokens
+  through the closure and ties FIFO at 0.000. **Scale + general
+  knowledge matter for the W21-Λ-real escape on the LLM-vote-
+  required regime**.
+
+The post-paper four-layer escape ladder (W18 → W19 → W20 → W21)
+discharges, in order: the symmetric-corroboration wall, the
+bundle-deceive wall (bundle-resolvable case), the bundle-outside
+wall (outside-resolvable case), and the single-oracle wall
+(majority-honest case). Each layer adds one structurally-distinct
+move (relational scoring → trust-weighted contradiction → outside-
+witness acquisition → multi-source quorum); each layer is
+*conditional* on the next regime's named bench property; each
+layer ships ≥ 2 named falsifiers that make its conditionality
+sharp; each layer is *empirically validated* on a fresh synthetic
+anchor at 1.000 strict gain over the prior strongest method, and
+(for W17, W20, W21) on a *fresh live LLM probe* that materially
+crosses the prior wall. The strongest current thesis after SDK
+v3.22 is therefore:
+
+> **Multi-agent context becomes tractable when the system is**
+> **designed as a layered capsule-native coordination pipeline in**
+> **which producer-side ambiguity preservation, normalization,**
+> **admission, bundle-aware decoding, cross-round decoding,**
+> **bounded-context packing, bundle-relational disambiguation,**
+> **trust-weighted bundle-contradiction handling,**
+> **outside-witness acquisition, AND trust-weighted multi-source**
+> **quorum adjudication are each explicit, audited, benchmarked,**
+> **and bounded above by named structural walls.** The deeper
+> walls (W21-Λ-all-compromised, W21-Λ-no-quorum) are *named* and
+> *proved-empirical*; the natural escapes (W21-C-CALIBRATED-TRUST
+> via prior calibration; W22 via cross-source consistency
+> detection) are *conjectural*.
 
 ## 15. Limitations
 

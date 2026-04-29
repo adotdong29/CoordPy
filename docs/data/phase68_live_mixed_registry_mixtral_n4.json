@@ -1,0 +1,517 @@
+{
+  "audit_ok_grid": {
+    "capsule_attention_aware": true,
+    "capsule_bundle_contradiction": true,
+    "capsule_cohort_buffered": true,
+    "capsule_corroboration": true,
+    "capsule_coverage": true,
+    "capsule_fifo": true,
+    "capsule_layered_fifo_packed": true,
+    "capsule_layered_multi_round": true,
+    "capsule_multi_oracle": true,
+    "capsule_multi_round": true,
+    "capsule_multi_service": true,
+    "capsule_outside_witness": true,
+    "capsule_priority": true,
+    "capsule_relational_compat": true,
+    "capsule_robust_multi_round": true,
+    "substrate": false
+  },
+  "bench_property_per_scenario": {
+    "p67outside_resolves_deadlock_orders_payments__sym_cache__rep0": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "symmetric_corroboration_holds": true
+    },
+    "p67outside_resolves_deadlock_orders_payments__sym_metrics__rep1": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "symmetric_corroboration_holds": true
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_cache__rep0": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "symmetric_corroboration_holds": true
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep1": {
+      "decoy_role_count": 2,
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "symmetric_corroboration_holds": true
+    }
+  },
+  "bench_summary": {
+    "K_auditor": 12,
+    "T_decoder": null,
+    "bank": "multi_majority",
+    "expected_shape": [
+      "decoy_only",
+      "all_three"
+    ],
+    "min_trust_sum": 0.0,
+    "n_oracle_registrations": 4,
+    "n_scenarios": 4,
+    "oracle_ids": [
+      "compromised_registry",
+      "service_graph",
+      "change_history",
+      "ollama_mixtral:8x7b"
+    ],
+    "oracle_role_labels": [
+      "compromised_registry",
+      "service_graph",
+      "change_history",
+      "llm_adjudicator"
+    ],
+    "quorum_min": 2,
+    "scenarios_with_expected_shape": 4,
+    "scenarios_with_symmetric_corroboration": 4,
+    "trust_priors": [
+      0.8,
+      1.0,
+      1.0,
+      0.7
+    ],
+    "w20_chosen_oracle_id": "compromised_registry"
+  },
+  "config": {
+    "K_auditor": 12,
+    "K_producer": 6,
+    "T_auditor": 256,
+    "T_decoder": null,
+    "T_producer": 96,
+    "bank": "multi_majority",
+    "bank_replicates": 2,
+    "bank_seed": 11,
+    "inbox_capacity": 12,
+    "min_trust_sum": 0.0,
+    "n_eval": 4,
+    "quorum_min": 2
+  },
+  "headline_gap": {
+    "max_non_w21_accuracy_full": 0.0,
+    "w21_minus_attention_aware": 1.0,
+    "w21_minus_fifo": 1.0,
+    "w21_minus_substrate": 1.0,
+    "w21_minus_w18": 1.0,
+    "w21_minus_w19": 1.0,
+    "w21_minus_w20": 1.0
+  },
+  "n_results": 64,
+  "pack_stats_summary": {
+    "capsule_attention_aware": {
+      "fraction_handoffs_kept": 1.0,
+      "handoffs_admitted_sum": 40,
+      "handoffs_decoder_input_sum": 40,
+      "n_cells": 4,
+      "n_dropped_budget_sum": 0,
+      "n_w20_triggered_cells": 0,
+      "n_w21_outside_queries_sum": 0,
+      "n_w21_triggered_cells": 0,
+      "outside_tokens_per_cell_avg": 0.0,
+      "outside_tokens_sum": 0,
+      "tokens_input_sum": 112,
+      "tokens_kept_over_input": 1.0,
+      "tokens_kept_sum": 112,
+      "w21_outside_queries_per_cell_avg": 0.0,
+      "w21_outside_tokens_total_per_cell_avg": 0.0,
+      "w21_outside_tokens_total_sum": 0
+    },
+    "capsule_bundle_contradiction": {
+      "fraction_handoffs_kept": 1.0,
+      "handoffs_admitted_sum": 40,
+      "handoffs_decoder_input_sum": 40,
+      "n_cells": 4,
+      "n_dropped_budget_sum": 0,
+      "n_w20_triggered_cells": 0,
+      "n_w21_outside_queries_sum": 0,
+      "n_w21_triggered_cells": 0,
+      "outside_tokens_per_cell_avg": 0.0,
+      "outside_tokens_sum": 0,
+      "tokens_input_sum": 112,
+      "tokens_kept_over_input": 1.0,
+      "tokens_kept_sum": 112,
+      "w21_outside_queries_per_cell_avg": 0.0,
+      "w21_outside_tokens_total_per_cell_avg": 0.0,
+      "w21_outside_tokens_total_sum": 0
+    },
+    "capsule_layered_fifo_packed": {
+      "fraction_handoffs_kept": 1.0,
+      "handoffs_admitted_sum": 40,
+      "handoffs_decoder_input_sum": 40,
+      "n_cells": 4,
+      "n_dropped_budget_sum": 0,
+      "n_w20_triggered_cells": 0,
+      "n_w21_outside_queries_sum": 0,
+      "n_w21_triggered_cells": 0,
+      "outside_tokens_per_cell_avg": 0.0,
+      "outside_tokens_sum": 0,
+      "tokens_input_sum": 112,
+      "tokens_kept_over_input": 1.0,
+      "tokens_kept_sum": 112,
+      "w21_outside_queries_per_cell_avg": 0.0,
+      "w21_outside_tokens_total_per_cell_avg": 0.0,
+      "w21_outside_tokens_total_sum": 0
+    },
+    "capsule_multi_oracle": {
+      "fraction_handoffs_kept": 1.0,
+      "handoffs_admitted_sum": 40,
+      "handoffs_decoder_input_sum": 40,
+      "n_cells": 4,
+      "n_dropped_budget_sum": 0,
+      "n_w20_triggered_cells": 0,
+      "n_w21_outside_queries_sum": 16,
+      "n_w21_triggered_cells": 4,
+      "outside_tokens_per_cell_avg": 0.0,
+      "outside_tokens_sum": 0,
+      "tokens_input_sum": 112,
+      "tokens_kept_over_input": 1.0,
+      "tokens_kept_sum": 112,
+      "w21_outside_queries_per_cell_avg": 4.0,
+      "w21_outside_tokens_total_per_cell_avg": 30.0,
+      "w21_outside_tokens_total_sum": 120
+    },
+    "capsule_outside_witness": {
+      "fraction_handoffs_kept": 1.0,
+      "handoffs_admitted_sum": 40,
+      "handoffs_decoder_input_sum": 40,
+      "n_cells": 4,
+      "n_dropped_budget_sum": 0,
+      "n_w20_triggered_cells": 4,
+      "n_w21_outside_queries_sum": 0,
+      "n_w21_triggered_cells": 0,
+      "outside_tokens_per_cell_avg": 3.0,
+      "outside_tokens_sum": 12,
+      "tokens_input_sum": 112,
+      "tokens_kept_over_input": 1.0,
+      "tokens_kept_sum": 112,
+      "w21_outside_queries_per_cell_avg": 0.0,
+      "w21_outside_tokens_total_per_cell_avg": 0.0,
+      "w21_outside_tokens_total_sum": 0
+    },
+    "capsule_relational_compat": {
+      "fraction_handoffs_kept": 1.0,
+      "handoffs_admitted_sum": 40,
+      "handoffs_decoder_input_sum": 40,
+      "n_cells": 4,
+      "n_dropped_budget_sum": 0,
+      "n_w20_triggered_cells": 0,
+      "n_w21_outside_queries_sum": 0,
+      "n_w21_triggered_cells": 0,
+      "outside_tokens_per_cell_avg": 0.0,
+      "outside_tokens_sum": 0,
+      "tokens_input_sum": 112,
+      "tokens_kept_over_input": 1.0,
+      "tokens_kept_sum": 112,
+      "w21_outside_queries_per_cell_avg": 0.0,
+      "w21_outside_tokens_total_per_cell_avg": 0.0,
+      "w21_outside_tokens_total_sum": 0
+    }
+  },
+  "pooled": {
+    "capsule_attention_aware": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_attention_aware"
+    },
+    "capsule_bundle_contradiction": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_bundle_contradiction"
+    },
+    "capsule_cohort_buffered": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_cohort_buffered"
+    },
+    "capsule_corroboration": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_corroboration"
+    },
+    "capsule_coverage": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_coverage"
+    },
+    "capsule_fifo": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_fifo"
+    },
+    "capsule_layered_fifo_packed": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_layered_fifo_packed"
+    },
+    "capsule_layered_multi_round": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_layered_multi_round"
+    },
+    "capsule_multi_oracle": {
+      "accuracy_full": 1.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 1.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "none": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_multi_oracle"
+    },
+    "capsule_multi_round": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_multi_round"
+    },
+    "capsule_multi_service": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_multi_service"
+    },
+    "capsule_outside_witness": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_outside_witness"
+    },
+    "capsule_priority": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "missing_handoff": 4
+      },
+      "mean_n_admitted_auditor": 1.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 4.0,
+      "n": 4,
+      "strategy": "capsule_priority"
+    },
+    "capsule_relational_compat": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_relational_compat"
+    },
+    "capsule_robust_multi_round": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 2.0,
+      "mean_n_role_view": 10.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_tokens_admitted": 8.0,
+      "n": 4,
+      "strategy": "capsule_robust_multi_round"
+    },
+    "substrate": {
+      "accuracy_full": 0.0,
+      "accuracy_remediation": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "audit_ok_rate": 0.0,
+      "failure_hist": {
+        "decoder_error": 4
+      },
+      "mean_n_admitted_auditor": 9.0,
+      "mean_n_role_view": 0.0,
+      "mean_n_team_handoff": 0.0,
+      "mean_tokens_admitted": 24.0,
+      "n": 4,
+      "strategy": "substrate"
+    }
+  },
+  "scenarios_evaluated": [
+    "p67outside_resolves_deadlock_orders_payments__sym_cache__rep0",
+    "p67outside_resolves_deadlock_orders_payments__sym_metrics__rep1",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_cache__rep0",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep1"
+  ],
+  "schema": "phase68.multi_oracle.v1",
+  "w20_branch_counts": {
+    "outside_resolved": 4
+  },
+  "w21_branch_counts": {
+    "quorum_resolved": 4
+  }
+}

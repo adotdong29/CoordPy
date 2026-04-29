@@ -629,6 +629,53 @@ The **named regimes** the bar refers to (anchored in code):
 > decoder-budget ingredients are independently load-bearing; a
 > method that closes one structural axis but leaves the other
 > firing does NOT clear bar 13).
+> SDK v3.22 anchors the bar to **R-68** below AND introduces
+> **bar 18** (multi-source outside-information adjudication under
+> partial oracle compromise: a method that wants to claim
+> "ambiguity resolution beyond W20" must (i) attack a regime
+> where any *single* outside oracle is insufficient
+> — concretely, a regime where the registered oracle set
+> contains both honest oracles AND adversarial oracles, and W20's
+> single-oracle interface picks one (e.g. the first registered)
+> and trusts whatever it returns AND (ii) introduce an explicit
+> **multi-oracle adjudication layer** — a typed registered set of
+> N :class:`OutsideWitnessOracle`-shaped objects with prior trust
+> weights, a bounded ``max_response_tokens`` per call (per oracle),
+> AND a deterministic per-tag voting rule with **quorum_min** +
+> **min_trust_sum** thresholds that projects only when ≥
+> ``quorum_min`` independently-replying oracles agree on a
+> non-empty proper asymmetric subset of admitted tags AND (iii)
+> preserve bounded-context efficiency (the W15 ``tokens_kept``
+> accounting is byte-for-byte unchanged from W19 / W20; the
+> per-cell ``n_outside_queries`` and ``n_outside_tokens_total`` are
+> strict additional cost) AND (iv) ship at least three named
+> falsifier regimes — R-68-MULTI-NO-QUORUM (registered oracles
+> disagree completely — W21-Λ-no-quorum ties FIFO at 0.000),
+> R-68-MULTI-ALL-COMPROMISED (every registered oracle returns the
+> same adversarial reply — W21-Λ-all-compromised picks decoy and
+> FAILS at 0.000), R-68-MULTI-PARTIAL (sub-quorum honest signal
+> — W21-Λ-partial abstains at default ``quorum_min = 2`` and ties
+> FIFO at 0.000) — where the new method ties FIFO or fails by
+> construction. A milestone that wins on R-68-MULTI-MAJORITY but
+> does NOT exhibit the three falsifier regimes materially
+> overstates and does NOT clear bar 18. The R-68-MULTI-MAJORITY
+> win is *strongly conditional* on (a) the bench property — W19
+> abstains via the trigger branches, (b) ≥ ``quorum_min`` honest
+> oracles registered, AND (c) the honest oracles' replies overlap
+> on a non-empty proper asymmetric subset. The single-oracle wall
+> W20-Λ-compromised remains real for *any* single-oracle scorer;
+> W21 widens the scope from "single oracle" to "registered set of
+> N oracles" without escaping joint compromise (R-68-MULTI-ALL-
+> COMPROMISED is the named structural limit). Live LLM transfer
+> via :class:`LLMAdjudicatorOracle` as a registered oracle is
+> W21-Λ-real (proved-conditional + empirical-research): the
+> registry-anchored regime (deterministic registry forms quorum
+> without LLM vote) trivially transfers; the coalition regime
+> (LLM vote required for quorum) is cross-model dependent and
+> sharp (mixtral 8x7b: 0.750 strict gain; gemma2:9b: 0.000).
+> Earlier R-55..R-67-anchored bars remain valid as historical
+> bars; the *current* bar is R-68-anchored.
+>
 > SDK v3.21 anchors the bar to **R-67** below AND introduces
 > **bar 17** (outside-information acquisition under bundle-only
 > insufficiency split: a method that wants to claim "ambiguity
@@ -736,7 +783,7 @@ The **named regimes** the bar refers to (anchored in code):
 
 ### 1.1 Strong success bar (a "real" advance)
 
-A milestone *strongly advances* the thesis iff **all seventeen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17; bar 14 from SDK v3.18; bar 15 from SDK v3.19; bar 16 from SDK v3.20; bar 17 from SDK v3.21):
+A milestone *strongly advances* the thesis iff **all eighteen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17; bar 14 from SDK v3.18; bar 15 from SDK v3.19; bar 16 from SDK v3.20; bar 17 from SDK v3.21; bar 18 from SDK v3.22):
 
 1. **Code anchor.** A new admission/decoder/coordination method
    ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
@@ -957,6 +1004,72 @@ A milestone *strongly advances* the thesis iff **all seventeen** hold (bars 1–
    by W20-1 in SDK v3.21 — see bar 17 below; remains *conjectural*
    on the joint-deception direction, where W20-Λ-joint-deception
    is the named structural limit).
+
+18. **(SDK v3.22+) Multi-source outside-information adjudication
+   under partial oracle compromise.** The milestone-anchored harder
+   regime (R-68-MULTI-MAJORITY) is **provably insufficient for any
+   single-oracle method** (W20-Λ-compromised extends verbatim to
+   the R-68-MULTI-MAJORITY single-oracle interface: every cell
+   trusts the first-registered compromised oracle and FAILS at
+   0.000). The new method must include an explicit **multi-oracle
+   adjudication layer**: a typed registered set of N
+   :class:`OutsideWitnessOracle`-shaped objects with prior trust
+   weights, a bounded ``max_response_tokens`` per call (per oracle),
+   AND a deterministic per-tag voting rule with **quorum_min** +
+   **min_trust_sum** thresholds that projects only when ≥
+   ``quorum_min`` independently-replying oracles agree on a
+   non-empty proper asymmetric subset of admitted tags. A pure W20
+   method (single-oracle projection) does NOT clear bar 18 on SDK
+   v3.22+.
+   **Pre-committed bench property:** under R-68-MULTI-MAJORITY,
+   the registered three-oracle set ``(compromised_registry,
+   service_graph, change_history)`` produces:
+   (a) compromised_registry returns a decoy-asymmetric reply on
+   every cell;
+   (b) service_graph returns a gold-pair-asymmetric reply on every
+   cell;
+   (c) change_history returns a gold-pair-asymmetric reply on every
+   cell.
+   The gold pair receives 2 votes; the decoy receives 1 vote;
+   quorum forms on the gold pair under default ``quorum_min = 2``.
+   Mechanically verified by ``Phase68DefaultConfigTests
+   ::test_w21_branches_quorum_resolved_on_majority``.
+   **Pre-committed token-budget honesty:** the W21 layer reads only
+   the W15-packed-and-W19-admitted bundle (no extra capsule reads)
+   AND records ``n_outside_queries`` + ``n_outside_tokens_total``
+   as strict additional cost; the ``tokens_kept`` accounting is
+   unchanged byte-for-byte from W19 / W20 (mechanically verified
+   by ``Phase68TokenBudgetHonestyTests
+   ::test_w21_does_not_inflate_w15_tokens_kept``).
+   **Pre-committed falsifiers:** R-68-MULTI-NO-QUORUM (no signal —
+   W21-Λ-no-quorum ties FIFO at 0.000), R-68-MULTI-ALL-COMPROMISED
+   (jointly compromised — W21-Λ-all-compromised picks decoy and
+   FAILS at 0.000), R-68-MULTI-PARTIAL (sub-quorum honest signal —
+   W21-Λ-partial abstains at default ``quorum_min = 2`` and ties
+   FIFO at 0.000). On all three, the W21 method ties FIFO or fails
+   by construction; the W21-1 conditionality is sharp. The
+   conditional W21-C-PARTIAL-RECOVERY (with ``quorum_min = 1``,
+   W21 recovers the gold pair on R-68-MULTI-PARTIAL) is *empirical-
+   on-default-config* but not strict at the default
+   ``quorum_min = 2`` — proves the quorum-strictness trade-off is
+   real. **Honest scope:** R-68 is a *synthetic* regime — the
+   producer is :class:`IdentityExtractor` AND the deterministic
+   oracles are closed-vocabulary. Real-LLM transfer via
+   :class:`LLMAdjudicatorOracle` as a fourth registered oracle is
+   W21-Λ-real / W21-C-LIVE-WITH-REGISTRY (proved-conditional +
+   empirical-research, partially discharged). Empirical n=4
+   probes on Mac-1 Ollama: registry-anchored regime (4 oracles
+   incl. ``mixtral:8x7b``) — W21 = 1.000, +1.000 over W20;
+   coalition regime (3 oracles, LLM vote required for quorum) —
+   ``mixtral:8x7b`` lands gold tokens through the W18/W19 closure
+   ⇒ W21 = 0.750, +0.750 over W20; ``gemma2:9b`` lands decoy
+   tokens through the closure ⇒ W21 = 0.000. Cross-model split
+   sharp (47B-MoE / 9.2B-dense). The W21 escape is *partial* by
+   design: bounded above by registered-set integrity (W21-Λ-all-
+   compromised remains the wall when all N oracles are jointly
+   compromised). The natural escape (W21-C-CALIBRATED-TRUST —
+   trust priors calibrated against held-out historical agreement)
+   is conjectural.
 
 17. **(SDK v3.21+) Outside-information acquisition under
    bundle-only insufficiency split.** The milestone-anchored harder

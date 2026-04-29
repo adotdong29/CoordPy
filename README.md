@@ -7,12 +7,65 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**As of SDK v3.21 (April 2026), capsules are load-bearing
+**As of SDK v3.22 (April 2026), capsules are load-bearing
 *inside one Wevra run*, *between agents in a team*, *across the
 model-class gradient*, and — most sharply — *across the first
 capsule-native multi-agent-coordination method that crosses the
-W19-Λ-outside wall (named SDK v3.20) on a regime where the wall
-actually applies: W20-1 strict +1.000 gain on R-67-OUTSIDE-RESOLVES
+W20-Λ-compromised wall (named SDK v3.21) on a regime where the
+wall actually applies: W21-1 strict +1.000 gain on
+R-68-MULTI-MAJORITY loose AND tight, with a three-oracle
+registered set (``compromised_registry`` first, ``service_graph``,
+``change_history``) under default ``quorum_min = 2``; W20 (the
+prior strongest method) trusts the first-registered compromised
+oracle on every cell and FAILS at 0.000; W21 consults all three
+oracles, gold pair receives 2 votes (from the two honest
+deterministic oracles), decoy receives 1, quorum forms on gold,
+W21 projects to the gold pair; stable across 5/5 alternate
+``bank_seed`` values; three named falsifiers
+(R-68-MULTI-NO-QUORUM = W21-Λ-no-quorum ties FIFO,
+R-68-MULTI-ALL-COMPROMISED = W21-Λ-all-compromised picks decoy
+and fails, R-68-MULTI-PARTIAL = W21-Λ-partial abstains at default
+``quorum_min = 2``) make the W21-1 conditionality sharp; the
+conditional W21-C-PARTIAL-RECOVERY (with override
+``quorum_min = 1``) is empirically discharged at 1.000 — the
+quorum-strictness trade-off is real. Live LLM transfer
+(W21-Λ-real / W21-C-LIVE-WITH-REGISTRY) on Mac-1 mixtral 8x7b
+(47B-MoE): registry-anchored regime achieves +1.000 over W20
+(four-oracle registry incl. mixtral); coalition regime
+(LLM-vote-required, three-oracle registry) cross-model split
+sharp — mixtral 8x7b lands gold tokens through the W18/W19
+closure on 3/4 cells (W21 = 0.750, +0.750 over W20); gemma2:9b
+(9.2B-dense) lands decoy tokens through the closure (W21 = 0.000)
+— scale + general knowledge matter for the W21-Λ-real escape on
+the LLM-vote-required regime. Backward-compat (W21-3-A / W21-3-B)
+preserved byte-for-byte: with ``enabled = False`` OR no oracles
+registered, W21 reduces to W19; with ``quorum_min = 1`` and a
+single registered honest oracle, W21 ties W20 byte-for-byte on
+R-67-OUTSIDE-RESOLVES; 633 / 633 wevra tests pass (= 585 prior +
+48 new W21). Mac 2 remains unreachable (ARP ``incomplete``, 15th
+milestone in a row); no two-Mac sharded inference. SDK v3.22's
+contribution is the Phase-68 multi-oracle adjudication benchmark
+family
+([`vision_mvp/experiments/phase68_multi_oracle_adjudication.py`](vision_mvp/experiments/phase68_multi_oracle_adjudication.py))
+plus a deterministic, training-free, closed-form
+[`TrustWeightedMultiOracleDisambiguator`](vision_mvp/wevra/team_coord.py)
+that wraps the W19 inner with **N independently-replied outside
+queries** (one per registered oracle, each bounded by
+``max_response_tokens``) and a deterministic per-tag voting rule
+under quorum + trust-sum thresholds — the channel single-oracle
+methods cannot reach. Closes both SDK v3.21 conjectures
+(W20-C-MULTI-ORACLE discharged on R-68-MULTI-MAJORITY;
+W20-C-LIVE-WITH-REGISTRY partially discharged on Mac-1 mixtral
+8x7b). See
+[`docs/RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md`](docs/RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md)
+for the full SDK v3.22 milestone note.*
+
+**Historical SDK v3.21 reading (preserved for context).** Capsules
+were load-bearing inside one Wevra run, between agents in a team,
+across the model-class gradient, and — most sharply — across the
+first capsule-native multi-agent-coordination method that crosses
+the W19-Λ-outside wall (named SDK v3.20) on a regime where the
+wall actually applies: W20-1 strict +1.000 gain on R-67-OUTSIDE-RESOLVES
 loose AND tight, with a deterministic ``ServiceGraphOracle``
 registered as the outside information source; every closed-form
 bundle-only scorer through W19 ties FIFO at 0.000 by W19-Λ-outside

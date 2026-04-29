@@ -5478,6 +5478,23 @@ __all__ = [
     "W20_BRANCH_DISABLED",
     "W20_ALL_BRANCHES",
     "W20_DEFAULT_TRIGGER_BRANCHES",
+    # SDK v3.22 — trust-weighted multi-oracle adjudicator (W21 family).
+    "OracleRegistration",
+    "ChangeHistoryOracle",
+    "OnCallNotesOracle",
+    "SingletonAsymmetricOracle",
+    "DisagreeingHonestOracle",
+    "W21OracleProbe",
+    "W21MultiOracleResult",
+    "TrustWeightedMultiOracleDisambiguator",
+    "W21_BRANCH_QUORUM_RESOLVED",
+    "W21_BRANCH_NO_QUORUM",
+    "W21_BRANCH_SYMMETRIC_QUORUM",
+    "W21_BRANCH_NO_ORACLES",
+    "W21_BRANCH_NO_TRIGGER",
+    "W21_BRANCH_DISABLED",
+    "W21_ALL_BRANCHES",
+    "W21_DEFAULT_TRIGGER_BRANCHES",
 ]
 
 
@@ -6292,6 +6309,859 @@ class OutsideWitnessAcquisitionDisambiguator:
 
     @property
     def last_result(self) -> W20OutsideResult | None:
+        return self._last_result
+
+    @property
+    def T_decoder(self) -> int | None:
+        return self.inner.T_decoder
+
+    @T_decoder.setter
+    def T_decoder(self, v: int | None) -> None:
+        self.inner.T_decoder = v
+
+    def pack_stats(self) -> dict[str, Any]:
+        return self.inner.pack_stats()
+
+
+# =============================================================================
+# SDK v3.22 — trust-weighted multi-oracle adjudicator (W21 family).
+#
+# The follow-up to SDK v3.21 (W20). Discharges the W20-C-MULTI-ORACLE
+# conjecture (named in SDK v3.21) on the exact regime where it applies:
+# multi-source outside-information adjudication under partial oracle
+# compromise, with bounded-context honesty and strict falsifier-driven
+# limits.
+#
+# The W20 milestone established three bundle+oracle walls:
+#
+#   * W20-Λ-none — registered oracle has no signal; ties FIFO by
+#     abstention.
+#   * W20-Λ-compromised — single-oracle interface trusts an
+#     adversarial oracle's reply; FAILS at 0.000.
+#   * W20-Λ-joint-deception — primary + secondary + oracle ALL
+#     consistent on decoy; FAILS at 0.000.
+#
+# The W20-Λ-compromised wall is the named regime W21 attacks. The
+# wall is not "the bundle has no signal"; it is "the runtime has only
+# one outside source, and its reply happens to be deceptive". Real
+# production systems usually have *more than one* outside source —
+# a service registry, a change-log, an on-call notes index, a
+# dependency graph, an LLM adjudicator. Each one is an independent
+# evidence channel; some may be compromised; some may abstain; some
+# may emit free-form replies that miss the closure. The runtime's
+# job is to *adjudicate* across them under bounded context.
+#
+# W21's :class:`TrustWeightedMultiOracleDisambiguator` is the smallest
+# move in that direction:
+#
+#   1. Run inner W19 (which itself wraps W18 + W15). Capture the W19
+#      branch decision and projected answer.
+#   2. If the W19 branch is in :data:`W21_DEFAULT_TRIGGER_BRANCHES`
+#      (default ``(W19_BRANCH_ABSTAINED_SYMMETRIC,
+#      W19_BRANCH_ABSTAINED_NO_SIGNAL)`` — same as W20), build a
+#      hypothesis-conditioned :class:`OutsideQuery` (same shape as
+#      W20).
+#   3. Consult **every** registered :class:`OracleRegistration` once.
+#      Each registration carries a prior trust weight in [0, 1] and
+#      a role label (``service_graph``, ``change_history``,
+#      ``oncall_notes``, ``llm_adjudicator``). Track per-oracle
+#      ``per_tag_outside_count`` via the same :func:`_disambiguator
+#      _payload_tokens` + :func:`_relational_compatibility_score`
+#      pipeline W20 / W19 / W18 use on in-bundle witnesses.
+#   4. Aggregate the per-tag votes:
+#         votes[tag]      = #oracles with per_tag_count[tag] > 0
+#         trust_sum[tag]  = Σ trust_prior over those oracles
+#   5. Project: top_set = {tag : votes[tag] ≥ quorum_min
+#                                AND trust_sum[tag] ≥ min_trust_sum}.
+#   6. If ``top_set`` is a non-empty proper subset of the admitted
+#      tag set, project the answer onto ``top_set``
+#      (:data:`W21_BRANCH_QUORUM_RESOLVED`). If ``top_set`` is empty,
+#      abstain (:data:`W21_BRANCH_NO_QUORUM`) — fall through to W19's
+#      answer. If ``top_set`` covers every admitted tag, abstain
+#      (:data:`W21_BRANCH_SYMMETRIC_QUORUM`) — fall through to W19's
+#      answer.
+#   7. Return a :class:`W21MultiOracleResult` with the final answer +
+#      audit record (per-oracle probe results, aggregated votes,
+#      total ``n_outside_queries`` and ``n_outside_tokens_total``).
+#
+# The trigger condition is conservative on purpose: W21 never overrides
+# a non-abstained W19 verdict (W19_BRANCH_INVERSION,
+# W19_BRANCH_CONFOUND_RESOLVED, W19_BRANCH_PRIMARY_TRUSTED). On
+# R-54..R-67 default banks the W21 layer reduces to W19 byte-for-byte
+# (W21-3-A backward-compat). On R-67-OUTSIDE-RESOLVES with one
+# clean oracle, W21 with ``quorum_min=1`` ties W20 byte-for-byte
+# (W21-3-B reduces-to-W20).
+#
+# Honest scope (W21). The W21-1 win is *strongly conditional* on:
+#   (a) the bench property — W19 abstains via SYMMETRIC or NO_SIGNAL,
+#   (b) the registered oracle set contains ≥ ``quorum_min`` oracles
+#       whose replies independently land on a non-empty proper
+#       asymmetric subset of the admitted tags AND that subset
+#       intersects to a non-empty asymmetric subset.
+# Three named falsifiers (W21-Λ-no-quorum, W21-Λ-all-compromised,
+# W21-Λ-disagreement-only) make the conditionality sharp:
+#   * W21-Λ-no-quorum — fewer than ``quorum_min`` oracles vote for any
+#     tag; W21 abstains; ties FIFO at 0.000.
+#   * W21-Λ-all-compromised — every registered oracle returns a
+#     decoy-asymmetric reply; quorum forms on decoy; W21 FAILS at
+#     0.000. Names the structural limit when ALL N registered
+#     oracles are jointly compromised. The fix is NOT richer scoring;
+#     it is *oracle integrity*.
+#   * W21-Λ-disagreement-only — registered oracles each emit a
+#     different singleton; no tag has ≥ ``quorum_min`` votes; W21
+#     abstains; ties FIFO at 0.000.
+#
+# Bounded-context honesty. The W21 layer issues *exactly N* outside
+# queries per cell where N = number of registered oracles. Each
+# query bounded by ``max_response_tokens``. The audit records
+# ``n_outside_queries`` and ``n_outside_tokens_total`` as strict
+# additional cost; the inner W15 ``tokens_kept`` accounting is
+# byte-for-byte unchanged.
+#
+# Real-LLM extension (W21-Λ-real). Same closure boundary as W20:
+# the LLM adjudicator's reply is parsed via the same
+# :func:`_disambiguator_payload_tokens` closure. Free-form replies
+# fall outside the closure unless the model emits the literal tag
+# tokens. The natural extension W21-C-LIVE-WITH-REGISTRY pairs an
+# LLM adjudicator with a deterministic ServiceGraphOracle as its
+# trusted "registry" — the deterministic oracle anchors the closure
+# and the LLM adjudicator votes on top.
+# =============================================================================
+
+
+@dataclasses.dataclass(frozen=True)
+class OracleRegistration:
+    """One registered oracle in a W21 multi-oracle adjudicator stack.
+
+    Fields
+    ------
+    oracle
+        An :class:`OutsideWitnessOracle`-shaped object (duck-typed:
+        any object with ``oracle_id: str`` and
+        ``consult(query) -> OutsideVerdict``).
+    trust_prior
+        Prior trust weight in [0, 1]. The W21 layer multiplies the
+        oracle's vote by this weight when computing
+        ``per_tag_trust_sum``. Default ``1.0`` treats every oracle
+        as equally trusted (pure majority). Production deployments
+        would calibrate trust priors via held-out historical
+        agreement (W21-C-CALIBRATED-TRUST conjecture).
+    role_label
+        Provenance label baked into the W21 audit
+        (``"service_graph"``, ``"change_history"``,
+        ``"oncall_notes"``, ``"llm_adjudicator"``, ...). Used by
+        downstream forensics — the W21 scorer does NOT use it at
+        projection time.
+
+    The W21 layer treats each registration as a distinct evidence
+    channel; per-oracle replies are scored independently and
+    aggregated by vote. Two registrations with the same ``oracle``
+    but different ``role_label`` are *two* independent votes —
+    do NOT register the same oracle twice unless that is intended.
+    """
+    oracle: Any  # OutsideWitnessOracle duck-type
+    trust_prior: float = 1.0
+    role_label: str = "outside_source"
+
+
+@dataclasses.dataclass
+class ChangeHistoryOracle:
+    """Synthetic deterministic oracle reading a recent-change log
+    (W21 multi-source companion to :class:`ServiceGraphOracle`).
+
+    Models a second independent outside-information channel — a
+    change-management or CI deployment log that records which
+    services have had recent commits / config rolls. The bench
+    pre-commits a closed-vocabulary log mapping
+    ``root_cause -> (service_a, service_b)`` for each gold family
+    in :data:`_P66_FAMILIES`; the oracle returns a payload of the
+    form ``recent_changes service=A service=B`` when the admitted
+    set contains the gold pair, and abstains otherwise.
+
+    Determinism: byte-stable for byte-identical queries.
+    Bounded-context: bounded by ``query.max_response_tokens``.
+    Different ontology from :class:`ServiceGraphOracle`: this oracle
+    answers "which services were recently changed?" (an event-log
+    semantics) rather than "which services depend on each other?"
+    (a topological semantics). When BOTH oracles agree on the same
+    asymmetric subset, that is genuinely independent corroboration —
+    the W21 quorum has structural meaning, not just byte-level
+    duplication.
+    """
+    oracle_id: str = "change_history"
+    # Default change-log mirrors the gold pairs of
+    # :data:`_P66_FAMILIES` — each gold pair has a recent
+    # co-deployment record. Decoys do not. Root-cause keys must
+    # match the elected ``root_cause`` strings emitted by the
+    # MultiRoundBundleDecoder family (i.e. the canonical
+    # _P66_FAMILIES root_causes).
+    change_log: dict[str, tuple[str, ...]] = dataclasses.field(
+        default_factory=lambda: {
+            "deadlock":             ("orders", "payments"),
+            "pool_exhaustion":      ("api", "db"),
+            "disk_fill":            ("storage", "logs_pipeline"),
+            "slow_query_cascade":   ("web", "db_query"),
+        })
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        admitted = sorted(set(query.admitted_tags))
+        # Look up the change log entry for the elected root_cause.
+        recent = self.change_log.get(query.elected_root_cause, ())
+        # Asymmetric: recent must be a non-empty proper subset of
+        # admitted.
+        recent_in_admitted = [t for t in recent if t in admitted]
+        if (not recent_in_admitted
+                or len(recent_in_admitted) == len(admitted)):
+            return OutsideVerdict(
+                payload=None, source_id=self.oracle_id, n_tokens=0)
+        named = sorted(recent_in_admitted)
+        payload = ("change_history recent_changes="
+                   f"{'_'.join(named)} "
+                   + " ".join(f"service={tag}" for tag in named))
+        words = payload.split()
+        if len(words) > query.max_response_tokens:
+            words = words[:query.max_response_tokens]
+        truncated = " ".join(words)
+        return OutsideVerdict(
+            payload=truncated, source_id=self.oracle_id,
+            n_tokens=len(words))
+
+
+@dataclasses.dataclass
+class OnCallNotesOracle:
+    """Synthetic deterministic oracle reading on-call note shorthand
+    (W21 multi-source companion to :class:`ServiceGraphOracle`).
+
+    Models a third independent outside-information channel — an
+    on-call rotation's free-form note index, post-keyword-extraction.
+    The bench pre-commits a closed-vocabulary note index mapping
+    ``root_cause -> (service_a, service_b)`` (default mirroring the
+    same gold pairs as :class:`ChangeHistoryOracle`); the oracle
+    returns a payload of the form ``oncall_notes mention=A,B`` when
+    the admitted set contains the noted pair.
+
+    Difference from :class:`ChangeHistoryOracle`: the on-call oracle
+    answers "which services are humans currently watching?" (a
+    behavioural semantics) rather than "which services were recently
+    deployed?" (a deployment-log semantics).
+
+    A **partial** mode (:attr:`emit_partial_only`) returns only ONE
+    element of the gold pair (selected by :attr:`partial_index`) —
+    useful for the R-68-PARTIAL-VOTE bench (some oracles see only
+    half of the gold answer; W21's quorum_min knob trades off
+    whether a partial intersection is sufficient).
+    """
+    oracle_id: str = "oncall_notes"
+    notes_log: dict[str, tuple[str, ...]] = dataclasses.field(
+        default_factory=lambda: {
+            "deadlock":             ("orders", "payments"),
+            "pool_exhaustion":      ("api", "db"),
+            "disk_fill":            ("storage", "logs_pipeline"),
+            "slow_query_cascade":   ("web", "db_query"),
+        })
+    emit_partial_only: bool = False
+    partial_index: int = 0  # which index of noted_in_admitted to emit
+                              # when emit_partial_only=True (default 0).
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        admitted = sorted(set(query.admitted_tags))
+        noted = self.notes_log.get(query.elected_root_cause, ())
+        noted_in_admitted = [t for t in noted if t in admitted]
+        if not noted_in_admitted:
+            return OutsideVerdict(
+                payload=None, source_id=self.oracle_id, n_tokens=0)
+        if self.emit_partial_only and len(noted_in_admitted) > 1:
+            i = max(0, min(int(self.partial_index),
+                            len(noted_in_admitted) - 1))
+            noted_in_admitted = [noted_in_admitted[i]]
+        if len(noted_in_admitted) == len(admitted):
+            return OutsideVerdict(
+                payload=None, source_id=self.oracle_id, n_tokens=0)
+        named = sorted(noted_in_admitted)
+        payload = ("oncall_notes mention="
+                   f"{','.join(named)} "
+                   + " ".join(f"service={tag}" for tag in named))
+        words = payload.split()
+        if len(words) > query.max_response_tokens:
+            words = words[:query.max_response_tokens]
+        truncated = " ".join(words)
+        return OutsideVerdict(
+            payload=truncated, source_id=self.oracle_id,
+            n_tokens=len(words))
+
+
+@dataclasses.dataclass
+class SingletonAsymmetricOracle:
+    """Oracle that emits *exactly one* admitted tag (W21 multi-oracle
+    disagreement primitive).
+
+    Models a deterministic outside source whose reply names exactly
+    one service. Used to construct R-68-NO-QUORUM regimes where
+    each of three registered oracles emits a different singleton —
+    no admitted tag receives ≥ ``quorum_min = 2`` votes; the W21
+    layer abstains; ties FIFO at 0.000.
+
+    Configuration via :attr:`target`:
+
+      * ``"first"``     — emit the first admitted tag (sorted).
+      * ``"middle"``    — emit the middle admitted tag (sorted).
+      * ``"last"``      — emit the last admitted tag (sorted).
+      * any other str   — emit that exact tag if in admitted_tags;
+                            abstain otherwise.
+
+    Bounded-context: the reply is one ``service=`` mention bounded
+    by ``query.max_response_tokens``.
+    """
+    oracle_id: str = "singleton_oracle"
+    target: str = "first"
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        admitted = sorted(set(query.admitted_tags))
+        if len(admitted) < 2:
+            return OutsideVerdict(
+                payload=None, source_id=self.oracle_id, n_tokens=0)
+        if self.target == "first":
+            chosen = admitted[0]
+        elif self.target == "middle":
+            chosen = admitted[len(admitted) // 2]
+        elif self.target == "last":
+            chosen = admitted[-1]
+        elif self.target in admitted:
+            chosen = self.target
+        else:
+            return OutsideVerdict(
+                payload=None, source_id=self.oracle_id, n_tokens=0)
+        payload = (f"singleton_oracle target={chosen} "
+                   f"service={chosen}")
+        words = payload.split()
+        if len(words) > query.max_response_tokens:
+            words = words[:query.max_response_tokens]
+        truncated = " ".join(words)
+        return OutsideVerdict(
+            payload=truncated, source_id=self.oracle_id,
+            n_tokens=len(words))
+
+
+@dataclasses.dataclass
+class DisagreeingHonestOracle:
+    """Honest oracle that points at a *different* gold pair from the
+    one that matches the elected root cause.
+
+    Models a well-intentioned outside source indexed on the wrong
+    incident type — e.g. a registry that returns the *next* gold
+    family's pair instead of the current one. Under the R-66-shape
+    admitted set ``{gold_a, gold_b, decoy}`` (only one gold pair
+    present), this oracle abstains by construction (the wrong gold
+    pair is not in admitted). It is most useful on R-68 regimes
+    that admit a wider set covering multiple gold pairs.
+    """
+    oracle_id: str = "disagreeing_honest"
+    wrong_log: dict[str, tuple[str, ...]] = dataclasses.field(
+        default_factory=lambda: {
+            "deadlock":             ("api", "db"),
+            "pool_exhaustion":      ("storage", "logs_pipeline"),
+            "disk_fill":            ("web", "db_query"),
+            "slow_query_cascade":   ("orders", "payments"),
+        })
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        admitted = sorted(set(query.admitted_tags))
+        wrong = self.wrong_log.get(query.elected_root_cause, ())
+        wrong_in_admitted = [t for t in wrong if t in admitted]
+        if (not wrong_in_admitted
+                or len(wrong_in_admitted) == len(admitted)):
+            return OutsideVerdict(
+                payload=None, source_id=self.oracle_id, n_tokens=0)
+        named = sorted(wrong_in_admitted)
+        payload = ("disagreeing_oracle attribution_chain="
+                   f"{'_'.join(named)} "
+                   + " ".join(f"service={tag}" for tag in named))
+        words = payload.split()
+        if len(words) > query.max_response_tokens:
+            words = words[:query.max_response_tokens]
+        truncated = " ".join(words)
+        return OutsideVerdict(
+            payload=truncated, source_id=self.oracle_id,
+            n_tokens=len(words))
+
+
+W21_BRANCH_QUORUM_RESOLVED = "quorum_resolved"
+W21_BRANCH_NO_QUORUM = "no_quorum"
+W21_BRANCH_SYMMETRIC_QUORUM = "symmetric_quorum"
+W21_BRANCH_NO_ORACLES = "no_oracles"
+W21_BRANCH_NO_TRIGGER = "no_trigger"
+W21_BRANCH_DISABLED = "disabled"
+
+W21_ALL_BRANCHES: tuple[str, ...] = (
+    W21_BRANCH_QUORUM_RESOLVED,
+    W21_BRANCH_NO_QUORUM,
+    W21_BRANCH_SYMMETRIC_QUORUM,
+    W21_BRANCH_NO_ORACLES,
+    W21_BRANCH_NO_TRIGGER,
+    W21_BRANCH_DISABLED,
+)
+
+W21_DEFAULT_TRIGGER_BRANCHES: frozenset[str] = W20_DEFAULT_TRIGGER_BRANCHES
+
+
+@dataclasses.dataclass(frozen=True)
+class W21OracleProbe:
+    """Per-oracle probe record for one
+    ``TrustWeightedMultiOracleDisambiguator.decode_rounds`` call.
+
+    Fields
+    ------
+    oracle_id
+        The oracle's ``oracle_id`` (provenance label).
+    role_label
+        The registration's ``role_label`` (e.g. ``"service_graph"``,
+        ``"change_history"``).
+    trust_prior
+        The registration's prior trust weight in [0, 1].
+    payload
+        The (truncated) oracle reply bytes — empty string when the
+        oracle abstained.
+    payload_tokens
+        Tokenised oracle bytes — empty tuple when the oracle
+        abstained.
+    per_tag_count
+        ``{tag: aw_count}`` over the oracle's reply — same scoring
+        rule as W20 / W19 / W18.
+    top_set
+        Positive-set projection of this oracle's reply (sorted
+        tuple of admitted tags with ``aw_count > 0``). Empty when
+        the oracle abstained or its reply is symmetric across the
+        admitted set.
+    abstained
+        True when the oracle returned ``None`` OR its top_set was
+        empty / equal to the full admitted set.
+    n_outside_tokens
+        The oracle's actual reply length in
+        :func:`_handoff_n_tokens` units (post-truncation).
+    """
+    oracle_id: str
+    role_label: str
+    trust_prior: float
+    payload: str
+    payload_tokens: tuple[str, ...]
+    per_tag_count: dict[str, int]
+    top_set: tuple[str, ...]
+    abstained: bool
+    n_outside_tokens: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "oracle_id": str(self.oracle_id),
+            "role_label": str(self.role_label),
+            "trust_prior": float(self.trust_prior),
+            "payload": str(self.payload),
+            "payload_tokens": list(self.payload_tokens),
+            "per_tag_count": {
+                tag: int(c) for tag, c in self.per_tag_count.items()
+            },
+            "top_set": list(self.top_set),
+            "abstained": bool(self.abstained),
+            "n_outside_tokens": int(self.n_outside_tokens),
+        }
+
+
+@dataclasses.dataclass(frozen=True)
+class W21MultiOracleResult:
+    """Audit record for one
+    ``TrustWeightedMultiOracleDisambiguator.decode_rounds`` call.
+
+    Fields
+    ------
+    answer
+        The W21-projected answer dict (same shape as W19 / W20).
+    inner_branch
+        The W19 branch that fired before the W21 layer ran.
+    triggered
+        Whether the W21 trigger fired (``inner_branch`` was in
+        the configured trigger set AND ``enabled`` AND
+        ``len(oracle_registrations) > 0``).
+    quorum_min
+        The configured ``quorum_min`` at projection time.
+    min_trust_sum
+        The configured ``min_trust_sum`` at projection time.
+    probes
+        Tuple of :class:`W21OracleProbe`, one per registered oracle
+        (preserving registration order). Empty tuple when no oracle
+        was consulted.
+    per_tag_votes
+        ``{tag: vote_count}`` aggregated across non-abstained probes.
+    per_tag_trust_sum
+        ``{tag: Σ trust_prior of voting oracles}`` aggregated across
+        non-abstained probes.
+    decoder_branch
+        The W21 branch (one of :data:`W21_ALL_BRANCHES`).
+    abstained
+        True when the W21 layer did not produce a strict-max
+        projection.
+    n_outside_queries
+        Number of oracle consults performed (equal to
+        ``len(oracle_registrations)`` when ``triggered`` else 0).
+    n_outside_tokens_total
+        Strict per-cell additional token cost — sum of
+        ``n_outside_tokens`` across all probes.
+    """
+    answer: dict[str, Any]
+    inner_branch: str
+    triggered: bool
+    quorum_min: int
+    min_trust_sum: float
+    probes: tuple[W21OracleProbe, ...]
+    per_tag_votes: dict[str, int]
+    per_tag_trust_sum: dict[str, float]
+    decoder_branch: str
+    abstained: bool
+    n_outside_queries: int
+    n_outside_tokens_total: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get("remediation",
+                                                 "investigate")),
+            "inner_branch": str(self.inner_branch),
+            "triggered": bool(self.triggered),
+            "quorum_min": int(self.quorum_min),
+            "min_trust_sum": float(self.min_trust_sum),
+            "probes": [p.as_dict() for p in self.probes],
+            "per_tag_votes": {
+                tag: int(v) for tag, v in self.per_tag_votes.items()
+            },
+            "per_tag_trust_sum": {
+                tag: float(v) for tag, v in self.per_tag_trust_sum.items()
+            },
+            "decoder_branch": str(self.decoder_branch),
+            "abstained": bool(self.abstained),
+            "n_outside_queries": int(self.n_outside_queries),
+            "n_outside_tokens_total": int(self.n_outside_tokens_total),
+        }
+
+
+@dataclasses.dataclass
+class TrustWeightedMultiOracleDisambiguator:
+    """Trust-weighted multi-oracle adjudicator (SDK v3.22, W21 family).
+
+    Wraps a :class:`BundleContradictionDisambiguator` (W19) and adds
+    multi-source outside-information adjudication when the inner W19
+    branch indicates the bundle alone is structurally insufficient.
+    Generalises the SDK v3.21 :class:`OutsideWitnessAcquisitionDisambi
+    guator` (W20) by consulting **N** registered oracles per cell
+    instead of one, and projecting the answer onto the
+    quorum-of-aligned subset of the admitted tag set.
+
+    This is the first capsule-native multi-agent-coordination method
+    that crosses the W20-Λ-compromised wall on a regime where the
+    wall actually applies (R-68-MULTI-MAJORITY): one of the registered
+    oracles emits a decoy-asymmetric reply, but a strict majority of
+    the registered oracles emit gold-asymmetric replies; the W21
+    quorum-aware projection commits to the gold subset.
+
+    The W21 layer is *not* a learned model — it is a closed-form
+    composition of (a) the inner W19 bundle-only scorer, (b) one
+    targeted oracle consult **per registered oracle**, (c) the same
+    per-tag scorer the W18 / W19 / W20 layers use, and (d) a
+    deterministic vote-counting rule with two configurable knobs
+    (``quorum_min``, ``min_trust_sum``).
+
+    Pipeline
+    --------
+    1. Run inner W19. If W19's branch is not in ``trigger_branches``
+       OR W21 is ``enabled = False`` OR no oracles are registered,
+       reduce to W19 byte-for-byte. The ``decoder_branch`` becomes
+       :data:`W21_BRANCH_NO_TRIGGER` /
+       :data:`W21_BRANCH_DISABLED` /
+       :data:`W21_BRANCH_NO_ORACLES` accordingly.
+    2. Build :class:`OutsideQuery` (same shape as W20).
+    3. Consult **every** registered oracle once. Per oracle:
+         * Truncate reply to ``max_response_tokens``.
+         * Tokenise via :func:`_disambiguator_payload_tokens`.
+         * Compute ``per_tag_count`` per admitted tag via
+           :func:`_relational_compatibility_score`.
+         * Record the probe's ``top_set`` (positive-set projection).
+    4. Aggregate per-tag votes:
+         votes[tag]      = #probes with per_tag_count[tag] > 0
+         trust_sum[tag]  = Σ trust_prior over those probes
+    5. Project:
+         top_set = {tag : votes[tag] ≥ quorum_min
+                          AND trust_sum[tag] ≥ min_trust_sum}.
+       * If ``top_set`` is non-empty proper subset of admitted_tags
+         → :data:`W21_BRANCH_QUORUM_RESOLVED`; project the answer.
+       * If ``top_set`` is empty
+         → :data:`W21_BRANCH_NO_QUORUM`; abstain (fall through).
+       * If ``top_set`` covers every admitted tag
+         → :data:`W21_BRANCH_SYMMETRIC_QUORUM`; abstain (fall through).
+    6. Return a :class:`W21MultiOracleResult` with the final answer +
+       audit record (per-oracle probes, aggregated votes, total
+       ``n_outside_queries`` and ``n_outside_tokens_total``).
+
+    Bounded-context honesty
+    ------------------------
+    The W21 layer issues *exactly N* outside queries per cell, where
+    N = ``len(oracle_registrations)``. Each query bounded by
+    ``max_response_tokens``. The total per-cell additional token
+    cost is recorded in ``n_outside_tokens_total`` and is *additive*
+    on top of the inner W15 ``tokens_kept`` figure. The inner W15
+    accounting is byte-for-byte unchanged from W20 / W19.
+
+    Backward-compat
+    ----------------
+    * **W21-3-A** (vs W19, no-trigger paths). With ``enabled = False``
+      or with no oracles registered, the W21 layer reduces to the
+      inner W19 byte-for-byte. With ``enabled = True`` AND the inner
+      W19 returns a non-trigger branch, the W21 layer reduces to W19
+      byte-for-byte.
+    * **W21-3-B** (vs W20, single-oracle quorum_min=1). With
+      ``quorum_min = 1`` AND a single oracle registered AND
+      ``min_trust_sum = 0.0``, the W21 layer ties W20 byte-for-byte
+      on the answer field on every regime where W20 fires. (W21
+      records richer audit info but the projected answer is
+      identical.)
+
+    Honest scope (W21)
+    -------------------
+    The W21-1 strict gain is *strongly conditional* on:
+      (a) the bench property — W19 abstains via SYMMETRIC or NO_SIGNAL,
+      (b) the registered oracle set contains ≥ ``quorum_min`` oracles
+          whose replies independently identify a non-empty proper
+          asymmetric subset of the admitted tags AND that subset
+          intersects to a non-empty asymmetric subset.
+
+    Three named falsifiers make the conditionality sharp:
+      * **W21-Λ-no-quorum** — every per-oracle reply identifies a
+        different singleton; no tag has ≥ ``quorum_min`` votes;
+        abstain → tie FIFO at 0.000.
+      * **W21-Λ-all-compromised** — every registered oracle returns
+        a decoy-asymmetric reply; quorum forms on decoy; FAIL at
+        0.000. The natural extension W21-C-CALIBRATED-TRUST (low
+        trust priors on uncalibrated oracles) is conjectural.
+      * **W21-Λ-disagreement-only** — registered oracles each emit a
+        different non-empty proper asymmetric subset that does NOT
+        intersect; abstain → tie FIFO at 0.000.
+    """
+
+    inner: BundleContradictionDisambiguator = dataclasses.field(
+        default_factory=lambda: BundleContradictionDisambiguator())
+    oracle_registrations: tuple[OracleRegistration, ...] = ()
+    enabled: bool = True
+    trigger_branches: frozenset[str] = dataclasses.field(
+        default_factory=lambda: W21_DEFAULT_TRIGGER_BRANCHES)
+    max_response_tokens: int = 24
+    quorum_min: int = 2
+    min_trust_sum: float = 0.0
+
+    # Forensic — last applied result, exposed for the bench driver.
+    _last_result: W21MultiOracleResult | None = None
+
+    def decode_rounds(self,
+                       per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+                       ) -> dict[str, Any]:
+        base = self.inner.decode_rounds(per_round_handoffs)
+        w19_result = self.inner.last_result
+        out = dict(base)
+        # Disabled / no inner W19 path.
+        if (not self.enabled) or w19_result is None:
+            result = W21MultiOracleResult(
+                answer=dict(base),
+                inner_branch=(w19_result.decoder_branch
+                                if w19_result is not None
+                                else W19_BRANCH_DISABLED),
+                triggered=False,
+                quorum_min=int(self.quorum_min),
+                min_trust_sum=float(self.min_trust_sum),
+                probes=(),
+                per_tag_votes={},
+                per_tag_trust_sum={},
+                decoder_branch=W21_BRANCH_DISABLED,
+                abstained=True,
+                n_outside_queries=0,
+                n_outside_tokens_total=0,
+            )
+            self._last_result = result
+            out["multi_oracle"] = result.as_dict()
+            return out
+        # No-trigger path.
+        if w19_result.decoder_branch not in self.trigger_branches:
+            result = W21MultiOracleResult(
+                answer=dict(base),
+                inner_branch=w19_result.decoder_branch,
+                triggered=False,
+                quorum_min=int(self.quorum_min),
+                min_trust_sum=float(self.min_trust_sum),
+                probes=(),
+                per_tag_votes={},
+                per_tag_trust_sum={},
+                decoder_branch=W21_BRANCH_NO_TRIGGER,
+                abstained=False,
+                n_outside_queries=0,
+                n_outside_tokens_total=0,
+            )
+            self._last_result = result
+            out["multi_oracle"] = result.as_dict()
+            return out
+        # No-oracles path — reduce to W19 byte-for-byte.
+        if not self.oracle_registrations:
+            result = W21MultiOracleResult(
+                answer=dict(base),
+                inner_branch=w19_result.decoder_branch,
+                triggered=False,
+                quorum_min=int(self.quorum_min),
+                min_trust_sum=float(self.min_trust_sum),
+                probes=(),
+                per_tag_votes={},
+                per_tag_trust_sum={},
+                decoder_branch=W21_BRANCH_NO_ORACLES,
+                abstained=True,
+                n_outside_queries=0,
+                n_outside_tokens_total=0,
+            )
+            self._last_result = result
+            out["multi_oracle"] = result.as_dict()
+            return out
+        # Build the OutsideQuery — same shape as W20.
+        union_tag_set: set[str] = set()
+        union: list[_DecodedHandoff] = []
+        raw_union: list[_DecodedHandoff] = []
+        layered_normaliser = self.inner.inner.inner.inner
+        for bundle in per_round_handoffs:
+            normalised = layered_normaliser.normalize_round(bundle)
+            for h_norm, h_raw in zip(normalised, bundle):
+                union.append(h_norm)
+                raw_union.append(h_raw)
+                tag = _service_tag_of(h_norm.payload)
+                if tag:
+                    union_tag_set.add(tag)
+        admitted_tags = tuple(sorted(union_tag_set))
+        round_hint: list[int] = []
+        for r_idx, bundle in enumerate(per_round_handoffs, start=1):
+            for _ in bundle:
+                round_hint.append(r_idx)
+        primary_idx = _w19_canonical_primary_index(
+            union, round_hint, raw_union=raw_union)
+        primary_payload = (union[primary_idx].payload
+                            if primary_idx >= 0 else "")
+        witness_payloads: list[str] = []
+        for i, h in enumerate(union):
+            if i == primary_idx:
+                continue
+            if h.claim_kind not in _SPECIFIC_TIER_CLAIM_KINDS:
+                continue
+            witness_payloads.append(h.payload)
+        elected_root_cause = str(base.get("root_cause", "unknown"))
+        query = OutsideQuery(
+            admitted_tags=admitted_tags,
+            elected_root_cause=elected_root_cause,
+            primary_payload=primary_payload,
+            witness_payloads=tuple(witness_payloads),
+            max_response_tokens=self.max_response_tokens,
+        )
+        # Consult every registered oracle exactly once.
+        probes: list[W21OracleProbe] = []
+        per_tag_votes: dict[str, int] = {tag: 0 for tag in admitted_tags}
+        per_tag_trust_sum: dict[str, float] = {
+            tag: 0.0 for tag in admitted_tags}
+        n_outside_total = 0
+        for reg in self.oracle_registrations:
+            oracle_id = getattr(reg.oracle, "oracle_id", "no_oracle")
+            try:
+                verdict = reg.oracle.consult(query)
+            except Exception:  # noqa: BLE001 — record + abstain
+                verdict = OutsideVerdict(
+                    payload=None, source_id=oracle_id, n_tokens=0)
+            n_outside_total += int(verdict.n_tokens or 0)
+            if verdict.payload is None or not verdict.payload:
+                probes.append(W21OracleProbe(
+                    oracle_id=oracle_id,
+                    role_label=reg.role_label,
+                    trust_prior=float(reg.trust_prior),
+                    payload="",
+                    payload_tokens=(),
+                    per_tag_count={tag: 0 for tag in admitted_tags},
+                    top_set=(),
+                    abstained=True,
+                    n_outside_tokens=int(verdict.n_tokens or 0),
+                ))
+                continue
+            words = verdict.payload.split()
+            if len(words) > self.max_response_tokens:
+                words = words[:self.max_response_tokens]
+            payload = " ".join(words)
+            tokens = _disambiguator_payload_tokens(payload)
+            per_tag: dict[str, int] = {}
+            for tag in admitted_tags:
+                d, c = _relational_compatibility_score(tag, tokens)
+                per_tag[tag] = int(d + c)
+            top_set = tuple(sorted(t for t in admitted_tags
+                                       if per_tag[t] > 0))
+            symmetric = (not top_set
+                          or len(top_set) == len(admitted_tags))
+            probe = W21OracleProbe(
+                oracle_id=oracle_id,
+                role_label=reg.role_label,
+                trust_prior=float(reg.trust_prior),
+                payload=payload,
+                payload_tokens=tokens,
+                per_tag_count=per_tag,
+                top_set=top_set,
+                abstained=symmetric,
+                n_outside_tokens=int(verdict.n_tokens or len(words)),
+            )
+            probes.append(probe)
+            if symmetric:
+                continue
+            for tag in admitted_tags:
+                if per_tag[tag] > 0:
+                    per_tag_votes[tag] += 1
+                    per_tag_trust_sum[tag] += float(reg.trust_prior)
+        # Aggregate: top_set under quorum + trust thresholds.
+        top_set = tuple(sorted(
+            t for t in admitted_tags
+            if per_tag_votes[t] >= int(self.quorum_min)
+            and per_tag_trust_sum[t] >= float(self.min_trust_sum)
+        ))
+        if not top_set:
+            branch = W21_BRANCH_NO_QUORUM
+            abstained = True
+            answer = dict(base)
+        elif len(top_set) == len(admitted_tags):
+            branch = W21_BRANCH_SYMMETRIC_QUORUM
+            abstained = True
+            answer = dict(base)
+        else:
+            branch = W21_BRANCH_QUORUM_RESOLVED
+            abstained = False
+            answer = dict(base)
+            answer["services"] = top_set
+        result = W21MultiOracleResult(
+            answer=answer,
+            inner_branch=w19_result.decoder_branch,
+            triggered=True,
+            quorum_min=int(self.quorum_min),
+            min_trust_sum=float(self.min_trust_sum),
+            probes=tuple(probes),
+            per_tag_votes=per_tag_votes,
+            per_tag_trust_sum=per_tag_trust_sum,
+            decoder_branch=branch,
+            abstained=abstained,
+            n_outside_queries=len(self.oracle_registrations),
+            n_outside_tokens_total=int(n_outside_total),
+        )
+        self._last_result = result
+        if not abstained:
+            out["services"] = top_set
+        out["multi_oracle"] = result.as_dict()
+        return out
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+               ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> W21MultiOracleResult | None:
         return self._last_result
 
     @property

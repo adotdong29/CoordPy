@@ -5,6 +5,112 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.22] — 2026-04-29 — SDK v3.22 — trust-weighted multi-oracle adjudicator + R-68 multi-oracle benchmark family + W21 family (first capsule-native multi-agent-coordination method that crosses the W20-Λ-compromised wall on a regime where single-oracle reasoning is structurally insufficient by adjudicating across N registered outside oracles under bounded context)
+
+*Strictly additive on SDK v3.21. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W21 surface adds
+one new dataclass (``OracleRegistration``), four oracle adapters
+(``ChangeHistoryOracle`` / ``OnCallNotesOracle`` /
+``SingletonAsymmetricOracle`` / ``DisagreeingHonestOracle``), two
+audit dataclasses (``W21OracleProbe``, ``W21MultiOracleResult``),
+six new branch constants (``W21_BRANCH_QUORUM_RESOLVED``,
+``W21_BRANCH_NO_QUORUM``, ``W21_BRANCH_SYMMETRIC_QUORUM``,
+``W21_BRANCH_NO_ORACLES``, ``W21_BRANCH_NO_TRIGGER``,
+``W21_BRANCH_DISABLED``), and one wrapping decoder
+(``TrustWeightedMultiOracleDisambiguator``). All purely additive
+in the multi-agent coordination research slice.*
+
+**Headline (W21-1, proved-conditional + proved-empirical n=80
+saturated × 5 seeds × 2 cells, also n=12).** Pairing the W19
+``BundleContradictionDisambiguator`` with the new
+``TrustWeightedMultiOracleDisambiguator`` over a three-oracle
+registered set ``(compromised_registry first, service_graph,
+change_history)`` under default ``quorum_min = 2`` achieves
+``accuracy_full = 1.000`` on R-68-MULTI-MAJORITY-LOOSE
+(``T_decoder = None``) AND R-68-MULTI-MAJORITY-TIGHT
+(``T_decoder = 24``), strictly improving over **every** non-W21
+capsule baseline including W20 (which trusts the first-registered
+compromised oracle and FAILS at 0.000) by **+1.000**, stable across
+**5/5** alternate ``bank_seed`` values (11, 17, 23, 29, 31). The
+first capsule-native multi-agent-coordination method that crosses
+the W20-Λ-compromised wall on a regime where the wall actually
+applies. Three named falsifiers (W21-Λ-no-quorum,
+W21-Λ-all-compromised, W21-Λ-partial) make the W21-1 conditionality
+sharp; the conditional W21-C-PARTIAL-RECOVERY (with override
+``quorum_min = 1`` on R-68-MULTI-PARTIAL) is empirically discharged
+at 1.000 — the quorum-strictness trade-off is real.
+
+**Live LLM transfer (SDK v3.22, W21-Λ-real / W21-C-LIVE-WITH-REGISTRY,
+empirical n=4 × 2 models, partially discharged).** Two regimes:
+
+* **Mixed-registry (registry-anchored, easy)** — four-oracle
+  registry pairing deterministic ``service_graph`` +
+  ``change_history`` with ``ollama_mixtral:8x7b``: W21 = 1.000,
+  +1.000 over W20. ``W21-C-LIVE-WITH-REGISTRY`` partially
+  discharged.
+* **Coalition (LLM-vote-required, hard)** — three-oracle registry
+  with one honest deterministic + one LLM + one compromised,
+  ``quorum_min = 2`` (LLM vote required for quorum on gold):
+  ``ollama_mixtral:8x7b`` (47B-MoE) lands gold tokens through the
+  W18/W19 closure on 3/4 cells → W21 = **0.750**, **+0.750 over
+  W20**; ``ollama_gemma2:9b`` (9.2B-dense) lands decoy tokens
+  through the closure → W21 = **0.000**, **+0.000 over W20**.
+  Cross-model split (47B-MoE / 9.2B-dense) sharp; **scale + general
+  knowledge matter for the W21-Λ-real escape on the LLM-vote-
+  required regime**.
+
+**Two-Mac status (SDK v3.22).** Mac 2 (192.168.12.248) ARP
+``incomplete`` — same status as SDK v3.6 through SDK v3.21 (15th
+milestone in a row). **No two-Mac sharded inference happened in SDK
+v3.22.** The W21 oracle Protocol is *naturally* a producer / multi-
+adjudicator separation; cross-host deployment (registry on Mac-1,
+LLM adjudicator on Mac-2) is wire-compatible — no W21 code changes
+required when Mac-2 returns. Strongest model class actually
+exercised: single-Mac ``mixtral:8x7b`` (46.7B-MoE Q4) on Mac 1
+Ollama.
+
+**Bounded-context honesty (SDK v3.22).** The W21 layer issues
+*exactly N = ``len(oracle_registrations)``* outside queries per
+cell, each bounded by ``max_response_tokens``. The inner W15
+``tokens_kept`` is byte-for-byte identical between W19, W20 AND
+W21 on R-68-MULTI-MAJORITY-TIGHT (mechanically verified). Total
+context delivered to the final decider on the 3-oracle stack:
+``tokens_kept (≤ T_decoder) + 3 × n_outside_tokens (each ≤
+max_response_tokens)``.
+
+**Backward-compat (W21-3-A / W21-3-B) preserved byte-for-byte.**
+With ``enabled = False`` OR no oracles registered, W21 reduces to
+W19 byte-for-byte. With ``quorum_min = 1`` AND a single registered
+honest oracle, W21 ties W20 byte-for-byte on R-67-OUTSIDE-RESOLVES.
+Full SDK regression: **633 / 633 wevra tests pass** (= 585 prior +
+48 new W21 tests).
+
+**Closes the named SDK v3.21 conjectures.** W20-C-MULTI-ORACLE
+(named conjectural in SDK v3.21) is **discharged** by W21-1 on
+R-68-MULTI-MAJORITY. W20-C-LIVE-WITH-REGISTRY (named conjectural
+in SDK v3.21) is **partially discharged** by the live mixed-
+registry probe on Mac-1 mixtral 8x7b.
+
+**SDK v3.22 mint files:**
+
+* New W21 surface in ``vision_mvp/wevra/team_coord.py`` (purely
+  additive on top of W20).
+* New experiment:
+  ``vision_mvp/experiments/phase68_multi_oracle_adjudication.py``
+  (R-68 driver: 5 sub-banks + cross-regime synthetic + 5-seed
+  stability sweep + live mixed-registry / coalition probes).
+* New tests:
+  ``vision_mvp/tests/test_wevra_multi_oracle_adjudication.py`` (48
+  tests).
+* New artifacts: ``docs/data/phase68_*.json`` (7 files).
+* New milestone results note:
+  ``docs/RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md``.
+* Master plan (§ 4.39), THEOREM_REGISTRY (W21 family with 11
+  entries), SUCCESS_CRITERION (Bar 18), START_HERE, README,
+  RESEARCH_STATUS, papers/context_as_objects.md (§ 14.2 escape
+  ladder) all updated.
+* ``SDK_VERSION = "wevra.sdk.v3.22"``.
+
 ## [3.21] — 2026-04-29 — SDK v3.21 — outside-witness acquisition disambiguator + R-67 outside-information benchmark family + W20 family (first capsule-native multi-agent-coordination method that crosses the W19-Λ-outside wall on a regime where bundle-only reasoning is structurally insufficient by acquiring asymmetric outside information)
 
 *Strictly additive on SDK v3.20. The Wevra single-run product

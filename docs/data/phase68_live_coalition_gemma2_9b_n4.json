@@ -1,0 +1,29 @@
+{
+  "model": "gemma2:9b",
+  "n_eval": 4,
+  "w19_acc": 0.0,
+  "w20_acc": 0.0,
+  "w21_acc": 0.0,
+  "w21_branches": {
+    "quorum_resolved": 3,
+    "no_quorum": 1
+  },
+  "w20_branches": {
+    "outside_resolved": 4
+  },
+  "headline_gap": {
+    "w21_minus_w20": 0.0,
+    "w21_minus_w19": 0.0,
+    "w21_minus_w18": 0.0,
+    "w21_minus_attention_aware": 0.0,
+    "w21_minus_fifo": 0.0,
+    "w21_minus_substrate": 0.0,
+    "max_non_w21_accuracy_full": 0.0
+  },
+  "oracle_ids": [
+    "compromised",
+    "change_history",
+    "ollama_gemma2:9b"
+  ],
+  "w20_chosen": "compromised"
+}
