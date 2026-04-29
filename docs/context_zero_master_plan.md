@@ -9221,6 +9221,138 @@ adversarial round-2 mentions).
 
 ---
 
+### 4.37 SDK v3.20 — bundle-contradiction-aware trust-weighted disambiguator + deceptive-ambiguity benchmark family + W19 family (Phase-66 R-66-DECEIVE-NAIVE / R-66-CONFOUND-RESOLVABLE + named falsifier pair)
+
+SDK v3.20 attacks the named research frontier SDK v3.19 left
+explicit (W18-Λ-deceive, the *adversarial-relational* wall where
+W18 trusts its evidence and fails; AND W18-Λ-confound, the
+*symmetric-relational* wall where W18 abstains and falls through
+to the empty inner W15 answer). The W18 milestone named the
+structural shape of the next move: a *richer scorer* that
+consumes information *beyond* the round-2 disambiguator's
+payload itself — specifically, the *consistency between* the
+canonical primary disambiguator and *independent asymmetric
+witnesses* elsewhere in the bundle.
+
+The W19 family is the smallest move in that direction. The
+:class:`BundleContradictionDisambiguator` is a deterministic,
+training-free, closed-form four-stage pipeline:
+
+  1. Run the W18 :class:`RelationalCompatibilityDisambiguator`
+     over the admitted bundle (capture inner answer + W18 audit
+     + W15 pack stats).
+  2. Identify the *canonical primary* specific-tier disambiguator
+     in the admitted union via canonical sort with a canonical-
+     role-for-kind tiebreak (the
+     :data:`_INCIDENT_TRIAGE_CANONICAL_ROLE_FOR_KIND` table) +
+     raw-kind tiebreak (so synonym/heuristic-rescued kinds from
+     non-canonical roles do not displace the canonical primary).
+  3. Count independent *asymmetric witnesses* per admitted
+     service tag — specific-tier handoffs OTHER than the
+     canonical primary whose tokenised payload mentions the tag,
+     deduplicated by ``(source_role, claim_kind, payload_sha)``.
+  4. Decide the W19 branch:
+     * **Inversion** — when W18 fires its strict-asymmetric
+       branch but ``max_aw(complement) > max_aw(named_set)``,
+       project to the complement.
+     * **Confound-resolved** — when W18 abstains AND there is a
+       unique strict-max-aw subset M ⊊ U, project to M.
+     * **Abstained-symmetric** — when W18 abstains AND
+       witnesses are symmetric across U, abstain (W19-Λ-outside
+       wall).
+     * **Primary-trusted / abstained-no-signal** — fall through
+       to W18.
+
+The SDK v3.20 mint:
+
+* **W19-Λ-deceive-extension (proved-empirical n=8 saturated × 5
+  seeds + structural sketch).** W18-Λ-deceive extends to
+  R-66-DECEIVE-NAIVE for every closed-form scorer that *trusts*
+  its concatenated disambiguator text — including W18 itself.
+* **W19-1 (proved-conditional + proved-empirical n=120 saturated
+  across 5 seeds × 3 regimes).** Pairing the W18 disambiguator
+  with the W19 trust layer achieves
+  ``capsule_bundle_contradiction = 1.000`` on R-66-DECEIVE-NAIVE-
+  LOOSE AND R-66-DECEIVE-NAIVE-TIGHT AND R-66-CONFOUND-RESOLVABLE,
+  strictly improving over the W18 baseline by **+1.000**, stable
+  across 5/5 alternate ``bank_seed`` values.
+* **W19-2 (proved by inspection + mechanically-checked).** W19
+  determinism + closed-form correctness; bounded-context honesty
+  (``tokens_kept_sum`` byte-for-byte identical to W18's).
+* **W19-3 (proved-empirical full programme regression).**
+  Backward-compat with R-54..R-65 byte-for-byte; with
+  ``enabled = False`` the W19 method reduces to W18 byte-for-
+  byte.
+* **W19-Λ-total / -outside (proved-empirical n=8 saturated
+  each).** Two named structural limit regimes where W19 ties
+  FIFO by construction. The W19-Λ-total wall (no asymmetric
+  witness anywhere in the bundle) bounds the bundle-only
+  closed-form scope; the W19-Λ-outside wall (symmetric witnesses)
+  bounds the same scope even when witnesses exist.
+* **W19-C-LEARNED, W19-C-OUTSIDE, W19-Λ-real, W19-C-CROSS-BENCH
+  (conjectural).** Named extension axes. W19-C-OUTSIDE is the
+  natural escape from BOTH falsifier walls.
+
+The W19 layer is *additive in code*: one new dataclass + two
+closed-form helpers + one canonical-role-for-kind table + one
+wrapping decoder. The SDK v3.19 runtime contract is byte-for-
+byte unchanged; **all prior wevra tests pass byte-for-byte**;
+new tests cover the W19 unit semantics, the Phase-66 bench-
+property witnesses, the W19-1 strict-win anchor, the 5-seed
+stability, the two named falsifiers, the backward-compat smoke,
+the token-budget honesty, and the cross-regime synthetic summary.
+Total: 405 pre-existing wevra tests + 45 new W19 tests =
+450 / 450 in the targeted wevra suites; 555 / 555 across the
+full ``test_wevra_*.py`` set.
+
+The defensible "thesis-after-SDK-v3.20" is that the
+synthetic→real-LLM-and-bounded-context transfer story now has
+**eleven layers + two named structural walls + five named
+falsifier regimes**. The first capsule-native multi-agent-
+coordination method has crossed the deceptive-ambiguity wall
+on regimes where the bundle carries an independent asymmetric
+witness for gold (R-66-DECEIVE-NAIVE / R-66-CONFOUND-RESOLVABLE).
+The next research frontier is W19-C-OUTSIDE (outside-information
+axis to escape BOTH the W19-Λ-total wall — no witnesses anywhere
+— AND the W19-Λ-outside wall — symmetric witnesses).
+
+**For another agent to instantly see the SDK v3.20 state**:
+
+1. **Is the new frontier deceptive ambiguity beyond W18?**
+   *YES.* The W19 family attacks the W18-Λ-deceive AND
+   W18-Λ-confound walls directly via the bundle-contradiction
+   channel that W18's selector ignores (W18 concatenates all
+   specific-tier payloads and treats them as one disambiguator
+   text; W19 distinguishes the canonical primary from secondary
+   witnesses).
+2. **Does the new method actually beat the W18-deceive wall?**
+   *YES, on the bundle-resolvable case (R-66-DECEIVE-NAIVE).*
+   W19 = 1.000; W18 = 0.000. **+1.000 strict separation**,
+   stable across 5/5 seeds, on both loose AND tight decoder
+   budgets. Same on R-66-CONFOUND-RESOLVABLE.
+3. **Did bounded-context efficiency survive?** *YES.* The W19
+   method reads only the W18-packed bundle (which itself reads
+   only the W15-packed bundle); ``tokens_kept_sum`` is byte-
+   for-byte identical to W18's. Bounded-context honesty
+   preserved.
+4. **Is the original thesis materially stronger or still
+   blocked by a deeper semantic / outside-information wall?**
+   *MATERIALLY STRONGER on the named axis; the deeper wall is
+   now SHARP — outside information is genuinely needed.* The
+   original Context-Zero thesis — *per-agent minimum-sufficient
+   context for multi-agent teams* — gains its **first capsule-
+   native method to resolve bundle-internal contradiction
+   between primary disambiguator and witnesses**. The deeper
+   walls (W19-Λ-total — bundle exhausted of asymmetric signal;
+   W19-Λ-outside — symmetric witnesses) are *named* and
+   *proved-structural* — the natural escape from BOTH is
+   outside information (W19-C-OUTSIDE), conjectural. **The
+   thesis is materially stronger AND the next research frontier
+   is precisely articulated as a structural result, not a
+   method-gap conjecture.**
+
+---
+
 *End of master plan. Changelog lives in the results notes, not
 here. If this document ever becomes a changelog, delete the
 changelog and restore the plan.*

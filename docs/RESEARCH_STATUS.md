@@ -5,21 +5,117 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.19,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.20,
 > 2026-04-28.
 
 ## TL;DR
 
-The programme now has **fifteen** coupled research axes, each
-with a sharp status. SDK v3.19 mints axis 15: **bundle-relational
-compatibility disambiguation under symmetric corroboration**. The
-W18 family adds one new dataclass (``W18CompatibilityResult``),
-one tokeniser (``_disambiguator_payload_tokens``), one closed-form
-scorer (``_relational_compatibility_score``) with contiguous-
-subsequence semantics for compound targets, and one wrapping
-decoder (``RelationalCompatibilityDisambiguator``) — purely
-additive on top of the W15 surface. The SDK v3.18 runtime contract
-is byte-for-byte unchanged.
+The programme now has **sixteen** coupled research axes, each
+with a sharp status. SDK v3.20 mints axis 16: **bundle-
+contradiction-aware trust-weighted disambiguation under deceptive
+/ confounded round-2 evidence (bundle-resolvable case)**. The W19
+family adds one new dataclass (``W19TrustResult``), two closed-
+form helpers (``_w19_canonical_primary_index``,
+``_w19_witness_counts``), one canonical-role-for-kind table
+(``_INCIDENT_TRIAGE_CANONICAL_ROLE_FOR_KIND``), and one wrapping
+decoder (``BundleContradictionDisambiguator``) — purely additive
+on top of the W18 surface. The SDK v3.19 runtime contract is
+byte-for-byte unchanged.
+
+**The headline SDK v3.20 results.** On a synthetic
+R-66-DECEIVE-NAIVE regime (symmetric round-1 corroboration; round-
+2 primary specific-tier disambiguator names DECOY service tags
+ONLY via ``relation=decoy_decoy_*``; round-2 secondary specific-
+tier witness — emitted by a non-canonical producer role under a
+synonym kind that resolves through the W12 / W13 normalisation
+closure to the same canonical specific-tier kind as the primary —
+names GOLD service tags ONLY via ``relation=A_B_*``), every
+closed-form scorer in the SDK pre-W19 — substrate FIFO,
+``capsule_fifo``, ``capsule_priority``, ``capsule_coverage``,
+W7-2 cohort, W8 corroboration, W9 multi-service, W11 multi-round,
+W12 robust-multi-round, W13 layered, W15
+``AttentionAwareBundleDecoder``, W14H + W15 composition, AND **W18
+``RelationalCompatibilityDisambiguator``** — ties FIFO at
+``accuracy_full = 0.000`` (W18-Λ-deceive extends verbatim:
+W18's full-disambiguator scorer sees positive scores on every
+admitted tag, abstains, and falls through to the empty inner W15
+answer). The new :class:`BundleContradictionDisambiguator` (W19)
+achieves ``capsule_bundle_contradiction = 1.000`` at both
+``T_decoder = None`` (R-66-DECEIVE-NAIVE-LOOSE) AND
+``T_decoder = 24`` (R-66-DECEIVE-NAIVE-TIGHT) AND on
+R-66-CONFOUND-RESOLVABLE (primary names all three; secondary
+names gold), strictly improving over the W18 baseline by
+**+1.000** on all three regimes, stable across **5/5** alternate
+``bank_seed`` values (11, 17, 23, 29, 31). **First capsule-native
+multi-agent-coordination method that resolves bundle-internal
+contradiction between a deceptive primary and a witness-
+corroborated alternative (W19-1).** Two named falsifiers make
+the conditionality sharp: R-66-DECEIVE-TOTAL (no asymmetric
+witness anywhere — W19 reduces to W18 and FAILS at 0.000;
+W19-Λ-total) and R-66-OUTSIDE-REQUIRED (witnesses are themselves
+symmetric across primary's named set and the complement — W19
+abstains via ``W19_BRANCH_ABSTAINED_SYMMETRIC`` and ties FIFO at
+0.000; W19-Λ-outside). Token-budget honesty: the W19 method
+consumes only the W18-packed bundle (which itself reads only the
+W15-packed bundle); ``tokens_kept_sum`` is byte-for-byte identical
+to W18's on R-66-DECEIVE-NAIVE-TIGHT (188 / 226 tokens kept across
+8 cells; same bundle, no extra capsule reads). Backward-compat
+(W19-3) preserved byte-for-byte: on R-58 default and on every
+R-65 default bank (compat / no_compat / confound / deceive), W19
+ties W18 byte-for-byte; with ``enabled = False`` the W19 method
+reduces to W18 byte-for-byte. **All prior wevra tests pass**
+(450 / 450 in the targeted wevra suites; 555 / 555 across the
+full ``test_wevra_*.py`` set with 45 new W19 tests).
+
+**Honest scope.** R-66 is a *synthetic* regime — the producer
+is :class:`IdentityExtractor`. Real-LLM transfer of the W19
+method is **W19-Λ-real** (proved-conditional + empirical-research):
+the LLM must emit the secondary witness in the same closed-
+vocabulary form (synonym specific-tier kinds + relational-compound
+payloads) AND from a non-canonical producer role; if the LLM
+emits free-form natural-language witnesses, the W19 exact-match
+layer misses by construction. The natural extension is
+**W19-C-LEARNED** (a small distilled trust scorer over capsule
+bundles), conjectural. The W19-Λ-total falsifier names the
+structural limit when the bundle is exhausted of asymmetric
+signal; the W19-Λ-outside falsifier names the structural limit
+when bundle-internal contradiction is itself symmetric. The
+natural escape from BOTH falsifier walls is **outside information**
+(W19-C-OUTSIDE — service-graph topology, prior reliability
+scores, cross-incident historical evidence), conjectural.
+
+The **prior-conjecture discharge ledger** for SDK v3.20:
+* **W18-Λ-deceive** (SDK v3.19; "no closed-form bundle-relational
+  scorer that *trusts* its evidence can escape adversarial round-2
+  evidence"). **PARTIALLY DISCHARGED-empirical** by W19-1 in the
+  *bundle-resolvable* direction: a deterministic training-free
+  bundle-contradiction-aware trust scorer is sufficient on
+  R-66-DECEIVE-NAIVE / R-66-CONFOUND-RESOLVABLE when the bundle
+  carries an independent asymmetric witness for gold. The
+  *bundle-only* clause where no witness exists (W19-Λ-total)
+  AND the *symmetric-witness* clause (W19-Λ-outside) remain
+  real and structural; the named research move beyond them is
+  W19-C-OUTSIDE (outside-information axis), conjectural.
+* **W18-Λ-confound** (SDK v3.19; "no closed-form bundle-relational
+  scorer can break a symmetric primary"). **PARTIALLY DISCHARGED-
+  empirical** by W19-1 in the *bundle-resolvable* direction on
+  R-66-CONFOUND-RESOLVABLE: when the bundle carries a witness
+  asymmetric for gold, W19 picks the strict-max-witness subset.
+  The *no-witness* and *symmetric-witness* cases remain bounded
+  by the same falsifiers above.
+
+---
+
+The *previous* (SDK v3.19) frontier mints axis 15: **bundle-
+relational compatibility disambiguation under symmetric
+corroboration**. The W18 family adds one new dataclass
+(``W18CompatibilityResult``), one tokeniser
+(``_disambiguator_payload_tokens``), one closed-form scorer
+(``_relational_compatibility_score``) with contiguous-subsequence
+semantics for compound targets, and one wrapping decoder
+(``RelationalCompatibilityDisambiguator``) — purely additive on
+top of the W15 surface. The SDK v3.18 runtime contract is
+byte-for-byte unchanged.
 
 **The headline SDK v3.19 results.** On a synthetic R-65-COMPAT
 regime (every gold service AND the decoy mentioned by ≥ 2 distinct
@@ -388,7 +484,164 @@ milestone note.
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.19, 2026-04-28)
+## Current frontier (SDK v3.20, 2026-04-28)
+
+### Active moves (SDK v3.20 — bundle-contradiction-aware trust-weighted disambiguator + deceptive-ambiguity benchmark family + W19 family — *first capsule-native move beyond the W18-Λ-deceive wall on the bundle-resolvable case*)
+
+- **Phase-66 deceptive-ambiguity benchmark family.**
+  ``vision_mvp.experiments.phase66_deceptive_ambiguity`` ships
+  five pre-committed sub-banks (one positive sanity anchor + two
+  W19-1 strict-gain anchors + two named falsifiers) plus a cross-
+  regime synthetic summary:
+  (i) ``r66_corroborated`` — primary names gold; secondary names
+  gold. W18 = W19 = 1.000. W19-3 backward-compat anchor.
+  (ii) ``r66_deceive_naive_loose`` (``T_decoder = None``) — primary
+  names DECOY ONLY; secondary names GOLD ONLY. W18 abstains, ties
+  FIFO at 0.000; W19 fires the confound-resolved branch (witness-
+  inversion semantics) and projects to gold at 1.000. **+1.000
+  strict separation.** The W19-1 anchor.
+  (iii) ``r66_deceive_naive_tight`` (``T_decoder = 24``) — same
+  shape under decoder-side budget pressure. W19 + W15 composition
+  preserves bounded-context efficiency byte-for-byte relative to
+  W18; gap +1.000.
+  (iv) ``r66_confound_resolvable`` — primary names ALL three;
+  secondary names gold. W18 abstains; W19 picks strict-max-witness
+  subset = {gold} at 1.000. **+1.000 strict separation.**
+  (v) ``r66_deceive_total`` — primary names DECOY ONLY; *no*
+  secondary witness. W19-Λ-total falsifier: W19 reduces to W18
+  and FAILS at 0.000.
+  (vi) ``r66_outside_required`` — primary names DECOY ONLY;
+  secondary names ALL three (symmetric witnesses). W19-Λ-outside
+  falsifier: W19 abstains via ``W19_BRANCH_ABSTAINED_SYMMETRIC``
+  and ties FIFO at 0.000.
+
+- **W19 family minted.** W19-Λ-deceive-extension (proved-empirical
+  + structural sketch; W18-Λ-deceive extends to R-66-DECEIVE-NAIVE
+  for every closed-form scorer that trusts its concatenated
+  disambiguator text), W19-1 (proved-conditional + proved-empirical
+  n=120 saturated across 5 seeds × 3 regimes; the first capsule-
+  native method to resolve bundle-internal contradiction between
+  primary and witnesses), W19-2 (proved by inspection +
+  mechanically-checked; W19 determinism + closed-form correctness),
+  W19-3 (proved-empirical full programme regression; backward-
+  compat with R-54..R-65 byte-for-byte), W19-Λ-total / -outside
+  (proved-empirical n=8 saturated each; two named structural
+  limits), W19-C-LEARNED (conjectural; learned trust scorer for
+  free-form witnesses), W19-C-OUTSIDE (conjectural; outside-
+  information axis to escape both falsifier walls), W19-Λ-real
+  (proved-conditional + empirical-research; real-LLM transfer is
+  conditional on closed-vocabulary secondary-witness emission),
+  W19-C-CROSS-BENCH (conjectural; transfer to non-incident-triage
+  benchmark families with a canonical-role-for-kind mapping).
+
+- **Bundle-contradiction-aware trust-weighted disambiguator** (new
+  SDK surface, purely additive). ``vision_mvp/wevra/team_coord.py``
+  ships:
+  * :class:`BundleContradictionDisambiguator` — the W19 four-stage
+    pipeline (inner W18 decode + canonical primary identification +
+    asymmetric witness counting + branch-decision projection).
+  * :class:`W19TrustResult` — the per-decode audit record carrying
+    the projected answer, the W18 fall-through answer, the
+    canonical primary's payload, the per-tag W18 scores, the
+    per-tag witness counts, and the W19 branch label.
+  * :func:`_w19_canonical_primary_index` — closed-form
+    deterministic primary identifier with canonical-role-for-kind
+    tiebreak + raw-kind tiebreak.
+  * :func:`_w19_witness_counts` — closed-form deterministic
+    witness counter excluding the canonical primary.
+  * :data:`_INCIDENT_TRIAGE_CANONICAL_ROLE_FOR_KIND` — closed-
+    vocabulary canonical-role-for-kind table for the incident-
+    triage benchmark family.
+  * :data:`W19_SYMMETRIC_NOISE_KINDS` — the round-1 generic-
+    noise kinds explicitly excluded from witness counting.
+  * :data:`W19_BRANCH_*` — closed-vocabulary branch labels
+    (``primary_trusted`` / ``inversion`` / ``confound_resolved``
+    / ``abstained_no_signal`` / ``abstained_symmetric`` /
+    ``disabled``).
+
+- **Pre-committed success criterion** in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-66 anchor +
+  bar 16 — deceptive-ambiguity bundle-contradiction split + § 2.15
+  R-66 ingredients). The SDK v3.20 result clears the **strong
+  success bar** § 1.1 on R-66-DECEIVE-NAIVE / R-66-CONFOUND-
+  RESOLVABLE (strict gain +1.000 vs every non-W19 capsule
+  baseline; bench property held in 8/8; named falsifier regimes
+  W19-Λ-total / W19-Λ-outside; W19-3 backward-compat preserved
+  byte-for-byte). Headline data files:
+  ``docs/data/phase66_cross_regime_synthetic.json``,
+  ``docs/data/phase66_seed_sweep_deceive_naive_loose.json``,
+  ``docs/data/phase66_seed_sweep_deceive_naive_tight.json``,
+  ``docs/data/phase66_seed_sweep_confound_resolvable.json``.
+
+- **Honest scope.** The W19-1 win is *strongly conditional* on
+  (a) the symmetric-corroboration round-1 property (so
+  W17-Λ-symmetric still applies and only an additional
+  information channel can win), AND (b) the bundle carrying at
+  least one *independent asymmetric witness* (a specific-tier
+  handoff OTHER than the canonical primary disambiguator) whose
+  payload mentions a service tag asymmetrically across the
+  candidate set. R-66 is a *synthetic* regime; the producer is
+  :class:`IdentityExtractor`. Real-LLM transfer (W19-Λ-real) is
+  conditional on closed-vocabulary secondary-witness emission;
+  free-form natural-language witnesses fall outside the W19
+  exact-match closure. The Wevra single-run product runtime
+  contract is byte-for-byte unchanged.
+
+### Active observations (SDK v3.20)
+
+- **W18-Λ-deceive holds on R-66-DECEIVE-NAIVE for every pre-W19
+  scorer including W18 itself.** W18's selector concatenates
+  primary + secondary payloads → its per-tag scorer sees positive
+  scores on every admitted tag → strict-asymmetric branch cannot
+  fire (N = U) → abstain → fall through to empty inner W15
+  answer. The wall is real and structural for every scorer that
+  does not distinguish the canonical primary from secondary
+  witnesses.
+
+- **W19's confound-resolved branch is the load-bearing branch on
+  R-66-DECEIVE-NAIVE and R-66-CONFOUND-RESOLVABLE.** Both regimes
+  trigger W18 abstention (full-set hit); W19's witness counter
+  (excluding the primary) sees aw(gold) > aw(decoy) and projects
+  to gold via the strict-max-aw subset. The inversion branch
+  (``W19_BRANCH_INVERSION``) is reserved for regimes where W18
+  fires its strict-asymmetric branch but the complement has more
+  witnesses than the named set — R-66 does not exercise this
+  branch directly because W18 abstains on the full-set hit; the
+  inversion branch is structurally available for future regimes.
+
+### Active conjectures (SDK v3.20)
+
+- **W19-C-LEARNED** (free-form witness transfer): a small
+  distilled trust scorer outperforms the closed-form witness-
+  count rule on free-form natural-language secondary witnesses.
+  **Conjectural.**
+- **W19-C-OUTSIDE** (outside-information escape from W19-Λ-total
+  AND W19-Λ-outside): a scorer with access to an outside-
+  information axis (service-graph topology, prior reliability
+  scores, cross-incident historical evidence) can detect both
+  falsifier walls by cross-reference. **Conjectural.**
+- **W19-Λ-real** (real-LLM transfer): partially-discharged when
+  the LLM emits closed-vocabulary secondary witnesses from non-
+  canonical roles; conjectural otherwise.
+- **W19-C-CROSS-BENCH** (cross-bench transfer): the W19 method
+  generalises to non-incident-triage families with a canonical-
+  role-for-kind mapping. **Conjectural.**
+
+### Discharged / partially-discharged conjectures (SDK v3.20)
+
+- **W18-Λ-deceive** (SDK v3.19): **PARTIALLY DISCHARGED-empirical**
+  by W19-1 in the *bundle-resolvable* direction. Closed-form
+  bundle-only scorers can escape adversarial round-2 evidence
+  AS LONG AS the bundle carries an independent asymmetric
+  witness. The bundle-only walls (W19-Λ-total / W19-Λ-outside)
+  remain real; escape requires outside information.
+- **W18-Λ-confound** (SDK v3.19): **PARTIALLY DISCHARGED-empirical**
+  by W19-1 in the *bundle-resolvable* direction on
+  R-66-CONFOUND-RESOLVABLE.
+
+---
+
+## Previous frontier (SDK v3.19, 2026-04-28)
 
 ### Active moves (SDK v3.19 — bundle-relational compatibility disambiguator + symmetric-ambiguity benchmark family + W18 family — *first capsule-native move beyond the W17-Λ-symmetric wall on a regime where it applies*)
 

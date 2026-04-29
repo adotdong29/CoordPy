@@ -4724,6 +4724,670 @@ class RelationalCompatibilityDisambiguator:
         return self.inner.pack_stats()
 
 
+# =============================================================================
+# SDK v3.20 — Bundle-contradiction-aware trust-weighted disambiguator
+# (W19 family)
+# =============================================================================
+#
+# W19 attacks the *deceptive-ambiguity wall* (W18-Λ-deceive, named in
+# SDK v3.19). On the W18-Λ-deceive regime, the round-2 specific-tier
+# disambiguator's payload mentions DECOY service tags but NOT gold —
+# adversarial relational evidence. W18 trusts its evidence and projects
+# the answer to the decoy-only set; ``services_correct`` fails by
+# construction. W18-Λ-confound is the symmetric case (round-2 mentions
+# both gold and decoy); W18 abstains and falls through to the inner
+# answer, which itself ties FIFO at 0.000 by W17-Λ-symmetric.
+#
+# The W19 :class:`BundleContradictionDisambiguator` is the smallest
+# move beyond W18 that does not require outside information. It sits
+# *after* the W18 layer (so it sees the same admitted/packed bundle
+# AND W18's projection AND W18's per-tag scores) and adds a
+# *bundle-contradiction* layer: count, for each admitted service tag,
+# the number of *independent asymmetric witnesses* in the bundle —
+# specific-tier handoffs OTHER than the canonical primary disambiguator
+# whose tokenised payload mentions the tag. When the W18 strict-
+# asymmetric branch picks tags whose witness count is *strictly less*
+# than the dropped tags' witness count, W19 *inverts* the projection
+# (the primary's evidence is contradicted by independent witnesses;
+# inversion picks the high-witness subset = gold). When W18 abstains
+# (full-set or empty-set hit), W19 *refines* the abstention by picking
+# the strict-max-witness subset within the candidate set.
+#
+# Three structural properties matter (W19):
+#
+#   1. **Closed-form, training-free.** The witness counter is a
+#      deterministic O(|union| · |admitted_tags|) loop over specific-
+#      tier handoffs in the union, excluding the primary disambiguator
+#      identified in canonical W18 sort order. Every score is
+#      reproducible from the bytes of the surviving capsule bundle alone.
+#   2. **Bounded-context honest.** The W19 scorer reads only the
+#      W15-packed bundle (or the un-packed admitted union when
+#      ``T_decoder`` is None) — same input as W18. No extra capsule
+#      reads, no global state, no outside-information lookup. Token-
+#      budget accounting from W15 is byte-for-byte preserved.
+#   3. **Backward-compat (W19-3).** When the bundle carries no
+#      independent asymmetric witness (every aw count is zero), the
+#      W19 inversion guard cannot fire and the W19 abstention refinement
+#      cannot find a strict-max subset; the projection falls through to
+#      the W18 answer byte-for-byte. R-54..R-65 default banks are
+#      preserved.
+#
+# Why W19 is not "just another decoder"
+# -------------------------------------
+# Every prior decoder layer in the programme either consumed bipartite
+# corroboration counts (W7..W10), per-round structure (W11), normalised
+# kind / payload tokens (W12 / W13), producer-side protocol structure
+# (W14 / W17), salience-aware packing (W15), or relational-compound
+# match against ONE primary payload (W18). W19 is the first decoder
+# that consumes the *consistency between* multiple specific-tier
+# emissions in the bundle — the structural relationship between the
+# primary disambiguator and the secondary witnesses.
+#
+# The W18-Λ-deceive wall is exactly the regime where this *additional*
+# information channel — the bundle-internal contradiction between
+# primary and secondary witnesses — is the only signal that breaks
+# the deception. R-66-DECEIVE-NAIVE (Phase-66) pre-commits the regime
+# where this channel is consistently present; R-66-DECEIVE-TOTAL and
+# R-66-OUTSIDE-REQUIRED pre-commit the structural limits where W19
+# cannot escape (no witnesses anywhere; symmetric witnesses).
+#
+# Honest scope (W19)
+# ------------------
+# * **W19-1 is conditional** on (a) the symmetric-corroboration round-1
+#   property (so W17-Λ-symmetric still applies and only an additional
+#   information channel can win), AND (b) the bundle carrying at least
+#   one *independent asymmetric witness* (a specific-tier handoff
+#   OTHER than the primary disambiguator) whose payload mentions a
+#   service tag asymmetrically across the candidate set.
+# * **W19-Λ-total** (R-66-DECEIVE-TOTAL) is the named structural limit
+#   when the bundle carries NO asymmetric witnesses anywhere: W19
+#   reduces to W18 and fails identically (the closed-form bundle is
+#   exhausted of asymmetric signal).
+# * **W19-Λ-outside** (R-66-OUTSIDE-REQUIRED) is the named structural
+#   limit when the bundle carries witnesses but the witness count is
+#   *symmetric* between primary's named set and the complement: W19
+#   abstains and ties FIFO. The natural escape is **W19-C-OUTSIDE**
+#   (an outside-information axis to detect the deceptive primary by
+#   cross-reference; conjectural).
+# * **Real-LLM transfer (W19-Λ-real)** depends on the LLM emitting
+#   the *secondary* asymmetric witness in the same closed-vocabulary
+#   form the synthetic bench uses. Free-form natural-language relational
+#   mentions fall outside the closure. The natural extension is
+#   **W19-C-LEARNED** (a learned trust scorer over capsule bundles).
+
+
+# Closed-vocabulary set of round-1 generic-noise kinds. The W19
+# witness counter explicitly excludes these — they are the
+# *symmetric-noise* tier in R-64-SYM / R-65-COMPAT / R-66, where
+# both gold and decoy are corroborated equally. An *asymmetric
+# witness* is by definition a specific-tier handoff (kind in
+# :data:`_SPECIFIC_TIER_CLAIM_KINDS`) other than the primary
+# disambiguator. Listed lex-ordered for diff stability.
+W19_SYMMETRIC_NOISE_KINDS: frozenset[str] = frozenset({
+    "ERROR_RATE_SPIKE",
+    "FW_BLOCK_SURGE",
+    "LATENCY_SPIKE",
+})
+
+
+# Closed-vocabulary canonical-role-for-kind table for the
+# incident-triage benchmark family. Maps each specific-tier kind
+# to the producer role that *canonically* emits it (matches the
+# subscription table in
+# :func:`vision_mvp.tasks.incident_triage.build_role_subscriptions`).
+# The W19 primary-identification uses this table to disambiguate
+# between (a) the canonical primary disambiguator and (b)
+# secondary asymmetric witnesses from non-canonical roles whose
+# normalised kind happens to match the primary's. Hardcoded here
+# (rather than imported from incident_triage) to avoid a layering
+# inversion — team_coord is a peer of incident_triage, not a
+# dependent. Lex-ordered by kind for diff stability.
+_INCIDENT_TRIAGE_CANONICAL_ROLE_FOR_KIND: dict[str, str] = {
+    "CRON_OVERRUN":         "sysadmin",
+    "DEADLOCK_SUSPECTED":   "db_admin",
+    "DISK_FILL_CRITICAL":   "sysadmin",
+    "DNS_MISROUTE":         "network",
+    "OOM_KILL":             "sysadmin",
+    "POOL_EXHAUSTION":      "db_admin",
+    "SLOW_QUERY_OBSERVED":  "db_admin",
+    "TLS_EXPIRED":          "network",
+}
+
+
+def _w19_canonical_primary_index(
+        union: Sequence[_DecodedHandoff],
+        round_hint: Sequence[int],
+        raw_union: Sequence[_DecodedHandoff] | None = None,
+        ) -> int:
+    """Identify the canonical primary specific-tier handoff in the
+    union. Returns ``-1`` if none exists.
+
+    The canonical primary is the *first* specific-tier handoff in
+    canonical sort order, with two semantic tiebreakers:
+
+      1. **Canonical-role match.** A handoff whose ``source_role``
+         matches the canonical role for its (normalised) kind in
+         :data:`_INCIDENT_TRIAGE_CANONICAL_ROLE_FOR_KIND` is
+         preferred over a handoff whose ``source_role`` does NOT
+         match (the synonym/heuristic-rescued case where a
+         non-canonical role emitted a kind that normalises to a
+         canonical specific-tier kind). This breaks ties between
+         (a) the canonical primary and (b) the secondary
+         asymmetric witness from a non-canonical role.
+      2. **Raw-kind tiebreak.** When ``raw_union`` is provided, the
+         pre-normalisation ``claim_kind`` is used as the secondary
+         sort key (so the canonical raw kind ``DISK_FILL_CRITICAL``
+         sorts before its synonym ``DISK_FILL_DETECTED``).
+      3. **Canonical W18 tiebreak.** ``-ridx`` (highest round
+         first), then ``source_role``, then ``claim_kind``, then
+         ``sha``, then ``payload`` — the same canonical sort
+         W18's ``_select_disambiguator`` uses on its concatenated
+         output.
+
+    The two semantic tiebreakers are *only* used when there are
+    multiple specific-tier handoffs at the highest round; on R-58 /
+    R-65 default banks (single specific-tier handoff per scenario),
+    the primary identification reduces to the unique candidate.
+    """
+    candidates: list[tuple[int, int, str, str, str, str, str, int]] = []
+    for i, h in enumerate(union):
+        if h.claim_kind not in _SPECIFIC_TIER_CLAIM_KINDS:
+            continue
+        ridx = (round_hint[i] if i < len(round_hint) else 0)
+        canonical_role = _INCIDENT_TRIAGE_CANONICAL_ROLE_FOR_KIND.get(
+            h.claim_kind)
+        # 0 = canonical-role match (preferred); 1 = non-canonical.
+        canonical_match = 0 if (canonical_role is not None
+                                 and canonical_role == h.source_role) else 1
+        if raw_union is not None and i < len(raw_union):
+            raw_kind = raw_union[i].claim_kind
+        else:
+            raw_kind = h.claim_kind
+        sha = _payload_sha256(h.payload)[:16]
+        candidates.append((
+            -ridx, canonical_match, raw_kind,
+            h.source_role, h.claim_kind, sha, h.payload, i))
+    if not candidates:
+        return -1
+    candidates.sort()
+    return int(candidates[0][7])
+
+
+def _w19_witness_counts(
+        union: Sequence[_DecodedHandoff],
+        primary_index: int,
+        admitted_tags: Sequence[str],
+        ) -> dict[str, int]:
+    """Count independent asymmetric witnesses for each tag.
+
+    A handoff ``h`` is an *asymmetric witness* iff:
+
+      * ``h.claim_kind`` is in :data:`_SPECIFIC_TIER_CLAIM_KINDS`
+        (so it's not in the symmetric round-1 noise set), AND
+      * ``h`` is NOT the canonical primary disambiguator
+        (identified by ``primary_index``), AND
+      * ``h``'s tokenised payload contains a direct or contiguous-
+        subsequence-compound match for the target tag (same scoring
+        function as W18: :func:`_relational_compatibility_score`).
+
+    Returns ``{service_tag: aw_count}`` for every tag in
+    ``admitted_tags``. The count is the number of *distinct*
+    witness handoffs (deduplicated by ``(source_role, claim_kind,
+    payload_sha)`` so two byte-identical witnesses collapse to
+    one). All other handoffs in the union — round-1 generic noise
+    AND the primary itself — are excluded.
+
+    Bounded-context honesty: this function reads only the bytes of
+    the union it is passed. It does NOT consult any capsule outside
+    the W15-packed bundle.
+    """
+    out: dict[str, int] = {tag: 0 for tag in admitted_tags}
+    if not admitted_tags:
+        return out
+    seen: set[tuple[str, str, str]] = set()
+    for i, h in enumerate(union):
+        if i == primary_index:
+            continue
+        if h.claim_kind not in _SPECIFIC_TIER_CLAIM_KINDS:
+            continue
+        sha = _payload_sha256(h.payload)[:16]
+        key = (h.source_role, h.claim_kind, sha)
+        if key in seen:
+            continue
+        seen.add(key)
+        tokens = _disambiguator_payload_tokens(h.payload)
+        for tag in admitted_tags:
+            d, c = _relational_compatibility_score(tag, tokens)
+            if (d + c) > 0:
+                out[tag] = out.get(tag, 0) + 1
+    return out
+
+
+W19_BRANCH_PRIMARY_TRUSTED = "primary_trusted"
+W19_BRANCH_INVERSION = "inversion"
+W19_BRANCH_CONFOUND_RESOLVED = "confound_resolved"
+W19_BRANCH_ABSTAINED_NO_SIGNAL = "abstained_no_signal"
+W19_BRANCH_ABSTAINED_SYMMETRIC = "abstained_symmetric"
+W19_BRANCH_DISABLED = "disabled"
+
+W19_ALL_BRANCHES: tuple[str, ...] = (
+    W19_BRANCH_PRIMARY_TRUSTED,
+    W19_BRANCH_INVERSION,
+    W19_BRANCH_CONFOUND_RESOLVED,
+    W19_BRANCH_ABSTAINED_NO_SIGNAL,
+    W19_BRANCH_ABSTAINED_SYMMETRIC,
+    W19_BRANCH_DISABLED,
+)
+
+
+@dataclasses.dataclass(frozen=True)
+class W19TrustResult:
+    """The output of one ``BundleContradictionDisambiguator.apply``
+    call. Carries the projected answer plus the per-tag witness
+    counts, the W18 fall-through answer, and the chosen W19 branch
+    so the bench driver can audit the contradiction-resolution
+    channel.
+
+    Fields
+    ------
+    answer
+        ``{"root_cause", "services", "remediation"}`` — same shape as
+        every other capsule decoder. The ``services`` field is the
+        W18 answer projected through the W19 contradiction filter
+        (gold-only on R-66-DECEIVE-NAIVE / R-66-CONFOUND-RESOLVABLE;
+        unchanged on R-54..R-65; abstained on R-66-OUTSIDE-REQUIRED).
+    base_services
+        The pre-projection answer from the inner (W18) decoder —
+        useful for falsifier audit.
+    w18_services
+        The W18 strict-asymmetric / abstention answer — equal to
+        ``base_services`` when W18 didn't fire its strict-asymmetric
+        branch.
+    primary_payload
+        The *single* canonical primary disambiguator's payload bytes
+        the W19 layer treats as the "asymmetric primary" for the
+        inversion check. ``""`` when no specific-tier handoff exists.
+    per_tag_w18_score
+        ``{service_tag: (direct, compound)}`` over the W18-concatenated
+        full-disambiguator text — exactly what W18 records.
+    per_tag_witness_count
+        ``{service_tag: aw_count}`` — the W19 independent-witness count
+        per tag, EXCLUDING the canonical primary.
+    decoder_branch
+        One of the values in :data:`W19_ALL_BRANCHES`. Names the
+        precise branch the W19 logic took on this cell.
+    abstained
+        True when the W19 projection abstained (no strict-max subset
+        AND no inversion). Abstention falls back to the W18 answer.
+    """
+    answer: dict[str, Any]
+    base_services: tuple[str, ...]
+    w18_services: tuple[str, ...]
+    primary_payload: str
+    per_tag_w18_score: dict[str, tuple[int, int]]
+    per_tag_witness_count: dict[str, int]
+    decoder_branch: str
+    abstained: bool
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get("remediation",
+                                                 "investigate")),
+            "base_services": tuple(self.base_services),
+            "w18_services": tuple(self.w18_services),
+            "primary_payload": str(self.primary_payload),
+            "per_tag_w18_score": {
+                tag: [int(d), int(c)]
+                for tag, (d, c) in self.per_tag_w18_score.items()
+            },
+            "per_tag_witness_count": {
+                tag: int(c)
+                for tag, c in self.per_tag_witness_count.items()
+            },
+            "decoder_branch": str(self.decoder_branch),
+            "abstained": bool(self.abstained),
+        }
+
+
+@dataclasses.dataclass
+class BundleContradictionDisambiguator:
+    """Bundle-contradiction-aware trust-weighted disambiguator
+    (SDK v3.20, W19 family).
+
+    The first decoder in the programme that *resolves bundle-internal
+    contradiction* between a deceptive (or confounded) round-2
+    disambiguator and independent asymmetric witnesses elsewhere in
+    the bundle. It sits *after* the W18 layer and refines W18's
+    projection in two cases:
+
+    1. **W19-1-inversion branch.** When W18 fires the strict-asymmetric
+       branch (its named set N ⊊ U is a proper non-empty subset of the
+       admitted tag set U) but the *complement* tag set U \\ N has a
+       strictly higher max independent-witness count than the named set
+       N, W19 *inverts* the projection: project to U \\ N. This handles
+       the W18-Λ-deceive limit when the bundle carries a quiet asymmetric
+       witness for gold (R-66-DECEIVE-NAIVE).
+    2. **W19-1-confound branch.** When W18 abstains (its named set N
+       equals U or is empty) AND there is a unique strict-max-witness
+       subset M ⊊ U of size ≥ 1, W19 projects to M. This handles the
+       W18-Λ-confound limit when the bundle carries an asymmetric
+       witness for gold among the confounded set (R-66-CONFOUND-RESOLVABLE).
+
+    On regimes where the bundle carries no independent asymmetric
+    witnesses (every aw count is zero, including R-65-NO-COMPAT,
+    R-65-CONFOUND, R-65-DECEIVE, R-66-DECEIVE-TOTAL), W19 reduces to
+    W18 byte-for-byte. Honest scope: when no asymmetric witness is
+    present anywhere in the bundle, W19 cannot escape the W18-Λ-deceive
+    wall — that's W19-Λ-total, the named structural limit.
+
+    Pipeline (deterministic, training-free)
+    ----------------------------------------
+    1. Run inner W18 (the W15 attention-aware decoder + W18 relational-
+       compatibility projection). Capture the W18 answer + per-tag W18
+       score + abstention flag.
+    2. Identify the *canonical primary* specific-tier disambiguator
+       in the admitted union (highest-round, lex-min source_role +
+       claim_kind in canonical W18 sort order).
+    3. Compute the asymmetric-witness count ``aw(T)`` for each
+       admitted tag T: count specific-tier handoffs other than the
+       primary whose tokenised payload mentions T (deduplicated by
+       ``(source_role, claim_kind, payload_sha)``).
+    4. Decide the W19 branch:
+
+       * If the W18 strict-asymmetric branch fired (W18 chose a
+         proper non-empty subset N ⊊ U) AND
+         ``max_aw(U \\ N) > max_aw(N)``: invert — project to
+         ``U \\ N`` (W19-1-inversion).
+       * If the W18 abstained on a non-empty admitted set U (W18 saw
+         all-positive or all-zero scores) AND there is a unique
+         strict-max-aw subset M ⊊ U with |M| ≥ 1: project to M
+         (W19-1-confound).
+       * Otherwise: fall through to W18's answer
+         (primary_trusted / abstained).
+    5. Return a :class:`W19TrustResult` with the projected answer,
+       the W18 fall-through answer, the per-tag witness counts, and
+       the chosen branch.
+
+    Honest scope (W19)
+    ------------------
+    See the file-level W19 commentary block above. The W19-1 win is
+    *strongly conditional* on the bench property (R-66-DECEIVE-NAIVE
+    or R-66-CONFOUND-RESOLVABLE); the named falsifiers
+    R-66-DECEIVE-TOTAL (W19-Λ-total) and R-66-OUTSIDE-REQUIRED
+    (W19-Λ-outside) are pre-committed in
+    ``vision_mvp.experiments.phase66_deceptive_ambiguity`` and
+    mechanically verified by ``Phase66FalsifierTests``.
+
+    Backward-compat (W19-3)
+    ------------------------
+    When the bundle carries no independent asymmetric witness (every
+    aw count is zero), neither the inversion guard nor the confound
+    refinement can fire; W19 returns the inner W18 answer byte-for-
+    byte. R-54..R-65 default banks are preserved. With
+    ``enabled = False`` W19 reduces to W18 byte-for-byte.
+    """
+
+    inner: RelationalCompatibilityDisambiguator = dataclasses.field(
+        default_factory=lambda: RelationalCompatibilityDisambiguator())
+    enabled: bool = True
+
+    # Forensic — last applied result, exposed for the bench driver.
+    _last_result: W19TrustResult | None = None
+
+    def decode_rounds(self,
+                       per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+                       ) -> dict[str, Any]:
+        """Run the W19 pipeline. Returns the same shape as the inner
+        W18 decoder plus an additional ``trust`` block (W19 audit)
+        and forwards W18's ``compatibility`` block + W15's
+        ``pack_stats`` block."""
+        base = self.inner.decode_rounds(per_round_handoffs)
+        # Build the same union the inner consumed (post-normalisation
+        # via the W15 → W13 → layered normaliser). Also retain the
+        # raw (pre-normalisation) union — primary identification uses
+        # the raw ``claim_kind`` field to disambiguate between the
+        # canonical primary and synonym/heuristic-rescued secondary
+        # witnesses (whose post-normalisation kinds are identical).
+        union: list[_DecodedHandoff] = []
+        raw_union: list[_DecodedHandoff] = []
+        round_hint: list[int] = []
+        normalised_per_round: list[list[_DecodedHandoff]] = []
+        for bundle in per_round_handoffs:
+            normalised_per_round.append(
+                self.inner.inner.inner.normalize_round(bundle))
+        for r_idx, (norm_bundle, raw_bundle) in enumerate(
+                zip(normalised_per_round, per_round_handoffs), start=1):
+            # The normaliser is element-wise (preserves order and
+            # arity) — verified by ``LayeredRobustMultiRoundBundleDecoder
+            # .normalize_round``. We therefore zip the two bundles
+            # in parallel.
+            for h_norm, h_raw in zip(norm_bundle, raw_bundle):
+                union.append(h_norm)
+                raw_union.append(h_raw)
+                round_hint.append(r_idx)
+        result = self._project_answer(
+            base, union, round_hint, raw_union=raw_union)
+        self._last_result = result
+        out = dict(result.answer)
+        if "pack_stats" in base:
+            out["pack_stats"] = base["pack_stats"]
+        if "compatibility" in base:
+            out["compatibility"] = base["compatibility"]
+        if "first_pass_root_cause" in base:
+            out["first_pass_root_cause"] = base["first_pass_root_cause"]
+        out["trust"] = result.as_dict()
+        return out
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+               ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    def _project_answer(self,
+                         base: dict[str, Any],
+                         union: Sequence[_DecodedHandoff],
+                         round_hint: Sequence[int],
+                         raw_union: Sequence[_DecodedHandoff] | None = None,
+                         ) -> W19TrustResult:
+        # The W18 inner records its own audit on ``base["compatibility"]``.
+        # We reuse it where useful AND re-derive what W19 needs from
+        # the union directly (so W19 is self-sufficient and does not
+        # depend on the W18 audit's exact fields).
+        w18_services = tuple(base.get("services", ()) or ())
+        w18_audit = base.get("compatibility") or {}
+        per_tag_w18: dict[str, tuple[int, int]] = {}
+        scores_raw = w18_audit.get("per_tag_scores") or {}
+        for tag, val in scores_raw.items():
+            if isinstance(val, (list, tuple)) and len(val) == 2:
+                per_tag_w18[tag] = (int(val[0]), int(val[1]))
+            else:
+                per_tag_w18[tag] = (0, 0)
+        if not self.enabled:
+            return W19TrustResult(
+                answer=dict(base),
+                base_services=w18_services,
+                w18_services=w18_services,
+                primary_payload="",
+                per_tag_w18_score=per_tag_w18,
+                per_tag_witness_count={},
+                decoder_branch=W19_BRANCH_DISABLED,
+                abstained=True,
+            )
+
+        # Identify the canonical primary disambiguator. Uses the
+        # canonical-role-for-kind table + raw-kind tiebreak so the
+        # primary is the canonical-routed handoff even when a
+        # non-canonical role emitted a synonym/heuristic-rescued
+        # kind that normalises to the same canonical specific-tier.
+        primary_idx = _w19_canonical_primary_index(
+            union, round_hint, raw_union=raw_union)
+        if primary_idx < 0:
+            return W19TrustResult(
+                answer=dict(base),
+                base_services=w18_services,
+                w18_services=w18_services,
+                primary_payload="",
+                per_tag_w18_score=per_tag_w18,
+                per_tag_witness_count={},
+                decoder_branch=W19_BRANCH_ABSTAINED_NO_SIGNAL,
+                abstained=True,
+            )
+        primary_payload = union[primary_idx].payload
+
+        # The W19 candidate set is the *full* admitted-tag union — same
+        # set the W18 layer scored over.
+        union_tag_set: set[str] = set()
+        for h in union:
+            tag = _service_tag_of(h.payload)
+            if tag:
+                union_tag_set.add(tag)
+        admitted_tags = sorted(union_tag_set)
+        if not admitted_tags:
+            return W19TrustResult(
+                answer=dict(base),
+                base_services=w18_services,
+                w18_services=w18_services,
+                primary_payload=primary_payload,
+                per_tag_w18_score=per_tag_w18,
+                per_tag_witness_count={},
+                decoder_branch=W19_BRANCH_ABSTAINED_NO_SIGNAL,
+                abstained=True,
+            )
+
+        # Witness count per tag (excludes primary).
+        aw = _w19_witness_counts(union, primary_idx, admitted_tags)
+
+        # Re-derive W18's per-tag scores over the FULL concatenated
+        # disambiguator text (so W19 is robust against W18 audit
+        # changes). Use the same _select_disambiguator + tokeniser
+        # the W18 inner uses.
+        full_disambiguator, _ = self.inner._select_disambiguator(
+            union, round_hint)
+        tokens_full = _disambiguator_payload_tokens(full_disambiguator)
+        per_tag_full: dict[str, tuple[int, int]] = {}
+        for tag in admitted_tags:
+            per_tag_full[tag] = _relational_compatibility_score(
+                tag, tokens_full)
+        # Use the freshly re-derived scores so W19 is self-contained.
+        per_tag_w18 = per_tag_full
+
+        # Identify the W18 named set N: tags whose full-disambiguator
+        # score is positive.
+        N_set = [tag for tag in admitted_tags
+                  if (per_tag_w18[tag][0] + per_tag_w18[tag][1]) > 0]
+        N = set(N_set)
+        U = set(admitted_tags)
+        complement = sorted(U - N)
+        N_sorted = sorted(N)
+
+        def _max_aw(tags: Sequence[str]) -> int:
+            return max((aw.get(t, 0) for t in tags), default=0)
+
+        # W19 inversion guard. Fires when:
+        #   - W18 strict-asymmetric branch fired (N ⊊ U is proper non-
+        #     empty subset).
+        #   - max_aw(U \ N) > max_aw(N) — independent witnesses
+        #     contradict the primary's named set.
+        if 0 < len(N) < len(U):
+            if _max_aw(complement) > _max_aw(N_sorted):
+                # Project to the high-witness tags in the complement.
+                top_aw = _max_aw(complement)
+                projected = tuple(
+                    sorted(t for t in complement if aw.get(t, 0) == top_aw))
+                new_answer = dict(base)
+                new_answer["services"] = projected
+                return W19TrustResult(
+                    answer=new_answer,
+                    base_services=w18_services,
+                    w18_services=w18_services,
+                    primary_payload=primary_payload,
+                    per_tag_w18_score=per_tag_w18,
+                    per_tag_witness_count=aw,
+                    decoder_branch=W19_BRANCH_INVERSION,
+                    abstained=False,
+                )
+            # No inversion → trust W18's strict-asymmetric pick.
+            return W19TrustResult(
+                answer=dict(base),
+                base_services=w18_services,
+                w18_services=w18_services,
+                primary_payload=primary_payload,
+                per_tag_w18_score=per_tag_w18,
+                per_tag_witness_count=aw,
+                decoder_branch=W19_BRANCH_PRIMARY_TRUSTED,
+                abstained=False,
+            )
+
+        # W19 confound-refinement branch. Fires when:
+        #   - W18 abstained (N = U or N = ∅).
+        #   - There is a unique strict-max-aw subset M ⊊ U with |M| ≥ 1.
+        max_aw_in_U = _max_aw(admitted_tags)
+        if max_aw_in_U > 0:
+            top_set = sorted(t for t in admitted_tags
+                              if aw.get(t, 0) == max_aw_in_U)
+            if 0 < len(top_set) < len(admitted_tags):
+                new_answer = dict(base)
+                new_answer["services"] = tuple(top_set)
+                return W19TrustResult(
+                    answer=new_answer,
+                    base_services=w18_services,
+                    w18_services=w18_services,
+                    primary_payload=primary_payload,
+                    per_tag_w18_score=per_tag_w18,
+                    per_tag_witness_count=aw,
+                    decoder_branch=W19_BRANCH_CONFOUND_RESOLVED,
+                    abstained=False,
+                )
+            # Top set covers all admitted tags — symmetric witnesses;
+            # W19 cannot prefer one. Abstain.
+            return W19TrustResult(
+                answer=dict(base),
+                base_services=w18_services,
+                w18_services=w18_services,
+                primary_payload=primary_payload,
+                per_tag_w18_score=per_tag_w18,
+                per_tag_witness_count=aw,
+                decoder_branch=W19_BRANCH_ABSTAINED_SYMMETRIC,
+                abstained=True,
+            )
+
+        # No witnesses, no inversion. Fall through to W18 (which
+        # itself may have abstained or trusted the primary).
+        branch = (W19_BRANCH_PRIMARY_TRUSTED
+                   if 0 < len(N) < len(U)
+                   else W19_BRANCH_ABSTAINED_NO_SIGNAL)
+        return W19TrustResult(
+            answer=dict(base),
+            base_services=w18_services,
+            w18_services=w18_services,
+            primary_payload=primary_payload,
+            per_tag_w18_score=per_tag_w18,
+            per_tag_witness_count=aw,
+            decoder_branch=branch,
+            abstained=(branch == W19_BRANCH_ABSTAINED_NO_SIGNAL),
+        )
+
+    @property
+    def last_result(self) -> W19TrustResult | None:
+        return self._last_result
+
+    @property
+    def T_decoder(self) -> int | None:
+        return self.inner.T_decoder
+
+    @T_decoder.setter
+    def T_decoder(self, v: int | None) -> None:
+        self.inner.T_decoder = v
+
+    def pack_stats(self) -> dict[str, Any]:
+        """Forward the inner W15 pack-stats so the bench driver can
+        verify token-budget honesty (W19 reads only the W15-packed
+        bundle; ``tokens_kept`` is byte-for-byte identical to W18's
+        which is byte-for-byte identical to W15's)."""
+        return self.inner.pack_stats()
+
+
 __all__ = [
     # Per-role budget
     "RoleBudget", "DEFAULT_ROLE_BUDGETS",
@@ -4781,4 +5445,19 @@ __all__ = [
     "RelationalCompatibilityDisambiguator",
     "_disambiguator_payload_tokens",
     "_relational_compatibility_score",
+    # SDK v3.20 — bundle-contradiction-aware trust-weighted disambiguator
+    # (W19 family).
+    "W19TrustResult",
+    "BundleContradictionDisambiguator",
+    "W19_SYMMETRIC_NOISE_KINDS",
+    "_INCIDENT_TRIAGE_CANONICAL_ROLE_FOR_KIND",
+    "W19_BRANCH_PRIMARY_TRUSTED",
+    "W19_BRANCH_INVERSION",
+    "W19_BRANCH_CONFOUND_RESOLVED",
+    "W19_BRANCH_ABSTAINED_NO_SIGNAL",
+    "W19_BRANCH_ABSTAINED_SYMMETRIC",
+    "W19_BRANCH_DISABLED",
+    "W19_ALL_BRANCHES",
+    "_w19_canonical_primary_index",
+    "_w19_witness_counts",
 ]

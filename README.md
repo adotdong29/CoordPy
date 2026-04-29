@@ -7,39 +7,63 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**As of SDK v3.19 (April 2026), capsules are load-bearing
+**As of SDK v3.20 (April 2026), capsules are load-bearing
 *inside one Wevra run*, *between agents in a team*, *across the
 model-class gradient*, *across the model regime × admission
 strategy grid on a real-LLM benchmark*, *across cross-role
 coherence / corroboration / multi-service / decoder-forcing /
 multi-round / open-world-normalisation / producer-protocol /
-decoder-context-packing / live-end-to-end-composition axes*, and
-— most sharply — *across the first capsule-native multi-agent-
-coordination method that crosses the symmetric-corroboration wall
-(W17-Λ-symmetric, named in SDK v3.18) on a regime where the wall
-actually applies: W18-1 strict +1.000 gain on R-65-COMPAT loose
-AND tight, stable across 5/5 alternate ``bank_seed`` values,
-bounded-context honesty preserved byte-for-byte, with three named
-falsifier regimes — W18-Λ-no-compat / -confound / -deceive — that
-make the W18-1 conditionality sharp.* SDK v3.19's contribution is
-the Phase-65 relational-compatibility disambiguation benchmark
-family
-([`vision_mvp/experiments/phase65_relational_disambiguation.py`](vision_mvp/experiments/phase65_relational_disambiguation.py))
+decoder-context-packing / live-end-to-end-composition /
+relational-compatibility-disambiguation axes*, and — most sharply
+— *across the first capsule-native multi-agent-coordination
+method that crosses the deceptive-ambiguity wall on a regime
+where bundle-only relational compatibility is structurally
+insufficient: W19-1 strict +1.000 gain on R-66-DECEIVE-NAIVE
+loose AND tight (W18 = 0.000 because the round-2 disambiguator
+is adversarial — mentions decoy, not gold) AND on
+R-66-CONFOUND-RESOLVABLE (W18 abstains at 0.000 because both
+gold and decoy are mentioned symmetrically — W19 sees the
+asymmetric witness count from secondary specific-tier handoffs
+and breaks the tie correctly), stable across 5/5 alternate
+``bank_seed`` values, bounded-context honesty preserved byte-for-
+byte (``tokens_kept_sum`` byte-identical to W18 on the tight
+budget cell), with two named falsifier regimes —
+R-66-DECEIVE-TOTAL (no witnesses anywhere; W19-Λ-total fires;
+W19 abstains; ties FIFO at 0.000) and R-66-OUTSIDE-REQUIRED
+(witnesses are symmetric across gold and decoy; W19-Λ-outside
+fires; W19 abstains; ties FIFO at 0.000) — that make the W19-1
+conditionality sharp and name the structural limit no
+bundle-only closed-form scorer can escape.* SDK v3.20's
+contribution is the Phase-66 deceptive-ambiguity-under-trust
+benchmark family
+([`vision_mvp/experiments/phase66_deceptive_ambiguity.py`](vision_mvp/experiments/phase66_deceptive_ambiguity.py))
 plus a deterministic, training-free, closed-form
-[`RelationalCompatibilityDisambiguator`](vision_mvp/wevra/team_coord.py)
-that consumes the round-2 specific-tier disambiguator's payload
-text — the channel every prior decoder ignored. On R-65-COMPAT,
-every closed-form salience scorer in the SDK ties FIFO at
-`accuracy_full = 0.000` (W17-Λ-symmetric extends to R-65 verbatim);
-the new W18 method achieves `capsule_relational_compat = 1.000`
-at both `T_decoder ∈ {None, 24}`, **+1.000** strict separation
-vs every non-W18 capsule baseline, stable across 5/5 alternate
-`bank_seed` values. The W18 surface is purely additive on top of
-W15. See
-[`docs/RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md`](docs/RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md)
-for the full SDK v3.19 milestone note.
+[`BundleContradictionDisambiguator`](vision_mvp/wevra/team_coord.py)
+that asymmetrically counts independent specific-tier witnesses
+per tag (excluding the canonical primary, deduplicated by
+``(role, kind, payload_sha)``) — the channel every prior
+disambiguator ignored. On R-66-CORROBORATED (the existing R-65
+positive anchor recreated under the new framework), W19 ties
+W18 byte-for-byte at 1.000 (the W19-3 ratification anchor —
+W19 reduces to W18 when no witnesses exist). On R-66-DECEIVE-NAIVE
+loose AND tight, W18 fails at 0.000 (trusts adversarial
+disambiguator); W19 achieves 1.000, **+1.000 strict separation**
+vs W18 and every other capsule baseline. On R-66-CONFOUND-RESOLVABLE,
+W18 abstains at 0.000 (symmetric round-2 disambiguator); W19
+achieves 1.000, **+1.000 strict separation**. Stable across
+5/5 alternate ``bank_seed`` values on every deceptive cell. The
+W19 surface is purely additive on top of W18. See
+[`docs/RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md`](docs/RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md)
+for the full SDK v3.20 milestone note.
 
-The previous milestone (**SDK v3.18**) contributed the **Phase-64
+The previous milestone (**SDK v3.19**) contributed the **Phase-65
+relational-compatibility disambiguation benchmark family + W18
+family (first capsule-native multi-agent-coordination method to
+cross the symmetric-corroboration wall on a regime where the wall
+actually applies)** — see
+[`docs/RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md`](docs/RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md).
+
+The milestone before that (**SDK v3.18**) contributed the **Phase-64
 fresh-live composition + magnitude-hinted producer protocol +
 symmetric-corroboration limit theorem** — see
 [`docs/RESULTS_WEVRA_LIVE_COMPOSITION.md`](docs/RESULTS_WEVRA_LIVE_COMPOSITION.md).

@@ -5,6 +5,159 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.20] — 2026-04-28 — SDK v3.20 — bundle-contradiction-aware trust-weighted disambiguator + deceptive-ambiguity-under-trust benchmark family + W19 family (first capsule-native multi-agent-coordination method to cross the deceptive-ambiguity wall on a regime where bundle-only relational compatibility is structurally insufficient)
+
+*Strictly additive on SDK v3.19. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W19 surface adds
+one new dataclass (``W19TrustResult``), one wrapping decoder
+(``BundleContradictionDisambiguator``), one canonical-role-for-kind
+table (``_INCIDENT_TRIAGE_CANONICAL_ROLE_FOR_KIND``), one
+asymmetric-witness counter (``_w19_witness_counts``), one
+canonical-primary-index helper (``_w19_canonical_primary_index``),
+and seven W19 branch constants. Re-exported via the SDK
+``__init__``. The new
+``vision_mvp/experiments/phase66_deceptive_ambiguity.py`` driver
+ships as a research-slice addition with one positive
+ratification anchor sub-bank (R-66-CORROBORATED), two strict-win
+sub-banks (R-66-DECEIVE-NAIVE under loose AND tight ``T_decoder``,
+R-66-CONFOUND-RESOLVABLE), and two named falsifier sub-banks
+(R-66-DECEIVE-TOTAL, R-66-OUTSIDE-REQUIRED).*
+
+On the new Phase-66 *deceptive-ambiguity-under-trust* benchmark:
+
+* **R-66-CORROBORATED** (no adversarial signal; corroborating
+  witnesses present; **W19-3 ratification anchor**; n=8 ×
+  bank_replicates=2): W19 ties the W18
+  ``RelationalCompatibilityDisambiguator`` byte-for-byte at
+  ``accuracy_full = 1.000``. W19 reduces to W18 when no
+  contradicting witnesses exist (asymmetric witness scores are
+  uniformly zero ⇒ W18 trust path fires unchanged).
+* **R-66-DECEIVE-NAIVE-LOOSE** (round-2 disambiguator
+  adversarially mentions DECOY but NOT gold; secondary
+  specific-tier witnesses corroborate gold; **W19-1 deceive
+  anchor**, ``T_decoder = None``; n=8 × bank_replicates=2): every
+  closed-form salience scorer including W18 ties FIFO at
+  ``accuracy_full = 0.000`` (W18 trusts the adversarial
+  disambiguator and picks decoy; W18-Λ-deceive extends to
+  R-66 verbatim by W19-Λ-deceive-extension). The new W19
+  ``BundleContradictionDisambiguator`` achieves
+  ``capsule_bundle_contradiction = 1.000``. **+1.000 strict
+  separation** vs every non-W19 capsule baseline.
+* **R-66-DECEIVE-NAIVE-TIGHT** (same regime under decoder-side
+  budget pressure ``T_decoder = 24``): same headline as loose.
+  The W19 method composes cleanly with the W15 attention-aware
+  pack; ``tokens_kept_sum`` is byte-for-byte identical to W18's
+  on this regime (bounded-context honesty preserved).
+* **R-66-CONFOUND-RESOLVABLE** (round-2 disambiguator mentions
+  BOTH gold AND decoy symmetrically — the W18-Λ-confound wall;
+  secondary specific-tier witnesses break the tie asymmetrically
+  toward gold; **W19-1 confound anchor**, n=8 × bank_replicates=2):
+  W18 abstains at 0.000 (symmetric round-2 disambiguator); the
+  new W19 method achieves ``capsule_bundle_contradiction = 1.000``.
+  **+1.000 strict separation** vs W18 and every other baseline.
+* **5-seed stability** on R-66-DECEIVE-NAIVE-LOOSE,
+  R-66-DECEIVE-NAIVE-TIGHT, AND R-66-CONFOUND-RESOLVABLE: gap
+  ``w19 − w18 = +1.000`` on every seed in
+  ``{11, 17, 23, 29, 31}`` (saturated; well above the 0.50
+  strong-bar threshold).
+* **R-66-DECEIVE-TOTAL** (W19-Λ-total falsifier): no witnesses
+  anywhere (round-2 disambiguator adversarial; secondary handoffs
+  silent); aw uniformly zero ⇒ W19 reduces to W18 byte-for-byte
+  ⇒ W19 ties FIFO at 0.000 on 8/8 cells. Names the structural
+  limit no bundle-only closed-form scorer can escape when the
+  bundle carries no exonerating evidence at all.
+* **R-66-OUTSIDE-REQUIRED** (W19-Λ-outside falsifier): witnesses
+  are symmetric across gold and decoy (each side gets the same
+  asymmetric witness count); W19's tiebreak is a wash ⇒ W19
+  abstains; ties FIFO at 0.000 on 8/8 cells. Names the structural
+  limit no bundle-only closed-form scorer can escape when the
+  symmetry inside the bundle is total. The named research move
+  beyond it is W19-C-OUTSIDE (conjectural; requires
+  outside-the-bundle information — a learned scorer, an external
+  knowledge base, an extra round of evidence).
+* **W19-3 backward-compat**: on R-58 default the W19 method ties
+  W18 byte-for-byte on the answer field; on every R-65 default
+  bank (compat / no_compat / confound / deceive) W19 ties W18
+  byte-for-byte. With ``enabled = False`` the W19 method reduces
+  to W18 byte-for-byte.
+* **Audit T-1..T-7** OK on every capsule strategy of every cell of
+  every regime.
+
+The W19 surface is purely additive on top of the W18 surface (one
+new dataclass + one canonical-role table + one asymmetric-witness
+counter + one canonical-primary-index helper + one wrapping
+decoder + seven branch constants). The SDK v3.19 runtime contract
+is byte-for-byte unchanged. New tests cover the W19 unit
+semantics, the Phase-66 bench-property witnesses, the W19-1
+strict-win anchor on three deceptive regimes, the 5-seed
+stability across all three, the two named falsifiers, the
+backward-compat smoke (R-58 + every R-65 default bank), the
+token-budget honesty, and the cross-regime synthetic summary —
+all 555/555 wevra tests pass.
+
+### Added
+
+- **W19 surface** (``vision_mvp/wevra/team_coord.py``):
+  - ``BundleContradictionDisambiguator`` (wraps W18; consumes
+    asymmetric specific-tier witness counts to either ratify
+    W18's verdict or override it when the bundle's witness
+    distribution contradicts W18's choice; reduces to W18
+    byte-for-byte when no witnesses exist).
+  - ``W19TrustResult`` dataclass (decision + branch + witness
+    counts per tag + token bookkeeping).
+  - ``_w19_witness_counts(...)``, ``_w19_canonical_primary_index(...)``
+    helpers + ``_INCIDENT_TRIAGE_CANONICAL_ROLE_FOR_KIND`` table
+    + ``W19_SYMMETRIC_NOISE_KINDS`` frozenset + seven
+    ``W19_BRANCH_*`` constants.
+  - Re-exported via ``vision_mvp.wevra.__all__``.
+- **Phase-66 driver**
+  (``vision_mvp/experiments/phase66_deceptive_ambiguity.py``):
+  five-bank synthetic benchmark + cross-regime summary +
+  5-seed stability sweep + closed-vocabulary secondary-witness
+  routing extension (``_P66_SECONDARY_ROUTES``).
+- **Tests** (``vision_mvp/tests/test_wevra_bundle_contradiction.py``):
+  45 tests across 10 test classes — unit semantics, bench
+  properties, default config, 5-seed stability, two named
+  falsifiers, backward-compat, token efficiency, cross-regime,
+  invariants.
+- **Docs**: ``docs/RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md`` (new
+  milestone note, ~12KB) + R-66 anchor + W19 family in
+  ``docs/THEOREM_REGISTRY.md`` + bar 16 in
+  ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` +
+  ``docs/HOW_NOT_TO_OVERSTATE.md`` (W19 honest-scope sections)
+  + ``docs/RESEARCH_STATUS.md`` SDK v3.20 frontier +
+  ``docs/context_zero_master_plan.md`` § 4.37 + four data files
+  in ``docs/data/phase66_*.json``.
+
+### Discharged conjectures
+
+- **W18-Λ-deceive** (SDK v3.19 falsifier; named limit on bundle-
+  relational scorers that *trust* round-2 disambiguator evidence):
+  **PARTIALLY DISCHARGED** by W19-1 on R-66-DECEIVE-NAIVE — the
+  bundle carries asymmetric secondary witnesses W18 ignored;
+  W19's witness counter consumes them. Remaining limit
+  W19-Λ-total (no witnesses anywhere) is genuinely beyond
+  bundle-only closed-form scorers.
+- **W18-Λ-confound** (implicit SDK v3.19 falsifier; W18 abstains
+  on symmetric round-2 disambiguator): **PARTIALLY DISCHARGED**
+  by W19-1 on R-66-CONFOUND-RESOLVABLE — secondary witnesses
+  break the inside-bundle symmetry asymmetrically. Remaining
+  limit W19-Λ-outside (symmetric witnesses) is genuinely beyond
+  bundle-only closed-form scorers.
+
+### Preserved
+
+- **SDK v3.19 multi-agent surface.** Every fixed admission
+  policy, every closed-form salience scorer, every bundle-aware
+  decoder, every layered normaliser, every producer protocol,
+  every attention-aware pack, every relational-compatibility
+  disambiguator — all byte-for-byte unchanged from SDK v3.19.
+- **Wevra single-run product report v2 schema:** byte-for-byte
+  identical from SDK v3.19.
+
+See [`docs/RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md`](docs/RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md)
+for the full milestone note.
+
 ## [3.19] — 2026-04-28 — SDK v3.19 — bundle-relational compatibility disambiguator + symmetric-ambiguity benchmark family + W18 family (first capsule-native multi-agent-coordination method to cross the symmetric-corroboration wall on a regime where the wall actually applies)
 
 *Strictly additive on SDK v3.18. The Wevra single-run product

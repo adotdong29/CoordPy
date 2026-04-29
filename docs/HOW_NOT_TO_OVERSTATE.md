@@ -207,6 +207,92 @@ that *trusts* its evidence can escape (the named research move
 beyond it is W18-C-OUTSIDE — an outside-information axis to
 detect deceptive round-2 mentions, conjectural).
 
+### "W19 broke the deceptive-ambiguity wall" or "we solved adversarial ambiguity"
+
+> *"W19 broke the deceptive-ambiguity wall."*
+
+Forbidden as a *general* claim. The W19-1 win is *strongly
+conditional* on the R-66-DECEIVE-NAIVE / R-66-CONFOUND-RESOLVABLE
+bench property: the bundle carries at least one *independent
+asymmetric witness* — a specific-tier handoff OTHER than the
+canonical primary disambiguator whose tokenised payload mentions a
+service tag asymmetrically across the candidate set. Permitted
+phrasings: *"clears bar 16 of the SDK-v3.20-anchored success
+criterion"*, *"first capsule-native multi-agent-coordination
+method that resolves bundle-internal contradiction between a
+deceptive primary and a witness-corroborated alternative"*,
+*"closes the W18-Λ-deceive wall on R-66-DECEIVE-NAIVE under the
+named bench property"*. Forbidden: *"W19 solved adversarial
+ambiguity"* (unqualified), *"the bundle-contradiction scorer is
+universal"*, *"W19-1 holds for any deceptive primary"*, *"the
+trust scorer escapes deception in general"*.
+
+The W19-1 win is conditional on:
+* (a) symmetric-corroboration round-1 (R-65 / R-66 bench shape),
+* (b) the bundle carrying at least one *independent asymmetric
+  witness* — i.e. a specific-tier handoff from a non-canonical
+  producer role under a synonym kind whose payload mentions a
+  service tag asymmetrically (R-66-DECEIVE-NAIVE,
+  R-66-CONFOUND-RESOLVABLE, R-66-CORROBORATED — not
+  R-66-DECEIVE-TOTAL or R-66-OUTSIDE-REQUIRED),
+* (c) the secondary witness's relational-mention convention being
+  inside the closed-vocabulary closure the W19 exact-match scorer
+  reads (the same closure that bounds W18 / W13 / W12),
+* (d) the canonical-role-for-kind table identifying the canonical
+  primary correctly — i.e. the primary's
+  ``(source_role, claim_kind)`` pair is in
+  :data:`_INCIDENT_TRIAGE_CANONICAL_ROLE_FOR_KIND`.
+
+If any condition fails, W19 ties FIFO or fails by construction:
+* **W19-Λ-total** (no asymmetric witness anywhere in the bundle):
+  W19 reduces to W18 byte-for-byte → primary-trusted branch →
+  picks decoy → fails at 0.000.
+* **W19-Λ-outside** (witnesses are symmetric across primary's
+  named set and the complement): W19 abstains via
+  ``W19_BRANCH_ABSTAINED_SYMMETRIC`` → ties FIFO at 0.000.
+* **W19-Λ-real** (free-form natural-language witnesses outside the
+  closure): the closed-form scorer misses by construction.
+
+The W19 method is the *sixteenth* of sixteen named structural
+axes the programme has identified; "adversarial ambiguity solved"
+requires resolving every named limit theorem on every axis, which
+the programme has *not* done. The W19-Λ-total and W19-Λ-outside
+falsifiers in particular name structural limits no closed-form
+*bundle-only* scorer can escape (the named research move beyond
+both is W19-C-OUTSIDE — an outside-information axis with access
+to service-graph topology / prior reliability / cross-incident
+historical evidence; conjectural).
+
+### "the W19 trust scorer is a learned model" or "W19 reads attention"
+
+> *"The W19 method uses a small learned trust model that reads
+> transformer attention to detect deception."*
+
+Forbidden. The W19 method is a *deterministic, training-free,
+closed-form* bundle-contradiction scorer:
+* It identifies the canonical primary disambiguator via a closed-
+  form sort with a hardcoded canonical-role-for-kind tiebreak
+  (:func:`_w19_canonical_primary_index`,
+  :data:`_INCIDENT_TRIAGE_CANONICAL_ROLE_FOR_KIND`).
+* It counts independent asymmetric witnesses per admitted tag via
+  an O(|union| · |tokens| · |admitted_tags|) match loop, excluding
+  the primary and deduplicating by
+  ``(source_role, claim_kind, payload_sha)``
+  (:func:`_w19_witness_counts`).
+* It applies a deterministic branch decision: invert when
+  ``max_aw(complement) > max_aw(named_set)``; refine when W18
+  abstains AND a unique strict-max subset exists; otherwise fall
+  through to W18.
+
+There is **no learned model**, no transformer attention reading,
+no embedding lookup. A learned variant is the named
+**W19-C-LEARNED** conjecture, conjectural and out of scope for
+SDK v3.20. Permitted phrasings: *"closed-form bundle-
+contradiction scorer"*, *"deterministic training-free trust
+scorer"*, *"the W19 scorer counts asymmetric witnesses excluding
+the canonical primary"*. Forbidden: *"W19 reads attention
+weights"*, *"the W19 trust model"*, *"the W19 learned scorer"*.
+
 ### "the relational scorer reads transformer attention" or "W18 is a learned model"
 
 > *"The W18 method uses a small learned compatibility model that

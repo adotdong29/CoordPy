@@ -1,12 +1,12 @@
-# Success criterion — solving multi-agent context (SDK v3.19 bar)
+# Success criterion — solving multi-agent context (SDK v3.20 bar)
 
 > Pre-committed, falsifiable bar for what counts as a *real* advance
 > on "solving multi-agent context" in the Context Zero / Wevra
 > programme. This document is the **referee** for SDK v3.9 / v3.10 /
 > v3.11 / v3.12 / v3.13 / v3.14 / v3.15 / v3.16 / v3.17 / v3.18 /
-> v3.19 (and later milestones). Any milestone note that claims an
-> advance must name the bar it cleared and cite the code-anchored
-> evidence. Last touched: SDK v3.19, 2026-04-28.
+> v3.19 / v3.20 (and later milestones). Any milestone note that
+> claims an advance must name the bar it cleared and cite the
+> code-anchored evidence. Last touched: SDK v3.20, 2026-04-28.
 >
 > The history of this programme is full of moves where a partial
 > result was written up too strongly and later had to be sharpened
@@ -296,6 +296,95 @@ The **named regimes** the bar refers to (anchored in code):
   is the natural learned-scorer extension). Anchor:
   `vision_mvp/experiments/phase65_relational_disambiguation.py`.
 
+* **R-66** — Phase-66 *bundle-contradiction-aware trust-weighted
+  disambiguation under deceptive / confounded round-2 evidence*
+  regime, the *new harder regime* SDK v3.20 introduces. R-66
+  directly attacks the **W18-Λ-deceive** wall (named in SDK v3.19)
+  AND the **W18-Λ-confound** wall in the *bundle-resolvable* case
+  — i.e. when the round-2 disambiguator's payload is adversarial
+  or symmetric BUT the bundle carries *at least one independent
+  asymmetric witness* (a specific-tier handoff OTHER than the
+  canonical primary disambiguator) whose payload mentions a
+  service tag asymmetrically across the candidate set. The bench
+  shape extends R-65's symmetric round-1 corroboration with a
+  *secondary specific-tier witness* (under a synonym kind
+  resolved through the W12 / W13 normalisation closure) emitted
+  by a producer role distinct from the canonical primary. **No
+  closed-form bundle-relational scorer that** *trusts* **its
+  primary's evidence** can win on R-66-DECEIVE-NAIVE by
+  construction (W18-Λ-deceive extends — W18 abstains on the
+  full-set hit; the answer remains 0.000).** A *bundle-
+  contradiction-aware trust-weighted scorer*
+  (``BundleContradictionDisambiguator``: counts independent
+  asymmetric witnesses per admitted tag, excluding the canonical
+  primary; inverts the projection when witnesses contradict the
+  primary's named set; refines W18's abstention by picking the
+  strict-max-witness subset when W18 abstains) closes the gap
+  (W19-1). Six pre-committed sub-banks plus two named falsifiers:
+    - **R-66-CORROBORATED** (positive sanity anchor; synthetic
+      identity producer, ``T_decoder = None``). Primary names
+      gold; secondary also names gold. Both W18 (via primary
+      alone) AND W19 (via primary + secondary consistency)
+      recover gold; W18 = W19 = 1.000. W19-3 backward-compat
+      anchor.
+    - **R-66-DECEIVE-NAIVE-LOOSE** (W19-1-deceive anchor;
+      synthetic identity producer, ``T_decoder = None``). Primary
+      names decoy ONLY (relational compound ``relation=
+      decoy_decoy_*``); secondary names gold ONLY (synonym
+      specific-tier kind from monitor with ``relation=A_B_*``).
+      W18's full-disambiguator scorer sees positive scores on
+      every admitted tag → W18 abstains; W15 inner is empty;
+      W18 ties FIFO at 0.000. W19's witness counter excludes the
+      primary; aw(gold) > aw(decoy) via the secondary; W19 fires
+      the confound-resolved branch and projects to gold. **+1.000
+      strict separation.**
+    - **R-66-DECEIVE-NAIVE-TIGHT** (W19-1 + W15 composition
+      anchor; synthetic identity producer, ``T_decoder = 24``).
+      Same R-66-DECEIVE-NAIVE shape under decoder-side budget
+      pressure. The W19 scorer reads only the W15-packed bundle;
+      the W15 packer keeps BOTH the primary disambiguator AND the
+      secondary witness within ``T_decoder``. Token-budget
+      honesty preserved byte-for-byte relative to W18 (which
+      itself preserves W15's ``tokens_kept``).
+    - **R-66-CONFOUND-RESOLVABLE** (W19-1-confound anchor;
+      synthetic identity producer, ``T_decoder = None``). Primary
+      names ALL three (``relation=A_B_decoy_*``); secondary names
+      gold ONLY. W18 abstains (full-set hit); W15 inner ties
+      FIFO. W19's witness counter sees aw(gold) > aw(decoy) and
+      fires the confound-resolved branch; projects to gold.
+      **+1.000 strict separation.**
+    - **R-66-DECEIVE-TOTAL** (W19-Λ-total falsifier; synthetic,
+      ``T_decoder = None``). Same R-65-DECEIVE primary payload
+      AND *no* secondary witness anywhere in the bundle. The
+      bundle is exhausted of asymmetric signal; W19 cannot
+      detect deception and reduces to W18 (picks decoy and FAILS
+      at 0.000). Names the structural limit when the bundle is
+      exhausted of asymmetric signal — escape requires outside
+      information (W19-C-OUTSIDE, conjectural).
+    - **R-66-OUTSIDE-REQUIRED** (W19-Λ-outside falsifier;
+      synthetic, ``T_decoder = None``). Same R-65-DECEIVE primary
+      AND a *symmetric* secondary witness that mentions BOTH gold
+      AND decoy (so the asymmetric-witness count is uniform
+      across all admitted tags). W19's confound branch cannot
+      find a strict-max subset; W19 abstains
+      (``W19_BRANCH_ABSTAINED_SYMMETRIC``); ties FIFO at 0.000.
+      Names the structural limit when bundle-internal contradiction
+      is itself symmetric — the natural escape requires outside
+      information (W19-C-OUTSIDE, conjectural).
+  **Honest scope.** R-66 is a *synthetic* regime — the producer
+  is :class:`IdentityExtractor`. Real-LLM transfer of the
+  asymmetric-witness convention is **W19-Λ-real**
+  (proved-conditional + empirical-research): the LLM must emit
+  the secondary witness in the same closed-vocabulary form the
+  synthetic bench uses (synonym specific-tier kinds + relational-
+  compound payloads) AND from a non-canonical role. If the LLM
+  emits free-form natural-language witnesses, the W19 exact-
+  match layer misses by construction. The closure is bounded by
+  the same closed-vocabulary discipline as W18 / W13 / W12; the
+  **W19-C-LEARNED** axis names the natural learned-scorer
+  extension. Anchor:
+  `vision_mvp/experiments/phase66_deceptive_ambiguity.py`.
+
 * **R-62** — Phase-62 *attention-aware capsule context packing under
   decoder-side budget pressure* regime, the *new harder regime* SDK
   v3.16 introduces. The producer-side gap was closed by W14 on R-61;
@@ -447,6 +536,39 @@ The **named regimes** the bar refers to (anchored in code):
 > decoder-budget ingredients are independently load-bearing; a
 > method that closes one structural axis but leaves the other
 > firing does NOT clear bar 13).
+> SDK v3.20 anchors the bar to **R-66** below AND introduces
+> **bar 16** (deceptive-ambiguity bundle-contradiction split: a
+> method that wants to claim "ambiguity resolution beyond W18"
+> must (i) attack a regime where the round-2 disambiguator's
+> payload is adversarial or symmetric BUT the bundle carries at
+> least one *independent asymmetric witness* — a specific-tier
+> handoff from a non-canonical producer role whose payload
+> mentions a service tag asymmetrically across the candidate
+> set — AND (ii) introduce a *bundle-contradiction-aware
+> scorer* that counts independent witnesses per admitted tag,
+> excluding the canonical primary, AND inverts or refines W18's
+> projection when witnesses contradict the primary AND (iii)
+> preserve bounded-context efficiency byte-for-byte relative to
+> W18 (the new scorer must consume *only* the W15-packed bundle,
+> not extra capsules) AND (iv) ship at least two named
+> falsifier regimes — R-66-DECEIVE-TOTAL (no asymmetric witness
+> anywhere in the bundle) and R-66-OUTSIDE-REQUIRED (witnesses
+> exist but are themselves symmetric across primary's named
+> set and the complement) — where the new method ties FIFO by
+> construction. A milestone that wins on R-66-DECEIVE-NAIVE
+> AND R-66-CONFOUND-RESOLVABLE but does NOT exhibit
+> R-66-DECEIVE-TOTAL / R-66-OUTSIDE-REQUIRED materially
+> overstates and does NOT clear bar 16. The R-66 win is
+> *strongly conditional* on the bundle carrying at least one
+> independent asymmetric witness; the W18-Λ-deceive wall
+> remains real wherever the bundle is exhausted of asymmetric
+> signal (W19-Λ-total) and the symmetric-witness wall is real
+> wherever witnesses are themselves symmetric across the
+> candidate set (W19-Λ-outside). The natural escape from both
+> walls is **outside information** (W19-C-OUTSIDE, conjectural).
+> Earlier R-55..R-65-anchored bars remain valid as historical
+> bars; the *current* bar is R-66-anchored.
+>
 > SDK v3.19 anchors the bar to **R-65** below AND introduces
 > **bar 15** (relational-compatibility disambiguation under
 > symmetric-corroboration split: a method that wants to claim
@@ -489,7 +611,7 @@ The **named regimes** the bar refers to (anchored in code):
 
 ### 1.1 Strong success bar (a "real" advance)
 
-A milestone *strongly advances* the thesis iff **all fifteen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17; bar 14 from SDK v3.18; bar 15 from SDK v3.19):
+A milestone *strongly advances* the thesis iff **all sixteen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17; bar 14 from SDK v3.18; bar 15 from SDK v3.19; bar 16 from SDK v3.20):
 
 1. **Code anchor.** A new admission/decoder/coordination method
    ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
@@ -646,6 +768,66 @@ A milestone *strongly advances* the thesis iff **all fifteen** hold (bars 1–6 
    layer misses by construction (the natural extension is
    W18-C-LEARNED — a small distilled compatibility scorer over
    capsule bundles).
+
+16. **(SDK v3.20+) Deceptive-ambiguity bundle-contradiction split.**
+   The milestone-anchored harder regime (R-66-DECEIVE-NAIVE) is
+   **provably insufficient for any *trusting* closed-form bundle-
+   relational scorer** (W18-Λ-deceive extends to R-66-DECEIVE-NAIVE
+   for every method that consumes the round-2 disambiguator's
+   payload as a single concatenated text: every closed-form
+   salience packer ties FIFO at 0.000 by W17-Λ-symmetric extended
+   verbatim; W18 itself sees positive scores on every admitted tag
+   when the secondary witness is concatenated with the primary,
+   abstains, and falls through to the empty W15 inner answer; ties
+   FIFO at 0.000). The new method must include an explicit
+   **bundle-contradiction-aware trust layer**: a deterministic,
+   training-free witness counter that
+   (i) identifies a single *canonical primary* specific-tier
+   disambiguator in the admitted union (the handoff whose
+   ``(source_role, claim_kind)`` matches the canonical
+   subscription for the kind),
+   (ii) counts independent *asymmetric witnesses* per admitted
+   service tag — specific-tier handoffs OTHER than the canonical
+   primary whose tokenised payload mentions the tag, deduplicated
+   by ``(source_role, claim_kind, payload_sha)``, and
+   (iii) projects the W18 answer through the witness counts:
+   when W18's strict-asymmetric branch fired AND the complement's
+   max witness count strictly exceeds the named set's, INVERT the
+   projection (W19-1-inversion); when W18 abstained AND there is
+   a unique strict-max-witness subset M ⊊ U, project to M
+   (W19-1-confound); otherwise fall through to W18.
+   A pure W18 method (no witness layer) does NOT clear bar 16.
+   **Pre-committed bench property:** under R-66-DECEIVE-NAIVE,
+   the bundle's bipartite (primary_class, secondary_class) shape
+   is ``(decoy_only, gold_only)`` for every cell (mechanically
+   verified by ``Phase66BenchPropertyTests::test_deceive_naive_shape``).
+   Under R-66-CONFOUND-RESOLVABLE the shape is
+   ``(all_three, gold_only)``. Under R-66-CORROBORATED it is
+   ``(gold_only, gold_only)`` (positive sanity anchor).
+   **Pre-committed token-budget honesty:** the W19 scorer MUST
+   consume only the W18-packed bundle (which itself reads only
+   the W15-packed bundle); ``tokens_kept`` accounting is
+   unchanged byte-for-byte from W18 (mechanically verified by
+   ``Phase66TokenEfficiencyTests::test_w19_does_not_inflate_tokens_kept``).
+   **Pre-committed falsifiers:** R-66-DECEIVE-TOTAL (no asymmetric
+   witness anywhere — W19-Λ-total: W19 reduces to W18 and FAILS
+   at 0.000), R-66-OUTSIDE-REQUIRED (witnesses are symmetric
+   across primary's named set and the complement — W19-Λ-outside:
+   W19 abstains via ``W19_BRANCH_ABSTAINED_SYMMETRIC`` and ties
+   FIFO at 0.000). On both, W19 ties FIFO; the W19-1 conditionality
+   is sharp. **Honest scope:** R-66 is a *synthetic* regime — the
+   producer is :class:`IdentityExtractor`. Real-LLM transfer of
+   the asymmetric-witness convention is W19-Λ-real (proved-
+   conditional + empirical-research): the LLM must emit the
+   secondary witness in the same closed-vocabulary form (synonym
+   specific-tier kinds + relational-compound payloads) AND from
+   a non-canonical role; if the LLM emits free-form natural-
+   language witnesses, the W19 exact-match layer misses by
+   construction (the natural extension is W19-C-LEARNED — a small
+   distilled trust scorer over capsule bundles). The natural
+   escape from BOTH falsifier walls is **outside information**
+   (W19-C-OUTSIDE — service-graph topology, prior reliability
+   scores, cross-incident historical evidence; conjectural).
 
 14. **(SDK v3.18+) Live-end-to-end + magnitude-hinted-protocol +
    symmetric-corroboration-wall split.** The milestone-anchored
@@ -852,6 +1034,64 @@ For SDK v3.11 specifically, the canonical phrasing instantiates as:
 > Phase-57-falsifier regime where the decoy is corroborated AND
 > mentioned via a causal claim_kind for the chosen root_cause
 > (W10-4)."*
+
+For SDK v3.20 specifically, the canonical phrasing instantiates as:
+
+> *"On R-66-DECEIVE-NAIVE (Phase-66 symmetric-corroboration regime
+> where the round-2 specific-tier disambiguator's primary payload
+> mentions DECOY service tags ONLY via ``relation=decoy_decoy_*``
+> AND a secondary specific-tier witness — emitted by a non-
+> canonical producer role under a synonym kind that resolves
+> through the W12 / W13 normalisation closure to the same
+> canonical specific-tier kind as the primary — mentions GOLD
+> service tags ONLY via ``relation=A_B_*``), every closed-form
+> bundle-relational scorer in the SDK that *trusts* its
+> concatenated disambiguator text — substrate FIFO,
+> ``capsule_fifo``, ``capsule_priority``, ``capsule_coverage``,
+> W7-2 cohort, W8 corroboration, W9 multi-service, W11 multi-round,
+> W12 robust-multi-round, W13 layered, W15
+> :class:`AttentionAwareBundleDecoder`, AND W18
+> :class:`RelationalCompatibilityDisambiguator` — ties FIFO at
+> ``accuracy_full = 0.000`` (W17-Λ-symmetric extended verbatim;
+> W18-Λ-deceive extended to the symmetric/secondary regime: W18
+> abstains on the full-set hit and falls through to the empty
+> inner W15 answer). The new
+> :class:`BundleContradictionDisambiguator` (W19) — a
+> deterministic, training-free witness counter that identifies a
+> canonical primary, counts independent asymmetric witnesses per
+> admitted tag (excluding the primary), and inverts or refines
+> W18's projection when witnesses contradict the primary —
+> achieves ``accuracy_full = 1.000`` on R-66-DECEIVE-NAIVE-LOOSE
+> (``T_decoder = None``) AND on R-66-DECEIVE-NAIVE-TIGHT
+> (``T_decoder = 24``) AND on R-66-CONFOUND-RESOLVABLE (primary
+> mentions all three; secondary mentions gold only), strictly
+> improving over the W18 baseline by ``+1.000`` on all three
+> regimes, stable across 5/5 alternate ``bank_seed`` values
+> (11, 17, 23, 29, 31). Token-budget honesty: on
+> R-66-DECEIVE-NAIVE-TIGHT, the W19 method consumes only the
+> W18-packed bundle (which itself reads only the W15-packed
+> bundle); ``tokens_kept`` is byte-for-byte equal to W18's
+> ``tokens_kept`` (W19 reads the same bytes; it does not re-admit
+> any handoff). The win does NOT transfer to the two named
+> falsifier regimes: R-66-DECEIVE-TOTAL (no asymmetric witness
+> anywhere; W19-Λ-total: W19 reduces to W18 and FAILS at 0.000)
+> and R-66-OUTSIDE-REQUIRED (witnesses are symmetric across
+> primary's named set and the complement; W19-Λ-outside: W19
+> abstains via ``W19_BRANCH_ABSTAINED_SYMMETRIC`` and ties FIFO
+> at 0.000). Backward-compat preserved: R-54 / R-55 / R-56 /
+> R-57 / R-58 / R-59 / R-60 / R-61 / R-62 / R-63 / R-64 / R-65
+> default banks all still hit prior anchors byte-for-byte; the
+> W19 surface is purely additive on top of the W18 surface
+> (W19-3): on every R-65 default bank (compat / no_compat /
+> confound / deceive), W19 ties W18 byte-for-byte. The honest
+> cap on the SDK v3.20 advance is the *synthetic* scope: the
+> asymmetric-witness convention is a closed-vocabulary contract
+> the synthetic bench enforces; real-LLM transfer (W19-Λ-real)
+> is conjectural pending Mac-1 reachable + the LLM's secondary-
+> witness emission style observed; the W19-Λ-total and
+> W19-Λ-outside walls are real and structural — closed-form
+> bundle-only scorers cannot escape them, and the natural escape
+> is outside information (W19-C-OUTSIDE, conjectural)."*
 
 For SDK v3.19 specifically, the canonical phrasing instantiates as:
 
@@ -1665,6 +1905,143 @@ preservation is provably load-bearing — must combine:
 
 A regime missing any of these is *not* R-61 — it does not test
 the SDK v3.15 hypothesis.
+
+## 2.14. Required ingredients of R-65 (SDK v3.19)
+
+The "harder fair regime" introduced by SDK v3.19 — the *current*
+strict-gain anchor against the W17-Λ-symmetric wall — must
+combine:
+
+* **All R-64-SYM symmetric-corroboration ingredients.** Both gold
+  A AND gold B AND the decoy mentioned by ≥ 2 distinct routed
+  producer roles in round 1 via generic-noise kinds with
+  comparable magnitudes (the bipartite ``(role × tag, kind,
+  magnitude)`` multiset is identical for gold and decoy by
+  construction). Mechanically verified by
+  ``Phase65BenchPropertyTests`` on the inherited Phase-64-SYM
+  shape.
+* **Round-2 specific-tier disambiguator with a closed-vocabulary
+  *relational-mention* convention.** The disambiguator's payload
+  text must contain a *relational compound* in one of the
+  pre-committed forms: ``relation=A_B_join`` (deadlock),
+  ``pool_chain=A_B`` / ``exhaustion=upstream_A_to_B``
+  (pool_exhaustion), ``mount=/storage/A/B`` (disk_fill),
+  ``query_path=svc_A_then_svc_B`` (slow_query_cascade). The
+  mention pattern is closed-vocabulary by W18's contract;
+  free-form natural-language mentions fall outside the closure.
+* **Four pre-committed sub-banks with named (relational-mention)
+  classes:**
+    - **R-65-COMPAT** — relational compound mentions gold ONLY.
+    - **R-65-NO-COMPAT** — payload contains no service-tag
+      mentions (kind + numeric magnitudes only).
+    - **R-65-CONFOUND** — relational compound mentions BOTH gold
+      AND decoy.
+    - **R-65-DECEIVE** — relational compound mentions DECOY ONLY
+      (adversarial round-2 evidence).
+  Mechanically verified by ``Phase65BenchPropertyTests::
+  test_compat_round2_mentions_gold_only`` and the three
+  falsifier shape tests.
+* **Determinism.** The Phase-65 bank generator is RNG-deterministic
+  given ``bank_seed``; the W18 scorer is byte-deterministic given
+  the union; the W18 strict-asymmetric branch fires iff at least
+  one but not all admitted tags have positive score.
+* **Audit-preserving.** T-1..T-7 holds on every cell of every
+  capsule strategy on every (bank, ``T_decoder``, bank_seed)
+  cell. Mechanically verified by
+  ``Phase65DefaultConfigTests::test_w18_audit_OK_on_every_cell``.
+* **Bounded-context honesty.** The W18 disambiguator MUST consume
+  only the W15-packed bundle; ``tokens_kept`` accounting is
+  unchanged byte-for-byte from W15 (mechanically verified by
+  ``Phase65TokenEfficiencyTests::test_w18_does_not_inflate_tokens_kept``).
+* **No regression on R-54..R-64.** Every prior anchor remains
+  green; with ``enabled = False`` the W18 method reduces to W15
+  byte-for-byte; on R-54..R-64 default banks the W18 method ties
+  W15 byte-for-byte either via abstention or strict-asymmetric
+  projection on the same gold subset; 442/442 prior tests pass.
+
+A regime missing any of these is *not* R-65 — it does not test
+the SDK v3.19 hypothesis.
+
+## 2.15. Required ingredients of R-66 (SDK v3.20)
+
+The "harder fair regime" introduced by SDK v3.20 — the *current*
+strict-gain anchor against the W18-Λ-deceive AND W18-Λ-confound
+walls in the *bundle-resolvable* case — must combine:
+
+* **All R-65 symmetric-corroboration round-1 ingredients.** Both
+  gold A AND gold B AND the decoy mentioned by ≥ 2 distinct
+  routed producer roles in round 1 via generic-noise kinds with
+  comparable magnitudes (so W17-Λ-symmetric still applies and
+  every closed-form salience packer ties FIFO at 0.000 by
+  construction). Mechanically verified by
+  ``Phase66BenchPropertyTests`` on the symmetric-corroboration
+  predicate.
+* **Round-2 *primary* specific-tier disambiguator + a *secondary*
+  asymmetric witness.**
+    - The **primary** is a specific-tier handoff from the
+      *canonical role* for its kind (db_admin for
+      ``DEADLOCK_SUSPECTED`` / ``POOL_EXHAUSTION`` /
+      ``SLOW_QUERY_OBSERVED``; sysadmin for ``DISK_FILL_CRITICAL``).
+      Mechanically verified by
+      ``W19PrimaryIndexTests::test_canonical_role_match_preferred``.
+      The primary's payload contains a closed-vocabulary
+      relational compound — same shape as R-65 — but the
+      mentioned tag set is bank-specific
+      (``gold_only`` / ``decoy_only`` / ``all_three``).
+    - The **secondary** is a specific-tier handoff from a
+      *non-canonical* role (typically ``monitor``) under a
+      *synonym* kind (``DEADLOCK_DETECTED`` / ``POOL_EXHAUSTED``
+      / ``DISK_FILL_DETECTED`` / ``SLOW_QUERY_DETECTED``) that
+      resolves through the W12 / W13 layered normaliser to the
+      same canonical specific-tier kind as the primary. The
+      secondary's payload contains a relational compound; the
+      mentioned tag set is bank-specific.
+    - The secondary is routed to the auditor via the Phase-66
+      secondary-witness routing extension
+      (:data:`_P66_SECONDARY_ROUTES` in
+      ``vision_mvp.experiments.phase66_deceptive_ambiguity``);
+      the canonical incident-triage subscription table is left
+      byte-for-byte unchanged.
+* **Five pre-committed sub-banks with named (primary, secondary)
+  shape predicates** (mechanically verified by
+  ``Phase66BenchPropertyTests``):
+    - **R-66-CORROBORATED** — ``(gold_only, gold_only)``.
+      Positive sanity anchor: W18 = W19 = 1.000.
+    - **R-66-DECEIVE-NAIVE** — ``(decoy_only, gold_only)``. The
+      W19-1-deceive anchor: W18 = 0.000, W19 = 1.000.
+    - **R-66-CONFOUND-RESOLVABLE** — ``(all_three, gold_only)``.
+      The W19-1-confound anchor: W18 = 0.000, W19 = 1.000.
+    - **R-66-DECEIVE-TOTAL** — ``(decoy_only, absent)``. The
+      W19-Λ-total falsifier: W18 = W19 = 0.000.
+    - **R-66-OUTSIDE-REQUIRED** — ``(decoy_only, all_three)``.
+      The W19-Λ-outside falsifier: W18 = W19 = 0.000 via W19
+      abstention.
+  R-66-DECEIVE-NAIVE additionally has a TIGHT variant
+  (``T_decoder = 24``) that exercises the W19 + W15 composition
+  under decoder-side budget pressure.
+* **Bounded-context honesty.** The W19 scorer MUST consume only
+  the W18-packed bundle (which itself reads only the W15-packed
+  bundle); ``tokens_kept`` accounting is unchanged byte-for-byte
+  from W18 (mechanically verified by
+  ``Phase66TokenEfficiencyTests::test_w19_does_not_inflate_tokens_kept``).
+* **Determinism.** The Phase-66 bank generator is RNG-deterministic
+  given ``bank_seed``; the W19 witness counter is byte-
+  deterministic given the union, the canonical primary index, and
+  the admitted tag set; the W19 branch decision is byte-
+  deterministic given the W18 named set and the witness counts.
+* **Audit-preserving.** T-1..T-7 holds on every cell of every
+  capsule strategy on every (bank, ``T_decoder``, bank_seed)
+  cell. Mechanically verified by
+  ``Phase66DefaultConfigTests::test_w19_audit_OK_on_every_cell``.
+* **No regression on R-54..R-65.** Every prior anchor remains
+  green; on R-58 default and on every R-65 default bank
+  (compat / no_compat / confound / deceive), W19 ties W18
+  byte-for-byte (mechanically verified by
+  ``Phase66BackwardCompatTests``). 405/405 wevra-suite tests
+  + the 45 new W19 tests = 450/450 pass.
+
+A regime missing any of these is *not* R-66 — it does not test
+the SDK v3.20 hypothesis.
 
 ## 3. What we are explicitly NOT testing
 
