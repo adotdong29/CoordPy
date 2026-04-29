@@ -9351,6 +9351,104 @@ axis to escape BOTH the W19-Λ-total wall — no witnesses anywhere
    is precisely articulated as a structural result, not a
    method-gap conjecture.**
 
+### 4.38 SDK v3.21 — outside-witness acquisition disambiguator + R-67 outside-information benchmark family + W20 family (Phase-67 R-67-OUTSIDE-RESOLVES + three named falsifiers)
+
+SDK v3.21 attacks the named research frontier SDK v3.20 left
+conjectural (W19-C-OUTSIDE) via the smallest possible move: a
+deterministic, training-free
+:class:`OutsideWitnessAcquisitionDisambiguator` (W20) that wraps
+the W19 inner and consults a registered
+:class:`OutsideWitnessOracle` exactly *once* per cell when the
+inner W19 returns a trigger branch (default
+:data:`W19_BRANCH_ABSTAINED_SYMMETRIC` /
+:data:`W19_BRANCH_ABSTAINED_NO_SIGNAL`). The oracle's reply is
+parsed via the same closed-vocabulary closure W18 / W19 use on
+in-bundle witnesses; the W19 answer is projected onto the
+positive set of admitted-tag mentions in the reply.
+
+**The R-67 bench family** reuses the R-66-OUTSIDE-REQUIRED bundle
+shape (deceptive primary + symmetric secondary) for *every*
+sub-bank — the only variable across sub-banks is the registered
+oracle. This makes the milestone story sharp: bundle-only methods
+cannot escape; the only thing that changes the W20 result is
+oracle integrity.
+
+The SDK v3.21 mint:
+
+* **R-67-OUTSIDE-RESOLVES** (W20-1 anchor; deterministic
+  ``ServiceGraphOracle``): W20 = 1.000; W19 = 0.000.
+  **+1.000 strict separation**, stable across 5/5 seeds,
+  on loose AND tight (``T_decoder = 24``) decoder budgets.
+* **R-67-OUTSIDE-REQUIRED-BASELINE** (W20-3 backward-compat;
+  no oracle): W20 ties W19 byte-for-byte at 0.000.
+* **R-67-OUTSIDE-NONE** (W20-Λ-none; ``AbstainingOracle``):
+  W20 = 0.000; abstain. Names "no signal" structural limit.
+* **R-67-OUTSIDE-COMPROMISED** (W20-Λ-compromised;
+  ``CompromisedServiceGraphOracle``): W20 trusts oracle, picks
+  decoy, FAILS at 0.000. Names "adversarial oracle" limit.
+* **R-67-JOINT-DECEPTION** (W20-Λ-joint-deception): primary +
+  secondary + oracle ALL favour decoy AND are internally
+  consistent. W20 ties W19 at 0.000. Names "all evidence channels
+  jointly compromised" limit.
+* **R-67-LIVE-MIXTRAL-8x7b** (W20-Λ-real partial-pass; n=4):
+  47B-MoE LLM adjudicator achieves ``acc_full = 0.750``;
+  +0.750 over W19 on a fresh live LLM stream.
+* **R-67-LIVE-QWEN-CODER-7B** (W20-Λ-real failure): smaller
+  model trusts deceptive primary; ties FIFO at 0.000.
+
+The next research frontier is **W20-C-MULTI-ORACLE** (multi-
+oracle aggregation escape from W20-Λ-compromised when *some*
+oracles remain trustworthy) AND **W20-C-LIVE-WITH-REGISTRY** (LLM
+adjudicator with explicit service-registry context narrowing the
+W20-Λ-real wall). Both conjectural, both bounded above by joint
+N-oracle compromise.
+
+**For another agent to instantly see the SDK v3.21 state**:
+
+1. **Is the new frontier outside-information acquisition beyond
+   W19?** *YES.* The W20 family attacks the W19-Λ-outside AND
+   W19-Λ-total walls directly via the outside-information channel
+   that bundle-only scorers cannot see.
+2. **Does the new method actually beat the W19-Λ-outside wall?**
+   *YES, on the bundle-only-insufficient-but-outside-resolvable
+   case (R-67-OUTSIDE-RESOLVES).* W20 = 1.000; W19 = 0.000.
+   **+1.000 strict separation**, stable across 5/5 seeds, on
+   both loose AND tight decoder budgets.
+3. **Did bounded-context efficiency survive?** *YES.* The W20
+   layer adds *exactly one* outside query per cell, bounded by
+   ``max_response_tokens = 24``; the W15 ``tokens_kept`` is
+   byte-for-byte identical between W19 and W20. Total context
+   delivered to the final decider: ``tokens_kept (≤ T_decoder) +
+   n_outside_tokens (≤ max_response_tokens)``.
+4. **Did two-Mac live evaluation materially broaden the
+   evidence?** *NO — Mac 2 remains unreachable (ARP
+   ``incomplete``, same status as the prior 14 milestones). No
+   two-Mac sharded inference. The W20 ``OutsideWitnessOracle``
+   Protocol IS infrastructure-ready for cross-host deployment
+   when Mac 2 returns; the ``MLXDistributedBackend`` adapter is
+   byte-for-byte unchanged. A *partial* live W20-Λ-real probe on
+   Mac-1 (``mixtral:8x7b`` 47B-MoE) achieved acc_full = 0.750
+   (+0.750 over W19) — a strict but partial live advance over
+   the W19-Λ-outside wall.*
+5. **Is the original thesis materially stronger or still
+   blocked by a deeper semantic / oracle-integrity wall?**
+   *MATERIALLY STRONGER on the named axis; the deeper wall is
+   now SHARP — joint-deception across primary + secondary +
+   oracle is the named structural limit.* The original Context-
+   Zero thesis — *per-agent minimum-sufficient context for
+   multi-agent teams* — gains its **first capsule-native method
+   to acquire asymmetric outside information when the bundle
+   alone is structurally insufficient**. The deeper walls
+   (W20-Λ-compromised, W20-Λ-joint-deception) are *named* and
+   *proved-empirical* — the natural escape from W20-Λ-compromised
+   is W20-C-MULTI-ORACLE (multi-oracle aggregation) and the
+   natural escape from W20-Λ-real is W20-C-LIVE-WITH-REGISTRY
+   (LLM adjudicator with explicit registry context); both
+   conjectural. **The thesis is materially stronger AND the
+   next research frontier is precisely articulated as oracle
+   integrity + multi-oracle aggregation, not a method-gap
+   conjecture.**
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

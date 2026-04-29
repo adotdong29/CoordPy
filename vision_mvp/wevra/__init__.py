@@ -244,6 +244,22 @@ from .team_coord import (
     # SDK v3.19 — bundle-relational compatibility disambiguator (W18 family).
     W18CompatibilityResult,
     RelationalCompatibilityDisambiguator,
+    # SDK v3.20 — bundle-contradiction-aware trust-weighted disambiguator
+    # (W19 family).
+    BundleContradictionDisambiguator, W19TrustResult,
+    W19_ALL_BRANCHES, W19_BRANCH_PRIMARY_TRUSTED, W19_BRANCH_INVERSION,
+    W19_BRANCH_CONFOUND_RESOLVED, W19_BRANCH_ABSTAINED_NO_SIGNAL,
+    W19_BRANCH_ABSTAINED_SYMMETRIC, W19_BRANCH_DISABLED,
+    # SDK v3.21 — outside-witness acquisition disambiguator (W20 family).
+    OutsideWitnessOracle, OutsideQuery, OutsideVerdict,
+    ServiceGraphOracle, CompromisedServiceGraphOracle,
+    AbstainingOracle, LLMAdjudicatorOracle,
+    build_incident_triage_service_graph,
+    OutsideWitnessAcquisitionDisambiguator, W20OutsideResult,
+    W20_ALL_BRANCHES, W20_BRANCH_OUTSIDE_RESOLVED,
+    W20_BRANCH_OUTSIDE_TRUSTED_ASYMMETRIC,
+    W20_BRANCH_OUTSIDE_ABSTAINED, W20_BRANCH_NO_TRIGGER,
+    W20_BRANCH_DISABLED, W20_DEFAULT_TRIGGER_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -257,7 +273,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.19"
+SDK_VERSION = "wevra.sdk.v3.21"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -375,6 +391,21 @@ __all__ = [
     "AttentionAwareBundleDecoder",
     # SDK v3.19 — W18 family.
     "W18CompatibilityResult", "RelationalCompatibilityDisambiguator",
+    # SDK v3.20 — W19 family.
+    "BundleContradictionDisambiguator", "W19TrustResult",
+    "W19_ALL_BRANCHES", "W19_BRANCH_PRIMARY_TRUSTED", "W19_BRANCH_INVERSION",
+    "W19_BRANCH_CONFOUND_RESOLVED", "W19_BRANCH_ABSTAINED_NO_SIGNAL",
+    "W19_BRANCH_ABSTAINED_SYMMETRIC", "W19_BRANCH_DISABLED",
+    # SDK v3.21 — W20 family (outside-witness acquisition).
+    "OutsideWitnessOracle", "OutsideQuery", "OutsideVerdict",
+    "ServiceGraphOracle", "CompromisedServiceGraphOracle",
+    "AbstainingOracle", "LLMAdjudicatorOracle",
+    "build_incident_triage_service_graph",
+    "OutsideWitnessAcquisitionDisambiguator", "W20OutsideResult",
+    "W20_ALL_BRANCHES", "W20_BRANCH_OUTSIDE_RESOLVED",
+    "W20_BRANCH_OUTSIDE_TRUSTED_ASYMMETRIC",
+    "W20_BRANCH_OUTSIDE_ABSTAINED", "W20_BRANCH_NO_TRIGGER",
+    "W20_BRANCH_DISABLED", "W20_DEFAULT_TRIGGER_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

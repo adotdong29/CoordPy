@@ -5,6 +5,107 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.21] — 2026-04-29 — SDK v3.21 — outside-witness acquisition disambiguator + R-67 outside-information benchmark family + W20 family (first capsule-native multi-agent-coordination method that crosses the W19-Λ-outside wall on a regime where bundle-only reasoning is structurally insufficient by acquiring asymmetric outside information)
+
+*Strictly additive on SDK v3.20. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W20 surface
+adds one new Protocol (``OutsideWitnessOracle``), three new
+dataclasses (``OutsideQuery``, ``OutsideVerdict``,
+``W20OutsideResult``), four oracle adapters
+(``ServiceGraphOracle`` / ``CompromisedServiceGraphOracle`` /
+``AbstainingOracle`` / ``LLMAdjudicatorOracle``), one default
+service-graph (``build_incident_triage_service_graph``), one
+wrapping decoder (``OutsideWitnessAcquisitionDisambiguator``),
+and six W20 branch constants. Re-exported via the SDK
+``__init__``. The new
+``vision_mvp/experiments/phase67_outside_information.py`` driver
+ships as a research-slice addition with one positive anchor
+sub-bank (R-67-OUTSIDE-RESOLVES under loose AND tight
+``T_decoder``), one backward-compat sub-bank
+(R-67-OUTSIDE-REQUIRED-BASELINE), and three named falsifier
+sub-banks (R-67-OUTSIDE-NONE, R-67-OUTSIDE-COMPROMISED,
+R-67-JOINT-DECEPTION).*
+
+**The W20 family — outside-witness acquisition disambiguator
+(SDK v3.21).** On a synthetic R-67-OUTSIDE-RESOLVES regime
+(the same R-66-OUTSIDE-REQUIRED bundle shape — deceptive
+primary mentions decoy only AND symmetric secondary witness
+mentions all three — but with a deterministic
+:class:`ServiceGraphOracle` registered as the outside
+information source), every closed-form scorer in the SDK
+pre-W20 — substrate FIFO, ``capsule_fifo``, ``capsule_priority``,
+``capsule_coverage``, W7-2 cohort, W8 corroboration, W9 multi-
+service, W11 multi-round, W12 robust-multi-round, W13 layered,
+W15 ``AttentionAwareBundleDecoder``, W18
+``RelationalCompatibilityDisambiguator``, AND **W19
+``BundleContradictionDisambiguator``** — ties FIFO at
+``accuracy_full = 0.000`` (W19-Λ-outside extends verbatim:
+W19 abstains via ``W19_BRANCH_ABSTAINED_SYMMETRIC``). The W20
+method, with the deterministic ServiceGraphOracle, achieves
+``accuracy_full = 1.000`` on R-67-OUTSIDE-RESOLVES-LOOSE
+(``T_decoder = None``) AND R-67-OUTSIDE-RESOLVES-TIGHT
+(``T_decoder = 24``), strictly improving over every non-W20
+capsule baseline by **+1.000**, stable across **5/5**
+alternate ``bank_seed`` values (11, 17, 23, 29, 31). Three
+named falsifiers (R-67-OUTSIDE-NONE, R-67-OUTSIDE-COMPROMISED,
+R-67-JOINT-DECEPTION) make the W20-1 conditionality sharp:
+no signal → abstain → tie FIFO; adversarial signal → trust →
+fail at 0.000; jointly compromised → tie W19 at 0.000.
+Bounded-context honesty: the W20 layer adds *exactly one*
+outside query per cell, bounded by ``max_response_tokens =
+24``; the W15 ``tokens_kept`` is byte-for-byte identical
+between W19 and W20 on R-67-OUTSIDE-RESOLVES-TIGHT. Backward-
+compat (W20-3) preserved byte-for-byte: 545 / 545 prior wevra
+tests pass + 40 new W20 tests pass = **585 / 585**.
+
+**Live LLM extension (W20-Λ-real, partial pass).** A
+:class:`LLMAdjudicatorOracle` over a fresh live Mac-1 Ollama
+backend produces *measured*, not claimed, results. Partial
+live advance: ``mixtral:8x7b`` (47B-MoE) free-form reply
+mentions gold tokens asymmetrically and achieves ``acc_full
+= 0.750`` (3/4 cells, ``+0.750`` strict gain over W19) on
+``R-67-OUTSIDE-RESOLVES`` at ``n_eval = 4``,
+``K_auditor = 12``. Honest negative: ``qwen2.5-coder:7b``
+trusts the deceptive primary on every fired cell
+(``services=cache``) and ties FIFO at 0.000 — the W20-Λ-real
+under-scaled-model failure mode. Cross-model split: scale +
+general knowledge correlates with W20-Λ-real escape;
+smaller / coding-specialised models can fall into the
+deception. Artifacts:
+``docs/data/phase67_live_mixtral_8x7b_n4.json``,
+``docs/data/phase67_live_qwen2_5_coder_7b_n4.json``.
+
+**Two-Mac status (SDK v3.21).** Mac 2 (192.168.12.248) ARP
+``incomplete`` at milestone capture — same status as SDK
+v3.6 through SDK v3.20. **No two-Mac sharded inference
+happened in SDK v3.21.** The W20 ``OutsideWitnessOracle``
+Protocol is *infrastructure-ready* for cross-host deployment
+(producer roles on Mac 1 + adjudicator on Mac 2) when Mac 2
+returns; the ``MLXDistributedBackend`` adapter is byte-for-
+byte unchanged.
+
+**The W20 theorem family.** Twelve W20 statements:
+**W20-Λ-outside-extension** (proved-empirical n=8 saturated
++ structural sketch); **W20-1** (proved-conditional + proved-
+empirical n=80 across 5 seeds × 2 budgets, also n=12);
+**W20-2** (proved by inspection + mechanically-checked);
+**W20-3** (proved-empirical full programme regression);
+**W20-Λ-none** / **W20-Λ-compromised** /
+**W20-Λ-joint-deception** (each proved-empirical n=8
+saturated); **W20-Λ-real** (proved-conditional + empirical-
+research, n=4 × 2 models on Mac-1); **W20-C-LEARNED** /
+**W20-C-MULTI-ORACLE** / **W20-C-LIVE-WITH-REGISTRY** /
+**W20-C-CROSS-BENCH** (conjectural). Honest scope:
+``R-67-OUTSIDE-RESOLVES`` is a *synthetic* regime — the
+producer is :class:`IdentityExtractor` AND the oracle is a
+deterministic :class:`ServiceGraphOracle`. The W20 closure is
+bounded by the same closed-vocabulary discipline that bounds
+W19 / W18 / W13. The W20 escape is **partial** by design,
+bounded above by oracle integrity (W20-Λ-compromised) and by
+joint-N-oracle compromise (W20-Λ-joint-deception).
+
+**SDK version bumped: ``wevra.sdk.v3.20`` → ``wevra.sdk.v3.21``.**
+
 ## [3.20] — 2026-04-28 — SDK v3.20 — bundle-contradiction-aware trust-weighted disambiguator + deceptive-ambiguity-under-trust benchmark family + W19 family (first capsule-native multi-agent-coordination method to cross the deceptive-ambiguity wall on a regime where bundle-only relational compatibility is structurally insufficient)
 
 *Strictly additive on SDK v3.19. The Wevra single-run product

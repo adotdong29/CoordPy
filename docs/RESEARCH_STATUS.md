@@ -5,15 +5,63 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.20,
-> 2026-04-28.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.21,
+> 2026-04-29.
 
-## TL;DR
+## TL;DR — SDK v3.21
 
-The programme now has **sixteen** coupled research axes, each
-with a sharp status. SDK v3.20 mints axis 16: **bundle-
-contradiction-aware trust-weighted disambiguation under deceptive
-/ confounded round-2 evidence (bundle-resolvable case)**. The W19
+The programme now has **seventeen** coupled research axes, each
+with a sharp status. SDK v3.21 mints axis 17: **outside-witness
+acquisition under bundle-only insufficiency (outside-resolvable
+case)**. The W20 family adds one new Protocol
+(``OutsideWitnessOracle``), four oracle adapters
+(``ServiceGraphOracle`` / ``CompromisedServiceGraphOracle`` /
+``AbstainingOracle`` / ``LLMAdjudicatorOracle``), three new
+dataclasses (``OutsideQuery``, ``OutsideVerdict``,
+``W20OutsideResult``), one default service-graph
+(:func:`build_incident_triage_service_graph`), and one wrapping
+decoder (``OutsideWitnessAcquisitionDisambiguator``) — purely
+additive on top of the W19 surface. The SDK v3.20 runtime
+contract is byte-for-byte unchanged.
+
+**The headline SDK v3.21 results.** On a synthetic
+R-67-OUTSIDE-RESOLVES regime (the same R-66-OUTSIDE-REQUIRED
+bundle shape — deceptive primary mentions decoy only AND
+symmetric secondary witness mentions all three — but with a
+registered :class:`ServiceGraphOracle`), every closed-form
+scorer in the SDK pre-W20 — substrate FIFO, ``capsule_fifo``,
+``capsule_priority``, ``capsule_coverage``, W7-2 cohort, W8
+corroboration, W9 multi-service, W11 multi-round, W12 robust-
+multi-round, W13 layered, W15 ``AttentionAwareBundleDecoder``,
+W14H + W15 composition, **W18 ``RelationalCompatibilityDisambiguator``**,
+**AND W19 ``BundleContradictionDisambiguator``** — ties FIFO at
+``accuracy_full = 0.000`` (W19-Λ-outside extends verbatim:
+W19 abstains via ``W19_BRANCH_ABSTAINED_SYMMETRIC`` because the
+asymmetric-witness count is uniform across all admitted tags).
+The W20 method, with the deterministic ServiceGraphOracle,
+achieves ``accuracy_full = 1.000`` on R-67-OUTSIDE-RESOLVES-LOOSE
+(``T_decoder = None``) AND R-67-OUTSIDE-RESOLVES-TIGHT
+(``T_decoder = 24``), strictly improving over every non-W20
+capsule baseline by **+1.000**, stable across **5/5** alternate
+``bank_seed`` values (11, 17, 23, 29, 31). Three named falsifiers
+(R-67-OUTSIDE-NONE, R-67-OUTSIDE-COMPROMISED, R-67-JOINT-DECEPTION)
+make the W20-1 conditionality sharp: no signal → abstain → tie
+FIFO; adversarial signal → trust → fail at 0.000; jointly
+compromised → tie W19 at 0.000. Bounded-context honesty: the W20
+layer adds *exactly one* outside query per cell, bounded by
+``max_response_tokens = 24``; the W15 ``tokens_kept`` is
+byte-for-byte identical between W19 and W20. Backward-compat
+(W20-3) preserved byte-for-byte: 545 / 545 prior wevra tests
+pass + 40 new W20 tests pass = 585 / 585. A *partial* live-LLM
+W20-Λ-real probe on Mac-1 shows ``mixtral:8x7b`` (47B-MoE) free-
+form replies achieving ``acc_full = 0.750`` (+0.750 over W19);
+``qwen2.5-coder:7b`` trusts the deceptive primary and fails. Mac
+2 remains unreachable; no two-Mac sharded inference.
+
+The previous (now extended) headline: SDK v3.20 minted axis 16
+(**bundle-contradiction-aware trust-weighted disambiguation
+under deceptive / confounded round-2 evidence — bundle-resolvable
+case**). The W19
 family adds one new dataclass (``W19TrustResult``), two closed-
 form helpers (``_w19_canonical_primary_index``,
 ``_w19_witness_counts``), one canonical-role-for-kind table
@@ -484,7 +532,75 @@ milestone note.
    (W6-C1/C2 falsified-empirical, W6-C3 positive, W6-C4/C5
    conjectural) makes the empirical reading falsifiable.
 
-## Current frontier (SDK v3.20, 2026-04-28)
+## Current frontier (SDK v3.21, 2026-04-29)
+
+### Active moves (SDK v3.21 — outside-witness acquisition disambiguator + R-67 outside-information benchmark family + W20 family — *first capsule-native method that crosses the W19-Λ-outside wall on a regime where it applies*)
+
+- **W20-Λ-outside-extension** (proved-empirical n=8 saturated +
+  structural sketch) — W19-Λ-outside extends verbatim to
+  R-67-OUTSIDE-REQUIRED-BASELINE (no oracle / abstaining oracle):
+  every capsule strategy through W19 ties FIFO at ``accuracy_full
+  = 0.000``. The wall is real for every closed-form bundle-only
+  scorer.
+- **W20-1** (proved-conditional + proved-empirical n=80 saturated
+  across 5 seeds × 2 budgets, also n=12) — pairing W19 with the
+  new ``OutsideWitnessAcquisitionDisambiguator`` over a
+  deterministic ``ServiceGraphOracle`` strictly improves
+  ``accuracy_full`` over every non-W20 capsule baseline (incl.
+  W19) by **+1.000** on R-67-OUTSIDE-RESOLVES-LOOSE AND
+  R-67-OUTSIDE-RESOLVES-TIGHT, stable across 5/5 ``bank_seed``
+  values. The first capsule-native multi-agent-coordination
+  method that crosses the W19-Λ-outside wall on a regime where
+  the wall actually applies.
+- **W20-2** (proved by inspection + mechanically-checked) —
+  Determinism + closed-form correctness; positive-set projection
+  rule; ``n_outside_tokens`` recorded as strict additional cost;
+  W15 ``tokens_kept`` byte-for-byte unchanged from W19.
+- **W20-3** (proved-empirical full programme regression; 585/585
+  wevra tests pass, 545 pre-existing + 40 new W20 tests) —
+  Backward-compat with R-54..R-66 default banks; W20 reduces to
+  W19 byte-for-byte either via no-trigger or outside-abstained.
+  With ``enabled = False`` it reduces to W19 byte-for-byte.
+- **W20-Λ-none** (proved-empirical n=8 saturated) —
+  ``AbstainingOracle`` ⇒ W20 ties FIFO at 0.000.
+- **W20-Λ-compromised** (proved-empirical n=8 saturated) —
+  ``CompromisedServiceGraphOracle`` ⇒ W20 trusts decoy and FAILS
+  at 0.000.
+- **W20-Λ-joint-deception** (proved-empirical n=8 saturated) —
+  primary + secondary + oracle all favour decoy ⇒ W20 ties W19
+  at 0.000. Names the structural limit when *all* evidence
+  channels are jointly compromised.
+- **W20-Λ-real** (proved-conditional + empirical-research n=4 ×
+  2 models on Mac-1 Ollama) — ``mixtral:8x7b`` 47B-MoE achieves
+  ``acc_full = 0.750`` (+0.750 over W19); ``qwen2.5-coder:7b``
+  ties FIFO at 0.000. Cross-model split: scale + general
+  knowledge correlates with W20-Λ-real escape.
+- **Two-Mac status** — Mac 2 (192.168.12.248) still ARP
+  ``incomplete``. **No two-Mac sharded inference happened in SDK
+  v3.21.** The W20 ``OutsideWitnessOracle`` Protocol is
+  infrastructure-ready for cross-host deployment when Mac 2
+  returns; the ``MLXDistributedBackend`` adapter is byte-for-byte
+  unchanged.
+
+### Discharged / partially-discharged conjectures (SDK v3.21)
+
+- **W19-C-OUTSIDE** (SDK v3.20): **PARTIALLY DISCHARGED-empirical**
+  by W20-1 on the *bundle-only-insufficient-but-outside-resolvable*
+  direction — the closed-form ``OutsideWitnessAcquisitionDisambiguator``
+  with a registered ``ServiceGraphOracle`` strictly beats every
+  non-W20 capsule baseline including W19 by ``+1.000`` on
+  R-67-OUTSIDE-RESOLVES across 5/5 seeds. The W19-Λ-outside wall
+  remains real wherever the bundle is exhausted of asymmetric
+  signal AND no outside source is registered (W19-Λ-outside
+  default direction); remains a conjecture on the
+  *joint-deception* direction (named W20-Λ-joint-deception:
+  primary + secondary + all registered oracles compromised
+  jointly). The W19-Λ-total wall remains real unless a registered
+  oracle produces an asymmetric reply on the empty-bundle
+  ambiguity (W20-1 on R-67-OUTSIDE-NONE-style total absence falls
+  through to W19-Λ-total).
+
+## Previous frontier (SDK v3.20, 2026-04-28)
 
 ### Active moves (SDK v3.20 — bundle-contradiction-aware trust-weighted disambiguator + deceptive-ambiguity benchmark family + W19 family — *first capsule-native move beyond the W18-Λ-deceive wall on the bundle-resolvable case*)
 

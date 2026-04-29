@@ -17,7 +17,8 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.20)         | [`RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md`](RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md) |
+> | Latest milestone (SDK v3.21)         | [`RESULTS_WEVRA_OUTSIDE_INFORMATION.md`](RESULTS_WEVRA_OUTSIDE_INFORMATION.md) |
+> | Previous milestone (SDK v3.20)       | [`RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md`](RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md) |
 > | Previous milestone (SDK v3.19)       | [`RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md`](RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md) |
 > | Previous milestone (SDK v3.18)       | [`RESULTS_WEVRA_LIVE_COMPOSITION.md`](RESULTS_WEVRA_LIVE_COMPOSITION.md) |
 > | Previous milestone (SDK v3.17)       | [`RESULTS_WEVRA_COMPOSED_REAL_LLM.md`](RESULTS_WEVRA_COMPOSED_REAL_LLM.md) |
@@ -43,7 +44,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.19 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.21 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /

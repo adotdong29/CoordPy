@@ -115,7 +115,7 @@ import dataclasses
 import hashlib
 import json
 import time
-from typing import Any, Callable, Iterable, Protocol, Sequence
+from typing import Any, Callable, Iterable, Protocol, Sequence, runtime_checkable
 
 from vision_mvp.wevra.capsule import (
     CapsuleAdmissionError, CapsuleBudget, CapsuleKind, CapsuleLedger,
@@ -5460,4 +5460,847 @@ __all__ = [
     "W19_ALL_BRANCHES",
     "_w19_canonical_primary_index",
     "_w19_witness_counts",
+    # SDK v3.21 — outside-witness acquisition disambiguator (W20 family).
+    "OutsideWitnessOracle",
+    "OutsideQuery",
+    "OutsideVerdict",
+    "ServiceGraphOracle",
+    "CompromisedServiceGraphOracle",
+    "AbstainingOracle",
+    "LLMAdjudicatorOracle",
+    "build_incident_triage_service_graph",
+    "W20OutsideResult",
+    "OutsideWitnessAcquisitionDisambiguator",
+    "W20_BRANCH_OUTSIDE_RESOLVED",
+    "W20_BRANCH_OUTSIDE_TRUSTED_ASYMMETRIC",
+    "W20_BRANCH_OUTSIDE_ABSTAINED",
+    "W20_BRANCH_NO_TRIGGER",
+    "W20_BRANCH_DISABLED",
+    "W20_ALL_BRANCHES",
+    "W20_DEFAULT_TRIGGER_BRANCHES",
 ]
+
+
+# =============================================================================
+# SDK v3.21 — outside-witness acquisition disambiguator (W20 family).
+#
+# The follow-up to SDK v3.20 (W19) on the named research frontier the W19
+# milestone explicitly left conjectural: the **outside-information escape**
+# (W19-C-OUTSIDE) from BOTH bundle-only walls (W19-Λ-total and
+# W19-Λ-outside).
+#
+# The W19-Λ-outside anchor (Phase-66 R-66-OUTSIDE-REQUIRED) proves that
+# *no* closed-form bundle-only scorer can disambiguate when the
+# asymmetric-witness count is symmetric across primary's named set and
+# the complement. The W19-Λ-total anchor (Phase-66 R-66-DECEIVE-TOTAL)
+# proves the same when no asymmetric witness exists anywhere in the
+# bundle. SDK v3.20 named the next research move as **outside
+# information** — a scorer with access to an evidence channel that does
+# *not* live inside the W15-packed bundle.
+#
+# W20's :class:`OutsideWitnessAcquisitionDisambiguator` is the smallest
+# move in that direction:
+#
+#   1. Run inner W19 (which itself wraps W18 + W15). Capture the W19
+#      branch decision and projected answer.
+#   2. If the W19 branch is in :data:`W20_DEFAULT_TRIGGER_BRANCHES`
+#      (default ``(W19_BRANCH_ABSTAINED_SYMMETRIC,
+#      W19_BRANCH_ABSTAINED_NO_SIGNAL)``), build a hypothesis-
+#      conditioned :class:`OutsideQuery` carrying the admitted tag
+#      set + elected root_cause + primary_payload + the (possibly
+#      symmetric) witness payloads.
+#   3. Consult the registered :class:`OutsideWitnessOracle` *once*
+#      (one extra evidence acquisition per cell, bounded by
+#      ``max_response_tokens``). The oracle returns either a
+#      payload string mentioning specific service tags
+#      asymmetrically — or ``None`` (abstain).
+#   4. Tokenise the oracle's payload via the same
+#      :func:`_disambiguator_payload_tokens` W18 / W19 use, count
+#      asymmetric outside witnesses per admitted tag, AND project
+#      the answer onto the strict-max-aw subset (if non-empty,
+#      proper subset of admitted_tags). Otherwise fall through to
+#      the W19 answer.
+#
+# The trigger condition is conservative on purpose: W20 never overrides
+# a non-abstained W19 verdict (W19_BRANCH_INVERSION,
+# W19_BRANCH_CONFOUND_RESOLVED, W19_BRANCH_PRIMARY_TRUSTED), so on
+# R-54..R-66-DECEIVE-NAIVE / R-66-CONFOUND-RESOLVABLE / R-66-CORROBORATED
+# the W20 layer reduces to W19 byte-for-byte (W20-3). The named
+# escape regime is R-67-OUTSIDE-RESOLVES — exactly the W19-Λ-outside
+# wall plus a registered oracle that returns an asymmetric outside
+# witness.
+#
+# Honest scope (W20). The W20-1 win is *strongly conditional* on:
+#   (a) the bench property — W19 abstains via SYMMETRIC or NO_SIGNAL,
+#   (b) the registered oracle returning a payload that mentions a
+#       proper non-empty asymmetric subset of the admitted tags,
+#   (c) the oracle's payload mentions tag tokens in the same
+#       :func:`_disambiguator_payload_tokens` closure W18 / W19 read.
+#
+# Three named falsifiers (W20-Λ-compromised, W20-Λ-none,
+# W20-Λ-joint-deception) make the conditionality sharp:
+#   * W20-Λ-compromised — oracle returns a decoy-asymmetric payload;
+#     W20 trusts it and FAILS at 0.000.
+#   * W20-Λ-none — oracle abstains (returns ``None``); W20 falls
+#     through to W19's symmetric abstention; ties FIFO at 0.000.
+#   * W20-Λ-joint-deception — primary, secondary, AND oracle ALL
+#     mention decoy asymmetrically; W20 ties W19 at 0.000.
+#
+# Real-LLM extension (W20-Λ-real). When the oracle is an
+# :class:`LLMAdjudicatorOracle` over a registered :class:`LLMBackend`,
+# the question is one constrained-vocabulary query per cell asking
+# the LLM to identify the asymmetric subset; the LLM's reply is
+# parsed for service-tag mentions through the same closure as the
+# synthetic case. Closure of the parser is bounded by the same
+# closed-vocabulary discipline as W19 / W18 / W13 / W12 — natural-
+# language oracle replies that fall outside the closure miss by
+# construction; the natural extension is W20-C-LEARNED (a small
+# distilled outside-source scorer over capsule bundles).
+# =============================================================================
+
+
+@runtime_checkable
+class OutsideWitnessOracle(Protocol):
+    """The minimum surface a W20 outside-source must expose.
+
+    The W20 disambiguator queries the oracle *once* per cell when the
+    inner W19 branch matches the configured trigger set (default:
+    abstentions only). The oracle returns either a payload string
+    mentioning specific service tags asymmetrically — which W20
+    tokenises and scores via the same scorer W18 / W19 use on
+    in-bundle witnesses — or ``None`` (abstain).
+
+    A backend MUST expose:
+
+      * ``oracle_id`` : str — provenance label baked into the W20
+                              audit (so the team-decision capsule
+                              records WHICH oracle was consulted).
+      * ``consult(query) -> OutsideVerdict`` — a synchronous query.
+
+    The oracle is *not* permitted to inspect any capsule outside the
+    :class:`OutsideQuery` it is given. Bounded-context honesty: the
+    query carries only the *post-W15-pack* evidence the inner
+    pipeline already kept under ``T_decoder``; the oracle's reply
+    is bounded by ``query.max_response_tokens``.
+    """
+
+    oracle_id: str
+
+    def consult(self, query: "OutsideQuery") -> "OutsideVerdict": ...
+
+
+@dataclasses.dataclass(frozen=True)
+class OutsideQuery:
+    """Hypothesis-conditioned query the W20 layer sends to the oracle.
+
+    Fields
+    ------
+    admitted_tags
+        The W15-packed-and-W19-admitted service-tag set. Sorted
+        lex-min for determinism.
+    elected_root_cause
+        The inner W11 elected ``root_cause`` (e.g. ``deadlock``,
+        ``pool_exhaustion``). Lets the oracle answer kind-aware.
+    primary_payload
+        The canonical primary disambiguator's payload bytes
+        (possibly deceptive or symmetric).
+    witness_payloads
+        The *secondary* asymmetric-witness payload bytes inside the
+        bundle (possibly empty on R-66-DECEIVE-TOTAL or symmetric on
+        R-66-OUTSIDE-REQUIRED).
+    max_response_tokens
+        Strict per-call budget on the oracle's reply. Bounded-
+        context invariant: if the oracle's reply exceeds this, W20
+        truncates the reply *before* tokenising. Default ``24``
+        matches the W15 ``T_decoder`` budget band tested through
+        SDK v3.20.
+    cell_id
+        Optional opaque scenario id for the oracle's own provenance
+        / caching. Not used by W20.
+    """
+    admitted_tags: tuple[str, ...]
+    elected_root_cause: str
+    primary_payload: str
+    witness_payloads: tuple[str, ...]
+    max_response_tokens: int = 24
+    cell_id: str = ""
+
+
+@dataclasses.dataclass(frozen=True)
+class OutsideVerdict:
+    """The oracle's reply to one :class:`OutsideQuery`.
+
+    Fields
+    ------
+    payload
+        The oracle's response bytes — a payload string whose
+        tokenisation under :func:`_disambiguator_payload_tokens`
+        produces an asymmetric mention pattern across
+        ``query.admitted_tags``. ``None`` means the oracle has no
+        information (abstain). The W20 layer truncates to
+        ``query.max_response_tokens`` before scoring.
+    source_id
+        Provenance label for the W20 trust audit (e.g.
+        ``service_graph``, ``llm_adjudicator``,
+        ``compromised_oracle``).
+    confidence
+        Optional self-reported confidence in [0, 1]. The W20 layer
+        does NOT use this at projection time (the rule is
+        deterministic max-aw); it is recorded in the audit for
+        downstream / forensic use only.
+    n_tokens
+        The oracle's actual reply length in :func:`_handoff_n_tokens`
+        units (NOT bytes). Counted post-truncation. The W20 audit
+        accounts for it as a strict additional token cost on top of
+        the inner W15 ``tokens_kept``.
+    """
+    payload: str | None
+    source_id: str
+    confidence: float = 1.0
+    n_tokens: int = 0
+
+
+def build_incident_triage_service_graph() -> dict[str, frozenset[str]]:
+    """Default service-dependency graph for the incident-triage
+    benchmark family (used by the deterministic
+    :class:`ServiceGraphOracle`).
+
+    Each entry maps a service tag to the set of services it has a
+    *true topological dependency on* — the asymmetric outside
+    information that distinguishes gold pairs from the synthetic
+    decoy storm. The set is closed-vocabulary, deterministic, and
+    pre-committed in code — the synthetic R-67 anchor proves the
+    *mechanism* (outside information escapes the W19-Λ-outside
+    wall when present); real production deployments would supply
+    their own service registry.
+
+    Honest scope: this graph is the synthetic counterpart of a
+    real service registry / topology table. It is not claimed to
+    cover free-form natural-language relations (W20-C-LEARNED).
+    """
+    return {
+        # Gold pairs from _P66_FAMILIES — each pair is bidirectionally
+        # dependent (the deadlock / pool / disk / slow_query co-edge
+        # the bench is built around).
+        "orders":         frozenset({"payments"}),
+        "payments":       frozenset({"orders"}),
+        "api":            frozenset({"db"}),
+        "db":             frozenset({"api"}),
+        "storage":        frozenset({"logs_pipeline"}),
+        "logs_pipeline":  frozenset({"storage"}),
+        "web":            frozenset({"db_query"}),
+        "db_query":       frozenset({"web"}),
+        # Decoys — by design have no topological edge to any gold
+        # service; the oracle's asymmetric reply distinguishes them.
+        "search_index":   frozenset(),
+        "archival":       frozenset(),
+        "metrics":        frozenset(),
+        "telemetry":      frozenset(),
+        "audit_jobs":     frozenset(),
+        "sessions":       frozenset(),
+        "cache":          frozenset(),
+        "scratch_pool":   frozenset(),
+    }
+
+
+@dataclasses.dataclass
+class ServiceGraphOracle:
+    """Deterministic service-graph oracle (synthetic R-67 anchor).
+
+    Reads ``query.admitted_tags`` against a closed-vocabulary
+    service-dependency graph. If a *connected pair* exists in the
+    admitted set (two distinct tags ``a, b`` with
+    ``b in graph[a]``), returns a payload mentioning *every* tag in
+    the connected component intersected with admitted_tags — and
+    *no* singleton-component tags. This produces an asymmetric
+    outside witness across the admitted set whenever the bench's
+    gold pair is present in the union AND the decoys are
+    topologically isolated.
+
+    Determinism: byte-stable for byte-identical queries. No
+    randomness, no learning, no hidden state.
+
+    Bounded-context honesty: the reply payload is bounded by
+    ``query.max_response_tokens`` characters worth of tokens — the
+    oracle records the reply length and W20 truncates if needed.
+    """
+    oracle_id: str = "service_graph"
+    graph: dict[str, frozenset[str]] = dataclasses.field(
+        default_factory=build_incident_triage_service_graph)
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        admitted = sorted(set(query.admitted_tags))
+        if len(admitted) < 2:
+            return OutsideVerdict(
+                payload=None, source_id=self.oracle_id, n_tokens=0)
+        connected: set[str] = set()
+        for i, a in enumerate(admitted):
+            neighbours = self.graph.get(a, frozenset())
+            for b in admitted[i + 1:]:
+                if b in neighbours or a in self.graph.get(b, frozenset()):
+                    connected.add(a)
+                    connected.add(b)
+        if not connected or connected == set(admitted):
+            return OutsideVerdict(
+                payload=None, source_id=self.oracle_id, n_tokens=0)
+        named = sorted(connected)
+        # Build a payload using the same relational-compound shape
+        # the W18 / W19 scorers parse on in-bundle witnesses.
+        payload = (f"service_graph dependency_chain="
+                   f"{'_'.join(named)} "
+                   + " ".join(f"service={tag}" for tag in named))
+        # Truncate to budget. We treat one space-separated token as a
+        # token unit — same convention as :func:`_handoff_n_tokens`.
+        words = payload.split()
+        if len(words) > query.max_response_tokens:
+            words = words[:query.max_response_tokens]
+        truncated = " ".join(words)
+        return OutsideVerdict(
+            payload=truncated, source_id=self.oracle_id,
+            n_tokens=len(words))
+
+
+@dataclasses.dataclass
+class CompromisedServiceGraphOracle:
+    """Adversarial outside oracle (W20-Λ-compromised falsifier).
+
+    The oracle inspects the admitted-tag set and emits an asymmetric
+    reply naming exactly the *non-gold* tags — i.e. it confidently
+    asserts a decoy-only "dependency" pattern. The W20 layer trusts
+    the oracle's reply and projects to the decoy set, FAILING at
+    0.000.
+
+    This is the named structural limit when the outside source
+    itself is adversarial — analogous to a corrupted service registry
+    or a compromised LLM adjudicator. The fix is NOT a richer scorer;
+    it is *oracle integrity*. W20-Λ-compromised is the corresponding
+    theorem.
+
+    Bounded-context honesty: the oracle's reply is bounded by
+    ``query.max_response_tokens`` exactly the same way
+    :class:`ServiceGraphOracle` is.
+    """
+    oracle_id: str = "compromised_oracle"
+    # Gold-set used to discriminate adversarial targets: any admitted
+    # tag NOT in this set becomes the oracle's target. Defaulted to
+    # the incident-triage gold pairs (mirrors
+    # :func:`build_incident_triage_service_graph`).
+    gold_set: frozenset[str] = dataclasses.field(
+        default_factory=lambda: frozenset({
+            "orders", "payments", "api", "db", "storage",
+            "logs_pipeline", "web", "db_query",
+        }))
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        admitted = sorted(set(query.admitted_tags))
+        targets = [t for t in admitted if t not in self.gold_set]
+        if not targets or len(targets) == len(admitted):
+            return OutsideVerdict(
+                payload=None, source_id=self.oracle_id, n_tokens=0)
+        payload = (
+            f"compromised_oracle attribution_chain="
+            f"{'_'.join(targets)} "
+            + " ".join(f"service={tag}" for tag in targets))
+        words = payload.split()
+        if len(words) > query.max_response_tokens:
+            words = words[:query.max_response_tokens]
+        truncated = " ".join(words)
+        return OutsideVerdict(
+            payload=truncated, source_id=self.oracle_id,
+            n_tokens=len(words))
+
+
+@dataclasses.dataclass
+class AbstainingOracle:
+    """Oracle that always returns ``None`` (W20-Λ-none falsifier).
+
+    Models the regime where the registered outside source has no
+    information about the symmetric-witness ambiguity. Used by the
+    R-67-OUTSIDE-NONE bench to show that W20 ties FIFO when the
+    oracle returns no signal — bounded-context honesty: zero extra
+    tokens consumed when the oracle abstains.
+    """
+    oracle_id: str = "abstain"
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        return OutsideVerdict(
+            payload=None, source_id=self.oracle_id, n_tokens=0)
+
+
+@dataclasses.dataclass
+class LLMAdjudicatorOracle:
+    """Outside-source oracle backed by a real :class:`LLMBackend`
+    (live W20-C-LIVE extension).
+
+    Renders one constrained-vocabulary prompt per cell asking the
+    LLM to identify the asymmetric subset of the admitted tag set
+    given (a) the elected root_cause kind, (b) the primary
+    disambiguator's payload, (c) the witness payloads. The LLM's
+    reply is parsed via the SAME tokeniser
+    (:func:`_disambiguator_payload_tokens`) that W18 / W19 use on
+    in-bundle witnesses; tokens that match an admitted-tag string
+    are counted as outside-source asymmetric witnesses.
+
+    Closure: the parser only finds tag mentions inside the closed-
+    vocabulary closure W18 / W19 share. Free-form natural-language
+    replies (e.g. "the join between orders and payments") fall
+    *outside* the closure unless the model emits the literal tag
+    tokens. This is the same closure boundary as W12 / W13 / W18 /
+    W19; the natural extension is W20-C-LEARNED (a small distilled
+    outside-source scorer over capsule bundles).
+
+    Honest scope: this class is *infrastructure* for the W20-Λ-real
+    probe. Whether a *specific* model emits closed-vocabulary tag
+    mentions on a *specific* prompt is *empirical* — the milestone
+    measures, not claims. Failures (LLM unreachable, parse miss,
+    free-form reply) are recorded as ``payload=None`` (abstain), so
+    the W20 path remains audit-coherent.
+    """
+    backend: Any  # LLMBackend duck-type — keep optional for type-only imports.
+    oracle_id: str = "llm_adjudicator"
+    max_response_tokens: int = 24
+    temperature: float = 0.0
+    n_calls: int = 0
+    last_prompt: str = ""
+    last_reply: str = ""
+
+    def _render_prompt(self, query: OutsideQuery) -> str:
+        admitted_str = ", ".join(query.admitted_tags)
+        witnesses_str = "\n".join(
+            f"  witness #{i+1}: {p}"
+            for i, p in enumerate(query.witness_payloads)) or "  (none)"
+        return (
+            "You are an incident-triage adjudicator. The auditor saw a "
+            "symmetric witness pattern across these candidate services:"
+            f" {admitted_str}.\n"
+            f"Elected root cause kind: {query.elected_root_cause}.\n"
+            f"Primary disambiguator payload: {query.primary_payload}\n"
+            f"Bundle witness payloads:\n{witnesses_str}\n"
+            "Reply with ONE line of the form: "
+            "'services=svc1,svc2' naming ONLY the services you "
+            "judge to be the actual root cause among the candidates "
+            "above. If you cannot decide, reply: 'services='. "
+            "Reply with no extra text.")
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        prompt = self._render_prompt(query)
+        self.last_prompt = prompt
+        try:
+            reply = self.backend.generate(
+                prompt, max_tokens=self.max_response_tokens,
+                temperature=self.temperature)
+        except Exception as exc:  # noqa: BLE001 — record + abstain
+            self.last_reply = f"<exception: {exc!r}>"
+            self.n_calls += 1
+            return OutsideVerdict(
+                payload=None, source_id=self.oracle_id, n_tokens=0)
+        self.n_calls += 1
+        self.last_reply = reply or ""
+        if not reply:
+            return OutsideVerdict(
+                payload=None, source_id=self.oracle_id, n_tokens=0)
+        # Truncate to the per-call budget.
+        words = reply.split()
+        if len(words) > query.max_response_tokens:
+            words = words[:query.max_response_tokens]
+        truncated = " ".join(words)
+        # Materialise the reply as an outside-witness payload by
+        # framing it like a service-graph reply so the W20 scorer's
+        # tokeniser finds the tag mentions through the W18 / W19
+        # closure.
+        return OutsideVerdict(
+            payload=f"llm_adjudicator response: {truncated}",
+            source_id=self.oracle_id,
+            n_tokens=len(words))
+
+
+W20_BRANCH_OUTSIDE_RESOLVED = "outside_resolved"
+W20_BRANCH_OUTSIDE_TRUSTED_ASYMMETRIC = "outside_trusted_asymmetric"
+W20_BRANCH_OUTSIDE_ABSTAINED = "outside_abstained"
+W20_BRANCH_NO_TRIGGER = "no_trigger"
+W20_BRANCH_DISABLED = "disabled"
+
+W20_ALL_BRANCHES: tuple[str, ...] = (
+    W20_BRANCH_OUTSIDE_RESOLVED,
+    W20_BRANCH_OUTSIDE_TRUSTED_ASYMMETRIC,
+    W20_BRANCH_OUTSIDE_ABSTAINED,
+    W20_BRANCH_NO_TRIGGER,
+    W20_BRANCH_DISABLED,
+)
+
+# Default trigger set — W20 fires only when W19 abstains. This keeps
+# the W20-3 backward-compat byte-for-byte against W19 on every regime
+# where W19 does not abstain (R-54..R-66-DECEIVE-NAIVE / R-66-CONFOUND-
+# RESOLVABLE / R-66-CORROBORATED). The R-67 escape regime triggers
+# specifically through ``W19_BRANCH_ABSTAINED_SYMMETRIC``.
+W20_DEFAULT_TRIGGER_BRANCHES: frozenset[str] = frozenset({
+    W19_BRANCH_ABSTAINED_SYMMETRIC,
+    W19_BRANCH_ABSTAINED_NO_SIGNAL,
+})
+
+
+@dataclasses.dataclass(frozen=True)
+class W20OutsideResult:
+    """Audit record for one ``OutsideWitnessAcquisitionDisambiguator
+    .decode_rounds`` call.
+
+    Fields
+    ------
+    answer
+        The W20-projected answer dict (same shape as W19's).
+    inner_branch
+        The W19 branch that fired before the W20 layer ran.
+    triggered
+        Whether the W20 trigger fired (i.e. ``inner_branch`` was in
+        the configured trigger set AND ``enabled``).
+    oracle_consulted
+        The oracle's ``oracle_id`` if consulted; ``""`` otherwise.
+    oracle_payload
+        The (truncated) bytes the oracle returned. ``""`` if the
+        oracle abstained or W20 did not trigger.
+    oracle_payload_tokens
+        Tokenised oracle bytes (post-truncation) — the same closure
+        W18 / W19 use on in-bundle witnesses.
+    per_tag_outside_count
+        ``{tag: aw_count}`` over the oracle's payload — one
+        independent witness count per admitted service tag.
+    decoder_branch
+        The W20 branch (one of :data:`W20_ALL_BRANCHES`).
+    abstained
+        True when the W20 layer did not produce a strict-max
+        projection (oracle absent / abstained / symmetric over the
+        admitted tag set).
+    n_outside_tokens
+        Strict per-cell additional token cost of the outside-
+        information acquisition step (the oracle's reply length,
+        post-truncation). Bounded-context honesty: this number is
+        always reported and is *additive* on top of the inner W15
+        ``tokens_kept`` figure.
+    """
+    answer: dict[str, Any]
+    inner_branch: str
+    triggered: bool
+    oracle_consulted: str
+    oracle_payload: str
+    oracle_payload_tokens: tuple[str, ...]
+    per_tag_outside_count: dict[str, int]
+    decoder_branch: str
+    abstained: bool
+    n_outside_tokens: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get("remediation",
+                                                 "investigate")),
+            "inner_branch": str(self.inner_branch),
+            "triggered": bool(self.triggered),
+            "oracle_consulted": str(self.oracle_consulted),
+            "oracle_payload": str(self.oracle_payload),
+            "oracle_payload_tokens": list(self.oracle_payload_tokens),
+            "per_tag_outside_count": {
+                tag: int(c)
+                for tag, c in self.per_tag_outside_count.items()
+            },
+            "decoder_branch": str(self.decoder_branch),
+            "abstained": bool(self.abstained),
+            "n_outside_tokens": int(self.n_outside_tokens),
+        }
+
+
+@dataclasses.dataclass
+class OutsideWitnessAcquisitionDisambiguator:
+    """Outside-witness acquisition disambiguator (SDK v3.21, W20 family).
+
+    Wraps a :class:`BundleContradictionDisambiguator` (W19) and adds an
+    extra evidence-acquisition step when the inner W19 branch indicates
+    the bundle alone is structurally insufficient
+    (:data:`W19_BRANCH_ABSTAINED_SYMMETRIC` or
+    :data:`W19_BRANCH_ABSTAINED_NO_SIGNAL`). The acquired evidence is
+    one targeted, hypothesis-conditioned :class:`OutsideQuery` to a
+    registered :class:`OutsideWitnessOracle`; the oracle's reply is
+    parsed through the same tokeniser W18 / W19 use on in-bundle
+    witnesses, and the W19 answer is projected onto the strict-max-aw
+    subset of the admitted tags (if a non-empty proper subset exists).
+
+    This is the first capsule-native multi-agent-coordination method
+    that crosses the W19-Λ-outside wall on a regime where the wall
+    actually applies (R-67-OUTSIDE-RESOLVES). It is *not* a learned
+    model — it is a closed-form composition of (a) the inner W19
+    bundle-only scorer, (b) one targeted oracle consult, and (c) the
+    same per-tag scorer the W18 / W19 layers use.
+
+    Pipeline
+    --------
+    1. Run inner W19 (which itself wraps W18 + W15). Capture the W19
+       :class:`W19TrustResult` (inner branch + projected answer).
+    2. If W19's branch is NOT in ``trigger_branches`` (or W20 is
+       ``enabled = False``), return W19's answer byte-for-byte
+       (W20-3 backward-compat — :data:`W20_BRANCH_NO_TRIGGER` or
+       :data:`W20_BRANCH_DISABLED`).
+    3. Otherwise build :class:`OutsideQuery` carrying:
+         * the W15-packed-and-W19-admitted tag set (sorted),
+         * the inner W11 elected root_cause,
+         * the W19 canonical primary disambiguator's payload bytes,
+         * every other specific-tier handoff's payload bytes (the
+           potentially-symmetric secondary witnesses).
+    4. Consult the oracle exactly once. Truncate the reply to
+       ``max_response_tokens``. Tokenise.
+    5. Compute outside-asymmetric-witness count
+       ``aw_outside(tag)`` per admitted tag — the same scoring rule
+       :func:`_relational_compatibility_score` applies.
+    6. Project: if the strict-max set ``M`` is a non-empty proper
+       subset of the admitted tags, project to ``M``
+       (:data:`W20_BRANCH_OUTSIDE_RESOLVED`); otherwise abstain
+       (:data:`W20_BRANCH_OUTSIDE_ABSTAINED`) — fall through to W19's
+       answer.
+    7. Return a :class:`W20OutsideResult` with the final answer + audit
+       record. The W20 scorer also forwards the W19 ``trust`` block,
+       the W18 ``compatibility`` block, and the W15 ``pack_stats``
+       block so the bench driver can audit the entire chain.
+
+    Bounded-context honesty
+    ------------------------
+    The W20 layer adds *exactly one* outside query per cell, with a
+    strict per-cell ``max_response_tokens`` budget on the oracle's
+    reply. The inner W15 ``tokens_kept`` accounting is byte-for-byte
+    unchanged (the oracle's reply tokens are NOT folded into the
+    decoder bundle — they are recorded as a strict additional token
+    cost in ``W20OutsideResult.n_outside_tokens``). Total context
+    delivered to the final decider:
+    ``tokens_kept (W15) + n_outside_tokens (W20)``.
+
+    Backward-compat (W20-3)
+    ------------------------
+    With ``enabled = False`` the W20 layer reduces to the inner W19
+    byte-for-byte. With ``enabled = True`` AND the inner W19 returns
+    a non-trigger branch (``W19_BRANCH_INVERSION``,
+    ``W19_BRANCH_CONFOUND_RESOLVED``, ``W19_BRANCH_PRIMARY_TRUSTED``,
+    ``W19_BRANCH_DISABLED``), the W20 layer also reduces to W19
+    byte-for-byte. The outside oracle is *only* consulted when W19
+    abstains.
+    """
+
+    inner: BundleContradictionDisambiguator = dataclasses.field(
+        default_factory=lambda: BundleContradictionDisambiguator())
+    oracle: Any = None  # OutsideWitnessOracle duck-type
+    enabled: bool = True
+    trigger_branches: frozenset[str] = dataclasses.field(
+        default_factory=lambda: W20_DEFAULT_TRIGGER_BRANCHES)
+    max_response_tokens: int = 24
+
+    # Forensic — last applied result, exposed for the bench driver.
+    _last_result: W20OutsideResult | None = None
+
+    def decode_rounds(self,
+                       per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+                       ) -> dict[str, Any]:
+        base = self.inner.decode_rounds(per_round_handoffs)
+        w19_result = self.inner.last_result
+        out = dict(base)
+        if (not self.enabled) or w19_result is None:
+            result = W20OutsideResult(
+                answer=dict(base),
+                inner_branch=(w19_result.decoder_branch
+                                if w19_result is not None
+                                else W19_BRANCH_DISABLED),
+                triggered=False,
+                oracle_consulted="",
+                oracle_payload="",
+                oracle_payload_tokens=(),
+                per_tag_outside_count={},
+                decoder_branch=W20_BRANCH_DISABLED,
+                abstained=True,
+                n_outside_tokens=0,
+            )
+            self._last_result = result
+            out["outside"] = result.as_dict()
+            return out
+        if w19_result.decoder_branch not in self.trigger_branches:
+            result = W20OutsideResult(
+                answer=dict(base),
+                inner_branch=w19_result.decoder_branch,
+                triggered=False,
+                oracle_consulted="",
+                oracle_payload="",
+                oracle_payload_tokens=(),
+                per_tag_outside_count={},
+                decoder_branch=W20_BRANCH_NO_TRIGGER,
+                abstained=False,
+                n_outside_tokens=0,
+            )
+            self._last_result = result
+            out["outside"] = result.as_dict()
+            return out
+        # W20 trigger fires — build the query. Walk down the
+        # W20→W19→W18→W15→Layered chain to reach the layered
+        # normaliser (which exposes ``normalize_round``).
+        union_tag_set: set[str] = set()
+        union: list[_DecodedHandoff] = []
+        raw_union: list[_DecodedHandoff] = []
+        layered_normaliser = self.inner.inner.inner.inner
+        for bundle in per_round_handoffs:
+            normalised = layered_normaliser.normalize_round(bundle)
+            for h_norm, h_raw in zip(normalised, bundle):
+                union.append(h_norm)
+                raw_union.append(h_raw)
+                tag = _service_tag_of(h_norm.payload)
+                if tag:
+                    union_tag_set.add(tag)
+        admitted_tags = tuple(sorted(union_tag_set))
+        # Identify the canonical primary the same way W19 does, so the
+        # query carries the *same* primary the inner layer abstained on.
+        round_hint: list[int] = []
+        for r_idx, bundle in enumerate(per_round_handoffs, start=1):
+            for _ in bundle:
+                round_hint.append(r_idx)
+        primary_idx = _w19_canonical_primary_index(
+            union, round_hint, raw_union=raw_union)
+        primary_payload = (union[primary_idx].payload
+                            if primary_idx >= 0 else "")
+        witness_payloads: list[str] = []
+        for i, h in enumerate(union):
+            if i == primary_idx:
+                continue
+            if h.claim_kind not in _SPECIFIC_TIER_CLAIM_KINDS:
+                continue
+            witness_payloads.append(h.payload)
+        elected_root_cause = str(base.get("root_cause", "unknown"))
+        query = OutsideQuery(
+            admitted_tags=admitted_tags,
+            elected_root_cause=elected_root_cause,
+            primary_payload=primary_payload,
+            witness_payloads=tuple(witness_payloads),
+            max_response_tokens=self.max_response_tokens,
+        )
+        if self.oracle is None:
+            verdict = OutsideVerdict(
+                payload=None, source_id="no_oracle", n_tokens=0)
+        else:
+            verdict = self.oracle.consult(query)
+        oracle_id = getattr(self.oracle, "oracle_id", "no_oracle") \
+            if self.oracle is not None else "no_oracle"
+        if verdict.payload is None or not verdict.payload:
+            result = W20OutsideResult(
+                answer=dict(base),
+                inner_branch=w19_result.decoder_branch,
+                triggered=True,
+                oracle_consulted=oracle_id,
+                oracle_payload="",
+                oracle_payload_tokens=(),
+                per_tag_outside_count={tag: 0 for tag in admitted_tags},
+                decoder_branch=W20_BRANCH_OUTSIDE_ABSTAINED,
+                abstained=True,
+                n_outside_tokens=int(verdict.n_tokens),
+            )
+            self._last_result = result
+            out["outside"] = result.as_dict()
+            return out
+        # Truncate oracle reply to the per-call budget (defensive — the
+        # oracle is supposed to do this itself, but we enforce here).
+        words = verdict.payload.split()
+        if len(words) > self.max_response_tokens:
+            words = words[:self.max_response_tokens]
+        oracle_payload = " ".join(words)
+        oracle_tokens = _disambiguator_payload_tokens(oracle_payload)
+        per_tag: dict[str, int] = {}
+        for tag in admitted_tags:
+            d, c = _relational_compatibility_score(tag, oracle_tokens)
+            per_tag[tag] = int(d + c)
+        max_aw = max(per_tag.values(), default=0)
+        if max_aw <= 0:
+            # Oracle replied but doesn't mention any admitted tag.
+            result = W20OutsideResult(
+                answer=dict(base),
+                inner_branch=w19_result.decoder_branch,
+                triggered=True,
+                oracle_consulted=oracle_id,
+                oracle_payload=oracle_payload,
+                oracle_payload_tokens=oracle_tokens,
+                per_tag_outside_count=per_tag,
+                decoder_branch=W20_BRANCH_OUTSIDE_ABSTAINED,
+                abstained=True,
+                n_outside_tokens=int(verdict.n_tokens or len(words)),
+            )
+            self._last_result = result
+            out["outside"] = result.as_dict()
+            return out
+        # Positive-set projection: every admitted tag the oracle mentions
+        # at all (strictly above zero) is in the projected answer. This
+        # mirrors the W18 named-set rule and makes W20 robust against
+        # asymmetric mention counts (e.g. when a multi-component tag
+        # like ``logs_pipeline`` decomposes into one direct + one
+        # compound match while a single-component tag like ``storage``
+        # decomposes into two direct + one compound). The strict-max
+        # rule was tried first and produced false negatives on the
+        # multi-component-tag scenario families; positive-set is the
+        # sharper rule and keeps the W20 in the same projection class
+        # as W18 / W19.
+        top_set = tuple(sorted(t for t in admitted_tags
+                                  if per_tag[t] > 0))
+        if not top_set or len(top_set) == len(admitted_tags):
+            # Symmetric oracle reply — abstain.
+            result = W20OutsideResult(
+                answer=dict(base),
+                inner_branch=w19_result.decoder_branch,
+                triggered=True,
+                oracle_consulted=oracle_id,
+                oracle_payload=oracle_payload,
+                oracle_payload_tokens=oracle_tokens,
+                per_tag_outside_count=per_tag,
+                decoder_branch=W20_BRANCH_OUTSIDE_ABSTAINED,
+                abstained=True,
+                n_outside_tokens=int(verdict.n_tokens or len(words)),
+            )
+            self._last_result = result
+            out["outside"] = result.as_dict()
+            return out
+        new_answer = dict(base)
+        new_answer["services"] = top_set
+        # If oracle's projected set differs from W19's strict-asymmetric
+        # named set (i.e. W19 trusted primary on a strict subset and
+        # the oracle disagrees), record the branch as
+        # OUTSIDE_TRUSTED_ASYMMETRIC. This branch is reached only when
+        # the trigger set includes ``W19_BRANCH_PRIMARY_TRUSTED`` (an
+        # opt-in aggressive mode); under the default trigger
+        # (abstentions only), W20 always lands on OUTSIDE_RESOLVED.
+        branch = (W20_BRANCH_OUTSIDE_TRUSTED_ASYMMETRIC
+                  if w19_result.decoder_branch
+                      == W19_BRANCH_PRIMARY_TRUSTED
+                  else W20_BRANCH_OUTSIDE_RESOLVED)
+        result = W20OutsideResult(
+            answer=new_answer,
+            inner_branch=w19_result.decoder_branch,
+            triggered=True,
+            oracle_consulted=oracle_id,
+            oracle_payload=oracle_payload,
+            oracle_payload_tokens=oracle_tokens,
+            per_tag_outside_count=per_tag,
+            decoder_branch=branch,
+            abstained=False,
+            n_outside_tokens=int(verdict.n_tokens or len(words)),
+        )
+        self._last_result = result
+        out["services"] = top_set
+        out["outside"] = result.as_dict()
+        return out
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+               ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> W20OutsideResult | None:
+        return self._last_result
+
+    @property
+    def T_decoder(self) -> int | None:
+        return self.inner.T_decoder
+
+    @T_decoder.setter
+    def T_decoder(self, v: int | None) -> None:
+        self.inner.T_decoder = v
+
+    def pack_stats(self) -> dict[str, Any]:
+        return self.inner.pack_stats()

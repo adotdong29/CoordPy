@@ -1,12 +1,12 @@
-# Success criterion — solving multi-agent context (SDK v3.20 bar)
+# Success criterion — solving multi-agent context (SDK v3.21 bar)
 
 > Pre-committed, falsifiable bar for what counts as a *real* advance
 > on "solving multi-agent context" in the Context Zero / Wevra
 > programme. This document is the **referee** for SDK v3.9 / v3.10 /
 > v3.11 / v3.12 / v3.13 / v3.14 / v3.15 / v3.16 / v3.17 / v3.18 /
-> v3.19 / v3.20 (and later milestones). Any milestone note that
-> claims an advance must name the bar it cleared and cite the
-> code-anchored evidence. Last touched: SDK v3.20, 2026-04-28.
+> v3.19 / v3.20 / v3.21 (and later milestones). Any milestone note
+> that claims an advance must name the bar it cleared and cite the
+> code-anchored evidence. Last touched: SDK v3.21, 2026-04-29.
 >
 > The history of this programme is full of moves where a partial
 > result was written up too strongly and later had to be sharpened
@@ -373,7 +373,8 @@ The **named regimes** the bar refers to (anchored in code):
       information (W19-C-OUTSIDE, conjectural).
   **Honest scope.** R-66 is a *synthetic* regime — the producer
   is :class:`IdentityExtractor`. Real-LLM transfer of the
-  asymmetric-witness convention is **W19-Λ-real**
+  asymmetric-witness convention is W19-Λ-real (now refined by
+  W20-Λ-real, see § R-67 below)
   (proved-conditional + empirical-research): the LLM must emit
   the secondary witness in the same closed-vocabulary form the
   synthetic bench uses (synonym specific-tier kinds + relational-
@@ -384,6 +385,98 @@ The **named regimes** the bar refers to (anchored in code):
   **W19-C-LEARNED** axis names the natural learned-scorer
   extension. Anchor:
   `vision_mvp/experiments/phase66_deceptive_ambiguity.py`.
+
+* **R-67** — Phase-67 *outside-witness acquisition under symmetric
+  bundle-internal contradiction* regime, the *new harder regime*
+  SDK v3.21 introduces. R-67 directly attacks the **W19-Λ-outside**
+  wall (named in SDK v3.20) AND the **W19-Λ-total** wall AT the
+  *outside-resolvable* case — i.e. when the bundle alone is
+  structurally insufficient (W19 abstains via
+  ``W19_BRANCH_ABSTAINED_SYMMETRIC`` / ``W19_BRANCH_ABSTAINED_NO_SIGNAL``)
+  BUT a registered **outside source** (service-graph topology /
+  prior reliability scores / cross-incident historical evidence /
+  LLM adjudicator) can produce an asymmetric reply that breaks
+  the symmetry. The bench shape is identical to R-66-OUTSIDE-
+  REQUIRED — every cell carries a deceptive primary (mentions decoy
+  only) AND a symmetric secondary witness (mentions all three) —
+  so W17-Λ-symmetric, W18-Λ-deceive, W19-Λ-outside ALL extend
+  verbatim *for any closed-form bundle-only scorer*. **No
+  closed-form bundle-only scorer can win on R-67-OUTSIDE-RESOLVES
+  by construction (W19-Λ-outside extends — every capsule strategy
+  through W19 ties FIFO at 0.000).** A *outside-witness acquisition
+  scorer*
+  (:class:`OutsideWitnessAcquisitionDisambiguator`: consults a
+  registered :class:`OutsideWitnessOracle` exactly once when the
+  inner W19 abstains, with a strict ``max_response_tokens``
+  budget; tokenises the oracle's reply through the SAME closure
+  W18 / W19 use; projects onto the positive set of admitted-tag
+  mentions in the reply) closes the gap (W20-1). Five pre-committed
+  sub-banks plus three named falsifiers:
+    - **R-67-OUTSIDE-REQUIRED-BASELINE** (W20-3 backward-compat
+      anchor; no oracle / abstaining oracle, ``T_decoder = None``).
+      Verifies that with no outside source, W20 reduces to W19
+      byte-for-byte AND ties FIFO at 0.000. Establishes that the
+      W20 method is purely additive and does not regress.
+    - **R-67-OUTSIDE-RESOLVES-LOOSE** (W20-1 anchor; deterministic
+      :class:`ServiceGraphOracle`, ``T_decoder = None``). Oracle
+      returns a service-graph reply mentioning the gold pair
+      asymmetrically (``service=A service=B``) since the gold pair
+      has a true topological edge in
+      :func:`build_incident_triage_service_graph` and the decoy
+      is isolated. W20 fires
+      :data:`W20_BRANCH_OUTSIDE_RESOLVED`; projects the answer to
+      ``{A, B}``. ``+1.000`` strict gain over W19 (which abstains
+      via :data:`W19_BRANCH_ABSTAINED_SYMMETRIC` on the same
+      regime), stable across 5/5 alternate ``bank_seed`` values.
+    - **R-67-OUTSIDE-RESOLVES-TIGHT** (W20-1 + W15 composition
+      anchor; deterministic :class:`ServiceGraphOracle`,
+      ``T_decoder = 24``). Same R-67-OUTSIDE-RESOLVES shape under
+      decoder-side budget pressure. The W20 oracle reads only
+      ``query.admitted_tags`` (the W15-packed-and-W19-admitted
+      set), NOT the full bundle; the inner W15 ``tokens_kept`` is
+      byte-for-byte unchanged. The W20 ``n_outside_tokens`` is
+      recorded as a *strict additional* token cost
+      (``≤ max_response_tokens``). Bounded-context honesty
+      preserved.
+    - **R-67-OUTSIDE-NONE** (W20-Λ-none falsifier;
+      :class:`AbstainingOracle`, ``T_decoder = None``). The oracle
+      has no information about the symmetric-witness ambiguity;
+      W20 falls through to W19's symmetric abstention; ties FIFO
+      at 0.000. Names the structural limit when the registered
+      outside source has no signal.
+    - **R-67-OUTSIDE-COMPROMISED** (W20-Λ-compromised falsifier;
+      :class:`CompromisedServiceGraphOracle`, ``T_decoder = None``).
+      The oracle returns a *decoy-asymmetric* reply mentioning
+      ONLY the decoy. W20 trusts the oracle and projects to the
+      decoy set; FAILS at 0.000. Names the structural limit when
+      the outside source itself is adversarial — the fix is NOT a
+      richer scorer; it is *oracle integrity*.
+    - **R-67-JOINT-DECEPTION** (W20-Λ-joint-deception falsifier;
+      :class:`CompromisedServiceGraphOracle` again,
+      ``T_decoder = None``). Bench exhibits the named *joint*
+      consistency property: primary AND secondary AND oracle ALL
+      mention decoy asymmetrically AND are internally consistent.
+      No single-oracle cross-check can detect the deception. W20
+      ties W19 at 0.000. Names the structural limit when *all*
+      evidence channels are jointly compromised.
+  **Honest scope.** R-67 is a *synthetic* regime — the producer is
+  :class:`IdentityExtractor` AND the oracle is a deterministic
+  :class:`ServiceGraphOracle`. Real-LLM transfer of the outside-
+  witness convention via :class:`LLMAdjudicatorOracle` is
+  **W20-Λ-real** (proved-conditional + empirical-research): the
+  LLM must emit a reply whose token set finds asymmetric service
+  mentions through the same closure W19 / W18 / W13 / W12 share.
+  Empirical n=4 probe on Mac-1 Ollama: ``mixtral:8x7b`` (47B-MoE)
+  free-form reply lands gold tokens asymmetrically and achieves
+  ``acc_full = 0.750`` (``+0.750`` over W19, partial live advance);
+  ``qwen2.5-coder:7b`` trusts the deceptive primary and ties FIFO
+  at 0.000. The closure boundary is bounded by the same
+  closed-vocabulary discipline that bounds W19 / W18 / W13; the
+  natural extensions are **W20-C-LIVE-WITH-REGISTRY** (LLM
+  adjudicator with explicit service-registry context) and
+  **W20-C-LEARNED** (small distilled outside-source scorer) —
+  both conjectural. Anchor:
+  `vision_mvp/experiments/phase67_outside_information.py`.
 
 * **R-62** — Phase-62 *attention-aware capsule context packing under
   decoder-side budget pressure* regime, the *new harder regime* SDK
@@ -536,6 +629,38 @@ The **named regimes** the bar refers to (anchored in code):
 > decoder-budget ingredients are independently load-bearing; a
 > method that closes one structural axis but leaves the other
 > firing does NOT clear bar 13).
+> SDK v3.21 anchors the bar to **R-67** below AND introduces
+> **bar 17** (outside-information acquisition under bundle-only
+> insufficiency split: a method that wants to claim "ambiguity
+> resolution beyond W19" must (i) attack a regime where the bundle
+> alone is *structurally* insufficient (W19 abstains via
+> :data:`W19_BRANCH_ABSTAINED_SYMMETRIC` or
+> :data:`W19_BRANCH_ABSTAINED_NO_SIGNAL`) AND (ii) introduce an
+> explicit *outside-witness acquisition layer* — a registered
+> :class:`OutsideWitnessOracle` consulted exactly once per cell
+> with a strict ``max_response_tokens`` budget — AND (iii)
+> preserve bounded-context efficiency (the W15 ``tokens_kept``
+> accounting is byte-for-byte unchanged from W19; the
+> ``n_outside_tokens`` is a strict additional cost) AND (iv) ship
+> at least three named falsifier regimes — R-67-OUTSIDE-NONE
+> (no signal — W20-Λ-none ties FIFO at 0.000),
+> R-67-OUTSIDE-COMPROMISED (adversarial signal — W20-Λ-compromised
+> picks decoy and FAILS at 0.000), R-67-JOINT-DECEPTION (jointly
+> compromised — W20-Λ-joint-deception ties W19 at 0.000) — where
+> the new method ties FIFO or fails by construction. A milestone
+> that wins on R-67-OUTSIDE-RESOLVES but does NOT exhibit the
+> three falsifier regimes materially overstates and does NOT
+> clear bar 17. The R-67-OUTSIDE-RESOLVES win is *strongly
+> conditional* on (a) the bench property — W19 abstains via the
+> trigger branches AND (b) oracle integrity AND (c) the oracle's
+> reply tokenising through the same closed-vocabulary closure W18
+> / W19 / W13 share. The bundle-only walls W19-Λ-total and
+> W19-Λ-outside remain real for *any* closed-form bundle-only
+> scorer; W20 widens the scope from "bundle-only" to "bundle +
+> outside source" without escaping every adversarial regime.
+> Earlier R-55..R-66-anchored bars remain valid as historical
+> bars; the *current* bar is R-67-anchored.
+>
 > SDK v3.20 anchors the bar to **R-66** below AND introduces
 > **bar 16** (deceptive-ambiguity bundle-contradiction split: a
 > method that wants to claim "ambiguity resolution beyond W18"
@@ -611,7 +736,7 @@ The **named regimes** the bar refers to (anchored in code):
 
 ### 1.1 Strong success bar (a "real" advance)
 
-A milestone *strongly advances* the thesis iff **all sixteen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17; bar 14 from SDK v3.18; bar 15 from SDK v3.19; bar 16 from SDK v3.20):
+A milestone *strongly advances* the thesis iff **all seventeen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17; bar 14 from SDK v3.18; bar 15 from SDK v3.19; bar 16 from SDK v3.20; bar 17 from SDK v3.21):
 
 1. **Code anchor.** A new admission/decoder/coordination method
    ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
@@ -827,7 +952,66 @@ A milestone *strongly advances* the thesis iff **all sixteen** hold (bars 1–6 
    distilled trust scorer over capsule bundles). The natural
    escape from BOTH falsifier walls is **outside information**
    (W19-C-OUTSIDE — service-graph topology, prior reliability
-   scores, cross-incident historical evidence; conjectural).
+   scores, cross-incident historical evidence; **discharged-empirical
+   on the bundle-only-insufficient-but-outside-resolvable direction**
+   by W20-1 in SDK v3.21 — see bar 17 below; remains *conjectural*
+   on the joint-deception direction, where W20-Λ-joint-deception
+   is the named structural limit).
+
+17. **(SDK v3.21+) Outside-information acquisition under
+   bundle-only insufficiency split.** The milestone-anchored harder
+   regime (R-67-OUTSIDE-RESOLVES) is **provably insufficient for
+   any closed-form bundle-only scorer** (W19-Λ-outside extends
+   verbatim to R-67-OUTSIDE-REQUIRED-BASELINE: every capsule
+   strategy in the SDK ties FIFO at 0.000; W19 abstains via
+   ``W19_BRANCH_ABSTAINED_SYMMETRIC``). The new method must include
+   an explicit **outside-witness acquisition layer**: a Protocol-
+   typed :class:`OutsideWitnessOracle` that the auditor consults
+   *exactly once* per cell when the inner W19 returns a trigger
+   branch (default trigger set:
+   ``{W19_BRANCH_ABSTAINED_SYMMETRIC, W19_BRANCH_ABSTAINED_NO_SIGNAL}``),
+   AND a strict bounded ``max_response_tokens`` per call AND a
+   positive-set projection rule that uses the SAME per-tag scorer
+   W18 / W19 use on in-bundle witnesses. A pure W19 method (no
+   outside-acquisition step) does NOT clear bar 17 on SDK v3.21+.
+   **Pre-committed bench property:** under R-67-OUTSIDE-RESOLVES,
+   the deterministic :class:`ServiceGraphOracle` returns a payload
+   whose tokenisation finds a proper non-empty asymmetric subset
+   of the admitted tag set in *every* cell (mechanically verified
+   by ``ServiceGraphOracleTests::test_oracle_emits_gold_pair_when_admitted``,
+   ``Phase67BenchPropertyTests::test_every_bank_holds_outside_required_shape``).
+   **Pre-committed token-budget honesty:** the W20 layer reads
+   only the W15-packed bundle (no extra capsule reads) AND records
+   ``n_outside_tokens`` as a strict additional cost; the
+   ``tokens_kept`` accounting is unchanged byte-for-byte from W19
+   (mechanically verified by
+   ``Phase67TokenBudgetHonestyTests::test_w20_does_not_inflate_w15_tokens_kept``).
+   **Pre-committed falsifiers:** R-67-OUTSIDE-NONE (no signal —
+   W20-Λ-none ties FIFO at 0.000), R-67-OUTSIDE-COMPROMISED
+   (adversarial signal — W20-Λ-compromised picks decoy and FAILS
+   at 0.000), R-67-JOINT-DECEPTION (jointly compromised —
+   W20-Λ-joint-deception ties W19 at 0.000). On all three, the
+   W20 method ties FIFO or fails by construction; the W20-1
+   conditionality is sharp. **Honest scope:** R-67 is a
+   *synthetic* regime — the producer is
+   :class:`IdentityExtractor` AND the oracle is a deterministic
+   :class:`ServiceGraphOracle`. Real-LLM transfer via
+   :class:`LLMAdjudicatorOracle` is W20-Λ-real (proved-conditional
+   + empirical-research): the LLM must emit a reply whose token
+   set finds asymmetric service mentions through the same closure
+   W19 / W18 / W13 / W12 share; otherwise the W20 exact-match
+   parser misses by construction (the natural extensions are
+   W20-C-LIVE-WITH-REGISTRY — LLM adjudicator with explicit
+   service-registry context — and W20-C-LEARNED — small distilled
+   outside-source scorer; both conjectural). Empirical n=4 probe
+   on Mac-1 Ollama: ``mixtral:8x7b`` (47B-MoE) achieves
+   ``acc_full = 0.750`` (``+0.750`` over W19, partial live
+   advance); ``qwen2.5-coder:7b`` ties FIFO (W20-Λ-real fires the
+   under-scaled-model failure mode). The W20-C-MULTI-ORACLE
+   conjecture (multi-oracle aggregation) is the natural escape
+   from W20-Λ-compromised when *some* oracles remain trustworthy;
+   joint-deception (W20-Λ-joint-deception) remains the wall on
+   N-oracle aggregation when ALL N are compromised.
 
 14. **(SDK v3.18+) Live-end-to-end + magnitude-hinted-protocol +
    symmetric-corroboration-wall split.** The milestone-anchored

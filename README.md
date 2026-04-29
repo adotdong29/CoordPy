@@ -7,7 +7,50 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**As of SDK v3.20 (April 2026), capsules are load-bearing
+**As of SDK v3.21 (April 2026), capsules are load-bearing
+*inside one Wevra run*, *between agents in a team*, *across the
+model-class gradient*, and — most sharply — *across the first
+capsule-native multi-agent-coordination method that crosses the
+W19-Λ-outside wall (named SDK v3.20) on a regime where the wall
+actually applies: W20-1 strict +1.000 gain on R-67-OUTSIDE-RESOLVES
+loose AND tight, with a deterministic ``ServiceGraphOracle``
+registered as the outside information source; every closed-form
+bundle-only scorer through W19 ties FIFO at 0.000 by W19-Λ-outside
+extended verbatim — W19 abstains via
+``W19_BRANCH_ABSTAINED_SYMMETRIC`` because the asymmetric-witness
+count is uniform across the candidate set; W20 issues exactly one
+targeted hypothesis-conditioned outside query (bounded by
+``max_response_tokens``) and projects the answer through the
+SAME closed-vocabulary closure W18 / W19 use; stable across 5/5
+alternate ``bank_seed`` values, bounded-context honesty preserved
+byte-for-byte (``tokens_kept_sum`` byte-identical to W19 on the
+tight budget cell; ``n_outside_tokens`` accounted as a strict
+additional cost), with three named falsifier regimes —
+R-67-OUTSIDE-NONE (``W20-Λ-none`` — abstaining oracle ties FIFO),
+R-67-OUTSIDE-COMPROMISED (``W20-Λ-compromised`` — adversarial
+oracle trusts decoy and FAILS at 0.000), R-67-JOINT-DECEPTION
+(``W20-Λ-joint-deception`` — primary + secondary + oracle ALL
+favour decoy; ties W19 at 0.000) — that make the W20-1
+conditionality sharp and name oracle integrity as the structural
+escape limit. A partial live-LLM ``W20-Λ-real`` probe on Mac-1
+``mixtral:8x7b`` (47B-MoE) achieves ``acc_full = 0.750`` (+0.750
+over W19) on a fresh live LLM stream; ``qwen2.5-coder:7b`` ties
+FIFO at 0.000 — cross-model split honestly named. SDK v3.21's
+contribution is the Phase-67 outside-information benchmark family
+([`vision_mvp/experiments/phase67_outside_information.py`](vision_mvp/experiments/phase67_outside_information.py))
+plus a deterministic, training-free, closed-form
+[`OutsideWitnessAcquisitionDisambiguator`](vision_mvp/wevra/team_coord.py)
+that wraps the W19 inner with one targeted oracle consult per
+cell when the inner W19 abstains via the symmetric branch — the
+channel every prior bundle-only scorer cannot reach. Backward-
+compat preserved byte-for-byte: 545 / 545 prior wevra tests pass
++ 40 new W20 tests = 585 / 585. Mac 2 remains unreachable (ARP
+``incomplete``); no two-Mac sharded inference. See
+[`docs/RESULTS_WEVRA_OUTSIDE_INFORMATION.md`](docs/RESULTS_WEVRA_OUTSIDE_INFORMATION.md)
+for the full SDK v3.21 milestone note.
+
+**Historical SDK v3.20 reading (preserved for context).** Capsules
+were load-bearing
 *inside one Wevra run*, *between agents in a team*, *across the
 model-class gradient*, *across the model regime × admission
 strategy grid on a real-LLM benchmark*, *across cross-role
