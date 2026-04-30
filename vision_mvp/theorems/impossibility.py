@@ -229,6 +229,8 @@ class CapsuleContextTrace:
         We can replay: given cap2, walk its parents to see exactly what
         caused its decision.
         """
+        self.ledger = CapsuleLedger()
+        self.agent_outputs = []
         cap1 = self.agent_1_run()
         cap2 = self.agent_2_run(cap1.cid)
 

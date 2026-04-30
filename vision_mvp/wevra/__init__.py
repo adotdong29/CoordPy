@@ -280,6 +280,15 @@ from .team_coord import (
     W22_BRANCH_ABSTAIN_PASSTHROUGH,
     W22_DEFAULT_TRIGGER_BRANCHES,
     W22_LATENT_ENVELOPE_SCHEMA_VERSION,
+    # SDK v3.26 — shared-fanout dense-control + cross-agent state reuse (W25).
+    FanoutEnvelope, SharedFanoutRegistry, SharedFanoutDisambiguator,
+    verify_fanout, W25FanoutResult,
+    W25_FANOUT_SCHEMA_VERSION,
+    W25_ALL_BRANCHES, W25_BRANCH_FANOUT_PRODUCER_EMITTED,
+    W25_BRANCH_FANOUT_CONSUMER_RESOLVED,
+    W25_BRANCH_FANOUT_CONSUMER_REJECTED,
+    W25_BRANCH_NO_TRIGGER, W25_BRANCH_DISABLED,
+    W25_DEFAULT_TRIGGER_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -293,7 +302,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.25"
+SDK_VERSION = "wevra.sdk.v3.26"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -446,6 +455,15 @@ __all__ = [
     "W22_BRANCH_ABSTAIN_PASSTHROUGH",
     "W22_DEFAULT_TRIGGER_BRANCHES",
     "W22_LATENT_ENVELOPE_SCHEMA_VERSION",
+    # SDK v3.26 — W25 family (shared-fanout dense-control).
+    "FanoutEnvelope", "SharedFanoutRegistry", "SharedFanoutDisambiguator",
+    "verify_fanout", "W25FanoutResult",
+    "W25_FANOUT_SCHEMA_VERSION",
+    "W25_ALL_BRANCHES", "W25_BRANCH_FANOUT_PRODUCER_EMITTED",
+    "W25_BRANCH_FANOUT_CONSUMER_RESOLVED",
+    "W25_BRANCH_FANOUT_CONSUMER_REJECTED",
+    "W25_BRANCH_NO_TRIGGER", "W25_BRANCH_DISABLED",
+    "W25_DEFAULT_TRIGGER_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

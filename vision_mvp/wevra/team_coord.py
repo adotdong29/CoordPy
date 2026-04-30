@@ -10564,3 +10564,520 @@ class IntraCellFlippingOracle:
             source_id=self.oracle_id,
             n_tokens=len(toks),
         )
+
+
+# =============================================================================
+# W25 — shared-fanout dense-control capsule + cross-agent state reuse
+# =============================================================================
+#
+# The W24 family reduced per-agent session-context cost to one compact
+# token per cell via bounded-window compaction.  W25 extends that to the
+# MULTI-AGENT case: when K consumer agents all need the SAME cross-cell
+# session state produced by one producer agent, W24 would still require
+# K independent compact envelopes (K × C tokens total).  W25 replaces
+# those K envelopes with a single FanoutEnvelope emitted by the producer
+# + K single-token <fanout_ref:DDDD> references for the consumers.
+#
+# Total visible-token cost across all K+1 agents:
+#   W24: (K+1) × n_w24_compact_tokens_per_agent
+#   W25: n_w24_compact_tokens (producer) + K × 1 (consumers)
+#   Savings: K × (n_w24_compact_tokens - 1)  [strictly positive when compact > 1]
+#
+# This is the capsule-layer proxy for the LatentMAS "shared KV pool /
+# hardware pooling" direction: one producer computes; K consumers reuse.
+# Trust boundary: the FanoutEnvelope is hash-chained; the registry
+# enforces consumer authorisation; any mismatch → W25 falls through to
+# the W24 per-agent path.
+
+W25_FANOUT_SCHEMA_VERSION: str = "wevra.shared_fanout.v1"
+
+W25_BRANCH_FANOUT_PRODUCER_EMITTED = "fanout_producer_emitted"
+W25_BRANCH_FANOUT_CONSUMER_RESOLVED = "fanout_consumer_resolved"
+W25_BRANCH_FANOUT_CONSUMER_REJECTED = "fanout_consumer_rejected"
+W25_BRANCH_NO_TRIGGER = "no_trigger"
+W25_BRANCH_DISABLED = "disabled"
+
+W25_ALL_BRANCHES: tuple[str, ...] = (
+    W25_BRANCH_FANOUT_PRODUCER_EMITTED,
+    W25_BRANCH_FANOUT_CONSUMER_RESOLVED,
+    W25_BRANCH_FANOUT_CONSUMER_REJECTED,
+    W25_BRANCH_NO_TRIGGER,
+    W25_BRANCH_DISABLED,
+)
+
+# W25 fires on any W24 branch that produces meaningful compact state.
+W25_DEFAULT_TRIGGER_BRANCHES: frozenset[str] = frozenset({
+    W24_BRANCH_COMPACT_RESOLVED,
+    W24_BRANCH_BELOW_WINDOW,
+    W23_BRANCH_GENESIS,
+})
+
+
+@dataclasses.dataclass(frozen=True)
+class FanoutEnvelope:
+    """Shared cross-agent state fanout envelope (W25 family).
+
+    A producer agent emits one FanoutEnvelope carrying the compact
+    session state for K named consumer agents.  Each consumer resolves
+    their view via a single ``<fanout_ref:DDDDDDDDDDDDDDDD>`` token
+    (one whitespace token — same visible cost as the W23 super-token
+    and W24 compact_ref).
+
+    Visible-token accounting:
+    * Producer:  pays n_w24_compact_tokens (unchanged; W25 does not
+      change the producer's own compact envelope cost).
+    * Consumer k: pays 1 token (fanout_ref lookup) instead of its own
+      n_w24_compact_tokens.
+    * Total across 1 producer + K consumers:
+        W24: (K+1) × C  →  W25: C + K × 1  →  saves K×(C−1) tokens.
+
+    Trust boundary: ``fanout_cid`` is SHA-256 over the signed payload
+    (producer_id + consumer_ids + votes + schema_cid + cell_index);
+    any field tampered produces a ``hash_mismatch`` rejection.  The
+    registry additionally verifies that the requesting consumer_id is
+    in ``consumer_agent_ids`` before returning the envelope.
+
+    This is the capsule-layer proxy for the LatentMAS "shared KV pool"
+    direction: one producer computes; K consumers reuse.  It does NOT
+    touch transformer KV caches, embedding tables, or model-internal
+    state.
+    """
+
+    schema_version: str
+    producer_agent_id: str
+    consumer_agent_ids: tuple[str, ...]
+    compact_per_tag_votes: tuple[tuple[str, int], ...]
+    compact_projected_subset: tuple[str, ...]
+    schema_cid: str
+    cell_index: int
+    n_resolved_in_window: int
+    fanout_cid: str = ""
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "consumer_agent_ids",
+                            tuple(self.consumer_agent_ids))
+        object.__setattr__(self, "compact_per_tag_votes",
+                            tuple(sorted(self.compact_per_tag_votes,
+                                          key=lambda kv: kv[0])))
+        object.__setattr__(self, "compact_projected_subset",
+                            tuple(sorted(self.compact_projected_subset)))
+        if not self.fanout_cid:
+            object.__setattr__(self, "fanout_cid",
+                                self.recompute_fanout_cid())
+
+    def _signed_payload(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "producer_agent_id": self.producer_agent_id,
+            "consumer_agent_ids": sorted(self.consumer_agent_ids),
+            "compact_per_tag_votes": [
+                [t, int(c)] for t, c in self.compact_per_tag_votes],
+            "compact_projected_subset": list(self.compact_projected_subset),
+            "schema_cid": self.schema_cid,
+            "cell_index": int(self.cell_index),
+            "n_resolved_in_window": int(self.n_resolved_in_window),
+        }
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes(self._signed_payload())
+
+    def recompute_fanout_cid(self) -> str:
+        return hashlib.sha256(self.to_canonical_bytes()).hexdigest()
+
+    def consumer_ref_token(self, consumer_id: str) -> str:
+        """Per-consumer ``<fanout_ref:DDDDDDDDDDDDDDDD>`` token.
+
+        The consumer_id is baked into the hash so the ref is unique
+        per (fanout, consumer) pair — the controller can attribute
+        each ref back to its registered consumer.
+        """
+        ref_payload = _canonical_json_bytes({
+            "fanout_cid": self.fanout_cid,
+            "consumer_id": consumer_id,
+        })
+        consumer_cid = hashlib.sha256(ref_payload).hexdigest()
+        return f"<fanout_ref:{consumer_cid[:16]}>"
+
+    @property
+    def n_fanout_ref_tokens(self) -> int:
+        return 1  # constant 1 whitespace token per consumer ref
+
+    @property
+    def n_fanout_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    def as_dict(self) -> dict[str, Any]:
+        d = self._signed_payload()
+        d["fanout_cid"] = self.fanout_cid
+        d["n_fanout_ref_tokens"] = self.n_fanout_ref_tokens
+        d["n_fanout_bytes"] = self.n_fanout_bytes
+        return d
+
+
+@dataclasses.dataclass
+class SharedFanoutRegistry:
+    """Controller-side registry for :class:`FanoutEnvelope` objects.
+
+    The producer registers an envelope once; K consumers each resolve
+    their view by (fanout_cid, consumer_id).  Registration verifies
+    hash integrity; resolution verifies consumer authorisation.
+
+    Trust boundary: the registry is controller-owned.  A malicious
+    producer cannot register an envelope that passes hash verification
+    with a different payload.  A malicious consumer cannot resolve an
+    envelope they are not named in.
+    """
+
+    schema: SchemaCapsule | None = None
+    _registry: dict[str, FanoutEnvelope] = dataclasses.field(
+        default_factory=dict)
+    n_registered: int = 0
+    n_resolved: int = 0
+    n_rejected_register: int = 0
+    n_rejected_resolve: int = 0
+
+    def register(self, envelope: FanoutEnvelope) -> LatentVerificationOutcome:
+        """Register a FanoutEnvelope.  Verifies hash + schema before storing."""
+        n = 0
+        n += 1
+        if envelope.schema_version != W25_FANOUT_SCHEMA_VERSION:
+            self.n_rejected_register += 1
+            return LatentVerificationOutcome(
+                ok=False, reason="schema_version_unknown", n_checks=n)
+        if self.schema is not None:
+            n += 1
+            if envelope.schema_cid != self.schema.cid:
+                self.n_rejected_register += 1
+                return LatentVerificationOutcome(
+                    ok=False, reason="schema_cid_mismatch", n_checks=n)
+        n += 1
+        if envelope.fanout_cid != envelope.recompute_fanout_cid():
+            self.n_rejected_register += 1
+            return LatentVerificationOutcome(
+                ok=False, reason="hash_mismatch", n_checks=n)
+        self._registry[envelope.fanout_cid] = envelope
+        self.n_registered += 1
+        return LatentVerificationOutcome(ok=True, reason="ok", n_checks=n)
+
+    def resolve(self, fanout_cid: str,
+                consumer_id: str) -> tuple["FanoutEnvelope | None", str]:
+        """Resolve consumer view.  Returns (envelope, reason).
+
+        Returns (None, reason) if not found or consumer not authorised.
+        """
+        envelope = self._registry.get(fanout_cid)
+        if envelope is None:
+            self.n_rejected_resolve += 1
+            return None, "fanout_cid_not_found"
+        if consumer_id not in envelope.consumer_agent_ids:
+            self.n_rejected_resolve += 1
+            return None, "consumer_not_authorized"
+        self.n_resolved += 1
+        return envelope, "ok"
+
+    def get_by_producer(self, producer_id: str,
+                         cell_index: int) -> "FanoutEnvelope | None":
+        """Look up by (producer_id, cell_index) for consumer-side use."""
+        for env in self._registry.values():
+            if (env.producer_agent_id == producer_id
+                    and env.cell_index == cell_index):
+                return env
+        return None
+
+
+def verify_fanout(
+        envelope: "FanoutEnvelope | None",
+        *,
+        registered_schema: SchemaCapsule,
+        consumer_id: str,
+) -> LatentVerificationOutcome:
+    """Controller-side verification of a :class:`FanoutEnvelope` request.
+
+    Pure function.  Failure modes enumerated:
+
+    * ``empty_envelope``       — no envelope.
+    * ``schema_version_unknown`` — schema_version field mismatch.
+    * ``schema_cid_mismatch``  — envelope schema_cid ≠ registered.
+    * ``consumer_not_authorized`` — consumer_id not in consumer_agent_ids.
+    * ``hash_mismatch``        — fanout_cid does not recompute.
+    """
+    n = 0
+    if envelope is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_envelope", n_checks=n)
+    n += 1
+    if envelope.schema_version != W25_FANOUT_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n)
+    n += 1
+    if envelope.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n)
+    n += 1
+    if consumer_id not in envelope.consumer_agent_ids:
+        return LatentVerificationOutcome(
+            ok=False, reason="consumer_not_authorized", n_checks=n)
+    n += 1
+    if envelope.fanout_cid != envelope.recompute_fanout_cid():
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n)
+    return LatentVerificationOutcome(ok=True, reason="ok", n_checks=n)
+
+
+@dataclasses.dataclass
+class W25FanoutResult:
+    """Per-cell audit record for a W25 shared-fanout agent (W25 family)."""
+
+    answer: dict[str, Any]
+    inner_w24_branch: str
+    decoder_branch: str
+    agent_id: str
+    is_producer: bool
+    fanout_cid: str
+    n_consumer_agents: int
+    n_w24_visible_tokens: int
+    n_w25_visible_tokens: int
+    n_w24_minus_w25_savings: int
+    n_fanout_bytes: int
+    fanout_verification_ok: bool
+    fanout_verification_reason: str
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "answer": self.answer,
+            "inner_w24_branch": str(self.inner_w24_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "agent_id": str(self.agent_id),
+            "is_producer": bool(self.is_producer),
+            "fanout_cid": str(self.fanout_cid),
+            "n_consumer_agents": int(self.n_consumer_agents),
+            "n_w24_visible_tokens": int(self.n_w24_visible_tokens),
+            "n_w25_visible_tokens": int(self.n_w25_visible_tokens),
+            "n_w24_minus_w25_savings": int(self.n_w24_minus_w25_savings),
+            "n_fanout_bytes": int(self.n_fanout_bytes),
+            "fanout_verification_ok": bool(self.fanout_verification_ok),
+            "fanout_verification_reason": str(self.fanout_verification_reason),
+        }
+
+
+@dataclasses.dataclass
+class SharedFanoutDisambiguator:
+    """Cross-agent shared-fanout disambiguator (W25 family).
+
+    Wraps a :class:`MultiCellSessionCompactor` (W24) and, when a
+    :class:`SharedFanoutRegistry` is attached:
+
+    **Producer mode** (``is_producer = True``):
+      After W24 produces a compact envelope, the producer builds a
+      :class:`FanoutEnvelope` naming the consumer agents, registers it
+      in the shared registry, and reports the W24 compact token cost.
+      The producer's own visible-token cost is unchanged (it still pays
+      for the compact envelope); the benefit is that consumers avoid
+      their independent compact envelopes.
+
+    **Consumer mode** (``is_producer = False``):
+      The consumer resolves the producer's :class:`FanoutEnvelope` from
+      the registry via a single ``<fanout_ref:DDDDDDDDDDDDDDDD>`` token
+      (1 visible token vs n_w24_compact_tokens per W24).  On
+      verification failure the consumer falls through to the W24
+      per-agent path (no covert state, no loss of correctness).
+
+    Visible-token savings across 1 producer + K consumers per cell:
+    * W24: (K+1) × n_w24_compact_tokens
+    * W25: n_w24_compact_tokens + K × 1 = C + K
+    * Savings: K × (C − 1)  [e.g. K=3, C=31 → +90 tokens/cell saved]
+
+    Named falsifier (W25-Λ-disjoint): when consumers have fully
+    independent state (``fanout_registry = None`` or the producer's
+    cell_index doesn't match any consumer's current cell), W25 fires
+    ``W25_BRANCH_NO_TRIGGER`` and reduces to W24 per-agent.
+
+    Trust boundary: the registry verifies hash + schema + consumer
+    authorisation before returning an envelope; on any failure the
+    consumer falls through to W24 byte-for-byte.
+    """
+
+    inner: MultiCellSessionCompactor = dataclasses.field(
+        default_factory=lambda: MultiCellSessionCompactor())
+    fanout_registry: SharedFanoutRegistry | None = None
+    agent_id: str = ""
+    is_producer: bool = False
+    producer_agent_id: str = ""
+    consumer_agent_ids: tuple[str, ...] = ()
+    schema: SchemaCapsule | None = None
+    enabled: bool = True
+    require_fanout_verification: bool = True
+    trigger_branches: frozenset[str] = dataclasses.field(
+        default_factory=lambda: W25_DEFAULT_TRIGGER_BRANCHES)
+
+    _last_result: W25FanoutResult | None = None
+    _last_fanout_envelope: FanoutEnvelope | None = None
+    _cell_index: int = 0
+
+    def reset_session(self) -> None:
+        self._last_result = None
+        self._last_fanout_envelope = None
+        self._cell_index = 0
+        self.inner.reset_session()
+
+    @property
+    def T_decoder(self) -> int | None:
+        return self.inner.T_decoder
+
+    @T_decoder.setter
+    def T_decoder(self, v: int | None) -> None:
+        self.inner.T_decoder = v
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        base = self.inner.decode_rounds(per_round_handoffs)
+        w24_result = self.inner.last_result
+        out = dict(base)
+        cell_index = int(self._cell_index)
+
+        inner_w24_branch = (str(w24_result.decoder_branch)
+                              if w24_result is not None
+                              else W24_BRANCH_DISABLED)
+        n_w24_visible = (int(w24_result.n_w24_visible_tokens_to_decider)
+                           if w24_result is not None else 0)
+
+        def _pack(
+                *,
+                decoder_branch: str,
+                fanout: FanoutEnvelope | None,
+                fanout_ok: bool,
+                fanout_reason: str,
+                n_w25_visible: int,
+        ) -> dict[str, Any]:
+            savings = max(0, n_w24_visible - n_w25_visible)
+            fanout_cid = str(fanout.fanout_cid) if fanout is not None else ""
+            n_consumers = (len(fanout.consumer_agent_ids)
+                             if fanout is not None else 0)
+            n_fanout_bytes = (int(fanout.n_fanout_bytes)
+                                if fanout is not None else 0)
+            result = W25FanoutResult(
+                answer=dict(base),
+                inner_w24_branch=inner_w24_branch,
+                decoder_branch=decoder_branch,
+                agent_id=str(self.agent_id),
+                is_producer=bool(self.is_producer),
+                fanout_cid=fanout_cid,
+                n_consumer_agents=n_consumers,
+                n_w24_visible_tokens=n_w24_visible,
+                n_w25_visible_tokens=n_w25_visible,
+                n_w24_minus_w25_savings=savings,
+                n_fanout_bytes=n_fanout_bytes,
+                fanout_verification_ok=fanout_ok,
+                fanout_verification_reason=fanout_reason,
+            )
+            self._last_result = result
+            self._last_fanout_envelope = fanout
+            out_local = dict(out)
+            out_local["shared_fanout_hybrid"] = result.as_dict()
+            if fanout is not None:
+                out_local["fanout_envelope"] = fanout.as_dict()
+            return out_local
+
+        if not self.enabled or self.fanout_registry is None:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W25_BRANCH_DISABLED,
+                fanout=None, fanout_ok=False, fanout_reason="disabled",
+                n_w25_visible=n_w24_visible)
+
+        if inner_w24_branch not in self.trigger_branches:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W25_BRANCH_NO_TRIGGER,
+                fanout=None, fanout_ok=False,
+                fanout_reason="inner_w24_not_triggered",
+                n_w25_visible=n_w24_visible)
+
+        # --- Producer path ---
+        if self.is_producer:
+            w24_compact = self.inner.last_compact_envelope
+            compact_votes: tuple[tuple[str, int], ...] = ()
+            compact_projected: tuple[str, ...] = ()
+            n_resolved = 0
+            if w24_compact is not None:
+                compact_votes = tuple(w24_compact.compact_per_tag_votes)
+                compact_projected = tuple(w24_compact.compact_projected_subset)
+                n_resolved = int(w24_compact.n_resolved_in_window)
+            elif w24_result is not None:
+                # Genesis cell: extract votes from the W22 layer result
+                w22_r = getattr(self.inner.inner.inner, "last_result", None)
+                if w22_r is not None and hasattr(w22_r, "per_tag_votes"):
+                    compact_votes = tuple(
+                        sorted(w22_r.per_tag_votes.items(),
+                                key=lambda kv: kv[0]))
+                    compact_projected = tuple(
+                        sorted(w22_r.projected_subset))
+
+            schema_cid = (str(self.schema.cid)
+                            if self.schema is not None else "")
+            fanout = FanoutEnvelope(
+                schema_version=W25_FANOUT_SCHEMA_VERSION,
+                producer_agent_id=str(self.agent_id),
+                consumer_agent_ids=tuple(self.consumer_agent_ids),
+                compact_per_tag_votes=compact_votes,
+                compact_projected_subset=compact_projected,
+                schema_cid=schema_cid,
+                cell_index=cell_index,
+                n_resolved_in_window=n_resolved,
+            )
+            reg_outcome = self.fanout_registry.register(fanout)
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W25_BRANCH_FANOUT_PRODUCER_EMITTED,
+                fanout=fanout,
+                fanout_ok=reg_outcome.ok,
+                fanout_reason=str(reg_outcome.reason),
+                n_w25_visible=n_w24_visible)  # producer cost unchanged
+
+        # --- Consumer path ---
+        producer_id = str(self.producer_agent_id)
+        fanout = self.fanout_registry.get_by_producer(
+            producer_id, cell_index)
+
+        if fanout is None:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W25_BRANCH_FANOUT_CONSUMER_REJECTED,
+                fanout=None, fanout_ok=False,
+                fanout_reason="producer_fanout_not_found",
+                n_w25_visible=n_w24_visible)
+
+        if self.schema is not None:
+            outcome = verify_fanout(
+                fanout,
+                registered_schema=self.schema,
+                consumer_id=str(self.agent_id))
+            if not outcome.ok and self.require_fanout_verification:
+                self._cell_index += 1
+                return _pack(
+                    decoder_branch=W25_BRANCH_FANOUT_CONSUMER_REJECTED,
+                    fanout=fanout, fanout_ok=False,
+                    fanout_reason=str(outcome.reason),
+                    n_w25_visible=n_w24_visible)
+
+        # Consumer pays 1 token for the fanout ref.
+        n_w25_consumer = 1
+        self._cell_index += 1
+        return _pack(
+            decoder_branch=W25_BRANCH_FANOUT_CONSUMER_RESOLVED,
+            fanout=fanout, fanout_ok=True, fanout_reason="ok",
+            n_w25_visible=n_w25_consumer)
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+               ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> W25FanoutResult | None:
+        return self._last_result
+
+    @property
+    def last_fanout_envelope(self) -> FanoutEnvelope | None:
+        return self._last_fanout_envelope

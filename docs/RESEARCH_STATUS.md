@@ -5,8 +5,48 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.25,
-> 2026-04-29.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.26,
+> 2026-04-30.
+
+## TL;DR — SDK v3.26
+
+The programme now has **twenty-two** coupled research axes, each
+with a sharp status. SDK v3.26 mints axis 22: **shared-fanout
+dense-control + cross-agent state reuse** — extending the SDK v3.25
+W24 bounded-window compaction with a ``SharedFanoutDisambiguator``
+(W25) that lets one producer compute 1 ``FanoutEnvelope`` for K
+named consumers; each consumer resolves via 1
+``<fanout_ref:DDDD>`` token instead of carrying an independent
+compact envelope. Proxy for the LatentMAS "hardware pooling /
+shared KV pool" pattern at the capsule layer. The W25 family adds
+one new ``FanoutEnvelope``, one ``SharedFanoutRegistry``, one
+``verify_fanout``, one ``W25FanoutResult``, and one
+``SharedFanoutDisambiguator`` — purely additive on top of the W24
+surface. The SDK v3.25 runtime contract is byte-for-byte unchanged.
+
+**The headline SDK v3.26 results.** On the synthetic
+**R-72-FANOUT-SHARED** regime (1 producer + K=3 consumers sharing a
+``SharedFanoutRegistry``, same R-69-CACHE-FANOUT oracle ecology, 16
+cells), W25 strictly reduces total visible tokens across all agents
+by **−40.875 tokens / cell (−69.87 %)** at ``T_decoder = None``.
+``correctness_ratified_rate = 1.0000`` byte-for-byte;
+``fanout_consumer_resolved_rate = 1.0000``. Stable across **5/5**
+alternate ``bank_seed`` values: savings = 40.875 tokens/cell on
+every seed; min_correctness = 1.000 on every seed. Two named
+falsifiers make the W25-1 conditionality sharp: R-72-DISJOINT (no
+shared registry → W25 = W24, zero savings, W25-Λ-disjoint) and
+R-72-FANOUT-POISONED (unauthorised consumer_id → rejected on every
+cell, W25-3). Backward-compat (W25-3-A / W25-3-B) preserved
+byte-for-byte: IS-1, IS-2 theorem tests 14/14 + 31/31 new W25 tests
+= 45/45 clean.
+
+**Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+``incomplete`` — **20th consecutive milestone with Mac-2
+ARP-incomplete.** No two-host W25 execution. Honest scope: W25
+reduces multi-agent token overhead at the capsule layer on a single
+host.
+
+The W24 family TL;DR (SDK v3.25) is preserved historically below.
 
 ## TL;DR — SDK v3.25
 
