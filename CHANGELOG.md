@@ -5,6 +5,75 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.23] — 2026-04-29 — SDK v3.23 — capsule + audited latent-state-sharing hybrid + R-69 Phase-69 benchmark family + W22 family (first capsule-native multi-agent-coordination method that combines explicit-capsule passing with audited proxies for the LatentMAS direction — schema-passing, delta execution, shared-read cache, controller-verified latent digest envelope — measured efficiency gain on a regime where the W21 wire-cost concern actually applies)
+
+*Strictly additive on SDK v3.22. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W22 surface adds
+one new content-addressed dataclass (``SchemaCapsule``), one
+typed signed envelope (``LatentDigestEnvelope``), one verification
+result (``LatentVerificationOutcome``), one wire-side
+write-once-read-many cache (``SharedReadCache``), one drop-in
+oracle adapter (``CachingOracleAdapter``), one falsifier-test
+primitive (``EnvelopeTamperer``), one audit record
+(``W22LatentResult``), one controller verifier
+(``verify_latent_digest``), and one wrapping decoder
+(``LatentDigestDisambiguator``) — purely additive in the
+multi-agent coordination research slice.*
+
+**Headline (W22-1, proved-conditional + proved-empirical n=80
+saturated × 5 seeds × 2 cells).** Pairing the W21
+``TrustWeightedMultiOracleDisambiguator`` with the new
+``LatentDigestDisambiguator`` over a registered ``SchemaCapsule``
++ a shared ``SharedReadCache`` (every oracle wrapped in
+``CachingOracleAdapter``) on R-69-CACHE-FANOUT strictly reduces
+``mean_n_visible_tokens_to_decider`` over the W21 baseline by
+**−7 tokens / cell (−14.51 %)** at ``T_decoder = None`` and by
+**−7 tokens / cell (−16.09 %)** at ``T_decoder = 24``, AND
+records ``cache_tokens_saved_total = 88`` over n=8 (oracle-side
+wire savings), AND ties W21 byte-for-byte on
+``accuracy_full = 1.000``. Stable across 5/5 alternate
+``bank_seed`` values (savings exactly +7 tokens / cell on every
+seed; cache_tokens_saved=88 on every seed; correctness ratified
+rate=1.000 on every seed). The first capsule-native multi-agent-
+coordination method that combines explicit-capsule passing with
+audited proxies for the LatentMAS direction (collective KV
+pooling / latent hidden-state transfer / super-token side
+channels). Three named falsifiers (W22-Λ-no-cache,
+R-69-POISONED-DIGEST, R-69-SCHEMA-DRIFT) and one backward-compat
+anchor (R-69-NO-TRIGGER) make the W22-1 conditionality sharp.
+
+**Live LLM transfer (W22-Λ-real, empirical n=4 × 2 models,
+partially discharged).** Mac-1 mixtral 8x7b on cache_fanout:
+visible-tokens savings **+39.08 %** (W21=87, W22=53 tokens / cell);
+cache_tokens_saved_total=120 over 4 cells; correctness ratified
+rate=0.750 — newly named conjecture **W22-C-CACHE-AMPLIFICATION**
+(the cache freezes a probabilistic LLM oracle's first reply
+across all matching cells; cell-1's variance amplifies). gemma2:9b
+ties W21 byte-for-byte at 0.250 (gemma2's closure-landing rate is
+the structural bound).
+
+**Backward-compat preserved byte-for-byte.** With ``enabled=False``
+OR no ``SchemaCapsule`` registered OR an inner W21 branch outside
+``trigger_branches``, the W22 layer reduces to W21 byte-for-byte
+on the answer field. 633 prior wevra-suite tests + 32 new W22
+tests + 10 misc = **675/675** pass.
+
+**Audit T-1..T-7 preserved** on every cell of every regime.
+
+**Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+``incomplete`` (16th milestone in a row); no two-Mac sharded
+inference. The W22 surface is naturally a producer / cache-
+controller separation (wire-compatible with cross-host
+deployment) — no W22 code changes required when Mac-2 returns.
+
+**Closes** the wire-cost half of the SDK v3.22
+W21-C-CALIBRATED-TRUST conjecture (the *correctness* half remains
+open and orthogonal). See
+`docs/RESULTS_WEVRA_CAPSULE_LATENT_HYBRID.md` for the full
+SDK v3.23 milestone note; `vision_mvp/experiments/phase69_capsule_latent_hybrid.py`
+for the bench driver; `vision_mvp/tests/test_phase69_capsule_latent_hybrid.py`
+for the 32 new tests.
+
 ## [3.22] — 2026-04-29 — SDK v3.22 — trust-weighted multi-oracle adjudicator + R-68 multi-oracle benchmark family + W21 family (first capsule-native multi-agent-coordination method that crosses the W20-Λ-compromised wall on a regime where single-oracle reasoning is structurally insufficient by adjudicating across N registered outside oracles under bounded context)
 
 *Strictly additive on SDK v3.21. The Wevra single-run product

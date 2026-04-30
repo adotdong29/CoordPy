@@ -1828,6 +1828,33 @@ The current paper incorporates the following layers:
 - **W16 family:** end-to-end producer+decoder composition
 - **W17 family:** fresh live composition, magnitude-hinted protocol,
   cross-model live transfer, and symmetric-corroboration wall
+- **W18 family:** bundle-relational compatibility disambiguation
+  under symmetric corroboration (R-65, SDK v3.19)
+- **W19 family:** bundle-contradiction-aware trust-weighted
+  disambiguation under deceptive / confounded round-2 evidence
+  (R-66, SDK v3.20)
+- **W20 family:** outside-witness acquisition under bundle-only
+  insufficiency (R-67, SDK v3.21)
+- **W21 family:** trust-weighted multi-oracle adjudication under
+  partial oracle compromise (R-68, SDK v3.22)
+- **W22 family:** capsule + audited latent-state-sharing hybrid —
+  schema-passing (`SchemaCapsule`), delta execution
+  (`LatentDigestEnvelope`), shared-read cache (`SharedReadCache`
+  + `CachingOracleAdapter`), and controller-side verification
+  (`verify_latent_digest`); the first capsule-native multi-agent
+  coordination method that *combines* explicit-capsule passing
+  with audited proxies for the LatentMAS direction (collective
+  KV pooling / latent hidden-state transfer / super-token side
+  channels). On R-69-CACHE-FANOUT the W22 method strictly
+  reduces visible-tokens-to-decider by 14.51-16.09 % synthetic
+  and 39.08 % live-mixtral while ratifying W21 correctness
+  byte-for-byte. Three named falsifiers (W22-Λ-no-cache,
+  R-69-POISONED-DIGEST, R-69-SCHEMA-DRIFT) and one backward-
+  compat anchor (R-69-NO-TRIGGER) make the conditionality sharp.
+  Newly named conjecture **W22-C-CACHE-AMPLIFICATION** (the
+  cache freezes a probabilistic LLM oracle's first reply across
+  matching cells) emerges from the live mixtral 8x7b probe.
+  (R-69, SDK v3.23)
 
 ## Appendix C. Submission Pass Still Needed
 

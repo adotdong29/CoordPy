@@ -1,0 +1,205 @@
+{
+  "schema": "phase69.cross_regime_synthetic.v1",
+  "config": {
+    "n_eval": 8,
+    "bank_seed": 11,
+    "K_auditor": 12,
+    "T_auditor": 256,
+    "T_decoder_tight": 24,
+    "quorum_min": 2
+  },
+  "regimes": {
+    "R-69-CACHE-FANOUT-LOOSE": {
+      "bank": "cache_fanout",
+      "T_decoder": null,
+      "headline_gap": {
+        "w22_minus_w21": 0.0,
+        "w22_cached_minus_uncached": 0.0
+      },
+      "pooled_accuracy_full": {
+        "capsule_multi_oracle": 1.0,
+        "capsule_multi_oracle_cached": 1.0,
+        "capsule_w22_hybrid": 1.0,
+        "capsule_w22_hybrid_no_cache": 1.0
+      },
+      "eff_compare": {
+        "w21_visible_tokens_per_cell": 48.25,
+        "w22_visible_tokens_per_cell": 41.25,
+        "w22_no_cache_visible_tokens_per_cell": 41.25,
+        "visible_tokens_savings_per_cell": 7.0,
+        "visible_tokens_savings_pct": 14.5078,
+        "cache_tokens_saved_total": 88,
+        "cache_hit_rate": 1.0,
+        "digest_compression_ratio": 1.444444,
+        "verification_ok_rate": 1.0
+      },
+      "correctness_ratified_rate": 1.0,
+      "audit_ok_grid": {
+        "capsule_multi_oracle": true,
+        "capsule_multi_oracle_cached": true,
+        "capsule_w22_hybrid": true,
+        "capsule_w22_hybrid_no_cache": true
+      }
+    },
+    "R-69-CACHE-FANOUT-TIGHT": {
+      "bank": "cache_fanout",
+      "T_decoder": 24,
+      "headline_gap": {
+        "w22_minus_w21": 0.0,
+        "w22_cached_minus_uncached": 0.0
+      },
+      "pooled_accuracy_full": {
+        "capsule_multi_oracle": 1.0,
+        "capsule_multi_oracle_cached": 1.0,
+        "capsule_w22_hybrid": 1.0,
+        "capsule_w22_hybrid_no_cache": 1.0
+      },
+      "eff_compare": {
+        "w21_visible_tokens_per_cell": 43.5,
+        "w22_visible_tokens_per_cell": 36.5,
+        "w22_no_cache_visible_tokens_per_cell": 36.5,
+        "visible_tokens_savings_per_cell": 7.0,
+        "visible_tokens_savings_pct": 16.092,
+        "cache_tokens_saved_total": 88,
+        "cache_hit_rate": 1.0,
+        "digest_compression_ratio": 1.444444,
+        "verification_ok_rate": 1.0
+      },
+      "correctness_ratified_rate": 1.0,
+      "audit_ok_grid": {
+        "capsule_multi_oracle": true,
+        "capsule_multi_oracle_cached": true,
+        "capsule_w22_hybrid": true,
+        "capsule_w22_hybrid_no_cache": true
+      }
+    },
+    "R-69-NO-CACHE": {
+      "bank": "no_cache",
+      "T_decoder": null,
+      "headline_gap": {
+        "w22_minus_w21": 0.0,
+        "w22_cached_minus_uncached": 0.0
+      },
+      "pooled_accuracy_full": {
+        "capsule_multi_oracle": 1.0,
+        "capsule_multi_oracle_cached": 1.0,
+        "capsule_w22_hybrid": 1.0,
+        "capsule_w22_hybrid_no_cache": 1.0
+      },
+      "eff_compare": {
+        "w21_visible_tokens_per_cell": 48.25,
+        "w22_visible_tokens_per_cell": 41.25,
+        "w22_no_cache_visible_tokens_per_cell": 41.25,
+        "visible_tokens_savings_per_cell": 7.0,
+        "visible_tokens_savings_pct": 14.5078,
+        "cache_tokens_saved_total": 0,
+        "cache_hit_rate": 0.0,
+        "digest_compression_ratio": 1.444444,
+        "verification_ok_rate": 1.0
+      },
+      "correctness_ratified_rate": 1.0,
+      "audit_ok_grid": {
+        "capsule_multi_oracle": true,
+        "capsule_multi_oracle_cached": true,
+        "capsule_w22_hybrid": true,
+        "capsule_w22_hybrid_no_cache": true
+      }
+    },
+    "R-69-POISONED-DIGEST": {
+      "bank": "poisoned_digest",
+      "T_decoder": null,
+      "headline_gap": {
+        "w22_minus_w21": 0.0,
+        "w22_cached_minus_uncached": 0.0
+      },
+      "pooled_accuracy_full": {
+        "capsule_multi_oracle": 1.0,
+        "capsule_multi_oracle_cached": 1.0,
+        "capsule_w22_hybrid": 1.0,
+        "capsule_w22_hybrid_no_cache": 1.0
+      },
+      "eff_compare": {
+        "w21_visible_tokens_per_cell": 48.25,
+        "w22_visible_tokens_per_cell": 48.25,
+        "w22_no_cache_visible_tokens_per_cell": 48.25,
+        "visible_tokens_savings_per_cell": 0.0,
+        "visible_tokens_savings_pct": 0.0,
+        "cache_tokens_saved_total": 88,
+        "cache_hit_rate": 1.0,
+        "digest_compression_ratio": 1.444444,
+        "verification_ok_rate": 0.0
+      },
+      "correctness_ratified_rate": 1.0,
+      "audit_ok_grid": {
+        "capsule_multi_oracle": true,
+        "capsule_multi_oracle_cached": true,
+        "capsule_w22_hybrid": true,
+        "capsule_w22_hybrid_no_cache": true
+      }
+    },
+    "R-69-SCHEMA-DRIFT": {
+      "bank": "schema_drift",
+      "T_decoder": null,
+      "headline_gap": {
+        "w22_minus_w21": 0.0,
+        "w22_cached_minus_uncached": 0.0
+      },
+      "pooled_accuracy_full": {
+        "capsule_multi_oracle": 1.0,
+        "capsule_multi_oracle_cached": 1.0,
+        "capsule_w22_hybrid": 1.0,
+        "capsule_w22_hybrid_no_cache": 1.0
+      },
+      "eff_compare": {
+        "w21_visible_tokens_per_cell": 48.25,
+        "w22_visible_tokens_per_cell": 48.25,
+        "w22_no_cache_visible_tokens_per_cell": 48.25,
+        "visible_tokens_savings_per_cell": 0.0,
+        "visible_tokens_savings_pct": 0.0,
+        "cache_tokens_saved_total": 88,
+        "cache_hit_rate": 1.0,
+        "digest_compression_ratio": 1.444444,
+        "verification_ok_rate": 0.0
+      },
+      "correctness_ratified_rate": 1.0,
+      "audit_ok_grid": {
+        "capsule_multi_oracle": true,
+        "capsule_multi_oracle_cached": true,
+        "capsule_w22_hybrid": true,
+        "capsule_w22_hybrid_no_cache": true
+      }
+    },
+    "R-69-NO-TRIGGER": {
+      "bank": "no_trigger",
+      "T_decoder": null,
+      "headline_gap": {
+        "w22_minus_w21": 0.0,
+        "w22_cached_minus_uncached": 0.0
+      },
+      "pooled_accuracy_full": {
+        "capsule_multi_oracle": 0.0,
+        "capsule_multi_oracle_cached": 0.0,
+        "capsule_w22_hybrid": 0.0,
+        "capsule_w22_hybrid_no_cache": 0.0
+      },
+      "eff_compare": {
+        "w21_visible_tokens_per_cell": 44.25,
+        "w22_visible_tokens_per_cell": 44.25,
+        "w22_no_cache_visible_tokens_per_cell": 44.25,
+        "visible_tokens_savings_per_cell": 0.0,
+        "visible_tokens_savings_pct": 0.0,
+        "cache_tokens_saved_total": 72,
+        "cache_hit_rate": 1.0,
+        "digest_compression_ratio": 0.0,
+        "verification_ok_rate": 0.0
+      },
+      "correctness_ratified_rate": 1.0,
+      "audit_ok_grid": {
+        "capsule_multi_oracle": true,
+        "capsule_multi_oracle_cached": true,
+        "capsule_w22_hybrid": true,
+        "capsule_w22_hybrid_no_cache": true
+      }
+    }
+  }
+}

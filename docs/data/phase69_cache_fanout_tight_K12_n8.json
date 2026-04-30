@@ -1,0 +1,320 @@
+{
+  "schema": "phase69.capsule_latent_hybrid.v1",
+  "config": {
+    "bank": "cache_fanout",
+    "n_eval": 8,
+    "K_auditor": 12,
+    "T_auditor": 256,
+    "K_producer": 6,
+    "T_producer": 96,
+    "inbox_capacity": 12,
+    "bank_seed": 11,
+    "bank_replicates": 2,
+    "T_decoder": 24,
+    "quorum_min": 2,
+    "min_trust_sum": 0.0
+  },
+  "pooled": {
+    "capsule_multi_oracle": {
+      "strategy": "capsule_multi_oracle",
+      "n": 8,
+      "accuracy_full": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 1.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.25,
+      "mean_n_team_handoff": 10.25,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "none": 8
+      }
+    },
+    "capsule_multi_oracle_cached": {
+      "strategy": "capsule_multi_oracle_cached",
+      "n": 8,
+      "accuracy_full": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 1.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.25,
+      "mean_n_team_handoff": 10.25,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "none": 8
+      }
+    },
+    "capsule_w22_hybrid": {
+      "strategy": "capsule_w22_hybrid",
+      "n": 8,
+      "accuracy_full": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 1.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.25,
+      "mean_n_team_handoff": 10.25,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "none": 8
+      }
+    },
+    "capsule_w22_hybrid_no_cache": {
+      "strategy": "capsule_w22_hybrid_no_cache",
+      "n": 8,
+      "accuracy_full": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 1.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.25,
+      "mean_n_team_handoff": 10.25,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "none": 8
+      }
+    }
+  },
+  "audit_ok_grid": {
+    "capsule_multi_oracle": true,
+    "capsule_multi_oracle_cached": true,
+    "capsule_w22_hybrid": true,
+    "capsule_w22_hybrid_no_cache": true
+  },
+  "bench_summary": {
+    "n_scenarios": 8,
+    "scenarios_with_symmetric_corroboration": 8,
+    "scenarios_with_expected_shape": 8,
+    "expected_shape": [
+      "decoy_only",
+      "all_three"
+    ],
+    "K_auditor": 12,
+    "T_decoder": 24,
+    "bank": "cache_fanout",
+    "quorum_min": 2,
+    "min_trust_sum": 0.0,
+    "schema_cid": "5c5e88b1a6305652b9028d8e8330d33ac07020b2ec4d85b94cf92646133db91e",
+    "schema_n_canonical_tokens": 18,
+    "verifier_schema_cid": "5c5e88b1a6305652b9028d8e8330d33ac07020b2ec4d85b94cf92646133db91e",
+    "tamperer_mode": null,
+    "shared_cache_used": true,
+    "n_oracle_registrations": 3,
+    "oracle_role_labels": [
+      "compromised_registry",
+      "service_graph",
+      "change_history"
+    ]
+  },
+  "bench_property_per_scenario": {
+    "p67outside_resolves_deadlock_orders_payments__sym_cache__rep0": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_deadlock_orders_payments__sym_metrics__rep1": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_cache__rep0": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep1": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_telemetry__rep0": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_search_index__rep1": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_metrics__rep0": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_archival__rep1": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    }
+  },
+  "headline_gap": {
+    "w22_minus_w21": 0.0,
+    "w22_cached_minus_uncached": 0.0
+  },
+  "pack_stats_summary": {
+    "capsule_multi_oracle": {
+      "n_cells": 8,
+      "n_visible_tokens_to_decider_sum": 348,
+      "n_visible_tokens_to_decider_avg": 43.5,
+      "w15_tokens_kept_sum": 188,
+      "w21_outside_tokens_total_sum": 88,
+      "w21_verbose_audit_tokens_sum": 72
+    },
+    "capsule_multi_oracle_cached": {
+      "n_cells": 8,
+      "n_visible_tokens_to_decider_sum": 348,
+      "n_visible_tokens_to_decider_avg": 43.5,
+      "w15_tokens_kept_sum": 188,
+      "w21_outside_tokens_total_sum": 88,
+      "w21_verbose_audit_tokens_sum": 72
+    },
+    "capsule_w22_hybrid": {
+      "n_cells": 8,
+      "n_w22_triggered_cells": 8,
+      "n_w22_resolved_cells": 8,
+      "n_w22_rejected_cells": 0,
+      "n_w22_no_trigger_cells": 0,
+      "verification_ok_rate": 1.0,
+      "rejection_reasons": {},
+      "n_visible_tokens_to_decider_sum": 292,
+      "n_visible_tokens_to_decider_avg": 36.5,
+      "digest_n_tokens_sum": 104,
+      "digest_n_tokens_avg": 13.0,
+      "w15_tokens_kept_sum": 188,
+      "w21_outside_tokens_total_sum": 88,
+      "w21_verbose_audit_tokens_sum": 72,
+      "digest_compression_ratio_overall": 1.444444,
+      "cache_tokens_saved_total": 88,
+      "cache_tokens_saved_avg": 11.0,
+      "schema_shared_tokens_saved_total": 126,
+      "n_cache_hits_total": 24,
+      "n_cache_misses_total": 0,
+      "cache_hit_rate": 1.0
+    },
+    "capsule_w22_hybrid_no_cache": {
+      "n_cells": 8,
+      "n_w22_triggered_cells": 8,
+      "n_w22_resolved_cells": 8,
+      "n_w22_rejected_cells": 0,
+      "n_w22_no_trigger_cells": 0,
+      "verification_ok_rate": 1.0,
+      "rejection_reasons": {},
+      "n_visible_tokens_to_decider_sum": 292,
+      "n_visible_tokens_to_decider_avg": 36.5,
+      "digest_n_tokens_sum": 104,
+      "digest_n_tokens_avg": 13.0,
+      "w15_tokens_kept_sum": 188,
+      "w21_outside_tokens_total_sum": 88,
+      "w21_verbose_audit_tokens_sum": 72,
+      "digest_compression_ratio_overall": 1.444444,
+      "cache_tokens_saved_total": 0,
+      "cache_tokens_saved_avg": 0.0,
+      "schema_shared_tokens_saved_total": 0,
+      "n_cache_hits_total": 0,
+      "n_cache_misses_total": 24,
+      "cache_hit_rate": 0.0
+    }
+  },
+  "eff_compare": {
+    "w21_visible_tokens_per_cell": 43.5,
+    "w22_visible_tokens_per_cell": 36.5,
+    "w22_no_cache_visible_tokens_per_cell": 36.5,
+    "visible_tokens_savings_per_cell": 7.0,
+    "visible_tokens_savings_pct": 16.092,
+    "cache_tokens_saved_total": 88,
+    "cache_hit_rate": 1.0,
+    "digest_compression_ratio": 1.444444,
+    "verification_ok_rate": 1.0
+  },
+  "correctness_ratified_rate": 1.0,
+  "correctness_ratified_cells_count": 8,
+  "scenarios_evaluated": [
+    "p67outside_resolves_deadlock_orders_payments__sym_cache__rep0",
+    "p67outside_resolves_deadlock_orders_payments__sym_metrics__rep1",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_cache__rep0",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep1",
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_telemetry__rep0",
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_search_index__rep1",
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_metrics__rep0",
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_archival__rep1"
+  ],
+  "n_results": 32
+}

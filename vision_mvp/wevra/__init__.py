@@ -269,6 +269,17 @@ from .team_coord import (
     W21_BRANCH_NO_QUORUM, W21_BRANCH_SYMMETRIC_QUORUM,
     W21_BRANCH_NO_ORACLES, W21_BRANCH_NO_TRIGGER,
     W21_BRANCH_DISABLED, W21_DEFAULT_TRIGGER_BRANCHES,
+    # SDK v3.23 — capsule + audited latent-state-sharing hybrid (W22 family).
+    SchemaCapsule, build_incident_triage_schema_capsule,
+    LatentDigestEnvelope, LatentVerificationOutcome,
+    verify_latent_digest, SharedReadCache, CachingOracleAdapter,
+    EnvelopeTamperer, W22LatentResult, LatentDigestDisambiguator,
+    W22_ALL_BRANCHES, W22_BRANCH_LATENT_RESOLVED,
+    W22_BRANCH_LATENT_REJECTED, W22_BRANCH_NO_TRIGGER,
+    W22_BRANCH_NO_SCHEMA, W22_BRANCH_DISABLED,
+    W22_BRANCH_ABSTAIN_PASSTHROUGH,
+    W22_DEFAULT_TRIGGER_BRANCHES,
+    W22_LATENT_ENVELOPE_SCHEMA_VERSION,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -282,7 +293,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.22"
+SDK_VERSION = "wevra.sdk.v3.23"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -424,6 +435,17 @@ __all__ = [
     "W21_BRANCH_NO_QUORUM", "W21_BRANCH_SYMMETRIC_QUORUM",
     "W21_BRANCH_NO_ORACLES", "W21_BRANCH_NO_TRIGGER",
     "W21_BRANCH_DISABLED", "W21_DEFAULT_TRIGGER_BRANCHES",
+    # SDK v3.23 — W22 family (capsule + audited latent-state-sharing hybrid).
+    "SchemaCapsule", "build_incident_triage_schema_capsule",
+    "LatentDigestEnvelope", "LatentVerificationOutcome",
+    "verify_latent_digest", "SharedReadCache", "CachingOracleAdapter",
+    "EnvelopeTamperer", "W22LatentResult", "LatentDigestDisambiguator",
+    "W22_ALL_BRANCHES", "W22_BRANCH_LATENT_RESOLVED",
+    "W22_BRANCH_LATENT_REJECTED", "W22_BRANCH_NO_TRIGGER",
+    "W22_BRANCH_NO_SCHEMA", "W22_BRANCH_DISABLED",
+    "W22_BRANCH_ABSTAIN_PASSTHROUGH",
+    "W22_DEFAULT_TRIGGER_BRANCHES",
+    "W22_LATENT_ENVELOPE_SCHEMA_VERSION",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

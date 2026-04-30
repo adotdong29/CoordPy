@@ -9580,6 +9580,99 @@ can be compromised).
    frontier is precisely articulated as registered-set integrity
    + cross-source consistency, not a method-gap conjecture.**
 
+### 4.40 SDK v3.23 — capsule + audited latent-state-sharing hybrid + R-69 Phase-69 benchmark family + W22 family (R-69-CACHE-FANOUT + three named falsifiers + backward-compat anchor + live mixtral cross-model probes)
+
+**One paragraph.** SDK v3.22 (W21 family) crossed the
+W20-Λ-compromised wall by consulting **N registered oracles**
+under quorum + trust thresholds. It also explicitly named the
+**wire-cost concern** of consulting all N oracles every cell as
+a separate research direction, plus the LatentMAS direction
+(collective KV pooling / latent hidden-state transfer / super-
+token side channels) as conjectural. SDK v3.23 implements both at
+the *capsule layer*: it ships a content-addressed
+:class:`SchemaCapsule` (closed-vocabulary type schema, shared
+once per session by CID), :class:`SharedReadCache` (CID-keyed
+write-once-read-many proxy for the LatentMAS shared-KV-read
+direction), :class:`CachingOracleAdapter` (drop-in adapter
+routing any :class:`OutsideWitnessOracle` through the cache),
+:class:`LatentDigestEnvelope` (typed, controller-verified compact
+summary of one W21 vote outcome — hash-chained, schema-versioned,
+parent-CID-sealed), :func:`verify_latent_digest` (≈ 30-line
+controller-side verification with enumerated failure modes),
+:class:`EnvelopeTamperer` (falsifier-test primitive for
+R-69-POISONED-DIGEST), and a wrapping
+:class:`LatentDigestDisambiguator` (W22). On the new
+R-69-CACHE-FANOUT regime (same R-68-MULTI-MAJORITY oracle
+ecology, every oracle wrapped in a CachingOracleAdapter pointing
+at a shared SharedReadCache, verbose W21 audit replaced by one
+LatentDigestEnvelope per cell), the W22 method strictly reduces
+``mean_n_visible_tokens_to_decider`` by **−7 tokens / cell
+(−14.51 %)** at ``T_decoder = None`` and by **−7 tokens / cell
+(−16.09 %)** at ``T_decoder = 24``, AND records
+``cache_tokens_saved_total = 88`` over n=8, AND ties W21
+byte-for-byte on ``accuracy_full = 1.000``. Stable across **5/5**
+alternate ``bank_seed`` values. Three named falsifiers
+(W22-Λ-no-cache, R-69-POISONED-DIGEST, R-69-SCHEMA-DRIFT) and
+one backward-compat anchor (R-69-NO-TRIGGER) make the W22-1
+conditionality sharp. Live W22 transfer on Mac-1 Ollama:
+mixtral:8x7b (47B-MoE) on cache_fanout achieves **+39.08 %**
+visible-tokens savings + cache_tokens_saved=120; correctness
+ratified rate = 0.750 reveals newly named conjecture
+**W22-C-CACHE-AMPLIFICATION**. gemma2:9b ties W21 byte-for-byte
+at 0.250. Full programme regression: 633 prior + 32 new W22 +
+10 misc = **675/675**. Mac 2 still unreachable (16th milestone in
+a row); the W22 surface is naturally cross-host-compatible.
+Closes the wire-cost half of W21-C-CALIBRATED-TRUST.
+
+**Master-plan-level questions (the post-W21 audit board).**
+
+1. **Did capsule-native + latent/state-sharing integration
+   materially help?** *YES on the wire-cost axis.* On
+   R-69-CACHE-FANOUT W22 strictly reduces visible-tokens-to-
+   decider by 14.51-16.09 % synthetic and 39.08 % live-mixtral,
+   while ratifying W21 correctness byte-for-byte; stable across
+   5/5 seeds. Every piece of the LatentMAS idea family this repo
+   can verify end-to-end (schema-passing, delta execution,
+   shared-read cache, controller-verified side channel) is
+   implemented honestly with explicit proxies.
+2. **Did trust/audit survive?** *YES, sharply.* Every emitted
+   envelope is hash-chained, schema-versioned, parent-CID-sealed;
+   verification failure → W22 falls through to W21 byte-for-byte;
+   correctness ratified rate = 1.000 across both falsifier banks
+   while ``verification_ok_rate = 0.000``.
+3. **Did bounded-context efficiency improve in a real way?** *YES
+   on two independent axes:* (a) visible-tokens-to-decider per
+   cell (digest replaces verbose audit), (b) wire-side oracle
+   savings across cells (cache hits collapse identical
+   OutsideQueries). Both are honest capsule-layer proxies; no
+   transformer-internal KV reuse claimed.
+4. **Did two-Mac evaluation materially broaden the evidence?**
+   *NO — Mac 2 still unreachable (16th milestone in a row).* The
+   live evidence is single-Mac mixtral 8x7b and gemma2 9b on
+   Mac-1 Ollama. The W22 surface is naturally a producer / cache-
+   controller separation; cross-host deployment is wire-
+   compatible when Mac-2 returns.
+5. **Which earlier paper loose ends were closed versus only
+   sharpened?** *Closed: wire-cost half of W21-C-CALIBRATED-TRUST.
+   Sharpened: LLM nondeterminism caveat (W22-C-CACHE-AMPLIFICATION
+   newly named).* The paper's "capsule discipline" framing now
+   has its first audited proxy for hidden-state-shaped
+   coordination — strictly sharper than the prior "explicit
+   capsules only" stance.
+6. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on
+   the named axis; the deeper wall is sharper.* The Context Zero
+   thesis gains its **first capsule-native method that combines
+   explicit-capsule passing with audited proxies for the
+   LatentMAS direction**. Named open frontier: **W22-C-LATENT-KV-
+   NATIVE** (true cross-host KV reuse between MLX-distributed LLM
+   servers — gated on Mac-2 return) and **W22-C-DELTA-
+   COMPRESSION** (richer envelopes encoding *changes* against a
+   baseline). The thesis is materially stronger AND the next
+   research frontier is precisely articulated as cache-
+   amplification integrity + cross-host KV reuse + delta-
+   compression sufficiency.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

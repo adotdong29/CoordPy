@@ -5,8 +5,82 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.22,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.23,
 > 2026-04-29.
+
+## TL;DR — SDK v3.23
+
+The programme now has **nineteen** coupled research axes, each
+with a sharp status. SDK v3.23 mints axis 19: **capsule + audited
+latent-state-sharing hybrid** — combining the explicit capsule
+discipline with the LatentMAS direction (collective KV pooling /
+latent hidden-state transfer / super-token side channels) at the
+*capsule layer*, with a controller-side trust boundary on every
+latent payload. The W22 family adds one new content-addressed
+:class:`SchemaCapsule`, one typed :class:`LatentDigestEnvelope`,
+one :class:`SharedReadCache` (CID-keyed write-once-read-many),
+one :class:`CachingOracleAdapter` (drop-in for any
+:class:`OutsideWitnessOracle`), one :class:`EnvelopeTamperer`
+(falsifier-test primitive), one :class:`W22LatentResult` audit
+record, one :func:`verify_latent_digest` controller function, and
+one wrapping :class:`LatentDigestDisambiguator` — purely additive
+on top of the W21 surface. The SDK v3.22 runtime contract is
+byte-for-byte unchanged.
+
+**The headline SDK v3.23 results.** On the synthetic
+**R-69-CACHE-FANOUT** regime (the same R-68-MULTI-MAJORITY bundle
++ oracle ecology that the W21-1 anchor uses, BUT with every
+oracle wrapped in a :class:`CachingOracleAdapter` pointing at a
+shared :class:`SharedReadCache` AND with the W22 envelope
+emitted in place of the verbose W21 audit), the W22 method
+strictly reduces the visible-token cost to the final decoder by
+**−7 tokens / cell (−14.51 %)** at ``T_decoder = None`` and by
+**−7 tokens / cell (−16.09 %)** at ``T_decoder = 24``, AND records
+``cache_tokens_saved_total = 88`` over the bank (oracle-side wire
+savings), AND ties W21 byte-for-byte on
+``accuracy_full = 1.000``. Stable across **5/5** alternate
+``bank_seed`` values (11, 17, 23, 29, 31): savings exactly
++7 tokens / cell on every seed; cache_tokens_saved=88 on every
+seed. Three named falsifiers (R-69-NO-CACHE, R-69-POISONED-DIGEST,
+R-69-SCHEMA-DRIFT) and one backward-compat anchor (R-69-NO-TRIGGER)
+make the W22-1 conditionality sharp: no repeated reads → no
+wire-side savings (W22-Λ-no-cache); tampered envelope →
+``hash_mismatch`` → fall through to W21 (W22-3); schema mismatch
+→ ``schema_cid_mismatch`` → fall through (W22-3); inner W21
+abstains → W22 reduces to W21 byte-for-byte (W22-3-A). Backward-
+compat (W22-3-A / W22-3-B) preserved byte-for-byte: 633 / 633
+prior wevra tests pass + 32 new W22 tests + 10 misc = **675 /
+675**.
+
+**Live LLM transfer (W22-Λ-real, empirical n=4 × 2 models,
+partially discharged).** Two regimes:
+
+* **mixtral:8x7b** (47B-MoE) as a fourth registered LLM
+  adjudicator on cache_fanout: visible-tokens savings
+  **+39.08 %** (W21 = 87.0, W22 = 53.0 tokens / cell);
+  cache_tokens_saved_total = 120 over 4 cells; verification ok
+  rate = 0.750. Correctness ratified rate = 0.750 — newly named
+  conjecture **W22-C-CACHE-AMPLIFICATION**: the cache returns
+  cell-1's mixtral reply for every subsequent matching cell;
+  cell-1's reply variance amplifies across the session.
+* **gemma2:9b** (9.2B-dense): every strategy ties at
+  ``acc_full = 0.250`` (gemma2's closure-landing rate is the
+  structural bound, identical to SDK v3.22 W21-Λ-real
+  coalition); W22 ties W21 byte-for-byte
+  (``correctness_ratified_rate = 1.000``).
+
+**Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+``incomplete`` at milestone capture — same status as SDK v3.6
+through SDK v3.22 (16th milestone in a row). **No two-Mac
+sharded inference happened in SDK v3.23.** The W22 surface is
+*naturally* a producer / cache-controller separation
+(``SharedReadCache`` + ``LatentDigestDisambiguator`` is wire-
+compatible with cross-host deployment) — no W22 code changes
+required when Mac-2 returns. Strongest model class actually
+exercised: single-Mac ``mixtral:8x7b`` (46.7 B-MoE Q4) on Mac-1
+Ollama.
+
+The W21 family TL;DR (SDK v3.22) is preserved historically below.
 
 ## TL;DR — SDK v3.22
 

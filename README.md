@@ -7,7 +7,51 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**As of SDK v3.22 (April 2026), capsules are load-bearing
+**As of SDK v3.23 (April 2026), capsules are load-bearing
+*inside one Wevra run*, *between agents in a team*, *across the
+model-class gradient*, *across the multi-oracle adjudication
+axis*, and — most sharply — *across the first capsule-native
+multi-agent-coordination method that combines explicit-capsule
+passing with audited proxies for the LatentMAS direction
+(collective KV pooling / latent hidden-state transfer / super-
+token side channels): the W22 family ships
+:class:`SchemaCapsule` (closed-vocabulary type schema, content-
+addressed and shared once per session), :class:`SharedReadCache`
+(CID-keyed write-once-read-many proxy for the LatentMAS shared-KV
+direction), :class:`CachingOracleAdapter` (drop-in for any
+:class:`OutsideWitnessOracle`),
+:class:`LatentDigestEnvelope` (typed, controller-verified compact
+summary of one W21 vote outcome — hash-chained, schema-versioned,
+parent-CID-sealed), :func:`verify_latent_digest` (≈ 30-line
+controller-side verification with enumerated failure modes), and
+:class:`LatentDigestDisambiguator` (the wrapping decoder). On the
+new R-69-CACHE-FANOUT regime, W22 strictly reduces visible-tokens-
+to-decider over the W21 baseline by **−7 tokens / cell (−14.51 %)
+loose, −7 tokens / cell (−16.09 %) tight**, AND records
+``cache_tokens_saved_total = 88`` over the bank, AND ties W21
+byte-for-byte on ``accuracy_full = 1.000`` — stable across 5/5
+``bank_seed`` values; three named falsifiers (R-69-NO-CACHE,
+R-69-POISONED-DIGEST, R-69-SCHEMA-DRIFT) and one backward-compat
+anchor (R-69-NO-TRIGGER) make the W22-1 conditionality sharp.
+Live LLM transfer (W22-Λ-real, mixtral:8x7b on Mac-1):
+visible-tokens savings **+39.08 %**; cache_tokens_saved_total =
+120; correctness ratified rate = 0.750 — newly named conjecture
+**W22-C-CACHE-AMPLIFICATION** (the cache freezes a probabilistic
+LLM oracle's first reply across all matching cells). 633 / 633
+prior wevra tests pass, 32 new W22 tests pass, 10 misc = **675 /
+675**. Mac 2 remains unreachable (16th milestone in a row); no
+two-Mac sharded inference. SDK v3.23's contribution is the
+Phase-69 capsule-latent-hybrid benchmark family
+([`vision_mvp/experiments/phase69_capsule_latent_hybrid.py`](vision_mvp/experiments/phase69_capsule_latent_hybrid.py))
+plus the W22 surface in
+[`vision_mvp/wevra/team_coord.py`](vision_mvp/wevra/team_coord.py).
+Closes the wire-cost half of the SDK v3.22 W21-C-CALIBRATED-TRUST
+conjecture (the *correctness* half remains open). See
+[`docs/RESULTS_WEVRA_CAPSULE_LATENT_HYBRID.md`](docs/RESULTS_WEVRA_CAPSULE_LATENT_HYBRID.md)
+for the full SDK v3.23 milestone note.*
+
+**Historical SDK v3.22 reading (preserved for context).** Capsules
+were load-bearing
 *inside one Wevra run*, *between agents in a team*, *across the
 model-class gradient*, and — most sharply — *across the first
 capsule-native multi-agent-coordination method that crosses the

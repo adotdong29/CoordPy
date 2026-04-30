@@ -2340,6 +2340,98 @@ walls in the *bundle-resolvable* case — must combine:
 A regime missing any of these is *not* R-66 — it does not test
 the SDK v3.20 hypothesis.
 
+## 2.16. Required ingredients of R-69 (SDK v3.23, post-W21 bar)
+
+The "harder fair regime" introduced by SDK v3.23 — the *current*
+strict-gain anchor for the **capsule + latent-state-sharing
+hybrid axis** — must combine:
+
+* **Same R-68-MULTI-MAJORITY bundle / oracle ecology that the
+  W21-1 anchor uses.** Three registered oracles
+  (compromised_registry first, service_graph, change_history)
+  under default ``quorum_min = 2``; the inner W21
+  ``TrustWeightedMultiOracleDisambiguator`` MUST fire
+  ``W21_BRANCH_QUORUM_RESOLVED`` on every cell (else there is
+  nothing for W22 to compress / share). Mechanically verified by
+  ``Phase69CacheFanoutTests::test_w22_no_accuracy_regression_on_cache_fanout``
+  (W21 pooled accuracy_full = 1.000 on every cell).
+* **A registered closed-vocabulary :class:`SchemaCapsule`.** The
+  schema covers the named root-cause closed vocabulary, the named
+  service tag closed vocabulary, AND the named oracle-kind closed
+  vocabulary. The schema CID is content-addressed (SHA-256) and
+  shared once per session; the W22 envelope references it by CID.
+  Mechanically verified by ``SchemaCapsuleTests``.
+* **A shared :class:`SharedReadCache` plumbed through
+  :class:`CachingOracleAdapter` wrappers around every registered
+  oracle.** Identical OutsideQueries (same admitted_tags + same
+  elected_root_cause + same oracle_id) across cells must collapse
+  to one wire-side oracle call; the cache's
+  ``n_tokens_saved`` field MUST record the wire-side savings of
+  every hit. Mechanically verified by ``SharedReadCacheTests``.
+* **A typed :class:`LatentDigestEnvelope` per cell, signed at
+  construction.** The envelope's ``digest_cid`` is SHA-256 over
+  the canonical bytes (``schema_version + schema_cid +
+  inner_w19_branch + quorum_min + min_trust_sum + per_tag_votes +
+  per_tag_trust_sum + projected_subset + n_oracles +
+  n_outside_tokens + parent_probe_cids``). Tampering with any
+  field via :func:`dataclasses.replace` preserves the original
+  ``digest_cid``; :func:`verify_latent_digest` recomputes the SHA
+  over the new bytes and rejects on mismatch. Mechanically
+  verified by ``LatentDigestEnvelopeTests``,
+  ``LatentDigestVerificationTests`` (six unit tests, one per
+  failure-mode label).
+* **Five pre-committed sub-banks** (mechanically verified by
+  ``Phase69*Tests``):
+    - **R-69-CACHE-FANOUT-LOOSE** (positive anchor, ``T_decoder =
+      None``). W22 strictly improves
+      ``mean_n_visible_tokens_to_decider`` over W21 baseline AND
+      records ``cache_tokens_saved_total > 0`` AND ties W21
+      byte-for-byte on accuracy_full.
+    - **R-69-CACHE-FANOUT-TIGHT** (positive anchor, ``T_decoder =
+      24``). Same as above under decoder-side budget pressure.
+    - **R-69-NO-CACHE** (W22-Λ-no-cache falsifier; fresh per-cell
+      cache). ``cache_tokens_saved_total == 0`` by construction;
+      digest-only contribution to savings preserved.
+    - **R-69-POISONED-DIGEST** (W22-3 trust falsifier;
+      :class:`EnvelopeTamperer(mode="flip_projected_subset")`).
+      ``verification_ok_rate == 0.000`` on every cell; W22 falls
+      through to W21; ``correctness_ratified_rate == 1.000``.
+    - **R-69-SCHEMA-DRIFT** (W22-3 trust falsifier; verifier
+      registered with a different SchemaCapsule version). Same
+      strict requirement as POISONED-DIGEST.
+    - **R-69-NO-TRIGGER** (W22 backward-compat; W21 abstains
+      via NO_QUORUM). W22 fires NO_TRIGGER and reduces to W21
+      byte-for-byte; no envelope emitted; ``digest_n_tokens ==
+      0``.
+* **Bounded-context honesty.** The W22 layer reads only what the
+  W21 layer below produces (``last_result``); the W15
+  ``tokens_kept`` is byte-for-byte identical to W21 / W19 / W18.
+  The W22 ``n_visible_tokens_to_decider`` is the apples-to-apples
+  comparison (kept + digest_n_tokens for resolved cells; kept +
+  outside + verbose_audit for non-resolved / rejected cells).
+  Mechanically verified by
+  ``Phase69PoisonedDigestTests::test_poisoned_digest_no_visible_tokens_savings``.
+* **Determinism.** The Phase-69 bank generator is RNG-deterministic
+  given ``bank_seed``; the W22 envelope is byte-stable given a
+  byte-stable W21 result; the cache is byte-stable given a
+  deterministic CID rule.
+* **Audit-preserving.** T-1..T-7 holds on every cell of every
+  capsule strategy on every (bank, ``T_decoder``, ``bank_seed``)
+  cell. Mechanically verified by
+  ``Phase69AuditOKTests::test_audit_ok_on_every_w22_cell``.
+* **Seed-stable.** Visible-tokens savings strictly positive on
+  every alternate ``bank_seed`` value (5/5 on 11, 17, 23, 29,
+  31). Mechanically verified by
+  ``Phase69SeedStabilityTests::test_savings_strictly_positive_across_5_seeds``.
+* **No regression on R-54..R-68.** Every prior anchor remains
+  green; with ``enabled = False`` OR ``schema = None`` OR no
+  triggering W21 branch, the W22 layer reduces to W21
+  byte-for-byte; 633 prior wevra tests pass, 32 new W22 tests
+  pass, plus 10 misc = 675 / 675 total.
+
+A regime missing any of these is *not* R-69 — it does not test
+the SDK v3.23 hypothesis.
+
 ## 3. What we are explicitly NOT testing
 
 * **Not** "does cohort coherence ever beat FIFO?" — that's W7-2,

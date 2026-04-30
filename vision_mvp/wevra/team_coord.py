@@ -5495,6 +5495,32 @@ __all__ = [
     "W21_BRANCH_DISABLED",
     "W21_ALL_BRANCHES",
     "W21_DEFAULT_TRIGGER_BRANCHES",
+    # SDK v3.23 — capsule-native + latent-state-sharing hybrid (W22 family).
+    # The strongest honest hybrid that combines explicit-capsule
+    # coordination with audited proxies for the LatentMAS direction:
+    # schema-passing, delta execution, shared-read cache, and a
+    # controller-verified latent digest envelope. The trust boundary is
+    # explicit — every latent payload is hash-chained, schema-versioned,
+    # parent-CID-sealed, and rejected on verification failure.
+    "SchemaCapsule",
+    "build_incident_triage_schema_capsule",
+    "LatentDigestEnvelope",
+    "verify_latent_digest",
+    "LatentVerificationOutcome",
+    "SharedReadCache",
+    "CachingOracleAdapter",
+    "EnvelopeTamperer",
+    "W22LatentResult",
+    "LatentDigestDisambiguator",
+    "W22_BRANCH_LATENT_RESOLVED",
+    "W22_BRANCH_LATENT_REJECTED",
+    "W22_BRANCH_NO_TRIGGER",
+    "W22_BRANCH_NO_SCHEMA",
+    "W22_BRANCH_DISABLED",
+    "W22_BRANCH_ABSTAIN_PASSTHROUGH",
+    "W22_ALL_BRANCHES",
+    "W22_DEFAULT_TRIGGER_BRANCHES",
+    "W22_LATENT_ENVELOPE_SCHEMA_VERSION",
 ]
 
 
@@ -7163,6 +7189,911 @@ class TrustWeightedMultiOracleDisambiguator:
     @property
     def last_result(self) -> W21MultiOracleResult | None:
         return self._last_result
+
+    @property
+    def T_decoder(self) -> int | None:
+        return self.inner.T_decoder
+
+    @T_decoder.setter
+    def T_decoder(self, v: int | None) -> None:
+        self.inner.T_decoder = v
+
+    def pack_stats(self) -> dict[str, Any]:
+        return self.inner.pack_stats()
+
+
+# =============================================================================
+# SDK v3.23 — capsule-native + latent-state-sharing hybrid (W22 family).
+#
+# W22 is the first capsule-native multi-agent-coordination method that
+# *combines* explicit capsule passing with audited proxies for the
+# LatentMAS direction (collective KV pooling / latent hidden-state
+# transfer / super-token side channels). It does NOT manipulate
+# transformer-internal KV caches; it implements the closest honest
+# capsule-layer proxies for every LatentMAS idea family this repo can
+# verify end-to-end:
+#
+#   * schema-passing — closed-vocabulary type schema is content-
+#     addressed (:class:`SchemaCapsule`) and shared across roles via
+#     CID. The bundle carries the CID once per session, not the full
+#     schema text per cell.
+#   * delta execution — instead of replaying every per-oracle probe
+#     into the final decoder, the W22 layer emits one
+#     :class:`LatentDigestEnvelope` per cell that summarises the W21
+#     vote outcome as (per-tag votes, projected subset, provenance).
+#   * shared-read cache — :class:`SharedReadCache` is a CID-keyed,
+#     write-once-read-many proxy for the LatentMAS shared-KV-read idea.
+#     :class:`CachingOracleAdapter` wraps any
+#     :class:`OutsideWitnessOracle` and routes every ``consult(query)``
+#     through the cache; identical OutsideQueries collapse to one
+#     wire-side oracle call.
+#   * controller-side verification — :func:`verify_latent_digest` is a
+#     short, closed-form check (hash chain, schema-CID match, parent-
+#     CID seal). On verification failure the W22 layer rejects the
+#     digest and falls through to the W21 answer; the trust boundary
+#     is explicit and the explicit-capsule path is never bypassed.
+#
+# What W22 does NOT do (do-not-overstate):
+#
+#   * does NOT touch transformer KV caches, embedding tables, attention
+#     weights, or any model-internal state. The "shared cache" lives at
+#     the capsule layer; it is an honest *proxy*, not a runtime KV
+#     transplant.
+#   * does NOT hide unaudited coordination behind opaque latent
+#     payloads. Every envelope carries a content hash, a schema CID, a
+#     parent CID list, a closed-vocabulary projection, and a
+#     human-readable canonical encoding. The verification check is
+#     short and the failure modes are enumerated.
+#   * does NOT improve correctness over W21 on the synthetic R-69-CACHE
+#     anchors. W22's correctness is exactly W21's by construction
+#     (Theorem W22-2 — *correctness ratification*); the load-bearing
+#     contribution is on the *efficiency* and *trust* axes.
+#
+# The W22 surface is purely additive on top of the W21 surface:
+# decode_rounds returns the same answer dict W21 returns plus a single
+# new ``"latent_hybrid"`` audit block; existing decoders are unchanged.
+# =============================================================================
+
+W22_LATENT_ENVELOPE_SCHEMA_VERSION = "wevra.latent_digest.v1"
+
+W22_BRANCH_LATENT_RESOLVED = "latent_resolved"
+W22_BRANCH_LATENT_REJECTED = "latent_rejected"
+W22_BRANCH_NO_TRIGGER = "no_trigger"
+W22_BRANCH_NO_SCHEMA = "no_schema"
+W22_BRANCH_DISABLED = "disabled"
+W22_BRANCH_ABSTAIN_PASSTHROUGH = "abstain_passthrough"
+
+W22_ALL_BRANCHES = (
+    W22_BRANCH_LATENT_RESOLVED,
+    W22_BRANCH_LATENT_REJECTED,
+    W22_BRANCH_NO_TRIGGER,
+    W22_BRANCH_NO_SCHEMA,
+    W22_BRANCH_DISABLED,
+    W22_BRANCH_ABSTAIN_PASSTHROUGH,
+)
+
+# W22 fires only when the inner W21 produced a quorum-resolved
+# projection. The other W21 branches (NO_QUORUM, ALL_COMPROMISED-as-
+# SYMMETRIC_QUORUM, NO_TRIGGER, …) fall through unchanged so the W21
+# falsifier ladder remains intact byte-for-byte.
+W22_DEFAULT_TRIGGER_BRANCHES: frozenset[str] = frozenset({
+    W21_BRANCH_QUORUM_RESOLVED,
+})
+
+
+def _canonical_json_bytes(obj: Any) -> bytes:
+    """Stable JSON encoding for hash-chain inputs.
+
+    ``sort_keys=True`` + ``separators=(",", ":")`` + ``ensure_ascii=True``
+    is the canonical encoding used everywhere in the W22 surface (and
+    by :class:`ContextCapsule.new` for capsule CIDs). Float fields are
+    rounded by callers before passing in to avoid IEEE-754 byte drift.
+    """
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"),
+                      ensure_ascii=True).encode("ascii")
+
+
+def _whitespace_token_count(text: str) -> int:
+    """Whitespace token count, matching the W21 oracle reply convention.
+
+    The W21 layer counts oracle-reply tokens by ``payload.split()``;
+    the W22 latent digest counts canonical-encoding tokens by the same
+    rule so the visible-token accounting on a downstream decoder is
+    apples-to-apples between W21's ``n_outside_tokens_total`` and
+    W22's ``digest_n_tokens``.
+    """
+    if not text:
+        return 0
+    return len(text.split())
+
+
+@dataclasses.dataclass(frozen=True)
+class SchemaCapsule:
+    """Closed-vocabulary type schema, content-addressed (W22 family).
+
+    Models the LatentMAS *schema-passing* direction at the capsule
+    layer. A SchemaCapsule names the closed vocabularies that a
+    multi-agent coordination round operates over — root causes,
+    services, oracle kinds — and emits a stable content-address (the
+    SHA-256 over the canonical encoding) so multiple roles can refer
+    to the schema by CID instead of re-emitting the full vocabulary
+    in every handoff.
+
+    The "delta" idea (the W22 envelope only carries fields that
+    change vs the schema baseline) is realised on top of this:
+    :class:`LatentDigestEnvelope` references this schema's CID and
+    only encodes the per-cell vote / projection fields. The bundle
+    text never re-emits the closed-vocabulary lists themselves.
+    """
+    schema_id: str
+    version: str
+    closed_vocab_root_causes: tuple[str, ...]
+    closed_vocab_services: tuple[str, ...]
+    closed_vocab_oracle_kinds: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "closed_vocab_root_causes",
+                            tuple(sorted(self.closed_vocab_root_causes)))
+        object.__setattr__(self, "closed_vocab_services",
+                            tuple(sorted(self.closed_vocab_services)))
+        object.__setattr__(self, "closed_vocab_oracle_kinds",
+                            tuple(sorted(self.closed_vocab_oracle_kinds)))
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_id": self.schema_id,
+            "version": self.version,
+            "root_causes": list(self.closed_vocab_root_causes),
+            "services": list(self.closed_vocab_services),
+            "oracle_kinds": list(self.closed_vocab_oracle_kinds),
+        })
+
+    @property
+    def cid(self) -> str:
+        return hashlib.sha256(self.to_canonical_bytes()).hexdigest()
+
+    @property
+    def n_canonical_tokens(self) -> int:
+        return _whitespace_token_count(
+            " ".join((
+                self.schema_id, self.version,
+                *self.closed_vocab_root_causes,
+                *self.closed_vocab_services,
+                *self.closed_vocab_oracle_kinds,
+            )))
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_id": str(self.schema_id),
+            "version": str(self.version),
+            "cid": self.cid,
+            "n_canonical_tokens": int(self.n_canonical_tokens),
+            "n_root_causes": len(self.closed_vocab_root_causes),
+            "n_services": len(self.closed_vocab_services),
+            "n_oracle_kinds": len(self.closed_vocab_oracle_kinds),
+        }
+
+
+def build_incident_triage_schema_capsule() -> SchemaCapsule:
+    """Default SchemaCapsule for the incident-triage W22 bench."""
+    return SchemaCapsule(
+        schema_id="incident_triage",
+        version="v1",
+        closed_vocab_root_causes=(
+            "deadlock", "disk_fill",
+            "pool_exhaustion", "slow_query_cascade",
+        ),
+        closed_vocab_services=(
+            "api", "db", "db_query", "logs_pipeline",
+            "orders", "payments", "storage", "web",
+        ),
+        closed_vocab_oracle_kinds=(
+            "change_history",
+            "llm_adjudicator",
+            "oncall_notes",
+            "service_graph",
+        ),
+    )
+
+
+@dataclasses.dataclass(frozen=True)
+class LatentDigestEnvelope:
+    """Typed, controller-verified compact summary of one W21 cell
+    outcome (W22 family).
+
+    Models the LatentMAS *latent hidden-state transfer* and *delta
+    execution* directions at the capsule layer.
+
+    The ``digest_cid`` is *signed at construction*: ``__post_init__``
+    computes SHA-256 over the canonical bytes (schema-version-aware,
+    sorted, rounded floats) and freezes the result on the instance.
+    Tampering with any field via :func:`dataclasses.replace`
+    preserves the original ``digest_cid`` (the field is copied
+    through unchanged); :func:`verify_latent_digest` recomputes the
+    SHA over the new bytes and detects the mismatch — the
+    load-bearing tamper-detection signal (Theorem W22-3).
+    """
+    schema_cid: str
+    inner_w19_branch: str
+    quorum_min: int
+    min_trust_sum: float
+    per_tag_vote_count: tuple[tuple[str, int], ...]
+    per_tag_trust_sum: tuple[tuple[str, float], ...]
+    projected_subset: tuple[str, ...]
+    n_oracles_consulted: int
+    n_outside_tokens_total: int
+    parent_probe_cids: tuple[str, ...]
+    digest_cid: str = ""
+    schema_version: str = W22_LATENT_ENVELOPE_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        # Canonicalise tuple fields first so two logically-equal
+        # envelopes always have the same canonical bytes.
+        object.__setattr__(self, "per_tag_vote_count",
+                            tuple(sorted(self.per_tag_vote_count,
+                                            key=lambda kv: kv[0])))
+        object.__setattr__(self, "per_tag_trust_sum",
+                            tuple(sorted(
+                                ((tag, round(float(v), 4))
+                                  for tag, v in self.per_tag_trust_sum),
+                                key=lambda kv: kv[0])))
+        object.__setattr__(self, "projected_subset",
+                            tuple(sorted(self.projected_subset)))
+        object.__setattr__(self, "parent_probe_cids",
+                            tuple(self.parent_probe_cids))
+        # Sign at construction time IFF no digest_cid was provided.
+        # ``dataclasses.replace`` copies the original digest_cid
+        # through; the receiver's verifier recomputes the SHA over
+        # the new (post-tamper) canonical bytes and compares — a
+        # mismatch fires :data:`W22_BRANCH_LATENT_REJECTED`.
+        if not self.digest_cid:
+            object.__setattr__(
+                self, "digest_cid", self.recompute_digest_cid())
+
+    def _signed_payload(self) -> dict[str, Any]:
+        """Canonical payload signed by ``digest_cid`` (excludes
+        ``digest_cid`` itself — recursion would self-reference)."""
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "inner_w19_branch": self.inner_w19_branch,
+            "quorum_min": int(self.quorum_min),
+            "min_trust_sum": round(float(self.min_trust_sum), 4),
+            "per_tag_vote_count": [
+                [t, int(c)] for t, c in self.per_tag_vote_count
+            ],
+            "per_tag_trust_sum": [
+                [t, round(float(v), 4)] for t, v in self.per_tag_trust_sum
+            ],
+            "projected_subset": list(self.projected_subset),
+            "n_oracles_consulted": int(self.n_oracles_consulted),
+            "n_outside_tokens_total": int(self.n_outside_tokens_total),
+            "parent_probe_cids": list(self.parent_probe_cids),
+        }
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes(self._signed_payload())
+
+    def to_canonical_text(self) -> str:
+        return self.to_canonical_bytes().decode("ascii")
+
+    def recompute_digest_cid(self) -> str:
+        return hashlib.sha256(self.to_canonical_bytes()).hexdigest()
+
+    def to_decoder_text(self) -> str:
+        """Whitespace-tokenisable single-line summary the downstream
+        decoder consumes. Apples-to-apples with W21 oracle ``payload``
+        accounting (which uses :meth:`str.split`).
+
+        The decoder text is what the *final decoder* sees in place of
+        the verbose W21 audit; ``n_digest_tokens`` is its
+        whitespace-token count, the apples-to-apples comparison
+        against W21's ``n_outside_tokens_total``.
+        """
+        votes = ",".join(
+            f"{t}:{c}" for t, c in self.per_tag_vote_count) or "(empty)"
+        trust = ",".join(
+            f"{t}:{round(v,4)}" for t, v in self.per_tag_trust_sum
+        ) or "(empty)"
+        proj = ",".join(self.projected_subset) or "(empty)"
+        parts = [
+            "LATENT_DIGEST",
+            f"schema_version={self.schema_version}",
+            f"schema_cid={self.schema_cid[:16]}",
+            f"digest_cid={self.digest_cid[:16]}",
+            f"branch={self.inner_w19_branch}",
+            f"quorum_min={int(self.quorum_min)}",
+            f"min_trust_sum={round(float(self.min_trust_sum), 4)}",
+            f"votes={votes}",
+            f"trust={trust}",
+            f"projected={proj}",
+            f"oracles={int(self.n_oracles_consulted)}",
+            f"outside_tokens={int(self.n_outside_tokens_total)}",
+            f"n_probes={len(self.parent_probe_cids)}",
+        ]
+        return " ".join(parts)
+
+    @property
+    def n_digest_tokens(self) -> int:
+        # Whitespace-token count of the decoder-facing line — what a
+        # downstream decoder pays for the latent summary,
+        # apples-to-apples with W21's ``n_outside_tokens_total``
+        # (which counts oracle reply ``payload.split()`` tokens).
+        return _whitespace_token_count(self.to_decoder_text())
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "digest_cid": self.digest_cid,
+            "inner_w19_branch": self.inner_w19_branch,
+            "quorum_min": int(self.quorum_min),
+            "min_trust_sum": round(float(self.min_trust_sum), 4),
+            "per_tag_vote_count": [
+                [t, int(c)] for t, c in self.per_tag_vote_count
+            ],
+            "per_tag_trust_sum": [
+                [t, round(float(v), 4)] for t, v in self.per_tag_trust_sum
+            ],
+            "projected_subset": list(self.projected_subset),
+            "n_oracles_consulted": int(self.n_oracles_consulted),
+            "n_outside_tokens_total": int(self.n_outside_tokens_total),
+            "parent_probe_cids": list(self.parent_probe_cids),
+            "n_digest_tokens": int(self.n_digest_tokens),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+@dataclasses.dataclass(frozen=True)
+class LatentVerificationOutcome:
+    """Result of :func:`verify_latent_digest`. Closed-vocabulary
+    ``reason`` field — every verification failure fits one of the
+    named modes."""
+    ok: bool
+    reason: str
+    n_checks: int = 0
+
+
+def _digest_cid_for_canonical(canonical: bytes) -> str:
+    return hashlib.sha256(canonical).hexdigest()
+
+
+def verify_latent_digest(
+        envelope: LatentDigestEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        sealed_probe_cids: Iterable[str] | None = None,
+        ) -> LatentVerificationOutcome:
+    """Controller-side verification of a :class:`LatentDigestEnvelope`.
+
+    This is the W22 trust boundary. Every latent payload that enters
+    the decoder via the W22 layer is checked here; on any failure
+    the layer rejects the digest and the explicit-capsule path
+    stays sound (W22_BRANCH_LATENT_REJECTED).
+
+    The check is closed-form, short, and the failure modes are
+    enumerated. The function is pure (no side effects); soundness
+    holds by inspection.
+    """
+    n_checks = 0
+    if envelope is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_envelope", n_checks=n_checks)
+    n_checks += 1
+    if envelope.schema_version != W22_LATENT_ENVELOPE_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n_checks)
+    n_checks += 1
+    if envelope.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    canonical = envelope.to_canonical_bytes()
+    if _digest_cid_for_canonical(canonical) != envelope.digest_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n_checks)
+    if sealed_probe_cids is not None:
+        n_checks += 1
+        sealed_set = set(sealed_probe_cids)
+        for pcid in envelope.parent_probe_cids:
+            if pcid not in sealed_set:
+                return LatentVerificationOutcome(
+                    ok=False, reason="unsealed_parent_probe_cid",
+                    n_checks=n_checks)
+    return LatentVerificationOutcome(ok=True, reason="ok", n_checks=n_checks)
+
+
+@dataclasses.dataclass
+class SharedReadCache:
+    """CID-keyed write-once-read-many cache (W22 family).
+
+    Models the LatentMAS *shared-KV-read* direction at the capsule
+    layer. The cache is content-addressed: the key is the CID of an
+    :class:`OutsideQuery` + ``oracle_id`` pair; the value is the
+    canonical bytes of an :class:`OutsideVerdict` plus its token
+    count. Two queries with identical content collapse to one
+    entry; subsequent reads return the cached bytes without
+    consulting the underlying oracle.
+
+    Honest scope: capsule-layer proxy — NOT a transformer KV cache.
+    The "tokens saved" metric is wire-side oracle reply tokens that
+    are NOT paid because the entry was already in the cache.
+    """
+    _store: dict[str, tuple[bytes, int, str]] = dataclasses.field(
+        default_factory=dict)
+    n_hits: int = 0
+    n_misses: int = 0
+    n_tokens_saved: int = 0
+
+    @staticmethod
+    def query_cid_for(query: OutsideQuery, *, oracle_id: str) -> str:
+        body = _canonical_json_bytes({
+            "oracle_id": str(oracle_id),
+            "admitted_tags": list(query.admitted_tags),
+            "elected_root_cause": str(query.elected_root_cause),
+            "primary_payload": str(query.primary_payload),
+            "witness_payloads": list(query.witness_payloads),
+            "max_response_tokens": int(query.max_response_tokens),
+        })
+        return hashlib.sha256(body).hexdigest()
+
+    def get(self, cid: str) -> tuple[bytes, int, str] | None:
+        entry = self._store.get(cid)
+        if entry is None:
+            self.n_misses += 1
+            return None
+        self.n_hits += 1
+        self.n_tokens_saved += int(entry[1])
+        return entry
+
+    def put(self, cid: str, body: bytes, *, n_tokens: int,
+            source_id: str = "") -> None:
+        if cid in self._store:
+            return
+        self._store[cid] = (bytes(body), int(n_tokens), str(source_id))
+
+    def stats(self) -> dict[str, Any]:
+        return {
+            "n_hits": int(self.n_hits),
+            "n_misses": int(self.n_misses),
+            "n_tokens_saved": int(self.n_tokens_saved),
+            "n_entries": len(self._store),
+        }
+
+
+@dataclasses.dataclass
+class CachingOracleAdapter:
+    """Cache-aware adapter around any :class:`OutsideWitnessOracle`.
+
+    Routes every ``consult(query)`` through a :class:`SharedReadCache`.
+    Identical OutsideQueries collapse to one wire-side oracle call;
+    the second cell pays *zero* outside-oracle tokens (the cache
+    returns the bytes; the audit's ``n_outside_tokens_total`` sums
+    only the *uncached* token cost).
+
+    The adapter preserves the :class:`OutsideWitnessOracle` Protocol
+    so it can be registered in any W21 oracle stack as a drop-in
+    replacement for the wrapped oracle.
+    """
+    inner: Any
+    cache: SharedReadCache
+    oracle_id: str = ""
+    last_was_hit: bool = False
+
+    def __post_init__(self) -> None:
+        if not self.oracle_id:
+            self.oracle_id = str(getattr(
+                self.inner, "oracle_id", "cached_oracle"))
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        cid = SharedReadCache.query_cid_for(
+            query, oracle_id=self.oracle_id)
+        cached = self.cache.get(cid)
+        if cached is not None:
+            body, n_tokens, source_id = cached
+            self.last_was_hit = True
+            payload = body.decode("utf-8") if body else None
+            return OutsideVerdict(
+                payload=payload,
+                source_id=source_id or self.oracle_id,
+                n_tokens=int(n_tokens),
+            )
+        self.last_was_hit = False
+        verdict = self.inner.consult(query)
+        body = (verdict.payload or "").encode("utf-8")
+        self.cache.put(cid, body, n_tokens=int(verdict.n_tokens),
+                        source_id=str(verdict.source_id or self.oracle_id))
+        return verdict
+
+
+@dataclasses.dataclass(frozen=True)
+class EnvelopeTamperer:
+    """Tamper a :class:`LatentDigestEnvelope` for falsifier tests."""
+    mode: str = "flip_projected_subset"
+    admitted_tags: tuple[str, ...] = ()
+
+    def apply(self, env: LatentDigestEnvelope
+               ) -> LatentDigestEnvelope:
+        if self.mode == "flip_projected_subset":
+            admitted = set(self.admitted_tags) or {
+                t for t, _ in env.per_tag_vote_count}
+            new_subset = tuple(sorted(
+                t for t in admitted if t not in env.projected_subset))
+            return dataclasses.replace(
+                env, projected_subset=new_subset)
+        if self.mode == "add_phantom_probe_cid":
+            phantom = "0" * 64
+            return dataclasses.replace(
+                env, parent_probe_cids=tuple(
+                    list(env.parent_probe_cids) + [phantom]))
+        if self.mode == "change_quorum_min":
+            return dataclasses.replace(env, quorum_min=0)
+        raise ValueError(f"unknown EnvelopeTamperer mode {self.mode!r}")
+
+
+@dataclasses.dataclass
+class W22LatentResult:
+    """Audit record for the W22 latent-hybrid layer.
+
+    Captures (a) the W21 outcome below, (b) the latent envelope
+    emitted (or rejected), (c) the controller verification result,
+    (d) the cache statistics, and (e) the visible-token accounting
+    delta vs the W21 baseline.
+    """
+    answer: dict[str, Any]
+    inner_w21_branch: str
+    triggered: bool
+    decoder_branch: str
+    abstained: bool
+    schema_cid: str
+    schema_version: str
+    digest_cid: str
+    digest_n_tokens: int
+    n_w15_tokens_kept: int
+    n_w21_outside_tokens_total: int
+    n_w21_verbose_audit_tokens: int
+    n_visible_tokens_to_decider: int
+    digest_compression_ratio: float
+    n_cache_hits_this_cell: int
+    n_cache_misses_this_cell: int
+    cache_tokens_saved_this_cell: int
+    schema_shared_tokens_saved_this_cell: int
+    verification_ok: bool
+    verification_reason: str
+    verification_n_checks: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "answer": self.answer,
+            "inner_w21_branch": str(self.inner_w21_branch),
+            "triggered": bool(self.triggered),
+            "decoder_branch": str(self.decoder_branch),
+            "abstained": bool(self.abstained),
+            "schema_cid": str(self.schema_cid),
+            "schema_version": str(self.schema_version),
+            "digest_cid": str(self.digest_cid),
+            "digest_n_tokens": int(self.digest_n_tokens),
+            "n_w15_tokens_kept": int(self.n_w15_tokens_kept),
+            "n_w21_outside_tokens_total":
+                int(self.n_w21_outside_tokens_total),
+            "n_w21_verbose_audit_tokens":
+                int(self.n_w21_verbose_audit_tokens),
+            "n_visible_tokens_to_decider":
+                int(self.n_visible_tokens_to_decider),
+            "digest_compression_ratio":
+                round(float(self.digest_compression_ratio), 6),
+            "n_cache_hits_this_cell": int(self.n_cache_hits_this_cell),
+            "n_cache_misses_this_cell": int(self.n_cache_misses_this_cell),
+            "cache_tokens_saved_this_cell":
+                int(self.cache_tokens_saved_this_cell),
+            "schema_shared_tokens_saved_this_cell":
+                int(self.schema_shared_tokens_saved_this_cell),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": str(self.verification_reason),
+            "verification_n_checks": int(self.verification_n_checks),
+        }
+
+
+def _verbose_w21_audit_tokens(w21_result: W21MultiOracleResult) -> int:
+    """Whitespace-token count of the canonical W21 audit JSON."""
+    return _whitespace_token_count(
+        json.dumps(w21_result.as_dict(),
+                   sort_keys=True, separators=(",", ":"),
+                   ensure_ascii=True))
+
+
+def _build_envelope_from_w21(
+        w21_result: W21MultiOracleResult,
+        *, schema_cid: str,
+        ) -> LatentDigestEnvelope:
+    """Construct a :class:`LatentDigestEnvelope` from a W21 result."""
+    per_tag_vote_count = tuple(
+        sorted(
+            ((tag, int(c))
+              for tag, c in w21_result.per_tag_votes.items()),
+            key=lambda kv: kv[0]))
+    per_tag_trust_sum = tuple(
+        sorted(
+            ((tag, round(float(v), 4))
+              for tag, v in w21_result.per_tag_trust_sum.items()),
+            key=lambda kv: kv[0]))
+    services = w21_result.answer.get("services", ())
+    if isinstance(services, (list, tuple)):
+        projected = tuple(sorted(str(s) for s in services))
+    else:
+        projected = ()
+    parent_probe_cids: list[str] = []
+    for probe in w21_result.probes:
+        body = _canonical_json_bytes(probe.as_dict())
+        parent_probe_cids.append(hashlib.sha256(body).hexdigest())
+    return LatentDigestEnvelope(
+        schema_cid=schema_cid,
+        inner_w19_branch=w21_result.inner_branch,
+        quorum_min=int(w21_result.quorum_min),
+        min_trust_sum=float(w21_result.min_trust_sum),
+        per_tag_vote_count=per_tag_vote_count,
+        per_tag_trust_sum=per_tag_trust_sum,
+        projected_subset=projected,
+        n_oracles_consulted=int(w21_result.n_outside_queries),
+        n_outside_tokens_total=int(w21_result.n_outside_tokens_total),
+        parent_probe_cids=tuple(parent_probe_cids),
+        schema_version=W22_LATENT_ENVELOPE_SCHEMA_VERSION,
+    )
+
+
+@dataclasses.dataclass
+class LatentDigestDisambiguator:
+    """Capsule + audited latent-hybrid disambiguator (W22 family).
+
+    Wraps a :class:`TrustWeightedMultiOracleDisambiguator` (W21) and
+    layers four LatentMAS-direction proxies on top:
+
+      1. **Schema-passing** via :class:`SchemaCapsule` (CID-shared).
+      2. **Delta execution** via :class:`LatentDigestEnvelope`.
+      3. **Shared-read cache** via :class:`CachingOracleAdapter`.
+      4. **Controller-side verification** via
+         :func:`verify_latent_digest`.
+
+    The W22 surface is *strictly additive* on top of W21:
+
+      * If the inner W21 branch is not in ``trigger_branches`` (e.g.
+        W21 abstained for any reason), W22 fires
+        :data:`W22_BRANCH_NO_TRIGGER` and reduces to W21
+        byte-for-byte on the answer field.
+      * If no schema is registered, W22 fires
+        :data:`W22_BRANCH_NO_SCHEMA` and reduces to W21.
+      * If ``enabled = False``, W22 fires
+        :data:`W22_BRANCH_DISABLED` and reduces to W21.
+      * On verification failure, W22 fires
+        :data:`W22_BRANCH_LATENT_REJECTED` and the answer field is
+        the W21 answer byte-for-byte; the rejected envelope is
+        recorded for forensics.
+
+    Theorem family W22 — see
+    ``docs/RESULTS_WEVRA_CAPSULE_LATENT_HYBRID.md`` for the full
+    statements.
+    """
+
+    inner: TrustWeightedMultiOracleDisambiguator = dataclasses.field(
+        default_factory=lambda: TrustWeightedMultiOracleDisambiguator())
+    # Producer-side schema: the envelope's ``schema_cid`` is signed
+    # against this schema's CID.
+    schema: SchemaCapsule | None = None
+    # Controller-side schema (verifier's view). When None, defaults
+    # to ``schema``. When the controller has registered a
+    # *different* SchemaCapsule (e.g. a version drift, or a
+    # registry rotation), ``verify_latent_digest`` fires
+    # ``schema_cid_mismatch`` and W22 rejects the envelope. This
+    # is the R-69-SCHEMA-DRIFT falsifier path.
+    verifier_schema: SchemaCapsule | None = None
+    cache: SharedReadCache | None = None
+    enabled: bool = True
+    require_verification: bool = True
+    tamperer: EnvelopeTamperer | None = None
+    trigger_branches: frozenset[str] = dataclasses.field(
+        default_factory=lambda: W22_DEFAULT_TRIGGER_BRANCHES)
+
+    _last_result: W22LatentResult | None = None
+    _last_envelope: LatentDigestEnvelope | None = None
+    _schema_already_shared: bool = False
+    _sealed_probe_cids: set[str] = dataclasses.field(default_factory=set)
+
+    def reset_session(self) -> None:
+        """Reset per-session state (schema-shared flag + sealed-CID
+        set + cache stats). Useful when the same instance is reused
+        across independent benchmark cells in a fresh-session
+        regime."""
+        self._schema_already_shared = False
+        self._sealed_probe_cids = set()
+        if self.cache is not None:
+            self.cache.n_hits = 0
+            self.cache.n_misses = 0
+            self.cache.n_tokens_saved = 0
+            self.cache._store.clear()
+        self.inner._last_result = None
+        self._last_result = None
+        self._last_envelope = None
+
+    def _seal_probe_cids(self,
+                          w21_result: W21MultiOracleResult) -> list[str]:
+        cids: list[str] = []
+        for probe in w21_result.probes:
+            body = _canonical_json_bytes(probe.as_dict())
+            cid = hashlib.sha256(body).hexdigest()
+            cids.append(cid)
+            self._sealed_probe_cids.add(cid)
+        return cids
+
+    def _w15_tokens_kept_from(self, answer: dict[str, Any]) -> int:
+        # Prefer the in-answer packing block (when the bench driver
+        # injected one); else delegate down the W22→W21→W19→W18→W15
+        # chain via :meth:`pack_stats` to read the W15 packer's last
+        # ``tokens_kept`` value directly. This is the byte-for-byte
+        # honest accounting; W21's outside-tokens are NOT W15 tokens.
+        packing = answer.get("packing") if isinstance(answer, dict) else None
+        if isinstance(packing, dict) and "tokens_kept" in packing:
+            return int(packing["tokens_kept"])
+        try:
+            ps = self.inner.pack_stats() or {}
+            v = ps.get("tokens_kept")
+            if v is not None:
+                return int(v)
+        except Exception:  # noqa: BLE001 — accounting must never crash
+            pass
+        return 0
+
+    def _cache_stats_snapshot(self) -> tuple[int, int, int]:
+        if self.cache is None:
+            return 0, 0, 0
+        return (int(self.cache.n_hits),
+                int(self.cache.n_misses),
+                int(self.cache.n_tokens_saved))
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+            ) -> dict[str, Any]:
+        before_hits, before_misses, before_saved = (
+            self._cache_stats_snapshot())
+        base = self.inner.decode_rounds(per_round_handoffs)
+        w21_result = self.inner.last_result
+        out = dict(base)
+        n_w15_tokens_kept = self._w15_tokens_kept_from(base)
+
+        def _pack_result(*, decoder_branch: str, abstained: bool,
+                          envelope: LatentDigestEnvelope | None,
+                          verification_ok: bool, verification_reason: str,
+                          verification_n_checks: int,
+                          ) -> dict[str, Any]:
+            after_hits, after_misses, after_saved = (
+                self._cache_stats_snapshot())
+            n_hits = max(0, after_hits - before_hits)
+            n_misses = max(0, after_misses - before_misses)
+            cache_saved = max(0, after_saved - before_saved)
+            schema_saved = (
+                self.schema.n_canonical_tokens
+                if (self.schema is not None
+                    and self._schema_already_shared) else 0)
+            n_w21_outside = int(getattr(
+                w21_result, "n_outside_tokens_total", 0)
+                if w21_result is not None else 0)
+            verbose_audit_n = (
+                _verbose_w21_audit_tokens(w21_result)
+                if w21_result is not None else 0)
+            digest_n = int(envelope.n_digest_tokens if envelope else 0)
+            digest_cid = str(envelope.digest_cid if envelope else "")
+            denom = max(1, verbose_audit_n)
+            compression = (digest_n / denom) if denom else 0.0
+            # Visible-token cost the downstream decoder pays:
+            #   * LATENT_RESOLVED: the digest replaces the W21 audit
+            #     and W21 outside-replies → kept + digest_n.
+            #   * Otherwise (LATENT_REJECTED, NO_TRIGGER, NO_SCHEMA,
+            #     DISABLED): the explicit-capsule path stays in
+            #     force; the decoder pays the W21 baseline (kept +
+            #     outside + verbose audit). For LATENT_REJECTED this
+            #     is the *honest* fallback cost — the rejected
+            #     digest is NOT trusted by the decoder, so it does
+            #     not reduce visible cost.
+            if (envelope is not None
+                    and decoder_branch == W22_BRANCH_LATENT_RESOLVED):
+                visible = n_w15_tokens_kept + digest_n
+            else:
+                visible = (n_w15_tokens_kept
+                            + n_w21_outside + verbose_audit_n)
+            triggered = decoder_branch == W22_BRANCH_LATENT_RESOLVED
+            answer = dict(base)
+            inner_branch = (
+                w21_result.inner_branch
+                if w21_result is not None
+                else W19_BRANCH_DISABLED)
+            schema_cid = (
+                str(self.schema.cid) if self.schema is not None else "")
+            schema_version = (
+                str(self.schema.version) if self.schema is not None else "")
+            result = W22LatentResult(
+                answer=answer,
+                inner_w21_branch=inner_branch,
+                triggered=triggered,
+                decoder_branch=decoder_branch,
+                abstained=abstained,
+                schema_cid=schema_cid,
+                schema_version=schema_version,
+                digest_cid=digest_cid,
+                digest_n_tokens=digest_n,
+                n_w15_tokens_kept=n_w15_tokens_kept,
+                n_w21_outside_tokens_total=n_w21_outside,
+                n_w21_verbose_audit_tokens=verbose_audit_n,
+                n_visible_tokens_to_decider=int(visible),
+                digest_compression_ratio=float(compression),
+                n_cache_hits_this_cell=int(n_hits),
+                n_cache_misses_this_cell=int(n_misses),
+                cache_tokens_saved_this_cell=int(cache_saved),
+                schema_shared_tokens_saved_this_cell=int(schema_saved),
+                verification_ok=bool(verification_ok),
+                verification_reason=str(verification_reason),
+                verification_n_checks=int(verification_n_checks),
+            )
+            self._last_result = result
+            self._last_envelope = envelope
+            out_local = dict(out)
+            out_local["latent_hybrid"] = result.as_dict()
+            if envelope is not None:
+                out_local["latent_envelope"] = envelope.as_dict()
+            if envelope is not None and self.schema is not None:
+                self._schema_already_shared = True
+            return out_local
+
+        if (not self.enabled) or w21_result is None:
+            return _pack_result(
+                decoder_branch=W22_BRANCH_DISABLED, abstained=True,
+                envelope=None, verification_ok=False,
+                verification_reason="disabled", verification_n_checks=0)
+        if self.schema is None:
+            return _pack_result(
+                decoder_branch=W22_BRANCH_NO_SCHEMA, abstained=True,
+                envelope=None, verification_ok=False,
+                verification_reason="no_schema", verification_n_checks=0)
+        if w21_result.decoder_branch not in self.trigger_branches:
+            return _pack_result(
+                decoder_branch=W22_BRANCH_NO_TRIGGER, abstained=False,
+                envelope=None, verification_ok=False,
+                verification_reason="no_trigger", verification_n_checks=0)
+        sealed_probe_cids = self._seal_probe_cids(w21_result)
+        envelope = _build_envelope_from_w21(
+            w21_result, schema_cid=self.schema.cid)
+        if self.tamperer is not None:
+            envelope = self.tamperer.apply(envelope)
+        # The verifier compares against ``verifier_schema`` if set,
+        # otherwise the same producer ``schema`` (default backward-
+        # compat). On schema drift the verifier's CID differs from
+        # the envelope's signed CID and ``schema_cid_mismatch`` fires.
+        verifier_view = self.verifier_schema or self.schema
+        outcome = verify_latent_digest(
+            envelope, registered_schema=verifier_view,
+            sealed_probe_cids=set(sealed_probe_cids))
+        if (not outcome.ok) and self.require_verification:
+            return _pack_result(
+                decoder_branch=W22_BRANCH_LATENT_REJECTED, abstained=True,
+                envelope=envelope, verification_ok=False,
+                verification_reason=outcome.reason,
+                verification_n_checks=outcome.n_checks)
+        return _pack_result(
+            decoder_branch=W22_BRANCH_LATENT_RESOLVED, abstained=False,
+            envelope=envelope, verification_ok=outcome.ok,
+            verification_reason=outcome.reason,
+            verification_n_checks=outcome.n_checks)
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+               ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> W22LatentResult | None:
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> LatentDigestEnvelope | None:
+        return self._last_envelope
 
     @property
     def T_decoder(self) -> int | None:

@@ -1000,6 +1000,100 @@ Permitted phrasings:
 Forbidden: "SDK v3.14 closes synthetic→real-LLM transfer."
 Forbidden: "Real Ollama 14B emits drift; W13 rescues it."
 
+### "W22 solves wire-cost" or "the latent digest is a real KV cache"
+
+> *"W22 solves the wire-cost half of multi-agent coordination."*
+
+Forbidden as a *general* claim. The W22-1 win is *strongly
+conditional* on the R-69-CACHE-FANOUT bench property: at least
+two cells share an OutsideQuery + oracle_id pair (else the cache
+cannot hit) AND the inner W21 fires
+``W21_BRANCH_QUORUM_RESOLVED`` on every cell (else there is
+nothing to compress) AND the controller's verifier schema CID
+matches the producer's signed CID. Permitted phrasings: *"clears
+the post-W21 efficiency bar of the SDK-v3.23-anchored success
+criterion (R-69)"*, *"the first capsule-native multi-agent-
+coordination method that combines explicit-capsule passing with
+audited proxies for the LatentMAS direction"*, *"closes the
+wire-cost half of W21-C-CALIBRATED-TRUST on R-69-CACHE-FANOUT
+under the named bench property"*. Forbidden: *"W22 solved the
+wire-cost concern"* (unqualified), *"W22 is a KV cache"*, *"W22
+implements latent state transfer between LLM agents"*. The W22
+``SharedReadCache`` is a CAPSULE-LAYER proxy for the LatentMAS
+shared-KV-read direction; it does NOT touch transformer-internal
+KV caches, embedding tables, attention weights, or any model-
+internal state. The "shared cache" stores raw oracle reply bytes,
+content-addressed by the OutsideQuery + oracle_id CID; the cost
+metric is wire-side oracle reply tokens not paid because the
+entry was already in the cache — measured at the capsule
+boundary.
+
+The W22-1 win is conditional on:
+* (a) the cache-hit-rate condition (cross-cell OutsideQuery
+  overlap),
+* (b) the inner W21 trigger condition (``W21_BRANCH_QUORUM_RESOLVED``),
+* (c) the verifier-side schema CID match.
+
+If any condition fails, W22 reduces to W21 byte-for-byte or
+abstains by construction:
+* **W22-Λ-no-cache** (no repeated reads): cache_tokens_saved = 0;
+  the digest still compresses but no wire-side savings.
+* **R-69-POISONED-DIGEST** (tampered envelope): controller fires
+  ``hash_mismatch`` → W22 falls through to W21 baseline.
+* **R-69-SCHEMA-DRIFT** (verifier registered with different
+  schema CID): controller fires ``schema_cid_mismatch`` →
+  fall through.
+* **R-69-NO-TRIGGER** (W21 abstained): W22 fires
+  ``W22_BRANCH_NO_TRIGGER`` and reduces to W21 byte-for-byte.
+
+The natural extensions are conjectural and must be labelled
+that way:
+* **W22-C-CACHE-AMPLIFICATION** — when a probabilistic LLM
+  oracle is in the registry, the cache freezes the LLM's first
+  reply across all matching cells; bad first replies poison many
+  cells (observed empirically on mixtral:8x7b live regime, 1/4
+  drifts).
+* **W22-C-LATENT-KV-NATIVE** — the W22 typed-envelope +
+  verification surface as an integration boundary for true
+  cross-host KV reuse between MLX-distributed LLM servers (not
+  implemented; remains conjectural pending Mac-2 return).
+
+### "We've implemented LatentMAS" or "this is collective KV pooling"
+
+> *"This implements the LatentMAS direction."*
+
+Forbidden as an *unqualified* claim. The W22 family implements
+**capsule-layer audited proxies** for *some* of the LatentMAS
+idea families:
+
+* **schema-passing** → ``SchemaCapsule`` (closed-vocabulary type
+  schema, content-addressed, shared once per session by CID).
+* **delta execution** → ``LatentDigestEnvelope`` (one typed
+  envelope per cell summarising the W21 vote outcome instead of
+  replaying the verbose audit).
+* **shared-read cache** → ``SharedReadCache`` +
+  ``CachingOracleAdapter`` (CID-keyed write-once-read-many; oracle
+  replies cached at the capsule boundary).
+* **controller-verified side channel** → ``verify_latent_digest``
+  (hash-chained, schema-versioned, parent-CID-sealed; rejection
+  on any failure).
+
+These are **honest proxies at the capsule layer**, NOT runtime
+KV-cache transplants. Permitted phrasings: *"capsule-layer proxy
+for the LatentMAS shared-KV-read direction"*, *"audited
+controller-verified compact handoff abstraction"*, *"the closest
+honest implementation of the LatentMAS idea family this repo can
+verify end-to-end"*. Forbidden: *"we implemented LatentMAS"* (no
+runtime KV manipulation), *"collective KV pooling"* (the cache
+stores oracle reply bytes, not model-internal KV pairs),
+*"latent hidden-state transfer"* (no model state is transferred;
+only typed audit summaries).
+
+If a future programme builds true KV-sharing between Apple-Silicon-
+distributed MLX servers, the W22 typed-envelope + verification
+surface is a useful integration-boundary anchor — but the W22
+family as shipped does **not** make that claim.
+
 ## Change log
 
 - **2026-04-26 (SDK v3.3).** Initial canonical version. Adds
