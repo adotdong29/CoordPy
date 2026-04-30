@@ -5521,6 +5521,45 @@ __all__ = [
     "W22_ALL_BRANCHES",
     "W22_DEFAULT_TRIGGER_BRANCHES",
     "W22_LATENT_ENVELOPE_SCHEMA_VERSION",
+    # SDK v3.24 — capsule-native cross-cell delta execution +
+    # quorum-keyed cache + super-token reference (W23 family).
+    # The strongest honest hybrid that combines explicit-capsule
+    # coordination with the LatentMAS direction beyond W22:
+    # cross-cell hash-chained session digest, per-cell delta
+    # execution, quorum-keyed cache (mitigates
+    # W22-C-CACHE-AMPLIFICATION), super-token reference (bounded
+    # steganographic / dense-control-payload experiment), and a
+    # within-process producer/decoder host-split proxy (Mac-2
+    # unreachable fallback).
+    "SessionDigestEnvelope",
+    "SessionDeltaEnvelope",
+    "verify_session_digest_chain",
+    "verify_session_delta",
+    "SuperTokenReferenceEnvelope",
+    "SuperTokenRegistry",
+    "verify_super_token_reference",
+    "QuorumKeyedSharedReadCache",
+    "CACHE_FRESHNESS_BYTE_IDENTICAL",
+    "CACHE_FRESHNESS_PER_CELL_NONCE",
+    "CACHE_FRESHNESS_QUORUM_LOCKED",
+    "CACHE_FRESHNESS_POLICIES",
+    "QuorumKeyedCachingOracleAdapter",
+    "CrossHostProducerDecoderProxy",
+    "W23SessionResult",
+    "CrossCellDeltaDisambiguator",
+    "W23_BRANCH_DELTA_RESOLVED",
+    "W23_BRANCH_DELTA_REJECTED",
+    "W23_BRANCH_GENESIS",
+    "W23_BRANCH_SUPER_TOKEN_RESOLVED",
+    "W23_BRANCH_SUPER_TOKEN_REJECTED",
+    "W23_BRANCH_NO_TRIGGER",
+    "W23_BRANCH_NO_PRIOR_SESSION",
+    "W23_BRANCH_DISABLED",
+    "W23_ALL_BRANCHES",
+    "W23_SESSION_ENVELOPE_SCHEMA_VERSION",
+    "W23_DELTA_ENVELOPE_SCHEMA_VERSION",
+    "W23_SUPER_TOKEN_SCHEMA_VERSION",
+    "W23_DEFAULT_TRIGGER_BRANCHES",
 ]
 
 
@@ -8094,6 +8133,1567 @@ class LatentDigestDisambiguator:
     @property
     def last_envelope(self) -> LatentDigestEnvelope | None:
         return self._last_envelope
+
+    @property
+    def T_decoder(self) -> int | None:
+        return self.inner.T_decoder
+
+    @T_decoder.setter
+    def T_decoder(self, v: int | None) -> None:
+        self.inner.T_decoder = v
+
+    def pack_stats(self) -> dict[str, Any]:
+        return self.inner.pack_stats()
+
+
+# =============================================================================
+# SDK v3.24 — capsule-native cross-cell delta execution + quorum-keyed cache
+# + super-token reference (W23 family).
+#
+# The follow-up to SDK v3.23 (W22) on the named research direction the
+# W22 milestone explicitly left open: a denser latent / dense-control
+# transfer mechanism that goes *beyond the per-cell digest envelope* by
+# (a) carrying running cross-cell state in a hash-chained session
+# envelope, (b) emitting a *small per-cell delta* against that running
+# state instead of the full digest each time, (c) optionally collapsing
+# the visible-token cost to a *single super-token reference* (the
+# bounded, audited steganographic / dense-control-payload experiment
+# the user explicitly asked for), and (d) mitigating the
+# W22-C-CACHE-AMPLIFICATION conjecture (the cache freezing of a
+# probabilistic LLM oracle's first reply across all matching cells)
+# via a quorum-keyed cache freshness policy.
+#
+# The W22 layer was the smallest *per-cell* honest LatentMAS proxy
+# (schema-passing + delta execution + shared-read cache + controller
+# verification on one cell). The W23 layer is the smallest *cross-cell*
+# honest LatentMAS proxy (running session state + per-cell delta +
+# quorum-keyed cache + super-token reference + controller verification
+# on every link). Both layers leave the explicit-capsule path sound on
+# verification failure.
+#
+# Honest scope (W23). The "cross-cell state" lives at the **capsule
+# layer**; it is not a transformer-internal KV transplant. The
+# "super-token reference" is an audited single-visible-token CID
+# pointer to a verified envelope; it is a bounded, auditable proxy for
+# the LatentMAS *super-token side channel* idea — *not* an embedding
+# manipulation. We do NOT modify model-internal state, embedding
+# tables, attention weights, or any part of any transformer's runtime.
+#
+# Trust boundary. Every W23 envelope is hash-chained, schema-versioned,
+# parent-CID-sealed, and (optionally) registered in a controller-side
+# super-token registry. On any verification failure the W23 layer
+# rejects the payload and the explicit-capsule path stays sound.
+# =============================================================================
+
+
+W23_SESSION_ENVELOPE_SCHEMA_VERSION: str = "wevra.session_digest.v1"
+W23_DELTA_ENVELOPE_SCHEMA_VERSION: str = "wevra.session_delta.v1"
+W23_SUPER_TOKEN_SCHEMA_VERSION: str = "wevra.super_token_ref.v1"
+
+
+W23_BRANCH_DELTA_RESOLVED = "delta_resolved"
+W23_BRANCH_DELTA_REJECTED = "delta_rejected"
+W23_BRANCH_GENESIS = "genesis"
+W23_BRANCH_SUPER_TOKEN_RESOLVED = "super_token_resolved"
+W23_BRANCH_SUPER_TOKEN_REJECTED = "super_token_rejected"
+W23_BRANCH_NO_TRIGGER = "no_trigger"
+W23_BRANCH_NO_PRIOR_SESSION = "no_prior_session"
+W23_BRANCH_DISABLED = "disabled"
+
+
+W23_ALL_BRANCHES: tuple[str, ...] = (
+    W23_BRANCH_DELTA_RESOLVED,
+    W23_BRANCH_DELTA_REJECTED,
+    W23_BRANCH_GENESIS,
+    W23_BRANCH_SUPER_TOKEN_RESOLVED,
+    W23_BRANCH_SUPER_TOKEN_REJECTED,
+    W23_BRANCH_NO_TRIGGER,
+    W23_BRANCH_NO_PRIOR_SESSION,
+    W23_BRANCH_DISABLED,
+)
+
+
+# Trigger condition: W23 operates ONLY when the inner W22 layer
+# produced a verified envelope (W22_BRANCH_LATENT_RESOLVED). On every
+# other inner-W22 branch (NO_TRIGGER / LATENT_REJECTED / DISABLED /
+# NO_SCHEMA), the W23 layer reduces to W22 byte-for-byte.
+W23_DEFAULT_TRIGGER_BRANCHES: frozenset[str] = frozenset({
+    W22_BRANCH_LATENT_RESOLVED,
+})
+
+
+# Cache freshness policies (W23 quorum-keyed-cache). Each registered
+# oracle declares one policy; the cache uses it to decide whether two
+# byte-identical OutsideQueries from different cells should hit the
+# same entry.
+#
+#   * BYTE_IDENTICAL — W22 default. Two byte-identical queries always
+#     collapse to one wire-side call. Maximises wire savings; freezes
+#     a probabilistic oracle's first sample (W22-C-CACHE-AMPLIFICATION
+#     applies).
+#   * PER_CELL_NONCE — Cache key includes a per-cell nonce. Identical
+#     queries from different cells DO NOT hit. Eliminates
+#     W22-C-CACHE-AMPLIFICATION at the cost of zero cross-cell
+#     savings on this oracle. Recommended for probabilistic LLM
+#     adjudicators registered alongside deterministic oracles.
+#   * QUORUM_LOCKED — Cache stores entries only after the controller
+#     confirms the oracle's reply contributed to a successful quorum.
+#     A bad first reply that did NOT form quorum is NOT cached;
+#     subsequent matching cells re-consult and may produce a
+#     different (good) reply. The strictest mitigation; mid-cost.
+CACHE_FRESHNESS_BYTE_IDENTICAL: str = "byte_identical"
+CACHE_FRESHNESS_PER_CELL_NONCE: str = "per_cell_nonce"
+CACHE_FRESHNESS_QUORUM_LOCKED: str = "quorum_locked"
+
+
+CACHE_FRESHNESS_POLICIES: tuple[str, ...] = (
+    CACHE_FRESHNESS_BYTE_IDENTICAL,
+    CACHE_FRESHNESS_PER_CELL_NONCE,
+    CACHE_FRESHNESS_QUORUM_LOCKED,
+)
+
+
+@dataclasses.dataclass(frozen=True)
+class SessionDigestEnvelope:
+    """Hash-chained running cross-cell session state (W23 family).
+
+    Models the LatentMAS *cross-cell latent state-sharing* direction
+    at the capsule layer. After every cell, the W23 layer computes a
+    new SessionDigestEnvelope whose ``prior_session_digest_cid``
+    points back to the previous one (or empty string at genesis).
+    The chain is verifiable in O(1) per link by the controller — each
+    link's ``digest_cid`` recomputes from canonical bytes and the
+    parent CID is checked against the registered chain head.
+
+    The envelope is *not* a copy of every per-cell digest — it is a
+    rolling summary: cumulative per-tag votes, latest projected
+    subset, count of cells processed so far, the most recent inner
+    W19 branch. The full per-cell evidence remains in the per-cell
+    LatentDigestEnvelope (W22) and SessionDeltaEnvelope (W23).
+
+    Trust boundary: every link is hash-chained; tampering with any
+    field after construction yields a digest_cid mismatch on
+    re-verification.
+    """
+    schema_cid: str
+    prior_session_digest_cid: str
+    n_cells: int
+    cumulative_per_tag_votes: tuple[tuple[str, int], ...]
+    latest_projected_subset: tuple[str, ...]
+    latest_inner_branch: str
+    n_cells_resolved: int
+    digest_cid: str = ""
+    schema_version: str = W23_SESSION_ENVELOPE_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "cumulative_per_tag_votes",
+                            tuple(sorted(self.cumulative_per_tag_votes,
+                                            key=lambda kv: kv[0])))
+        object.__setattr__(self, "latest_projected_subset",
+                            tuple(sorted(self.latest_projected_subset)))
+        if not self.digest_cid:
+            object.__setattr__(self, "digest_cid",
+                                self.recompute_digest_cid())
+
+    def _signed_payload(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "prior_session_digest_cid": self.prior_session_digest_cid,
+            "n_cells": int(self.n_cells),
+            "cumulative_per_tag_votes": [
+                [t, int(c)] for t, c in self.cumulative_per_tag_votes
+            ],
+            "latest_projected_subset": list(self.latest_projected_subset),
+            "latest_inner_branch": self.latest_inner_branch,
+            "n_cells_resolved": int(self.n_cells_resolved),
+        }
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes(self._signed_payload())
+
+    def recompute_digest_cid(self) -> str:
+        return hashlib.sha256(self.to_canonical_bytes()).hexdigest()
+
+    def to_decoder_text(self) -> str:
+        votes = ",".join(
+            f"{t}:{c}" for t, c in self.cumulative_per_tag_votes
+        ) or "(empty)"
+        proj = ",".join(self.latest_projected_subset) or "(empty)"
+        prior = (self.prior_session_digest_cid[:16]
+                  if self.prior_session_digest_cid else "(genesis)")
+        parts = [
+            "SESSION_DIGEST",
+            f"schema_version={self.schema_version}",
+            f"schema_cid={self.schema_cid[:16]}",
+            f"digest_cid={self.digest_cid[:16]}",
+            f"prior={prior}",
+            f"n_cells={int(self.n_cells)}",
+            f"n_resolved={int(self.n_cells_resolved)}",
+            f"branch={self.latest_inner_branch}",
+            f"cumulative_votes={votes}",
+            f"projected={proj}",
+        ]
+        return " ".join(parts)
+
+    @property
+    def n_digest_tokens(self) -> int:
+        return _whitespace_token_count(self.to_decoder_text())
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "prior_session_digest_cid": self.prior_session_digest_cid,
+            "n_cells": int(self.n_cells),
+            "n_cells_resolved": int(self.n_cells_resolved),
+            "cumulative_per_tag_votes": [
+                [t, int(c)] for t, c in self.cumulative_per_tag_votes
+            ],
+            "latest_projected_subset": list(self.latest_projected_subset),
+            "latest_inner_branch": self.latest_inner_branch,
+            "digest_cid": self.digest_cid,
+            "n_digest_tokens": int(self.n_digest_tokens),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+@dataclasses.dataclass(frozen=True)
+class SessionDeltaEnvelope:
+    """Per-cell delta against the running session digest (W23 family).
+
+    Carries only what is *new* for this cell:
+
+      * which W21 inner branch fired,
+      * the *delta* in projected subset (added vs prior session
+        ``latest_projected_subset``; removed vs prior),
+      * the *delta* in per-tag votes (only tags whose count changed
+        between the prior cumulative and this cell's contribution),
+      * this cell's parent probe CIDs (provenance — the actual oracle
+        replies stay in the per-cell W22 LatentDigestEnvelope and
+        the W21 W21OracleProbe records).
+
+    Visible-token cost is strictly less than the full
+    :class:`LatentDigestEnvelope` on regimes where consecutive cells
+    share most of their state (the bench property of
+    R-70-DELTA-FANOUT). On disjoint-state cells (R-70-NO-DELTA) the
+    delta is the full envelope and the W23 layer reduces to W22 with
+    no efficiency gain (W23-Λ-no-delta).
+
+    The envelope is signed at construction; tampering after the fact
+    yields a ``hash_mismatch`` on verification.
+    """
+    schema_cid: str
+    prior_session_digest_cid: str
+    parent_session_digest_cid: str
+    cell_index: int
+    inner_w19_branch: str
+    delta_projected_added: tuple[str, ...]
+    delta_projected_removed: tuple[str, ...]
+    delta_per_tag_votes: tuple[tuple[str, int], ...]
+    delta_n_outside_tokens: int
+    parent_probe_cids: tuple[str, ...]
+    delta_cid: str = ""
+    schema_version: str = W23_DELTA_ENVELOPE_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "delta_projected_added",
+                            tuple(sorted(self.delta_projected_added)))
+        object.__setattr__(self, "delta_projected_removed",
+                            tuple(sorted(self.delta_projected_removed)))
+        object.__setattr__(self, "delta_per_tag_votes",
+                            tuple(sorted(self.delta_per_tag_votes,
+                                            key=lambda kv: kv[0])))
+        object.__setattr__(self, "parent_probe_cids",
+                            tuple(self.parent_probe_cids))
+        if not self.delta_cid:
+            object.__setattr__(self, "delta_cid",
+                                self.recompute_delta_cid())
+
+    def _signed_payload(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "prior_session_digest_cid": self.prior_session_digest_cid,
+            "parent_session_digest_cid": self.parent_session_digest_cid,
+            "cell_index": int(self.cell_index),
+            "inner_w19_branch": self.inner_w19_branch,
+            "delta_projected_added": list(self.delta_projected_added),
+            "delta_projected_removed": list(self.delta_projected_removed),
+            "delta_per_tag_votes": [
+                [t, int(c)] for t, c in self.delta_per_tag_votes
+            ],
+            "delta_n_outside_tokens": int(self.delta_n_outside_tokens),
+            "parent_probe_cids": list(self.parent_probe_cids),
+        }
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes(self._signed_payload())
+
+    def recompute_delta_cid(self) -> str:
+        return hashlib.sha256(self.to_canonical_bytes()).hexdigest()
+
+    def to_decoder_text(self) -> str:
+        # Adaptive serialisation: omit fields that are empty/zero so
+        # consecutive byte-identical cells produce minimal deltas.
+        # The required fields (schema_cid, parent, cell_index,
+        # delta_cid) anchor the chain; everything else is included
+        # only when nonempty. The controller can reconstruct the
+        # canonical bytes from the omitted-field absence (the
+        # JSON-canonical signed payload is unaffected; the
+        # decoder-facing text is the *visible* token cost only).
+        parts: list[str] = ["SESSION_DELTA"]
+        parts.append(f"schema_cid={self.schema_cid[:16]}")
+        parts.append(f"parent={self.parent_session_digest_cid[:16]}")
+        parts.append(f"cell={int(self.cell_index)}")
+        parts.append(f"delta_cid={self.delta_cid[:16]}")
+        # Optional fields — emitted only when nonempty/nonzero.
+        if self.inner_w19_branch:
+            parts.append(f"branch={self.inner_w19_branch}")
+        if self.delta_projected_added:
+            parts.append(
+                f"add={','.join(self.delta_projected_added)}")
+        if self.delta_projected_removed:
+            parts.append(
+                f"rm={','.join(self.delta_projected_removed)}")
+        if self.delta_per_tag_votes:
+            votes = ",".join(
+                f"{t}:{c}" for t, c in self.delta_per_tag_votes)
+            parts.append(f"votes={votes}")
+        if self.delta_n_outside_tokens:
+            parts.append(
+                f"out_tokens={int(self.delta_n_outside_tokens)}")
+        if self.parent_probe_cids:
+            parts.append(f"n_probes={len(self.parent_probe_cids)}")
+        return " ".join(parts)
+
+    @property
+    def n_delta_tokens(self) -> int:
+        return _whitespace_token_count(self.to_decoder_text())
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "prior_session_digest_cid": self.prior_session_digest_cid,
+            "parent_session_digest_cid": self.parent_session_digest_cid,
+            "cell_index": int(self.cell_index),
+            "inner_w19_branch": self.inner_w19_branch,
+            "delta_projected_added": list(self.delta_projected_added),
+            "delta_projected_removed": list(self.delta_projected_removed),
+            "delta_per_tag_votes": [
+                [t, int(c)] for t, c in self.delta_per_tag_votes
+            ],
+            "delta_n_outside_tokens": int(self.delta_n_outside_tokens),
+            "parent_probe_cids": list(self.parent_probe_cids),
+            "delta_cid": self.delta_cid,
+            "n_delta_tokens": int(self.n_delta_tokens),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_session_digest_chain(
+        envelope: SessionDigestEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        prior_chain_head_cid: str = "",
+        ) -> LatentVerificationOutcome:
+    """Controller-side verification of one link of the
+    SessionDigestEnvelope hash-chain.
+
+    Returns ``ok=True`` only if (a) schema versions match, (b) schema
+    CID matches, (c) digest_cid recomputes from canonical bytes, (d)
+    the envelope's ``prior_session_digest_cid`` equals the registered
+    chain head. The function is short, pure, and the failure modes
+    are enumerated; soundness holds by inspection.
+
+    The expected ``prior_chain_head_cid`` is "" at genesis (the first
+    cell of a session) and the previous link's ``digest_cid``
+    thereafter.
+    """
+    n_checks = 0
+    if envelope is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_envelope", n_checks=n_checks)
+    n_checks += 1
+    if envelope.schema_version != W23_SESSION_ENVELOPE_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n_checks)
+    n_checks += 1
+    if envelope.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    canonical = envelope.to_canonical_bytes()
+    if hashlib.sha256(canonical).hexdigest() != envelope.digest_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if envelope.prior_session_digest_cid != prior_chain_head_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="chain_head_mismatch", n_checks=n_checks)
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+def verify_session_delta(
+        delta: SessionDeltaEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        parent_session_digest_cid: str,
+        ) -> LatentVerificationOutcome:
+    """Controller-side verification of a SessionDeltaEnvelope.
+
+    Returns ``ok=True`` only if (a) schema versions match, (b) schema
+    CID matches, (c) delta_cid recomputes from canonical bytes, (d)
+    the delta's ``parent_session_digest_cid`` equals the registered
+    parent (the controller's view of the chain head this delta is
+    extending).
+    """
+    n_checks = 0
+    if delta is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_envelope", n_checks=n_checks)
+    n_checks += 1
+    if delta.schema_version != W23_DELTA_ENVELOPE_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n_checks)
+    n_checks += 1
+    if delta.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    canonical = delta.to_canonical_bytes()
+    if hashlib.sha256(canonical).hexdigest() != delta.delta_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if delta.parent_session_digest_cid != parent_session_digest_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="parent_session_mismatch", n_checks=n_checks)
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+@dataclasses.dataclass(frozen=True)
+class SuperTokenReferenceEnvelope:
+    """Single-visible-token CID reference (W23 family — bounded
+    steganographic / dense-control-payload experiment).
+
+    The decoder visible cost of a W23 cell can collapse to *one
+    whitespace token*: the super-token. The token format is
+
+        <latent_ref:DDDDDDDDDDDDDDDD>
+
+    where ``DDDDDDDDDDDDDDDD`` is the 16-character hex prefix of the
+    referenced :class:`SessionDeltaEnvelope`'s ``delta_cid``.
+
+    Honest scope: the super-token is **not** a transformer-internal
+    embedding manipulation. It is a content-addressed reference that
+    is *registered* with the controller: the controller's
+    :class:`SuperTokenRegistry` maps the prefix to the full
+    SessionDeltaEnvelope. On every read the controller verifies (a)
+    the prefix is in the registry, (b) the referenced delta's
+    delta_cid recomputes, (c) the parent_session_digest_cid links to
+    the chain. On any failure the W23 layer rejects the super-token
+    and falls through to the verbose digest path.
+
+    The bound on the channel is sharp: at most one super-token per
+    cell; at most ``hex_prefix_len`` characters of payload (default
+    16); the registry is controller-owned and can be enumerated /
+    audited; tampering yields a ``hash_mismatch`` or
+    ``unknown_super_token`` rejection.
+    """
+    schema_cid: str
+    delta_cid: str
+    parent_session_digest_cid: str
+    hex_prefix_len: int = 16
+    schema_version: str = W23_SUPER_TOKEN_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        if (self.hex_prefix_len < 4 or self.hex_prefix_len > 64):
+            raise ValueError(
+                f"hex_prefix_len must be in [4, 64]; got {self.hex_prefix_len}")
+        if len(self.delta_cid) != 64:
+            raise ValueError(
+                f"delta_cid must be 64 hex chars (SHA-256); got "
+                f"{len(self.delta_cid)}")
+
+    @property
+    def super_token(self) -> str:
+        return f"<latent_ref:{self.delta_cid[:self.hex_prefix_len]}>"
+
+    @property
+    def n_super_token_tokens(self) -> int:
+        # The super-token is one whitespace token by construction
+        # (no internal whitespace).
+        return 1
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "delta_cid": self.delta_cid,
+            "parent_session_digest_cid": self.parent_session_digest_cid,
+            "hex_prefix_len": int(self.hex_prefix_len),
+            "super_token": self.super_token,
+            "n_super_token_tokens": int(self.n_super_token_tokens),
+        }
+
+
+@dataclasses.dataclass
+class SuperTokenRegistry:
+    """Controller-side registry of super-token references (W23 family).
+
+    Maps the super-token's hex prefix to the full
+    :class:`SessionDeltaEnvelope` so the controller can resolve and
+    verify a super-token reference at decode time. The registry is
+    enumerable (auditable) and the resolve path is constant-time on
+    a hit.
+
+    The registry is the trust boundary on the W23
+    super-token / dense-control side channel: a super-token whose
+    prefix is not registered is rejected; a registered token whose
+    referenced delta fails verification (``hash_mismatch`` or
+    ``parent_session_mismatch``) is rejected.
+    """
+    _by_prefix: dict[str, SessionDeltaEnvelope] = dataclasses.field(
+        default_factory=dict)
+    _hex_prefix_len: int = 16
+    n_registered: int = 0
+    n_resolved: int = 0
+    n_rejected: int = 0
+
+    def register(self, delta: SessionDeltaEnvelope, *,
+                  hex_prefix_len: int | None = None) -> str:
+        L = int(hex_prefix_len or self._hex_prefix_len)
+        if not (4 <= L <= 64):
+            raise ValueError(f"hex_prefix_len must be in [4, 64]; got {L}")
+        prefix = str(delta.delta_cid[:L])
+        if prefix in self._by_prefix:
+            existing = self._by_prefix[prefix]
+            if existing.delta_cid != delta.delta_cid:
+                raise ValueError(
+                    f"super-token prefix collision on {prefix!r}: "
+                    f"existing={existing.delta_cid[:32]} new={delta.delta_cid[:32]}")
+            return prefix
+        self._by_prefix[prefix] = delta
+        self._hex_prefix_len = L
+        self.n_registered += 1
+        return prefix
+
+    def lookup(self, prefix: str) -> SessionDeltaEnvelope | None:
+        return self._by_prefix.get(prefix)
+
+    def known_prefixes(self) -> tuple[str, ...]:
+        return tuple(sorted(self._by_prefix.keys()))
+
+    def __len__(self) -> int:
+        return len(self._by_prefix)
+
+
+def verify_super_token_reference(
+        envelope: SuperTokenReferenceEnvelope | None,
+        *,
+        registry: SuperTokenRegistry,
+        registered_schema: SchemaCapsule,
+        parent_session_digest_cid: str,
+        ) -> LatentVerificationOutcome:
+    """Controller-side resolve+verify for a super-token reference.
+
+    Pure function. Failure modes enumerated:
+
+      * empty_envelope — no envelope passed.
+      * schema_version_unknown — schema_version differs.
+      * schema_cid_mismatch — envelope's schema_cid != registered.
+      * unknown_super_token — prefix not in registry.
+      * hash_mismatch — registered delta's delta_cid does not
+        recompute (registry tamper).
+      * parent_session_mismatch — registered delta's
+        parent_session_digest_cid does not match the controller's
+        chain head.
+      * delta_cid_mismatch — envelope's delta_cid does not match the
+        registered delta's delta_cid (forged super-token).
+    """
+    n_checks = 0
+    if envelope is None:
+        registry.n_rejected += 1
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_envelope", n_checks=n_checks)
+    n_checks += 1
+    if envelope.schema_version != W23_SUPER_TOKEN_SCHEMA_VERSION:
+        registry.n_rejected += 1
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n_checks)
+    n_checks += 1
+    if envelope.schema_cid != registered_schema.cid:
+        registry.n_rejected += 1
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n_checks)
+    L = int(envelope.hex_prefix_len)
+    n_checks += 1
+    prefix = str(envelope.delta_cid[:L])
+    delta = registry.lookup(prefix)
+    if delta is None:
+        registry.n_rejected += 1
+        return LatentVerificationOutcome(
+            ok=False, reason="unknown_super_token", n_checks=n_checks)
+    n_checks += 1
+    if delta.delta_cid != envelope.delta_cid:
+        # Forged super-token whose prefix happens to collide with a
+        # registered entry but whose tail does not match.
+        registry.n_rejected += 1
+        return LatentVerificationOutcome(
+            ok=False, reason="delta_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    canonical = delta.to_canonical_bytes()
+    if hashlib.sha256(canonical).hexdigest() != delta.delta_cid:
+        registry.n_rejected += 1
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if delta.parent_session_digest_cid != parent_session_digest_cid:
+        registry.n_rejected += 1
+        return LatentVerificationOutcome(
+            ok=False, reason="parent_session_mismatch", n_checks=n_checks)
+    registry.n_resolved += 1
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+@dataclasses.dataclass
+class QuorumKeyedSharedReadCache:
+    """Mitigation of W22-C-CACHE-AMPLIFICATION (W23 family).
+
+    Wraps a :class:`SharedReadCache` with a per-oracle freshness
+    policy registry. Each registered oracle declares one of:
+
+      * :data:`CACHE_FRESHNESS_BYTE_IDENTICAL` — W22 default.
+      * :data:`CACHE_FRESHNESS_PER_CELL_NONCE` — cache key includes
+        a per-cell nonce; identical queries from different cells DO
+        NOT hit. Used for probabilistic LLM oracles.
+      * :data:`CACHE_FRESHNESS_QUORUM_LOCKED` — cache stores entries
+        only after the controller confirms the reply contributed to
+        a successful quorum; bad first replies that fail quorum are
+        NOT cached.
+
+    The mitigation is **opt-in per oracle**: deterministic oracles
+    (e.g. ``service_graph``, ``change_history``) keep
+    BYTE_IDENTICAL for full cross-cell wire savings; the
+    probabilistic LLM adjudicator gets PER_CELL_NONCE so a bad
+    first sample does not propagate. The trade-off is named in the
+    audit (``cache_tokens_saved_total`` is lower with PER_CELL_NONCE
+    than BYTE_IDENTICAL by exactly the amount of W22-C-CACHE-
+    AMPLIFICATION variance).
+
+    Honest scope: this is a *cache-layer* mitigation, not a runtime
+    KV cache. The "cache key" is over canonical OutsideQuery bytes.
+    """
+    inner: SharedReadCache = dataclasses.field(
+        default_factory=SharedReadCache)
+    policy_per_oracle: dict[str, str] = dataclasses.field(
+        default_factory=dict)
+    quorum_pending: dict[str, tuple[bytes, int, str]] = (
+        dataclasses.field(default_factory=dict))
+    n_quorum_locked_admitted: int = 0
+    n_quorum_locked_dropped: int = 0
+
+    def policy_for(self, oracle_id: str) -> str:
+        return self.policy_per_oracle.get(
+            str(oracle_id), CACHE_FRESHNESS_BYTE_IDENTICAL)
+
+    def set_policy(self, oracle_id: str, policy: str) -> None:
+        if policy not in CACHE_FRESHNESS_POLICIES:
+            raise ValueError(
+                f"unknown cache freshness policy {policy!r}; "
+                f"valid: {CACHE_FRESHNESS_POLICIES}")
+        self.policy_per_oracle[str(oracle_id)] = str(policy)
+
+    def query_cid_for(self, query: OutsideQuery, *,
+                       oracle_id: str, cell_nonce: str = "") -> str:
+        policy = self.policy_for(oracle_id)
+        if policy == CACHE_FRESHNESS_PER_CELL_NONCE:
+            # Mix the cell nonce into the cache key so identical queries
+            # from different cells DO NOT hit.
+            body = _canonical_json_bytes({
+                "oracle_id": str(oracle_id),
+                "admitted_tags": list(query.admitted_tags),
+                "elected_root_cause": str(query.elected_root_cause),
+                "primary_payload": str(query.primary_payload),
+                "witness_payloads": list(query.witness_payloads),
+                "max_response_tokens": int(query.max_response_tokens),
+                "cell_nonce": str(cell_nonce),
+            })
+            return hashlib.sha256(body).hexdigest()
+        # BYTE_IDENTICAL and QUORUM_LOCKED both use the W22 query CID.
+        return SharedReadCache.query_cid_for(query, oracle_id=oracle_id)
+
+    def get(self, cid: str) -> tuple[bytes, int, str] | None:
+        return self.inner.get(cid)
+
+    def put(self, cid: str, body: bytes, *, n_tokens: int,
+            source_id: str = "", oracle_id: str = "",
+            quorum_locked_pending: bool = False) -> None:
+        if (quorum_locked_pending or
+                self.policy_for(oracle_id) == CACHE_FRESHNESS_QUORUM_LOCKED):
+            # Defer the put until the controller confirms quorum.
+            self.quorum_pending[cid] = (
+                bytes(body), int(n_tokens), str(source_id))
+            return
+        self.inner.put(cid, body, n_tokens=n_tokens, source_id=source_id)
+
+    def confirm_quorum_for(self, cids: Iterable[str]) -> int:
+        """Promote pending entries to the cache after quorum forms."""
+        n_admitted = 0
+        for cid in cids:
+            entry = self.quorum_pending.pop(cid, None)
+            if entry is None:
+                continue
+            body, n_tokens, source_id = entry
+            self.inner.put(cid, body, n_tokens=n_tokens,
+                            source_id=source_id)
+            n_admitted += 1
+            self.n_quorum_locked_admitted += 1
+        return n_admitted
+
+    def drop_pending(self, cids: Iterable[str]) -> int:
+        """Drop pending entries (e.g. quorum failed to form)."""
+        n_dropped = 0
+        for cid in cids:
+            if self.quorum_pending.pop(cid, None) is not None:
+                n_dropped += 1
+                self.n_quorum_locked_dropped += 1
+        return n_dropped
+
+    @property
+    def n_hits(self) -> int:
+        return self.inner.n_hits
+
+    @n_hits.setter
+    def n_hits(self, v: int) -> None:
+        self.inner.n_hits = int(v)
+
+    @property
+    def n_misses(self) -> int:
+        return self.inner.n_misses
+
+    @n_misses.setter
+    def n_misses(self, v: int) -> None:
+        self.inner.n_misses = int(v)
+
+    @property
+    def n_tokens_saved(self) -> int:
+        return self.inner.n_tokens_saved
+
+    @n_tokens_saved.setter
+    def n_tokens_saved(self, v: int) -> None:
+        self.inner.n_tokens_saved = int(v)
+
+    @property
+    def _store(self) -> dict[str, tuple[bytes, int, str]]:
+        return self.inner._store
+
+    def stats(self) -> dict[str, Any]:
+        s = dict(self.inner.stats())
+        s.update({
+            "n_quorum_locked_admitted":
+                int(self.n_quorum_locked_admitted),
+            "n_quorum_locked_dropped":
+                int(self.n_quorum_locked_dropped),
+            "n_quorum_pending": len(self.quorum_pending),
+            "policy_per_oracle": dict(self.policy_per_oracle),
+        })
+        return s
+
+
+@dataclasses.dataclass
+class QuorumKeyedCachingOracleAdapter:
+    """Cache-aware adapter that routes through a QuorumKeyedSharedReadCache
+    (W23 family).
+
+    Mirror of :class:`CachingOracleAdapter` but uses a
+    :class:`QuorumKeyedSharedReadCache` (with per-oracle freshness
+    policy) instead of the W22 :class:`SharedReadCache`. The
+    ``cell_nonce`` field is *mutable* — the bench driver sets it to
+    a fresh value before each cell so the
+    :data:`CACHE_FRESHNESS_PER_CELL_NONCE` path can mix it into the
+    cache key.
+
+    Preserves the :class:`OutsideWitnessOracle` Protocol so it can be
+    registered in any W21 oracle stack as a drop-in replacement for
+    the wrapped oracle.
+    """
+    inner: Any
+    cache: QuorumKeyedSharedReadCache
+    oracle_id: str = ""
+    cell_nonce: str = ""
+    last_was_hit: bool = False
+    last_was_quorum_pending: bool = False
+
+    def __post_init__(self) -> None:
+        if not self.oracle_id:
+            self.oracle_id = str(getattr(
+                self.inner, "oracle_id", "quorum_keyed_oracle"))
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        cid = self.cache.query_cid_for(
+            query, oracle_id=self.oracle_id,
+            cell_nonce=str(self.cell_nonce))
+        cached = self.cache.get(cid)
+        if cached is not None:
+            body, n_tokens, source_id = cached
+            self.last_was_hit = True
+            self.last_was_quorum_pending = False
+            payload = body.decode("utf-8") if body else None
+            return OutsideVerdict(
+                payload=payload,
+                source_id=source_id or self.oracle_id,
+                n_tokens=int(n_tokens),
+            )
+        self.last_was_hit = False
+        verdict = self.inner.consult(query)
+        body = (verdict.payload or "").encode("utf-8")
+        policy = self.cache.policy_for(self.oracle_id)
+        if policy == CACHE_FRESHNESS_QUORUM_LOCKED:
+            self.last_was_quorum_pending = True
+            self.cache.put(cid, body, n_tokens=int(verdict.n_tokens),
+                            source_id=str(verdict.source_id or self.oracle_id),
+                            oracle_id=self.oracle_id,
+                            quorum_locked_pending=True)
+        else:
+            self.last_was_quorum_pending = False
+            self.cache.put(cid, body, n_tokens=int(verdict.n_tokens),
+                            source_id=str(verdict.source_id or self.oracle_id),
+                            oracle_id=self.oracle_id)
+        return verdict
+
+
+@dataclasses.dataclass
+class CrossHostProducerDecoderProxy:
+    """Within-process producer/decoder host-split proxy (W23 family).
+
+    Two-Mac infrastructure note. The W22 milestone declared the
+    SharedReadCache + LatentDigestDisambiguator interface
+    "wire-compatible with cross-host deployment" without proving it.
+    Mac 2 has been ARP-incomplete for 17 milestones in a row; we
+    cannot validate true two-host execution on this machine. This
+    class is the **honest within-process proxy**: it forces the
+    producer and decoder to communicate **only** through canonical
+    JSON bytes (no shared Python references), so the wire boundary
+    is mechanically observable and any latent shared state would
+    surface as a serialisation failure.
+
+    Honest scope: this is **not** a true two-host setup. It is a
+    structural simulation that lets us measure (a) how many bytes
+    actually cross the wire, (b) whether the producer / decoder
+    interface honours the JSON-canonical encoding contract, and (c)
+    whether the W22 / W23 envelopes survive a round-trip
+    serialisation. When Mac 2 returns, the same interface drops in
+    over a real socket with no W23 code changes.
+    """
+    n_round_trips: int = 0
+    n_bytes_serialised: int = 0
+    n_bytes_deserialised: int = 0
+
+    def producer_to_decoder(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Round-trip a payload as if across a host boundary."""
+        body = _canonical_json_bytes(payload)
+        self.n_round_trips += 1
+        self.n_bytes_serialised += len(body)
+        out = json.loads(body.decode("ascii"))
+        self.n_bytes_deserialised += len(body)
+        return out
+
+    def stats(self) -> dict[str, Any]:
+        return {
+            "n_round_trips": int(self.n_round_trips),
+            "n_bytes_serialised": int(self.n_bytes_serialised),
+            "n_bytes_deserialised": int(self.n_bytes_deserialised),
+        }
+
+
+@dataclasses.dataclass
+class W23SessionResult:
+    """Audit record for one W23 cell.
+
+    Captures the W22 outcome below, the per-cell delta envelope (or
+    None on no-trigger / rejected), the running session digest after
+    this cell, the optional super-token, and the visible-token
+    accounting for the W23 path.
+    """
+    answer: dict[str, Any]
+    inner_w22_branch: str
+    decoder_branch: str
+    abstained: bool
+    schema_cid: str
+    schema_version: str
+    cell_index: int
+    is_genesis: bool
+    prior_session_digest_cid: str
+    session_digest_cid: str
+    delta_cid: str
+    delta_n_tokens: int
+    super_token_used: bool
+    super_token_resolved: bool
+    super_token_str: str
+    n_w15_tokens_kept: int
+    n_w22_visible_tokens_to_decider: int
+    n_w23_visible_tokens_to_decider: int
+    n_w22_minus_w23_savings: int
+    cache_freshness_policy_used: dict[str, str]
+    cache_tokens_saved_this_cell: int
+    chain_verification_ok: bool
+    chain_verification_reason: str
+    delta_verification_ok: bool
+    delta_verification_reason: str
+    super_token_verification_ok: bool
+    super_token_verification_reason: str
+    cross_host_round_trip_bytes: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "answer": self.answer,
+            "inner_w22_branch": str(self.inner_w22_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "abstained": bool(self.abstained),
+            "schema_cid": str(self.schema_cid),
+            "schema_version": str(self.schema_version),
+            "cell_index": int(self.cell_index),
+            "is_genesis": bool(self.is_genesis),
+            "prior_session_digest_cid": str(self.prior_session_digest_cid),
+            "session_digest_cid": str(self.session_digest_cid),
+            "delta_cid": str(self.delta_cid),
+            "delta_n_tokens": int(self.delta_n_tokens),
+            "super_token_used": bool(self.super_token_used),
+            "super_token_resolved": bool(self.super_token_resolved),
+            "super_token_str": str(self.super_token_str),
+            "n_w15_tokens_kept": int(self.n_w15_tokens_kept),
+            "n_w22_visible_tokens_to_decider":
+                int(self.n_w22_visible_tokens_to_decider),
+            "n_w23_visible_tokens_to_decider":
+                int(self.n_w23_visible_tokens_to_decider),
+            "n_w22_minus_w23_savings":
+                int(self.n_w22_minus_w23_savings),
+            "cache_freshness_policy_used":
+                dict(self.cache_freshness_policy_used),
+            "cache_tokens_saved_this_cell":
+                int(self.cache_tokens_saved_this_cell),
+            "chain_verification_ok": bool(self.chain_verification_ok),
+            "chain_verification_reason":
+                str(self.chain_verification_reason),
+            "delta_verification_ok": bool(self.delta_verification_ok),
+            "delta_verification_reason":
+                str(self.delta_verification_reason),
+            "super_token_verification_ok":
+                bool(self.super_token_verification_ok),
+            "super_token_verification_reason":
+                str(self.super_token_verification_reason),
+            "cross_host_round_trip_bytes":
+                int(self.cross_host_round_trip_bytes),
+        }
+
+
+def _projected_tuple_from_answer(answer: dict[str, Any]) -> tuple[str, ...]:
+    services = answer.get("services", ()) if isinstance(answer, dict) else ()
+    if isinstance(services, (list, tuple)):
+        return tuple(sorted(str(s) for s in services))
+    return ()
+
+
+def _per_tag_votes_from_w22(
+        envelope: LatentDigestEnvelope | None,
+        ) -> dict[str, int]:
+    if envelope is None:
+        return {}
+    return {str(t): int(c) for t, c in envelope.per_tag_vote_count}
+
+
+@dataclasses.dataclass
+class CrossCellDeltaDisambiguator:
+    """Capsule + cross-cell delta-execution disambiguator (W23 family).
+
+    Wraps a :class:`LatentDigestDisambiguator` (W22) with four
+    LatentMAS-direction proxies on top:
+
+      1. **Cross-cell hash-chained session digest** via
+         :class:`SessionDigestEnvelope`.
+      2. **Per-cell delta execution** via
+         :class:`SessionDeltaEnvelope` (smaller than the full digest
+         on regimes where consecutive cells share state).
+      3. **Quorum-keyed cache** via
+         :class:`QuorumKeyedSharedReadCache` (mitigates
+         W22-C-CACHE-AMPLIFICATION on probabilistic LLM oracles).
+      4. **Super-token reference** via
+         :class:`SuperTokenReferenceEnvelope` (bounded
+         steganographic / dense-control-payload experiment;
+         single-visible-token CID reference verified through a
+         controller-side registry).
+
+    Plus optionally a :class:`CrossHostProducerDecoderProxy` for the
+    within-process producer / decoder host-split proxy (Mac-2
+    fallback).
+
+    The W23 surface is *strictly additive* on top of W22:
+
+      * If the inner W22 branch is not in
+        :data:`W23_DEFAULT_TRIGGER_BRANCHES` (i.e. the inner W22 did
+        not produce a verified envelope), W23 fires
+        :data:`W23_BRANCH_NO_TRIGGER` and reduces to W22
+        byte-for-byte on the answer field.
+      * If ``enabled = False``, W23 fires
+        :data:`W23_BRANCH_DISABLED` and reduces to W22.
+      * On the first cell of a session, W23 fires
+        :data:`W23_BRANCH_GENESIS` and emits the full W22 envelope as
+        the chain root (no delta savings on genesis).
+      * On chain-link verification failure, W23 fires
+        :data:`W23_BRANCH_DELTA_REJECTED` and the answer is the W22
+        answer byte-for-byte.
+      * On super-token reference verification failure (when
+        ``use_super_token = True``), W23 fires
+        :data:`W23_BRANCH_SUPER_TOKEN_REJECTED` and falls through to
+        the verbose digest.
+
+    Theorem family W23 — see
+    ``docs/RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md`` for the full
+    statements.
+    """
+
+    inner: LatentDigestDisambiguator = dataclasses.field(
+        default_factory=lambda: LatentDigestDisambiguator())
+    schema: SchemaCapsule | None = None
+    enabled: bool = True
+    use_super_token: bool = False
+    super_token_registry: SuperTokenRegistry | None = None
+    # Controller-side verifier registry. When set (not None), the
+    # controller verifies super-token references against THIS
+    # registry instead of the producer-side ``super_token_registry``.
+    # On R-70-SUPER-TOKEN-TAMPERED this is set to an empty (or
+    # tampered) registry → ``unknown_super_token`` rejection on
+    # every cell. Default None means the controller and producer
+    # share the same registry (backward-compat with the simpler
+    # within-process bench).
+    verifier_super_token_registry: SuperTokenRegistry | None = None
+    # Controller-side verifier chain-head override. When set (not
+    # empty / not None), the controller's
+    # :func:`verify_session_digest_chain` is called with
+    # ``prior_chain_head_cid=verifier_chain_head_override`` instead
+    # of the producer's :meth:`chain_head_cid`. On R-70-CHAIN-BROKEN
+    # the bench installs a phantom CID here after the genesis cell
+    # → every subsequent link's verifier sees a
+    # ``chain_head_mismatch`` and the W23 layer rejects (falls
+    # through to W22). Default None means no override (the producer
+    # and verifier share the chain head, the within-process default).
+    verifier_chain_head_override: str | None = None
+    quorum_keyed_cache: QuorumKeyedSharedReadCache | None = None
+    cross_host_proxy: CrossHostProducerDecoderProxy | None = None
+    super_token_hex_prefix_len: int = 16
+    trigger_branches: frozenset[str] = dataclasses.field(
+        default_factory=lambda: W23_DEFAULT_TRIGGER_BRANCHES)
+    require_chain_verification: bool = True
+
+    _chain: list[SessionDigestEnvelope] = dataclasses.field(
+        default_factory=list)
+    _last_result: W23SessionResult | None = None
+    _last_session_envelope: SessionDigestEnvelope | None = None
+    _last_delta_envelope: SessionDeltaEnvelope | None = None
+    _last_super_token: SuperTokenReferenceEnvelope | None = None
+    _cell_index: int = 0
+    _cumulative_per_tag_votes: dict[str, int] = dataclasses.field(
+        default_factory=dict)
+    # The per-cell vote count of the *prior* cell — used by
+    # ``_build_delta`` to compute the per-cell vote delta (only emit
+    # tags whose count CHANGED vs the prior cell). On byte-identical
+    # consecutive cells the delta_per_tag_votes is empty, which is
+    # the load-bearing compression signal of W23-1.
+    _last_cell_per_tag_votes: dict[str, int] = dataclasses.field(
+        default_factory=dict)
+    _last_projected_subset: tuple[str, ...] = ()
+    _last_inner_branch: str = ""
+    _n_resolved: int = 0
+
+    def reset_session(self) -> None:
+        """Reset per-session state. Useful when reusing the same
+        instance across independent benchmark runs."""
+        self._chain = []
+        self._last_result = None
+        self._last_session_envelope = None
+        self._last_delta_envelope = None
+        self._last_super_token = None
+        self._cell_index = 0
+        self._cumulative_per_tag_votes = {}
+        self._last_cell_per_tag_votes = {}
+        self._last_projected_subset = ()
+        self._last_inner_branch = ""
+        self._n_resolved = 0
+        if self.super_token_registry is not None:
+            self.super_token_registry._by_prefix.clear()
+            self.super_token_registry.n_registered = 0
+            self.super_token_registry.n_resolved = 0
+            self.super_token_registry.n_rejected = 0
+        if self.quorum_keyed_cache is not None:
+            self.quorum_keyed_cache.inner.n_hits = 0
+            self.quorum_keyed_cache.inner.n_misses = 0
+            self.quorum_keyed_cache.inner.n_tokens_saved = 0
+            self.quorum_keyed_cache.inner._store.clear()
+            self.quorum_keyed_cache.quorum_pending.clear()
+            self.quorum_keyed_cache.n_quorum_locked_admitted = 0
+            self.quorum_keyed_cache.n_quorum_locked_dropped = 0
+        self.inner.reset_session()
+
+    def chain_head_cid(self) -> str:
+        return self._chain[-1].digest_cid if self._chain else ""
+
+    def session_chain(self) -> tuple[SessionDigestEnvelope, ...]:
+        return tuple(self._chain)
+
+    def _build_delta(self, *, w22_envelope: LatentDigestEnvelope,
+                       prior_session_digest_cid: str,
+                       prior_projected: tuple[str, ...],
+                       parent_session_digest_cid: str,
+                       ) -> SessionDeltaEnvelope:
+        new_projected = w22_envelope.projected_subset
+        added = tuple(sorted(set(new_projected) - set(prior_projected)))
+        removed = tuple(sorted(set(prior_projected) - set(new_projected)))
+        # Vote delta: emit only the (tag, count) pairs whose count
+        # CHANGED vs the prior cell's per-tag vote count. On
+        # byte-identical consecutive cells (the bench property of
+        # R-70-DELTA-FANOUT) the delta is empty for votes — the
+        # load-bearing compression signal. Tags that disappeared in
+        # the new cell are emitted with count 0 so the controller
+        # can reconstruct the running cumulative.
+        delta_votes: list[tuple[str, int]] = []
+        new_votes = {str(t): int(c)
+                       for t, c in w22_envelope.per_tag_vote_count}
+        prior_votes = self._last_cell_per_tag_votes
+        all_tags = set(new_votes) | set(prior_votes)
+        for tag in all_tags:
+            new_count = new_votes.get(tag, 0)
+            prior_count = prior_votes.get(tag, 0)
+            if new_count != prior_count:
+                delta_votes.append((tag, new_count))
+        return SessionDeltaEnvelope(
+            schema_cid=w22_envelope.schema_cid,
+            prior_session_digest_cid=prior_session_digest_cid,
+            parent_session_digest_cid=parent_session_digest_cid,
+            cell_index=int(self._cell_index),
+            inner_w19_branch=str(w22_envelope.inner_w19_branch),
+            delta_projected_added=tuple(added),
+            delta_projected_removed=tuple(removed),
+            delta_per_tag_votes=tuple(delta_votes),
+            delta_n_outside_tokens=int(
+                w22_envelope.n_outside_tokens_total),
+            parent_probe_cids=tuple(w22_envelope.parent_probe_cids),
+            schema_version=W23_DELTA_ENVELOPE_SCHEMA_VERSION,
+        )
+
+    def _build_session_digest(self, *,
+                                w22_envelope: LatentDigestEnvelope,
+                                prior_session_digest_cid: str,
+                                resolved: bool,
+                                ) -> SessionDigestEnvelope:
+        # Cumulative per-tag votes after this cell.
+        cumulative = dict(self._cumulative_per_tag_votes)
+        for tag, count in w22_envelope.per_tag_vote_count:
+            cumulative[str(tag)] = (
+                int(cumulative.get(str(tag), 0)) + int(count))
+        return SessionDigestEnvelope(
+            schema_cid=w22_envelope.schema_cid,
+            prior_session_digest_cid=prior_session_digest_cid,
+            n_cells=int(self._cell_index + 1),
+            cumulative_per_tag_votes=tuple(
+                sorted(cumulative.items(), key=lambda kv: kv[0])),
+            latest_projected_subset=tuple(
+                sorted(w22_envelope.projected_subset)),
+            latest_inner_branch=str(w22_envelope.inner_w19_branch),
+            n_cells_resolved=int(self._n_resolved + (1 if resolved else 0)),
+            schema_version=W23_SESSION_ENVELOPE_SCHEMA_VERSION,
+        )
+
+    def _maybe_round_trip_proxy(self, payload: dict[str, Any]
+                                  ) -> tuple[dict[str, Any], int]:
+        if self.cross_host_proxy is None:
+            return payload, 0
+        before = self.cross_host_proxy.n_bytes_serialised
+        out = self.cross_host_proxy.producer_to_decoder(payload)
+        after = self.cross_host_proxy.n_bytes_serialised
+        return out, max(0, after - before)
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+            ) -> dict[str, Any]:
+        # Run inner W22 (which itself runs W21 → W19 → W18 → W15).
+        base = self.inner.decode_rounds(per_round_handoffs)
+        w22_result = self.inner.last_result
+        w22_envelope = self.inner.last_envelope
+        out = dict(base)
+
+        n_w15_kept = (int(w22_result.n_w15_tokens_kept)
+                       if w22_result is not None else 0)
+        n_w22_visible = (int(w22_result.n_visible_tokens_to_decider)
+                          if w22_result is not None else 0)
+        cell_index = int(self._cell_index)
+        prior_session_digest_cid = self.chain_head_cid()
+        prior_projected = self._last_projected_subset
+        cache_policy_snapshot: dict[str, str] = {}
+        if self.quorum_keyed_cache is not None:
+            cache_policy_snapshot = dict(
+                self.quorum_keyed_cache.policy_per_oracle)
+        cache_saved_this_cell = (
+            int(w22_result.cache_tokens_saved_this_cell)
+            if w22_result is not None else 0)
+
+        def _pack(*, decoder_branch: str, abstained: bool,
+                   delta: SessionDeltaEnvelope | None,
+                   session_env: SessionDigestEnvelope | None,
+                   super_token: SuperTokenReferenceEnvelope | None,
+                   chain_ok: bool, chain_reason: str,
+                   delta_ok: bool, delta_reason: str,
+                   super_ok: bool, super_reason: str,
+                   round_trip_bytes: int,
+                   ) -> dict[str, Any]:
+            answer = dict(base)
+            schema_cid = (str(self.schema.cid)
+                            if self.schema is not None else "")
+            schema_version = (
+                str(self.schema.version)
+                if self.schema is not None else "")
+            inner_w22_branch = (
+                str(w22_result.decoder_branch)
+                if w22_result is not None else W22_BRANCH_DISABLED)
+            # Visible-token cost the downstream decoder pays under
+            # W23. Three regimes:
+            #   * GENESIS or DELTA_REJECTED or NO_TRIGGER or DISABLED
+            #     or SUPER_TOKEN_REJECTED → fall back to W22 cost.
+            #   * DELTA_RESOLVED → kept + delta_n_tokens (the
+            #     cross-cell running state lives in the
+            #     prior_session_digest_cid by reference, not in the
+            #     decoder's visible context).
+            #   * SUPER_TOKEN_RESOLVED → kept + 1 (single super-token).
+            if (decoder_branch == W23_BRANCH_DELTA_RESOLVED
+                    and delta is not None):
+                visible = n_w15_kept + int(delta.n_delta_tokens)
+            elif (decoder_branch == W23_BRANCH_SUPER_TOKEN_RESOLVED
+                    and super_token is not None):
+                visible = (n_w15_kept
+                            + int(super_token.n_super_token_tokens))
+            else:
+                visible = n_w22_visible
+            savings = max(0, n_w22_visible - visible)
+            delta_cid = str(delta.delta_cid) if delta is not None else ""
+            delta_n = int(delta.n_delta_tokens) if delta is not None else 0
+            session_cid = (
+                str(session_env.digest_cid)
+                if session_env is not None else "")
+            super_token_str = (
+                super_token.super_token if super_token is not None else "")
+            result = W23SessionResult(
+                answer=answer,
+                inner_w22_branch=inner_w22_branch,
+                decoder_branch=decoder_branch,
+                abstained=abstained,
+                schema_cid=schema_cid,
+                schema_version=schema_version,
+                cell_index=int(cell_index),
+                is_genesis=bool(decoder_branch == W23_BRANCH_GENESIS),
+                prior_session_digest_cid=str(prior_session_digest_cid),
+                session_digest_cid=session_cid,
+                delta_cid=delta_cid,
+                delta_n_tokens=delta_n,
+                super_token_used=bool(super_token is not None),
+                super_token_resolved=bool(super_ok and
+                                           super_token is not None),
+                super_token_str=super_token_str,
+                n_w15_tokens_kept=int(n_w15_kept),
+                n_w22_visible_tokens_to_decider=int(n_w22_visible),
+                n_w23_visible_tokens_to_decider=int(visible),
+                n_w22_minus_w23_savings=int(savings),
+                cache_freshness_policy_used=cache_policy_snapshot,
+                cache_tokens_saved_this_cell=int(cache_saved_this_cell),
+                chain_verification_ok=bool(chain_ok),
+                chain_verification_reason=str(chain_reason),
+                delta_verification_ok=bool(delta_ok),
+                delta_verification_reason=str(delta_reason),
+                super_token_verification_ok=bool(super_ok),
+                super_token_verification_reason=str(super_reason),
+                cross_host_round_trip_bytes=int(round_trip_bytes),
+            )
+            self._last_result = result
+            self._last_delta_envelope = delta
+            self._last_session_envelope = session_env
+            self._last_super_token = super_token
+            out_local = dict(out)
+            out_local["session_delta_hybrid"] = result.as_dict()
+            if delta is not None:
+                out_local["session_delta_envelope"] = delta.as_dict()
+            if session_env is not None:
+                out_local["session_digest_envelope"] = session_env.as_dict()
+            if super_token is not None:
+                out_local["super_token_reference"] = super_token.as_dict()
+            return out_local
+
+        # Branch dispatch (top-down):
+        if not self.enabled:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W23_BRANCH_DISABLED, abstained=True,
+                delta=None, session_env=None, super_token=None,
+                chain_ok=False, chain_reason="disabled",
+                delta_ok=False, delta_reason="disabled",
+                super_ok=False, super_reason="disabled",
+                round_trip_bytes=0)
+        if w22_result is None or self.schema is None:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W23_BRANCH_NO_TRIGGER, abstained=True,
+                delta=None, session_env=None, super_token=None,
+                chain_ok=False, chain_reason="no_w22_result",
+                delta_ok=False, delta_reason="no_w22_result",
+                super_ok=False, super_reason="no_w22_result",
+                round_trip_bytes=0)
+        if w22_result.decoder_branch not in self.trigger_branches:
+            # Inner W22 did not produce a verified envelope (e.g.
+            # NO_TRIGGER, LATENT_REJECTED, DISABLED). W23 reduces to
+            # W22 byte-for-byte.
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W23_BRANCH_NO_TRIGGER, abstained=False,
+                delta=None, session_env=None, super_token=None,
+                chain_ok=False, chain_reason="inner_w22_not_resolved",
+                delta_ok=False, delta_reason="inner_w22_not_resolved",
+                super_ok=False, super_reason="inner_w22_not_resolved",
+                round_trip_bytes=0)
+        if w22_envelope is None:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W23_BRANCH_NO_TRIGGER, abstained=True,
+                delta=None, session_env=None, super_token=None,
+                chain_ok=False, chain_reason="no_envelope",
+                delta_ok=False, delta_reason="no_envelope",
+                super_ok=False, super_reason="no_envelope",
+                round_trip_bytes=0)
+
+        # Genesis cell: there is no prior session digest to delta
+        # against. Emit the full W22 envelope as the session-chain
+        # root; the visible-token cost is the W22 cost (no savings on
+        # genesis is the honest accounting).
+        is_genesis = (len(self._chain) == 0)
+        if is_genesis:
+            session_env = self._build_session_digest(
+                w22_envelope=w22_envelope,
+                prior_session_digest_cid="",
+                resolved=True)
+            chain_outcome = verify_session_digest_chain(
+                session_env, registered_schema=self.schema,
+                prior_chain_head_cid="")
+            if (not chain_outcome.ok
+                    and self.require_chain_verification):
+                self._cell_index += 1
+                return _pack(
+                    decoder_branch=W23_BRANCH_DELTA_REJECTED,
+                    abstained=True, delta=None,
+                    session_env=session_env, super_token=None,
+                    chain_ok=False, chain_reason=chain_outcome.reason,
+                    delta_ok=False, delta_reason="genesis_chain_failed",
+                    super_ok=False, super_reason="genesis_chain_failed",
+                    round_trip_bytes=0)
+            self._chain.append(session_env)
+            for tag, count in w22_envelope.per_tag_vote_count:
+                self._cumulative_per_tag_votes[str(tag)] = (
+                    int(self._cumulative_per_tag_votes.get(str(tag), 0))
+                    + int(count))
+            self._last_cell_per_tag_votes = {
+                str(t): int(c)
+                for t, c in w22_envelope.per_tag_vote_count
+            }
+            self._last_projected_subset = tuple(
+                sorted(w22_envelope.projected_subset))
+            self._last_inner_branch = str(w22_envelope.inner_w19_branch)
+            self._n_resolved += 1
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W23_BRANCH_GENESIS, abstained=False,
+                delta=None, session_env=session_env,
+                super_token=None,
+                chain_ok=True, chain_reason="ok",
+                delta_ok=True, delta_reason="genesis_no_delta",
+                super_ok=False, super_reason="genesis_no_super_token",
+                round_trip_bytes=0)
+
+        # Subsequent cell: build delta + new session digest.
+        parent_cid = self.chain_head_cid()
+        delta = self._build_delta(
+            w22_envelope=w22_envelope,
+            prior_session_digest_cid=parent_cid,
+            prior_projected=prior_projected,
+            parent_session_digest_cid=parent_cid)
+        new_session_env = self._build_session_digest(
+            w22_envelope=w22_envelope,
+            prior_session_digest_cid=parent_cid,
+            resolved=True)
+
+        # Optionally round-trip the delta + session envelope across
+        # the within-process producer/decoder host-split proxy
+        # (Mac-2 fallback); if the proxy is set, we serialise both
+        # into JSON bytes and deserialise — any latent shared state
+        # would surface as a serialisation failure.
+        rt_bytes = 0
+        if self.cross_host_proxy is not None:
+            rt_payload = {
+                "delta_envelope": delta.as_dict(),
+                "session_digest_envelope": new_session_env.as_dict(),
+            }
+            _decoded, rt_bytes_step = self._maybe_round_trip_proxy(
+                rt_payload)
+            rt_bytes += int(rt_bytes_step)
+
+        # Verify the session chain link. The verifier uses
+        # ``verifier_chain_head_override`` if set; otherwise it falls
+        # back to the producer's chain head. The producer-decoder
+        # split is the honest model: in a true cross-host deployment
+        # the verifier maintains its own confirmed chain state, and
+        # mid-session tampering on the producer side is detected as
+        # a chain_head_mismatch.
+        verifier_prior_cid = (
+            self.verifier_chain_head_override
+            if self.verifier_chain_head_override is not None
+            else parent_cid)
+        chain_outcome = verify_session_digest_chain(
+            new_session_env, registered_schema=self.schema,
+            prior_chain_head_cid=verifier_prior_cid)
+        # Verify the delta envelope.
+        delta_outcome = verify_session_delta(
+            delta, registered_schema=self.schema,
+            parent_session_digest_cid=verifier_prior_cid)
+
+        if ((not chain_outcome.ok or not delta_outcome.ok)
+                and self.require_chain_verification):
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W23_BRANCH_DELTA_REJECTED,
+                abstained=True, delta=delta,
+                session_env=new_session_env, super_token=None,
+                chain_ok=chain_outcome.ok,
+                chain_reason=chain_outcome.reason,
+                delta_ok=delta_outcome.ok,
+                delta_reason=delta_outcome.reason,
+                super_ok=False,
+                super_reason="delta_rejected",
+                round_trip_bytes=int(rt_bytes))
+
+        # Optionally promote to a super-token reference (the bounded
+        # steganographic / dense-control-payload experiment).
+        super_token: SuperTokenReferenceEnvelope | None = None
+        super_ok = False
+        super_reason = "not_used"
+        if self.use_super_token:
+            registry = (self.super_token_registry
+                          or SuperTokenRegistry())
+            if self.super_token_registry is None:
+                self.super_token_registry = registry
+            registry.register(
+                delta, hex_prefix_len=self.super_token_hex_prefix_len)
+            super_token = SuperTokenReferenceEnvelope(
+                schema_cid=self.schema.cid,
+                delta_cid=delta.delta_cid,
+                parent_session_digest_cid=parent_cid,
+                hex_prefix_len=int(self.super_token_hex_prefix_len),
+            )
+            verifier_registry = (
+                self.verifier_super_token_registry
+                if self.verifier_super_token_registry is not None
+                else registry)
+            super_outcome = verify_super_token_reference(
+                super_token, registry=verifier_registry,
+                registered_schema=self.schema,
+                parent_session_digest_cid=parent_cid)
+            super_ok = bool(super_outcome.ok)
+            super_reason = str(super_outcome.reason)
+            if not super_ok:
+                self._cell_index += 1
+                # Update commit state regardless of super-token
+                # rejection: the verbose digest is still used in
+                # this fallback case, but the chain still moves
+                # forward (the underlying delta and session digest
+                # were both verified above).
+                self._chain.append(new_session_env)
+                for tag, count in w22_envelope.per_tag_vote_count:
+                    self._cumulative_per_tag_votes[str(tag)] = (
+                        int(self._cumulative_per_tag_votes.get(str(tag), 0))
+                        + int(count))
+                self._last_cell_per_tag_votes = {
+                    str(t): int(c)
+                    for t, c in w22_envelope.per_tag_vote_count
+                }
+                self._last_projected_subset = tuple(
+                    sorted(w22_envelope.projected_subset))
+                self._last_inner_branch = str(
+                    w22_envelope.inner_w19_branch)
+                self._n_resolved += 1
+                return _pack(
+                    decoder_branch=W23_BRANCH_SUPER_TOKEN_REJECTED,
+                    abstained=True, delta=delta,
+                    session_env=new_session_env,
+                    super_token=super_token,
+                    chain_ok=True, chain_reason="ok",
+                    delta_ok=True, delta_reason="ok",
+                    super_ok=False, super_reason=super_reason,
+                    round_trip_bytes=int(rt_bytes))
+
+        # Commit chain + cumulative state.
+        self._chain.append(new_session_env)
+        for tag, count in w22_envelope.per_tag_vote_count:
+            self._cumulative_per_tag_votes[str(tag)] = (
+                int(self._cumulative_per_tag_votes.get(str(tag), 0))
+                + int(count))
+        self._last_cell_per_tag_votes = {
+            str(t): int(c)
+            for t, c in w22_envelope.per_tag_vote_count
+        }
+        self._last_projected_subset = tuple(
+            sorted(w22_envelope.projected_subset))
+        self._last_inner_branch = str(w22_envelope.inner_w19_branch)
+        self._n_resolved += 1
+        self._cell_index += 1
+        if super_token is not None and super_ok:
+            return _pack(
+                decoder_branch=W23_BRANCH_SUPER_TOKEN_RESOLVED,
+                abstained=False, delta=delta,
+                session_env=new_session_env,
+                super_token=super_token,
+                chain_ok=True, chain_reason="ok",
+                delta_ok=True, delta_reason="ok",
+                super_ok=True, super_reason="ok",
+                round_trip_bytes=int(rt_bytes))
+        return _pack(
+            decoder_branch=W23_BRANCH_DELTA_RESOLVED,
+            abstained=False, delta=delta,
+            session_env=new_session_env,
+            super_token=None,
+            chain_ok=True, chain_reason="ok",
+            delta_ok=True, delta_reason="ok",
+            super_ok=False, super_reason="not_used",
+            round_trip_bytes=int(rt_bytes))
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+                ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> W23SessionResult | None:
+        return self._last_result
+
+    @property
+    def last_session_envelope(self) -> SessionDigestEnvelope | None:
+        return self._last_session_envelope
+
+    @property
+    def last_delta_envelope(self) -> SessionDeltaEnvelope | None:
+        return self._last_delta_envelope
+
+    @property
+    def last_super_token(self) -> SuperTokenReferenceEnvelope | None:
+        return self._last_super_token
 
     @property
     def T_decoder(self) -> int | None:

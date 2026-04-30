@@ -1,8 +1,9 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
-> Updated through SDK v3.22, 2026-04-29 (W21 multi-oracle
-> adjudicator post-paper escape ladder summarised in § 14.2).
+> Updated through SDK v3.24, 2026-04-29 (W23 cross-cell delta
+> execution + quorum-keyed cache + super-token reference post-paper
+> escape ladder summarised in § 14.2).
 > This file is intended to be the primary publication-grade paper
 > draft for the programme's multi-agent context thesis. It is not a
 > milestone diary. It is a paper-shaped synthesis of the system,
@@ -1397,7 +1398,7 @@ substantial progress. It has turned multiple previously blurred
 failure modes into explicit theorem/result pairs and has demonstrated
 end-to-end live improvement on at least one real model stream.
 
-## 13. The Strongest Current Thesis After SDK v3.22
+## 13. The Strongest Current Thesis After SDK v3.24
 
 The strongest current thesis is:
 
@@ -1855,6 +1856,42 @@ The current paper incorporates the following layers:
   cache freezes a probabilistic LLM oracle's first reply across
   matching cells) emerges from the live mixtral 8x7b probe.
   (R-69, SDK v3.23)
+- **W23 family:** capsule-native cross-cell delta execution +
+  quorum-keyed cache + super-token reference — hash-chained
+  cross-cell session digest (`SessionDigestEnvelope`), per-cell
+  delta (`SessionDeltaEnvelope`), single-visible-token CID-prefix
+  reference (`SuperTokenReferenceEnvelope` +
+  `SuperTokenRegistry`), per-oracle freshness policy
+  (`QuorumKeyedSharedReadCache` +
+  `QuorumKeyedCachingOracleAdapter`), within-process
+  producer/decoder host-split proxy
+  (`CrossHostProducerDecoderProxy`), and three new controller-side
+  verification functions (`verify_session_digest_chain`,
+  `verify_session_delta`, `verify_super_token_reference`). The
+  first capsule-native multi-agent coordination method that
+  *combines* explicit-capsule passing with audited proxies for the
+  LatentMAS *cross-cell* state-sharing + super-token side channel
+  + cache-amplification mitigation directions. On R-70-DELTA-FANOUT
+  the W23 method strictly reduces visible-tokens-to-decider over
+  the W22 baseline by 6.67-7.53 % (delta path) and 25.45-28.77 %
+  (super-token path) while ratifying W22 correctness byte-for-byte;
+  stable across 5/5 seeds. On R-70-AMPLIFIED-LLM the W23
+  quorum-keyed cache **empirically discharges**
+  W22-C-CACHE-AMPLIFICATION at +0.125 strict mitigation advantage
+  over W22 (the first empirical demonstration in the programme
+  that a named conjecture's weakness is mitigable). Three named
+  falsifiers (R-70-NO-DELTA, R-70-SUPER-TOKEN-TAMPERED,
+  R-70-CHAIN-BROKEN) make the W23-1 / W23-3 conditionality sharp.
+  Live mixtral 8x7b probe (n=4) shows visible-tokens savings
+  +2.84 % delta, +11.37 % super-token, with chain verification
+  rate 0.750 and super-token verification rate 1.000; the
+  synthetic mitigation does not strictly transfer at this n
+  (newly named conjecture **W23-C-MITIGATION-LIVE-VARIANCE**).
+  Mac 2 unreachable (17th milestone in a row); the
+  `CrossHostProducerDecoderProxy` validates the wire-encoding
+  contract via JSON-canonical round-trip on every cell (≈ 1.79
+  KB/cell on R-70-DELTA-FANOUT n=8), but no true two-host
+  execution validated. (R-70, SDK v3.24)
 
 ## Appendix C. Submission Pass Still Needed
 

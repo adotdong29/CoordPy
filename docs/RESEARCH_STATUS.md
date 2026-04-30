@@ -5,8 +5,94 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.23,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.24,
 > 2026-04-29.
+
+## TL;DR — SDK v3.24
+
+The programme now has **twenty** coupled research axes, each with a
+sharp status. SDK v3.24 mints axis 20: **capsule-native cross-cell
+delta execution + quorum-keyed cache + super-token reference** —
+extending the SDK v3.23 W22 per-cell digest with a hash-chained
+*cross-cell* session digest (the LatentMAS *cross-cell latent
+state-sharing* direction at the capsule layer), a per-cell delta
+that emits only what changed against the running state, a
+quorum-keyed cache freshness policy that *mitigates* the SDK v3.23
+W22-C-CACHE-AMPLIFICATION conjecture on probabilistic LLM oracles,
+a single-visible-token CID-prefix super-token reference (the
+bounded steganographic / dense-control-payload experiment) verified
+through a controller-side registry, and a within-process
+producer/decoder host-split proxy (the honest fallback for the
+unreachable Mac 2). The W23 family adds one new
+:class:`SessionDigestEnvelope`, one :class:`SessionDeltaEnvelope`,
+one :class:`SuperTokenReferenceEnvelope`, one
+:class:`SuperTokenRegistry`, one :class:`QuorumKeyedSharedReadCache`,
+one :class:`QuorumKeyedCachingOracleAdapter`, one
+:class:`CrossHostProducerDecoderProxy`, one :class:`W23SessionResult`
+audit record, three new verification functions
+(:func:`verify_session_digest_chain`,
+:func:`verify_session_delta`,
+:func:`verify_super_token_reference`), and one wrapping
+:class:`CrossCellDeltaDisambiguator` — purely additive on top of the
+W22 surface. The SDK v3.23 runtime contract is byte-for-byte
+unchanged.
+
+**The headline SDK v3.24 results.** On the synthetic
+**R-70-DELTA-FANOUT** regime (the same R-69-CACHE-FANOUT bundle +
+oracle ecology used by W22-1 BUT with a persistent
+:class:`CrossCellDeltaDisambiguator` accumulating a hash-chained
+session digest across cells), the W23 method strictly reduces the
+visible-token cost to the final decoder by **−2.75 tokens / cell
+(−6.67 %)** at ``T_decoder = None`` and by **−2.75 tokens / cell
+(−7.53 %)** at ``T_decoder = 24`` (delta path); by **−10.50 tokens
+/ cell (−25.45 %)** loose AND **−10.50 tokens / cell (−28.77 %)**
+tight (super-token path), AND ties W22 byte-for-byte on
+``accuracy_full = 1.000``. Stable across **5/5** alternate
+``bank_seed`` values (11, 17, 23, 29, 31): super-token savings
+exactly +10.50 tokens / cell on every seed; delta savings ≥ 2.75 on
+every seed; ``chain_verifies_ok_rate = 1.000``;
+``super_token_resolved_rate = 1.000``;
+``correctness_ratified_rate = 1.000``. Three named falsifiers
+(R-70-NO-DELTA, R-70-SUPER-TOKEN-TAMPERED, R-70-CHAIN-BROKEN) make
+the W23-1 conditionality sharp: no cross-cell state → no savings
+(W23-Λ-no-delta); tampered super-token → ``unknown_super_token``
+→ fall through to W22 (W23-3); chain head split → ``chain_head_mismatch``
+→ fall through (W23-3). One named mitigation regime
+(R-70-AMPLIFIED-LLM) **empirically discharges
+W22-C-CACHE-AMPLIFICATION** at +0.125 strict gain over W22 (the W22
+baseline reproduces ``acc_full = 0.875``; W23 quorum-keyed cache
+achieves ``acc_full = 1.000``) — names W23-2.
+Backward-compat (W23-3-A / W23-3-B / W23-3-C) preserved
+byte-for-byte: 703 prior wevra-anchor + capsule + recent-phase
+tests pass + 39 new W23 tests = **742 / 742**.
+
+**Live LLM transfer (W23-Λ-real, empirical n=4 × 1 model,
+partially discharged).** Mac-1 ``mixtral:8x7b`` (47B-MoE) on the
+AMPLIFIED-LLM bench: visible-tokens savings ``+2.84 %`` (delta),
+``+11.37 %`` (super-token); ``chain_verifies_ok_rate = 0.750``;
+``super_token_verification_ok_rate = 1.000``;
+``cross_host_round_trip_bytes_total = 4232`` bytes (the
+producer/decoder split is wire-validated). All four strategies tie
+at ``acc_full = 0.750`` — the synthetic ``+0.125`` mitigation
+advantage does NOT cleanly transfer to this live n=4 probe. Names
+**W23-C-MITIGATION-LIVE-VARIANCE** as the follow-up conjecture
+(positive expected improvement, not strict per-probe).
+
+**Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+``incomplete`` at milestone capture — same status as SDK v3.6
+through SDK v3.23 (**17th milestone in a row**). **No two-Mac
+sharded inference happened in SDK v3.24.** The W23 surface is
+*naturally* a producer / cache-controller / decoder split: the
+:class:`CrossHostProducerDecoderProxy` forces every
+delta+session-digest envelope through a JSON-canonical
+serialisation round-trip on every cell, mechanically validating
+that the W23 envelopes survive a wire boundary with no shared
+Python references. When Mac 2 returns the same proxy interface
+drops in over a real socket with no W23 code changes. Strongest
+model class actually exercised: single-Mac ``mixtral:8x7b`` (46.7
+B-MoE Q4) on Mac-1 Ollama.
+
+The W22 family TL;DR (SDK v3.23) is preserved historically below.
 
 ## TL;DR — SDK v3.23
 

@@ -3,7 +3,7 @@
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
 > README-of-README must satisfy these rules. Last touched: SDK
-> v3.19, 2026-04-28.
+> v3.24, 2026-04-29.
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or
@@ -1371,3 +1371,163 @@ corroborated** anchor for W8-1. They measure orthogonal axes:
 Both are true; both are conditional. The W8-1 win on Phase 55
 **does not contradict** the W7-1 result on Phase 53 — they
 operate in disjoint regimes (high surplus vs low surplus).
+
+### W23 forbidden moves
+
+#### "W23 implements cross-cell KV sharing" or "the session digest is a real shared KV cache"
+
+> *"W23 implements cross-cell KV sharing between LLM agents."*
+
+Forbidden as an unqualified claim. The W23
+``SessionDigestEnvelope`` is a hash-chained capsule-layer summary;
+it does **not** touch transformer-internal KV caches,
+embedding tables, attention weights, or any model-internal state.
+The "cross-cell state" is a SHA-256-addressed, schema-versioned,
+parent-CID-sealed running summary of W21/W22 vote outcomes — a
+controller-side audit object, not a runtime KV transplant.
+
+Permitted phrasings: *"capsule-layer proxy for the LatentMAS
+*cross-cell latent state-sharing* direction"*, *"the smallest
+honest cross-cell state-sharing mechanism this repo can validate
+end-to-end"*, *"clears the post-W22 efficiency bar of the SDK-
+v3.24-anchored success criterion (R-70)"*, *"the first capsule-
+native multi-agent-coordination method that combines explicit-
+capsule passing with audited proxies for the LatentMAS direction
+at the **cross-cell** session layer"*. Forbidden: *"W23 implements
+cross-cell KV sharing"*, *"W23 is a real shared KV cache between
+agents"*, *"the session digest is a hidden-state transfer"*.
+
+#### "the super-token IS embedding-level steganography" or "W23 implements super-token side channels"
+
+> *"W23 implements the LatentMAS super-token side channel."*
+
+Forbidden as an unqualified claim. The
+``SuperTokenReferenceEnvelope`` is a single-visible-token CID
+prefix verified through a controller-side
+``SuperTokenRegistry`` — at most one whitespace token per cell;
+at most ``hex_prefix_len`` (default 16) characters of payload;
+the registry is enumerable / auditable; tampering yields a
+``hash_mismatch`` or ``unknown_super_token`` rejection. **No
+embedding-level intervention happens. No transformer-internal
+state is modified.**
+
+Permitted phrasings: *"a bounded, audited proxy for the LatentMAS
+*super-token side channel* idea"*, *"single-visible-token CID-
+prefix reference verified through a controller-side registry"*,
+*"the smallest honest dense-control-payload experiment this repo
+can validate end-to-end"*. Forbidden: *"W23 implements
+embedding-level steganography"*, *"the super-token bypasses the
+explicit context channel"*, *"W23 is a covert channel"*. The
+super-token is **not covert**: every reference is registered, the
+registry is enumerable, and the verifier rejects unknown tokens.
+
+#### "W23 mitigates probabilistic LLM oracles" or "we've solved cache amplification"
+
+> *"W23 mitigates probabilistic LLM oracles."*
+
+Forbidden as an unqualified claim. The W23-2 mitigation
+(``QuorumKeyedSharedReadCache`` with
+``CACHE_FRESHNESS_PER_CELL_NONCE`` on the flipping oracle)
+strictly improves over W22 baseline by **+0.125** on the
+**synthetic** R-70-AMPLIFIED-LLM regime — where the
+``FlippingProbabilisticOracle`` deterministically returns a
+decoy-asymmetric reply on consult #1 and gold-asymmetric replies
+afterwards. On the **live** mixtral 8x7b probe at n=4, the same
+mitigation does NOT strictly improve overall accuracy (all four
+strategies tie at ``acc_full = 0.750``) — the live LLM's drift
+pattern is approximately symmetric across cells at that n.
+
+Permitted phrasings: *"empirically discharges
+W22-C-CACHE-AMPLIFICATION as mitigable on the synthetic regime
+at +0.125 strict gain"*, *"the W23 quorum-keyed cache changes
+half of cells' outcomes on live mixtral n=4 but the mitigation
+advantage is not strict per-probe at this n
+(W23-C-MITIGATION-LIVE-VARIANCE)"*, *"the synthetic mitigation
+preserves cross-cell wire savings on deterministic oracles while
+mitigating amplification on probabilistic ones"*. Forbidden:
+*"W23 solves cache amplification"*, *"the quorum-keyed cache
+mitigates any LLM probabilism"*, *"W23-2 transfers to live LLMs
+at n=4"*.
+
+The W23-2 win is conditional on:
+* (a) at least one registered oracle's drift pattern follows the
+  flipping (first-sample-decoy → later-sample-gold) shape;
+* (b) the bench has ≥ 2 cells sharing identical OutsideQuery +
+  oracle_id pairs;
+* (c) the per-cell nonce successfully fragments the cache key.
+
+The synthetic flipping oracle satisfies (a) by construction; live
+LLMs may or may not — the live-LLM transfer is empirical-research,
+not strict-empirical.
+
+#### "the cross-host proxy validates two-host execution"
+
+> *"The CrossHostProducerDecoderProxy validates two-host execution."*
+
+Forbidden as an unqualified claim. The
+``CrossHostProducerDecoderProxy`` is a **within-process**
+JSON-canonical serialisation round-trip; it forces the producer
+and decoder to communicate ONLY through canonical bytes (no
+shared Python references) so any latent shared state would
+surface as a serialisation failure. This validates the
+**wire-encoding contract** — bytes round-trip cleanly, the
+W23 envelopes survive serialisation, the producer/decoder
+interface respects the JSON-canonical encoding boundary.
+
+It does NOT validate:
+* socket-level latency, partition tolerance, or RTT contributions
+  to the visible-tokens-to-decider metric;
+* true two-host execution between Mac 1 and Mac 2;
+* network-level adversarial conditions (dropped messages,
+  out-of-order delivery, byzantine tampering on the wire).
+
+Mac 2 has been ARP-incomplete for 17 milestones in a row. **No
+true two-host execution happened in SDK v3.24.** When Mac 2
+returns the same proxy interface drops in over a real socket
+with no W23 code changes — but until that happens, every
+"cross-host" claim must be qualified as *within-process
+structural simulation*, not *cross-host execution*.
+
+Permitted phrasings: *"within-process producer/decoder
+host-split simulation"*, *"the wire-format contract is mechanically
+validated by JSON-canonical round-trip on every cell"*, *"the
+honest fallback for the unreachable Mac 2"*, *"the W23 envelopes
+are wire-compatible with cross-host deployment when Mac 2 returns,
+no W23 code changes required"*. Forbidden: *"W23 implements
+cross-host KV sharing"*, *"the proxy validates two-host
+execution"*, *"W23 runs on two Macs"*.
+
+#### Labelling the SDK v3.24 result "we solved multi-agent context"
+
+> *"SDK v3.24 solves multi-agent context."*
+
+Forbidden. SDK v3.24 ships three honest cross-cell-axis advances
+(efficiency, cache-amplification mitigation, dense-control side
+channel) and the first empirical demonstration in the programme
+that a named conjecture's weakness is mitigable. This clears the
+post-W22 efficiency bar at +6.67 % to +25.45 % savings AND the
+W22-C-CACHE-AMPLIFICATION mitigation bar at +0.125 strict gain
+on the synthetic regime. But "solved" remains forbidden:
+
+* The W23-1 win is *strongly conditional* on cross-cell session
+  continuity (W23-Λ-no-delta is the named limit).
+* The W23-2 mitigation does not strictly transfer to live LLMs at
+  n=4 (W23-C-MITIGATION-LIVE-VARIANCE conjectural).
+* The W23-3 trust boundary holds on the falsifiers tested but
+  does not extend to embedding-level steganography or
+  cryptographically-signed envelopes (out of scope).
+* Mac 2 is unreachable; no true two-host execution validated.
+
+Permitted phrasings:
+* "SDK v3.24 clears the post-W22 cross-cell efficiency bar at
+  +6.67 % (delta) to +25.45 % (super-token) on R-70-DELTA-FANOUT
+  with chain-verified correctness ratification."
+* "On R-70-AMPLIFIED-LLM, the W23 quorum-keyed cache empirically
+  discharges W22-C-CACHE-AMPLIFICATION as mitigable at +0.125
+  strict gain — the first empirical demonstration in the
+  programme that a named conjecture's weakness is mitigable."
+* "Three regimes anchored, the W23 conditional advance is sharp
+  and falsifiable. We have not solved multi-agent context;
+  we have made the strongest cross-regime conditional advance
+  on the cross-cell axis to date."
+

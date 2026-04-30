@@ -9673,6 +9673,148 @@ Closes the wire-cost half of W21-C-CALIBRATED-TRUST.
    amplification integrity + cross-host KV reuse + delta-
    compression sufficiency.
 
+### 4.41 SDK v3.24 — capsule-native cross-cell delta execution + quorum-keyed cache + super-token reference + Phase-70 R-70 benchmark family + W23 family (R-70-DELTA-FANOUT + R-70-AMPLIFIED-LLM mitigation + R-70-SUPER-TOKEN dense-control + three named falsifiers + live mixtral cross-host probe)
+
+**One paragraph.** SDK v3.23 (W22 family) crossed the W21
+wire-cost wall at the *per-cell* layer (schema-passing + delta
+execution + shared-read cache + controller-verified latent
+digest, on one cell). It explicitly named two open frontiers:
+the **W22-C-CACHE-AMPLIFICATION** conjecture (the SharedReadCache
+freezes a probabilistic LLM oracle's first reply across all
+matching cells) and the absence of a true **cross-cell
+state-sharing** or **super-token / dense-control side channel**.
+SDK v3.24 implements the smallest honest version of those moves
+*together* at the *capsule layer*: a hash-chained
+:class:`SessionDigestEnvelope` carrying running cross-cell state;
+a small :class:`SessionDeltaEnvelope` per cell that emits only
+what changed against the running state; a
+:class:`QuorumKeyedSharedReadCache` with per-oracle freshness
+policies (``byte_identical`` / ``per_cell_nonce`` /
+``quorum_locked``) that *mitigates* W22-C-CACHE-AMPLIFICATION on
+probabilistic adjudicators while preserving cross-cell wire
+savings on deterministic ones; a single-visible-token
+:class:`SuperTokenReferenceEnvelope` (the bounded steganographic /
+dense-control payload experiment) verified through a
+controller-side :class:`SuperTokenRegistry`; and a within-process
+:class:`CrossHostProducerDecoderProxy` that forces every W23
+envelope through a JSON-canonical wire round-trip — the honest
+fallback for the unreachable Mac 2. Three new verification
+functions (:func:`verify_session_digest_chain`,
+:func:`verify_session_delta`,
+:func:`verify_super_token_reference`) implement the controller-
+side trust boundary. On the new R-70-DELTA-FANOUT regime, the
+W23 method strictly reduces ``mean_n_w23_visible_tokens_to_decider``
+over the W22 baseline by **−2.75 tokens / cell (−6.67 %)** loose,
+**−2.75 tokens / cell (−7.53 %)** tight (delta path); **−10.50
+tokens / cell (−25.45 %)** loose, **−10.50 tokens / cell
+(−28.77 %)** tight (super-token path); ties W22 byte-for-byte on
+``accuracy_full = 1.000``; stable across **5/5** alternate
+``bank_seed`` values. On R-70-AMPLIFIED-LLM (synthetic
+``FlippingProbabilisticOracle``), the W23 quorum-keyed cache
+**empirically discharges W22-C-CACHE-AMPLIFICATION** at **+0.125
+strict mitigation advantage** over W22 (W22 = 0.875, W23
+quorum-keyed = 1.000) — the **first empirical demonstration in
+the programme that a named conjecture's weakness is mitigable**.
+Three named falsifiers (R-70-NO-DELTA, R-70-SUPER-TOKEN-TAMPERED,
+R-70-CHAIN-BROKEN) make the W23-1 / W23-3 conditionality sharp:
+no cross-cell state → no savings (W23-Λ-no-delta); tampered
+super-token → ``unknown_super_token`` → fall through to W22;
+chain head split → ``chain_head_mismatch`` → fall through. Live
+W23 transfer on Mac-1 Ollama: ``mixtral:8x7b`` (47B-MoE) on
+AMPLIFIED-LLM achieves **+2.84 % (delta)**, **+11.37 %
+(super-token)** visible-tokens savings;
+``chain_verifies_ok_rate = 0.750``;
+``super_token_verification_ok_rate = 1.000``;
+``cross_host_round_trip_bytes_total = 4232`` bytes (the
+producer/decoder split is wire-validated). All four strategies
+tie at ``acc_full = 0.750`` — the synthetic mitigation advantage
+does not cleanly transfer at n=4 (newly named conjecture
+**W23-C-MITIGATION-LIVE-VARIANCE**: positive expected
+improvement, not strict per-probe). Full programme regression:
+703 prior + 39 new W23 = **742/742** wevra-anchor + capsule +
+recent-phase tests pass. Mac 2 still unreachable (**17th
+milestone in a row**); the W23 :class:`CrossHostProducerDecoderProxy`
+mechanically validates the wire-encoding contract via a
+within-process round-trip on every cell. **Empirically discharges
+W22-C-CACHE-AMPLIFICATION as a mitigable property; further
+sharpens the wire-cost half of W21-C-CALIBRATED-TRUST.**
+
+**Master-plan-level questions (the post-W22 audit board).**
+
+1. **Did capsule-native + latent/state-sharing integration
+   materially help (cross-cell layer)?** *YES on three independent
+   axes.* (a) Cross-cell delta execution: −6.67 % to −7.53 %
+   visible-tokens savings over W22. (b) Super-token reference:
+   −25.45 % to −28.77 % savings over W22. (c) Quorum-keyed cache
+   mitigation: +0.125 strict mitigation of W22-C-CACHE-
+   AMPLIFICATION on the synthetic regime. All three preserve W22
+   correctness byte-for-byte. The W23 surface implements every
+   piece of the LatentMAS *cross-cell latent state-sharing* +
+   *delta execution* + *super-token side channel* idea family this
+   repo can validate end-to-end as honest, audited proxies.
+2. **Did trust/audit survive?** *YES, sharply.* Every emitted
+   envelope (session digest, session delta, super-token reference)
+   is hash-chained, schema-versioned, parent-CID-sealed, AND (for
+   super-tokens) registry-verified; verification failure → W23
+   falls through to W22 byte-for-byte; correctness ratified rate
+   = 1.000 across both falsifier banks while
+   ``super_token_verification_ok_rate = 0.000`` on
+   R-70-SUPER-TOKEN-TAMPERED and ``chain_verifies_ok_rate = 0.125``
+   on R-70-CHAIN-BROKEN. The producer/verifier split is *honest*:
+   the verifier maintains its own super-token registry AND its own
+   chain-head expectation; mid-session tampering on the producer
+   side is detected.
+3. **Did bounded-context efficiency improve in a real way?** *YES
+   on three independent axes:* (a) cross-cell delta replaces full
+   per-cell digest, (b) super-token reference replaces verbose
+   digest with a single visible token, (c) quorum-keyed cache
+   preserves cross-cell wire savings on deterministic oracles
+   while mitigating amplification on probabilistic ones. The
+   savings compose multiplicatively with W15 / W21 / W22 to a
+   meaningful end-to-end reduction.
+4. **Did two-Mac evaluation materially broaden the evidence?**
+   *NO — Mac 2 still unreachable (17th milestone in a row).* The
+   live evidence is single-Mac mixtral 8x7b on Mac-1 Ollama. The
+   W23 :class:`CrossHostProducerDecoderProxy` validates the
+   wire-encoding contract via a within-process JSON-canonical
+   round-trip on every cell (≈ 1.79 KB/cell on R-70-DELTA-FANOUT);
+   when Mac 2 returns the same proxy interface drops in over a
+   real socket with no W23 code changes. Honest scope: this is a
+   *structural* simulation, not a true two-host setup.
+5. **Which earlier paper loose ends were closed versus only
+   sharpened?** *Closed (mitigated): W22-C-CACHE-AMPLIFICATION
+   (synthetic R-70-AMPLIFIED-LLM at +0.125 strict gain).
+   Sharpened: live-LLM mitigation transfer
+   (W23-C-MITIGATION-LIVE-VARIANCE newly named — positive
+   expected improvement, not strict per-probe at n=4).
+   Sharpened: cross-cell latent state-sharing direction (W23
+   implements the smallest honest cross-cell proxy; true
+   transformer-KV cross-cell reuse remains gated on Mac-2 return).
+   Sharpened: dense-control / super-token side channel direction
+   (W23 implements the smallest honest single-visible-token CID-
+   prefix proxy; true embedding-level steganographic intervention
+   remains out of scope).*
+6. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on
+   three named axes; the deeper wall is sharper.* The Context
+   Zero thesis now has its **first capsule-native method that
+   combines explicit-capsule passing with audited proxies for
+   the LatentMAS *cross-cell* state-sharing direction**, **first
+   capsule-native trust boundary on a single-visible-token
+   dense-control payload**, and **first empirical demonstration
+   that a named conjecture's weakness is mitigable** (W22-C-
+   CACHE-AMPLIFICATION). Named open frontier:
+   **W23-C-MITIGATION-LIVE-VARIANCE** (live-LLM mitigation
+   transfer at higher n), **W23-C-LATENT-KV-NATIVE** (true
+   cross-host KV reuse between MLX-distributed LLM servers —
+   gated on Mac-2 return), and **W23-C-EMBEDDING-PAYLOAD**
+   (transformer-internal embedding-side dense-control —
+   architecture-dependent, out of scope until Mac-2 returns or a
+   richer transformer integration boundary opens). The thesis
+   is materially stronger AND the next research frontier is
+   precisely articulated as live-LLM mitigation transfer +
+   cross-host validation + embedding-level integration.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

@@ -1,0 +1,220 @@
+{
+  "schema": "phase70.seed_stability.v1",
+  "config": {
+    "bank": "delta_fanout",
+    "T_decoder": null,
+    "n_eval": 8,
+    "K_auditor": 12,
+    "quorum_min": 2,
+    "seeds": [
+      11,
+      17,
+      23,
+      29,
+      31
+    ]
+  },
+  "per_seed": {
+    "11": {
+      "headline_gap": {
+        "w23_delta_minus_w22": 0.0,
+        "w23_super_token_minus_w22": 0.0,
+        "w23_quorum_keyed_minus_w22": 0.0
+      },
+      "pooled": {
+        "capsule_w22_hybrid": 1.0,
+        "capsule_w23_delta": 1.0,
+        "capsule_w23_super_token": 1.0,
+        "capsule_w23_quorum_keyed": 1.0
+      },
+      "eff_compare": {
+        "w22_visible_tokens_per_cell": 41.25,
+        "w23_delta_visible_tokens_per_cell": 38.5,
+        "w23_super_token_visible_tokens_per_cell": 30.75,
+        "w23_quorum_keyed_visible_tokens_per_cell": 38.5,
+        "w23_delta_savings_per_cell": 2.75,
+        "w23_delta_savings_pct": 6.6667,
+        "w23_super_token_savings_per_cell": 10.5,
+        "w23_super_token_savings_pct": 25.4545,
+        "w23_quorum_keyed_savings_per_cell": 2.75,
+        "chain_verifies_ok_rate": 1.0,
+        "super_token_verification_ok_rate": 1.0,
+        "super_token_resolved_rate": 1.0,
+        "cross_host_round_trip_bytes_total": 14322
+      },
+      "correctness_ratified_rates": {
+        "capsule_w23_delta": 1.0,
+        "capsule_w23_super_token": 1.0,
+        "capsule_w23_quorum_keyed": 1.0
+      },
+      "audit_ok_grid": {
+        "capsule_w22_hybrid": true,
+        "capsule_w23_delta": true,
+        "capsule_w23_super_token": true,
+        "capsule_w23_quorum_keyed": true
+      }
+    },
+    "17": {
+      "headline_gap": {
+        "w23_delta_minus_w22": 0.0,
+        "w23_super_token_minus_w22": 0.0,
+        "w23_quorum_keyed_minus_w22": 0.0
+      },
+      "pooled": {
+        "capsule_w22_hybrid": 1.0,
+        "capsule_w23_delta": 1.0,
+        "capsule_w23_super_token": 1.0,
+        "capsule_w23_quorum_keyed": 1.0
+      },
+      "eff_compare": {
+        "w22_visible_tokens_per_cell": 41.25,
+        "w23_delta_visible_tokens_per_cell": 38.5,
+        "w23_super_token_visible_tokens_per_cell": 30.75,
+        "w23_quorum_keyed_visible_tokens_per_cell": 38.5,
+        "w23_delta_savings_per_cell": 2.75,
+        "w23_delta_savings_pct": 6.6667,
+        "w23_super_token_savings_per_cell": 10.5,
+        "w23_super_token_savings_pct": 25.4545,
+        "w23_quorum_keyed_savings_per_cell": 2.75,
+        "chain_verifies_ok_rate": 1.0,
+        "super_token_verification_ok_rate": 1.0,
+        "super_token_resolved_rate": 1.0,
+        "cross_host_round_trip_bytes_total": 14492
+      },
+      "correctness_ratified_rates": {
+        "capsule_w23_delta": 1.0,
+        "capsule_w23_super_token": 1.0,
+        "capsule_w23_quorum_keyed": 1.0
+      },
+      "audit_ok_grid": {
+        "capsule_w22_hybrid": true,
+        "capsule_w23_delta": true,
+        "capsule_w23_super_token": true,
+        "capsule_w23_quorum_keyed": true
+      }
+    },
+    "23": {
+      "headline_gap": {
+        "w23_delta_minus_w22": 0.0,
+        "w23_super_token_minus_w22": 0.0,
+        "w23_quorum_keyed_minus_w22": 0.0
+      },
+      "pooled": {
+        "capsule_w22_hybrid": 1.0,
+        "capsule_w23_delta": 1.0,
+        "capsule_w23_super_token": 1.0,
+        "capsule_w23_quorum_keyed": 1.0
+      },
+      "eff_compare": {
+        "w22_visible_tokens_per_cell": 41.25,
+        "w23_delta_visible_tokens_per_cell": 38.25,
+        "w23_super_token_visible_tokens_per_cell": 30.75,
+        "w23_quorum_keyed_visible_tokens_per_cell": 38.25,
+        "w23_delta_savings_per_cell": 3.0,
+        "w23_delta_savings_pct": 7.2727,
+        "w23_super_token_savings_per_cell": 10.5,
+        "w23_super_token_savings_pct": 25.4545,
+        "w23_quorum_keyed_savings_per_cell": 3.0,
+        "chain_verifies_ok_rate": 1.0,
+        "super_token_verification_ok_rate": 1.0,
+        "super_token_resolved_rate": 1.0,
+        "cross_host_round_trip_bytes_total": 14398
+      },
+      "correctness_ratified_rates": {
+        "capsule_w23_delta": 1.0,
+        "capsule_w23_super_token": 1.0,
+        "capsule_w23_quorum_keyed": 1.0
+      },
+      "audit_ok_grid": {
+        "capsule_w22_hybrid": true,
+        "capsule_w23_delta": true,
+        "capsule_w23_super_token": true,
+        "capsule_w23_quorum_keyed": true
+      }
+    },
+    "29": {
+      "headline_gap": {
+        "w23_delta_minus_w22": 0.0,
+        "w23_super_token_minus_w22": 0.0,
+        "w23_quorum_keyed_minus_w22": 0.0
+      },
+      "pooled": {
+        "capsule_w22_hybrid": 1.0,
+        "capsule_w23_delta": 1.0,
+        "capsule_w23_super_token": 1.0,
+        "capsule_w23_quorum_keyed": 1.0
+      },
+      "eff_compare": {
+        "w22_visible_tokens_per_cell": 41.25,
+        "w23_delta_visible_tokens_per_cell": 38.5,
+        "w23_super_token_visible_tokens_per_cell": 30.75,
+        "w23_quorum_keyed_visible_tokens_per_cell": 38.5,
+        "w23_delta_savings_per_cell": 2.75,
+        "w23_delta_savings_pct": 6.6667,
+        "w23_super_token_savings_per_cell": 10.5,
+        "w23_super_token_savings_pct": 25.4545,
+        "w23_quorum_keyed_savings_per_cell": 2.75,
+        "chain_verifies_ok_rate": 1.0,
+        "super_token_verification_ok_rate": 1.0,
+        "super_token_resolved_rate": 1.0,
+        "cross_host_round_trip_bytes_total": 14502
+      },
+      "correctness_ratified_rates": {
+        "capsule_w23_delta": 1.0,
+        "capsule_w23_super_token": 1.0,
+        "capsule_w23_quorum_keyed": 1.0
+      },
+      "audit_ok_grid": {
+        "capsule_w22_hybrid": true,
+        "capsule_w23_delta": true,
+        "capsule_w23_super_token": true,
+        "capsule_w23_quorum_keyed": true
+      }
+    },
+    "31": {
+      "headline_gap": {
+        "w23_delta_minus_w22": 0.0,
+        "w23_super_token_minus_w22": 0.0,
+        "w23_quorum_keyed_minus_w22": 0.0
+      },
+      "pooled": {
+        "capsule_w22_hybrid": 1.0,
+        "capsule_w23_delta": 1.0,
+        "capsule_w23_super_token": 1.0,
+        "capsule_w23_quorum_keyed": 1.0
+      },
+      "eff_compare": {
+        "w22_visible_tokens_per_cell": 41.25,
+        "w23_delta_visible_tokens_per_cell": 38.5,
+        "w23_super_token_visible_tokens_per_cell": 30.75,
+        "w23_quorum_keyed_visible_tokens_per_cell": 38.5,
+        "w23_delta_savings_per_cell": 2.75,
+        "w23_delta_savings_pct": 6.6667,
+        "w23_super_token_savings_per_cell": 10.5,
+        "w23_super_token_savings_pct": 25.4545,
+        "w23_quorum_keyed_savings_per_cell": 2.75,
+        "chain_verifies_ok_rate": 1.0,
+        "super_token_verification_ok_rate": 1.0,
+        "super_token_resolved_rate": 1.0,
+        "cross_host_round_trip_bytes_total": 14684
+      },
+      "correctness_ratified_rates": {
+        "capsule_w23_delta": 1.0,
+        "capsule_w23_super_token": 1.0,
+        "capsule_w23_quorum_keyed": 1.0
+      },
+      "audit_ok_grid": {
+        "capsule_w22_hybrid": true,
+        "capsule_w23_delta": true,
+        "capsule_w23_super_token": true,
+        "capsule_w23_quorum_keyed": true
+      }
+    }
+  },
+  "min_w23_delta_savings_per_cell": 2.75,
+  "mean_w23_delta_savings_per_cell": 2.8,
+  "min_w23_super_token_savings_per_cell": 10.5,
+  "mean_w23_super_token_savings_per_cell": 10.5,
+  "min_w23_delta_correctness_ratified_rate": 1.0,
+  "min_w23_super_token_correctness_ratified_rate": 1.0
+}

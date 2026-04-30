@@ -7,7 +7,72 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**As of SDK v3.23 (April 2026), capsules are load-bearing
+**As of SDK v3.24 (April 2026), capsules are load-bearing
+*inside one Wevra run*, *between agents in a team*, *across the
+model-class gradient*, *across the multi-oracle adjudication
+axis*, *across the per-cell latent-hybrid axis (W22)*, and —
+most sharply — *across the first capsule-native multi-agent-
+coordination method that combines explicit-capsule passing with
+audited proxies for the LatentMAS direction at the **cross-cell
+session layer** (collective KV pooling / latent hidden-state
+transfer / super-token side channels): the W23 family ships
+:class:`SessionDigestEnvelope` (hash-chained running cross-cell
+state — the LatentMAS *cross-cell latent state-sharing* direction
+at the capsule layer), :class:`SessionDeltaEnvelope` (per-cell
+delta carrying only what changed), :class:`SuperTokenReferenceEnvelope`
+(bounded steganographic / dense-control-payload single-token CID
+reference), :class:`SuperTokenRegistry` (controller-side
+verifier registry), :class:`QuorumKeyedSharedReadCache` (per-oracle
+freshness policy that mitigates W22-C-CACHE-AMPLIFICATION on
+probabilistic LLM oracles), :class:`QuorumKeyedCachingOracleAdapter`
+(drop-in W23 oracle adapter), :class:`CrossHostProducerDecoderProxy`
+(within-process producer/decoder host-split simulation — the honest
+fallback for the unreachable Mac 2), :func:`verify_session_digest_chain`
+/ :func:`verify_session_delta` / :func:`verify_super_token_reference`
+(≈ 30–40-line controller-side verification, enumerated failure
+modes), and :class:`CrossCellDeltaDisambiguator` (the wrapping
+decoder). On the new R-70-DELTA-FANOUT regime, W23 strictly
+reduces visible-tokens-to-decider over the W22 baseline by **−2.75
+tokens / cell (−6.67 %)** loose, **−2.75 tokens / cell (−7.53 %)**
+tight (delta path); **−10.50 tokens / cell (−25.45 %)** loose,
+**−10.50 tokens / cell (−28.77 %)** tight (super-token path); AND
+ties W22 byte-for-byte on ``accuracy_full = 1.000`` — stable across
+5/5 ``bank_seed`` values. On R-70-AMPLIFIED-LLM (synthetic
+``FlippingProbabilisticOracle``), the W23 quorum-keyed cache
+**empirically discharges W22-C-CACHE-AMPLIFICATION** at **+0.125
+strict mitigation advantage** over the W22 baseline (W22 = 0.875,
+W23 quorum-keyed = 1.000). Three named falsifiers (R-70-NO-DELTA,
+R-70-SUPER-TOKEN-TAMPERED, R-70-CHAIN-BROKEN) make the W23-1 / W23-3
+conditionality sharp: no cross-cell state → no savings; tampered
+super-token → ``unknown_super_token`` → fall through to W22; chain
+head split → ``chain_head_mismatch`` → fall through. Live LLM
+transfer (W23-Λ-real, mixtral:8x7b on Mac-1, n=4): visible-tokens
+savings **+2.84 % (delta)**, **+11.37 % (super-token)**;
+``chain_verifies_ok_rate = 0.750``;
+``super_token_verification_ok_rate = 1.000``;
+``cross_host_round_trip_bytes_total = 4232`` bytes — the
+producer/decoder split is wire-validated; the synthetic mitigation
+advantage does not cleanly transfer at n=4 (newly named conjecture
+**W23-C-MITIGATION-LIVE-VARIANCE**). 703 prior wevra-anchor +
+capsule + recent-phase tests pass, 39 new W23 tests pass = **742 /
+742**. Mac 2 remains unreachable (**17th milestone in a row**);
+the :class:`CrossHostProducerDecoderProxy` forces every W23
+envelope through a JSON-canonical wire round-trip on every cell —
+the W23 envelopes survive the wire boundary with no shared Python
+references; when Mac 2 returns the same proxy interface drops in
+over a real socket with no W23 code changes. SDK v3.24's
+contribution is the Phase-70 capsule-session-delta benchmark family
+([`vision_mvp/experiments/phase70_capsule_session_delta.py`](vision_mvp/experiments/phase70_capsule_session_delta.py))
+plus the W23 surface in
+[`vision_mvp/wevra/team_coord.py`](vision_mvp/wevra/team_coord.py).
+Empirically discharges the SDK v3.23 W22-C-CACHE-AMPLIFICATION
+conjecture as a *mitigable* property (the synthetic mitigation is
++0.125 strict; the live mitigation is partially discharged). See
+[`docs/RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md`](docs/RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md)
+for the full SDK v3.24 milestone note.*
+
+**Historical SDK v3.23 reading (preserved for context).** Capsules
+were load-bearing
 *inside one Wevra run*, *between agents in a team*, *across the
 model-class gradient*, *across the multi-oracle adjudication
 axis*, and — most sharply — *across the first capsule-native
