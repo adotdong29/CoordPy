@@ -5,6 +5,95 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.25] — 2026-04-29 — SDK v3.25 — bounded-window session compaction + intra-cell resample-quorum + real cross-process producer/decoder wire + Phase-71 R-71 benchmark family + W24 family (first capsule-native multi-agent-coordination method that combines bounded-window session compaction with intra-cell resample-quorum mitigation and a real OS-level cross-process producer/decoder wire — measured efficiency gain on long sessions, empirical discharge of W23-C-MITIGATION-LIVE-VARIANCE on the intra-cell drift axis, and the first real OS-level subprocess pipe in the programme)
+
+*Strictly additive on SDK v3.24. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W24 surface adds
+one new content-addressed signed envelope
+(``SessionCompactEnvelope``), one verification function
+(``verify_session_compact``), one audit record
+(``W24CompactionResult``), one wrapping decoder
+(``MultiCellSessionCompactor``), one intra-cell resample-quorum
+caching adapter (``ResampleQuorumCachingOracleAdapter``), one
+real cross-process producer/decoder wire
+(``CrossProcessProducerDecoderWire``), and one synthetic intra-
+cell drift oracle (``IntraCellFlippingOracle``) — purely additive
+in the multi-agent coordination research slice.*
+
+**Headline (W24-1, proved-conditional + proved-empirical n=80
+saturated × 5 seeds × 2 budgets).** Pairing the W23
+``CrossCellDeltaDisambiguator`` with the new
+``MultiCellSessionCompactor`` over a registered ``SchemaCapsule``
+on R-71-LONG-SESSION (16-cell session, ``compact_window = 4``)
+strictly reduces ``mean_n_w24_visible_tokens_to_decider`` over
+the W23 baseline by **−6.81 tokens / cell (−18.0 %)** at
+``T_decoder = None`` and by **−6.81 tokens / cell (−20.5 %)** at
+``T_decoder = 24``. ``compact_verifies_ok_rate = 0.812`` (13/16
+cells beyond the window); ``correctness_ratified_rate = 1.000``
+byte-for-byte vs W22; ties W22 / W23 byte-for-byte on
+``accuracy_full = 1.000``. Stable across **5/5** alternate
+``bank_seed`` values: savings ≥ 6.69 tokens/cell on every seed,
+mean savings 6.79 tokens/cell.
+
+**W24-2 mitigation (proved-empirical n=8 saturated synthetic +
+proved-empirical-research n=4 live mixtral).** On
+R-71-INTRA-CELL-FLIP (synthetic ``IntraCellFlippingOracle``
+registered in isolation so its vote is decisive in W21 quorum),
+the W23 PER_CELL_NONCE baseline ties FIFO at ``acc_full = 0.000``
+(each cell's first consult is the bad one); the W24
+``ResampleQuorumCachingOracleAdapter`` (M=3, T=2) achieves
+``acc_full = 0.500`` — **+0.500 strict mitigation advantage**.
+**Empirically discharges W23-C-MITIGATION-LIVE-VARIANCE on the
+intra-cell drift axis**. Live transfer to ``mixtral:8x7b`` on
+Mac-1 Ollama (n=4): W23 quorum-keyed = 0.500, W24 resample =
+**0.750** — **+0.250 strict gain on a fresh live LLM stream**.
+
+**W24-3 trust-boundary soundness + real cross-process wire
+(proved-empirical n=16 + proved by inspection).** On
+R-71-COMPACT-TAMPERED, every tampered window is rejected (12/16
+cells fire ``window_cids_mismatch`` → fall through to W23
+byte-for-byte; ``correctness_ratified_rate = 1.000``). On
+R-71-CROSS-PROCESS, the ``CrossProcessProducerDecoderWire`` spawns
+a real Python subprocess and round-trips JSON envelopes via
+stdin/stdout pipes: **12 861 bytes round-tripped on n=16, 0
+failures** — a strictly stronger cross-process honesty proxy than
+the W23 within-process round-trip.
+
+**W24-Λ-no-compact (named falsifier).** On R-71-NO-COMPACT (chain
+reset every cell), ``n_w24_compact_resolved_cells = 0`` AND W24
+reduces to W23 byte-for-byte. Names the structural limit when the
+chain length stays below the window.
+
+**W24-Λ-real (proved-conditional + empirical-research n=4).**
+Live mixtral 8x7b probe on R-71-INTRA-CELL-FLIP yields +0.250
+strict mitigation advantage; the synthetic +0.500 does not fully
+transfer because the live LLM does not perfectly match the
+deterministic IntraCellFlippingOracle pattern. Names
+**W24-C-LIVE-VARIANCE-COMPLETE** as the follow-up conjecture
+frontier.
+
+**Backward-compat.** 121/121 phase-69/70/71 + capsule tests pass;
+33/33 new W24 tests pass; 619/619 wevra-anchor + capsule + recent
+phases pass. With ``enabled = False`` OR ``schema = None`` OR no
+multi-cell window, W24 reduces to W23 byte-for-byte.
+
+**Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+``incomplete`` at milestone capture — **18th milestone in a row**.
+**No two-Mac sharded inference happened in SDK v3.25.** The W24-3
+``CrossProcessProducerDecoderWire`` upgrades the W23 within-
+process round-trip to a real OS-level subprocess pipe — the
+strongest cross-process honesty this repo can validate end-to-end
+on Mac-1 alone. When Mac 2 returns the same JSON-canonical
+interface drops in over a real socket with no W24 code changes.
+
+See ``docs/RESULTS_WEVRA_W24_SESSION_COMPACTION.md`` for the
+theory-forward results note,
+``docs/THEOREM_REGISTRY.md`` for the W24 theorem family entries,
+``docs/HOW_NOT_TO_OVERSTATE.md`` § "W24 forbidden moves" for the
+canonical do-not-overstate rules, and
+``vision_mvp/experiments/phase71_session_compaction.py`` for the
+R-71 driver.
+
 ## [3.23] — 2026-04-29 — SDK v3.23 — capsule + audited latent-state-sharing hybrid + R-69 Phase-69 benchmark family + W22 family (first capsule-native multi-agent-coordination method that combines explicit-capsule passing with audited proxies for the LatentMAS direction — schema-passing, delta execution, shared-read cache, controller-verified latent digest envelope — measured efficiency gain on a regime where the W21 wire-cost concern actually applies)
 
 *Strictly additive on SDK v3.22. The Wevra single-run product

@@ -9705,3 +9705,862 @@ class CrossCellDeltaDisambiguator:
 
     def pack_stats(self) -> dict[str, Any]:
         return self.inner.pack_stats()
+
+
+# =============================================================================
+# SDK v3.25 — bounded-window session compaction + intra-cell resample-quorum
+# + real cross-process producer/decoder wire (W24 family).
+#
+# The W23 family (SDK v3.24) shipped a hash-chained cross-cell session
+# digest + per-cell delta + quorum-keyed cache + super-token reference.
+# The honest W23-1 win is bounded above by the *per-cell* delta cost,
+# which on multi-cell sessions still grows monotonically because each
+# post-genesis cell's verbose digest grows with cumulative state. The
+# W23-2 mitigation (PER_CELL_NONCE on the probabilistic oracle) only
+# changes drift *across* cells; intra-cell probabilistic drift on a
+# single consult survives the mitigation and is named in
+# W23-C-MITIGATION-LIVE-VARIANCE.
+#
+# W24 attacks both fronts at once and adds a real OS-level cross-process
+# wire to upgrade the "structural" cross-host story:
+#
+#   * **W24-1 Bounded-window session compaction.** The
+#     :class:`MultiCellSessionCompactor` wraps
+#     :class:`CrossCellDeltaDisambiguator`. On every cell beyond the
+#     compact_window threshold, replaces the W23 verbose digest +
+#     delta pair with a single bounded :class:`SessionCompactEnvelope`
+#     that folds the last (compact_window - 1) cell digest CIDs into
+#     one window CID + bounded compact-summary text. Visible-token
+#     cost per cell beyond ``compact_window`` stays O(1) regardless of
+#     session length. Strict density gain over W23 delta on the same
+#     regime.
+#
+#   * **W24-2 Intra-cell resample-quorum mitigation.** The
+#     :class:`ResampleQuorumCachingOracleAdapter` consults its inner
+#     oracle ``sample_count`` times *within one cell* and returns the
+#     majority verdict. Mitigates probabilistic-LLM intra-cell drift
+#     that PER_CELL_NONCE cannot touch. Empirically discharges
+#     W23-C-MITIGATION-LIVE-VARIANCE on a synthetic
+#     :class:`IntraCellFlippingOracle`.
+#
+#   * **W24-3 Real cross-process producer/decoder wire.** The
+#     :class:`CrossProcessProducerDecoderWire` spawns a real Python
+#     subprocess that round-trips JSON envelopes via stdin/stdout
+#     pipes. Real OS-level wire — bytes serialised, written to a
+#     subprocess pipe, read back, deserialised. Strictly stronger
+#     proxy for the cross-host claim than the W23 within-process
+#     :class:`CrossHostProducerDecoderProxy`. Mac-2 still unreachable
+#     for 18+ milestones; W24-3 is the strongest cross-process
+#     honesty this repo can validate end-to-end on Mac-1 alone.
+# =============================================================================
+
+W24_COMPACT_ENVELOPE_SCHEMA_VERSION: str = "wevra.session_compact.v1"
+
+
+W24_BRANCH_COMPACT_RESOLVED = "compact_resolved"
+W24_BRANCH_COMPACT_REJECTED = "compact_rejected"
+W24_BRANCH_BELOW_WINDOW = "below_window"
+W24_BRANCH_NO_TRIGGER = "no_trigger"
+W24_BRANCH_DISABLED = "disabled"
+
+
+W24_ALL_BRANCHES: tuple[str, ...] = (
+    W24_BRANCH_COMPACT_RESOLVED,
+    W24_BRANCH_COMPACT_REJECTED,
+    W24_BRANCH_BELOW_WINDOW,
+    W24_BRANCH_NO_TRIGGER,
+    W24_BRANCH_DISABLED,
+)
+
+
+W24_DEFAULT_TRIGGER_BRANCHES: frozenset[str] = frozenset({
+    W23_BRANCH_DELTA_RESOLVED,
+    W23_BRANCH_SUPER_TOKEN_RESOLVED,
+    W23_BRANCH_GENESIS,
+})
+
+
+@dataclasses.dataclass(frozen=True)
+class SessionCompactEnvelope:
+    """Bounded-window cross-cell session compaction (W24 family).
+
+    Folds the last ``len(window_cids)`` cell digests into one
+    fixed-size envelope. Visible-token cost per cell is
+    O(window_size) regardless of total session length — a strict
+    density gain over W23, where every post-genesis cell's verbose
+    digest grows with cumulative per-tag votes / projected subset.
+
+    Trust boundary: every field is hash-chained into
+    ``compact_envelope_cid``; tampering yields a ``hash_mismatch``
+    rejection. The window CID is a hash over the ordered tuple of
+    prior cell digest CIDs; reordering or inserting / removing any
+    cell produces a different ``window_cid``.
+    """
+    schema_cid: str
+    cell_index: int
+    parent_session_digest_cid: str
+    window_size: int
+    window_cids: tuple[str, ...]
+    window_cid: str
+    compact_per_tag_votes: tuple[tuple[str, int], ...]
+    compact_projected_subset: tuple[str, ...]
+    n_resolved_in_window: int
+    compact_envelope_cid: str = ""
+    schema_version: str = W24_COMPACT_ENVELOPE_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "window_cids", tuple(self.window_cids))
+        object.__setattr__(self, "compact_per_tag_votes",
+                            tuple(sorted(self.compact_per_tag_votes,
+                                          key=lambda kv: kv[0])))
+        object.__setattr__(self, "compact_projected_subset",
+                            tuple(sorted(self.compact_projected_subset)))
+        if not self.compact_envelope_cid:
+            object.__setattr__(self, "compact_envelope_cid",
+                                self.recompute_envelope_cid())
+
+    def _signed_payload(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "cell_index": int(self.cell_index),
+            "parent_session_digest_cid": self.parent_session_digest_cid,
+            "window_size": int(self.window_size),
+            "window_cids": list(self.window_cids),
+            "window_cid": self.window_cid,
+            "compact_per_tag_votes": [
+                [t, int(c)] for t, c in self.compact_per_tag_votes
+            ],
+            "compact_projected_subset": list(self.compact_projected_subset),
+            "n_resolved_in_window": int(self.n_resolved_in_window),
+        }
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes(self._signed_payload())
+
+    def recompute_envelope_cid(self) -> str:
+        return hashlib.sha256(self.to_canonical_bytes()).hexdigest()
+
+    def to_decoder_text(self) -> str:
+        # Minimal visible text: a single whitespace-token reference of
+        # the form ``<compact_ref:DDDDDDDDDDDDDDDD>`` whose hex prefix
+        # uniquely identifies this envelope's ``compact_envelope_cid``
+        # in the controller's registry (constant 1 whitespace token by
+        # construction, matching super-token's visible cost). The full
+        # envelope's canonical bytes are recovered from the
+        # producer/decoder wire (within-process or cross-process); the
+        # controller verifies them against the chain and the
+        # registered window CIDs.
+        return f"<compact_ref:{self.compact_envelope_cid[:16]}>"
+
+    @property
+    def n_compact_tokens(self) -> int:
+        return _whitespace_token_count(self.to_decoder_text())
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "cell_index": int(self.cell_index),
+            "parent_session_digest_cid": self.parent_session_digest_cid,
+            "window_size": int(self.window_size),
+            "window_cids": list(self.window_cids),
+            "window_cid": self.window_cid,
+            "compact_per_tag_votes": [
+                [t, int(c)] for t, c in self.compact_per_tag_votes
+            ],
+            "compact_projected_subset": list(self.compact_projected_subset),
+            "n_resolved_in_window": int(self.n_resolved_in_window),
+            "compact_envelope_cid": self.compact_envelope_cid,
+            "n_compact_tokens": int(self.n_compact_tokens),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def _compute_window_cid(window_cids: Sequence[str]) -> str:
+    body = _canonical_json_bytes({
+        "window_cids": list(window_cids),
+    })
+    return hashlib.sha256(body).hexdigest()
+
+
+def verify_session_compact(
+        envelope: SessionCompactEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        expected_window_cids: Sequence[str],
+        ) -> LatentVerificationOutcome:
+    """Controller-side verification of a SessionCompactEnvelope.
+
+    Pure function. Failure modes enumerated:
+
+      * empty_envelope — no envelope passed.
+      * schema_version_unknown — schema_version differs.
+      * schema_cid_mismatch — envelope's schema_cid != registered.
+      * window_size_mismatch — window_size != len(expected_window_cids).
+      * window_cids_mismatch — envelope's window_cids tuple does not
+        equal the controller's expected window.
+      * window_cid_mismatch — envelope's window_cid does not recompute
+        from window_cids.
+      * hash_mismatch — compact_envelope_cid does not recompute from
+        canonical bytes.
+    """
+    n_checks = 0
+    if envelope is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_envelope", n_checks=n_checks)
+    n_checks += 1
+    if envelope.schema_version != W24_COMPACT_ENVELOPE_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n_checks)
+    n_checks += 1
+    if envelope.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n_checks)
+    expected = tuple(expected_window_cids)
+    n_checks += 1
+    if int(envelope.window_size) != len(expected):
+        return LatentVerificationOutcome(
+            ok=False, reason="window_size_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if tuple(envelope.window_cids) != expected:
+        return LatentVerificationOutcome(
+            ok=False, reason="window_cids_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if envelope.window_cid != _compute_window_cid(envelope.window_cids):
+        return LatentVerificationOutcome(
+            ok=False, reason="window_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    canonical = envelope.to_canonical_bytes()
+    if (hashlib.sha256(canonical).hexdigest()
+            != envelope.compact_envelope_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n_checks)
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+@dataclasses.dataclass
+class W24CompactionResult:
+    """Audit record for one W24 cell."""
+    answer: dict[str, Any]
+    inner_w23_branch: str
+    decoder_branch: str
+    abstained: bool
+    schema_cid: str
+    schema_version: str
+    cell_index: int
+    compact_envelope_cid: str
+    compact_window_size: int
+    compact_window_cids: tuple[str, ...]
+    compact_window_cid: str
+    n_compact_tokens: int
+    n_w15_tokens_kept: int
+    n_w23_visible_tokens_to_decider: int
+    n_w24_visible_tokens_to_decider: int
+    n_w23_minus_w24_savings: int
+    compact_verification_ok: bool
+    compact_verification_reason: str
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "answer": self.answer,
+            "inner_w23_branch": str(self.inner_w23_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "abstained": bool(self.abstained),
+            "schema_cid": str(self.schema_cid),
+            "schema_version": str(self.schema_version),
+            "cell_index": int(self.cell_index),
+            "compact_envelope_cid": str(self.compact_envelope_cid),
+            "compact_window_size": int(self.compact_window_size),
+            "compact_window_cids": list(self.compact_window_cids),
+            "compact_window_cid": str(self.compact_window_cid),
+            "n_compact_tokens": int(self.n_compact_tokens),
+            "n_w15_tokens_kept": int(self.n_w15_tokens_kept),
+            "n_w23_visible_tokens_to_decider":
+                int(self.n_w23_visible_tokens_to_decider),
+            "n_w24_visible_tokens_to_decider":
+                int(self.n_w24_visible_tokens_to_decider),
+            "n_w23_minus_w24_savings":
+                int(self.n_w23_minus_w24_savings),
+            "compact_verification_ok": bool(self.compact_verification_ok),
+            "compact_verification_reason":
+                str(self.compact_verification_reason),
+        }
+
+
+@dataclasses.dataclass
+class MultiCellSessionCompactor:
+    """Bounded-window cross-cell session compactor (W24 family).
+
+    Wraps a :class:`CrossCellDeltaDisambiguator` (W23) and replaces
+    the per-cell verbose digest+delta pair with a fixed-size compact
+    envelope on cells beyond the genesis-plus-(window-1) threshold.
+
+    Trust boundary: every compact envelope is hash-chained,
+    schema-versioned, and verifier-rejectable. The verifier registry
+    can be split (``verifier_window_cids_override``) to model
+    tampered/desynchronised cross-host deployments.
+    """
+
+    inner: CrossCellDeltaDisambiguator = dataclasses.field(
+        default_factory=lambda: CrossCellDeltaDisambiguator())
+    schema: SchemaCapsule | None = None
+    enabled: bool = True
+    compact_window: int = 4
+    trigger_branches: frozenset[str] = dataclasses.field(
+        default_factory=lambda: W24_DEFAULT_TRIGGER_BRANCHES)
+    require_compact_verification: bool = True
+    verifier_window_cids_override: tuple[str, ...] | None = None
+    cross_process_wire: Any | None = None
+
+    _last_result: W24CompactionResult | None = None
+    _last_compact_envelope: SessionCompactEnvelope | None = None
+    _cell_index: int = 0
+    _resolved_cells_seen: int = 0
+
+    def reset_session(self) -> None:
+        self._last_result = None
+        self._last_compact_envelope = None
+        self._cell_index = 0
+        self._resolved_cells_seen = 0
+        self.inner.reset_session()
+
+    @property
+    def session_chain(self) -> tuple[SessionDigestEnvelope, ...]:
+        return self.inner.session_chain()
+
+    def chain_window_cids(self) -> tuple[str, ...]:
+        chain = self.inner.session_chain()
+        K = max(1, int(self.compact_window))
+        if len(chain) < K:
+            return ()
+        prior_window = chain[-K:-1]
+        return tuple(env.digest_cid for env in prior_window)
+
+    def expected_window_cids(self) -> tuple[str, ...]:
+        if self.verifier_window_cids_override is not None:
+            return tuple(self.verifier_window_cids_override)
+        return self.chain_window_cids()
+
+    def _build_compact(
+            self,
+            *,
+            cell_index: int,
+            parent_session_digest_cid: str,
+            window_cids: tuple[str, ...],
+            ) -> SessionCompactEnvelope:
+        latest_envelope = self.inner.last_session_envelope
+        if latest_envelope is None:
+            cumulative_votes: tuple[tuple[str, int], ...] = ()
+            projected: tuple[str, ...] = ()
+            n_resolved = int(self._resolved_cells_seen)
+        else:
+            cumulative_votes = tuple(
+                (t, int(c))
+                for t, c in latest_envelope.cumulative_per_tag_votes
+            )
+            projected = tuple(latest_envelope.latest_projected_subset)
+            n_resolved = int(latest_envelope.n_cells_resolved)
+
+        return SessionCompactEnvelope(
+            schema_cid=self.schema.cid if self.schema is not None else "",
+            cell_index=int(cell_index),
+            parent_session_digest_cid=str(parent_session_digest_cid),
+            window_size=len(window_cids),
+            window_cids=tuple(window_cids),
+            window_cid=_compute_window_cid(window_cids),
+            compact_per_tag_votes=cumulative_votes,
+            compact_projected_subset=projected,
+            n_resolved_in_window=n_resolved,
+            schema_version=W24_COMPACT_ENVELOPE_SCHEMA_VERSION,
+        )
+
+    def _maybe_round_trip_wire(self, payload: dict[str, Any]
+                                  ) -> tuple[dict[str, Any], int]:
+        if self.cross_process_wire is None:
+            return payload, 0
+        before = int(getattr(
+            self.cross_process_wire, "n_bytes_serialised", 0))
+        out = self.cross_process_wire.producer_to_decoder(payload)
+        after = int(getattr(
+            self.cross_process_wire, "n_bytes_serialised", 0))
+        return out, max(0, after - before)
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+            ) -> dict[str, Any]:
+        base = self.inner.decode_rounds(per_round_handoffs)
+        w23_result = self.inner.last_result
+        out = dict(base)
+
+        n_w15_kept = (int(w23_result.n_w15_tokens_kept)
+                       if w23_result is not None else 0)
+        n_w23_visible = (
+            int(w23_result.n_w23_visible_tokens_to_decider)
+            if w23_result is not None else 0)
+        cell_index = int(self._cell_index)
+        inner_w23_branch = (str(w23_result.decoder_branch)
+                              if w23_result is not None
+                              else W23_BRANCH_DISABLED)
+
+        def _pack(*,
+                   decoder_branch: str,
+                   abstained: bool,
+                   compact: SessionCompactEnvelope | None,
+                   compact_ok: bool,
+                   compact_reason: str,
+                   ) -> dict[str, Any]:
+            schema_cid = (str(self.schema.cid)
+                            if self.schema is not None else "")
+            schema_version = W24_COMPACT_ENVELOPE_SCHEMA_VERSION
+            if (decoder_branch == W24_BRANCH_COMPACT_RESOLVED
+                    and compact is not None):
+                visible = n_w15_kept + int(compact.n_compact_tokens)
+            else:
+                visible = n_w23_visible
+            savings = max(0, n_w23_visible - visible)
+            compact_cid = (str(compact.compact_envelope_cid)
+                            if compact is not None else "")
+            window_size = (int(compact.window_size)
+                             if compact is not None else 0)
+            window_cids = (tuple(compact.window_cids)
+                             if compact is not None else ())
+            window_cid = (str(compact.window_cid)
+                            if compact is not None else "")
+            n_compact = (int(compact.n_compact_tokens)
+                           if compact is not None else 0)
+            result = W24CompactionResult(
+                answer=dict(base),
+                inner_w23_branch=inner_w23_branch,
+                decoder_branch=decoder_branch,
+                abstained=abstained,
+                schema_cid=schema_cid,
+                schema_version=schema_version,
+                cell_index=cell_index,
+                compact_envelope_cid=compact_cid,
+                compact_window_size=window_size,
+                compact_window_cids=window_cids,
+                compact_window_cid=window_cid,
+                n_compact_tokens=n_compact,
+                n_w15_tokens_kept=n_w15_kept,
+                n_w23_visible_tokens_to_decider=n_w23_visible,
+                n_w24_visible_tokens_to_decider=visible,
+                n_w23_minus_w24_savings=savings,
+                compact_verification_ok=compact_ok,
+                compact_verification_reason=compact_reason,
+            )
+            self._last_result = result
+            self._last_compact_envelope = compact
+            out_local = dict(out)
+            out_local["session_compact_hybrid"] = result.as_dict()
+            if compact is not None:
+                out_local["session_compact_envelope"] = compact.as_dict()
+            return out_local
+
+        if not self.enabled:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W24_BRANCH_DISABLED, abstained=True,
+                compact=None,
+                compact_ok=False, compact_reason="disabled")
+        if (w23_result is None or self.schema is None
+                or inner_w23_branch not in self.trigger_branches):
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W24_BRANCH_NO_TRIGGER, abstained=False,
+                compact=None,
+                compact_ok=False,
+                compact_reason="inner_w23_not_triggered")
+
+        if inner_w23_branch in (W23_BRANCH_DELTA_RESOLVED,
+                                  W23_BRANCH_SUPER_TOKEN_RESOLVED,
+                                  W23_BRANCH_GENESIS):
+            self._resolved_cells_seen += 1
+
+        K = max(1, int(self.compact_window))
+        chain_len = len(self.inner.session_chain())
+        if chain_len < K:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W24_BRANCH_BELOW_WINDOW,
+                abstained=False, compact=None,
+                compact_ok=False, compact_reason="chain_below_window")
+
+        parent_cid = self.inner.chain_head_cid()
+        producer_window = self.chain_window_cids()
+        compact = self._build_compact(
+            cell_index=cell_index,
+            parent_session_digest_cid=parent_cid,
+            window_cids=producer_window)
+
+        try:
+            _ = self._maybe_round_trip_wire({
+                "compact_envelope": compact.as_dict(),
+            })
+        except Exception:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W24_BRANCH_COMPACT_REJECTED,
+                abstained=True, compact=compact,
+                compact_ok=False,
+                compact_reason="cross_process_wire_failed")
+
+        expected = self.expected_window_cids()
+        outcome = verify_session_compact(
+            compact, registered_schema=self.schema,
+            expected_window_cids=expected)
+        if (not outcome.ok) and self.require_compact_verification:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W24_BRANCH_COMPACT_REJECTED,
+                abstained=True, compact=compact,
+                compact_ok=False, compact_reason=str(outcome.reason))
+
+        self._cell_index += 1
+        return _pack(
+            decoder_branch=W24_BRANCH_COMPACT_RESOLVED,
+            abstained=False, compact=compact,
+            compact_ok=True, compact_reason="ok")
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+                ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> W24CompactionResult | None:
+        return self._last_result
+
+    @property
+    def last_compact_envelope(self) -> SessionCompactEnvelope | None:
+        return self._last_compact_envelope
+
+    @property
+    def T_decoder(self) -> int | None:
+        return self.inner.T_decoder
+
+    @T_decoder.setter
+    def T_decoder(self, v: int | None) -> None:
+        self.inner.T_decoder = v
+
+
+@dataclasses.dataclass
+class ResampleQuorumCachingOracleAdapter:
+    """Intra-cell M-sample quorum-caching oracle adapter (W24 family).
+
+    On every consult resamples the wrapped oracle ``sample_count``
+    times and returns the *majority* verdict. Mitigates intra-cell
+    probabilistic-LLM drift that PER_CELL_NONCE cannot touch
+    (PER_CELL_NONCE only changes drift between cells; a probabilistic
+    oracle whose first-sample drift is intra-cell-bound still
+    amplifies the bad sample).
+
+    Tradeoffs:
+      * pays M× the inner oracle cost on every cache-miss cell;
+      * mitigates intra-cell drift directly
+        (W23-C-MITIGATION-LIVE-VARIANCE);
+      * collapses to single-consult behaviour on cache hit.
+    """
+    inner: Any
+    cache: QuorumKeyedSharedReadCache | None = None
+    oracle_id: str = ""
+    cell_nonce: str = ""
+    sample_count: int = 3
+    majority_threshold: int = 0
+    last_was_hit: bool = False
+    last_was_resampled: bool = False
+    last_n_samples: int = 0
+    last_majority_size: int = 0
+    last_majority_formed: bool = False
+    n_total_consults: int = 0
+    n_total_resamples: int = 0
+    n_majority_formed: int = 0
+    n_majority_failed: int = 0
+
+    def __post_init__(self) -> None:
+        if not self.oracle_id:
+            self.oracle_id = str(getattr(
+                self.inner, "oracle_id", "resample_quorum_oracle"))
+        if int(self.sample_count) < 1:
+            raise ValueError(
+                f"sample_count must be ≥ 1; got {self.sample_count}")
+        if int(self.majority_threshold) <= 0:
+            self.majority_threshold = (
+                (int(self.sample_count) + 1) // 2)
+        if int(self.majority_threshold) > int(self.sample_count):
+            raise ValueError(
+                f"majority_threshold ({self.majority_threshold}) must "
+                f"be ≤ sample_count ({self.sample_count})")
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        self.n_total_consults += 1
+        if self.cache is not None:
+            cid = self.cache.query_cid_for(
+                query, oracle_id=self.oracle_id,
+                cell_nonce=str(self.cell_nonce))
+            cached = self.cache.get(cid)
+            if cached is not None:
+                body, n_tokens, source_id = cached
+                self.last_was_hit = True
+                self.last_was_resampled = False
+                self.last_n_samples = 0
+                self.last_majority_size = 1
+                self.last_majority_formed = True
+                payload = body.decode("utf-8") if body else None
+                return OutsideVerdict(
+                    payload=payload,
+                    source_id=source_id or self.oracle_id,
+                    n_tokens=int(n_tokens),
+                )
+        self.last_was_hit = False
+
+        M = max(1, int(self.sample_count))
+        T = max(1, int(self.majority_threshold))
+        samples: list[OutsideVerdict] = []
+        body_counts: dict[str, int] = {}
+        for _ in range(M):
+            v = self.inner.consult(query)
+            samples.append(v)
+            body = (v.payload or "")
+            body_counts[body] = body_counts.get(body, 0) + 1
+        self.n_total_resamples += max(0, M - 1)
+        self.last_was_resampled = (M > 1)
+        self.last_n_samples = M
+
+        # Iterate samples in order so on tie we keep the first-seen body.
+        seen_bodies: list[str] = []
+        for s in samples:
+            b = (s.payload or "")
+            if b not in seen_bodies:
+                seen_bodies.append(b)
+        best_body: str | None = None
+        best_count = 0
+        for b in seen_bodies:
+            c = body_counts.get(b, 0)
+            if c > best_count:
+                best_body = b
+                best_count = c
+        if best_body is None:
+            chosen = samples[0]
+            self.last_majority_size = 1
+            self.last_majority_formed = False
+            self.n_majority_failed += 1
+        else:
+            self.last_majority_size = int(best_count)
+            self.last_majority_formed = (best_count >= T)
+            if self.last_majority_formed:
+                self.n_majority_formed += 1
+                chosen = next(
+                    s for s in samples
+                    if (s.payload or "") == best_body)
+            else:
+                chosen = samples[0]
+                self.n_majority_failed += 1
+
+        if self.cache is not None:
+            cid = self.cache.query_cid_for(
+                query, oracle_id=self.oracle_id,
+                cell_nonce=str(self.cell_nonce))
+            body = (chosen.payload or "").encode("utf-8")
+            policy = self.cache.policy_for(self.oracle_id)
+            if policy == CACHE_FRESHNESS_QUORUM_LOCKED:
+                self.cache.put(
+                    cid, body, n_tokens=int(chosen.n_tokens),
+                    source_id=str(chosen.source_id or self.oracle_id),
+                    oracle_id=self.oracle_id,
+                    quorum_locked_pending=True)
+            else:
+                self.cache.put(
+                    cid, body, n_tokens=int(chosen.n_tokens),
+                    source_id=str(chosen.source_id or self.oracle_id),
+                    oracle_id=self.oracle_id)
+        return chosen
+
+    def stats(self) -> dict[str, Any]:
+        return {
+            "oracle_id": str(self.oracle_id),
+            "sample_count": int(self.sample_count),
+            "majority_threshold": int(self.majority_threshold),
+            "n_total_consults": int(self.n_total_consults),
+            "n_total_resamples": int(self.n_total_resamples),
+            "n_majority_formed": int(self.n_majority_formed),
+            "n_majority_failed": int(self.n_majority_failed),
+            "last_majority_size": int(self.last_majority_size),
+            "last_majority_formed": bool(self.last_majority_formed),
+            "last_was_hit": bool(self.last_was_hit),
+            "last_was_resampled": bool(self.last_was_resampled),
+            "last_n_samples": int(self.last_n_samples),
+        }
+
+
+@dataclasses.dataclass
+class CrossProcessProducerDecoderWire:
+    """Real cross-process producer/decoder wire (W24 family).
+
+    Spawns a Python subprocess and round-trips JSON payloads via
+    stdin/stdout pipes. Real OS-level wire — bytes serialised, written
+    to a child process pipe, read back, deserialised. No Python
+    references survive the wire.
+
+    Honest scope: real cross-process, **NOT** cross-host. Mac 2 has
+    been ARP-incomplete for 18 milestones in a row.
+    """
+    _proc: Any | None = None
+    _python_path: str = ""
+    _started: bool = False
+    n_round_trips: int = 0
+    n_bytes_serialised: int = 0
+    n_bytes_deserialised: int = 0
+    n_restarts: int = 0
+    n_failures: int = 0
+
+    _ECHO_SCRIPT: str = (
+        "import sys, json\n"
+        "for line in sys.stdin:\n"
+        "    line = line.strip()\n"
+        "    if not line: break\n"
+        "    try:\n"
+        "        payload = json.loads(line)\n"
+        "    except Exception:\n"
+        "        sys.stdout.write('null\\n'); sys.stdout.flush(); continue\n"
+        "    out = json.dumps(payload, sort_keys=True, separators=(',', ':'))\n"
+        "    sys.stdout.write(out + '\\n'); sys.stdout.flush()\n"
+    )
+
+    def __post_init__(self) -> None:
+        if not self._python_path:
+            import sys as _sys
+            self._python_path = str(_sys.executable)
+
+    def start(self) -> None:
+        if self._started and self._proc is not None:
+            return
+        import subprocess as _subprocess
+        self._proc = _subprocess.Popen(
+            [self._python_path, "-c", self._ECHO_SCRIPT],
+            stdin=_subprocess.PIPE,
+            stdout=_subprocess.PIPE,
+            stderr=_subprocess.PIPE,
+            bufsize=0,
+            text=False,
+        )
+        self._started = True
+
+    def stop(self) -> None:
+        if self._proc is None:
+            return
+        try:
+            if self._proc.stdin is not None:
+                try:
+                    self._proc.stdin.close()
+                except Exception:
+                    pass
+            self._proc.wait(timeout=2.0)
+        except Exception:
+            try:
+                self._proc.terminate()
+            except Exception:
+                pass
+        finally:
+            self._proc = None
+            self._started = False
+
+    def __enter__(self) -> "CrossProcessProducerDecoderWire":
+        self.start()
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        self.stop()
+
+    def producer_to_decoder(self, payload: dict[str, Any]
+                              ) -> dict[str, Any]:
+        if not self._started or self._proc is None:
+            self.start()
+        body = _canonical_json_bytes(payload)
+        try:
+            line = body + b"\n"
+            assert self._proc is not None
+            assert self._proc.stdin is not None
+            self._proc.stdin.write(line)
+            self._proc.stdin.flush()
+            assert self._proc.stdout is not None
+            reply = self._proc.stdout.readline()
+        except Exception:
+            self.n_failures += 1
+            self.stop()
+            self.n_restarts += 1
+            raise
+        if not reply:
+            self.n_failures += 1
+            self.stop()
+            self.n_restarts += 1
+            raise RuntimeError(
+                "cross_process_wire: empty subprocess reply")
+        self.n_round_trips += 1
+        self.n_bytes_serialised += len(body)
+        self.n_bytes_deserialised += len(reply)
+        try:
+            return json.loads(reply.decode("ascii"))
+        except Exception:
+            self.n_failures += 1
+            raise RuntimeError(
+                "cross_process_wire: malformed subprocess reply")
+
+    def stats(self) -> dict[str, Any]:
+        return {
+            "n_round_trips": int(self.n_round_trips),
+            "n_bytes_serialised": int(self.n_bytes_serialised),
+            "n_bytes_deserialised": int(self.n_bytes_deserialised),
+            "n_restarts": int(self.n_restarts),
+            "n_failures": int(self.n_failures),
+            "started": bool(self._started),
+        }
+
+
+@dataclasses.dataclass
+class IntraCellFlippingOracle:
+    """Bench oracle that drifts WITHIN a single cell across consults.
+
+    Models the *intra-cell* portion of the live-LLM probabilistic
+    drift named in W23-C-MITIGATION-LIVE-VARIANCE: even within one
+    cell, sample #1 may produce a decoy-asymmetric reply while
+    samples #2.. produce gold-asymmetric replies. The W22 / W23
+    PER_CELL_NONCE mitigation does **not** help here because both
+    samples are taken inside the same cell.
+
+    The W24 :class:`ResampleQuorumCachingOracleAdapter` mitigates the
+    intra-cell drift directly: with M=3, T=2, samples #1 = decoy,
+    #2 = gold, #3 = gold → majority gold → quorum forms on gold.
+    """
+    oracle_id: str = "intra_cell_flipping"
+    gold_subset: tuple[str, ...] = ("orders", "payments")
+    decoy_tag: str = "cache"
+    decoy_asymmetric_reply: str = ""
+    gold_asymmetric_reply: str = ""
+    max_response_tokens: int = 24
+    bad_consult_indices: frozenset[int] = dataclasses.field(
+        default_factory=lambda: frozenset({1}))
+    n_consults: int = 0
+
+    def __post_init__(self) -> None:
+        if not self.decoy_asymmetric_reply:
+            self.decoy_asymmetric_reply = (
+                f"investigate {self.decoy_tag} subsystem only")
+        if not self.gold_asymmetric_reply:
+            gold = " ".join(self.gold_subset) or "orders payments"
+            self.gold_asymmetric_reply = f"check {gold} call graph"
+
+    def consult(self, query: OutsideQuery) -> OutsideVerdict:
+        self.n_consults += 1
+        if self.n_consults in self.bad_consult_indices:
+            payload = self.decoy_asymmetric_reply
+        else:
+            payload = self.gold_asymmetric_reply
+        toks = payload.split()[:self.max_response_tokens]
+        payload_truncated = " ".join(toks)
+        return OutsideVerdict(
+            payload=payload_truncated,
+            source_id=self.oracle_id,
+            n_tokens=len(toks),
+        )

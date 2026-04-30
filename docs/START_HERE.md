@@ -17,7 +17,8 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.24)         | [`RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md`](RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md) |
+> | Latest milestone (SDK v3.25)         | [`RESULTS_WEVRA_W24_SESSION_COMPACTION.md`](RESULTS_WEVRA_W24_SESSION_COMPACTION.md) |
+> | Previous milestone (SDK v3.24)       | [`RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md`](RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md) |
 > | Previous milestone (SDK v3.23)       | [`RESULTS_WEVRA_CAPSULE_LATENT_HYBRID.md`](RESULTS_WEVRA_CAPSULE_LATENT_HYBRID.md) |
 > | Previous milestone (SDK v3.22)       | [`RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md`](RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md) |
 > | Previous milestone (SDK v3.21)       | [`RESULTS_WEVRA_OUTSIDE_INFORMATION.md`](RESULTS_WEVRA_OUTSIDE_INFORMATION.md) |

@@ -1,0 +1,462 @@
+{
+  "schema": "phase71.session_compaction.v1",
+  "config": {
+    "bank": "cross_process",
+    "n_eval": 16,
+    "K_auditor": 12,
+    "T_auditor": 256,
+    "K_producer": 6,
+    "T_producer": 96,
+    "inbox_capacity": 12,
+    "bank_seed": 11,
+    "bank_replicates": 4,
+    "T_decoder": null,
+    "quorum_min": 2,
+    "min_trust_sum": 0.0,
+    "use_cross_host_proxy": true,
+    "use_cross_process_wire": true,
+    "super_token_hex_prefix_len": 16,
+    "compact_window": 4,
+    "resample_count": 3
+  },
+  "pooled": {
+    "capsule_w22_hybrid": {
+      "strategy": "capsule_w22_hybrid",
+      "n": 16,
+      "accuracy_full": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 1.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.25,
+      "mean_n_team_handoff": 10.25,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "none": 16
+      }
+    },
+    "capsule_w23_delta": {
+      "strategy": "capsule_w23_delta",
+      "n": 16,
+      "accuracy_full": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 1.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.25,
+      "mean_n_team_handoff": 10.25,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "none": 16
+      }
+    },
+    "capsule_w23_quorum_keyed": {
+      "strategy": "capsule_w23_quorum_keyed",
+      "n": 16,
+      "accuracy_full": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 1.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.25,
+      "mean_n_team_handoff": 10.25,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "none": 16
+      }
+    },
+    "capsule_w24_compact": {
+      "strategy": "capsule_w24_compact",
+      "n": 16,
+      "accuracy_full": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 1.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.25,
+      "mean_n_team_handoff": 10.25,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "none": 16
+      }
+    },
+    "capsule_w24_resample_quorum": {
+      "strategy": "capsule_w24_resample_quorum",
+      "n": 16,
+      "accuracy_full": 1.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 1.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.25,
+      "mean_n_team_handoff": 10.25,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "none": 16
+      }
+    }
+  },
+  "audit_ok_grid": {
+    "capsule_w22_hybrid": true,
+    "capsule_w23_delta": true,
+    "capsule_w23_quorum_keyed": true,
+    "capsule_w24_compact": true,
+    "capsule_w24_resample_quorum": true
+  },
+  "bench_summary": {
+    "n_scenarios": 16,
+    "scenarios_with_symmetric_corroboration": 16,
+    "scenarios_with_expected_shape": 16,
+    "K_auditor": 12,
+    "T_decoder": null,
+    "bank": "cross_process",
+    "compact_window": 4,
+    "resample_count": 3,
+    "quorum_min": 2,
+    "min_trust_sum": 0.0,
+    "schema_cid": "5c5e88b1a6305652b9028d8e8330d33ac07020b2ec4d85b94cf92646133db91e",
+    "schema_n_canonical_tokens": 18,
+    "n_oracle_registrations_w22": 3,
+    "n_oracle_registrations_w23": 3,
+    "n_oracle_registrations_w24": 3,
+    "use_cross_host_proxy": true,
+    "use_cross_process_wire": true,
+    "super_token_hex_prefix_len": 16,
+    "intra_cell_oracle_present": false
+  },
+  "bench_property_per_scenario": {
+    "p67outside_resolves_deadlock_orders_payments__sym_cache__rep0": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_deadlock_orders_payments__sym_metrics__rep1": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_deadlock_orders_payments__sym_search_index__rep2": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_deadlock_orders_payments__sym_sessions__rep3": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep0": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_search_index__rep1": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_audit_jobs__rep2": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep3": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_scratch_pool__rep0": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_search_index__rep1": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_telemetry__rep2": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_scratch_pool__rep3": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_archival__rep0": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_cache__rep1": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_search_index__rep2": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_cache__rep3": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    }
+  },
+  "headline_gap": {
+    "w24_compact_minus_w23_delta": 0.0,
+    "w24_resample_minus_w23_quorum": 0.0,
+    "w24_compact_minus_w22": 0.0
+  },
+  "pack_stats_summary": {
+    "capsule_w22_hybrid": {
+      "n_cells": 16,
+      "n_w23_visible_tokens_to_decider_avg": 41.25,
+      "n_w22_visible_tokens_to_decider_avg": 41.25
+    },
+    "capsule_w23_delta": {
+      "n_cells": 16,
+      "n_w23_visible_tokens_to_decider_avg": 37.875,
+      "n_w22_visible_tokens_to_decider_avg": 41.25
+    },
+    "capsule_w23_quorum_keyed": {
+      "n_cells": 16,
+      "n_w23_visible_tokens_to_decider_avg": 36.25,
+      "n_w22_visible_tokens_to_decider_avg": 41.25
+    },
+    "capsule_w24_compact": {
+      "n_cells": 16,
+      "n_w24_compact_resolved_cells": 13,
+      "n_w24_compact_rejected_cells": 0,
+      "n_w24_below_window_cells": 3,
+      "n_w24_no_trigger_cells": 0,
+      "n_w24_visible_tokens_to_decider_sum": 496,
+      "n_w24_visible_tokens_to_decider_avg": 31.0,
+      "n_w23_visible_tokens_to_decider_sum": 606,
+      "n_w23_visible_tokens_to_decider_avg": 37.875,
+      "n_w23_minus_w24_savings_sum": 110,
+      "n_w23_minus_w24_savings_avg": 6.875,
+      "compact_n_tokens_avg": 0.8125,
+      "compact_verifies_ok_rate": 0.8125
+    },
+    "capsule_w24_resample_quorum": {
+      "n_cells": 16,
+      "n_w24_compact_resolved_cells": 13,
+      "n_w24_compact_rejected_cells": 0,
+      "n_w24_below_window_cells": 3,
+      "n_w24_no_trigger_cells": 0,
+      "n_w24_visible_tokens_to_decider_sum": 496,
+      "n_w24_visible_tokens_to_decider_avg": 31.0,
+      "n_w23_visible_tokens_to_decider_sum": 606,
+      "n_w23_visible_tokens_to_decider_avg": 37.875,
+      "n_w23_minus_w24_savings_sum": 110,
+      "n_w23_minus_w24_savings_avg": 6.875,
+      "compact_n_tokens_avg": 0.8125,
+      "compact_verifies_ok_rate": 0.8125
+    }
+  },
+  "eff_compare": {
+    "w22_visible_tokens_per_cell": 41.25,
+    "w23_visible_tokens_per_cell": 37.875,
+    "w23_quorum_visible_tokens_per_cell": 36.25,
+    "w24_compact_visible_tokens_per_cell": 31.0,
+    "w24_resample_visible_tokens_per_cell": 31.0,
+    "w24_compact_savings_per_cell": 6.875,
+    "w24_compact_savings_pct": 18.1518,
+    "compact_verifies_ok_rate": 0.8125,
+    "compact_n_tokens_avg": 0.8125,
+    "n_w24_compact_resolved_cells": 13,
+    "n_w24_compact_rejected_cells": 0,
+    "n_w24_below_window_cells": 3,
+    "cross_process_round_trip_bytes_total": 13071,
+    "cross_process_round_trips": 13,
+    "cross_process_failures": 0
+  },
+  "correctness_ratified_rates": {
+    "capsule_w23_delta": 1.0,
+    "capsule_w23_quorum_keyed": 1.0,
+    "capsule_w24_compact": 1.0,
+    "capsule_w24_resample_quorum": 1.0
+  },
+  "intra_cell_mitigation_advantage_w24_minus_w23": 0.0,
+  "compaction_correctness_preserved": 0.0,
+  "scenarios_evaluated": [
+    "p67outside_resolves_deadlock_orders_payments__sym_cache__rep0",
+    "p67outside_resolves_deadlock_orders_payments__sym_metrics__rep1",
+    "p67outside_resolves_deadlock_orders_payments__sym_search_index__rep2",
+    "p67outside_resolves_deadlock_orders_payments__sym_sessions__rep3",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep0",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_search_index__rep1",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_audit_jobs__rep2",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep3",
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_scratch_pool__rep0",
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_search_index__rep1",
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_telemetry__rep2",
+    "p67outside_resolves_disk_fill_storage_logs_pipeline__sym_scratch_pool__rep3",
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_archival__rep0",
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_cache__rep1",
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_search_index__rep2",
+    "p67outside_resolves_slow_query_cascade_web_db_query__sym_cache__rep3"
+  ],
+  "n_results": 80,
+  "cross_process_stats": {
+    "n_round_trips": 13,
+    "n_bytes_serialised": 13071,
+    "n_bytes_deserialised": 13084,
+    "n_restarts": 0,
+    "n_failures": 0,
+    "started": true
+  }
+}

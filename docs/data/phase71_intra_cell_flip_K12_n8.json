@@ -1,0 +1,336 @@
+{
+  "schema": "phase71.session_compaction.v1",
+  "config": {
+    "bank": "intra_cell_flip",
+    "n_eval": 8,
+    "K_auditor": 12,
+    "T_auditor": 256,
+    "K_producer": 6,
+    "T_producer": 96,
+    "inbox_capacity": 12,
+    "bank_seed": 11,
+    "bank_replicates": 4,
+    "T_decoder": null,
+    "quorum_min": 2,
+    "min_trust_sum": 0.0,
+    "use_cross_host_proxy": true,
+    "use_cross_process_wire": false,
+    "super_token_hex_prefix_len": 16,
+    "compact_window": 4,
+    "resample_count": 3
+  },
+  "pooled": {
+    "capsule_w22_hybrid": {
+      "strategy": "capsule_w22_hybrid",
+      "n": 8,
+      "accuracy_full": 0.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      }
+    },
+    "capsule_w23_delta": {
+      "strategy": "capsule_w23_delta",
+      "n": 8,
+      "accuracy_full": 0.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      }
+    },
+    "capsule_w23_quorum_keyed": {
+      "strategy": "capsule_w23_quorum_keyed",
+      "n": 8,
+      "accuracy_full": 0.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      }
+    },
+    "capsule_w24_compact": {
+      "strategy": "capsule_w24_compact",
+      "n": 8,
+      "accuracy_full": 0.0,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.0,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "decoder_error": 8
+      }
+    },
+    "capsule_w24_resample_quorum": {
+      "strategy": "capsule_w24_resample_quorum",
+      "n": 8,
+      "accuracy_full": 0.5,
+      "accuracy_root_cause": 1.0,
+      "accuracy_services": 0.5,
+      "accuracy_remediation": 1.0,
+      "mean_n_admitted_auditor": 2.0,
+      "mean_tokens_admitted": 8.0,
+      "mean_n_team_handoff": 10.0,
+      "mean_n_role_view": 10.0,
+      "audit_ok_rate": 1.0,
+      "failure_hist": {
+        "none": 4,
+        "decoder_error": 4
+      }
+    }
+  },
+  "audit_ok_grid": {
+    "capsule_w22_hybrid": true,
+    "capsule_w23_delta": true,
+    "capsule_w23_quorum_keyed": true,
+    "capsule_w24_compact": true,
+    "capsule_w24_resample_quorum": true
+  },
+  "bench_summary": {
+    "n_scenarios": 8,
+    "scenarios_with_symmetric_corroboration": 8,
+    "scenarios_with_expected_shape": 8,
+    "K_auditor": 12,
+    "T_decoder": null,
+    "bank": "intra_cell_flip",
+    "compact_window": 4,
+    "resample_count": 3,
+    "quorum_min": 2,
+    "min_trust_sum": 0.0,
+    "schema_cid": "5c5e88b1a6305652b9028d8e8330d33ac07020b2ec4d85b94cf92646133db91e",
+    "schema_n_canonical_tokens": 18,
+    "n_oracle_registrations_w22": 1,
+    "n_oracle_registrations_w23": 1,
+    "n_oracle_registrations_w24": 1,
+    "use_cross_host_proxy": true,
+    "use_cross_process_wire": false,
+    "super_token_hex_prefix_len": 16,
+    "intra_cell_oracle_present": true
+  },
+  "bench_property_per_scenario": {
+    "p67outside_resolves_deadlock_orders_payments__sym_cache__rep0": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_deadlock_orders_payments__sym_metrics__rep1": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_deadlock_orders_payments__sym_search_index__rep2": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_deadlock_orders_payments__sym_sessions__rep3": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep0": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_search_index__rep1": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_audit_jobs__rep2": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    },
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep3": {
+      "gold_a_role_count": 2,
+      "gold_b_role_count": 2,
+      "decoy_role_count": 2,
+      "symmetric_corroboration_holds": true,
+      "primary_class": "decoy_only",
+      "secondary_class": "all_three",
+      "shape": [
+        "decoy_only",
+        "all_three"
+      ],
+      "n_round1_to_auditor": 8,
+      "n_round2_to_auditor": 2
+    }
+  },
+  "headline_gap": {
+    "w24_compact_minus_w23_delta": 0.0,
+    "w24_resample_minus_w23_quorum": 0.5,
+    "w24_compact_minus_w22": 0.0
+  },
+  "pack_stats_summary": {
+    "capsule_w22_hybrid": {
+      "n_cells": 8,
+      "n_w23_visible_tokens_to_decider_avg": 36.625,
+      "n_w22_visible_tokens_to_decider_avg": 36.625
+    },
+    "capsule_w23_delta": {
+      "n_cells": 8,
+      "n_w23_visible_tokens_to_decider_avg": 36.625,
+      "n_w22_visible_tokens_to_decider_avg": 36.625
+    },
+    "capsule_w23_quorum_keyed": {
+      "n_cells": 8,
+      "n_w23_visible_tokens_to_decider_avg": 36.0,
+      "n_w22_visible_tokens_to_decider_avg": 36.625
+    },
+    "capsule_w24_compact": {
+      "n_cells": 8,
+      "n_w24_compact_resolved_cells": 0,
+      "n_w24_compact_rejected_cells": 0,
+      "n_w24_below_window_cells": 1,
+      "n_w24_no_trigger_cells": 7,
+      "n_w24_visible_tokens_to_decider_sum": 293,
+      "n_w24_visible_tokens_to_decider_avg": 36.625,
+      "n_w23_visible_tokens_to_decider_sum": 293,
+      "n_w23_visible_tokens_to_decider_avg": 36.625,
+      "n_w23_minus_w24_savings_sum": 0,
+      "n_w23_minus_w24_savings_avg": 0.0,
+      "compact_n_tokens_avg": 0.0,
+      "compact_verifies_ok_rate": 0.0
+    },
+    "capsule_w24_resample_quorum": {
+      "n_cells": 8,
+      "n_w24_compact_resolved_cells": 1,
+      "n_w24_compact_rejected_cells": 0,
+      "n_w24_below_window_cells": 3,
+      "n_w24_no_trigger_cells": 4,
+      "n_w24_visible_tokens_to_decider_sum": 294,
+      "n_w24_visible_tokens_to_decider_avg": 36.75,
+      "n_w23_visible_tokens_to_decider_sum": 301,
+      "n_w23_visible_tokens_to_decider_avg": 37.625,
+      "n_w23_minus_w24_savings_sum": 7,
+      "n_w23_minus_w24_savings_avg": 0.875,
+      "compact_n_tokens_avg": 0.125,
+      "compact_verifies_ok_rate": 0.125
+    }
+  },
+  "eff_compare": {
+    "w22_visible_tokens_per_cell": 36.625,
+    "w23_visible_tokens_per_cell": 36.625,
+    "w23_quorum_visible_tokens_per_cell": 36.0,
+    "w24_compact_visible_tokens_per_cell": 36.625,
+    "w24_resample_visible_tokens_per_cell": 36.75,
+    "w24_compact_savings_per_cell": 0.0,
+    "w24_compact_savings_pct": 0.0,
+    "compact_verifies_ok_rate": 0.0,
+    "compact_n_tokens_avg": 0.0,
+    "n_w24_compact_resolved_cells": 0,
+    "n_w24_compact_rejected_cells": 0,
+    "n_w24_below_window_cells": 1,
+    "cross_process_round_trip_bytes_total": 0,
+    "cross_process_round_trips": 0,
+    "cross_process_failures": 0
+  },
+  "correctness_ratified_rates": {
+    "capsule_w23_delta": 1.0,
+    "capsule_w23_quorum_keyed": 1.0,
+    "capsule_w24_compact": 1.0,
+    "capsule_w24_resample_quorum": 0.5
+  },
+  "intra_cell_mitigation_advantage_w24_minus_w23": 0.5,
+  "compaction_correctness_preserved": 0.0,
+  "scenarios_evaluated": [
+    "p67outside_resolves_deadlock_orders_payments__sym_cache__rep0",
+    "p67outside_resolves_deadlock_orders_payments__sym_metrics__rep1",
+    "p67outside_resolves_deadlock_orders_payments__sym_search_index__rep2",
+    "p67outside_resolves_deadlock_orders_payments__sym_sessions__rep3",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep0",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_search_index__rep1",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_audit_jobs__rep2",
+    "p67outside_resolves_pool_exhaustion_api_db__sym_telemetry__rep3"
+  ],
+  "n_results": 40,
+  "cross_process_stats": {}
+}

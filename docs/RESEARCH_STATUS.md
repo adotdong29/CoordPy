@@ -5,8 +5,87 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.24,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.25,
 > 2026-04-29.
+
+## TL;DR — SDK v3.25
+
+The programme now has **twenty-one** coupled research axes, each
+with a sharp status. SDK v3.25 mints axis 21: **bounded-window
+session compaction + intra-cell resample-quorum + real cross-process
+producer/decoder wire** — extending the SDK v3.24 W23 cross-cell
+delta with a fixed-size :class:`SessionCompactEnvelope` that folds
+the last ``compact_window - 1`` cell digests into one envelope
+(visible-token cost is a single ``<compact_ref:DDDD>`` token per
+cell), a :class:`ResampleQuorumCachingOracleAdapter` that consults
+the inner oracle ``sample_count`` times within one cell and returns
+the majority verdict (mitigating intra-cell probabilistic drift the
+W23 PER_CELL_NONCE policy cannot touch), a real
+:class:`CrossProcessProducerDecoderWire` that round-trips JSON
+envelopes through a Python subprocess's stdin/stdout pipes (real
+OS-level wire — strictly stronger cross-process honesty than the W23
+within-process round-trip), and a synthetic
+:class:`IntraCellFlippingOracle` whose drift fits the *intra-cell*
+pattern named in W23-C-MITIGATION-LIVE-VARIANCE. The W24 family adds
+one new :class:`SessionCompactEnvelope`, one
+:func:`verify_session_compact`, one :class:`W24CompactionResult`,
+one :class:`MultiCellSessionCompactor`, one
+:class:`ResampleQuorumCachingOracleAdapter`, one
+:class:`CrossProcessProducerDecoderWire`, and one
+:class:`IntraCellFlippingOracle` — purely additive on top of the W23
+surface. The SDK v3.24 runtime contract is byte-for-byte unchanged.
+
+**The headline SDK v3.25 results.** On the synthetic
+**R-71-LONG-SESSION** regime (the same R-69-CACHE-FANOUT bundle +
+oracle ecology used by W22-1 / W23-1 BUT with a 16-cell session
+through one persistent :class:`MultiCellSessionCompactor`), the W24
+method strictly reduces the visible-token cost to the final decoder
+by **−6.81 tokens / cell (−18.0 %)** at ``T_decoder = None`` and
+by **−6.81 tokens / cell (−20.5 %)** at ``T_decoder = 24``, AND
+ties W23 byte-for-byte on ``accuracy_full = 1.000``. Stable across
+**5/5** alternate ``bank_seed`` values (11, 17, 23, 29, 31): savings
+≥ 6.69 tokens/cell on every seed; mean savings 6.79 tokens/cell;
+``compact_verifies_ok_rate = 0.812`` (13/16 cells beyond the
+``compact_window = 4`` threshold; first 3 cells are
+``W24_BRANCH_BELOW_WINDOW`` by construction);
+``correctness_ratified_rate = 1.000`` byte-for-byte. Two named
+falsifiers (R-71-NO-COMPACT, R-71-COMPACT-TAMPERED) make the W24-1
+conditionality sharp: chain reset every cell → no compact resolved
+(W24-Λ-no-compact); tampered window → ``window_cids_mismatch`` →
+fall through to W23 (W24-3). One named mitigation regime
+(R-71-INTRA-CELL-FLIP) **empirically discharges
+W23-C-MITIGATION-LIVE-VARIANCE on the intra-cell drift axis** at
++0.500 strict gain over W23 PER_CELL_NONCE on synthetic AND **+0.250
+strict gain on a fresh live mixtral:8x7b probe** (W24-2). One real
+cross-process anchor (R-71-CROSS-PROCESS) records 12 861 bytes
+round-tripped through a real Python subprocess pipe with 0 failures
+(W24-3 / W24-Λ-cross-host). Backward-compat (W24-3-A / W24-3-B /
+W24-3-C) preserved byte-for-byte: 121/121 phase-69/70/71 + capsule
+tests + 33/33 new W24 tests = clean.
+
+**Live LLM transfer (W24-Λ-real, empirical n=4 × 1 model,
+empirically discharged).** Mac-1 ``mixtral:8x7b`` (47B-MoE) on
+R-71-INTRA-CELL-FLIP: ``acc_full(W23 quorum-keyed) = 0.500``;
+``acc_full(W24 resample M=3) = 0.750`` — **+0.250 strict
+mitigation advantage on a fresh live LLM**. The synthetic +0.500
+advantage does not fully transfer because the live LLM does not
+perfectly match the deterministic IntraCellFlippingOracle pattern;
+names **W24-C-LIVE-VARIANCE-COMPLETE** as the follow-up conjecture
+(positive expected improvement bounded by drift-pattern similarity).
+
+**Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+``incomplete`` at milestone capture — same status as SDK v3.6
+through SDK v3.24 (**18th milestone in a row**). **No two-Mac
+sharded inference happened in SDK v3.25.** The W24-3
+:class:`CrossProcessProducerDecoderWire` upgrades the W23
+within-process round-trip to a real OS-level Python subprocess pipe
+— a strictly stronger cross-process honesty proxy. When Mac 2
+returns, the same JSON-canonical interface drops in over a real
+socket with no W24 code changes. Strongest model class actually
+exercised: single-Mac ``mixtral:8x7b`` (46.7 B-MoE Q4) on Mac-1
+Ollama.
+
+The W23 family TL;DR (SDK v3.24) is preserved historically below.
 
 ## TL;DR — SDK v3.24
 

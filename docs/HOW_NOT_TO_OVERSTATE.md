@@ -3,7 +3,7 @@
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
 > README-of-README must satisfy these rules. Last touched: SDK
-> v3.24, 2026-04-29.
+> v3.25, 2026-04-29.
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or
@@ -1530,4 +1530,168 @@ Permitted phrasings:
   and falsifiable. We have not solved multi-agent context;
   we have made the strongest cross-regime conditional advance
   on the cross-cell axis to date."
+
+### W24 forbidden moves
+
+#### "W24 implements bounded-context summarisation in the LLM" or "the compact envelope is a real LLM context window manager"
+
+> *"W24 implements bounded-context summarisation inside the LLM."*
+
+Forbidden as an unqualified claim. The W24
+``SessionCompactEnvelope`` is a hash-chained capsule-layer summary;
+the visible-token cost on the wire collapses to a single
+``<compact_ref:DDDD>`` token per cell that the controller resolves
+through its own state. **Nothing inside the LLM changes** — no
+attention head is reshaped, no KV cache is folded, no model
+state is truncated. The "bounded window" lives at the **capsule
+layer**.
+
+Permitted phrasings: *"capsule-layer bounded-window summary
+proxy for the LatentMAS *running summary* direction"*, *"a
+fixed-size envelope that folds the last (compact_window - 1)
+prior cell digests into one CID + bounded text"*, *"the smallest
+honest bounded-context-summary mechanism this repo can validate
+end-to-end"*. Forbidden: *"W24 manages the LLM context
+window"*, *"the compact envelope is a real bounded summary inside
+the model"*, *"W24 proves bounded context"*.
+
+#### "W24 implements intra-cell self-consistency in the LLM" or "the resample-quorum is a real test-time mixture"
+
+> *"W24 implements intra-cell self-consistency inside the LLM."*
+
+Forbidden as an unqualified claim. The W24
+``ResampleQuorumCachingOracleAdapter`` consults the wrapped oracle
+``sample_count`` times *at the protocol layer* and returns the
+majority verdict. **No change to the LLM's decoding strategy or
+sampling temperature happens.** The "resample" is a closed-form
+controller-side aggregation of M independent oracle consults,
+not an in-model intervention.
+
+Permitted phrasings: *"capsule-layer intra-cell resample-quorum
+mitigation"*, *"M-sample majority-vote on the wrapped oracle"*,
+*"closed-form policy on the oracle adapter"*. Forbidden: *"W24
+implements self-consistency decoding"*, *"the W24 method is a
+test-time mixture-of-samples on the LLM"*, *"W24 changes the LLM's
+sampler"*.
+
+#### "W24 mitigates probabilistic LLMs in general" or "we've solved live LLM variance"
+
+> *"W24 mitigates live LLM probabilism."*
+
+Forbidden as an unqualified claim. The W24-2 mitigation
+strictly improves over W23 PER_CELL_NONCE by **+0.500** on the
+**synthetic** R-71-INTRA-CELL-FLIP regime (where the
+``IntraCellFlippingOracle`` deterministically returns
+decoy-asymmetric on consult #1 and gold-asymmetric on #2..M
+within each cell, in isolation as the only registered oracle). On
+the **live** mixtral 8x7b probe at n=4, the same mitigation
+strictly improves over W23 PER_CELL_NONCE by **+0.250** — the
+live LLM does not perfectly match the synthetic pattern.
+
+Permitted phrasings: *"empirically discharges
+W23-C-MITIGATION-LIVE-VARIANCE on the intra-cell drift axis at
++0.500 strict gain (synthetic) / +0.250 strict gain (live mixtral
+n=4)"*, *"the W24 resample-quorum is bounded by the LLM's
+intra-cell drift pattern's similarity to the synthetic
+oracle"*, *"the live mitigation is non-trivially measurable but
+not saturated at the synthetic rate"*. Forbidden: *"W24 solves
+live LLM variance"*, *"the resample-quorum mitigates any LLM
+probabilism"*, *"W24-2 transfers fully to live LLMs"*.
+
+The W24-2 win is conditional on:
+* (a) at least one consult per cell follows a non-uniform drift
+  pattern (i.e. some samples are reliably bad, others reliably
+  good);
+* (b) the inner oracle's behaviour is sample-count-sensitive (M
+  consults yield distinguishable replies);
+* (c) the cache-key freshness policy permits resampling within
+  one cell without short-circuiting on cache hit.
+
+The synthetic IntraCellFlippingOracle satisfies (a) and (b) by
+construction; (c) is satisfied by the per-cell fresh oracle/
+cache instances on the bench. Live LLMs at temperature=0 may or
+may not satisfy (a) — the live-LLM transfer is
+empirical-research, not strict-empirical.
+
+#### "the cross-process wire validates two-host execution"
+
+> *"The CrossProcessProducerDecoderWire validates two-host execution."*
+
+Forbidden as an unqualified claim. The
+``CrossProcessProducerDecoderWire`` is a **real
+cross-PROCESS** JSON-canonical pipe (Python subprocess + stdin/
+stdout); it forces the producer and decoder to communicate ONLY
+through OS-level pipes (no shared Python references) so any
+latent shared state would surface as a serialisation failure or
+an empty subprocess reply. This is **strictly stronger** than
+the W23 within-process round-trip — bytes traverse a real OS
+pipe, the subprocess can be killed mid-session, and the wire
+reports a real failure (not a Python exception in the same
+process).
+
+It does NOT validate:
+* network-level latency, partition tolerance, or RTT contributions
+  to the visible-tokens-to-decider metric across two machines;
+* true two-host execution between Mac 1 and Mac 2;
+* network-level adversarial conditions (dropped messages,
+  out-of-order delivery, byzantine tampering on a real network).
+
+Mac 2 has been ARP-incomplete for 18 milestones in a row. **No
+true two-host execution happened in SDK v3.25.** When Mac 2
+returns the same JSON-canonical interface drops in over a real
+socket with no W24 code changes — but until that happens, every
+"cross-host" claim must be qualified as *cross-PROCESS* (real OS
+pipe), not *cross-HOST* (real network socket between machines).
+
+Permitted phrasings: *"real cross-process producer/decoder wire
+via Python subprocess + stdin/stdout pipes"*, *"the wire-format
+contract is validated end-to-end by real OS-level
+serialisation/deserialisation"*, *"strictly stronger
+cross-process honesty than the W23 within-process round-trip"*,
+*"the strongest cross-process honesty this repo can validate
+end-to-end on Mac-1 alone"*. Forbidden: *"W24 implements
+cross-host KV sharing"*, *"the wire validates two-host
+execution"*, *"W24 runs on two Macs"*.
+
+#### Labelling the SDK v3.25 result "we solved multi-agent context"
+
+> *"SDK v3.25 solves multi-agent context."*
+
+Forbidden. SDK v3.25 ships three honest cross-cell-axis advances
+(bounded-window efficiency, intra-cell mitigation, real
+cross-process honesty) and the first programme-internal
+demonstration that the live-LLM mitigation transfer is
+non-trivially measurable on a fresh probe. This clears the
+post-W23 efficiency bar at +18 % to +20 % savings AND the
+W23-C-MITIGATION-LIVE-VARIANCE mitigation bar at +0.500 synthetic
+/ +0.250 live strict gain. But "solved" remains forbidden:
+
+* The W24-1 win is *strongly conditional* on cross-cell session
+  continuity ≥ ``compact_window`` (W24-Λ-no-compact is the named
+  limit).
+* The W24-2 mitigation transfers partially to live mixtral
+  (+0.250 not +0.500); a live LLM whose intra-cell drift is
+  unbiased symmetric across samples would produce
+  ``E[mitigation] = 0`` (W24-C-LIVE-VARIANCE-COMPLETE
+  conjectural).
+* The W24-3 trust boundary holds on the falsifiers tested but
+  does not extend to network-level adversarial conditions or
+  cryptographically-signed envelopes (out of scope).
+* Mac 2 is unreachable; no true two-host execution validated.
+
+Permitted phrasings:
+* "SDK v3.25 clears the post-W23 bounded-window efficiency bar
+  at +18.0 % (loose) / +20.5 % (tight) on R-71-LONG-SESSION
+  with compact-verified correctness ratification."
+* "On R-71-INTRA-CELL-FLIP, the W24 resample-quorum empirically
+  discharges W23-C-MITIGATION-LIVE-VARIANCE on the intra-cell
+  drift axis at +0.500 strict gain on synthetic AND +0.250
+  strict gain on live mixtral n=4 — the first programme-internal
+  demonstration that the live-LLM mitigation transfer is
+  non-trivially measurable on a fresh probe."
+* "Three regimes anchored, the W24 conditional advance is sharp
+  and falsifiable. We have not solved multi-agent context;
+  we have made the strongest cross-regime conditional advance
+  on the bounded-window-efficiency + intra-cell-mitigation +
+  real-cross-process axes to date."
 
