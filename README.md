@@ -7,6 +7,22 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
+**Latest milestone: SDK v3.27 (April 2026).** Chain-persisted
+dense-control fanout + per-consumer projections (W26 family). The
+W26 ``ChainPersistedFanoutDisambiguator`` amortises the producer's
+per-cell salience-token cost across cells via a two-tier
+content-addressed envelope hierarchy (``ChainAnchorEnvelope`` +
+``ChainAdvanceEnvelope``); on R-73-CHAIN-SHARED (1 producer + K=3
+consumers, 16 cells) it strictly reduces total visible tokens by
+**−12.125 tokens / cell (−68.79 %)** over W25 AND **−53.00 tokens /
+cell (−90.60 %)** over W24, stable across 5/5 seeds. Trust boundary:
+``verify_chain_anchor`` (6 failure modes), ``verify_chain_advance``
+(8), ``verify_projection_subscription`` (2). Four named falsifiers
+(W26-Λ-no-chain / -tampered / -projection-mismatch / -divergent).
+W25-C-K-SCALING discharged at K∈{3,5,8,10}. See
+[`docs/RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md`](docs/RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md)
+and [`CHANGELOG.md`](CHANGELOG.md) for details.
+
 **As of SDK v3.24 (April 2026), capsules are load-bearing
 *inside one Wevra run*, *between agents in a team*, *across the
 model-class gradient*, *across the multi-oracle adjudication

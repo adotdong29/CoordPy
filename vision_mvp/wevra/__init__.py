@@ -289,6 +289,23 @@ from .team_coord import (
     W25_BRANCH_FANOUT_CONSUMER_REJECTED,
     W25_BRANCH_NO_TRIGGER, W25_BRANCH_DISABLED,
     W25_DEFAULT_TRIGGER_BRANCHES,
+    # SDK v3.27 — chain-persisted dense-control fanout +
+    # per-consumer projections (W26 family).
+    ChainAnchorEnvelope, ChainAdvanceEnvelope,
+    ChainPersistedFanoutRegistry,
+    ChainPersistedFanoutDisambiguator,
+    ProjectionSlot, W26ChainResult,
+    verify_chain_anchor, verify_chain_advance,
+    verify_projection_subscription,
+    W26_CHAIN_ANCHOR_SCHEMA_VERSION,
+    W26_CHAIN_ADVANCE_SCHEMA_VERSION,
+    W26_ALL_BRANCHES,
+    W26_BRANCH_CHAIN_ANCHORED, W26_BRANCH_CHAIN_ADVANCED,
+    W26_BRANCH_CHAIN_REJECTED, W26_BRANCH_CHAIN_RE_ANCHORED,
+    W26_BRANCH_CHAIN_PROJECTION_RESOLVED,
+    W26_BRANCH_CHAIN_PROJECTION_REJECTED,
+    W26_BRANCH_NO_TRIGGER, W26_BRANCH_DISABLED,
+    W26_DEFAULT_TRIGGER_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -302,7 +319,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.26"
+SDK_VERSION = "wevra.sdk.v3.27"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -464,6 +481,23 @@ __all__ = [
     "W25_BRANCH_FANOUT_CONSUMER_REJECTED",
     "W25_BRANCH_NO_TRIGGER", "W25_BRANCH_DISABLED",
     "W25_DEFAULT_TRIGGER_BRANCHES",
+    # SDK v3.27 — W26 family (chain-persisted dense-control fanout +
+    # per-consumer projections).
+    "ChainAnchorEnvelope", "ChainAdvanceEnvelope",
+    "ChainPersistedFanoutRegistry",
+    "ChainPersistedFanoutDisambiguator",
+    "ProjectionSlot", "W26ChainResult",
+    "verify_chain_anchor", "verify_chain_advance",
+    "verify_projection_subscription",
+    "W26_CHAIN_ANCHOR_SCHEMA_VERSION",
+    "W26_CHAIN_ADVANCE_SCHEMA_VERSION",
+    "W26_ALL_BRANCHES",
+    "W26_BRANCH_CHAIN_ANCHORED", "W26_BRANCH_CHAIN_ADVANCED",
+    "W26_BRANCH_CHAIN_REJECTED", "W26_BRANCH_CHAIN_RE_ANCHORED",
+    "W26_BRANCH_CHAIN_PROJECTION_RESOLVED",
+    "W26_BRANCH_CHAIN_PROJECTION_REJECTED",
+    "W26_BRANCH_NO_TRIGGER", "W26_BRANCH_DISABLED",
+    "W26_DEFAULT_TRIGGER_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

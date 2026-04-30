@@ -11081,3 +11081,1111 @@ class SharedFanoutDisambiguator:
     @property
     def last_fanout_envelope(self) -> FanoutEnvelope | None:
         return self._last_fanout_envelope
+
+
+# =============================================================================
+# W26 — chain-persisted dense-control fanout (cross-cell amortisation +
+# per-consumer projections)
+# =============================================================================
+#
+# The W25 family reduced multi-agent fanout cost from K × C tokens/cell
+# to C + K tokens/cell at K=3 (where C is the producer's per-cell
+# compact + salience cost ≈ 14.6 tokens). W25 still requires the
+# producer to re-emit the full ``n_w15_kept`` salience-token block on
+# *every* cell, even when the salience content is structurally repeated
+# across cells (the bench-driver reads the same gold services and decoy
+# magnitudes every cell).  W26 lifts that floor by chaining the
+# producer's compact state across cells:
+#
+#   * At a *chain anchor* cell, the producer pays the full W25 cost
+#     (compact + salience + fanout register).  The anchor envelope
+#     carries the canonical salience-token block and the per-consumer
+#     projection slots (so each consumer can subscribe to a distinct
+#     subset of tags / projected services).
+#   * At each subsequent in-window cell, the producer emits a 1-token
+#     ``<chain_advance:DDDD>`` reference and registers a small
+#     :class:`ChainAdvanceEnvelope` that hash-chains to the parent
+#     advance (or the anchor for the first advance).  The advance
+#     carries only the *delta* from the parent (small, often empty on
+#     stable benches).  Consumers emit a 1-token
+#     ``<chain_consumer:DDDD>`` reference indexed by the current
+#     advance.
+#   * Re-anchor occurs when the chain reaches ``chain_persist_window``
+#     cells or when the controller-verified divergence guard rejects an
+#     advance (e.g., the producer's gold subset diverges beyond the
+#     allowed projection drift).
+#
+# Total visible-token cost over N cells, K consumers (chain window W,
+# C = mean per-agent W25 producer cost when chain re-anchors, c = 1):
+#   W25:     N × (C + K)                            [no chain]
+#   W26:     ⌈N/W⌉ × (C + K) + (N − ⌈N/W⌉) × (1+K)  [chain hits]
+#
+# At N=16, K=3, C=14.625, W=16 (one anchor):
+#   W25 ≈ 282 tokens
+#   W26 ≈ 17.625 + 15 × 4 = 77.625 tokens   (saving ≈ 72.5%)
+#
+# Trust boundary
+# ==============
+# Every chain envelope is content-addressed, schema-versioned, and
+# parent-CID-sealed.  The controller-side
+# :class:`ChainPersistedFanoutRegistry` enforces:
+#   * anchor_cid integrity (SHA-256 over canonical bytes);
+#   * advance_cid integrity (SHA-256 over canonical bytes);
+#   * parent linkage (every advance references either the anchor or a
+#     prior advance whose CID is registered);
+#   * cell-index monotonicity (no replay or reordering);
+#   * schema_cid pinning (cross-schema envelopes rejected);
+#   * consumer-projection scope (consumers can only resolve projections
+#     they were named in by the anchor);
+#   * window expiry (advances beyond ``chain_persist_window`` are
+#     rejected — the producer must re-anchor).
+#
+# Honest scope
+# ============
+# W26 is an **amortisation** mechanism, not a new information channel:
+#   * It does not add new content; it changes how the existing producer
+#     state is *delivered* to the K consumers + final decoder.
+#   * The total *bytes* on the wire is bounded above by W25's bytes
+#     when consumer projections fully reuse the anchor's content; on
+#     anchor cells W26 ≥ W25 by a constant (the projection slot map).
+#     Across N cells the total bytes is ≤ W25 by construction (advance
+#     envelopes carry only deltas, hash chains, and CIDs).
+#   * The visible-token reduction comes from the chain reference being
+#     a single whitespace token by design (``<chain_advance:DDDD>``),
+#     which is the same accounting model already in W23/W24/W25.
+#
+# Named falsifiers
+# ================
+#   * **W26-Λ-no-chain** — ``chain_persist_window = 1`` reduces to W25
+#     byte-for-byte (every cell is an anchor).
+#   * **W26-Λ-divergent** — when consecutive cells produce divergent
+#     gold subsets (the bench driver flips the gold tag), the
+#     controller rejects the advance and the producer re-anchors; the
+#     measured savings collapse toward the W25 floor on the divergent
+#     cells.
+#   * **W26-Λ-tampered** — any tamper on advance hash / parent linkage
+#     / schema_cid is rejected by ``verify_chain_advance``; W26 falls
+#     through to W25 byte-for-byte on that cell.
+#   * **W26-Λ-projection-mismatch** — consumer asks for a projection
+#     not in ``projection_slots``: rejected with
+#     ``projection_unauthorized``; consumer falls through to W25.
+
+W26_CHAIN_ANCHOR_SCHEMA_VERSION: str = "wevra.chain_anchor.v1"
+W26_CHAIN_ADVANCE_SCHEMA_VERSION: str = "wevra.chain_advance.v1"
+
+W26_BRANCH_CHAIN_ANCHORED = "chain_anchored"
+W26_BRANCH_CHAIN_ADVANCED = "chain_advanced"
+W26_BRANCH_CHAIN_REJECTED = "chain_rejected"
+W26_BRANCH_CHAIN_RE_ANCHORED = "chain_re_anchored"
+W26_BRANCH_CHAIN_PROJECTION_RESOLVED = "chain_projection_resolved"
+W26_BRANCH_CHAIN_PROJECTION_REJECTED = "chain_projection_rejected"
+W26_BRANCH_NO_TRIGGER = "no_trigger"
+W26_BRANCH_DISABLED = "disabled"
+
+W26_ALL_BRANCHES: tuple[str, ...] = (
+    W26_BRANCH_CHAIN_ANCHORED,
+    W26_BRANCH_CHAIN_ADVANCED,
+    W26_BRANCH_CHAIN_REJECTED,
+    W26_BRANCH_CHAIN_RE_ANCHORED,
+    W26_BRANCH_CHAIN_PROJECTION_RESOLVED,
+    W26_BRANCH_CHAIN_PROJECTION_REJECTED,
+    W26_BRANCH_NO_TRIGGER,
+    W26_BRANCH_DISABLED,
+)
+
+# W26 fires whenever W25 was able to fire — anchoring on the producer
+# emit, advancing for subsequent cells.  If the inner W25 abstains
+# (W25_BRANCH_NO_TRIGGER / W25_BRANCH_DISABLED), W26 also abstains.
+W26_DEFAULT_TRIGGER_BRANCHES: frozenset[str] = frozenset({
+    W25_BRANCH_FANOUT_PRODUCER_EMITTED,
+    W25_BRANCH_FANOUT_CONSUMER_RESOLVED,
+})
+
+
+@dataclasses.dataclass(frozen=True)
+class ProjectionSlot:
+    """Per-consumer projection slot inside a :class:`ChainAnchorEnvelope`.
+
+    Each consumer named in the anchor receives a *projection* — the
+    subset of compact_per_tag_votes / projected_subset they are
+    authorised to resolve.  A consumer can only resolve their own
+    projection_id (cross-projection access is rejected).
+
+    Trust: the projection_cid is hash-chained into the anchor's
+    chain_root_cid, so the slot map is tamper-evident.
+    """
+    projection_id: str
+    consumer_id: str
+    projected_tags: tuple[str, ...]
+    projection_cid: str = ""
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "projected_tags",
+                            tuple(sorted(self.projected_tags)))
+        if not self.projection_cid:
+            object.__setattr__(self, "projection_cid",
+                                self.recompute_projection_cid())
+
+    def _signed_payload(self) -> dict[str, Any]:
+        return {
+            "projection_id": str(self.projection_id),
+            "consumer_id": str(self.consumer_id),
+            "projected_tags": list(self.projected_tags),
+        }
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes(self._signed_payload())
+
+    def recompute_projection_cid(self) -> str:
+        return hashlib.sha256(self.to_canonical_bytes()).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class ChainAnchorEnvelope:
+    """Chain anchor (W26 family) — genesis cell of a chain window.
+
+    Carries the canonical compact state (votes + projected subset)
+    plus per-consumer projection slots and the chain window length.
+    The ``chain_root_cid`` is the unique identifier for the chain;
+    every subsequent :class:`ChainAdvanceEnvelope` hash-chains to it.
+    """
+    schema_version: str
+    schema_cid: str
+    producer_agent_id: str
+    consumer_agent_ids: tuple[str, ...]
+    cell_index_anchor: int
+    chain_persist_window: int
+    canonical_compact_per_tag_votes: tuple[tuple[str, int], ...]
+    canonical_compact_projected_subset: tuple[str, ...]
+    n_w15_canonical_tokens: int
+    projection_slots: tuple[ProjectionSlot, ...]
+    chain_root_cid: str = ""
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "consumer_agent_ids",
+                            tuple(self.consumer_agent_ids))
+        object.__setattr__(self, "canonical_compact_per_tag_votes",
+                            tuple(sorted(self.canonical_compact_per_tag_votes,
+                                          key=lambda kv: kv[0])))
+        object.__setattr__(self, "canonical_compact_projected_subset",
+                            tuple(sorted(self.canonical_compact_projected_subset)))
+        object.__setattr__(self, "projection_slots",
+                            tuple(sorted(self.projection_slots,
+                                          key=lambda s: s.projection_id)))
+        if not self.chain_root_cid:
+            object.__setattr__(self, "chain_root_cid",
+                                self.recompute_chain_root_cid())
+
+    def _signed_payload(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "producer_agent_id": self.producer_agent_id,
+            "consumer_agent_ids": sorted(self.consumer_agent_ids),
+            "cell_index_anchor": int(self.cell_index_anchor),
+            "chain_persist_window": int(self.chain_persist_window),
+            "canonical_compact_per_tag_votes": [
+                [t, int(c)]
+                for t, c in self.canonical_compact_per_tag_votes],
+            "canonical_compact_projected_subset":
+                list(self.canonical_compact_projected_subset),
+            "n_w15_canonical_tokens": int(self.n_w15_canonical_tokens),
+            "projection_slots": [
+                s._signed_payload() for s in self.projection_slots],
+        }
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes(self._signed_payload())
+
+    def recompute_chain_root_cid(self) -> str:
+        return hashlib.sha256(self.to_canonical_bytes()).hexdigest()
+
+    @property
+    def n_anchor_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    def projection_for(self, consumer_id: str) -> ProjectionSlot | None:
+        for s in self.projection_slots:
+            if s.consumer_id == consumer_id:
+                return s
+        return None
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "producer_agent_id": self.producer_agent_id,
+            "consumer_agent_ids": list(self.consumer_agent_ids),
+            "cell_index_anchor": int(self.cell_index_anchor),
+            "chain_persist_window": int(self.chain_persist_window),
+            "canonical_compact_per_tag_votes": [
+                [t, int(c)]
+                for t, c in self.canonical_compact_per_tag_votes],
+            "canonical_compact_projected_subset":
+                list(self.canonical_compact_projected_subset),
+            "n_w15_canonical_tokens": int(self.n_w15_canonical_tokens),
+            "n_anchor_bytes": int(self.n_anchor_bytes),
+            "projection_slots": [
+                {**s._signed_payload(),
+                  "projection_cid": s.projection_cid}
+                for s in self.projection_slots],
+            "chain_root_cid": self.chain_root_cid,
+        }
+
+
+@dataclasses.dataclass(frozen=True)
+class ChainAdvanceEnvelope:
+    """Chain advance (W26 family) — per-cell delta inside a chain.
+
+    Hash-chains to the parent advance (or directly to the anchor for
+    cell 1 of a chain).  Carries only the delta from the parent — on
+    a stable bench (R-69-CACHE-FANOUT) the delta is empty by design.
+    """
+    schema_version: str
+    schema_cid: str
+    chain_root_cid: str
+    parent_advance_cid: str  # anchor CID for first advance, else previous advance_cid
+    cell_index: int
+    cell_in_chain: int  # 1-indexed within the chain window
+    delta_per_tag_votes: tuple[tuple[str, int], ...]
+    delta_projected_subset_added: tuple[str, ...]
+    delta_projected_subset_removed: tuple[str, ...]
+    advance_cid: str = ""
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "delta_per_tag_votes",
+                            tuple(sorted(self.delta_per_tag_votes,
+                                          key=lambda kv: kv[0])))
+        object.__setattr__(self, "delta_projected_subset_added",
+                            tuple(sorted(self.delta_projected_subset_added)))
+        object.__setattr__(self, "delta_projected_subset_removed",
+                            tuple(sorted(self.delta_projected_subset_removed)))
+        if not self.advance_cid:
+            object.__setattr__(self, "advance_cid",
+                                self.recompute_advance_cid())
+
+    def _signed_payload(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "chain_root_cid": self.chain_root_cid,
+            "parent_advance_cid": self.parent_advance_cid,
+            "cell_index": int(self.cell_index),
+            "cell_in_chain": int(self.cell_in_chain),
+            "delta_per_tag_votes": [
+                [t, int(c)] for t, c in self.delta_per_tag_votes],
+            "delta_projected_subset_added":
+                list(self.delta_projected_subset_added),
+            "delta_projected_subset_removed":
+                list(self.delta_projected_subset_removed),
+        }
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes(self._signed_payload())
+
+    def recompute_advance_cid(self) -> str:
+        return hashlib.sha256(self.to_canonical_bytes()).hexdigest()
+
+    def to_decoder_text(self) -> str:
+        return f"<chain_advance:{self.advance_cid[:16]}>"
+
+    @property
+    def n_advance_tokens(self) -> int:
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_advance_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def is_empty_delta(self) -> bool:
+        return (not self.delta_per_tag_votes
+                  and not self.delta_projected_subset_added
+                  and not self.delta_projected_subset_removed)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "chain_root_cid": self.chain_root_cid,
+            "parent_advance_cid": self.parent_advance_cid,
+            "cell_index": int(self.cell_index),
+            "cell_in_chain": int(self.cell_in_chain),
+            "delta_per_tag_votes": [
+                [t, int(c)] for t, c in self.delta_per_tag_votes],
+            "delta_projected_subset_added":
+                list(self.delta_projected_subset_added),
+            "delta_projected_subset_removed":
+                list(self.delta_projected_subset_removed),
+            "advance_cid": self.advance_cid,
+            "n_advance_tokens": int(self.n_advance_tokens),
+            "n_advance_bytes": int(self.n_advance_bytes),
+            "is_empty_delta": bool(self.is_empty_delta),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_chain_anchor(
+        anchor: ChainAnchorEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+) -> LatentVerificationOutcome:
+    """Controller-side verification of a :class:`ChainAnchorEnvelope`.
+
+    Pure function. Failure modes enumerated:
+
+    * ``empty_anchor``               — no anchor passed.
+    * ``schema_version_unknown``     — anchor.schema_version mismatch.
+    * ``schema_cid_mismatch``        — anchor.schema_cid != registered.
+    * ``window_non_positive``        — chain_persist_window ≤ 0.
+    * ``projection_cid_mismatch``    — a slot's CID does not recompute.
+    * ``hash_mismatch``              — chain_root_cid does not recompute.
+    """
+    n = 0
+    if anchor is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_anchor", n_checks=n)
+    n += 1
+    if anchor.schema_version != W26_CHAIN_ANCHOR_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n)
+    n += 1
+    if anchor.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n)
+    n += 1
+    if int(anchor.chain_persist_window) <= 0:
+        return LatentVerificationOutcome(
+            ok=False, reason="window_non_positive", n_checks=n)
+    n += 1
+    for s in anchor.projection_slots:
+        if s.projection_cid != s.recompute_projection_cid():
+            return LatentVerificationOutcome(
+                ok=False, reason="projection_cid_mismatch", n_checks=n)
+    n += 1
+    if anchor.chain_root_cid != anchor.recompute_chain_root_cid():
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n)
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n)
+
+
+def verify_chain_advance(
+        advance: ChainAdvanceEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        anchor: ChainAnchorEnvelope,
+        expected_parent_cid: str,
+        expected_cell_in_chain: int,
+) -> LatentVerificationOutcome:
+    """Controller-side verification of a :class:`ChainAdvanceEnvelope`.
+
+    Pure function. Failure modes enumerated:
+
+    * ``empty_advance``              — no advance passed.
+    * ``schema_version_unknown``     — advance.schema_version mismatch.
+    * ``schema_cid_mismatch``        — advance.schema_cid != registered.
+    * ``chain_root_mismatch``        — advance.chain_root_cid != anchor.
+    * ``parent_mismatch``            — parent_advance_cid != expected.
+    * ``cell_in_chain_mismatch``     — cell_in_chain != expected.
+    * ``window_expired``             — cell_in_chain > chain_persist_window.
+    * ``hash_mismatch``              — advance_cid does not recompute.
+    """
+    n = 0
+    if advance is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_advance", n_checks=n)
+    n += 1
+    if advance.schema_version != W26_CHAIN_ADVANCE_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n)
+    n += 1
+    if advance.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n)
+    n += 1
+    if advance.chain_root_cid != anchor.chain_root_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="chain_root_mismatch", n_checks=n)
+    n += 1
+    if advance.parent_advance_cid != expected_parent_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="parent_mismatch", n_checks=n)
+    n += 1
+    if int(advance.cell_in_chain) != int(expected_cell_in_chain):
+        return LatentVerificationOutcome(
+            ok=False, reason="cell_in_chain_mismatch", n_checks=n)
+    n += 1
+    if int(advance.cell_in_chain) > int(anchor.chain_persist_window):
+        return LatentVerificationOutcome(
+            ok=False, reason="window_expired", n_checks=n)
+    n += 1
+    if advance.advance_cid != advance.recompute_advance_cid():
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n)
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n)
+
+
+def verify_projection_subscription(
+        anchor: ChainAnchorEnvelope,
+        *,
+        consumer_id: str,
+        projection_id: str,
+) -> LatentVerificationOutcome:
+    """Controller-side verification that ``consumer_id`` is authorised
+    to resolve ``projection_id`` against ``anchor``.
+
+    Pure function. Failure modes:
+
+    * ``consumer_not_in_anchor``        — consumer_id not in anchor.consumer_agent_ids.
+    * ``projection_unauthorized``       — projection_id not in anchor.projection_slots
+                                            for this consumer.
+    """
+    n = 0
+    n += 1
+    if consumer_id not in anchor.consumer_agent_ids:
+        return LatentVerificationOutcome(
+            ok=False, reason="consumer_not_in_anchor", n_checks=n)
+    n += 1
+    slot = anchor.projection_for(consumer_id)
+    if slot is None or slot.projection_id != projection_id:
+        return LatentVerificationOutcome(
+            ok=False, reason="projection_unauthorized", n_checks=n)
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n)
+
+
+@dataclasses.dataclass
+class ChainPersistedFanoutRegistry:
+    """Controller-side registry for chain anchors and advances (W26).
+
+    The registry is the single source of truth for chain validity.
+    Producers register the anchor exactly once per chain window, then
+    submit advances whose hash and parent linkage are checked.
+
+    Trust boundary: the registry is controller-owned.  A malicious
+    producer cannot register a tampered advance; a malicious consumer
+    cannot resolve a projection they were not slotted into.
+    """
+    schema: SchemaCapsule | None = None
+    _anchors: dict[str, ChainAnchorEnvelope] = dataclasses.field(
+        default_factory=dict)  # keyed by chain_root_cid
+    _advances: dict[str, ChainAdvanceEnvelope] = dataclasses.field(
+        default_factory=dict)  # keyed by advance_cid
+    _chain_state: dict[str, dict[str, Any]] = dataclasses.field(
+        default_factory=dict)  # keyed by chain_root_cid; tracks parent_cid + cell_in_chain
+    n_anchors_registered: int = 0
+    n_advances_registered: int = 0
+    n_advances_rejected: int = 0
+    n_projections_resolved: int = 0
+    n_projections_rejected: int = 0
+
+    def register_anchor(
+            self, anchor: ChainAnchorEnvelope,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            self.n_advances_rejected += 0  # registry without schema cannot verify
+            return LatentVerificationOutcome(
+                ok=False, reason="registry_no_schema", n_checks=0)
+        outcome = verify_chain_anchor(
+            anchor, registered_schema=self.schema)
+        if not outcome.ok:
+            return outcome
+        self._anchors[anchor.chain_root_cid] = anchor
+        self._chain_state[anchor.chain_root_cid] = {
+            "parent_cid": anchor.chain_root_cid,
+            "cell_in_chain": 0,
+        }
+        self.n_anchors_registered += 1
+        return outcome
+
+    def register_advance(
+            self, advance: ChainAdvanceEnvelope,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            self.n_advances_rejected += 1
+            return LatentVerificationOutcome(
+                ok=False, reason="registry_no_schema", n_checks=0)
+        anchor = self._anchors.get(advance.chain_root_cid)
+        if anchor is None:
+            self.n_advances_rejected += 1
+            return LatentVerificationOutcome(
+                ok=False, reason="anchor_not_found", n_checks=0)
+        state = self._chain_state.get(advance.chain_root_cid, {})
+        expected_parent = str(state.get("parent_cid",
+                                          anchor.chain_root_cid))
+        expected_cell_in_chain = int(state.get("cell_in_chain", 0)) + 1
+        outcome = verify_chain_advance(
+            advance,
+            registered_schema=self.schema,
+            anchor=anchor,
+            expected_parent_cid=expected_parent,
+            expected_cell_in_chain=expected_cell_in_chain)
+        if not outcome.ok:
+            self.n_advances_rejected += 1
+            return outcome
+        self._advances[advance.advance_cid] = advance
+        self._chain_state[advance.chain_root_cid] = {
+            "parent_cid": advance.advance_cid,
+            "cell_in_chain": expected_cell_in_chain,
+        }
+        self.n_advances_registered += 1
+        return outcome
+
+    def expected_parent_for(self, chain_root_cid: str) -> str:
+        state = self._chain_state.get(chain_root_cid, {})
+        return str(state.get("parent_cid", chain_root_cid))
+
+    def expected_cell_in_chain_for(self, chain_root_cid: str) -> int:
+        state = self._chain_state.get(chain_root_cid, {})
+        return int(state.get("cell_in_chain", 0)) + 1
+
+    def get_anchor(
+            self, chain_root_cid: str,
+    ) -> ChainAnchorEnvelope | None:
+        return self._anchors.get(chain_root_cid)
+
+    def get_advance(
+            self, advance_cid: str,
+    ) -> ChainAdvanceEnvelope | None:
+        return self._advances.get(advance_cid)
+
+    def latest_state(
+            self, chain_root_cid: str,
+    ) -> tuple[str, int]:
+        """Return (parent_cid, cell_in_chain) for the latest registered
+        cell of this chain.  Used by consumers resolving the chain head.
+        """
+        state = self._chain_state.get(chain_root_cid, {})
+        return (str(state.get("parent_cid", chain_root_cid)),
+                int(state.get("cell_in_chain", 0)))
+
+    def resolve_projection(
+            self,
+            *,
+            chain_root_cid: str,
+            consumer_id: str,
+            projection_id: str,
+    ) -> tuple[ChainAnchorEnvelope | None, str]:
+        anchor = self._anchors.get(chain_root_cid)
+        if anchor is None:
+            self.n_projections_rejected += 1
+            return None, "anchor_not_found"
+        outcome = verify_projection_subscription(
+            anchor, consumer_id=consumer_id,
+            projection_id=projection_id)
+        if not outcome.ok:
+            self.n_projections_rejected += 1
+            return None, outcome.reason
+        self.n_projections_resolved += 1
+        return anchor, "ok"
+
+
+@dataclasses.dataclass
+class W26ChainResult:
+    """Per-cell audit record for a W26 chain-persisted agent."""
+    answer: dict[str, Any]
+    inner_w25_branch: str
+    decoder_branch: str
+    agent_id: str
+    is_producer: bool
+    chain_root_cid: str
+    advance_cid: str
+    cell_in_chain: int
+    chain_persist_window: int
+    n_w25_visible_tokens: int
+    n_w26_visible_tokens: int
+    n_w25_minus_w26_savings: int
+    n_anchor_bytes: int
+    n_advance_bytes: int
+    chain_verification_ok: bool
+    chain_verification_reason: str
+    projection_resolved: bool
+    projection_id: str
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "answer": self.answer,
+            "inner_w25_branch": str(self.inner_w25_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "agent_id": str(self.agent_id),
+            "is_producer": bool(self.is_producer),
+            "chain_root_cid": str(self.chain_root_cid),
+            "advance_cid": str(self.advance_cid),
+            "cell_in_chain": int(self.cell_in_chain),
+            "chain_persist_window": int(self.chain_persist_window),
+            "n_w25_visible_tokens": int(self.n_w25_visible_tokens),
+            "n_w26_visible_tokens": int(self.n_w26_visible_tokens),
+            "n_w25_minus_w26_savings":
+                int(self.n_w25_minus_w26_savings),
+            "n_anchor_bytes": int(self.n_anchor_bytes),
+            "n_advance_bytes": int(self.n_advance_bytes),
+            "chain_verification_ok": bool(self.chain_verification_ok),
+            "chain_verification_reason":
+                str(self.chain_verification_reason),
+            "projection_resolved": bool(self.projection_resolved),
+            "projection_id": str(self.projection_id),
+        }
+
+
+@dataclasses.dataclass
+class ChainPersistedFanoutDisambiguator:
+    """Cross-cell chain-persisted dense-control fanout (W26 family).
+
+    Wraps a :class:`SharedFanoutDisambiguator` (W25) and adds:
+
+    1. **Producer-side cross-cell amortisation.**  At a chain anchor
+       cell the producer pays the full W25 cost
+       (``n_w25_visible = n_w24_visible`` ≈ 14.6 tokens at K=3).  At
+       each subsequent in-window cell the producer pays a single
+       ``<chain_advance:DDDD>`` token (1 token).  Producer cost over N
+       cells of a chain window of size W:
+         W26 producer ≈ C + (W-1)
+       vs W25 producer ≈ W × C
+       Saving: (W-1) × (C-1) per window.
+    2. **Consumer-side persistent subscription.**  Consumers subscribe
+       once at the anchor (1 token, same as W25 fanout_ref) and emit
+       a 1-token advance reference per subsequent cell (same cost as
+       W25 fanout_ref but resolves through the chain instead of a
+       per-cell fanout envelope, eliminating the per-cell fanout
+       registration overhead from K × bytes/cell to bytes per anchor).
+    3. **Per-consumer projections.**  Each consumer is slotted into
+       a projection (subset of compact_per_tag_votes /
+       projected_subset).  A consumer can only resolve their own
+       projection_id; cross-projection access is rejected.
+
+    Trust boundary
+    --------------
+    Every chain envelope (anchor + advance) is content-addressed,
+    schema-versioned, and parent-CID-sealed.  The controller's
+    :class:`ChainPersistedFanoutRegistry` enforces:
+      * anchor / advance hash integrity;
+      * parent linkage (every advance hash-chains to anchor or prior advance);
+      * cell-index monotonicity inside a chain window;
+      * window expiry (advance beyond chain_persist_window rejected);
+      * schema_cid pinning (cross-schema envelopes rejected);
+      * consumer-projection scope (consumers can only resolve their slot).
+
+    Honest scope
+    ------------
+    W26 changes how the producer's compact state is *delivered* to the
+    K consumers + final decoder; it does not add a new information
+    channel.  The visible-token reduction comes from chaining
+    references (the same accounting model already in W23/W24/W25).
+    """
+    inner: SharedFanoutDisambiguator = dataclasses.field(
+        default_factory=lambda: SharedFanoutDisambiguator())
+    chain_registry: ChainPersistedFanoutRegistry | None = None
+    schema: SchemaCapsule | None = None
+    chain_persist_window: int = 16
+    enabled: bool = True
+    require_chain_verification: bool = True
+    trigger_branches: frozenset[str] = dataclasses.field(
+        default_factory=lambda: W26_DEFAULT_TRIGGER_BRANCHES)
+    projection_id_for_consumer: dict[str, str] = dataclasses.field(
+        default_factory=dict)
+    projected_tags_for_consumer: dict[str, tuple[str, ...]] = (
+        dataclasses.field(default_factory=dict))
+
+    _last_result: W26ChainResult | None = None
+    _active_chain_root_cid: str = ""
+    _active_anchor: ChainAnchorEnvelope | None = None
+    _active_cell_in_chain: int = 0
+    _last_advance: ChainAdvanceEnvelope | None = None
+    _cell_index: int = 0
+    _last_anchor_per_tag_votes: tuple[tuple[str, int], ...] = ()
+    _last_anchor_projected_subset: tuple[str, ...] = ()
+
+    @property
+    def agent_id(self) -> str:
+        return self.inner.agent_id
+
+    @property
+    def is_producer(self) -> bool:
+        return self.inner.is_producer
+
+    @property
+    def producer_agent_id(self) -> str:
+        return self.inner.producer_agent_id
+
+    @property
+    def consumer_agent_ids(self) -> tuple[str, ...]:
+        return self.inner.consumer_agent_ids
+
+    @property
+    def T_decoder(self) -> int | None:
+        return self.inner.T_decoder
+
+    @T_decoder.setter
+    def T_decoder(self, v: int | None) -> None:
+        self.inner.T_decoder = v
+
+    def reset_session(self) -> None:
+        self._last_result = None
+        self._active_chain_root_cid = ""
+        self._active_anchor = None
+        self._active_cell_in_chain = 0
+        self._last_advance = None
+        self._cell_index = 0
+        self._last_anchor_per_tag_votes = ()
+        self._last_anchor_projected_subset = ()
+        self.inner.reset_session()
+
+    def _make_projection_slots(
+            self,
+            *,
+            consumer_ids: tuple[str, ...],
+            canonical_projected_subset: tuple[str, ...],
+    ) -> tuple[ProjectionSlot, ...]:
+        slots: list[ProjectionSlot] = []
+        for cid in consumer_ids:
+            pid = self.projection_id_for_consumer.get(cid, "default")
+            tags = self.projected_tags_for_consumer.get(
+                cid, canonical_projected_subset)
+            slots.append(ProjectionSlot(
+                projection_id=str(pid),
+                consumer_id=str(cid),
+                projected_tags=tuple(tags),
+            ))
+        return tuple(slots)
+
+    def _build_anchor(
+            self,
+            *,
+            cell_index: int,
+            w25_result: W25FanoutResult,
+            n_w15_canonical_tokens: int,
+            canonical_compact_per_tag_votes: tuple[tuple[str, int], ...],
+            canonical_compact_projected_subset: tuple[str, ...],
+    ) -> ChainAnchorEnvelope:
+        schema_cid = (str(self.schema.cid)
+                        if self.schema is not None else "")
+        slots = self._make_projection_slots(
+            consumer_ids=tuple(self.consumer_agent_ids),
+            canonical_projected_subset=canonical_compact_projected_subset)
+        return ChainAnchorEnvelope(
+            schema_version=W26_CHAIN_ANCHOR_SCHEMA_VERSION,
+            schema_cid=schema_cid,
+            producer_agent_id=str(self.producer_agent_id
+                                    or self.agent_id),
+            consumer_agent_ids=tuple(self.consumer_agent_ids),
+            cell_index_anchor=int(cell_index),
+            chain_persist_window=int(self.chain_persist_window),
+            canonical_compact_per_tag_votes=tuple(
+                canonical_compact_per_tag_votes),
+            canonical_compact_projected_subset=tuple(
+                canonical_compact_projected_subset),
+            n_w15_canonical_tokens=int(n_w15_canonical_tokens),
+            projection_slots=slots,
+        )
+
+    def _compute_delta(
+            self,
+            *,
+            current_per_tag_votes: tuple[tuple[str, int], ...],
+            current_projected_subset: tuple[str, ...],
+    ) -> tuple[tuple[tuple[str, int], ...],
+                tuple[str, ...], tuple[str, ...]]:
+        anchor_votes = dict(self._last_anchor_per_tag_votes)
+        cur_votes = dict(current_per_tag_votes)
+        delta_votes: list[tuple[str, int]] = []
+        for tag, cnt in cur_votes.items():
+            if anchor_votes.get(tag, 0) != cnt:
+                delta_votes.append((tag, int(cnt)))
+        anchor_set = set(self._last_anchor_projected_subset)
+        cur_set = set(current_projected_subset)
+        added = tuple(sorted(cur_set - anchor_set))
+        removed = tuple(sorted(anchor_set - cur_set))
+        return (tuple(sorted(delta_votes, key=lambda kv: kv[0])),
+                added, removed)
+
+    def _build_advance(
+            self,
+            *,
+            cell_index: int,
+            anchor: ChainAnchorEnvelope,
+            parent_advance_cid: str,
+            cell_in_chain: int,
+            current_per_tag_votes: tuple[tuple[str, int], ...],
+            current_projected_subset: tuple[str, ...],
+    ) -> ChainAdvanceEnvelope:
+        schema_cid = (str(self.schema.cid)
+                        if self.schema is not None else "")
+        delta_votes, added, removed = self._compute_delta(
+            current_per_tag_votes=current_per_tag_votes,
+            current_projected_subset=current_projected_subset)
+        return ChainAdvanceEnvelope(
+            schema_version=W26_CHAIN_ADVANCE_SCHEMA_VERSION,
+            schema_cid=schema_cid,
+            chain_root_cid=anchor.chain_root_cid,
+            parent_advance_cid=parent_advance_cid,
+            cell_index=int(cell_index),
+            cell_in_chain=int(cell_in_chain),
+            delta_per_tag_votes=delta_votes,
+            delta_projected_subset_added=added,
+            delta_projected_subset_removed=removed,
+        )
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        # Always run the W25 inner decode first; W25 already runs W24
+        # and embeds its result.
+        w25_out = self.inner.decode_rounds(per_round_handoffs)
+        w25_result = self.inner.last_result
+        out = dict(w25_out)
+        cell_index = int(self._cell_index)
+
+        inner_w25_branch = (str(w25_result.decoder_branch)
+                              if w25_result is not None
+                              else W25_BRANCH_DISABLED)
+        n_w25_visible = (int(w25_result.n_w25_visible_tokens)
+                          if w25_result is not None else 0)
+
+        def _pack(
+                *,
+                decoder_branch: str,
+                anchor: ChainAnchorEnvelope | None,
+                advance: ChainAdvanceEnvelope | None,
+                cell_in_chain: int,
+                chain_ok: bool,
+                chain_reason: str,
+                n_w26_visible: int,
+                projection_resolved: bool = False,
+                projection_id: str = "",
+        ) -> dict[str, Any]:
+            savings = max(0, n_w25_visible - n_w26_visible)
+            chain_root_cid = ""
+            if anchor is not None:
+                chain_root_cid = str(anchor.chain_root_cid)
+            elif advance is not None:
+                chain_root_cid = str(advance.chain_root_cid)
+            elif self._active_anchor is not None:
+                chain_root_cid = str(
+                    self._active_anchor.chain_root_cid)
+            advance_cid = (str(advance.advance_cid)
+                            if advance is not None else "")
+            n_anchor_bytes = (int(anchor.n_anchor_bytes)
+                                if anchor is not None else 0)
+            n_advance_bytes = (int(advance.n_advance_bytes)
+                                 if advance is not None else 0)
+            result = W26ChainResult(
+                answer=dict(out),
+                inner_w25_branch=inner_w25_branch,
+                decoder_branch=decoder_branch,
+                agent_id=str(self.agent_id),
+                is_producer=bool(self.is_producer),
+                chain_root_cid=chain_root_cid,
+                advance_cid=advance_cid,
+                cell_in_chain=int(cell_in_chain),
+                chain_persist_window=int(self.chain_persist_window),
+                n_w25_visible_tokens=n_w25_visible,
+                n_w26_visible_tokens=n_w26_visible,
+                n_w25_minus_w26_savings=savings,
+                n_anchor_bytes=n_anchor_bytes,
+                n_advance_bytes=n_advance_bytes,
+                chain_verification_ok=bool(chain_ok),
+                chain_verification_reason=str(chain_reason),
+                projection_resolved=bool(projection_resolved),
+                projection_id=str(projection_id),
+            )
+            self._last_result = result
+            out_local = dict(out)
+            out_local["chain_persisted_hybrid"] = result.as_dict()
+            if anchor is not None:
+                out_local["chain_anchor_envelope"] = anchor.as_dict()
+            if advance is not None:
+                out_local["chain_advance_envelope"] = advance.as_dict()
+            return out_local
+
+        if (not self.enabled or self.chain_registry is None
+                or self.schema is None):
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W26_BRANCH_DISABLED,
+                anchor=None, advance=None, cell_in_chain=0,
+                chain_ok=False, chain_reason="disabled",
+                n_w26_visible=n_w25_visible)
+
+        if inner_w25_branch not in self.trigger_branches:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W26_BRANCH_NO_TRIGGER,
+                anchor=None, advance=None, cell_in_chain=0,
+                chain_ok=False, chain_reason="inner_w25_not_triggered",
+                n_w26_visible=n_w25_visible)
+
+        # --- Producer path ---
+        if self.is_producer and w25_result is not None:
+            # Pull canonical content from the inner W25 fanout envelope
+            # (built by the inner W25 from W24 / W22 state).
+            fanout = self.inner.last_fanout_envelope
+            if fanout is None:
+                # No fanout envelope means W25 fired but didn't emit
+                # — treat as no-trigger.
+                self._cell_index += 1
+                return _pack(
+                    decoder_branch=W26_BRANCH_NO_TRIGGER,
+                    anchor=None, advance=None, cell_in_chain=0,
+                    chain_ok=False,
+                    chain_reason="inner_w25_no_envelope",
+                    n_w26_visible=n_w25_visible)
+
+            canonical_per_tag_votes = tuple(
+                fanout.compact_per_tag_votes)
+            canonical_projected_subset = tuple(
+                fanout.compact_projected_subset)
+            # n_w15_canonical_tokens approximated from W25 visible
+            # minus the compact_ref token.
+            n_w15_canonical = max(0, n_w25_visible - 1)
+
+            # Chain persists for at most ``chain_persist_window`` cells
+            # *including* the anchor cell.  window=1 means anchor-only
+            # (no advances); window=N means anchor + (N-1) advances.
+            need_anchor = (
+                not self._active_chain_root_cid
+                or self._active_cell_in_chain + 1
+                    >= int(self.chain_persist_window))
+
+            if need_anchor:
+                anchor = self._build_anchor(
+                    cell_index=cell_index,
+                    w25_result=w25_result,
+                    n_w15_canonical_tokens=n_w15_canonical,
+                    canonical_compact_per_tag_votes=
+                        canonical_per_tag_votes,
+                    canonical_compact_projected_subset=
+                        canonical_projected_subset)
+                outcome = self.chain_registry.register_anchor(anchor)
+                if not outcome.ok and self.require_chain_verification:
+                    self._cell_index += 1
+                    return _pack(
+                        decoder_branch=W26_BRANCH_CHAIN_REJECTED,
+                        anchor=anchor, advance=None,
+                        cell_in_chain=0, chain_ok=False,
+                        chain_reason=str(outcome.reason),
+                        n_w26_visible=n_w25_visible)
+                # Anchor cell: producer pays full W25 visible cost.
+                self._active_chain_root_cid = anchor.chain_root_cid
+                self._active_anchor = anchor
+                self._active_cell_in_chain = 0
+                self._last_advance = None
+                self._last_anchor_per_tag_votes = (
+                    canonical_per_tag_votes)
+                self._last_anchor_projected_subset = (
+                    canonical_projected_subset)
+                # Decide branch label.
+                if cell_index > 0:
+                    branch = W26_BRANCH_CHAIN_RE_ANCHORED
+                else:
+                    branch = W26_BRANCH_CHAIN_ANCHORED
+                self._cell_index += 1
+                return _pack(
+                    decoder_branch=branch,
+                    anchor=anchor, advance=None, cell_in_chain=0,
+                    chain_ok=True, chain_reason="ok",
+                    n_w26_visible=n_w25_visible)
+
+            # Subsequent in-window cell: build + register advance.
+            anchor = self._active_anchor
+            assert anchor is not None
+            parent_cid = (str(self._last_advance.advance_cid)
+                            if self._last_advance is not None
+                            else anchor.chain_root_cid)
+            cell_in_chain = self._active_cell_in_chain + 1
+            advance = self._build_advance(
+                cell_index=cell_index,
+                anchor=anchor,
+                parent_advance_cid=parent_cid,
+                cell_in_chain=cell_in_chain,
+                current_per_tag_votes=canonical_per_tag_votes,
+                current_projected_subset=canonical_projected_subset)
+            outcome = self.chain_registry.register_advance(advance)
+            if not outcome.ok and self.require_chain_verification:
+                self._cell_index += 1
+                return _pack(
+                    decoder_branch=W26_BRANCH_CHAIN_REJECTED,
+                    anchor=None, advance=advance,
+                    cell_in_chain=cell_in_chain,
+                    chain_ok=False, chain_reason=str(outcome.reason),
+                    n_w26_visible=n_w25_visible)
+            self._active_cell_in_chain = cell_in_chain
+            self._last_advance = advance
+            # Producer in-window advance: 1 token.
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W26_BRANCH_CHAIN_ADVANCED,
+                anchor=None, advance=advance,
+                cell_in_chain=cell_in_chain,
+                chain_ok=True, chain_reason="ok",
+                n_w26_visible=int(advance.n_advance_tokens))
+
+        # --- Consumer path ---
+        # Consumers consume the chain via their projection.  The chain
+        # root must already be registered by a producer earlier in this
+        # cell's processing (caller orchestrates producer-then-consumer
+        # ordering, exactly as W25's run_phase72 does).
+        # Find the active chain root the producer registered for this
+        # producer_agent_id.
+        producer_id = str(self.producer_agent_id)
+        consumer_id = str(self.agent_id)
+        projection_id = self.projection_id_for_consumer.get(
+            consumer_id, "default")
+
+        # Identify the chain by looking at all registered anchors
+        # whose producer_agent_id matches.
+        anchor: ChainAnchorEnvelope | None = None
+        for cid, env in self.chain_registry._anchors.items():
+            if env.producer_agent_id == producer_id:
+                anchor = env  # latest wins (dicts preserve insertion order)
+        if anchor is None:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W26_BRANCH_CHAIN_REJECTED,
+                anchor=None, advance=None, cell_in_chain=0,
+                chain_ok=False,
+                chain_reason="anchor_not_found_for_producer",
+                n_w26_visible=n_w25_visible)
+        # Verify projection scope.
+        proj_anchor, proj_reason = self.chain_registry.resolve_projection(
+            chain_root_cid=anchor.chain_root_cid,
+            consumer_id=consumer_id,
+            projection_id=projection_id)
+        if proj_anchor is None:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W26_BRANCH_CHAIN_PROJECTION_REJECTED,
+                anchor=anchor, advance=None,
+                cell_in_chain=0, chain_ok=False,
+                chain_reason=str(proj_reason),
+                n_w26_visible=n_w25_visible,
+                projection_resolved=False,
+                projection_id=projection_id)
+        # Track which chain advance this consumer is on.
+        self._cell_index += 1
+        return _pack(
+            decoder_branch=W26_BRANCH_CHAIN_PROJECTION_RESOLVED,
+            anchor=anchor, advance=self._last_advance,
+            cell_in_chain=self._active_cell_in_chain,
+            chain_ok=True, chain_reason="ok",
+            n_w26_visible=1,  # 1-token consumer chain ref
+            projection_resolved=True,
+            projection_id=projection_id)
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+                ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> W26ChainResult | None:
+        return self._last_result
+
+    @property
+    def active_anchor(self) -> ChainAnchorEnvelope | None:
+        return self._active_anchor
+
+    @property
+    def last_advance(self) -> ChainAdvanceEnvelope | None:
+        return self._last_advance

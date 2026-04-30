@@ -5,8 +5,56 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.26,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.27,
 > 2026-04-30.
+
+## TL;DR — SDK v3.27
+
+The programme now has **twenty-three** coupled research axes, each
+with a sharp status. SDK v3.27 mints axis 23: **chain-persisted
+dense-control fanout + per-consumer projections** — extending the
+SDK v3.26 W25 multi-agent fanout with a
+``ChainPersistedFanoutDisambiguator`` (W26) that amortises the
+producer's per-cell salience-token cost across cells via a two-tier
+content-addressed envelope hierarchy: a ``ChainAnchorEnvelope`` at
+the chain genesis (carrying canonical compact state +
+per-consumer ``ProjectionSlot`` map) and a sequence of
+``ChainAdvanceEnvelope`` (each hash-chained to the parent advance)
+for in-window cells. At the anchor cell the producer pays the full
+W25 cost ``C ≈ 14.6`` tokens; at each subsequent in-window cell the
+producer pays a single ``<chain_advance:DDDD>`` token (1 token).
+Consumers subscribe at the anchor and emit a 1-token chain-consumer
+ref per cell; per-consumer projections enforce controller-verified
+scope.
+
+**The headline SDK v3.27 results.** On the synthetic
+**R-73-CHAIN-SHARED** regime (1 producer + K=3 consumers sharing a
+``ChainPersistedFanoutRegistry``, same R-69-CACHE-FANOUT oracle
+ecology, 16 cells, ``chain_persist_window = 16``), W26 strictly
+reduces total visible tokens across all agents by **−12.125 tokens
+/ cell (−68.79 %)** over the W25 baseline AND **−53.00 tokens /
+cell (−90.60 %)** over the W24 baseline at ``T_decoder = None``.
+``correctness_ratified_rate = 1.0000`` byte-for-byte;
+``chain_consumer_resolved_rate = 1.0000``. Stable across **5/5**
+seeds. Four named falsifiers make the conditionality sharp:
+**W26-Λ-no-chain** (``chain_persist_window = 1`` → W26 = W25
+byte-for-byte), **W26-Λ-tampered** (14/16 advances rejected via
+``parent_mismatch``), **W26-Λ-projection-mismatch** (16/16
+cross-projection accesses rejected via ``projection_unauthorized``),
+**W26-Λ-divergent** (gold subset flips → W26 falls through; no
+false savings claim). Trust boundary: ``verify_chain_anchor`` (6
+failure modes), ``verify_chain_advance`` (8), ``verify_projection_subscription``
+(2). Backward-compat (W26-3-A / W26-3-B) preserved byte-for-byte:
+full focused regression on W22..W26 + IS-1 / IS-2 = **180/180 + 6
+subtests pass in 15.6s**.
+
+**K-scaling discharge (W25-C-K-SCALING).** The W25-C-K-SCALING
+conjecture from SDK v3.26 was empirically discharged at K∈{3,5,8,10}:
+W25 saving over W24 grows from 69.87 % at K=3 to 84.69 % at K=10
+(close to the conjectured 88 %, slightly below because the cell-0
+W25 producer cost is heterogeneous); W26 saving over W24 grows
+from 90.60 % at K=3 to 92.23 % at K=10. Anchor:
+``docs/data/phase73_k_scaling.json``.
 
 ## TL;DR — SDK v3.26
 

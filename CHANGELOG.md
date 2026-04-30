@@ -5,6 +5,109 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.27] — 2026-04-30 — SDK v3.27 — chain-persisted dense-control fanout + per-consumer projections + Phase-73 R-73 benchmark family + W26 family + W25-C-K-SCALING discharge (first capsule-native multi-agent-coordination method that amortises the producer's per-cell salience-token cost across cells via 1-token chain-advance references while preserving the W25 multi-consumer fanout floor — measured −68.79% total token reduction over W25 and −90.60% over W24 on K=3 at 5/5 seeds, trust boundary sound on tampered + projection-mismatch falsifiers, W26-Λ-no-chain falsifier confirmed, W25-C-K-SCALING discharged at K∈{3,5,8,10})
+
+*Strictly additive on SDK v3.26. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W26 surface adds
+two new content-addressed signed envelopes
+(``ChainAnchorEnvelope``, ``ChainAdvanceEnvelope``), one
+projection slot (``ProjectionSlot``), three verification
+functions (``verify_chain_anchor`` with 6 enumerated failure modes,
+``verify_chain_advance`` with 8, ``verify_projection_subscription``
+with 2), one controller-side registry
+(``ChainPersistedFanoutRegistry``), one audit record
+(``W26ChainResult``), and one wrapping decoder
+(``ChainPersistedFanoutDisambiguator``) — purely additive in the
+multi-agent coordination research slice.*
+
+**Headline (W26-1, proved-conditional + proved-empirical n=80
+saturated × 5 seeds × 2 T_decoder).** Wrapping the W25
+``SharedFanoutDisambiguator`` in the new
+``ChainPersistedFanoutDisambiguator`` (W26: producer pays the full
+W25 cost ``C ≈ 14.6`` tokens at the chain anchor; subsequent
+in-window cells emit a single ``<chain_advance:DDDD>`` token + a
+hash-chained ``ChainAdvanceEnvelope``; consumers subscribe at the
+anchor via per-consumer ``ProjectionSlot`` and emit a single
+``<chain_consumer:DDDD>`` token per cell) over the same
+R-69-CACHE-FANOUT oracle ecology
+(1 producer + K=3 consumers, 16 cells, ``chain_persist_window =
+16``) strictly reduces ``mean_total_w26_visible_tokens`` over
+``mean_total_w25_visible_tokens`` by **−12.125 tokens / cell
+(−68.79 %)** at ``T_decoder = None``, AND over
+``mean_total_w24_visible_tokens`` by **−53.00 tokens / cell
+(−90.60 %)**. ``correctness_ratified_rate = 1.0000`` byte-for-byte;
+``chain_consumer_resolved_rate = 1.0000``;
+``registry_n_anchors = 1``, ``registry_n_advances = 15``. Identical
+results at ``T_decoder = 24``. Stable across **5/5** seeds.
+
+**K-scaling discharge (W25-C-K-SCALING).** The W25-C-K-SCALING
+conjecture (savings should grow as K×(C−1)) was empirically
+discharged at K∈{3,5,8,10}: W25 saving over W24 grows from 69.87 %
+at K=3 to 84.69 % at K=10 (close to the conjectured 88 %); W26
+saving over W24 grows from 90.60 % at K=3 to 92.23 % at K=10.
+
+**Trust-boundary anchors (W26-3).** ``verify_chain_anchor``
+enumerates 6 failure modes; ``verify_chain_advance`` enumerates 8;
+``verify_projection_subscription`` enumerates 2. On
+R-73-CHAIN-TAMPERED, 14/16 advances rejected via
+``parent_mismatch``; correctness preserved via W25 fall-through.
+On R-73-PROJECTION-MISMATCH, all 16 cells reject for the
+mismatched consumer via ``projection_unauthorized``; the other 2
+consumers still resolve.
+
+**Named falsifiers** (all proved-empirical). **W26-Λ-no-chain**:
+``chain_persist_window = 1`` reduces W26 to W25 byte-for-byte.
+**W26-Λ-tampered**: tampered advances rejected. **W26-Λ-projection-mismatch**:
+cross-projection access rejected. **W26-Λ-divergent**: when gold
+subset flips at the bench midpoint, the inner W25 fires
+``no_trigger`` and W26 falls through; correctness drops to 0.5
+by construction.
+
+**Backward-compat (W26-3-A, W26-3-B).** With ``enabled = False``
+OR ``chain_registry = None``, W26 reduces to W25 byte-for-byte.
+Full pre-existing W22..W25 + IS-1 / IS-2 test surfaces preserved
+byte-for-byte (180/180 in the focused regression).
+
+**Theoretical (W26-L, proved by inspection).** Any capsule-native
+multi-agent coordination strategy whose producer emits only its
+own compact state and whose consumers reference it via 1-token-
+per-cell tokens has a per-cell total visible cost ≥ 1 + K. W26
+attains this floor on every in-window advance cell.
+
+**Mac 2 status: ARP-incomplete (21st consecutive milestone)**;
+all results Mac-1 only. The W26 surface inherits the W24
+``CrossProcessProducerDecoderWire`` as the strongest cross-
+process honesty validated end-to-end on this repo. The
+wire-bytes vs token-cost tradeoff is named **W26-C-MULTI-HOST**;
+remains conjectural.
+
+**New tests:** 63/63 pass on
+``test_phase73_chain_persisted_fanout.py``. Full focused
+regression on W22..W26 + IS-1 / IS-2: **180/180 + 6 subtests
+pass in 15.6s**.
+
+See ``docs/RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md`` for the
+milestone note, ``docs/THEOREM_REGISTRY.md`` for the 13 new
+theorems / falsifiers / conjectures (W26-1 through W26-C-MULTI-HOST,
+plus W25-C-K-SCALING discharge), and
+``docs/context_zero_master_plan.md`` § 4.44 for the
+master-plan-level audit board.
+
+## [3.26] — 2026-04-29 — SDK v3.26 — shared-fanout dense-control + cross-agent state reuse + Phase-72 R-72 benchmark family + W25 family (first capsule-native multi-agent-coordination method that extends W24 single-agent compaction to the multi-agent case — one producer computes 1 FanoutEnvelope for K named consumers, each consumer resolves via 1 ``<fanout_ref:DDDD>`` token, measured −69.87% total token reduction on K=3 at 5/5 seeds, trust boundary sound on poisoned-consumer falsifier, W25-Λ-disjoint named falsifier confirmed)
+
+*Strictly additive on SDK v3.25.* The W25 surface adds one new
+content-addressed signed envelope (``FanoutEnvelope``), one
+controller-side registry (``SharedFanoutRegistry``), one
+verification function (``verify_fanout``), one audit record
+(``W25FanoutResult``), and one wrapping decoder
+(``SharedFanoutDisambiguator``). On R-72-FANOUT-SHARED (1
+producer + K=3 consumers, 16 cells, R-69-CACHE-FANOUT oracle
+ecology), W25 strictly reduces ``mean_total_w25_visible_tokens``
+over ``mean_total_w24_visible_tokens`` by **−40.875 tokens / cell
+(−69.87 %)**; ``correctness_ratified_rate = 1.0000``;
+``fanout_consumer_resolved_rate = 1.0000``. Stable across **5/5**
+seeds. See ``docs/RESULTS_WEVRA_W25_SHARED_FANOUT.md``.
+
 ## [3.25] — 2026-04-29 — SDK v3.25 — bounded-window session compaction + intra-cell resample-quorum + real cross-process producer/decoder wire + Phase-71 R-71 benchmark family + W24 family (first capsule-native multi-agent-coordination method that combines bounded-window session compaction with intra-cell resample-quorum mitigation and a real OS-level cross-process producer/decoder wire — measured efficiency gain on long sessions, empirical discharge of W23-C-MITIGATION-LIVE-VARIANCE on the intra-cell drift axis, and the first real OS-level subprocess pipe in the programme)
 
 *Strictly additive on SDK v3.24. The Wevra single-run product

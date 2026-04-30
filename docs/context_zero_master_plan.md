@@ -9954,6 +9954,186 @@ sharpens the live-LLM transfer half of W23-Λ-real.**
    live-LLM mitigation transfer at large n + cross-host
    validation + embedding-level integration.
 
+### 4.43 SDK v3.26 — shared-fanout dense-control + cross-agent state reuse + Phase-72 R-72 benchmark family + W25 family (R-72-FANOUT-SHARED + R-72-DISJOINT named falsifier + R-72-FANOUT-POISONED trust falsifier)
+
+**One paragraph.** SDK v3.25 (W24 family) closed the per-agent
+session-compaction frontier (one ``<compact_ref:DDDD>`` token per
+cell). SDK v3.26 extends that to the **multi-agent** case: when K
+consumer agents need the same cross-cell session state produced by
+one producer, W24 still required K independent compact envelopes
+(K × C tokens total). W25 replaces those K envelopes with a single
+:class:`FanoutEnvelope` registered by the producer + K single-token
+``<fanout_ref:DDDD>`` references for the consumers (one per
+consumer). On R-72-FANOUT-SHARED (1 producer + K=3 consumers, 16
+cells, R-69-CACHE-FANOUT oracle ecology), W25 strictly reduces
+``mean_total_w25_visible_tokens`` over ``mean_total_w24_visible_
+tokens`` by **−40.875 tokens / cell (−69.87 %)**;
+``correctness_ratified_rate = 1.0000`` byte-for-byte;
+``fanout_consumer_resolved_rate = 1.0000``. Stable across **5/5**
+seeds. Trust boundary: every envelope is hash-chained
+(``fanout_cid``), schema-versioned, and verifier-rejectable on 5
+failure modes (``empty_envelope``, ``schema_version_unknown``,
+``schema_cid_mismatch``, ``consumer_not_authorized``,
+``hash_mismatch``). Two named falsifiers — W25-Λ-disjoint (no
+shared registry → W25 = W24 byte-for-byte) and W25-3 trust
+soundness (R-72-FANOUT-POISONED: unauthorised consumer rejected on
+every cell) — make the conditionality sharp. **Empirically
+discharges the multi-agent extension of the W24 single-agent
+compaction direction.** See `docs/RESULTS_WEVRA_W25_SHARED_FANOUT.md`.
+
+### 4.44 SDK v3.27 — chain-persisted dense-control fanout + per-consumer projections + Phase-73 R-73 benchmark family + W26 family (R-73-CHAIN-SHARED + R-73-CHAIN-WINDOWED + R-73-NO-CHAIN named falsifier + R-73-CHAIN-TAMPERED + R-73-PROJECTION-MISMATCH trust falsifiers + R-73-DIVERGENT regime + W25-C-K-SCALING discharge at K∈{3,5,8,10})
+
+**One paragraph.** SDK v3.26 (W25) reduced multi-agent fanout cost
+from K × C tokens/cell to **C + K** tokens/cell; the producer's
+per-cell salience-token cost (``n_w15_kept`` ≈ 13.6 tokens) was
+unchanged, since W25 emits a fresh :class:`FanoutEnvelope` every
+cell. W25 explicitly named **W25-C-K-SCALING** (savings should
+grow as K×(C−1)) and **W25-C-MULTI-HOST** (cross-host wire vs token
+tradeoff) as conjectures. SDK v3.27 implements the smallest honest
+version of the next step at the *capsule layer*: a two-tier
+content-addressed envelope hierarchy comprising :class:`ChainAnchorEnvelope`
+(genesis cell carrying canonical compact state + per-consumer
+:class:`ProjectionSlot` map) and :class:`ChainAdvanceEnvelope`
+(per-cell hash-chained delta). The :class:`ChainPersistedFanoutDisambiguator`
+(W26) wraps the W25 :class:`SharedFanoutDisambiguator` and amortises
+the producer's per-cell cost across cells: at the chain anchor cell
+the producer pays the full W25 cost (~14.6 tokens); at each
+subsequent in-window cell the producer pays a single
+``<chain_advance:DDDD>`` token (1 token) and registers a
+:class:`ChainAdvanceEnvelope` whose ``parent_advance_cid``
+hash-chains to the prior advance (or the anchor for the first
+advance). Consumers subscribe at the anchor and emit a 1-token
+chain-consumer ref per cell; per-consumer projections enforce that
+each consumer can only resolve their slotted projection_id
+(cross-projection access rejected with ``projection_unauthorized``).
+Three new verification functions (:func:`verify_chain_anchor` with
+6 enumerated failure modes, :func:`verify_chain_advance` with 8
+failure modes, :func:`verify_projection_subscription` with 2
+failure modes) implement the controller-side trust boundary. On
+R-73-CHAIN-SHARED (K=3, 16 cells, ``chain_persist_window = 16``),
+the W26 method strictly reduces ``mean_total_w26_visible_tokens``
+over ``mean_total_w25_visible_tokens`` by **−12.125 tokens / cell
+(−68.79 %)** at ``T_decoder = None`` AND over
+``mean_total_w24_visible_tokens`` by **−53.00 tokens / cell
+(−90.60 %)**; ``correctness_ratified_rate = 1.0000`` byte-for-byte;
+``chain_consumer_resolved_rate = 1.0000``;
+``registry_n_anchors = 1``, ``registry_n_advances = 15``. Identical
+at ``T_decoder = 24``. Stable across **5/5** seeds (savings = 12.125
+tokens/cell on every seed). On R-73-CHAIN-WINDOWED
+(``chain_persist_window = 4``), the producer emits 1 anchor + 12
+advances + 3 re-anchors; savings = −56.0 % over W25. On R-73-NO-CHAIN
+(``chain_persist_window = 1``) **W26 reduces to W25 byte-for-byte**
+(every cell is a (re-)anchor; W26-Λ-no-chain falsifier discharged).
+On R-73-CHAIN-TAMPERED (producer's first advance corrupted
+post-registration), the controller rejects 14/16 advances via
+``parent_mismatch``; correctness preserved via W25 fall-through
+(W26-Λ-tampered). On R-73-PROJECTION-MISMATCH (consumer 0 requests
+``WRONG_PROJECTION_ID``), all 16 cells reject for that consumer;
+the other 2 consumers still resolve (W26-Λ-projection-mismatch).
+On R-73-DIVERGENT (gold subset flips at cell 8), the inner W25
+fires ``no_trigger`` on divergent cells and W26 falls through;
+correctness drops to 0.5 (W26 *does not claim* chain savings on
+cells where the inner W25 abstains). **K-scaling sweep at
+K∈{3,5,8,10}** discharges **W25-C-K-SCALING** by direct measurement:
+W25 saving over W24 grows from 69.87 % at K=3 to 84.69 % at K=10
+(close to the conjectured 88 %, slightly below because the cell-0
+W25 producer cost is heterogeneous); W26 saving over W24 grows
+from 90.60 % at K=3 to 92.23 % at K=10. New W26 unit + integration
+tests: 63/63 pass; full pre-existing W22..W25 + IS-1 / IS-2 test
+surfaces preserved byte-for-byte (180/180 in the focused
+regression). Mac 2 still unreachable (**21st milestone in a row**);
+W26 inherits the W24 :class:`CrossProcessProducerDecoderWire` as
+the strongest cross-process honesty validated on this repo.
+
+**Master-plan-level questions (the post-W25 audit board).**
+
+1. **Did denser capsule-native latent/control integration
+   materially help?** *YES on three independent axes simultaneously,
+   with all three composing cleanly.* (a) Producer-side cross-cell
+   amortisation: ~13.6 producer tokens/cell collapse to 1 token on
+   advance cells (W26 chain-advance). (b) Per-consumer projection
+   slots: each consumer can be slotted into a projection subset
+   (orders / payments / both / etc.) with controller-verified
+   authorisation, enabling fine-grained dense-control distribution
+   without breaking the W25 fanout floor. (c) Bounded-window
+   re-anchoring: the chain re-anchors every
+   ``chain_persist_window`` cells, bounding the controller-side
+   state to O(1) per chain (not per cell). On R-73-CHAIN-SHARED
+   the combined effect is **−68.79 % over W25** and **−90.60 % over
+   W24** at K=3, scaling to **−92.23 % over W24** at K=10.
+2. **Did trust/audit survive?** *YES, sharply, with three new
+   tier-2 verification functions.* The :class:`ChainAnchorEnvelope`
+   is hash-chained (``chain_root_cid``), schema-versioned, and
+   verifier-rejectable on 6 failure modes; each
+   :class:`ChainAdvanceEnvelope` is parent-CID-linked and
+   verifier-rejectable on 8 failure modes; per-consumer projections
+   are scope-checked on 2 failure modes. The R-73-CHAIN-TAMPERED
+   bench measures 14/16 advances rejected by the controller; the
+   R-73-PROJECTION-MISMATCH bench measures 16/16 cross-projection
+   accesses rejected. **No spurious resolutions.** Correctness is
+   preserved byte-for-byte under the W25 fall-through path on
+   every rejected advance.
+3. **Did bounded-context efficiency improve in a real way?**
+   *YES.* (a) Producer per-cell cost: 14.6 → 1 token on advance
+   cells (the W26-L lower bound, mathematically tight). (b)
+   Anchor amortisation: 1 anchor cell + (W-1) advance cells per
+   chain window; controller-side state is O(1) per chain. (c)
+   K-scaling: the W26 saving over W24 grows from 90.60 % at K=3
+   to 92.23 % at K=10 (W25-C-K-SCALING discharged by direct
+   measurement). The trade-off is a small wire-byte cost
+   increase (~7 600 bytes/16 cells vs W25's ~5 885 bytes); this
+   is named explicitly as W26-C-MULTI-HOST.
+4. **Did two-Mac evaluation materially broaden the evidence?**
+   *PARTIALLY — Mac 2 still unreachable (21st milestone in a row).*
+   The W26 cross-host story inherits the W24
+   :class:`CrossProcessProducerDecoderWire` (real Python
+   subprocess via stdin/stdout pipes) as the strongest cross-
+   process honesty validated end-to-end on this repo. When Mac 2
+   returns the same JSON-canonical interface drops in over a real
+   socket with no W26 code changes. Honest scope: real cross-
+   *process*, not cross-*host*. The wire-bytes vs token-cost
+   tradeoff is named W26-C-MULTI-HOST.
+5. **Which earlier paper loose ends were closed versus only
+   sharpened?** *Closed: W25-C-K-SCALING (empirically discharged
+   at K∈{3,5,8,10}; the structural form K×(C−1) is confirmed; the
+   exact percentage at K=10 is measured at 84.69 %, slightly below
+   the conjectured 88 %). Sharpened: W25-C-MULTI-HOST inherits
+   into W26-C-MULTI-HOST with explicit anchor / advance byte
+   measurements. Sharpened: the live-LLM transfer story now has a
+   sixth layer (W22 latent + W23 cross-cell + W24 compact + W24
+   resample-quorum + W25 fanout + W26 chain-persist), each with a
+   structurally-distinct mechanism and a sharp limit theorem.*
+   New named conjecture: **W26-C-K-SCALING** (W26 mean visible
+   cost / cell tends to ``1 + K`` as ``chain_persist_window →
+   ∞``); empirically anchored at K∈{3,5,8,10}, asymptote unverified.
+6. **Did release readiness improve?** *YES, on three axes.* (a)
+   The W26 surface is purely additive on top of W25; the W22..W25
+   stable runtime contract is byte-for-byte unchanged. (b) The
+   focused regression covering W22..W26 + IS-1 / IS-2 is
+   **180/180** in 15.6s — fast and reproducible. (c) The new W26
+   verification surface enumerates 16 failure modes across 3
+   verify_* functions, and every failure mode has a unit test;
+   the audit story is mechanically-checked, not merely asserted.
+   The remaining release-readiness blocker (live-LLM cross-host)
+   is unchanged and inherited into W26-C-MULTI-HOST.
+7. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on
+   three named axes; the deeper wall is sharper.* The Context
+   Zero thesis now has its **first capsule-native chain-persisted
+   producer-amortisation method**, **first per-consumer projection
+   slot mechanism with controller-verified scope**, and **first
+   empirical discharge of W25-C-K-SCALING** at K∈{3,5,8,10}. Named
+   open frontier: **W26-C-K-SCALING** (asymptotic floor verified
+   at finite K; ∞-K asymptote conjectural), **W26-C-MULTI-HOST**
+   (real cross-host wire vs token cost — gated on Mac-2 return),
+   and **W26-C-DIVERGENCE-RECOVERY** (workloads where the gold
+   subset flips per cell — currently W26 falls through to W25; a
+   smarter chain-replay could recover savings even on divergent
+   cells, but this requires a new mechanism). The thesis is
+   materially stronger AND the next research frontier is precisely
+   articulated as long-K asymptotic verification + cross-host
+   real-wire validation + divergence-aware chain replay.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not
