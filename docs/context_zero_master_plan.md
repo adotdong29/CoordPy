@@ -10493,6 +10493,154 @@ evidence.
 
 ---
 
+## SDK v3.31 (W30 family) — calibrated geometry-partitioned dense control + multi-stride basis-history + per-partition calibration prior + cross-host disagreement-routing + ancestor-chain causal binding — 2026-05-01
+
+W30 wraps the W29 ``GeometryPartitionedOrchestrator`` with a
+``CalibratedGeometryOrchestrator`` that adds two **closed-form,
+audited override mechanisms** before each cell dispatch — keeping
+the W29 partition classifier on the *normal* path and only
+overriding when a calibrated prior or a cross-host disagreement
+witness justifies the reroute. Both mechanisms are **NOT** learned
+models: the calibration prior is a deterministic running-mean
+update over observed agreement, and the disagreement-routing
+override peeks at the inner W28's last-result
+``cross_host_disagreement_count`` from the *previous* cell.
+Everything rides on a single content-addressed envelope at a
+fixed 1-token wire cost via a new optional
+``partition_classifier_hook`` on W29.
+
+The ``CalibratedGeometryRatificationEnvelope`` adds four
+content-addressed primitives over the W29 envelope: a
+``BasisHistory`` (multi-stride accumulator over ``stride`` recent
+partition basis CIDs, content-addressed so rotation in the
+history changes the CID byte-for-byte), a
+``PartitionCalibrationVector`` (canonical-sorted partition_id →
+mean agreement vector, with a single high_trust_partition_id +
+threshold for the override), an ``AncestorChain``
+(``ancestor_window`` sorted parent CIDs giving deeper causal
+binding than W29's single-parent W28 link), and the W29 parent
+partition CID. The new
+``verify_calibrated_geometry_ratification`` enumerates **14
+disjoint failure modes** — basis-history-CID forgery,
+calibration-vector-out-of-range, ancestor-chain-CID forgery,
+disagreement-route-target forgery, calibrated-CID forgery — none
+of which existed in any W22..W29 verifier.
+
+**Headline result.** On **R-77-CHAIN-CRAM** at
+``stride = 28``, ``ancestor_window = 12`` (the v0.2 pre-commit
+defaults) the W30 envelope packs ``cram_w30/w28 = 8.74×`` AND
+``cram_w30/w29 = 2.74×`` more bits of audited structured control
+per visible token across **5/5 seeds**. **Empirically discharges
+W29-C-CRAM-AMPLIFICATION** (8.74× ≥ the pre-committed 8.0× bar
+that W29 missed at 2.30×). On **R-77-CALIBRATION-PRIOR** the
+calibration override yields ``Δ(W30 − W29) = +0.250 correctness
+gain`` across 5/5 seeds (**discharges W29-C-PARTITION-CALIBRATION
+on the closed-form-prior axis**). On **R-77-XHOST-DISAGREE** the
+disagreement-routing override yields ``Δ(W30 − W29) = +0.250
+correctness gain`` across 5/5 seeds (**sharpens
+W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE on the
+capsule-layer-routing axis**). ``trust_precision_w30 = 1.000``
+on every R-77 sub-bank where W30 ratifies; tamper rejection 100 %
+(60/60) across five named modes.
+
+Three named falsifiers all empirically confirmed
+(W30-Λ-trivial-calibration, W30-Λ-non-calibratable,
+W30-Λ-degenerate-history). 14 enumerated trust-boundary failure
+modes (vs W29's 14, disjoint from W29's). **357/357 focused
+regression pass** (273/273 phase69-77 + 84/84 wider wevra
+suite).
+
+Mac 2 (192.168.12.248) still ARP-incomplete (25th milestone in a
+row). The two reachable hosts (localhost gemma2:9b + 192.168.12.191
+qwen2.5:14b) were used for the live cross-host bench; at
+temperature 0 the LLMs agreed on every cell, so the
+disagreement-routing override correctly stayed null and the
+S1 *cross-host variance live magnitude* gate is reported as
+honestly null (not failure).
+
+### Post-W30 audit board
+
+1. **Did calibrated dense-control integration materially help?**
+   *YES on three load-bearing axes simultaneously: H6 cram
+   amplification (8.74× ≥ 8.0 bar), H7 calibration prior
+   (Δ +0.250), H8 disagreement-routing (Δ +0.250). The first
+   capsule-native milestone to discharge BOTH a missed prior
+   conjecture (W29-C-CRAM-AMPLIFICATION) AND a never-before-
+   measured prior conjecture (W29-C-PARTITION-CALIBRATION) on a
+   single milestone.*
+2. **Did trust/audit survive?** *YES — 14 enumerated failure
+   modes (disjoint from W29's 14), 100 % rejection rate on
+   tamper banks (60/60 + 12/12), trust precision = 1.000 on
+   every ratifying sub-bank.*
+3. **Did bounded-context efficiency improve in a real way?**
+   *YES — the W30 envelope packs 8.74× more structured-control
+   bits per wire token than W28 and 2.74× more than W29 at
+   ``stride = 28``, ``ancestor_window = 12``, while keeping the
+   1-token wire cost. The mechanism scales linearly in
+   ``stride`` (each additional stride slot is one more
+   content-addressed CID in the basis-history accumulator at
+   the same 1-token wire cost).*
+4. **Did two-Mac evaluation materially broaden the evidence?**
+   *PARTIAL — the live cross-host topology (gemma2:9b +
+   qwen2.5:14b) was probed for R-77-CROSS-HOST-LIVE, but at
+   temperature 0 the LLMs agreed on every cell, so the
+   disagreement-routing override correctly stayed null. Mac 2
+   (192.168.12.248) remains ARP-incomplete (25th milestone).
+   The synthetic R-77-XHOST-DISAGREE bench is the load-bearing
+   evidence for the H8 axis; the live bench is honestly
+   reported as null on the disagreement-routing magnitude.*
+5. **Which earlier loose ends were closed vs only sharpened?**
+   *CLOSED: W29-C-CRAM-AMPLIFICATION on the
+   multi-stride-history axis. CLOSED:
+   W29-C-PARTITION-CALIBRATION on the closed-form-prior axis.
+   SHARPENED: W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE on the
+   capsule-layer-routing axis (residual frontier:
+   regime where live LLMs systematically disagree at temp 0).
+   SHARPENED: W21-C-CALIBRATED-TRUST on the per-partition axis.
+   STILL OPEN: W22-C-CACHE-AMPLIFICATION (per-partition first-
+   cell still cache-amplifies); W23-C-MITIGATION-LIVE-VARIANCE
+   inter-cell axis; W24-C-LIVE-VARIANCE-COMPLETE;
+   W26-C-K-SCALING K → ∞ asymptote;
+   W27-C-MULTI-SIGNATURE-SCALING; W30-C-NATIVE-LATENT
+   (architecture-dependent: true transformer-internal
+   subspace projection vs the W30 audited proxy);
+   W30-C-MULTI-HOST (3+ host topology, blocked on Mac 2 ARP);
+   W30-C-PRIOR-LEARNING (true learned per-partition prior vs
+   the W30 deterministic running mean — out of scope as a
+   capsule-layer mechanism).*
+6. **Did release readiness improve?** *YES on the SDK-version /
+   ``__experimental__`` / pyproject.toml axis. (a) W30 surface
+   added under ``__experimental__`` (36 unit tests + verifier
+   + 12 W30 primitives). (b) SDK version bumped to v3.31 /
+   0.5.4. (c) Focused regression W3..W30 phase suite + wider
+   wevra = 357/357 in ~15s, fast + reproducible. (d) The
+   calibration prior + disagreement-routing vocabulary is
+   honestly framed as capsule-layer audited proxy in the module
+   docstring AND in the results note's §9.*
+7. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on
+   THREE axes simultaneously (cram amplification, calibration
+   prior, disagreement-routing) on a single milestone. The
+   deeper wall is whichever regime the closed-form override
+   cannot resolve: a regime where live LLMs systematically
+   disagree at temperature 0 (W30-C-CROSS-HOST-VARIANCE-LIVE-
+   MAGNITUDE-LIVE), or a regime where partitions are not
+   structurally separable by the W29 LINEAR/HIERARCHICAL/CYCLIC
+   classifier (W30-C-NATIVE-LATENT — true transformer-internal
+   subspace projection vs the audited proxy), or a regime where
+   the per-partition prior must be learned, not running-mean
+   updated (W30-C-PRIOR-LEARNING — out of scope as a capsule-
+   layer mechanism).* Named open frontier for SDK v3.32:
+   **W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE** (regime
+   where live LLMs systematically disagree),
+   **W30-C-NATIVE-LATENT** (architecture-dependent — true
+   transformer-internal subspace projection vs the W30 audited
+   proxy), **W30-C-MULTI-HOST** (3+ host topology, blocked on
+   Mac 2 ARP), **W30-C-PRIOR-LEARNING** (out of scope as a
+   capsule-layer mechanism).
+
+---
+
 *End of master plan. Changelog lives in the results notes, not
 here. If this document ever becomes a changelog, delete the
 changelog and restore the plan.*

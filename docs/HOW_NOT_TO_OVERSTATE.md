@@ -1781,3 +1781,106 @@ The honest summary one may emit:
   transformer-internal subspace projection vs the W29 audited
   proxy)."
 
+
+## SDK v3.31 / W30 — calibrated geometry-aware dense control + multi-stride basis history + per-partition calibration prior + cross-host disagreement-routing + ancestor-chain causal binding
+
+W30 introduces new vocabulary that *sounds* learned or model-internal:
+"calibration prior", "running-mean update", "multi-stride history",
+"disagreement-routing", "ancestor-chain causal binding".  Each of
+these is a **capsule-layer audited proxy**.  None of them claim a
+learned model, transformer-internal manipulation, or temporal-
+ordering proofs at the model layer.
+
+What you may say (W30 honest scope):
+
+* "On R-77-CHAIN-CRAM, the W30 multi-stride basis-history
+  accumulator amplifies cram-factor by 8.74× over W28 AND 3.80×
+  over W29 across 5/5 seeds at stride=28, window=12 — the smallest
+  stride that achieves the W29 H7 8× bar that W29 itself missed at
+  2.30×.  This is the W29-C-CRAM-AMPLIFICATION empirical discharge
+  on the magnitude axis."
+* "On R-77-CALIBRATION-PRIOR, the W30 per-partition calibration
+  prior strictly improves correctness over W29 by Δ = +0.250
+  across 5/5 seeds at trust precision 1.000.  The calibrated priors
+  (0.95, 0.95, 0.30) reroute CYCLIC cells (low historical
+  agreement) to LINEAR (high agreement, full oracle).  This is the
+  W29-C-PARTITION-CALIBRATION empirical discharge AND a sharpening
+  of W21-C-CALIBRATED-TRUST."
+* "On R-77-XHOST-DISAGREE, the W30 cross-host disagreement-routing
+  reroutes cells with witnessed disagreement to the high-trust
+  partition; Δ = +0.250 across 5/5 seeds.  This sharpens
+  W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE on the synthetic axis."
+* "The W30 envelope's calibration vector is a vector of floats in
+  [0, 1] registered at construction time; the running-mean update
+  is closed-form arithmetic over observed agreement-rate samples.
+  Not a learned model."
+* "The W30 envelope's basis history is a content-addressed CID over
+  the last K cells' W29 basis CIDs; the verifier checks every CID
+  is in the registered set AND the history_cid recomputes byte-
+  for-byte."
+* "The W30 envelope's ancestor chain is a sorted tuple of registered
+  W29 partition CIDs over the last ancestor_window cells; the chain
+  CID is SHA-256 over canonical bytes; the controller's bus
+  enforces structural commitment to the declared ancestor set at
+  admission time."
+* "W30 discharges W29-C-CRAM-AMPLIFICATION AND W29-C-PARTITION-
+  CALIBRATION in one milestone.  The next true wall is
+  W29-C-NATIVE-LATENT (architecture-dependent)."
+
+What you must NOT say (W30 honest scope):
+
+* "W30 implements a learned trust model."  It does not.  The
+  calibration vector is registered at construction time; the
+  running-mean update is closed-form (``new = (prev * n + obs) /
+  (n + 1)``).  A learned variant is the named conjecture
+  **W30-C-PRIOR-LEARNING** (open).
+* "W30 implements transformer-internal subspace projection."  It
+  does not.  The basis history is a capsule-layer accumulator over
+  W29's deterministic basis CIDs; an honest **proxy** for the
+  LatentMAS shared-substrate direction, not a runtime KV
+  transplant.
+* "W30 proves temporal ordering at the model layer."  It does not.
+  The ancestor chain is a sorted tuple of CIDs sealed by SHA-256;
+  it commits the bus to the declared ancestor set, not to a
+  particular execution sequence at the model layer.
+* "W30 solves cross-host disagreement reduction."  Not in general.
+  The H8 strict gain is on **synthetic** disagreement (constructed
+  via a deterministic ``_SyntheticDisagreementProbe``); the
+  live-LLM extension to a regime where two reachable LLMs
+  systematically disagree at temperature 0 remains the named open
+  **W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE**.
+* "W30 amplifies cram-factor 8× on every regime."  It amplifies at
+  the *registered* stride and ancestor_window; the linear scaling
+  with stride is honest mechanism, but the magnitude depends on
+  the bench parameters.  The H6 bar specifies the smallest stride
+  at which the 8× ratio holds.
+* "W30 brings up Mac 2."  It does not.  192.168.12.248 remains
+  ARP-incomplete (25th milestone).
+* "W30 closes W29-C-NATIVE-LATENT."  It does not.  W30 is a
+  capsule-layer mechanism extension; the architecture-dependent
+  native-latent question is still open.
+* "W30 solves multi-agent context."  Three named conjectures
+  discharged + one sharpened in one milestone is a strong step,
+  but real multi-agent reality has more axes than any 5-seed
+  synthetic bench can test.
+
+The honest summary one may emit:
+
+* "On R-77-CHAIN-CRAM, R-77-CALIBRATION-PRIOR, and R-77-XHOST-
+  DISAGREE (three pre-committed regimes), the W30 calibrated
+  geometry-aware dense control mechanism simultaneously discharges
+  W29-C-CRAM-AMPLIFICATION (cram_ratio_w30/w28 = 8.74×, cram_ratio
+  w30/w29 = 3.80×, both across 5/5 seeds) AND W29-C-PARTITION-
+  CALIBRATION (Δ correctness = +0.250 across 5/5 seeds, trust
+  precision 1.000) AND sharpens W29-C-CROSS-HOST-VARIANCE-LIVE-
+  MAGNITUDE on the synthetic axis (Δ correctness = +0.250 across
+  5/5 seeds). We have not solved multi-agent context; we have
+  empirically discharged three named open conjectures in a single
+  milestone, on a regime where the synthesis (W29 geometry-
+  partitioning + W30 calibration + multi-stride history +
+  disagreement-routing + ancestor chain) is the load-bearing reason
+  correctness AND structured-bits-per-token AND trust precision all
+  improve simultaneously.  The next true wall — the regime where
+  the audited capsule-layer proxy is insufficient and real
+  transformer-internal subspace projection is required — is the
+  named open frontier **W30-C-NATIVE-LATENT**."

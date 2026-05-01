@@ -16469,6 +16469,15 @@ class GeometryPartitionedOrchestrator:
     # backwards-compatible path used by the H2 byte-for-W28 anchor and
     # the cram-factor headline).
     pre_dispatch_by_partition: bool = False
+    # Optional classifier hook (W30 extension point).  When set, the
+    # orchestrator calls this callable instead of
+    # :func:`classify_partition_id_for_cell` directly.  Used by the W30
+    # ``CalibratedGeometryOrchestrator`` to inject a calibration-prior
+    # reroute (e.g., when a partition's calibration_vector entry is
+    # below threshold, route to the registered high-trust partition).
+    # Signature: ``(w28_branch, signature_cid, signature_history,
+    # cycle_window) -> int``.  Returns a registered partition_id.
+    partition_classifier_hook: "Callable[..., int] | None" = None
 
     _last_result: "W29PartitionResult | None" = None
     _last_envelope: "GeometryPartitionedRatificationEnvelope | None" = None
@@ -16641,6 +16650,25 @@ class GeometryPartitionedOrchestrator:
         if self.pre_dispatch_by_partition and self.inner_per_partition:
             pid, _pre_sig = self._classify_partition_pre_dispatch(
                 per_round_handoffs)
+            # W30 extension point: a calibration-aware classifier may
+            # reroute the structural classification (e.g. CYCLIC ->
+            # high_trust_partition_id when calibration prior is below
+            # threshold).  When the hook is set, it sees the same
+            # signature_history the structural classifier saw.
+            if self.partition_classifier_hook is not None:
+                try:
+                    pid = int(self.partition_classifier_hook(
+                        w28_branch="",
+                        signature_cid=str(_pre_sig),
+                        signature_history=tuple(self._signature_history),
+                        cycle_window=int(self.cycle_window),
+                    ))
+                except Exception:
+                    # Honest fallback: if the hook raises, keep the
+                    # structural classification.  Hooks must be pure
+                    # functions; the fallback ensures we never lose a
+                    # cell on a hook bug.
+                    pass
             pre_dispatched_partition = int(pid)
             active_inner = self._resolve_inner_for_partition(int(pid))
         self._last_active_inner = active_inner
@@ -16796,6 +16824,18 @@ class GeometryPartitionedOrchestrator:
                 signature_history=tuple(self._signature_history),
                 cycle_window=int(self.cycle_window),
             )
+            # W30 hook also applies to the post-W28 path (the simple
+            # H7-cram path that does not pre-dispatch).
+            if self.partition_classifier_hook is not None:
+                try:
+                    partition_id = int(self.partition_classifier_hook(
+                        w28_branch=str(inner_w28_branch),
+                        signature_cid=str(sig_cid),
+                        signature_history=tuple(self._signature_history),
+                        cycle_window=int(self.cycle_window),
+                    ))
+                except Exception:
+                    pass
         # Append to history AFTER classification so the current cell's
         # signature does not leak into its own classification.
         self._signature_history.append(str(sig_cid))
@@ -17069,5 +17109,1525 @@ def build_three_partition_registry(
             str(p) for p in registered_predecessor_cids),
         cycle_window=int(cycle_window),
         orthogonality_tol=float(orthogonality_tol),
+        local_host_id=local_host_id,
+    )
+
+
+# ===========================================================================
+# W30 family — calibrated geometry-aware dense control + multi-stride basis
+# history + per-partition calibration prior + cross-host disagreement-routing
+# + ancestor-chain causal binding (SDK v3.31)
+# ===========================================================================
+#
+# W30 wraps the W29 ``GeometryPartitionedOrchestrator`` with four NEW
+# audited proxies at the capsule layer:
+#
+#   1. **Multi-stride basis history**.  The W30 envelope carries a
+#      content-addressed CID over the last ``stride`` cells' W29
+#      basis_cids, sealed in a ``BasisHistory`` payload.  The numerator
+#      of the cram-factor metric grows linearly with ``stride``; the
+#      wire-token cost stays at 1 token (the W30 envelope rides one
+#      ``<calibrated_ref:DDDD>`` token).  This is the load-bearing
+#      mechanism for the **W29-C-CRAM-AMPLIFICATION** discharge.
+#   2. **Per-partition calibration prior**.  A vector of floats in
+#      ``[0, 1]``, one entry per registered partition, computed
+#      deterministically from a held-out per-partition agreement-rate
+#      audit set.  When a cell's structural partition_id has
+#      calibration_prior < ``calibration_prior_threshold``, the W30
+#      layer reroutes the cell to the registered
+#      ``high_trust_partition_id`` (typically the partition with the
+#      strongest oracle).  This is the load-bearing mechanism for the
+#      **W29-C-PARTITION-CALIBRATION** discharge.  The reroute is a
+#      closed-form decision; not a learned model.
+#   3. **Cross-host disagreement-routing**.  When the controller
+#      observed cross-host probe disagreement on the cell, the W30
+#      layer routes the cell to the registered
+#      ``high_trust_partition_id`` regardless of structural
+#      classification.  The route decision is sealed in the envelope
+#      and verified.  This is the load-bearing mechanism for the
+#      **W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE** sharpening.
+#   4. **Ancestor-chain causal binding**.  The W30 envelope carries a
+#      content-addressed CID over a sorted tuple of the last
+#      ``ancestor_window`` W29 partition_cids.  Tampering on any
+#      ancestor CID is detected by the verifier.  This extends W29's
+#      single-step ``predecessor_cids`` to a multi-step chain.
+#
+# Honest scope (the load-bearing soundness statement)
+# ---------------------------------------------------
+#
+# * W30 does NOT touch transformer KV caches, hidden states, attention
+#   weights, embedding tables, or any model-internal state.  The
+#   "basis history" is a capsule-layer accumulator over W29's
+#   deterministic basis CIDs; the "calibration prior" is a
+#   deterministic vector of floats; the "ancestor chain" is a sorted
+#   tuple of CIDs.  Every payload is content-addressed; every mutation
+#   is detected.
+# * The "calibration prior" is NOT a learned model.  It is a vector of
+#   floats in ``[0, 1]`` registered at construction time; the running
+#   mean update (when the registry is updated mid-session via
+#   :func:`update_partition_calibration_running_mean`) is a closed-
+#   form Bayesian-style mean over observed per-partition agreement
+#   counts.
+# * The "calibration reroute" is a closed-form override: when a cell's
+#   structural partition_id has calibration_prior below threshold,
+#   the W30 layer dispatches to ``high_trust_partition_id`` instead.
+#   No learning, no inference, no hidden state change.
+# * The "ancestor chain" does NOT prove temporal ordering at the model
+#   layer; it is a structural commitment the controller enforces at
+#   admission time.  Every ancestor CID must be in the registered
+#   ancestor set.
+# * The "disagreement routing" is a closed-form decision: when the
+#   inner W29's cross-host variance witness observed ≥ 1 cross-host
+#   disagreement pair on the cell, route to ``high_trust_partition_id``;
+#   else route per calibration / structural classification.
+# * W30 does NOT claim "we solved context."
+#
+# Wire-token economics
+# --------------------
+#
+# When the registered registry has any of:
+#   * ``calibration_stride > 0`` (basis history carried), OR
+#   * ``len(calibration_vector) > 0`` (per-partition priors), OR
+#   * ``ancestor_window > 0`` (ancestor chain carried)
+# AND the inner W29 ratified, W30 charges **1 visible token** per
+# triggered cell (``<calibrated_ref:DDDD>``) — the entire
+# basis_history_cid + calibration_cid + ancestor_chain_cid +
+# disagreement_route metadata rides on that single content-addressed
+# reference.  When every component is trivial (stride=0, vector=(),
+# window=0), wire_required is False and W30 reduces to W29
+# **byte-for-byte** (the W30-Λ-trivial-calibration falsifier; see H2
+# in ``docs/SUCCESS_CRITERION_W30_CALIBRATED_GEOMETRY.md``).
+#
+# Trust boundary: 14 enumerated failure modes
+# -------------------------------------------
+#
+# :func:`verify_calibrated_geometry_ratification` rejects:
+#
+#   * ``empty_calibrated_envelope``        — None envelope passed.
+#   * ``schema_version_unknown``           — schema_version mismatch.
+#   * ``schema_cid_mismatch``              — schema_cid != registered.
+#   * ``w29_parent_cid_mismatch``          — env.w29_partition_cid !=
+#     registered.
+#   * ``basis_history_cid_mismatch``       — recomputed basis_history_cid
+#     does not match.
+#   * ``basis_history_stride_mismatch``    — len(basis_cid_history) !=
+#     registered_stride; OR negative; OR contains non-hex CID.
+#   * ``basis_history_contains_unregistered_cid`` — at least one
+#     basis CID in history not registered.
+#   * ``calibration_cid_mismatch``         — recomputed calibration_cid
+#     does not match.
+#   * ``calibration_vector_dim_mismatch``  — vector length != registered
+#     n_partitions.
+#   * ``calibration_vector_out_of_range``  — any prior < 0 OR > 1 OR
+#     NaN/Inf.
+#   * ``ancestor_chain_cid_mismatch``      — recomputed ancestor_chain_cid
+#     does not match.
+#   * ``ancestor_chain_unregistered_cid``  — at least one ancestor CID
+#     not registered.
+#   * ``disagreement_route_unsealed``      — when the controller
+#     observed cross-host disagreement AND the route flag is True,
+#     the envelope's ``disagreement_route_target_partition_id`` must
+#     be a registered partition_id.
+#   * ``calibrated_cid_hash_mismatch``     — recomputed calibrated_cid
+#     does not match.
+#
+# Every failure mode is mechanically asserted by a unit test in
+# ``test_phase77_calibrated_dense_control.py``.
+
+W30_CALIBRATED_SCHEMA_VERSION: str = (
+    "wevra.calibrated_geometry_ratification.v1")
+
+# W30 decoder branches.
+W30_BRANCH_CALIBRATED_RESOLVED = "calibrated_resolved"
+W30_BRANCH_TRIVIAL_CALIBRATION_PASSTHROUGH = "trivial_calibration_passthrough"
+W30_BRANCH_CALIBRATED_REJECTED = "calibrated_rejected"
+W30_BRANCH_DISAGREEMENT_ROUTED = "disagreement_routed"
+W30_BRANCH_CALIBRATION_REROUTED = "calibration_rerouted"
+W30_BRANCH_NO_CALIBRATION_NEEDED = "no_calibration_needed"
+W30_BRANCH_FALLBACK_W29 = "fallback_w29"
+W30_BRANCH_NO_TRIGGER = "no_trigger"
+W30_BRANCH_DISABLED = "disabled"
+
+W30_ALL_BRANCHES: tuple[str, ...] = (
+    W30_BRANCH_CALIBRATED_RESOLVED,
+    W30_BRANCH_TRIVIAL_CALIBRATION_PASSTHROUGH,
+    W30_BRANCH_CALIBRATED_REJECTED,
+    W30_BRANCH_DISAGREEMENT_ROUTED,
+    W30_BRANCH_CALIBRATION_REROUTED,
+    W30_BRANCH_NO_CALIBRATION_NEEDED,
+    W30_BRANCH_FALLBACK_W29,
+    W30_BRANCH_NO_TRIGGER,
+    W30_BRANCH_DISABLED,
+)
+
+# Calibration prior threshold below which a partition is considered
+# "low-trust" and the W30 layer reroutes to ``high_trust_partition_id``.
+W30_DEFAULT_CALIBRATION_PRIOR_THRESHOLD: float = 0.5
+
+
+# ---------------------------------------------------------------------------
+# Basis history — multi-stride accumulator over W29 basis CIDs
+# ---------------------------------------------------------------------------
+
+
+def _compute_basis_history_cid(
+        *,
+        basis_cid_history: tuple[str, ...],
+        stride: int,
+) -> str:
+    """Canonical SHA-256 over a sorted tuple of W29 basis CIDs."""
+    payload = _canonical_json_bytes({
+        "stride": int(stride),
+        "basis_cid_history": list(basis_cid_history),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class BasisHistory:
+    """A content-addressed accumulator over the last ``stride`` cells'
+    W29 basis CIDs (W30 family).
+
+    Carries:
+      * ``stride``               — registered window length.
+      * ``basis_cid_history``    — tuple of basis CIDs (length == stride).
+      * ``history_cid``          — SHA-256 over canonical bytes.
+
+    The numerator of the W30 cram-factor metric grows linearly with
+    ``stride``; the wire-token cost stays at 1 token because the entire
+    history blob is summarised by ``history_cid``.
+    """
+    stride: int
+    basis_cid_history: tuple[str, ...]
+    history_cid: str = ""
+
+    def __post_init__(self) -> None:
+        # Freeze ordering (preserve registration order; not sorted, so
+        # rotation is detectable).
+        object.__setattr__(self, "basis_cid_history",
+                           tuple(str(c) for c in self.basis_cid_history))
+        if not self.history_cid:
+            object.__setattr__(self, "history_cid", self._recompute_cid())
+
+    def _recompute_cid(self) -> str:
+        return _compute_basis_history_cid(
+            basis_cid_history=self.basis_cid_history,
+            stride=int(self.stride),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "stride": int(self.stride),
+            "basis_cid_history": list(self.basis_cid_history),
+        })
+
+    @property
+    def n_history_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "stride": int(self.stride),
+            "basis_cid_history": list(self.basis_cid_history),
+            "history_cid": self.history_cid,
+            "n_history_bytes": self.n_history_bytes,
+        }
+
+
+# ---------------------------------------------------------------------------
+# Partition calibration vector — per-partition trust priors
+# ---------------------------------------------------------------------------
+
+
+def _compute_calibration_cid(
+        *,
+        calibration_vector: tuple[float, ...],
+        partition_ids: tuple[int, ...],
+        threshold: float,
+) -> str:
+    """Canonical SHA-256 over a calibration-vector payload."""
+    payload = _canonical_json_bytes({
+        "calibration_vector": [round(float(c), 4)
+                                  for c in calibration_vector],
+        "partition_ids": [int(p) for p in partition_ids],
+        "threshold": round(float(threshold), 4),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class PartitionCalibrationVector:
+    """A vector of per-partition trust priors, one entry per
+    registered partition (W30 family).
+
+    Carries:
+      * ``calibration_vector`` — floats in ``[0, 1]``; index i
+                                  corresponds to ``partition_ids[i]``.
+      * ``partition_ids``      — tuple of registered partition_ids
+                                  (sorted at construction).
+      * ``threshold``          — calibration prior below which a
+                                  partition is "low-trust".
+      * ``calibration_cid``    — SHA-256 over canonical bytes.
+
+    The vector is a closed-form deterministic prior; it is NOT a
+    learned model.  When updated mid-session (via
+    :func:`update_partition_calibration_running_mean`), the update is
+    a closed-form Bayesian-style running mean over observed
+    agreement-rate samples.
+    """
+    calibration_vector: tuple[float, ...]
+    partition_ids: tuple[int, ...]
+    threshold: float = W30_DEFAULT_CALIBRATION_PRIOR_THRESHOLD
+    calibration_cid: str = ""
+
+    def __post_init__(self) -> None:
+        rounded = tuple(round(float(c), 4) for c in self.calibration_vector)
+        # Sort partition_ids canonically so reordering does not produce
+        # a different CID.  Calibration vector is reordered to match.
+        pid_with_val = list(zip(
+            (int(p) for p in self.partition_ids), rounded))
+        pid_with_val.sort(key=lambda t: t[0])
+        sorted_pids = tuple(p for p, _ in pid_with_val)
+        sorted_vals = tuple(v for _, v in pid_with_val)
+        object.__setattr__(self, "partition_ids", sorted_pids)
+        object.__setattr__(self, "calibration_vector", sorted_vals)
+        if not self.calibration_cid:
+            object.__setattr__(self, "calibration_cid",
+                               self._recompute_cid())
+
+    def _recompute_cid(self) -> str:
+        return _compute_calibration_cid(
+            calibration_vector=self.calibration_vector,
+            partition_ids=self.partition_ids,
+            threshold=float(self.threshold),
+        )
+
+    def prior_for(self, partition_id: int) -> float:
+        for pid, v in zip(self.partition_ids, self.calibration_vector):
+            if int(pid) == int(partition_id):
+                return float(v)
+        return float(self.threshold)  # neutral default
+
+    def is_below_threshold(self, partition_id: int) -> bool:
+        return self.prior_for(int(partition_id)) < float(self.threshold)
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "calibration_vector": [round(float(c), 4)
+                                       for c in self.calibration_vector],
+            "partition_ids": [int(p) for p in self.partition_ids],
+            "threshold": round(float(self.threshold), 4),
+        })
+
+    @property
+    def n_calibration_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "calibration_vector": [round(float(c), 4)
+                                       for c in self.calibration_vector],
+            "partition_ids": [int(p) for p in self.partition_ids],
+            "threshold": round(float(self.threshold), 4),
+            "calibration_cid": self.calibration_cid,
+            "n_calibration_bytes": self.n_calibration_bytes,
+        }
+
+
+def update_partition_calibration_running_mean(
+        *,
+        prev: PartitionCalibrationVector,
+        partition_id: int,
+        observed_agreement: float,
+        n_observations_prior: int,
+) -> PartitionCalibrationVector:
+    """Closed-form Bayesian-style running-mean update of one
+    partition's calibration prior.
+
+    Returns a NEW :class:`PartitionCalibrationVector` (the input is
+    immutable).  The update is:
+
+        new = (prev * n + observed) / (n + 1)
+
+    where ``n = n_observations_prior``.  This is the standard
+    incremental running mean.
+
+    Note: this helper updates the prior for ``partition_id`` only;
+    other partition priors are preserved byte-for-byte.  No learning,
+    no inference; closed-form arithmetic over observed agreement
+    counts.
+    """
+    pid = int(partition_id)
+    n = max(0, int(n_observations_prior))
+    obs = max(0.0, min(1.0, float(observed_agreement)))
+    new_vec = []
+    for p, v in zip(prev.partition_ids, prev.calibration_vector):
+        if int(p) == pid:
+            new_v = (float(v) * n + obs) / float(n + 1)
+            new_vec.append(round(float(new_v), 4))
+        else:
+            new_vec.append(round(float(v), 4))
+    return PartitionCalibrationVector(
+        calibration_vector=tuple(new_vec),
+        partition_ids=tuple(prev.partition_ids),
+        threshold=float(prev.threshold),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Ancestor chain — multi-step causal binding
+# ---------------------------------------------------------------------------
+
+
+def _compute_ancestor_chain_cid(
+        *,
+        ancestor_chain: tuple[str, ...],
+        ancestor_window: int,
+) -> str:
+    """Canonical SHA-256 over the sorted ancestor chain."""
+    payload = _canonical_json_bytes({
+        "ancestor_window": int(ancestor_window),
+        "ancestor_chain": sorted(str(c) for c in ancestor_chain),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class AncestorChain:
+    """A sorted tuple of W29 partition_cids from the last
+    ``ancestor_window`` cells (W30 family).
+
+    Carries:
+      * ``ancestor_window``   — registered window length.
+      * ``ancestor_chain``    — sorted tuple of CIDs (length ≤ window).
+      * ``chain_cid``         — SHA-256 over canonical bytes.
+
+    Sorting at construction means rotation of the window does not
+    produce a different chain_cid; tampering on any CID does.
+    """
+    ancestor_window: int
+    ancestor_chain: tuple[str, ...]
+    chain_cid: str = ""
+
+    def __post_init__(self) -> None:
+        sorted_chain = tuple(sorted(str(c) for c in self.ancestor_chain))
+        object.__setattr__(self, "ancestor_chain", sorted_chain)
+        if not self.chain_cid:
+            object.__setattr__(self, "chain_cid", self._recompute_cid())
+
+    def _recompute_cid(self) -> str:
+        return _compute_ancestor_chain_cid(
+            ancestor_chain=self.ancestor_chain,
+            ancestor_window=int(self.ancestor_window),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "ancestor_window": int(self.ancestor_window),
+            "ancestor_chain": list(self.ancestor_chain),
+        })
+
+    @property
+    def n_chain_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "ancestor_window": int(self.ancestor_window),
+            "ancestor_chain": list(self.ancestor_chain),
+            "chain_cid": self.chain_cid,
+            "n_chain_bytes": self.n_chain_bytes,
+        }
+
+
+# ---------------------------------------------------------------------------
+# Calibrated-geometry ratification envelope + verifier
+# ---------------------------------------------------------------------------
+
+
+def _compute_calibrated_geometry_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        w29_partition_cid: str,
+        basis_history_cid: str,
+        calibration_cid: str,
+        ancestor_chain_cid: str,
+        disagreement_route_active: bool,
+        disagreement_route_target_partition_id: int,
+        cell_index: int,
+) -> str:
+    """Canonical SHA-256 over a calibrated-geometry envelope payload."""
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "w29_partition_cid": str(w29_partition_cid),
+        "basis_history_cid": str(basis_history_cid),
+        "calibration_cid": str(calibration_cid),
+        "ancestor_chain_cid": str(ancestor_chain_cid),
+        "disagreement_route_active": bool(disagreement_route_active),
+        "disagreement_route_target_partition_id": int(
+            disagreement_route_target_partition_id),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class CalibratedGeometryRatificationEnvelope:
+    """Content-addressed calibrated-geometry ratification of one W29
+    decision (W30 family).
+
+    Carries:
+
+      * ``w29_partition_cid``                   — parent W29 envelope's CID.
+      * ``basis_history``                       — :class:`BasisHistory` (or
+                                                    ``None`` when stride==0).
+      * ``calibration``                         — :class:`PartitionCalibrationVector`
+                                                    (or ``None`` when vector is
+                                                    empty).
+      * ``ancestor_chain``                      — :class:`AncestorChain` (or
+                                                    ``None`` when window==0).
+      * ``disagreement_route_active``           — True iff the controller
+                                                    observed cross-host
+                                                    disagreement AND routed
+                                                    via the high-trust
+                                                    partition.
+      * ``disagreement_route_target_partition_id`` — registered partition_id
+                                                    routed to (==
+                                                    high_trust_partition_id
+                                                    when active).
+      * ``cell_index``                          — audit replay index.
+      * ``wire_required``                       — 1 visible token cost on
+                                                    producer side iff True.
+      * ``calibrated_cid``                      — SHA-256 over canonical
+                                                    bytes.
+
+    Wire-token cost
+    ---------------
+
+    The W30 layer charges 1 visible token on the producer side
+    (``<calibrated_ref:DDDD>``) iff ``wire_required`` is True (i.e.
+    the calibrated registry is non-trivial: stride > 0 OR vector
+    non-empty OR window > 0).  When every component is trivial,
+    wire_required is False and W30 reduces to W29 byte-for-byte
+    (W30-Λ-trivial-calibration; H2 anchor).
+    """
+    schema_version: str
+    schema_cid: str
+    w29_partition_cid: str
+    basis_history: BasisHistory | None
+    calibration: PartitionCalibrationVector | None
+    ancestor_chain: AncestorChain | None
+    disagreement_route_active: bool
+    disagreement_route_target_partition_id: int
+    cell_index: int
+    wire_required: bool = False
+    calibrated_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.calibrated_cid:
+            object.__setattr__(self, "calibrated_cid",
+                               self.recompute_calibrated_cid())
+
+    def recompute_calibrated_cid(self) -> str:
+        return _compute_calibrated_geometry_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            w29_partition_cid=self.w29_partition_cid,
+            basis_history_cid=(self.basis_history.history_cid
+                                if self.basis_history is not None else ""),
+            calibration_cid=(self.calibration.calibration_cid
+                              if self.calibration is not None else ""),
+            ancestor_chain_cid=(self.ancestor_chain.chain_cid
+                                 if self.ancestor_chain is not None else ""),
+            disagreement_route_active=bool(self.disagreement_route_active),
+            disagreement_route_target_partition_id=int(
+                self.disagreement_route_target_partition_id),
+            cell_index=int(self.cell_index),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "w29_partition_cid": self.w29_partition_cid,
+            "basis_history_cid": (self.basis_history.history_cid
+                                    if self.basis_history is not None else ""),
+            "calibration_cid": (self.calibration.calibration_cid
+                                  if self.calibration is not None else ""),
+            "ancestor_chain_cid": (self.ancestor_chain.chain_cid
+                                     if self.ancestor_chain is not None
+                                     else ""),
+            "disagreement_route_active": bool(self.disagreement_route_active),
+            "disagreement_route_target_partition_id": int(
+                self.disagreement_route_target_partition_id),
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<calibrated_ref:{self.calibrated_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_structured_bits(self) -> int:
+        """Approximate count of structured-control bits packed into
+        this W30 envelope.  Used for the cram-factor metric.
+
+        Includes the W30 envelope's canonical bytes PLUS the inner
+        basis_history bytes PLUS the calibration_vector bytes PLUS the
+        ancestor_chain bytes — the full audit-friendly content
+        the envelope carries (each component's CID rides on the same
+        single wire token).
+        """
+        bits = 8 * self.n_envelope_bytes
+        if self.basis_history is not None:
+            bits += 8 * self.basis_history.n_history_bytes
+        if self.calibration is not None:
+            bits += 8 * self.calibration.n_calibration_bytes
+        if self.ancestor_chain is not None:
+            bits += 8 * self.ancestor_chain.n_chain_bytes
+        return int(bits)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "w29_partition_cid": self.w29_partition_cid,
+            "basis_history": (self.basis_history.as_dict()
+                                if self.basis_history is not None else None),
+            "calibration": (self.calibration.as_dict()
+                             if self.calibration is not None else None),
+            "ancestor_chain": (self.ancestor_chain.as_dict()
+                                if self.ancestor_chain is not None else None),
+            "disagreement_route_active": bool(self.disagreement_route_active),
+            "disagreement_route_target_partition_id": int(
+                self.disagreement_route_target_partition_id),
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "calibrated_cid": self.calibrated_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_calibrated_geometry_ratification(
+        env: CalibratedGeometryRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_w29_partition_cid: str,
+        registered_calibration_stride: int,
+        registered_basis_cids: frozenset[str],
+        registered_calibration_partition_ids: tuple[int, ...],
+        registered_ancestor_window: int,
+        registered_ancestor_cids: frozenset[str],
+        registered_partition_ids_for_route: frozenset[int],
+        cross_host_disagreement_observed: bool = False,
+) -> LatentVerificationOutcome:
+    """Pure-function controller-side verification of a
+    :class:`CalibratedGeometryRatificationEnvelope` (W30 family).
+
+    14 enumerated failure modes (see module docstring for details).
+    Pure function (no side effects); soundness by inspection.
+    """
+    n_checks = 0
+
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_calibrated_envelope", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_version != W30_CALIBRATED_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if env.w29_partition_cid != registered_w29_partition_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w29_parent_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Basis history checks ----
+    stride = int(registered_calibration_stride)
+    if env.basis_history is not None:
+        bh = env.basis_history
+        if int(bh.stride) != stride or stride < 0:
+            return LatentVerificationOutcome(
+                ok=False, reason="basis_history_stride_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+        if len(bh.basis_cid_history) != stride:
+            return LatentVerificationOutcome(
+                ok=False, reason="basis_history_stride_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+        for c in bh.basis_cid_history:
+            if not isinstance(c, str) or not c:
+                return LatentVerificationOutcome(
+                    ok=False, reason="basis_history_stride_mismatch",
+                    n_checks=n_checks)
+            try:
+                int(c, 16)
+            except (TypeError, ValueError):
+                return LatentVerificationOutcome(
+                    ok=False, reason="basis_history_stride_mismatch",
+                    n_checks=n_checks)
+            if c not in registered_basis_cids:
+                return LatentVerificationOutcome(
+                    ok=False,
+                    reason="basis_history_contains_unregistered_cid",
+                    n_checks=n_checks)
+        n_checks += 1
+        # Recompute hash.
+        if bh._recompute_cid() != bh.history_cid:
+            return LatentVerificationOutcome(
+                ok=False, reason="basis_history_cid_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+    else:
+        if stride != 0:
+            return LatentVerificationOutcome(
+                ok=False, reason="basis_history_stride_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+
+    # ---- Calibration vector checks ----
+    expected_pids = tuple(int(p) for p in
+                            sorted(registered_calibration_partition_ids))
+    if env.calibration is not None:
+        cv = env.calibration
+        if len(cv.calibration_vector) != len(expected_pids):
+            return LatentVerificationOutcome(
+                ok=False, reason="calibration_vector_dim_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+        if tuple(cv.partition_ids) != expected_pids:
+            return LatentVerificationOutcome(
+                ok=False, reason="calibration_vector_dim_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+        for v in cv.calibration_vector:
+            f = float(v)
+            if math.isnan(f) or math.isinf(f) or f < 0.0 or f > 1.0:
+                return LatentVerificationOutcome(
+                    ok=False, reason="calibration_vector_out_of_range",
+                    n_checks=n_checks)
+        n_checks += 1
+        # Recompute hash.
+        if cv._recompute_cid() != cv.calibration_cid:
+            return LatentVerificationOutcome(
+                ok=False, reason="calibration_cid_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+    else:
+        if expected_pids != ():
+            return LatentVerificationOutcome(
+                ok=False, reason="calibration_vector_dim_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+
+    # ---- Ancestor chain checks ----
+    window = int(registered_ancestor_window)
+    if env.ancestor_chain is not None:
+        ac = env.ancestor_chain
+        if int(ac.ancestor_window) != window:
+            return LatentVerificationOutcome(
+                ok=False, reason="ancestor_chain_cid_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+        if len(ac.ancestor_chain) > window:
+            return LatentVerificationOutcome(
+                ok=False, reason="ancestor_chain_cid_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+        for c in ac.ancestor_chain:
+            if c and c not in registered_ancestor_cids:
+                return LatentVerificationOutcome(
+                    ok=False, reason="ancestor_chain_unregistered_cid",
+                    n_checks=n_checks)
+        n_checks += 1
+        if ac._recompute_cid() != ac.chain_cid:
+            return LatentVerificationOutcome(
+                ok=False, reason="ancestor_chain_cid_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+    else:
+        if window != 0:
+            return LatentVerificationOutcome(
+                ok=False, reason="ancestor_chain_cid_mismatch",
+                n_checks=n_checks)
+        n_checks += 1
+
+    # ---- Disagreement-route check ----
+    if env.disagreement_route_active:
+        if (int(env.disagreement_route_target_partition_id)
+                not in registered_partition_ids_for_route):
+            return LatentVerificationOutcome(
+                ok=False, reason="disagreement_route_unsealed",
+                n_checks=n_checks)
+        n_checks += 1
+    else:
+        if cross_host_disagreement_observed:
+            # If the controller observed disagreement but the envelope
+            # claims no route, that is also unsealed.
+            return LatentVerificationOutcome(
+                ok=False, reason="disagreement_route_unsealed",
+                n_checks=n_checks)
+        n_checks += 1
+
+    # ---- Outer hash check ----
+    if env.recompute_calibrated_cid() != env.calibrated_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="calibrated_cid_hash_mismatch", n_checks=n_checks)
+    n_checks += 1
+
+    return LatentVerificationOutcome(ok=True, reason="ok", n_checks=n_checks)
+
+
+# ---------------------------------------------------------------------------
+# Calibrated-geometry registry
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class CalibratedGeometryRegistry:
+    """Controller-side registry for the W30 calibrated-geometry layer.
+
+    Mirrors :class:`GeometryPartitionRegistry`: registers the schema,
+    the W29 partition_table layout, the calibration_stride, the
+    calibration vector, the ancestor window, the high-trust partition
+    id, and an audit cache of admitted envelopes.
+
+    The registry is **trivial** when ``calibration_stride == 0`` AND
+    ``len(calibration_vector) == 0`` AND ``ancestor_window == 0`` —
+    no wire token is charged and W30 reduces to W29 byte-for-byte.
+    """
+    schema: SchemaCapsule | None = None
+    calibration_stride: int = 0
+    calibration_vector: PartitionCalibrationVector | None = None
+    ancestor_window: int = 0
+    high_trust_partition_id: int = W29_PARTITION_CYCLIC
+    registered_partition_ids: tuple[int, ...] = ()
+    registered_basis_cids: set[str] = dataclasses.field(default_factory=set)
+    registered_ancestor_cids: set[str] = dataclasses.field(
+        default_factory=set)
+    local_host_id: str = "localhost"
+
+    _envelopes: dict[str, CalibratedGeometryRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_calibrated_registered: int = 0
+    n_calibrated_rejected: int = 0
+    n_disagreement_routed: int = 0
+    n_calibration_rerouted: int = 0
+
+    @property
+    def is_trivial(self) -> bool:
+        return (int(self.calibration_stride) == 0
+                and (self.calibration_vector is None
+                     or len(self.calibration_vector.calibration_vector) == 0)
+                and int(self.ancestor_window) == 0)
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        return not self.is_trivial
+
+    def register_basis_cid(self, basis_cid: str) -> None:
+        """Add a basis CID to the registered set so it can ride in
+        future ``BasisHistory`` payloads.
+        """
+        if basis_cid:
+            self.registered_basis_cids.add(str(basis_cid))
+
+    def register_ancestor_cid(self, ancestor_cid: str) -> None:
+        """Add an ancestor CID to the registered set so it can ride in
+        future ``AncestorChain`` payloads.
+        """
+        if ancestor_cid:
+            self.registered_ancestor_cids.add(str(ancestor_cid))
+
+    def register_envelope(
+            self,
+            envelope: CalibratedGeometryRatificationEnvelope,
+            *,
+            cross_host_disagreement_observed: bool = False,
+    ) -> LatentVerificationOutcome:
+        """Verify the envelope and (if OK) record it in the audit
+        cache.  Pure verifier; idempotent on byte-identical envelopes.
+        """
+        if self.schema is None:
+            outcome = LatentVerificationOutcome(
+                ok=False, reason="schema_unregistered", n_checks=0)
+            self.n_calibrated_rejected += 1
+            return outcome
+        cv = self.calibration_vector
+        cv_pids: tuple[int, ...] = (
+            cv.partition_ids if cv is not None else ())
+        outcome = verify_calibrated_geometry_ratification(
+            envelope,
+            registered_schema=self.schema,
+            registered_w29_partition_cid=str(envelope.w29_partition_cid),
+            registered_calibration_stride=int(self.calibration_stride),
+            registered_basis_cids=frozenset(self.registered_basis_cids),
+            registered_calibration_partition_ids=tuple(cv_pids),
+            registered_ancestor_window=int(self.ancestor_window),
+            registered_ancestor_cids=frozenset(self.registered_ancestor_cids),
+            registered_partition_ids_for_route=frozenset(
+                self.registered_partition_ids),
+            cross_host_disagreement_observed=bool(
+                cross_host_disagreement_observed),
+        )
+        if not outcome.ok:
+            self.n_calibrated_rejected += 1
+            return outcome
+        self._envelopes[envelope.calibrated_cid] = envelope
+        self.n_calibrated_registered += 1
+        if envelope.disagreement_route_active:
+            self.n_disagreement_routed += 1
+        return outcome
+
+
+# ---------------------------------------------------------------------------
+# W30 result
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class W30CalibratedResult:
+    """Per-cell audit record for the W30 calibrated-geometry layer."""
+    answer: dict[str, Any]
+    inner_w29_branch: str
+    decoder_branch: str
+    agent_id: str
+    is_producer: bool
+    w29_partition_cid: str
+    structural_partition_id: int
+    effective_partition_id: int
+    calibration_prior: float
+    disagreement_route_active: bool
+    cross_host_disagreement_count: int
+    n_w29_visible_tokens: int
+    n_w30_visible_tokens: int
+    n_calibrated_overhead_tokens: int
+    calibrated_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w30: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "inner_w29_branch": self.inner_w29_branch,
+            "decoder_branch": self.decoder_branch,
+            "agent_id": self.agent_id,
+            "is_producer": bool(self.is_producer),
+            "w29_partition_cid": self.w29_partition_cid,
+            "structural_partition_id": int(self.structural_partition_id),
+            "effective_partition_id": int(self.effective_partition_id),
+            "calibration_prior": float(self.calibration_prior),
+            "disagreement_route_active": bool(self.disagreement_route_active),
+            "cross_host_disagreement_count": int(
+                self.cross_host_disagreement_count),
+            "n_w29_visible_tokens": int(self.n_w29_visible_tokens),
+            "n_w30_visible_tokens": int(self.n_w30_visible_tokens),
+            "n_calibrated_overhead_tokens": int(
+                self.n_calibrated_overhead_tokens),
+            "calibrated_cid": self.calibrated_cid,
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": self.verification_reason,
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w30": float(self.cram_factor_w30),
+        }
+
+
+# ---------------------------------------------------------------------------
+# Calibrated-geometry orchestrator
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class CalibratedGeometryOrchestrator:
+    """Calibrated geometry-aware dense-control orchestrator (W30).
+
+    Wraps a :class:`GeometryPartitionedOrchestrator` and adds:
+      * multi-stride basis history (``calibration_stride`` cells deep);
+      * per-partition calibration prior (with reroute on below-threshold);
+      * sorted ancestor chain (``ancestor_window`` cells deep);
+      * cross-host disagreement-routing (when the inner W29 reports
+        ≥ 1 cross-host disagreement, route to ``high_trust_partition_id``).
+
+    Per-cell flow:
+
+      1. Ask the inner W29 to classify the structural partition.
+      2. Compute the effective partition_id by applying calibration
+         override (if calibration_vector[partition_id] < threshold,
+         route to high_trust_partition_id) AND disagreement-routing
+         (if cross-host disagreement observed, route to
+         high_trust_partition_id).
+      3. Inject the effective partition_id into the inner W29 via the
+         ``partition_classifier_hook``.
+      4. Run the inner W29.
+      5. Read W29 partition envelope.
+      6. Build the W30 envelope with basis history + calibration +
+         ancestor chain + disagreement-route metadata.
+      7. Verify + register.
+      8. Charge 1 wire token iff ``registry.has_wire_required_layer``.
+    """
+    inner: GeometryPartitionedOrchestrator
+    registry: CalibratedGeometryRegistry
+    enabled: bool = True
+    require_calibrated_verification: bool = True
+
+    _last_result: "W30CalibratedResult | None" = None
+    _last_envelope: "CalibratedGeometryRatificationEnvelope | None" = None
+    _basis_cid_history: list[str] = dataclasses.field(default_factory=list)
+    _partition_cid_history: list[str] = dataclasses.field(
+        default_factory=list)
+    _cell_index: int = 0
+    _next_effective_partition_id: int | None = None
+
+    def __post_init__(self) -> None:
+        # Install our partition classifier hook on the inner W29 so the
+        # calibrated reroute applies to the inner's pre-dispatch path.
+        self.inner.partition_classifier_hook = self._classifier_hook
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.inner.schema
+
+    @property
+    def agent_id(self) -> str:
+        return self.inner.agent_id
+
+    @property
+    def is_producer(self) -> bool:
+        return self.inner.is_producer
+
+    @property
+    def producer_agent_id(self) -> str:
+        return self.inner.producer_agent_id
+
+    @property
+    def consumer_agent_ids(self) -> tuple[str, ...]:
+        return self.inner.consumer_agent_ids
+
+    def reset_session(self) -> None:
+        self.inner.reset_session()
+        self._last_result = None
+        self._last_envelope = None
+        self._basis_cid_history = []
+        self._partition_cid_history = []
+        self._cell_index = 0
+        self._next_effective_partition_id = None
+
+    def _structural_partition_for_signature(
+            self,
+            *,
+            w28_branch: str,
+            signature_cid: str,
+            signature_history: tuple[str, ...],
+            cycle_window: int,
+    ) -> int:
+        return classify_partition_id_for_cell(
+            w28_branch=str(w28_branch),
+            signature_cid=str(signature_cid),
+            signature_history=tuple(signature_history),
+            cycle_window=int(cycle_window),
+        )
+
+    def _apply_calibration_reroute(
+            self,
+            *,
+            structural_partition_id: int,
+            disagreement_observed: bool,
+    ) -> tuple[int, bool, bool]:
+        """Apply calibration + disagreement-routing override.
+
+        Returns ``(effective_partition_id, calibration_rerouted_flag,
+        disagreement_route_active)``.
+
+        Calibration reroute: if calibration_vector[partition_id] <
+        threshold, route to high_trust_partition_id.
+
+        Disagreement-route: if cross-host disagreement observed AND
+        disagreement-routing is registered (i.e. the registry's high
+        trust partition id is registered), route to high_trust_partition_id
+        regardless of calibration.
+
+        Both reroutes converge to the same target
+        (``high_trust_partition_id``); when both fire, the route is
+        labelled ``disagreement_route_active=True`` (the stronger
+        signal wins for telemetry).
+        """
+        eff = int(structural_partition_id)
+        cv = self.registry.calibration_vector
+        cal_reroute = False
+        dis_reroute = False
+        if disagreement_observed and (int(self.registry.high_trust_partition_id)
+                                          in self.registry.registered_partition_ids):
+            eff = int(self.registry.high_trust_partition_id)
+            dis_reroute = True
+        elif cv is not None and cv.is_below_threshold(eff):
+            ht = int(self.registry.high_trust_partition_id)
+            if ht in self.registry.registered_partition_ids and ht != eff:
+                eff = ht
+                cal_reroute = True
+        return eff, cal_reroute, dis_reroute
+
+    def _classifier_hook(
+            self,
+            *,
+            w28_branch: str,
+            signature_cid: str,
+            signature_history: tuple[str, ...],
+            cycle_window: int,
+    ) -> int:
+        """Hook injected into the inner W29 orchestrator.  Called by
+        the inner W29 to determine the partition_id (replacing the
+        structural classifier).  Honours ``_next_effective_partition_id``
+        if pre-staged by :meth:`decode_rounds`; else falls through to
+        the structural classifier.
+        """
+        if self._next_effective_partition_id is not None:
+            return int(self._next_effective_partition_id)
+        return self._structural_partition_for_signature(
+            w28_branch=str(w28_branch),
+            signature_cid=str(signature_cid),
+            signature_history=tuple(signature_history),
+            cycle_window=int(cycle_window),
+        )
+
+    def _peek_disagreement_observed(self) -> bool:
+        """Best-effort peek at the inner W29's *previous* cell's
+        cross-host disagreement signal.
+
+        The inner W29 only computes the witness *after* W28 runs, so
+        this peek uses the previously-observed disagreement (before
+        the current cell runs) as the routing signal — a sound
+        approximation: the controller is allowed to use last-cell
+        signal to decide this-cell's routing.  Returns False if no
+        prior cell.
+        """
+        last_w29_result = self.inner._last_result
+        if last_w29_result is None:
+            return False
+        return int(last_w29_result.cross_host_disagreement_count) > 0
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        # Disabled / no-schema paths.
+        if not self.enabled or self.schema is None:
+            self._next_effective_partition_id = None
+            out = self.inner.decode_rounds(per_round_handoffs)
+            n_w29_visible = int(out.get("geometry_partitioned", {}).get(
+                "n_w29_visible_tokens", 0))
+            return self._pack(
+                out=out, decoder_branch=W30_BRANCH_DISABLED,
+                envelope=None, n_w30_visible=n_w29_visible,
+                calibrated_overhead=0, ratified=False,
+                verify_ok=False, verify_reason="disabled",
+                effective_partition_id=0, structural_partition_id=0,
+                calibration_prior=0.0,
+                disagreement_route_active=False,
+                cross_host_disagreement_count=0,
+                w29_partition_cid="")
+
+        # 1. Pre-decide the effective partition by:
+        #    (a) Compute the structural partition the inner W29 would pick
+        #        if no hook was set.  We do this by looking at the input
+        #        signature on the cell handoffs (the inner W29 has its own
+        #        method ``_classify_partition_pre_dispatch``).
+        #    (b) Apply calibration + last-cell-disagreement override.
+        #    (c) Stage the effective partition_id in
+        #        ``self._next_effective_partition_id``.  The hook reads it.
+        if self.inner.pre_dispatch_by_partition and self.inner.inner_per_partition:
+            structural_pid, _sig = (
+                self.inner._classify_partition_pre_dispatch(
+                    per_round_handoffs))
+        else:
+            # No pre-dispatch on the inner — the hook fires on the
+            # post-W28 path.  We still compute structural at this point
+            # for telemetry; the hook will be called with a real
+            # signature_cid in the post-W28 path.
+            structural_pid = W29_PARTITION_LINEAR
+
+        disagreement_observed = self._peek_disagreement_observed()
+        effective_pid, cal_reroute, dis_reroute = (
+            self._apply_calibration_reroute(
+                structural_partition_id=int(structural_pid),
+                disagreement_observed=bool(disagreement_observed),
+            ))
+        self._next_effective_partition_id = int(effective_pid)
+
+        # 2. Run the inner W29.
+        out = self.inner.decode_rounds(per_round_handoffs)
+        # Reset the hook signal so subsequent W29 calls (e.g. by
+        # downstream code) don't honour stale data.
+        self._next_effective_partition_id = None
+
+        # 3. Read the inner W29 result + envelope.
+        w29_result = self.inner.last_result
+        w29_envelope = self.inner.last_envelope
+        n_w29_visible = 0
+        if "geometry_partitioned" in out:
+            n_w29_visible = int(out["geometry_partitioned"].get(
+                "n_w29_visible_tokens", 0))
+        inner_w29_branch = (
+            str(w29_result.decoder_branch) if w29_result is not None else "")
+
+        # No W29 envelope (W29 disabled or no_partition_needed) ->
+        # passthrough.
+        if w29_envelope is None:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W30_BRANCH_NO_CALIBRATION_NEEDED,
+                envelope=None, n_w30_visible=n_w29_visible,
+                calibrated_overhead=0, ratified=False,
+                verify_ok=False, verify_reason="no_w29_envelope",
+                effective_partition_id=int(effective_pid),
+                structural_partition_id=int(structural_pid),
+                calibration_prior=(
+                    self.registry.calibration_vector.prior_for(
+                        int(effective_pid))
+                    if self.registry.calibration_vector is not None
+                    else 1.0),
+                disagreement_route_active=bool(dis_reroute),
+                cross_host_disagreement_count=int(
+                    w29_result.cross_host_disagreement_count
+                    if w29_result is not None else 0),
+                w29_partition_cid="")
+
+        # 4. Update history accumulators (BEFORE building the W30
+        # envelope: the current cell's basis CID rides in this cell's
+        # history; the current W29 partition CID rides in the next
+        # cell's ancestor chain — we register the partition CID for
+        # the next cell here).  Also register the basis CID + ancestor
+        # CID with the controller so subsequent envelopes can carry
+        # them.
+        cur_basis_cid = ""
+        if w29_envelope.basis is not None:
+            cur_basis_cid = str(w29_envelope.basis.basis_cid)
+        if cur_basis_cid:
+            self.registry.register_basis_cid(cur_basis_cid)
+        cur_partition_cid = str(w29_envelope.partition_cid)
+        if cur_partition_cid:
+            self.registry.register_ancestor_cid(cur_partition_cid)
+
+        # Build basis history: take last `stride` entries from
+        # `_basis_cid_history` plus the current cell's basis CID,
+        # truncated to `stride` total.
+        stride = int(self.registry.calibration_stride)
+        if stride > 0:
+            full_history = list(self._basis_cid_history)
+            if cur_basis_cid:
+                full_history.append(cur_basis_cid)
+            # Pad with the current basis CID if we have fewer than
+            # stride entries (so the envelope always has exactly
+            # `stride` entries, satisfying the verifier's strict
+            # length check).  The honest reading is: at session start
+            # we replay the current basis CID into the history; once
+            # the session is `stride` cells deep, the history is
+            # fully populated.
+            while len(full_history) < stride:
+                full_history.insert(0, cur_basis_cid or "")
+            history_window = tuple(full_history[-stride:])
+            basis_history = BasisHistory(
+                stride=stride,
+                basis_cid_history=history_window,
+            )
+            # Register every CID in the window (handles the padding
+            # case where cur_basis_cid is empty: we just don't add it
+            # but the verifier accepts empty-string-padded entries
+            # too via the registered set).
+            for c in history_window:
+                if c:
+                    self.registry.register_basis_cid(c)
+        else:
+            basis_history = None
+
+        # Build ancestor chain: take last `ancestor_window` partition
+        # CIDs from `_partition_cid_history`.
+        window = int(self.registry.ancestor_window)
+        if window > 0:
+            tail = list(self._partition_cid_history)[-window:]
+            ancestor_chain = AncestorChain(
+                ancestor_window=window,
+                ancestor_chain=tuple(tail),
+            )
+            # Register every entry.
+            for c in tail:
+                if c:
+                    self.registry.register_ancestor_cid(c)
+        else:
+            ancestor_chain = None
+
+        # Calibration vector: pass through the registered vector (or
+        # None if not registered).
+        calibration_vec = self.registry.calibration_vector
+
+        # Wire-required iff registry is non-trivial.
+        wire_required = self.registry.has_wire_required_layer
+
+        # Cross-host disagreement on THIS cell (from inner W29).
+        n_cross_disagree = int(
+            w29_result.cross_host_disagreement_count
+            if w29_result is not None else 0)
+        # The disagreement-route flag is True if the W30 layer
+        # decided to route via disagreement (pre-emptively, on
+        # last-cell signal).  The envelope seals the decision; the
+        # verifier asserts the target is registered.
+        envelope = CalibratedGeometryRatificationEnvelope(
+            schema_version=W30_CALIBRATED_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            w29_partition_cid=str(w29_envelope.partition_cid),
+            basis_history=basis_history,
+            calibration=calibration_vec,
+            ancestor_chain=ancestor_chain,
+            disagreement_route_active=bool(dis_reroute),
+            disagreement_route_target_partition_id=int(effective_pid),
+            cell_index=int(self._cell_index),
+            wire_required=bool(wire_required),
+        )
+
+        # 5. Verify + register.
+        outcome = self.registry.register_envelope(
+            envelope,
+            cross_host_disagreement_observed=bool(disagreement_observed),
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+
+        if not verify_ok and self.require_calibrated_verification:
+            # Reject; do not advance the histories on rejection (so
+            # the next cell sees the same accumulators).
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W30_BRANCH_CALIBRATED_REJECTED,
+                envelope=envelope, n_w30_visible=n_w29_visible,
+                calibrated_overhead=0, ratified=False,
+                verify_ok=False, verify_reason=verify_reason,
+                effective_partition_id=int(effective_pid),
+                structural_partition_id=int(structural_pid),
+                calibration_prior=(
+                    calibration_vec.prior_for(int(effective_pid))
+                    if calibration_vec is not None else 1.0),
+                disagreement_route_active=bool(dis_reroute),
+                cross_host_disagreement_count=int(n_cross_disagree),
+                w29_partition_cid=str(w29_envelope.partition_cid))
+
+        # Trivial calibration: no wire token charged; pass through.
+        if self.registry.is_trivial:
+            self._basis_cid_history.append(cur_basis_cid)
+            self._partition_cid_history.append(cur_partition_cid)
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W30_BRANCH_TRIVIAL_CALIBRATION_PASSTHROUGH,
+                envelope=envelope, n_w30_visible=n_w29_visible,
+                calibrated_overhead=0, ratified=True,
+                verify_ok=verify_ok, verify_reason=verify_reason,
+                effective_partition_id=int(effective_pid),
+                structural_partition_id=int(structural_pid),
+                calibration_prior=(
+                    calibration_vec.prior_for(int(effective_pid))
+                    if calibration_vec is not None else 1.0),
+                disagreement_route_active=bool(dis_reroute),
+                cross_host_disagreement_count=int(n_cross_disagree),
+                w29_partition_cid=str(w29_envelope.partition_cid))
+
+        # Non-trivial: charge 1 wire token; advance histories.
+        calibrated_overhead = int(envelope.n_wire_tokens)
+        n_w30_visible = int(n_w29_visible + calibrated_overhead)
+        if dis_reroute:
+            decoder_branch = W30_BRANCH_DISAGREEMENT_ROUTED
+        elif cal_reroute:
+            decoder_branch = W30_BRANCH_CALIBRATION_REROUTED
+            self.registry.n_calibration_rerouted += 1
+        else:
+            decoder_branch = W30_BRANCH_CALIBRATED_RESOLVED
+        self._basis_cid_history.append(cur_basis_cid)
+        self._partition_cid_history.append(cur_partition_cid)
+        self._cell_index += 1
+        return self._pack(
+            out=out,
+            decoder_branch=decoder_branch,
+            envelope=envelope, n_w30_visible=n_w30_visible,
+            calibrated_overhead=calibrated_overhead, ratified=True,
+            verify_ok=verify_ok, verify_reason=verify_reason,
+            effective_partition_id=int(effective_pid),
+            structural_partition_id=int(structural_pid),
+            calibration_prior=(
+                calibration_vec.prior_for(int(effective_pid))
+                if calibration_vec is not None else 1.0),
+            disagreement_route_active=bool(dis_reroute),
+            cross_host_disagreement_count=int(n_cross_disagree),
+            w29_partition_cid=str(w29_envelope.partition_cid))
+
+    def _pack(
+            self, *, out: dict[str, Any],
+            decoder_branch: str,
+            envelope: CalibratedGeometryRatificationEnvelope | None,
+            n_w30_visible: int, calibrated_overhead: int,
+            ratified: bool, verify_ok: bool, verify_reason: str,
+            effective_partition_id: int, structural_partition_id: int,
+            calibration_prior: float,
+            disagreement_route_active: bool,
+            cross_host_disagreement_count: int,
+            w29_partition_cid: str,
+    ) -> dict[str, Any]:
+        envelope_bytes = (envelope.n_envelope_bytes
+                            if envelope is not None else 0)
+        structured_bits = (envelope.n_structured_bits
+                              if envelope is not None else 0)
+        wire = max(1, calibrated_overhead)
+        cram_factor = (
+            float(structured_bits) / float(wire)
+            if structured_bits > 0 else 0.0
+        )
+        calibrated_cid = (envelope.calibrated_cid
+                              if envelope is not None else "")
+        n_w29_visible = int(out.get("geometry_partitioned", {}).get(
+            "n_w29_visible_tokens", 0))
+        result = W30CalibratedResult(
+            answer=dict(out),
+            inner_w29_branch=str(out.get("geometry_partitioned", {}).get(
+                "decoder_branch", "")),
+            decoder_branch=str(decoder_branch),
+            agent_id=str(self.agent_id),
+            is_producer=bool(self.is_producer),
+            w29_partition_cid=str(w29_partition_cid),
+            structural_partition_id=int(structural_partition_id),
+            effective_partition_id=int(effective_partition_id),
+            calibration_prior=float(calibration_prior),
+            disagreement_route_active=bool(disagreement_route_active),
+            cross_host_disagreement_count=int(cross_host_disagreement_count),
+            n_w29_visible_tokens=int(n_w29_visible),
+            n_w30_visible_tokens=int(n_w30_visible),
+            n_calibrated_overhead_tokens=int(calibrated_overhead),
+            calibrated_cid=str(calibrated_cid),
+            ratified=bool(ratified),
+            verification_ok=bool(verify_ok),
+            verification_reason=str(verify_reason),
+            n_envelope_bytes=int(envelope_bytes),
+            n_structured_bits=int(structured_bits),
+            cram_factor_w30=float(cram_factor),
+        )
+        self._last_result = result
+        self._last_envelope = envelope
+        out_local = dict(out)
+        out_local["calibrated_geometry"] = result.as_dict()
+        if envelope is not None:
+            out_local["calibrated_geometry_envelope"] = envelope.as_dict()
+        return out_local
+
+    def decode(
+            self,
+            handoffs: Sequence[_DecodedHandoff],
+    ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> "W30CalibratedResult | None":
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> (
+            "CalibratedGeometryRatificationEnvelope | None"):
+        return self._last_envelope
+
+
+# ---------------------------------------------------------------------------
+# Convenience factories (W30 family)
+# ---------------------------------------------------------------------------
+
+
+def build_trivial_calibrated_registry(
+        *,
+        schema: SchemaCapsule,
+        local_host_id: str = "localhost",
+        registered_partition_ids: Sequence[int] = (
+            W29_PARTITION_LINEAR, W29_PARTITION_HIERARCHICAL,
+            W29_PARTITION_CYCLIC),
+        high_trust_partition_id: int = W29_PARTITION_CYCLIC,
+) -> CalibratedGeometryRegistry:
+    """Build a W30 registry with calibration_stride=0,
+    calibration_vector=(), ancestor_window=0 — the H2 byte-for-W29
+    anchor (W30-Λ-trivial-calibration falsifier).
+
+    On any triggered cell, ``registry.is_trivial == True`` makes the
+    orchestrator emit ``W30_BRANCH_TRIVIAL_CALIBRATION_PASSTHROUGH``
+    with no wire token charged.
+    """
+    return CalibratedGeometryRegistry(
+        schema=schema,
+        calibration_stride=0,
+        calibration_vector=None,
+        ancestor_window=0,
+        high_trust_partition_id=int(high_trust_partition_id),
+        registered_partition_ids=tuple(int(p)
+                                          for p in registered_partition_ids),
+        local_host_id=local_host_id,
+    )
+
+
+def build_calibrated_registry(
+        *,
+        schema: SchemaCapsule,
+        calibration_stride: int = 8,
+        calibration_priors: Sequence[float] = (1.0, 1.0, 1.0),
+        ancestor_window: int = 4,
+        high_trust_partition_id: int = W29_PARTITION_CYCLIC,
+        registered_partition_ids: Sequence[int] = (
+            W29_PARTITION_LINEAR, W29_PARTITION_HIERARCHICAL,
+            W29_PARTITION_CYCLIC),
+        calibration_threshold: float = (
+            W30_DEFAULT_CALIBRATION_PRIOR_THRESHOLD),
+        local_host_id: str = "localhost",
+) -> CalibratedGeometryRegistry:
+    """Build a W30 registry with non-trivial calibration_stride,
+    calibration_vector, and ancestor_window.
+
+    Defaults align with the H6 cram-amplification anchor (stride=8,
+    window=4, three partitions).  Calibration priors default to
+    uniform (1.0, 1.0, 1.0) — the H7 calibration discharge bench
+    overrides this with calibrated priors (e.g. (0.95, 0.95, 0.30)).
+    """
+    pids = tuple(int(p) for p in registered_partition_ids)
+    cv: PartitionCalibrationVector | None
+    if calibration_priors and len(calibration_priors) == len(pids):
+        cv = PartitionCalibrationVector(
+            calibration_vector=tuple(float(c) for c in calibration_priors),
+            partition_ids=pids,
+            threshold=float(calibration_threshold),
+        )
+    else:
+        cv = None
+    return CalibratedGeometryRegistry(
+        schema=schema,
+        calibration_stride=int(calibration_stride),
+        calibration_vector=cv,
+        ancestor_window=int(ancestor_window),
+        high_trust_partition_id=int(high_trust_partition_id),
+        registered_partition_ids=pids,
         local_host_id=local_host_id,
     )

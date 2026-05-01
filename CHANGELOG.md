@@ -5,6 +5,126 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.4 / 3.31] — 2026-05-01 — SDK v3.31 — calibrated geometry-aware dense control + multi-stride basis history + per-partition calibration prior + cross-host disagreement-routing + ancestor-chain causal binding + simultaneous discharge of W29-C-CRAM-AMPLIFICATION AND W29-C-PARTITION-CALIBRATION
+
+*Strictly additive on SDK v3.30. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W30 surface wraps
+the W29 ``GeometryPartitionedOrchestrator`` with four NEW audited
+proxies at the capsule layer: a multi-stride basis-history
+accumulator, a per-partition calibration prior, a sorted ancestor
+chain, and a cross-host disagreement-routing decision. The new
+"calibration / multi-stride basis history / cross-host disagreement-
+routing / ancestor-chain" vocabulary is added at the **capsule
+layer as audited proxy** — explicitly NOT a learned model, NOT
+transformer-internal subspace projection, NOT a Riemannian
+curvature, NOT a temporal-ordering proof at the model layer.*
+
+**New surface (W30 family, multi-agent-coordination research slice).**
+
+``BasisHistory``, ``AncestorChain``, ``PartitionCalibrationVector``,
+``CalibratedGeometryRatificationEnvelope``,
+``CalibratedGeometryRegistry``, ``W30CalibratedResult``,
+``CalibratedGeometryOrchestrator``,
+``verify_calibrated_geometry_ratification`` (14 enumerated failure
+modes — disjoint from W29's 14, cumulative 28-mode trust boundary
+across W29 + W30), ``update_partition_calibration_running_mean``,
+``build_trivial_calibrated_registry``, ``build_calibrated_registry``,
+W30 branch constants (``W30_BRANCH_*``),
+``W30_CALIBRATED_SCHEMA_VERSION``,
+``W30_DEFAULT_CALIBRATION_PRIOR_THRESHOLD = 0.5``.  W29's
+``GeometryPartitionedOrchestrator`` extended with one new optional
+``partition_classifier_hook`` field — the W30 extension point that
+lets the calibrated orchestrator inject calibration / disagreement-
+route overrides into the inner W29's pre-dispatch path.  New
+benchmark phase ``vision_mvp.experiments.phase77_calibrated_dense_control``.
+
+``__experimental__`` tuple in ``vision_mvp.wevra.__init__`` extended
+with all new W30 symbols.  ``SDK_VERSION`` bumped to
+``wevra.sdk.v3.31``.  ``pyproject.toml`` version ``0.5.4``.
+
+**Headline empirical results (W30 family).**
+
+* **R-77-CHAIN-CRAM (H6 cram-factor anchor).** First empirical
+  discharge of **W29-C-CRAM-AMPLIFICATION**:
+  ``cram_factor_w30 / cram_factor_w28 = 8.74`` AND
+  ``cram_factor_w30 / cram_factor_w29 = 3.80`` across **5/5 seeds**
+  (11, 17, 23, 29, 31) at ``calibration_stride = 28``,
+  ``ancestor_window = 12``.  Pre-committed bar: 8.0× over W28 ✓ and
+  2.0× over W29 ✓.  Max overhead = 1 token/cell.  W30's multi-stride
+  basis-history accumulator packs 28 basis CIDs + 12 ancestor CIDs
+  + 3 calibration priors onto one ``<calibrated_ref:DDDD>`` wire
+  token.
+* **R-77-CALIBRATION-PRIOR (H7 calibration anchor).** First empirical
+  discharge of **W29-C-PARTITION-CALIBRATION**:
+  ``correctness_ratified_rate_w30 - correctness_ratified_rate_w29 =
+  +0.250 across 5/5 seeds`` with ``trust_precision_w30 = 1.000``.
+  Calibrated priors (0.95, 0.95, 0.30) trigger reroute on 8 CYCLIC
+  cells (low historical agreement) → routed to LINEAR (high agreement,
+  full oracle) → strict correctness recovery.  W29 baseline 0.750,
+  W30 1.000.  Sharpens **W21-C-CALIBRATED-TRUST** on the per-partition
+  axis.
+* **R-77-XHOST-DISAGREE (H8 disagreement-routing anchor).**  Sharpens
+  **W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE**:
+  ``correctness_ratified_rate_w30 - correctness_ratified_rate_w29 =
+  +0.250 across 5/5 seeds`` with ``trust_precision_w30 = 1.000``.
+  Synthetic disagreement probe (simulating a more-pessimistic
+  cross-host LLM probe at temperature 0) systematically rejects;
+  cross-host variance witness fires on every ratified cell; W30
+  reroutes 15 cells to high-trust = CYCLIC (full oracle).
+* **R-77-TRIVIAL-CALIBRATION (H2 byte-for-W29).** W30 = W29
+  byte-for-byte; every cell yields
+  ``W30_BRANCH_TRIVIAL_CALIBRATION_PASSTHROUGH``.
+* **R-77-CALIBRATED-TAMPERED (H3).** 100% rejection rate across five
+  named tamper modes (basis_history_cid, calibration_vector,
+  ancestor_chain_cid, disagreement_route_target, calibrated_cid).
+* **R-77-NON-CALIBRATABLE (W30-Λ-non-calibratable).** Uniform priors
+  (1.0, 1.0, 1.0) ⇒ no override fires ⇒ W30 = W29 on correctness;
+  ``n_calibration_rerouted = 0`` correctly reported.
+* **R-77-DEGENERATE-HISTORY (W30-Λ-degenerate-history).**  ``stride =
+  1`` ⇒ no real cram amplification; ``cram_ratio_w30/w29 = 0.86 ≤
+  1.20`` correctly reported.
+
+Trust boundary: tampered envelopes rejected **100%** across every
+sub-bank, every seed, every named mode.  Cumulative 28 enumerated
+trust-boundary failure modes across W29 + W30.  **36/36 W30 unit
+tests + 273/273 phase69-77 tests + 84/84 wider wevra_* tests pass**.
+
+**Honest scope (what W30 does NOT claim).**
+
+* W30 does NOT claim "we solved context."
+* W30 does NOT claim a learned model.  Calibration vector is a
+  vector of floats in [0, 1] registered at construction; the
+  running-mean update is closed-form arithmetic.
+* W30 does NOT claim transformer-internal latent control.  The
+  basis history is a capsule-layer accumulator over W29's
+  deterministic basis CIDs; honest **proxy** for the LatentMAS
+  shared-substrate direction, not a runtime KV transplant.
+* W30 does NOT claim a temporal-ordering proof at the model layer.
+  The ancestor chain is a sorted tuple of registered ancestor CIDs;
+  the chain CID is SHA-256 over canonical bytes.
+* W30 does NOT bring up Mac 2 (192.168.12.248 ARP-incomplete, 25th
+  consecutive milestone).  Two reachable hosts (localhost +
+  192.168.12.191) suffice for the synthetic discharge.
+* W30 does NOT solve full live LLM disagreement reduction.  The H8
+  strict gain is on synthetic disagreement; live-LLM extension
+  remains open as **W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE**.
+* W30 does NOT close ``W29-C-NATIVE-LATENT`` (architecture-dependent;
+  the next true wall).
+
+**Discharges (in this milestone).**
+
+* **W29-C-CRAM-AMPLIFICATION** (H6).
+* **W29-C-PARTITION-CALIBRATION** (H7).
+* **W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE** (H8 synthetic axis;
+  live axis carried forward as
+  W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE).
+* **W21-C-CALIBRATED-TRUST** sharpened (per-partition calibrated
+  priors are the natural land for the W21 conjecture).
+
+**Verdict against pre-committed `SUCCESS_CRITERION_W30_*.md`:**
+**STRONG SUCCESS** — 10/10 hard gates met AND ≥ 4/5 soft gates
+PASS or honestly-null with explanation.
+
 ## [0.5.3 / 3.30] — 2026-04-30 — SDK v3.30 — geometry-partitioned product-manifold dense control + audited subspace-basis payload + factoradic Lehmer routing index + causal-validity gate + cross-host variance witness + first empirical discharge of W28-C-CROSS-HOST-VARIANCE on the magnitude axis
 
 *Strictly additive on SDK v3.29. The Wevra single-run product

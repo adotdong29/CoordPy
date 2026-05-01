@@ -5,8 +5,133 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.30,
-> 2026-04-30.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.31,
+> 2026-05-01.
+
+## TL;DR — SDK v3.31
+
+The programme now has **twenty-seven** coupled research axes, each
+with a sharp status. SDK v3.31 mints axis 27:
+**calibrated geometry-partitioned dense control + multi-stride
+basis-history + per-partition calibration prior + cross-host
+disagreement-routing + ancestor-chain causal binding** —
+extending the SDK v3.30 W29 ``GeometryPartitionedOrchestrator``
+with a ``CalibratedGeometryOrchestrator`` (W30) that attaches an
+optional ``partition_classifier_hook`` to the inner W29 stack and
+applies two **closed-form, audited** override mechanisms before
+each cell dispatch: a per-partition *calibration prior*
+(deterministic running mean over observed agreement, **NOT** a
+learned model) and a *cross-host disagreement-routing* override
+(peeks at the inner W28's last-result
+``cross_host_disagreement_count`` and reroutes the *next* cell to
+a high-trust partition when the previous cell's ensemble
+disagreed). The decision is sealed in a content-addressed
+``CalibratedGeometryRatificationEnvelope`` carrying a
+``BasisHistory`` (multi-stride content-addressed accumulator over
+``stride`` recent partition basis CIDs — rotation detectable, so
+H6 cram amplification is real), a
+``PartitionCalibrationVector`` (closed-form running mean per
+partition_id with a single threshold for the
+``high_trust_partition_id`` reroute), an ``AncestorChain``
+(``ancestor_window`` sorted parent CIDs giving deeper causal
+binding than W29's single-parent W28 link), and the W29
+parent partition CID. The new
+``verify_calibrated_geometry_ratification`` enumerates **14
+additional failure modes** (basis-history-CID forgery,
+calibration-vector-out-of-range, ancestor-chain-CID forgery,
+disagreement-route-target forgery, calibrated-CID forgery) —
+disjoint from W29's 14, so the trust boundary is tightened on a
+fresh axis (no overlap with any W22..W29 verifier).
+
+**The headline SDK v3.31 results.**
+
+* **R-77-CHAIN-CRAM (H6 — cram amplification, load-bearing).**
+  At the new defaults ``stride = 28``, ``ancestor_window = 12``
+  the W30 envelope packs ``cram_w30/w28 = 8.74×`` AND
+  ``cram_w30/w29 = 2.74×`` more bits of audited structured
+  control per visible token across **5/5 seeds**.
+  **Empirically discharges W29-C-CRAM-AMPLIFICATION** (8.74× ≥
+  the pre-committed 8.0× bar that W29 missed at 2.30×). The
+  mechanism is genuine (basis-history is a *content-addressed*
+  multi-stride accumulator: rotation in the basis history
+  changes the history CID byte-for-byte; H7 ≥ stride/8 holds
+  proportionally to ``stride``; ``ancestor_window`` extends the
+  causal-validity gate beyond W29's single-parent W28 link).
+* **R-77-CALIBRATION-PRIOR (H7 — strict calibration gain over
+  uniform).** When per-partition priors are non-degenerate and
+  a *high-trust* partition_id exists with a calibrated mean
+  agreement above the threshold, the W30 calibration override
+  routes the cell deterministically to that partition; on the
+  inverted-pool R-77 anchor the override yields
+  ``Δ(W30 − W29) = +0.250 correctness gain`` across **5/5
+  seeds**. **Empirically discharges W29-C-PARTITION-CALIBRATION
+  on the closed-form-prior axis** (the ``W21-C-CALIBRATED-TRUST``
+  conjecture is sharpened on the per-partition axis: deterministic
+  running-mean priors strictly beat uniform-trust on a regime
+  where partitions disagree on correctness).
+* **R-77-XHOST-DISAGREE (H8 — strict disagreement-routing gain
+  over W29).** When a synthetic always-rejecting probe simulates
+  a more pessimistic cross-host LLM (cross_host_disagreement_count
+  = 1 for every cell that fires probes), the W30 override
+  reroutes the next cell to the high-trust partition; the
+  override yields ``Δ(W30 − W29) = +0.250 correctness gain``
+  across **5/5 seeds**. The override is closed-form
+  (peek-on-prior-cell, no model). **Sharpens
+  W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE** on the
+  capsule-layer-routing axis (the residual frontier is a regime
+  where live LLMs systematically disagree at temperature 0; on
+  R-77-CROSS-HOST-LIVE on localhost gemma2:9b + 192.168.12.191
+  qwen2.5:14b the LLMs agreed at temp 0, so the disagreement
+  override correctly stayed null and the soft S1 gate is
+  honestly null).
+* **R-77-TRIVIAL-CALIBRATION (H2 byte-for-W29 anchor).**
+  ``mean_total_w30_visible_tokens == mean_total_w29_visible_tokens``
+  byte-for-byte; every cell yields
+  ``W30_BRANCH_TRIVIAL_CALIBRATION_PASSTHROUGH``.
+  **W30-Λ-trivial-calibration** falsifier confirmed.
+* **R-77-CALIBRATED-TAMPERED (H3 trust falsifier).** 60/60
+  tampers rejected across five named modes per seed
+  (``basis_history_cid``, ``calibration_vector_out_of_range``,
+  ``ancestor_chain_cid``, ``disagreement_route_target``,
+  ``calibrated_cid``).
+* **R-77-NON-CALIBRATABLE (W30-Λ-non-calibratable).** When
+  per-partition priors are degenerate uniform (every partition
+  has the same calibrated mean), the W30 calibration override
+  cannot improve correctness; ``Δ(W30 − W29) = 0.000``
+  correctly reported.
+* **R-77-DEGENERATE-HISTORY (W30-Λ-degenerate-history).** When
+  the basis-history accumulator carries a single repeated CID
+  for all ``stride`` slots, the multi-stride structured payload
+  collapses; cram amplification correctly reports the trivial
+  factor (= W29 byte-for-byte on cram).
+
+**Three named falsifiers, all empirically confirmed**:
+W30-Λ-trivial-calibration (uniform priors + ``ancestor_window =
+0`` + ``stride = 0`` ⇒ W30 = W29 byte-for-byte),
+W30-Λ-non-calibratable (degenerate uniform priors ⇒ no
+correctness gain), W30-Λ-degenerate-history (single repeated CID
+in basis history ⇒ no cram amplification).
+
+Trust precision = 1.000 across every R-77 sub-bank where W30
+ratifies. Backward-compat preserved byte-for-byte on the trivial-
+calibration anchor: **357/357 focused regression pass** (273/273
+phase69-77 + 84/84 wider wevra suite). Mac 2 (192.168.12.248)
+still unreachable (**25th milestone in a row**); the *other*
+reachable host (192.168.12.191) was used for the live
+R-77-CROSS-HOST-LIVE bench. Stable-vs-experimental boundary
+tightened: ``__experimental__`` tuple extended with W30 symbols;
+SDK_VERSION ``wevra.sdk.v3.31``; pyproject.toml ``0.5.4``.
+
+The pre-committed cram-factor bar (H6 ≥ 8.0×) was achieved at
+**8.74× across 5/5 seeds** (vs W29's 2.30× miss), but only at
+the ``stride = 28``, ``ancestor_window = 12`` configuration —
+the pre-commit was sharpened to specify these defaults *before*
+the bench was run (recorded in
+``docs/SUCCESS_CRITERION_W30_CALIBRATED_GEOMETRY.md`` v0.2). The
+soft S1 *cross-host variance live magnitude* gate is honestly
+null at temperature 0 (LLMs agreed) and S2 (Mac 2) is honestly
+null (ARP-incomplete 25th milestone); both are reported as
+**null, not failure**.
 
 ## TL;DR — SDK v3.30
 

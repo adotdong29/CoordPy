@@ -377,6 +377,31 @@ from .team_coord import (
     W29_BRANCH_NO_TRIGGER, W29_BRANCH_DISABLED,
     W29_ALL_BRANCHES,
     W29_DEFAULT_TRIGGER_BRANCHES,
+    # SDK v3.31 — calibrated geometry-aware dense control + multi-stride
+    # basis history + per-partition calibration prior + cross-host
+    # disagreement-routing + ancestor-chain causal binding (W30 family).
+    # EXPERIMENTAL — see __experimental__.
+    BasisHistory, AncestorChain, PartitionCalibrationVector,
+    CalibratedGeometryRatificationEnvelope,
+    CalibratedGeometryRegistry,
+    W30CalibratedResult,
+    CalibratedGeometryOrchestrator,
+    verify_calibrated_geometry_ratification,
+    update_partition_calibration_running_mean,
+    build_trivial_calibrated_registry,
+    build_calibrated_registry,
+    W30_CALIBRATED_SCHEMA_VERSION,
+    W30_DEFAULT_CALIBRATION_PRIOR_THRESHOLD,
+    W30_BRANCH_CALIBRATED_RESOLVED,
+    W30_BRANCH_TRIVIAL_CALIBRATION_PASSTHROUGH,
+    W30_BRANCH_CALIBRATED_REJECTED,
+    W30_BRANCH_DISAGREEMENT_ROUTED,
+    W30_BRANCH_CALIBRATION_REROUTED,
+    W30_BRANCH_NO_CALIBRATION_NEEDED,
+    W30_BRANCH_FALLBACK_W29,
+    W30_BRANCH_NO_TRIGGER,
+    W30_BRANCH_DISABLED,
+    W30_ALL_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -390,7 +415,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.30"
+SDK_VERSION = "wevra.sdk.v3.31"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -454,6 +479,18 @@ __experimental__: tuple[str, ...] = (
     "verify_geometry_partition_ratification",
     "build_trivial_partition_registry",
     "build_three_partition_registry",
+    # W30 family — calibrated geometry-aware dense control + multi-stride
+    # basis history + per-partition calibration prior + cross-host
+    # disagreement-routing + ancestor-chain causal binding.
+    "BasisHistory", "AncestorChain", "PartitionCalibrationVector",
+    "CalibratedGeometryRatificationEnvelope",
+    "CalibratedGeometryRegistry",
+    "W30CalibratedResult",
+    "CalibratedGeometryOrchestrator",
+    "verify_calibrated_geometry_ratification",
+    "update_partition_calibration_running_mean",
+    "build_trivial_calibrated_registry",
+    "build_calibrated_registry",
 )
 
 __all__ = [
@@ -695,6 +732,30 @@ __all__ = [
     "W29_BRANCH_NO_TRIGGER", "W29_BRANCH_DISABLED",
     "W29_ALL_BRANCHES",
     "W29_DEFAULT_TRIGGER_BRANCHES",
+    # SDK v3.31 — W30 family (calibrated geometry-aware dense control +
+    # multi-stride basis history + per-partition calibration prior +
+    # cross-host disagreement-routing + ancestor-chain causal binding).
+    # EXPERIMENTAL — see __experimental__ tuple.
+    "BasisHistory", "AncestorChain", "PartitionCalibrationVector",
+    "CalibratedGeometryRatificationEnvelope",
+    "CalibratedGeometryRegistry",
+    "W30CalibratedResult",
+    "CalibratedGeometryOrchestrator",
+    "verify_calibrated_geometry_ratification",
+    "update_partition_calibration_running_mean",
+    "build_trivial_calibrated_registry",
+    "build_calibrated_registry",
+    "W30_CALIBRATED_SCHEMA_VERSION",
+    "W30_DEFAULT_CALIBRATION_PRIOR_THRESHOLD",
+    "W30_BRANCH_CALIBRATED_RESOLVED",
+    "W30_BRANCH_TRIVIAL_CALIBRATION_PASSTHROUGH",
+    "W30_BRANCH_CALIBRATED_REJECTED",
+    "W30_BRANCH_DISAGREEMENT_ROUTED",
+    "W30_BRANCH_CALIBRATION_REROUTED",
+    "W30_BRANCH_NO_CALIBRATION_NEEDED",
+    "W30_BRANCH_FALLBACK_W29",
+    "W30_BRANCH_NO_TRIGGER", "W30_BRANCH_DISABLED",
+    "W30_ALL_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

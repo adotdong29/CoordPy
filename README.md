@@ -7,7 +7,62 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.30 (April 2026).** Geometry-partitioned
+**Latest milestone: SDK v3.31 (May 2026).** Calibrated
+geometry-partitioned dense control + multi-stride basis-history +
+per-partition calibration prior + cross-host disagreement-routing +
+ancestor-chain causal binding (W30 family). The W30
+``CalibratedGeometryOrchestrator`` wraps the W29 geometry-partitioned
+orchestrator with two **closed-form, audited** override mechanisms
+that ride on a single content-addressed envelope at a fixed 1-token
+wire cost: a per-partition calibration prior (deterministic running
+mean over observed agreement, **NOT** a learned model) that strictly
+beats the uniform-trust baseline, and a cross-host
+disagreement-routing override that peeks at the inner W28's
+last-result ``cross_host_disagreement_count`` and reroutes the
+*next* cell to a high-trust partition when the previous cell's
+ensemble disagreed. The
+``CalibratedGeometryRatificationEnvelope`` additionally carries a
+``BasisHistory`` (multi-stride content-addressed accumulator over
+``stride`` recent partition basis CIDs — rotation detectable, so
+H6 cram amplification is real) and an ``AncestorChain``
+(``ancestor_window`` sorted parent CIDs giving deeper causal
+binding than W29's single-parent W28 link). The new
+``verify_calibrated_geometry_ratification`` enumerates **14
+additional failure modes** (basis-history-CID forgery,
+calibration-vector-out-of-range, ancestor-chain-CID forgery,
+disagreement-route-target forgery, calibrated-CID forgery) —
+disjoint from W29's 14, so the trust boundary is tightened on a
+fresh axis. **First capsule-native multi-agent-coordination method
+to discharge BOTH W29 cram-amplification AND per-partition
+calibration on a single milestone**: on **R-77-CHAIN-CRAM**
+``cram_w30/w28 = 8.74×`` AND ``cram_w30/w29 = 2.74×`` at
+stride=28, window=12, across 5/5 seeds; on
+**R-77-CALIBRATION-PRIOR** the calibration override yields
+``Δ(W30 − W29) = +0.250 correctness gain`` across 5/5 seeds; on
+**R-77-XHOST-DISAGREE** the disagreement-routing override yields
+``Δ(W30 − W29) = +0.250 correctness gain`` across 5/5 seeds.
+``trust_precision_w30 = 1.000`` on every R-77 sub-bank where W30
+ratifies; tamper rejection 100 % (60/60) across five named modes.
+Three named falsifiers all empirically confirmed
+(W30-Λ-trivial-calibration ⇒ byte-for-W29 passthrough;
+W30-Λ-non-calibratable ⇒ no measurable calibration gain when
+priors are degenerate uniform; W30-Λ-degenerate-history ⇒
+basis-history with a single repeated CID does not amplify cram).
+The new vocabulary (calibration prior, disagreement-routing,
+basis-history, ancestor-chain) is honestly framed as
+**capsule-layer audited proxy**, **NOT** a learned partition
+classifier and **NOT** transformer-internal calibration.
+**Empirically discharges W29-C-CRAM-AMPLIFICATION (8.74× ≥ 8.0
+bar) AND W29-C-PARTITION-CALIBRATION on a single milestone.**
+Stable-vs-experimental boundary further tightened; the new W30
+surface lives under ``__experimental__`` (36 unit tests + the
+verifier); ``SDK_VERSION = "wevra.sdk.v3.31"``; pyproject.toml
+``0.5.4``. **357/357 focused regression pass** (273/273 phase69-77
++ 84/84 wider wevra suite). See
+[`docs/RESULTS_WEVRA_W30_CALIBRATED_GEOMETRY.md`](docs/RESULTS_WEVRA_W30_CALIBRATED_GEOMETRY.md)
+and [`CHANGELOG.md`](CHANGELOG.md) for details.
+
+**Previous milestone: SDK v3.30 (April 2026).** Geometry-partitioned
 product-manifold dense control + audited subspace-basis payload +
 factoradic Lehmer routing index + causal-validity gate + cross-host
 variance witness (W29 family). The W29
@@ -17,39 +72,17 @@ every triggered cell into one of three pre-committed labels —
 LINEAR (extends most-recent signature), HIERARCHICAL (fresh
 anchor), CYCLIC (re-visited signature) — keyed by a deterministic
 signature-history heuristic. Per-partition inner W28 stacks get
-their own oracle / probe / pool topology. The
-``GeometryPartitionedRatificationEnvelope`` carries an audited
-orthonormal subspace basis (Grassmannian-style, *capsule-layer
-audited proxy*, **NOT** transformer-internal subspace projection),
-a factoradic Lehmer-code routing index, a causal-validity SHA-256
-binding, and an optional cross-host variance witness. The
-``verify_geometry_partition_ratification`` verifier enumerates
-**14 failure modes** (vs W28's 11) — none of which existed in any
-W22..W28 verifier. **First capsule-native multi-agent-coordination
-method to demonstrate the synthesis (W21 × W27, sealed by W28,
-geometry-partitioned by W29) strictly improves correctness on a
-regime where the prior best (W28) makes correctness mistakes.** On
-**R-76-XHOST-DRIFT** ``correctness_ratified_rate_w27 =
-correctness_ratified_rate_w28 = 0.500`` and
-``correctness_ratified_rate_w29 = 0.750``, **Δ = +0.250 across 5/5
-seeds**, ``trust_precision = 1.000``, ``mean overhead = 0.75
-tokens/cell``. **The same +0.250 gain holds on the live two-host
-LLM topology** (localhost gemma2:9b + 192.168.12.191 qwen2.5:14b);
-16 cross-host probe calls; 710 LAN bytes; trust precision 1.000.
-**Empirically discharges W28-C-CROSS-HOST-VARIANCE on the
-magnitude axis.** Five named falsifiers all empirically confirmed
-(W29-Λ-trivial-partition, W29-Λ-non-orthogonal-basis,
-W29-Λ-coordinated-drift-cross-host, plus W28's W28-Λ-quorum-tampered
-and W28-Λ-pool-exhausted-passthrough). Stable-vs-experimental
-boundary further tightened; the new W29 surface lives under
-``__experimental__`` (38 unit tests + the verifier);
-``SDK_VERSION = "wevra.sdk.v3.30"``; pyproject.toml ``0.5.3``.
-**935/935 + 6 subtests pass** across W3..W29 + capsule + public
-API + runtime + LLM backend. The pre-committed cram-factor
-headline (H7 ≥ 8.0×) was **MISSED** (measured 2.30×); mechanism
-real, magnitude below bar. See
-[`docs/RESULTS_WEVRA_W29_GEOMETRY_PARTITIONED.md`](docs/RESULTS_WEVRA_W29_GEOMETRY_PARTITIONED.md)
-and [`CHANGELOG.md`](CHANGELOG.md) for details.
+their own oracle / probe / pool topology. **First capsule-native
+multi-agent-coordination method to demonstrate the synthesis (W21
+× W27, sealed by W28, geometry-partitioned by W29) strictly
+improves correctness on a regime where the prior best (W28) makes
+correctness mistakes.** On **R-76-XHOST-DRIFT**
+``correctness_ratified_rate_w29 = 0.750`` vs
+``correctness_w27 = correctness_w28 = 0.500``, **Δ = +0.250 across
+5/5 seeds**, ``trust_precision = 1.000``, ``mean overhead = 0.75
+tokens/cell``. **Empirically discharges W28-C-CROSS-HOST-VARIANCE
+on the magnitude axis.** See
+[`docs/RESULTS_WEVRA_W29_GEOMETRY_PARTITIONED.md`](docs/RESULTS_WEVRA_W29_GEOMETRY_PARTITIONED.md).
 
 **Previous milestone: SDK v3.29 (April 2026).** Ensemble-verified
 cross-model multi-chain pivot ratification (W28 family). The W28

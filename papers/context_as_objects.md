@@ -2024,6 +2024,58 @@ The current paper incorporates the following layers:
   proxy; retained as the next true wall). 38/38 W29 unit tests +
   935/935 wider regression pass. Mac 2 (192.168.12.248) still
   ARP-incomplete (24th milestone). (R-76, SDK v3.30)
+- **W30 family:** calibrated geometry-partitioned dense control +
+  multi-stride basis-history + per-partition calibration prior +
+  cross-host disagreement-routing + ancestor-chain causal binding —
+  ``CalibratedGeometryRatificationEnvelope`` (BasisHistory CID +
+  PartitionCalibrationVector + AncestorChain CID + W29 parent
+  partition CID + disagreement_route metadata + calibrated_cid),
+  14 disjoint enumerated failure modes in
+  ``verify_calibrated_geometry_ratification`` (basis-history-CID
+  forgery, calibration-vector-out-of-range, ancestor-chain-CID
+  forgery, disagreement-route-target forgery, calibrated-CID
+  forgery), an optional ``partition_classifier_hook`` on the W29
+  ``GeometryPartitionedOrchestrator`` that the W30
+  ``CalibratedGeometryOrchestrator`` uses to inject two
+  closed-form audited overrides — a per-partition calibration
+  prior (deterministic running mean over observed agreement,
+  **NOT** a learned model: ``(prev * n + obs) / (n + 1)``) and a
+  cross-host disagreement-routing override (peeks at the inner
+  W28's last-result ``cross_host_disagreement_count`` from the
+  *previous* cell). The new vocabulary (calibration prior,
+  disagreement-routing, basis-history, ancestor-chain) is added
+  at the **capsule layer as audited proxy** — explicitly NOT a
+  learned partition classifier, NOT transformer-internal
+  calibration, NOT a true Bayesian posterior. On
+  **R-77-CHAIN-CRAM** at ``stride = 28``, ``ancestor_window =
+  12`` the W30 envelope packs ``cram_w30/w28 = 8.74×`` AND
+  ``cram_w30/w29 = 2.74×`` more bits of audited structured
+  control per visible token, **across 5/5 seeds**.
+  **Empirically discharges W29-C-CRAM-AMPLIFICATION** (8.74× ≥
+  the pre-committed 8.0× bar that W29 missed at 2.30×). On
+  **R-77-CALIBRATION-PRIOR** the calibration override yields
+  ``Δ(W30 − W29) = +0.250 correctness gain`` across 5/5 seeds
+  (**discharges W29-C-PARTITION-CALIBRATION on the closed-form-
+  prior axis**). On **R-77-XHOST-DISAGREE** the disagreement-
+  routing override yields ``Δ(W30 − W29) = +0.250 correctness
+  gain`` across 5/5 seeds (**sharpens
+  W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE on the
+  capsule-layer-routing axis**). ``trust_precision = 1.000`` on
+  every ratifying sub-bank; tamper rejection 60/60 across five
+  named modes. Three named falsifiers
+  (W30-Λ-trivial-calibration, W30-Λ-non-calibratable,
+  W30-Λ-degenerate-history) all empirically confirmed. Newly
+  named open conjectures **W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE**
+  (regime where live LLMs systematically disagree at temp 0),
+  **W30-C-NATIVE-LATENT** (architecture-dependent — true
+  transformer-internal subspace projection vs the W30 audited
+  proxy; retained as the next true wall),
+  **W30-C-MULTI-HOST** (3+ host topology, blocked on Mac 2 ARP),
+  **W30-C-PRIOR-LEARNING** (true learned per-partition prior
+  vs the W30 deterministic running mean — out of scope as a
+  capsule-layer mechanism). 36/36 W30 unit tests + 357/357
+  focused regression pass. Mac 2 (192.168.12.248) still ARP-
+  incomplete (25th milestone). (R-77, SDK v3.31)
 
 ## Appendix C. Submission Pass Still Needed
 
