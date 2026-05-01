@@ -17,7 +17,8 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.27)         | [`RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md`](RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md) |
+> | Latest milestone (SDK v3.28)         | [`RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md`](RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md) |
+> | Previous milestone (SDK v3.27)       | [`RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md`](RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md) |
 > | Previous milestone (SDK v3.26)       | [`RESULTS_WEVRA_W25_SHARED_FANOUT.md`](RESULTS_WEVRA_W25_SHARED_FANOUT.md) |
 > | Previous milestone (SDK v3.25)       | [`RESULTS_WEVRA_W24_SESSION_COMPACTION.md`](RESULTS_WEVRA_W24_SESSION_COMPACTION.md) |
 > | Previous milestone (SDK v3.24)       | [`RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md`](RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md) |
@@ -50,7 +51,7 @@ this one. Everything else in the repo should make sense after this page.
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
-**SDK v3.22 (April 2026)**, capsules are load-bearing **inside one
+**SDK v3.28 (April 2026)**, capsules are load-bearing **inside one
 Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
@@ -82,7 +83,44 @@ limit), while pairing W9 admission with the new
 achieves 1.000 — the first capsule-native multi-agent coordination
 method that crosses the admission/decoding split** (W10 family,
 SDK v3.11).
-SDK v3.22's headline result is the **first capsule-native multi-
+SDK v3.28's headline result is the **first capsule-native multi-
+agent-coordination method that simultaneously improves both
+efficiency AND correctness over the prior best (W26)** on a regime
+where the prior best architecturally limits correctness. The W27
+family ships the :class:`MultiChainPersistedFanoutOrchestrator` — a
+team-wide :class:`SharedMultiChainPool` of independent W26 stacks,
+keyed by salience signature (SHA-256 over canonical input
+handoffs computed by :func:`compute_input_signature_cid`). The
+companion audited :class:`MultiChainPersistedFanoutDisambiguator`
+adds two new content-addressed envelopes
+(:class:`SalienceSignatureEnvelope`, :class:`ChainPivotEnvelope`)
+plus :func:`verify_salience_signature` (4 enumerated failure modes)
+and :func:`verify_chain_pivot` (8 failure modes) for trust-boundary
+auditing. On R-74-XORACLE-RECOVER (1 producer + K=3 consumers, 16
+cells, 2 distinct gold-subset signatures, partial ServiceGraphOracle
+on the W26 baseline scoped to GOLD_A), the W27 method
+**simultaneously** strictly reduces ``mean_total_w27_visible_tokens``
+over ``mean_total_w26_visible_tokens`` by **−22.5 tokens / cell
+(−76.27 %)** AND raises ``correctness_ratified_rate`` from 0.500
+to 1.000; identical at ``T_decoder ∈ {None, 24}``; stable across
+**5/5** seeds. Four named falsifiers
+(W27-Λ-single-signature, W27-Λ-pool-exhausted,
+W27-Λ-pivot-tampered, W27-Λ-signature-drift) make the W27-1
+conditionality sharp. Discharges **W26-C-DIVERGENCE-RECOVERY**
+in the per-signature scoping direction. Backward-compat preserved
+byte-for-byte: 508/508 focused regression. See
+`docs/RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md` for the milestone note.
+
+SDK v3.27's prior headline result was the **first capsule-native
+multi-agent-coordination method that amortises the producer's
+per-cell salience-token cost across cells via 1-token chain-advance
+references while preserving the W25 multi-consumer fanout floor**
+(W26 family / Phase-73). Measured **−68.79 % over W25** at K=3 on
+R-73-CHAIN-SHARED, **−90.60 % over W24** at K=3, scaling to
+**−92.23 % over W24 at K=10** (W25-C-K-SCALING discharged at
+K∈{3,5,8,10}).
+
+SDK v3.22's prior-prior headline result is the **first capsule-native multi-
 agent-coordination method that crosses the W20-Λ-compromised
 wall** (named in SDK v3.21) **on a regime where the wall actually
 applies**. The W21 family ships the

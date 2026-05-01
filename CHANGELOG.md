@@ -5,6 +5,62 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [3.28] — 2026-04-30 — SDK v3.28 — multi-chain salience-keyed dense-control fanout + per-signature scoping + Phase-74 R-74 benchmark family + W27 family + W26-C-DIVERGENCE-RECOVERY discharged (first capsule-native multi-agent-coordination method that simultaneously improves both efficiency AND correctness over W26 on a regime where W26's single-stack scope architecturally limits correctness — measured −76.27% total token reduction AND +0.500 correctness gain over W26 on R-74-XORACLE-RECOVER at 5/5 seeds, trust boundary sound via 12 enumerated failure modes across 2 new verify_* functions, four named W27-Λ falsifiers all empirically confirmed)
+
+*Strictly additive on SDK v3.27. The Wevra single-run product
+runtime contract is byte-for-byte unchanged.*
+
+**New surface (W27 family, multi-agent-coordination research slice):**
+
+* `vision_mvp.wevra.team_coord.SalienceSignatureEnvelope` — content-
+  addressed signature over canonical compact state (4 enumerated
+  failure modes via `verify_salience_signature`).
+* `vision_mvp.wevra.team_coord.ChainPivotEnvelope` — per-cell pivot
+  to an existing chain in the multi-chain pool (8 enumerated
+  failure modes via `verify_chain_pivot`).
+* `vision_mvp.wevra.team_coord.MultiChainPersistedFanoutRegistry` —
+  controller-side multi-chain pool maintained inside the audited
+  disambig wrapper.
+* `vision_mvp.wevra.team_coord.MultiChainPersistedFanoutDisambiguator`
+  — audited W27 wrapper on top of one W26 stack.
+* `vision_mvp.wevra.team_coord.SharedMultiChainPool` — team-wide
+  pool shared across producer + K consumers; one independent W26
+  disambiguator per (signature, agent).
+* `vision_mvp.wevra.team_coord.MultiChainPersistedFanoutOrchestrator`
+  — load-bearing W27 implementation that routes cells via
+  `compute_input_signature_cid` to the matching slot in the team-
+  wide pool.
+* `vision_mvp.wevra.team_coord.compute_input_signature_cid` —
+  deterministic SHA-256 over canonical input handoffs.
+* W27 branch vocabulary (7 branches): `pivoted`, `anchored_new`,
+  `pool_exhausted`, `pivot_rejected`, `fallback_w26`, `no_trigger`,
+  `disabled`.
+
+**New benchmark family (R-74):**
+
+* `vision_mvp/experiments/phase74_multi_chain_pivot.py` — six
+  pre-committed sub-banks + cross_regime + signature_period sweep.
+* `vision_mvp/tests/test_phase74_multi_chain_pivot.py` — 22 unit +
+  integration tests covering the W27 surface end-to-end.
+* `docs/data/phase74_cross_regime.json`,
+  `docs/data/phase74_xoracle_seed_sweep.json`,
+  `docs/data/phase74_signature_period_sweep.json`.
+
+**Headline empirical result (R-74-XORACLE-RECOVER).** W27
+**simultaneously** reduces total visible tokens by −76.27 % over
+W26 AND raises correctness_ratified_rate from 0.500 to 1.000 at
+T_decoder ∈ {None, 24}, K=3, 16 cells. Stable across 5/5 seeds.
+
+**Falsifiers all empirically confirmed:** W27-Λ-single-signature,
+W27-Λ-pool-exhausted, W27-Λ-pivot-tampered, W27-Λ-signature-drift.
+
+**Conjectures introduced:** W27-C-MULTI-SIGNATURE-SCALING (M → ∞
+asymptote unverified), W27-C-CROSS-HOST (gated on Mac-2 return —
+22nd consecutive ARP-incomplete).
+
+**Regression:** 508/508 in the focused suite — all preserved
+byte-for-byte.
+
 ## [3.27] — 2026-04-30 — SDK v3.27 — chain-persisted dense-control fanout + per-consumer projections + Phase-73 R-73 benchmark family + W26 family + W25-C-K-SCALING discharge (first capsule-native multi-agent-coordination method that amortises the producer's per-cell salience-token cost across cells via 1-token chain-advance references while preserving the W25 multi-consumer fanout floor — measured −68.79% total token reduction over W25 and −90.60% over W24 on K=3 at 5/5 seeds, trust boundary sound on tampered + projection-mismatch falsifiers, W26-Λ-no-chain falsifier confirmed, W25-C-K-SCALING discharged at K∈{3,5,8,10})
 
 *Strictly additive on SDK v3.26. The Wevra single-run product

@@ -5560,6 +5560,30 @@ __all__ = [
     "W23_DELTA_ENVELOPE_SCHEMA_VERSION",
     "W23_SUPER_TOKEN_SCHEMA_VERSION",
     "W23_DEFAULT_TRIGGER_BRANCHES",
+    # SDK v3.28 — multi-chain salience-keyed dense-control fanout (W27 family).
+    "SalienceSignatureEnvelope",
+    "ChainPivotEnvelope",
+    "MultiChainPersistedFanoutRegistry",
+    "MultiChainPersistedFanoutDisambiguator",
+    "W27MultiChainResult",
+    "verify_salience_signature",
+    "verify_chain_pivot",
+    "W27_SALIENCE_SIGNATURE_SCHEMA_VERSION",
+    "W27_CHAIN_PIVOT_SCHEMA_VERSION",
+    "W27_BRANCH_PIVOTED",
+    "W27_BRANCH_ANCHORED_NEW",
+    "W27_BRANCH_POOL_EXHAUSTED",
+    "W27_BRANCH_PIVOT_REJECTED",
+    "W27_BRANCH_FALLBACK_W26",
+    "W27_BRANCH_NO_TRIGGER",
+    "W27_BRANCH_DISABLED",
+    "W27_ALL_BRANCHES",
+    "W27_DEFAULT_TRIGGER_BRANCHES",
+    # SDK v3.28 — orchestrator-level multi-chain pool (W27 family).
+    "compute_input_signature_cid",
+    "MultiChainPersistedFanoutOrchestrator",
+    "W27OrchestratorResult",
+    "SharedMultiChainPool",
 ]
 
 
@@ -12189,3 +12213,1464 @@ class ChainPersistedFanoutDisambiguator:
     @property
     def last_advance(self) -> ChainAdvanceEnvelope | None:
         return self._last_advance
+
+
+# =============================================================================
+# W27 — multi-chain salience-keyed dense-control fanout (divergence-aware
+# chain replay + parallel chain pool + per-cell pivot routing)
+# =============================================================================
+#
+# The W26 family amortises the producer's per-cell salience-token cost
+# across cells inside a single chain window via 1-token chain-advance
+# references.  W26 has two structural limits, both named in
+# SDK v3.27:
+#
+#   * **W26-Λ-divergent** — when the cell's gold subset / canonical
+#     compact state changes between cells (e.g. R-73-DIVERGENT flips
+#     the gold subset at cell 8), the inner W25 fires NO_TRIGGER on
+#     the divergent cells and W26 falls through to W25 (no chain
+#     savings on those cells).  Correctness drops to 0.5.
+#   * **W26-C-DIVERGENCE-RECOVERY** — open conjecture that a smarter
+#     chain replay could recover savings even on divergent cells via
+#     a new mechanism.
+#
+# W27 implements the smallest honest version of that mechanism at
+# the *capsule layer*: a pool of parallel chains keyed by the cell's
+# **salience signature** (a content-addressed CID over the canonical
+# compact state).  At each cell, the controller hashes the producer's
+# current canonical compact state into a salience signature; if a
+# chain with that signature is already in the pool, the producer
+# *pivots* to that chain (1 token, audited via
+# :class:`ChainPivotEnvelope` whose ``parent_chain_root_cid`` matches
+# the registered chain).  If no chain matches, the producer anchors
+# a fresh chain (full W25 cost) and adds it to the pool.
+#
+# Total visible-token cost over N cells, K consumers, M distinct
+# salience signatures (chain pool of size M):
+#   W25:     N × (C + K)
+#   W26:     ⌈N/W⌉ × (C + K) + (N − ⌈N/W⌉) × (1+K)
+#   W27:     M × (C + K) + (N − M) × (1+K)
+#
+# At N=16, K=3, C=14.625, M=2 (one anchor per gold subset):
+#   W25 ≈ 282 tokens
+#   W26 (with divergence) ≈ 17.625 + 7×4 + 8×17.625 ≈ 186 tokens
+#                         (the 8 divergent cells fall through to W25)
+#   W27 ≈ 2×17.625 + 14×4 ≈ 91 tokens   (saving ≈ 51% over W26 on
+#                                          R-74-DIVERGENT-RECOVER)
+#
+# Trust boundary
+# ==============
+# The W27 layer adds two new content-addressed envelopes
+# (:class:`SalienceSignatureEnvelope`,
+# :class:`ChainPivotEnvelope`) and a controller-side
+# :class:`MultiChainPersistedFanoutRegistry`.  Verification:
+#
+#   * ``verify_salience_signature``  — schema_cid pinning, hash
+#     integrity, signature_cid recompute matches.
+#   * ``verify_chain_pivot``         — the pivot's
+#     parent_chain_root_cid must reference an existing chain in the
+#     pool (else ``unknown_chain``); the pivot's salience_signature
+#     must match the parent's registered signature (else
+#     ``salience_signature_mismatch``); the pool size must be ≤
+#     ``max_active_chains`` (else ``chain_pool_exhausted``).
+#   * ``verify_multi_chain_pool``    — the pool's bounded size, one
+#     active chain per signature, per-consumer projection scope is
+#     preserved across pivots.
+#
+# Honest scope
+# ============
+# W27 is an **amortisation across divergence** mechanism, not a new
+# information channel:
+#   * It does not add new content; it changes how the existing
+#     producer state is *distributed* across multiple chains.
+#   * The total *bytes* on the wire is bounded above by W26's bytes
+#     when only one signature is observed (W27 = W26 byte-for-byte
+#     in that case — W27-Λ-single-signature falsifier).
+#   * The visible-token reduction is bounded above by 1 + K per
+#     cell; the floor 1+K matches W26-L on every pivot cell.
+#   * The bounded chain pool size ``max_active_chains`` is the
+#     critical safety knob: an unbounded pool could be exhausted by
+#     adversarial divergence; ``chain_pool_exhausted`` rejects any
+#     anchor beyond the bound and W27 falls through to W26.
+#
+# Named falsifiers
+# ================
+#   * **W27-Λ-single-signature** — when every cell produces the same
+#     canonical compact state (R-73-CHAIN-SHARED), W27 reduces to
+#     W26 byte-for-byte (no extra chains created; one signature in
+#     the pool).
+#   * **W27-Λ-pool-exhausted** — when more than ``max_active_chains``
+#     distinct signatures appear, the controller rejects new
+#     anchors and W27 falls through to W26 (which then falls through
+#     to W25 on divergent cells).  Correctness preserved.
+#   * **W27-Λ-pivot-tampered** — any tamper on a pivot's
+#     parent_chain_root_cid / salience_signature_cid is rejected by
+#     ``verify_chain_pivot``.
+#   * **W27-Λ-signature-mismatch** — if the producer's canonical
+#     state does not match the claimed signature, the pivot is
+#     rejected with ``salience_signature_mismatch``.
+
+W27_SALIENCE_SIGNATURE_SCHEMA_VERSION: str = "wevra.salience_signature.v1"
+W27_CHAIN_PIVOT_SCHEMA_VERSION: str = "wevra.chain_pivot.v1"
+
+W27_BRANCH_PIVOTED = "pivoted"            # advance via pivot to existing chain
+W27_BRANCH_ANCHORED_NEW = "anchored_new"  # registered a new chain in the pool
+W27_BRANCH_POOL_EXHAUSTED = "pool_exhausted"
+W27_BRANCH_PIVOT_REJECTED = "pivot_rejected"
+W27_BRANCH_FALLBACK_W26 = "fallback_w26"  # delegated to W26 (single-signature path)
+W27_BRANCH_NO_TRIGGER = "no_trigger"
+W27_BRANCH_DISABLED = "disabled"
+
+W27_ALL_BRANCHES: tuple[str, ...] = (
+    W27_BRANCH_PIVOTED,
+    W27_BRANCH_ANCHORED_NEW,
+    W27_BRANCH_POOL_EXHAUSTED,
+    W27_BRANCH_PIVOT_REJECTED,
+    W27_BRANCH_FALLBACK_W26,
+    W27_BRANCH_NO_TRIGGER,
+    W27_BRANCH_DISABLED,
+)
+
+# W27 fires on the same trigger set as W26.  When the inner W26 emits
+# a chain anchor / advance / re-anchor / projection-resolved branch
+# OR the inner W25 produced an envelope, W27 considers a pivot.
+W27_DEFAULT_TRIGGER_BRANCHES: frozenset[str] = frozenset({
+    W26_BRANCH_CHAIN_ANCHORED,
+    W26_BRANCH_CHAIN_ADVANCED,
+    W26_BRANCH_CHAIN_RE_ANCHORED,
+    W26_BRANCH_CHAIN_PROJECTION_RESOLVED,
+    # W26 NO_TRIGGER is the divergence recovery path: when the inner
+    # W26 fell through, W27 still tries to pivot from a parallel chain
+    # whose signature matches the cell's salience signature.
+    W26_BRANCH_NO_TRIGGER,
+})
+
+
+def _compute_salience_signature_cid(
+        *,
+        per_tag_votes: tuple[tuple[str, int], ...],
+        projected_subset: tuple[str, ...],
+        producer_agent_id: str,
+        consumer_agent_ids: tuple[str, ...],
+        schema_cid: str,
+) -> str:
+    """Canonical SHA-256 over the salience signature payload.
+
+    The signature is producer-agent-keyed and consumer-set-keyed so
+    that a chain can only be pivoted by the same producer for the
+    same consumer set.  Cell index is *not* part of the signature —
+    that is the whole point of W27 (content-keyed amortisation).
+    """
+    payload = _canonical_json_bytes({
+        "schema_version": W27_SALIENCE_SIGNATURE_SCHEMA_VERSION,
+        "producer_agent_id": str(producer_agent_id),
+        "consumer_agent_ids": sorted(str(c) for c in consumer_agent_ids),
+        "per_tag_votes": [
+            [str(t), int(c)] for t, c in
+            sorted(per_tag_votes, key=lambda kv: kv[0])],
+        "projected_subset": sorted(str(s) for s in projected_subset),
+        "schema_cid": str(schema_cid),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class SalienceSignatureEnvelope:
+    """Content-addressed signature over a producer's canonical compact
+    state at one cell (W27 family).
+
+    The signature is the routing key into the multi-chain pool.  Two
+    cells with byte-identical canonical state produce byte-identical
+    signature_cid; a divergent cell produces a different signature
+    and routes to a different chain.
+
+    Trust: signature_cid is SHA-256 over the canonical bytes; tampering
+    is detected on every recompute.
+    """
+    schema_version: str
+    schema_cid: str
+    producer_agent_id: str
+    consumer_agent_ids: tuple[str, ...]
+    canonical_per_tag_votes: tuple[tuple[str, int], ...]
+    canonical_projected_subset: tuple[str, ...]
+    cell_index_first_observed: int
+    signature_cid: str = ""
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "consumer_agent_ids",
+                            tuple(sorted(self.consumer_agent_ids)))
+        object.__setattr__(self, "canonical_per_tag_votes",
+                            tuple(sorted(self.canonical_per_tag_votes,
+                                          key=lambda kv: kv[0])))
+        object.__setattr__(self, "canonical_projected_subset",
+                            tuple(sorted(self.canonical_projected_subset)))
+        if not self.signature_cid:
+            object.__setattr__(self, "signature_cid",
+                                self.recompute_signature_cid())
+
+    def _signed_payload(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "producer_agent_id": self.producer_agent_id,
+            "consumer_agent_ids": list(self.consumer_agent_ids),
+            "canonical_per_tag_votes": [
+                [t, int(c)] for t, c in self.canonical_per_tag_votes],
+            "canonical_projected_subset":
+                list(self.canonical_projected_subset),
+            "cell_index_first_observed": int(self.cell_index_first_observed),
+        }
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes(self._signed_payload())
+
+    def recompute_signature_cid(self) -> str:
+        return _compute_salience_signature_cid(
+            per_tag_votes=self.canonical_per_tag_votes,
+            projected_subset=self.canonical_projected_subset,
+            producer_agent_id=self.producer_agent_id,
+            consumer_agent_ids=self.consumer_agent_ids,
+            schema_cid=self.schema_cid,
+        )
+
+    @property
+    def n_signature_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    def as_dict(self) -> dict[str, Any]:
+        d = self._signed_payload()
+        d["signature_cid"] = self.signature_cid
+        d["n_signature_bytes"] = self.n_signature_bytes
+        return d
+
+
+@dataclasses.dataclass(frozen=True)
+class ChainPivotEnvelope:
+    """Per-cell pivot to an existing chain in the multi-chain pool
+    (W27 family).
+
+    Carries:
+      * ``signature_cid``        — the cell's salience signature.
+      * ``parent_chain_root_cid`` — the registered chain whose
+        signature matches.
+      * ``parent_advance_cid``   — the latest advance of that chain
+        (the pivot extends the parent chain).
+      * ``cell_index``           — the cell index this pivot applies to.
+
+    The pivot is parent-CID-linked into the multi-chain pool: tampering
+    is detected by ``verify_chain_pivot``.
+    """
+    schema_version: str
+    schema_cid: str
+    signature_cid: str
+    parent_chain_root_cid: str
+    parent_advance_cid: str
+    cell_index: int
+    pivot_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.pivot_cid:
+            object.__setattr__(self, "pivot_cid",
+                                self.recompute_pivot_cid())
+
+    def _signed_payload(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "signature_cid": self.signature_cid,
+            "parent_chain_root_cid": self.parent_chain_root_cid,
+            "parent_advance_cid": self.parent_advance_cid,
+            "cell_index": int(self.cell_index),
+        }
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes(self._signed_payload())
+
+    def recompute_pivot_cid(self) -> str:
+        return hashlib.sha256(self.to_canonical_bytes()).hexdigest()
+
+    def to_decoder_text(self) -> str:
+        return f"<chain_pivot:{self.pivot_cid[:16]}>"
+
+    @property
+    def n_pivot_tokens(self) -> int:
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_pivot_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    def as_dict(self) -> dict[str, Any]:
+        d = self._signed_payload()
+        d["pivot_cid"] = self.pivot_cid
+        d["n_pivot_tokens"] = self.n_pivot_tokens
+        d["n_pivot_bytes"] = self.n_pivot_bytes
+        d["decoder_text"] = self.to_decoder_text()
+        return d
+
+
+def verify_salience_signature(
+        sig: SalienceSignatureEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+) -> LatentVerificationOutcome:
+    """Controller-side verification of a :class:`SalienceSignatureEnvelope`.
+
+    Pure function. Failure modes enumerated:
+
+    * ``empty_signature``         — no signature passed.
+    * ``schema_version_unknown``  — sig.schema_version mismatch.
+    * ``schema_cid_mismatch``     — sig.schema_cid != registered.
+    * ``hash_mismatch``           — signature_cid does not recompute.
+    """
+    n = 0
+    if sig is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_signature", n_checks=n)
+    n += 1
+    if sig.schema_version != W27_SALIENCE_SIGNATURE_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n)
+    n += 1
+    if sig.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n)
+    n += 1
+    if sig.signature_cid != sig.recompute_signature_cid():
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n)
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n)
+
+
+def verify_chain_pivot(
+        pivot: ChainPivotEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_signature_cid: str,
+        registered_parent_chain_root_cid: str,
+        registered_parent_advance_cid: str,
+) -> LatentVerificationOutcome:
+    """Controller-side verification of a :class:`ChainPivotEnvelope`.
+
+    Pure function. Failure modes enumerated:
+
+    * ``empty_pivot``                  — no pivot passed.
+    * ``schema_version_unknown``       — pivot.schema_version mismatch.
+    * ``schema_cid_mismatch``          — pivot.schema_cid != registered.
+    * ``unknown_signature``            — pivot.signature_cid not registered.
+    * ``salience_signature_mismatch``  — sig of pivot's parent != registered.
+    * ``parent_chain_unknown``         — parent_chain_root_cid not in pool.
+    * ``parent_advance_unknown``       — parent_advance_cid not in chain.
+    * ``hash_mismatch``                — pivot_cid does not recompute.
+    """
+    n = 0
+    if pivot is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_pivot", n_checks=n)
+    n += 1
+    if pivot.schema_version != W27_CHAIN_PIVOT_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n)
+    n += 1
+    if pivot.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n)
+    n += 1
+    if not registered_signature_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="unknown_signature", n_checks=n)
+    if pivot.signature_cid != registered_signature_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="salience_signature_mismatch", n_checks=n)
+    n += 1
+    if pivot.parent_chain_root_cid != registered_parent_chain_root_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="parent_chain_unknown", n_checks=n)
+    n += 1
+    if pivot.parent_advance_cid != registered_parent_advance_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="parent_advance_unknown", n_checks=n)
+    n += 1
+    if pivot.pivot_cid != pivot.recompute_pivot_cid():
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n)
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n)
+
+
+@dataclasses.dataclass
+class MultiChainPersistedFanoutRegistry:
+    """Controller-side multi-chain pool (W27 family).
+
+    Maintains a bounded pool of parallel chains, keyed by salience
+    signature.  Each chain in the pool has its own
+    :class:`ChainPersistedFanoutRegistry` (the W26 layer is reused
+    for in-chain advance/anchor verification).  Pivots route a cell
+    to the chain whose registered signature matches the cell's
+    salience signature.
+
+    Trust boundary: the registry is controller-owned.  A malicious
+    producer cannot register a tampered pivot or grow the pool past
+    ``max_active_chains``.
+
+    The registry tracks:
+      * Registered signatures — ``signature_cid → (chain_root_cid, last_advance_cid)``
+      * Active chain anchors — ``chain_root_cid → ChainAnchorEnvelope``
+      * Pool size statistics.
+    """
+    schema: SchemaCapsule | None = None
+    max_active_chains: int = 8
+    chain_registry: ChainPersistedFanoutRegistry = dataclasses.field(
+        default_factory=lambda: ChainPersistedFanoutRegistry())
+    _signature_to_chain: dict[str, str] = dataclasses.field(
+        default_factory=dict)  # signature_cid -> chain_root_cid
+    _signature_to_last_advance: dict[str, str] = dataclasses.field(
+        default_factory=dict)  # signature_cid -> last advance_cid (or chain_root if no advance)
+    _signature_envelopes: dict[str, SalienceSignatureEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    _pivots: dict[str, ChainPivotEnvelope] = dataclasses.field(
+        default_factory=dict)  # pivot_cid -> envelope
+    n_signatures_registered: int = 0
+    n_pivots_registered: int = 0
+    n_pivots_rejected: int = 0
+    n_pool_exhausted_rejections: int = 0
+    n_anchors_added: int = 0
+
+    def __post_init__(self) -> None:
+        # Ensure the inner chain_registry shares schema.
+        if self.schema is not None and self.chain_registry.schema is None:
+            self.chain_registry.schema = self.schema
+
+    @property
+    def pool_size(self) -> int:
+        return len(self._signature_to_chain)
+
+    def has_signature(self, signature_cid: str) -> bool:
+        return signature_cid in self._signature_to_chain
+
+    def register_signature(
+            self, sig: SalienceSignatureEnvelope,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            return LatentVerificationOutcome(
+                ok=False, reason="registry_no_schema", n_checks=0)
+        outcome = verify_salience_signature(
+            sig, registered_schema=self.schema)
+        if not outcome.ok:
+            return outcome
+        if sig.signature_cid not in self._signature_envelopes:
+            self._signature_envelopes[sig.signature_cid] = sig
+            self.n_signatures_registered += 1
+        return outcome
+
+    def attach_anchor(
+            self,
+            *,
+            sig: SalienceSignatureEnvelope,
+            anchor: ChainAnchorEnvelope,
+    ) -> LatentVerificationOutcome:
+        """Register a fresh chain in the pool.
+
+        Bounded by ``max_active_chains``.  Returns ``chain_pool_exhausted``
+        if the pool is already at capacity AND the signature is new.
+        """
+        if self.schema is None:
+            return LatentVerificationOutcome(
+                ok=False, reason="registry_no_schema", n_checks=0)
+        sig_outcome = self.register_signature(sig)
+        if not sig_outcome.ok:
+            return sig_outcome
+        # If the signature already maps to a chain, refuse to overwrite
+        # — this would silently dispose of the existing chain.  The
+        # caller should pivot instead.
+        if sig.signature_cid in self._signature_to_chain:
+            return LatentVerificationOutcome(
+                ok=False, reason="signature_already_anchored",
+                n_checks=1)
+        # Bound the pool size.
+        if len(self._signature_to_chain) >= int(self.max_active_chains):
+            self.n_pool_exhausted_rejections += 1
+            return LatentVerificationOutcome(
+                ok=False, reason="chain_pool_exhausted", n_checks=1)
+        # Register the anchor in the inner W26 chain registry.
+        anchor_outcome = self.chain_registry.register_anchor(anchor)
+        if not anchor_outcome.ok:
+            return anchor_outcome
+        self._signature_to_chain[sig.signature_cid] = anchor.chain_root_cid
+        self._signature_to_last_advance[sig.signature_cid] = (
+            anchor.chain_root_cid)
+        self.n_anchors_added += 1
+        return anchor_outcome
+
+    def attach_advance_to_signature(
+            self,
+            *,
+            signature_cid: str,
+            advance: ChainAdvanceEnvelope,
+    ) -> LatentVerificationOutcome:
+        """Register an in-chain advance for a signature's chain."""
+        chain_root = self._signature_to_chain.get(signature_cid)
+        if chain_root is None:
+            return LatentVerificationOutcome(
+                ok=False, reason="unknown_signature", n_checks=0)
+        if advance.chain_root_cid != chain_root:
+            return LatentVerificationOutcome(
+                ok=False, reason="chain_root_mismatch", n_checks=1)
+        outcome = self.chain_registry.register_advance(advance)
+        if outcome.ok:
+            self._signature_to_last_advance[signature_cid] = (
+                advance.advance_cid)
+        return outcome
+
+    def register_pivot(
+            self,
+            pivot: ChainPivotEnvelope,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            self.n_pivots_rejected += 1
+            return LatentVerificationOutcome(
+                ok=False, reason="registry_no_schema", n_checks=0)
+        registered_chain_root = self._signature_to_chain.get(
+            pivot.signature_cid, "")
+        registered_last_adv = self._signature_to_last_advance.get(
+            pivot.signature_cid, "")
+        outcome = verify_chain_pivot(
+            pivot,
+            registered_schema=self.schema,
+            registered_signature_cid=pivot.signature_cid
+                if registered_chain_root else "",
+            registered_parent_chain_root_cid=registered_chain_root,
+            registered_parent_advance_cid=registered_last_adv,
+        )
+        if not outcome.ok:
+            self.n_pivots_rejected += 1
+            return outcome
+        self._pivots[pivot.pivot_cid] = pivot
+        # A pivot becomes the new "last advance" for its signature so
+        # that subsequent pivots/advances chain off of it.
+        self._signature_to_last_advance[pivot.signature_cid] = (
+            pivot.pivot_cid)
+        self.n_pivots_registered += 1
+        return outcome
+
+    def get_anchor_for_signature(
+            self, signature_cid: str,
+    ) -> ChainAnchorEnvelope | None:
+        chain_root = self._signature_to_chain.get(signature_cid)
+        if not chain_root:
+            return None
+        return self.chain_registry.get_anchor(chain_root)
+
+    def last_advance_cid_for_signature(
+            self, signature_cid: str,
+    ) -> str:
+        return self._signature_to_last_advance.get(signature_cid, "")
+
+    def get_pivot(self, pivot_cid: str) -> ChainPivotEnvelope | None:
+        return self._pivots.get(pivot_cid)
+
+
+@dataclasses.dataclass
+class W27MultiChainResult:
+    """Per-cell audit record for a W27 multi-chain agent."""
+    answer: dict[str, Any]
+    inner_w26_branch: str
+    decoder_branch: str
+    agent_id: str
+    is_producer: bool
+    salience_signature_cid: str
+    chain_root_cid: str
+    pivot_cid: str
+    n_w26_visible_tokens: int
+    n_w27_visible_tokens: int
+    n_w26_minus_w27_savings: int
+    n_signature_bytes: int
+    n_pivot_bytes: int
+    pool_size: int
+    pool_exhausted: bool
+    pivot_verification_ok: bool
+    pivot_verification_reason: str
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "inner_w26_branch": self.inner_w26_branch,
+            "decoder_branch": self.decoder_branch,
+            "agent_id": self.agent_id,
+            "is_producer": bool(self.is_producer),
+            "salience_signature_cid": self.salience_signature_cid,
+            "chain_root_cid": self.chain_root_cid,
+            "pivot_cid": self.pivot_cid,
+            "n_w26_visible_tokens": int(self.n_w26_visible_tokens),
+            "n_w27_visible_tokens": int(self.n_w27_visible_tokens),
+            "n_w26_minus_w27_savings": int(self.n_w26_minus_w27_savings),
+            "n_signature_bytes": int(self.n_signature_bytes),
+            "n_pivot_bytes": int(self.n_pivot_bytes),
+            "pool_size": int(self.pool_size),
+            "pool_exhausted": bool(self.pool_exhausted),
+            "pivot_verification_ok": bool(self.pivot_verification_ok),
+            "pivot_verification_reason": str(self.pivot_verification_reason),
+        }
+
+
+@dataclasses.dataclass
+class MultiChainPersistedFanoutDisambiguator:
+    """Multi-chain salience-keyed dense-control fanout (W27 family).
+
+    Wraps a :class:`ChainPersistedFanoutDisambiguator` (W26) and adds
+    a controller-side pool of parallel chains.  At each cell the
+    producer's canonical compact state is hashed into a
+    :class:`SalienceSignatureEnvelope`; the controller looks up the
+    pool:
+
+      * **Pivot**     — signature already in pool ⇒ producer emits a
+                         single ``<chain_pivot:DDDD>`` token; consumer
+                         pays 1 token (chain_consumer_ref).
+      * **Anchor new** — signature not in pool AND pool not exhausted
+                         ⇒ delegate to W26 to anchor a fresh chain.
+      * **Pool exhausted** — signature not in pool AND pool full ⇒
+                         the controller rejects with
+                         ``chain_pool_exhausted``; W27 falls through
+                         to W26 (which falls through to W25 on
+                         divergent cells, preserving correctness).
+
+    Trust boundary
+    --------------
+    The pool is bounded by ``max_active_chains``; the controller-side
+    :class:`MultiChainPersistedFanoutRegistry` enforces:
+
+      * salience signature integrity (SHA-256 over canonical state);
+      * pivot parent linkage (parent_chain_root_cid + parent_advance_cid
+        must match the chain registered for the signature);
+      * pool size bound (anchors beyond ``max_active_chains`` rejected);
+      * schema_cid pinning (cross-schema envelopes rejected);
+      * cross-pivot tampering — any tamper on
+        ``signature_cid`` / ``parent_chain_root_cid`` /
+        ``parent_advance_cid`` triggers a verification failure.
+
+    Honest scope
+    ------------
+    W27 changes how the producer's chain state is *partitioned* across
+    salience signatures; it does not add a new information channel.
+    The visible-token reduction comes from routing each cell to its
+    matching chain (the same accounting model already in W23..W26).
+
+    Composition
+    -----------
+    When only one signature is observed (R-73-CHAIN-SHARED), the pool
+    contains exactly one chain and W27 reduces to W26 byte-for-byte
+    (W27-Λ-single-signature falsifier).  When the bench has M
+    distinct signatures and ``max_active_chains ≥ M``, W27 saves
+    (M+1..N) × (C-1) tokens over W26 (the N-M cells beyond the first
+    M anchors pay 1+K instead of C+K).
+    """
+    inner: ChainPersistedFanoutDisambiguator = dataclasses.field(
+        default_factory=lambda: ChainPersistedFanoutDisambiguator())
+    multi_chain_registry: MultiChainPersistedFanoutRegistry | None = None
+    schema: SchemaCapsule | None = None
+    max_active_chains: int = 8
+    enabled: bool = True
+    require_pivot_verification: bool = True
+    trigger_branches: frozenset[str] = dataclasses.field(
+        default_factory=lambda: W27_DEFAULT_TRIGGER_BRANCHES)
+
+    _last_result: W27MultiChainResult | None = None
+    _last_signature: SalienceSignatureEnvelope | None = None
+    _last_pivot: ChainPivotEnvelope | None = None
+    _cell_index: int = 0
+
+    @property
+    def agent_id(self) -> str:
+        return self.inner.agent_id
+
+    @property
+    def is_producer(self) -> bool:
+        return self.inner.is_producer
+
+    @property
+    def producer_agent_id(self) -> str:
+        return self.inner.producer_agent_id
+
+    @property
+    def consumer_agent_ids(self) -> tuple[str, ...]:
+        return self.inner.consumer_agent_ids
+
+    @property
+    def T_decoder(self) -> int | None:
+        return self.inner.T_decoder
+
+    @T_decoder.setter
+    def T_decoder(self, v: int | None) -> None:
+        self.inner.T_decoder = v
+
+    def reset_session(self) -> None:
+        self._last_result = None
+        self._last_signature = None
+        self._last_pivot = None
+        self._cell_index = 0
+        self.inner.reset_session()
+
+    def _build_signature(
+            self,
+            *,
+            cell_index: int,
+            per_tag_votes: tuple[tuple[str, int], ...],
+            projected_subset: tuple[str, ...],
+    ) -> SalienceSignatureEnvelope:
+        schema_cid = (str(self.schema.cid)
+                        if self.schema is not None else "")
+        return SalienceSignatureEnvelope(
+            schema_version=W27_SALIENCE_SIGNATURE_SCHEMA_VERSION,
+            schema_cid=schema_cid,
+            producer_agent_id=str(self.producer_agent_id
+                                    or self.agent_id),
+            consumer_agent_ids=tuple(self.consumer_agent_ids),
+            canonical_per_tag_votes=tuple(per_tag_votes),
+            canonical_projected_subset=tuple(projected_subset),
+            cell_index_first_observed=int(cell_index),
+        )
+
+    def _build_pivot(
+            self,
+            *,
+            cell_index: int,
+            sig: SalienceSignatureEnvelope,
+    ) -> ChainPivotEnvelope:
+        assert self.multi_chain_registry is not None
+        schema_cid = (str(self.schema.cid)
+                        if self.schema is not None else "")
+        chain_root = (
+            self.multi_chain_registry._signature_to_chain.get(
+                sig.signature_cid, ""))
+        last_adv = (
+            self.multi_chain_registry._signature_to_last_advance.get(
+                sig.signature_cid, ""))
+        return ChainPivotEnvelope(
+            schema_version=W27_CHAIN_PIVOT_SCHEMA_VERSION,
+            schema_cid=schema_cid,
+            signature_cid=sig.signature_cid,
+            parent_chain_root_cid=chain_root,
+            parent_advance_cid=last_adv,
+            cell_index=int(cell_index),
+        )
+
+    def _producer_canonical_state(
+            self,
+    ) -> tuple[tuple[tuple[str, int], ...], tuple[str, ...], int] | None:
+        """Read the inner W25 fanout envelope to compute the producer's
+        canonical compact state for this cell.
+
+        Returns ``(per_tag_votes, projected_subset, n_w25_visible)``
+        if available, else ``None``.
+        """
+        w25_dis = self.inner.inner  # W26.inner -> W25
+        fanout = w25_dis.last_fanout_envelope
+        if fanout is None:
+            return None
+        per_tag = tuple(fanout.compact_per_tag_votes)
+        projected = tuple(fanout.compact_projected_subset)
+        w25_result = w25_dis.last_result
+        n_w25_visible = int(w25_result.n_w25_visible_tokens) if w25_result else 0
+        return (per_tag, projected, n_w25_visible)
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        # Always run the W26 inner first; it may anchor / advance /
+        # fall through.
+        w26_out = self.inner.decode_rounds(per_round_handoffs)
+        w26_result = self.inner.last_result
+        out = dict(w26_out)
+        cell_index = int(self._cell_index)
+
+        inner_w26_branch = (str(w26_result.decoder_branch)
+                              if w26_result is not None
+                              else W26_BRANCH_DISABLED)
+        n_w26_visible = (int(w26_result.n_w26_visible_tokens)
+                          if w26_result is not None else 0)
+
+        def _pack(
+                *,
+                decoder_branch: str,
+                signature: SalienceSignatureEnvelope | None,
+                pivot: ChainPivotEnvelope | None,
+                pool_size: int,
+                pool_exhausted: bool,
+                pivot_ok: bool,
+                pivot_reason: str,
+                n_w27_visible: int,
+                chain_root_cid: str = "",
+        ) -> dict[str, Any]:
+            savings = max(0, n_w26_visible - n_w27_visible)
+            sig_cid = (str(signature.signature_cid)
+                        if signature is not None else "")
+            pivot_cid = str(pivot.pivot_cid) if pivot is not None else ""
+            n_sig_bytes = (int(signature.n_signature_bytes)
+                            if signature is not None else 0)
+            n_pivot_bytes = (int(pivot.n_pivot_bytes)
+                              if pivot is not None else 0)
+            result = W27MultiChainResult(
+                answer=dict(out),
+                inner_w26_branch=inner_w26_branch,
+                decoder_branch=decoder_branch,
+                agent_id=str(self.agent_id),
+                is_producer=bool(self.is_producer),
+                salience_signature_cid=sig_cid,
+                chain_root_cid=chain_root_cid,
+                pivot_cid=pivot_cid,
+                n_w26_visible_tokens=n_w26_visible,
+                n_w27_visible_tokens=int(n_w27_visible),
+                n_w26_minus_w27_savings=savings,
+                n_signature_bytes=n_sig_bytes,
+                n_pivot_bytes=n_pivot_bytes,
+                pool_size=int(pool_size),
+                pool_exhausted=bool(pool_exhausted),
+                pivot_verification_ok=bool(pivot_ok),
+                pivot_verification_reason=str(pivot_reason),
+            )
+            self._last_result = result
+            self._last_signature = signature
+            self._last_pivot = pivot
+            out_local = dict(out)
+            out_local["multi_chain_persisted_hybrid"] = result.as_dict()
+            if signature is not None:
+                out_local["salience_signature_envelope"] = signature.as_dict()
+            if pivot is not None:
+                out_local["chain_pivot_envelope"] = pivot.as_dict()
+            return out_local
+
+        # ---- Disabled / no-trigger / no-registry paths ----
+        if (not self.enabled or self.multi_chain_registry is None
+                or self.schema is None):
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W27_BRANCH_DISABLED,
+                signature=None, pivot=None,
+                pool_size=0, pool_exhausted=False,
+                pivot_ok=False, pivot_reason="disabled",
+                n_w27_visible=n_w26_visible)
+
+        if inner_w26_branch not in self.trigger_branches:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W27_BRANCH_NO_TRIGGER,
+                signature=None, pivot=None,
+                pool_size=int(self.multi_chain_registry.pool_size),
+                pool_exhausted=False,
+                pivot_ok=False, pivot_reason="inner_w26_not_triggered",
+                n_w27_visible=n_w26_visible)
+
+        # ---- Compute the cell's salience signature ----
+        canonical = self._producer_canonical_state()
+        if canonical is None:
+            # No fanout envelope means W25 didn't emit; nothing to
+            # signature on the consumer side either.  Fall back to W26.
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W27_BRANCH_FALLBACK_W26,
+                signature=None, pivot=None,
+                pool_size=int(self.multi_chain_registry.pool_size),
+                pool_exhausted=False,
+                pivot_ok=False, pivot_reason="no_w25_envelope",
+                n_w27_visible=n_w26_visible)
+        per_tag, projected, n_w25_visible = canonical
+        sig = self._build_signature(
+            cell_index=cell_index,
+            per_tag_votes=per_tag,
+            projected_subset=projected)
+
+        # ---- Producer path ----
+        if self.is_producer:
+            registry = self.multi_chain_registry
+            pool_size_before = registry.pool_size
+
+            if registry.has_signature(sig.signature_cid):
+                # Pivot to existing chain — 1 token.
+                pivot = self._build_pivot(
+                    cell_index=cell_index, sig=sig)
+                outcome = registry.register_pivot(pivot)
+                chain_root = (
+                    registry._signature_to_chain.get(
+                        sig.signature_cid, ""))
+                if not outcome.ok and self.require_pivot_verification:
+                    self._cell_index += 1
+                    return _pack(
+                        decoder_branch=W27_BRANCH_PIVOT_REJECTED,
+                        signature=sig, pivot=pivot,
+                        pool_size=int(registry.pool_size),
+                        pool_exhausted=False,
+                        pivot_ok=False,
+                        pivot_reason=str(outcome.reason),
+                        n_w27_visible=n_w26_visible,
+                        chain_root_cid=chain_root)
+                self._cell_index += 1
+                return _pack(
+                    decoder_branch=W27_BRANCH_PIVOTED,
+                    signature=sig, pivot=pivot,
+                    pool_size=int(registry.pool_size),
+                    pool_exhausted=False,
+                    pivot_ok=True, pivot_reason="ok",
+                    n_w27_visible=int(pivot.n_pivot_tokens),
+                    chain_root_cid=chain_root)
+
+            # Signature is new.  Did the inner W26 successfully anchor?
+            # If yes, attach it to our pool (if room).
+            inner_anchor = self.inner.active_anchor
+            if (inner_anchor is not None
+                    and inner_w26_branch in (
+                        W26_BRANCH_CHAIN_ANCHORED,
+                        W26_BRANCH_CHAIN_RE_ANCHORED)):
+                # Attach the inner anchor to the multi-chain pool.
+                # Re-register signature + anchor.
+                # NOTE: the inner W26 has *already* registered the
+                # anchor in its own chain_registry; the multi-chain
+                # registry's chain_registry IS the same one.
+                if registry.chain_registry is self.inner.chain_registry:
+                    # Anchor already registered — just bind signature.
+                    if (len(registry._signature_to_chain)
+                            >= int(registry.max_active_chains)):
+                        registry.n_pool_exhausted_rejections += 1
+                        self._cell_index += 1
+                        return _pack(
+                            decoder_branch=W27_BRANCH_POOL_EXHAUSTED,
+                            signature=sig, pivot=None,
+                            pool_size=int(registry.pool_size),
+                            pool_exhausted=True,
+                            pivot_ok=False,
+                            pivot_reason="chain_pool_exhausted",
+                            n_w27_visible=n_w26_visible,
+                            chain_root_cid=inner_anchor.chain_root_cid)
+                    sig_outcome = registry.register_signature(sig)
+                    if not sig_outcome.ok:
+                        self._cell_index += 1
+                        return _pack(
+                            decoder_branch=W27_BRANCH_PIVOT_REJECTED,
+                            signature=sig, pivot=None,
+                            pool_size=int(registry.pool_size),
+                            pool_exhausted=False,
+                            pivot_ok=False,
+                            pivot_reason=str(sig_outcome.reason),
+                            n_w27_visible=n_w26_visible)
+                    registry._signature_to_chain[sig.signature_cid] = (
+                        inner_anchor.chain_root_cid)
+                    registry._signature_to_last_advance[
+                        sig.signature_cid] = (
+                        inner_anchor.chain_root_cid)
+                    registry.n_anchors_added += 1
+                else:
+                    outcome = registry.attach_anchor(
+                        sig=sig, anchor=inner_anchor)
+                    if not outcome.ok:
+                        self._cell_index += 1
+                        if outcome.reason == "chain_pool_exhausted":
+                            return _pack(
+                                decoder_branch=W27_BRANCH_POOL_EXHAUSTED,
+                                signature=sig, pivot=None,
+                                pool_size=int(registry.pool_size),
+                                pool_exhausted=True,
+                                pivot_ok=False,
+                                pivot_reason="chain_pool_exhausted",
+                                n_w27_visible=n_w26_visible,
+                                chain_root_cid=inner_anchor.chain_root_cid)
+                        return _pack(
+                            decoder_branch=W27_BRANCH_PIVOT_REJECTED,
+                            signature=sig, pivot=None,
+                            pool_size=int(registry.pool_size),
+                            pool_exhausted=False,
+                            pivot_ok=False,
+                            pivot_reason=str(outcome.reason),
+                            n_w27_visible=n_w26_visible)
+                self._cell_index += 1
+                return _pack(
+                    decoder_branch=W27_BRANCH_ANCHORED_NEW,
+                    signature=sig, pivot=None,
+                    pool_size=int(registry.pool_size),
+                    pool_exhausted=False,
+                    pivot_ok=True, pivot_reason="ok",
+                    n_w27_visible=n_w26_visible,
+                    chain_root_cid=inner_anchor.chain_root_cid)
+
+            # Inner W26 advanced (in-window) on a *known* chain root,
+            # but our pool maps signatures, not chain roots.  Track the
+            # advance for the active signature if we have one.
+            if (inner_anchor is not None
+                    and inner_w26_branch == W26_BRANCH_CHAIN_ADVANCED):
+                # Find which signature this advance belongs to.  Its
+                # chain_root must match one of our pool entries.
+                target_sig: str | None = None
+                for sc, cr in registry._signature_to_chain.items():
+                    if cr == inner_anchor.chain_root_cid:
+                        target_sig = sc
+                        break
+                if target_sig is not None and self.inner.last_advance is not None:
+                    registry._signature_to_last_advance[target_sig] = (
+                        self.inner.last_advance.advance_cid)
+                # The W26 advance fires this cell — W27 has nothing extra
+                # to add; we bill the W26 cost.
+                self._cell_index += 1
+                return _pack(
+                    decoder_branch=W27_BRANCH_FALLBACK_W26,
+                    signature=sig, pivot=None,
+                    pool_size=int(registry.pool_size),
+                    pool_exhausted=False,
+                    pivot_ok=True, pivot_reason="w26_in_window_advance",
+                    n_w27_visible=n_w26_visible,
+                    chain_root_cid=inner_anchor.chain_root_cid)
+
+            # Fall through: W26 reported NO_TRIGGER (e.g. divergent
+            # cell) AND signature is new AND pool is full → exhausted.
+            if (len(registry._signature_to_chain)
+                    >= int(registry.max_active_chains)):
+                registry.n_pool_exhausted_rejections += 1
+                self._cell_index += 1
+                return _pack(
+                    decoder_branch=W27_BRANCH_POOL_EXHAUSTED,
+                    signature=sig, pivot=None,
+                    pool_size=int(registry.pool_size),
+                    pool_exhausted=True,
+                    pivot_ok=False, pivot_reason="chain_pool_exhausted",
+                    n_w27_visible=n_w26_visible)
+
+            # No inner anchor and pool not exhausted: nothing to do
+            # except record the signature for future reference.
+            registry.register_signature(sig)
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W27_BRANCH_FALLBACK_W26,
+                signature=sig, pivot=None,
+                pool_size=int(registry.pool_size),
+                pool_exhausted=False,
+                pivot_ok=True,
+                pivot_reason="w26_fallthrough_no_inner_anchor",
+                n_w27_visible=n_w26_visible)
+
+        # ---- Consumer path ----
+        # Consumer pays 1 token if the producer pivoted (the chain
+        # head is content-addressed via signature), else mirrors W26.
+        registry = self.multi_chain_registry
+        if registry.has_signature(sig.signature_cid):
+            chain_root = registry._signature_to_chain[sig.signature_cid]
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W27_BRANCH_PIVOTED,
+                signature=sig, pivot=None,
+                pool_size=int(registry.pool_size),
+                pool_exhausted=False,
+                pivot_ok=True, pivot_reason="ok",
+                n_w27_visible=1,  # 1-token consumer chain ref
+                chain_root_cid=chain_root)
+        self._cell_index += 1
+        return _pack(
+            decoder_branch=W27_BRANCH_FALLBACK_W26,
+            signature=sig, pivot=None,
+            pool_size=int(registry.pool_size),
+            pool_exhausted=False,
+            pivot_ok=True,
+            pivot_reason="consumer_signature_unknown",
+            n_w27_visible=n_w26_visible)
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]
+                ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> W27MultiChainResult | None:
+        return self._last_result
+
+    @property
+    def last_signature(self) -> SalienceSignatureEnvelope | None:
+        return self._last_signature
+
+    @property
+    def last_pivot(self) -> ChainPivotEnvelope | None:
+        return self._last_pivot
+
+
+def compute_input_signature_cid(
+        per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+        *,
+        producer_agent_id: str,
+        consumer_agent_ids: Sequence[str],
+        schema_cid: str,
+) -> str:
+    """Pre-compute a salience signature from raw input handoffs.
+
+    Unlike :func:`_compute_salience_signature_cid` which keys on the
+    inner W25 envelope's compact state, this function keys on the
+    producer's *input* — the canonical (sorted) tuple of
+    (source_role, claim_kind, payload) per round.  This signature is
+    stable across cells with byte-identical inputs and therefore
+    suitable for **input-keyed routing** to a multi-chain pool BEFORE
+    any inner W22..W26 stack is exercised.
+
+    The orchestrator (:class:`MultiChainPersistedFanoutOrchestrator`)
+    uses this signature to route each cell to its dedicated inner W26
+    disambiguator without contaminating sibling chains' state.
+    """
+    canonical_rounds: list[list[list[str]]] = []
+    for round_handoffs in per_round_handoffs:
+        round_canonical: list[list[str]] = []
+        for h in round_handoffs:
+            round_canonical.append([
+                str(h.source_role),
+                str(h.claim_kind),
+                str(h.payload),
+            ])
+        # Sort each round's handoffs canonically (deterministic).
+        round_canonical.sort()
+        canonical_rounds.append(round_canonical)
+    payload = _canonical_json_bytes({
+        "schema_version": W27_SALIENCE_SIGNATURE_SCHEMA_VERSION,
+        "producer_agent_id": str(producer_agent_id),
+        "consumer_agent_ids": sorted(str(c) for c in consumer_agent_ids),
+        "schema_cid": str(schema_cid),
+        "rounds": canonical_rounds,
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass
+class _ChainSlot:
+    """One slot in the orchestrator's pool: a signature paired with a
+    fully-instantiated W26 disambiguator and per-cell counters.
+    """
+    signature_cid: str
+    disambiguator: ChainPersistedFanoutDisambiguator
+    n_cells_routed: int = 0
+    n_anchored: int = 0
+    n_advanced: int = 0
+    n_re_anchored: int = 0
+
+
+@dataclasses.dataclass
+class SharedMultiChainPool:
+    """Team-wide pool of per-signature W26 stacks (W27 family).
+
+    A *single* pool is created per team and threaded through every
+    agent's :class:`MultiChainPersistedFanoutOrchestrator`.  When an
+    agent first encounters a signature, the pool builds a fresh
+    *team* of W26 disambiguators (1 producer + K consumers) for that
+    signature, sharing one ``SharedFanoutRegistry`` and one
+    ``ChainPersistedFanoutRegistry`` so consumers can resolve the
+    producer's fanout envelopes inside that signature's chain.
+
+    Concretely:
+      * ``stack_factory(signature_cid, agent_id, is_producer) ->
+        ChainPersistedFanoutDisambiguator`` — supplied by the caller.
+        It is responsible for sharing the per-signature registries
+        (the pool calls the factory ``1 + K`` times per signature,
+        once per agent).
+      * ``max_active_chains`` — bounded pool size; new signatures
+        beyond the bound are rejected.
+
+    Trust boundary: the pool is controller-owned; every per-signature
+    chain inherits the W26 trust boundary on its own
+    :class:`ChainPersistedFanoutRegistry`.  The pool layer adds
+    ``chain_pool_exhausted`` as the only new failure mode.
+    """
+    schema: SchemaCapsule
+    stack_factory: Callable[..., ChainPersistedFanoutDisambiguator]
+    max_active_chains: int = 8
+
+    _agent_slots: dict[str, dict[str, _ChainSlot]] = dataclasses.field(
+        default_factory=dict)  # agent_id -> signature_cid -> slot
+    _known_signatures: list[str] = dataclasses.field(
+        default_factory=list)
+    _pool_exhausted_rejections: int = 0
+
+    @property
+    def pool_size(self) -> int:
+        return len(self._known_signatures)
+
+    @property
+    def n_pool_exhausted_rejections(self) -> int:
+        return self._pool_exhausted_rejections
+
+    def signatures(self) -> tuple[str, ...]:
+        return tuple(self._known_signatures)
+
+    def has_signature(self, signature_cid: str) -> bool:
+        return signature_cid in self._known_signatures
+
+    def get_or_make_slot(
+            self,
+            *,
+            agent_id: str,
+            signature_cid: str,
+            is_producer: bool,
+    ) -> tuple[_ChainSlot | None, bool]:
+        """Return ``(slot, pool_exhausted)`` for this agent + signature.
+
+        If the signature is new and the pool is full, returns
+        ``(None, True)``.  Else returns an existing slot or builds a
+        fresh disambiguator via the stack_factory.
+        """
+        if signature_cid not in self._known_signatures:
+            if len(self._known_signatures) >= int(self.max_active_chains):
+                self._pool_exhausted_rejections += 1
+                return None, True
+            self._known_signatures.append(signature_cid)
+        agent_dict = self._agent_slots.setdefault(agent_id, {})
+        slot = agent_dict.get(signature_cid)
+        if slot is None:
+            new_dis = self.stack_factory(
+                signature_cid=signature_cid,
+                agent_id=agent_id,
+                is_producer=is_producer,
+            )
+            slot = _ChainSlot(
+                signature_cid=signature_cid,
+                disambiguator=new_dis,
+            )
+            agent_dict[signature_cid] = slot
+        return slot, False
+
+    def reset_session(self) -> None:
+        for adict in self._agent_slots.values():
+            for s in adict.values():
+                s.disambiguator.reset_session()
+        self._agent_slots.clear()
+        self._known_signatures = []
+        self._pool_exhausted_rejections = 0
+
+
+@dataclasses.dataclass
+class W27OrchestratorResult:
+    """Per-cell audit record for a W27 orchestrator route."""
+    answer: dict[str, Any]
+    inner_w26_branch: str
+    decoder_branch: str
+    agent_id: str
+    is_producer: bool
+    input_signature_cid: str
+    routed_chain_root_cid: str
+    n_w26_in_pool_visible_tokens: int
+    n_w27_visible_tokens: int
+    n_w26_minus_w27_savings: int
+    pool_size: int
+    pool_exhausted: bool
+    n_signature_bytes: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "inner_w26_branch": self.inner_w26_branch,
+            "decoder_branch": self.decoder_branch,
+            "agent_id": self.agent_id,
+            "is_producer": bool(self.is_producer),
+            "input_signature_cid": self.input_signature_cid,
+            "routed_chain_root_cid": self.routed_chain_root_cid,
+            "n_w26_in_pool_visible_tokens": int(self.n_w26_in_pool_visible_tokens),
+            "n_w27_visible_tokens": int(self.n_w27_visible_tokens),
+            "n_w26_minus_w27_savings": int(self.n_w26_minus_w27_savings),
+            "pool_size": int(self.pool_size),
+            "pool_exhausted": bool(self.pool_exhausted),
+            "n_signature_bytes": int(self.n_signature_bytes),
+        }
+
+
+@dataclasses.dataclass
+class MultiChainPersistedFanoutOrchestrator:
+    """Orchestrator-level multi-chain dense-control fanout (W27 family).
+
+    This is the load-bearing W27 implementation.  Where
+    :class:`MultiChainPersistedFanoutDisambiguator` adds a content-
+    addressed pivot envelope on top of *one* W26 disambiguator, the
+    orchestrator routes each cell to a per-signature W26 stack
+    inside a *team-wide* :class:`SharedMultiChainPool`.  All agents
+    on the team share one pool, so per-signature fanout / chain
+    registries are shared between producer and K consumers.
+
+    Invariants
+    ----------
+    * Each (agent, signature) pair has its own W26 inner stack —
+      no cross-contamination between signatures.  Per-signature
+      registries are shared across agents on the team.
+    * The pool is bounded by ``max_active_chains``.  New signatures
+      beyond the bound are rejected with
+      ``W27_BRANCH_POOL_EXHAUSTED``; cells with that exhausted-pool
+      signature fall through to a single fallback W26 disambiguator
+      (``_fallback`` slot) which mirrors the original W26 behaviour.
+
+    Trust boundary
+    --------------
+    Each slot inherits the W26 trust boundary (anchor + advance hash
+    integrity, parent linkage, projection scope).  The pool layer
+    adds a single failure mode: ``chain_pool_exhausted``.
+    """
+    schema: SchemaCapsule
+    producer_agent_id: str
+    consumer_agent_ids: tuple[str, ...]
+    agent_id: str
+    is_producer: bool
+    pool: SharedMultiChainPool
+    enabled: bool = True
+    fallback_factory: "Callable[..., ChainPersistedFanoutDisambiguator] | None" = None
+
+    _fallback: "ChainPersistedFanoutDisambiguator | None" = None
+    _last_result: "W27OrchestratorResult | None" = None
+    _cell_index: int = 0
+
+    def reset_session(self) -> None:
+        if self._fallback is not None:
+            self._fallback.reset_session()
+        self._fallback = None
+        self._last_result = None
+        self._cell_index = 0
+        # The pool is shared — only the team-level reset clears it.
+
+    @property
+    def pool_size(self) -> int:
+        return self.pool.pool_size
+
+    @property
+    def n_pool_exhausted_rejections(self) -> int:
+        return self.pool.n_pool_exhausted_rejections
+
+    def _ensure_fallback(self) -> ChainPersistedFanoutDisambiguator:
+        if self._fallback is None:
+            factory = self.fallback_factory
+            if factory is None:
+                # If no explicit fallback, build one via the pool's
+                # stack_factory — same shape as a slot's stack but
+                # not bound to any signature.
+                factory = self.pool.stack_factory
+            self._fallback = factory(
+                signature_cid="__fallback__",
+                agent_id=self.agent_id,
+                is_producer=self.is_producer,
+            )
+        return self._fallback
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        schema_cid = (str(self.schema.cid)
+                        if self.schema is not None else "")
+        sig_cid = compute_input_signature_cid(
+            per_round_handoffs,
+            producer_agent_id=str(self.producer_agent_id
+                                    or self.agent_id),
+            consumer_agent_ids=tuple(self.consumer_agent_ids),
+            schema_cid=schema_cid,
+        )
+        n_signature_bytes = len(sig_cid.encode("utf-8"))
+
+        if not self.enabled:
+            fallback = self._ensure_fallback()
+            out = fallback.decode_rounds(per_round_handoffs)
+            inner = fallback.last_result
+            inner_branch = (str(inner.decoder_branch) if inner
+                              else W26_BRANCH_DISABLED)
+            n_w26 = int(inner.n_w26_visible_tokens) if inner else 0
+            self._cell_index += 1
+            self._last_result = W27OrchestratorResult(
+                answer=out,
+                inner_w26_branch=inner_branch,
+                decoder_branch=W27_BRANCH_DISABLED,
+                agent_id=str(self.agent_id),
+                is_producer=bool(self.is_producer),
+                input_signature_cid=sig_cid,
+                routed_chain_root_cid="",
+                n_w26_in_pool_visible_tokens=n_w26,
+                n_w27_visible_tokens=n_w26,
+                n_w26_minus_w27_savings=0,
+                pool_size=self.pool_size,
+                pool_exhausted=False,
+                n_signature_bytes=n_signature_bytes,
+            )
+            out_local = dict(out)
+            out_local["multi_chain_orchestrator"] = (
+                self._last_result.as_dict())
+            return out_local
+
+        slot, pool_exhausted = self.pool.get_or_make_slot(
+            agent_id=self.agent_id,
+            signature_cid=sig_cid,
+            is_producer=self.is_producer,
+        )
+        if pool_exhausted or slot is None:
+            fallback = self._ensure_fallback()
+            out = fallback.decode_rounds(per_round_handoffs)
+            inner = fallback.last_result
+            inner_branch = (str(inner.decoder_branch) if inner
+                              else W26_BRANCH_DISABLED)
+            n_w26 = int(inner.n_w26_visible_tokens) if inner else 0
+            self._cell_index += 1
+            self._last_result = W27OrchestratorResult(
+                answer=out,
+                inner_w26_branch=inner_branch,
+                decoder_branch=W27_BRANCH_POOL_EXHAUSTED,
+                agent_id=str(self.agent_id),
+                is_producer=bool(self.is_producer),
+                input_signature_cid=sig_cid,
+                routed_chain_root_cid="",
+                n_w26_in_pool_visible_tokens=n_w26,
+                n_w27_visible_tokens=n_w26,
+                n_w26_minus_w27_savings=0,
+                pool_size=self.pool_size,
+                pool_exhausted=True,
+                n_signature_bytes=n_signature_bytes,
+            )
+            out_local = dict(out)
+            out_local["multi_chain_orchestrator"] = (
+                self._last_result.as_dict())
+            return out_local
+
+        out = slot.disambiguator.decode_rounds(per_round_handoffs)
+        slot.n_cells_routed += 1
+        inner = slot.disambiguator.last_result
+        inner_branch = (str(inner.decoder_branch) if inner
+                          else W26_BRANCH_DISABLED)
+        n_w26 = int(inner.n_w26_visible_tokens) if inner else 0
+        if inner_branch == W26_BRANCH_CHAIN_ANCHORED:
+            slot.n_anchored += 1
+            decoder_branch = W27_BRANCH_ANCHORED_NEW
+        elif inner_branch == W26_BRANCH_CHAIN_RE_ANCHORED:
+            slot.n_re_anchored += 1
+            decoder_branch = W27_BRANCH_ANCHORED_NEW
+        elif inner_branch in (W26_BRANCH_CHAIN_ADVANCED,
+                                W26_BRANCH_CHAIN_PROJECTION_RESOLVED):
+            slot.n_advanced += 1
+            decoder_branch = W27_BRANCH_PIVOTED
+        else:
+            decoder_branch = W27_BRANCH_FALLBACK_W26
+
+        chain_root = (str(inner.chain_root_cid) if inner else "")
+
+        self._cell_index += 1
+        self._last_result = W27OrchestratorResult(
+            answer=out,
+            inner_w26_branch=inner_branch,
+            decoder_branch=decoder_branch,
+            agent_id=str(self.agent_id),
+            is_producer=bool(self.is_producer),
+            input_signature_cid=sig_cid,
+            routed_chain_root_cid=chain_root,
+            n_w26_in_pool_visible_tokens=n_w26,
+            n_w27_visible_tokens=n_w26,
+            n_w26_minus_w27_savings=0,
+            pool_size=self.pool_size,
+            pool_exhausted=False,
+            n_signature_bytes=n_signature_bytes,
+        )
+        out_local = dict(out)
+        out_local["multi_chain_orchestrator"] = (
+            self._last_result.as_dict())
+        return out_local
+
+    def decode(
+            self,
+            handoffs: Sequence[_DecodedHandoff],
+    ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> "W27OrchestratorResult | None":
+        return self._last_result
+
+    @property
+    def slots(self) -> dict[str, _ChainSlot]:
+        # Shadow proxy for backward compat: returns this agent's slot map
+        return self.pool._agent_slots.get(self.agent_id, {})

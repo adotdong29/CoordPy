@@ -10134,6 +10134,139 @@ the strongest cross-process honesty validated on this repo.
    articulated as long-K asymptotic verification + cross-host
    real-wire validation + divergence-aware chain replay.
 
+### 4.45 SDK v3.28 — multi-chain salience-keyed dense-control fanout + per-signature scoping + Phase-74 R-74 benchmark family + W27 family (R-74-XORACLE-RECOVER + R-74-CHAIN-SHARED + R-74-DIVERGENT-RECOVER + R-74-POOL-EXHAUSTED + R-74-PIVOT-TAMPERED + R-74-SIGNATURE-DRIFT + signature_period sweep + W26-C-DIVERGENCE-RECOVERY discharged on the per-signature scoping axis)
+
+**One paragraph.** SDK v3.27 (W26) amortised the producer's
+per-cell salience-token cost across cells inside a single chain
+window via 1-token chain-advance references; W26 explicitly named
+**W26-C-DIVERGENCE-RECOVERY** (a smarter chain-replay mechanism
+could recover savings on divergent cells) and **W26-Λ-divergent**
+(when the gold subset flips, the inner W22 chain breaks and W26
+falls through to W25) as open frontiers. SDK v3.28 implements the
+smallest honest version of that mechanism at the *capsule layer*: a
+**bounded pool of parallel chains, keyed by salience signature**
+(SHA-256 over the canonical input handoffs computed by
+:func:`compute_input_signature_cid`). The
+:class:`MultiChainPersistedFanoutOrchestrator` is the load-bearing
+W27 implementation — it wraps a team-wide
+:class:`SharedMultiChainPool` that maintains one independent W26
+disambiguator per (signature, agent) pair, sharing per-signature
+``SharedFanoutRegistry`` and ``ChainPersistedFanoutRegistry``
+across producer + K consumers so consumers find the producer's
+per-signature fanout envelopes inside that signature's chain. The
+:class:`MultiChainPersistedFanoutDisambiguator` is the audited
+pivot wrapper — it adds two new content-addressed envelopes
+(:class:`SalienceSignatureEnvelope`, :class:`ChainPivotEnvelope`)
+on top of one W26 stack and ships :func:`verify_salience_signature`
+(4 enumerated failure modes) plus :func:`verify_chain_pivot` (8
+enumerated failure modes) for trust-boundary auditing. On
+**R-74-XORACLE-RECOVER** (1 producer + K=3 consumers, 16 cells, 2
+distinct gold-subset signatures, ``signature_period = 4``,
+``max_active_chains = 8``, partial ServiceGraphOracle on the W26
+baseline scoped only to GOLD_A) the W27 method **simultaneously**
+strictly reduces ``mean_total_w27_visible_tokens`` over
+``mean_total_w26_visible_tokens`` by **−22.5 tokens / cell
+(−76.27 %)** at ``T_decoder = None`` AND raises
+``correctness_ratified_rate`` from **0.500 → 1.000** (the W26
+baseline's partial oracle abstains on phase-B cells; the W27
+orchestrator's per-signature oracle registration scopes a fresh
+oracle to each gold pair so both phases resolve cleanly via the
+matching slot's stack); identical at ``T_decoder = 24``; stable
+across **5/5** seeds (savings = 22.5 tokens/cell on every seed,
+correctness 1.0 on every seed). On **R-74-CHAIN-SHARED**
+(every cell produces byte-identical canonical state) **W27 reduces
+to W26 byte-for-byte** (one signature in the pool;
+W27-Λ-single-signature falsifier discharged). On
+**R-74-DIVERGENT-RECOVER** (within-graph divergence — both gold
+subsets in default oracle scope) W26 single-stack handles
+divergence cleanly and W27 pays a measured isolation cost of
+**−27.27 %** (one extra anchor per signature spread over 16 cells
+≈ 1.5 tokens/cell). On **R-74-POOL-EXHAUSTED** (``max_active_chains
+= 2`` but 4 distinct signatures appear) the controller rejects
+new anchors beyond the bound and W27 falls through to a single
+fallback W26 disambiguator; correctness preserved
+(W27-Λ-pool-exhausted). On **R-74-PIVOT-TAMPERED** and
+**R-74-SIGNATURE-DRIFT** the audited disambig wrapper rejects
+tampering via ``verify_chain_pivot`` /
+``verify_salience_signature``; the orchestrator path is
+unaffected. **Signature-period sweep** at periods ∈ {1, 2, 4, 8, 16}
+on R-74-DIVERGENT-RECOVER confirms the W27 isolation cost is
+**constant** at one extra anchor per phase regardless of
+alternation frequency (period=16 has only one signature → W27 =
+W26 byte-for-byte). New W27 unit + integration tests: 22/22 pass;
+full pre-existing W21..W26 + IS-1 / IS-2 + producer / team_coord /
+attention / capsules surfaces preserved byte-for-byte (508/508 in
+the focused regression). Mac 2 still unreachable (**22nd milestone
+in a row**); W27 inherits the W24
+:class:`CrossProcessProducerDecoderWire` proxy as the strongest
+cross-process honesty validated on this repo.
+
+**Master-plan-level questions (the post-W26 audit board).**
+
+1. **Did denser capsule-native latent/control integration
+   materially help?** *YES on a new axis: per-signature isolation
+   that simultaneously rescues correctness AND saves tokens on a
+   regime where W26's single-stack scope architecturally fails.*
+   On R-74-XORACLE-RECOVER the combined effect is **−76.27 %
+   tokens AND +0.500 correctness over W26** at K=3. This is the
+   first capsule-native multi-agent-coordination method that
+   *simultaneously* improves both efficiency and correctness over
+   the prior best on a regime where the prior best actually
+   limits correctness. The honest cost-of-isolation when W26
+   doesn't fail is +27 % (one extra anchor per signature) —
+   measured and reported plainly.
+2. **Did trust/audit survive?** *YES, sharply, with two new
+   enumerated-failure-mode verification functions.* The
+   :class:`SalienceSignatureEnvelope` is hash-chained
+   (``signature_cid``), schema-versioned, and verifier-rejectable
+   on 4 failure modes; each :class:`ChainPivotEnvelope` is
+   parent-CID-linked and verifier-rejectable on 8 failure modes.
+   The R-74-PIVOT-TAMPERED and R-74-SIGNATURE-DRIFT benches
+   measure rejection on every attempt. **No spurious resolutions.**
+3. **Did bounded-context efficiency improve in a real way?** *YES
+   on the regime where W27's isolation rescues correctness, with
+   honest cost on regimes where it doesn't.* (a) Per-cell tokens:
+   W26 baseline 29.5 → W27 7.0 on R-74-XORACLE-RECOVER (−76 %);
+   W26 5.5 → W27 7.0 on R-74-DIVERGENT-RECOVER (+27 % cost). (b)
+   Pool capacity bound: ``max_active_chains`` controls pool
+   size; cells beyond the bound deterministically fall through
+   (W27-Λ-pool-exhausted).
+4. **Did two-Mac evaluation materially broaden the evidence?**
+   *NO — Mac 2 still unreachable (22nd milestone in a row).*
+   The W27 cross-host story inherits the W24
+   :class:`CrossProcessProducerDecoderWire` proxy; no real
+   two-host execution. Honest scope: real cross-*process*, not
+   cross-*host*.
+5. **Which earlier paper loose ends were closed versus only
+   sharpened?** *Closed: W26-C-DIVERGENCE-RECOVERY in the
+   per-signature scoping direction (per-signature oracle
+   registration recovers correctness on divergent benches via
+   independent oracle scopes per signature). Sharpened: the
+   W27-Λ-single-signature falsifier makes the conditionality of
+   the W27 advance precise — W27 only beats W26 when there are
+   distinct signatures AND W26's single-stack actually fails.
+   New named conjectures: **W27-C-MULTI-SIGNATURE-SCALING**
+   (per-cell cost → 1+K as N → ∞ for stable benches with M ≤
+   max_active_chains; M → ∞ asymptote unverified) and
+   **W27-C-CROSS-HOST** (wire cost ≈ W26 per-chain, with
+   per-signature overhead — gated on Mac-2 return).*
+6. **Did release readiness improve?** *YES, on three axes.* (a)
+   The W27 surface is purely additive on top of W26; the W22..W26
+   stable runtime contract is byte-for-byte unchanged. (b) The
+   focused regression covering W18..W27 + IS-1 / IS-2 + producer
+   / team_coord / attention / capsules is **508/508** in
+   ≤ 60s — fast and reproducible. (c) The new W27 verification
+   surface enumerates 12 failure modes across 2 verify_*
+   functions, and every failure mode has a unit test; the audit
+   story is mechanically-checked, not merely asserted.
+7. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on
+   the simultaneous-correctness-and-efficiency axis; the deeper
+   wall is sharper.* Named open frontier:
+   **W27-C-MULTI-SIGNATURE-SCALING**, **W27-C-CROSS-HOST**, and
+   **W27-C-LIVE-CROSS-MODEL** (live LLM oracles per signature,
+   not measured in this milestone).
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

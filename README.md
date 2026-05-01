@@ -7,7 +7,34 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.27 (April 2026).** Chain-persisted
+**Latest milestone: SDK v3.28 (April 2026).** Multi-chain
+salience-keyed dense-control fanout + per-signature scoping
+(W27 family). The W27
+``MultiChainPersistedFanoutOrchestrator`` maintains a bounded
+pool of independent W26 stacks keyed by the cell's salience
+signature (SHA-256 over canonical input handoffs computed by
+``compute_input_signature_cid``); the audited
+``MultiChainPersistedFanoutDisambiguator`` adds two new content-
+addressed envelopes (``SalienceSignatureEnvelope``,
+``ChainPivotEnvelope``) plus ``verify_salience_signature`` (4
+failure modes) and ``verify_chain_pivot`` (8 failure modes) for
+trust-boundary auditing. On R-74-XORACLE-RECOVER (1 producer +
+K=3 consumers, 16 cells, 2 signatures, partial oracle on the W26
+baseline scoped to GOLD_A) the W27 method **simultaneously**
+strictly reduces visible tokens by **−22.5 tokens / cell
+(−76.27 %)** over W26 AND raises ``correctness_ratified_rate``
+from **0.500 → 1.000**, stable across 5/5 seeds. The first
+capsule-native multi-agent-coordination method that
+*simultaneously* improves both efficiency and correctness over
+the prior best on a regime where the prior best architecturally
+limits correctness. Four named falsifiers
+(W27-Λ-single-signature / -pool-exhausted / -pivot-tampered /
+-signature-drift). **Discharges W26-C-DIVERGENCE-RECOVERY** on
+the per-signature scoping axis. See
+[`docs/RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md`](docs/RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md)
+and [`CHANGELOG.md`](CHANGELOG.md) for details.
+
+**Previous milestone: SDK v3.27 (April 2026).** Chain-persisted
 dense-control fanout + per-consumer projections (W26 family). The
 W26 ``ChainPersistedFanoutDisambiguator`` amortises the producer's
 per-cell salience-token cost across cells via a two-tier
@@ -20,8 +47,7 @@ cell (−90.60 %)** over W24, stable across 5/5 seeds. Trust boundary:
 (8), ``verify_projection_subscription`` (2). Four named falsifiers
 (W26-Λ-no-chain / -tampered / -projection-mismatch / -divergent).
 W25-C-K-SCALING discharged at K∈{3,5,8,10}. See
-[`docs/RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md`](docs/RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md)
-and [`CHANGELOG.md`](CHANGELOG.md) for details.
+[`docs/RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md`](docs/RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md).
 
 **As of SDK v3.24 (April 2026), capsules are load-bearing
 *inside one Wevra run*, *between agents in a team*, *across the

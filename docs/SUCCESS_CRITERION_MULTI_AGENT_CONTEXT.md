@@ -2432,6 +2432,89 @@ hybrid axis** — must combine:
 A regime missing any of these is *not* R-69 — it does not test
 the SDK v3.23 hypothesis.
 
+## 2.17. Required ingredients of R-74 (SDK v3.28, post-W26 bar)
+
+The "harder fair regime" introduced by SDK v3.28 — the *current*
+strict-gain anchor for the **multi-chain salience-keyed
+dense-control fanout axis** — must combine:
+
+* **Same R-69-CACHE-FANOUT bundle / oracle ecology that the
+  W22..W26 chain ratifies.** The inner W22..W26 chain MUST resolve
+  cleanly per-signature (else there is nothing for the per-signature
+  W27 isolation to recover). Mechanically verified by reusing the
+  same shared pool factory under each signature.
+* **Multiple distinct salience signatures over the same producer
+  agent / consumer set.** The bench builder produces byte-stable
+  inputs WITHIN each signature phase so
+  :func:`compute_input_signature_cid` is deterministic per phase.
+  Mechanically verified by ``InputSignatureCidTests``.
+* **A team-wide :class:`SharedMultiChainPool` plumbed through every
+  agent's :class:`MultiChainPersistedFanoutOrchestrator`.** Each
+  (signature, agent) pair must get one independent W26
+  disambiguator with its own ``SharedFanoutRegistry`` and
+  ``ChainPersistedFanoutRegistry``. Mechanically verified by
+  ``SharedMultiChainPoolTests``.
+* **A typed :class:`SalienceSignatureEnvelope` per signature and
+  :class:`ChainPivotEnvelope` per pivot, signed at construction.**
+  Each envelope's CID is SHA-256 over canonical bytes; tampering
+  via :func:`dataclasses.replace` preserves the original CID and is
+  detected by :func:`verify_salience_signature` /
+  :func:`verify_chain_pivot`. Mechanically verified by the
+  ``VerifySalienceSignatureTests`` and ``VerifyChainPivotTests``
+  suites.
+* **Six pre-committed sub-banks** (mechanically verified by
+  ``Phase74*Tests``):
+    - **R-74-XORACLE-RECOVER** (positive anchor, ``T_decoder = None``
+      and ``T_decoder = 24``). On a regime where the W26 baseline
+      uses a *partial* ServiceGraphOracle scoped to GOLD_A
+      (correctness drops to 0.500 on phase-B cells), W27 with
+      per-signature oracle registration achieves
+      ``correctness_ratified_rate = 1.000`` AND strictly reduces
+      ``mean_total_w27_visible_tokens`` over
+      ``mean_total_w26_visible_tokens``.
+    - **R-74-CHAIN-SHARED** (W27-Λ-single-signature falsifier).
+      Every cell produces byte-identical canonical state →
+      ``pool_size_final = 1`` → W27 = W26 byte-for-byte.
+    - **R-74-DIVERGENT-RECOVER** (within-graph divergence,
+      isolation cost). W26 single-stack handles divergence
+      cleanly (``correctness = 1.000``); W27 pays a small
+      isolation cost (~+27 % over W26).
+    - **R-74-POOL-EXHAUSTED** (W27-Λ-pool-exhausted falsifier).
+      ``max_active_chains = 2`` but bench produces 4 distinct
+      signatures; cells beyond bound fall through to fallback W26.
+    - **R-74-PIVOT-TAMPERED** (W27-3 trust falsifier; audited
+      disambig wrapper's ``parent_advance_cid`` overwritten).
+      ``verify_chain_pivot`` rejects subsequent pivots; correctness
+      preserved on the orchestrator path.
+    - **R-74-SIGNATURE-DRIFT** (W27-3 trust falsifier; stale
+      signature_cid in the multi-chain registry). Lookup misses
+      cleanly; correctness preserved.
+* **Bounded-context honesty.** The W27 layer reads only what the
+  inner W26 layer below produces (via the slot's
+  ``last_result``); the W27 ``n_w27_visible_tokens`` is the
+  apples-to-apples comparison (the matching slot's W26 visible
+  tokens for resolved cells, the fallback W26 visible tokens for
+  pool-exhausted cells). Mechanically verified by
+  ``Phase74XOracleRecoverTests::test_w27_strictly_better_than_w26_xoracle``.
+* **Determinism.** The Phase-74 bench generator is seed-deterministic
+  per signature phase. The signature CID is deterministic from the
+  canonical input handoffs.
+* **Audit-preserving.** T-1..T-7 holds on every cell of every
+  capsule strategy on every (bank, ``T_decoder``, ``bank_seed``)
+  cell.
+* **Seed-stable.** Visible-tokens savings AND correctness gains
+  hold on every alternate ``bank_seed`` value (5/5 on 11, 17, 23,
+  29, 31). Mechanically verified by
+  ``Phase74XOracleRecoverTests::test_w27_xoracle_seed_stability``.
+* **No regression on R-54..R-73.** Every prior anchor remains
+  green; with ``enabled = False`` OR the orchestrator missing the
+  pool, the W27 layer reduces to W26 byte-for-byte. 508 prior
+  tests pass + 22 new W27 tests = 530 / 530 in the focused
+  regression.
+
+A regime missing any of these is *not* R-74 — it does not test
+the SDK v3.28 hypothesis.
+
 ## 3. What we are explicitly NOT testing
 
 * **Not** "does cohort coherence ever beat FIFO?" — that's W7-2,

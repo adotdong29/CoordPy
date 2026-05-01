@@ -5,8 +5,55 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.27,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.28,
 > 2026-04-30.
+
+## TL;DR — SDK v3.28
+
+The programme now has **twenty-four** coupled research axes, each
+with a sharp status. SDK v3.28 mints axis 24: **multi-chain
+salience-keyed dense-control fanout + per-signature scoping** —
+extending the SDK v3.27 W26 chain-persisted fanout with a
+``MultiChainPersistedFanoutOrchestrator`` (W27) that maintains a
+**bounded pool of independent W26 stacks**, keyed by the cell's
+salience signature (SHA-256 over canonical input handoffs computed
+by :func:`compute_input_signature_cid`). Producer and K consumers
+share one team-wide :class:`SharedMultiChainPool`; each
+(signature, agent) gets its own W26 disambiguator with its own
+``SharedFanoutRegistry`` and ``ChainPersistedFanoutRegistry``. The
+audited :class:`MultiChainPersistedFanoutDisambiguator` adds two
+content-addressed envelopes (:class:`SalienceSignatureEnvelope`,
+:class:`ChainPivotEnvelope`) plus
+:func:`verify_salience_signature` (4 enumerated failure modes) and
+:func:`verify_chain_pivot` (8 failure modes) for trust-boundary
+auditing.
+
+**The headline SDK v3.28 result.** On **R-74-XORACLE-RECOVER**
+(1 producer + K=3 consumers, 16 cells, 2 distinct gold-subset
+signatures, ``signature_period = 4``, ``max_active_chains = 8``,
+partial ServiceGraphOracle on the W26 baseline scoped to GOLD_A
+only), the W27 method **simultaneously** strictly reduces
+``mean_total_w27_visible_tokens`` over
+``mean_total_w26_visible_tokens`` by **−22.5 tokens / cell
+(−76.27 %)** at ``T_decoder = None`` AND raises
+``correctness_ratified_rate`` from **0.500 → 1.000**. Identical at
+``T_decoder = 24``. Stable across **5/5** seeds. The first
+capsule-native multi-agent-coordination method that
+*simultaneously* improves both efficiency and correctness over
+W26 on a regime where W26's single-stack scope architecturally
+limits correctness. Four named falsifiers:
+**W27-Λ-single-signature** (R-74-CHAIN-SHARED → W27 = W26
+byte-for-byte), **W27-Λ-pool-exhausted** (max=2 vs 4 signatures
+→ controller rejects beyond bound, W27 falls through to fallback
+W26), **W27-Λ-pivot-tampered** (audited disambig wrapper rejects
+via ``verify_chain_pivot``), **W27-Λ-signature-drift** (stale
+signatures fall through cleanly). **Discharges
+W26-C-DIVERGENCE-RECOVERY** in the per-signature scoping
+direction. Backward-compat preserved byte-for-byte: 508/508
+focused regression covering W18..W27 + IS-1 / IS-2 + producer +
+team_coord + attention + capsules. Mac 2 still unreachable
+(**22nd milestone in a row**); W27 inherits the W24
+``CrossProcessProducerDecoderWire`` proxy.
 
 ## TL;DR — SDK v3.27
 

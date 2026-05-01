@@ -306,6 +306,24 @@ from .team_coord import (
     W26_BRANCH_CHAIN_PROJECTION_REJECTED,
     W26_BRANCH_NO_TRIGGER, W26_BRANCH_DISABLED,
     W26_DEFAULT_TRIGGER_BRANCHES,
+    # SDK v3.28 — multi-chain salience-keyed dense-control fanout +
+    # per-signature scoping (W27 family).
+    SalienceSignatureEnvelope, ChainPivotEnvelope,
+    MultiChainPersistedFanoutRegistry,
+    MultiChainPersistedFanoutDisambiguator,
+    MultiChainPersistedFanoutOrchestrator,
+    SharedMultiChainPool,
+    W27MultiChainResult, W27OrchestratorResult,
+    compute_input_signature_cid,
+    verify_salience_signature, verify_chain_pivot,
+    W27_SALIENCE_SIGNATURE_SCHEMA_VERSION,
+    W27_CHAIN_PIVOT_SCHEMA_VERSION,
+    W27_ALL_BRANCHES,
+    W27_BRANCH_PIVOTED, W27_BRANCH_ANCHORED_NEW,
+    W27_BRANCH_POOL_EXHAUSTED, W27_BRANCH_PIVOT_REJECTED,
+    W27_BRANCH_FALLBACK_W26, W27_BRANCH_NO_TRIGGER,
+    W27_BRANCH_DISABLED,
+    W27_DEFAULT_TRIGGER_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -319,7 +337,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.27"
+SDK_VERSION = "wevra.sdk.v3.28"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -498,6 +516,23 @@ __all__ = [
     "W26_BRANCH_CHAIN_PROJECTION_REJECTED",
     "W26_BRANCH_NO_TRIGGER", "W26_BRANCH_DISABLED",
     "W26_DEFAULT_TRIGGER_BRANCHES",
+    # SDK v3.28 — W27 family.
+    "SalienceSignatureEnvelope", "ChainPivotEnvelope",
+    "MultiChainPersistedFanoutRegistry",
+    "MultiChainPersistedFanoutDisambiguator",
+    "MultiChainPersistedFanoutOrchestrator",
+    "SharedMultiChainPool",
+    "W27MultiChainResult", "W27OrchestratorResult",
+    "compute_input_signature_cid",
+    "verify_salience_signature", "verify_chain_pivot",
+    "W27_SALIENCE_SIGNATURE_SCHEMA_VERSION",
+    "W27_CHAIN_PIVOT_SCHEMA_VERSION",
+    "W27_ALL_BRANCHES",
+    "W27_BRANCH_PIVOTED", "W27_BRANCH_ANCHORED_NEW",
+    "W27_BRANCH_POOL_EXHAUSTED", "W27_BRANCH_PIVOT_REJECTED",
+    "W27_BRANCH_FALLBACK_W26", "W27_BRANCH_NO_TRIGGER",
+    "W27_BRANCH_DISABLED",
+    "W27_DEFAULT_TRIGGER_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

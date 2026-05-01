@@ -1,9 +1,11 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
-> Updated through SDK v3.24, 2026-04-29 (W23 cross-cell delta
-> execution + quorum-keyed cache + super-token reference post-paper
-> escape ladder summarised in § 14.2).
+> Updated through SDK v3.28, 2026-04-30 (W22 → W27 cross-cell
+> efficiency ladder summarised in § 14.2; W27 — multi-chain
+> salience-keyed dense-control fanout + per-signature scoping —
+> is the first capsule-native method that simultaneously improves
+> both efficiency AND correctness over the prior best).
 > This file is intended to be the primary publication-grade paper
 > draft for the programme's multi-agent context thesis. It is not a
 > milestone diary. It is a paper-shaped synthesis of the system,
@@ -1530,6 +1532,71 @@ in its own milestone results note; the canonical references are:
   through the closure and ties FIFO at 0.000. **Scale + general
   knowledge matter for the W21-Λ-real escape on the LLM-vote-
   required regime**.
+
+**Cross-cell efficiency ladder (SDK v3.23 → v3.28).** After
+W21 the programme advances on a different axis: not "how to escape
+a stronger semantic wall" but "how to amortise the cost of the
+already-working capsule-native pipeline across cells, agents, and
+salience signatures":
+
+- **W22 — Capsule + audited latent-state-sharing hybrid (SDK v3.23,
+  *RESULTS_WEVRA_CAPSULE_LATENT_HYBRID.md*).** A typed
+  ``LatentDigestEnvelope`` per cell carrying the W21 quorum result
+  + projected subset, signed at construction; a
+  ``SharedReadCache`` reuses identical-query oracle replies across
+  cells. The first capsule-native method that combines explicit-
+  capsule passing with audited proxies for the LatentMAS
+  latent-state-sharing direction.
+- **W23 — Cross-cell delta + super-token reference (SDK v3.24,
+  *RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md*).** A
+  ``SessionDigestEnvelope`` (hash-chained running cross-cell state)
+  + ``SessionDeltaEnvelope`` (per-cell delta) +
+  ``SuperTokenReferenceEnvelope`` (single-token CID dense-control
+  reference). The first capsule-native method to amortise running
+  state via O(1) visible-token references per cell.
+- **W24 — Bounded-window session compaction + intra-cell
+  resample-quorum + cross-process wire (SDK v3.25,
+  *RESULTS_WEVRA_W24_SESSION_COMPACTION.md*).** A
+  ``MultiCellSessionCompactor`` folds the last
+  ``compact_window - 1`` cell digests into one fixed-size
+  ``SessionCompactEnvelope``; a ``ResampleQuorumCachingOracleAdapter``
+  mitigates intra-cell drift on probabilistic LLM oracles; a
+  ``CrossProcessProducerDecoderWire`` round-trips JSON envelopes
+  through a real Python subprocess (real cross-*process*, not
+  cross-*host*). −18 % over W23 on R-71-LONG-SESSION.
+- **W25 — Shared-fanout dense-control + cross-agent state reuse
+  (SDK v3.26, *RESULTS_WEVRA_W25_SHARED_FANOUT.md*).** One producer
+  computes one ``FanoutEnvelope`` for K named consumers, each
+  consumer resolves via 1 ``<fanout_ref:DDDD>`` token. −69.87 %
+  over W24 on R-72-FANOUT-SHARED at K=3.
+- **W26 — Chain-persisted dense-control fanout + per-consumer
+  projections (SDK v3.27,
+  *RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md*).** A two-tier
+  envelope hierarchy (``ChainAnchorEnvelope`` +
+  ``ChainAdvanceEnvelope``) amortises the producer's per-cell
+  salience-token cost across cells via 1-token chain-advance
+  references; per-consumer ``ProjectionSlot`` map enforces
+  controller-verified scope. −68.79 % over W25, −90.60 % over W24
+  on R-73-CHAIN-SHARED at K=3, scaling to −92.23 % over W24 at
+  K=10. W25-C-K-SCALING discharged at K∈{3,5,8,10}.
+- **W27 — Multi-chain salience-keyed dense-control fanout +
+  per-signature scoping (SDK v3.28,
+  *RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md*).** The first capsule-
+  native method that *simultaneously* improves both efficiency AND
+  correctness over the prior best (W26) on a regime where the
+  prior best architecturally limits correctness. A bounded pool
+  of independent W26 stacks keyed by
+  :func:`compute_input_signature_cid` over canonical input
+  handoffs; the audited ``MultiChainPersistedFanoutDisambiguator``
+  ships :func:`verify_salience_signature` (4 enumerated failure
+  modes) and :func:`verify_chain_pivot` (8 failure modes). On
+  R-74-XORACLE-RECOVER (1 producer + K=3 consumers, 16 cells, 2
+  signatures, partial ServiceGraphOracle on the W26 baseline):
+  **−76.27 % over W26 AND +0.500 correctness over W26**, stable
+  across 5/5 seeds. Discharges **W26-C-DIVERGENCE-RECOVERY** in
+  the per-signature scoping direction. Four named falsifiers
+  (W27-Λ-single-signature / -pool-exhausted / -pivot-tampered /
+  -signature-drift) make the W27-1 conditionality sharp.
 
 The post-paper four-layer escape ladder (W18 → W19 → W20 → W21)
 discharges, in order: the symmetric-corroboration wall, the
