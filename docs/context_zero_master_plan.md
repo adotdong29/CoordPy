@@ -10269,6 +10269,111 @@ cross-process honesty validated on this repo.
 
 ---
 
+## Post-W27 next steps → discharged in SDK v3.29 (W28)
+
+**SDK v3.29 / W28** (`docs/RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md`)
+ships the **first capsule-native synthesis between the explicit-
+capsule trust line (W21 trust-weighted multi-oracle adjudication)
+and the dense-control line (W27 multi-chain salience-keyed
+pool)**, behind a controller-verified ratification envelope with
+**11 new enumerated failure modes** in
+``verify_ensemble_pivot_ratification``.
+
+* **W28 mechanism.** ``EnsembleVerifiedMultiChainOrchestrator``
+  wraps a W27 ``MultiChainPersistedFanoutOrchestrator`` with a
+  trust-weighted probe table; each probe is an
+  ``EnsembleProbeRegistration`` (mirrors W21's
+  ``OracleRegistration``). Built-in probe types:
+  ``DeterministicSignatureProbe`` (locally-recomputable, K=1 path
+  is W28 = W27 byte-for-byte), ``OracleConsultationProbe``
+  (wraps any W20/W21 ``OutsideWitnessOracle``),
+  ``LLMSignatureProbe`` (wraps any ``LLMBackend`` —
+  Ollama or MLX-distributed; cross-host telemetry via ``host_id``).
+* **W28-1 (proved + mechanically-checked).** Trust-boundary
+  soundness: 11 enumerated failure modes; every mode has a unit
+  test in ``EnsembleVerifierFailureModeTests``.
+* **W28-2 (proved + empirical).** Backward-compat: K=1 W28 = W27
+  byte-for-byte across 5/5 seeds on R-75-SINGLE-PROBE.
+* **W28-3 (proved-conditional + empirical).** Trust-amplification
+  overhead bound: max per-cell overhead = 1.00 token across all 7
+  synthetic R-75 sub-banks at 5 seeds (within S4 ≤ 2 budget); 0.625
+  on R-75-CROSS-HOST-LIVE (n=16, 10/16 ratified).
+* **R-75-RATIFICATION-TAMPERED.** 16/16 tampered envelopes rejected
+  per seed across 5/5 seeds.
+* **R-75-CROSS-HOST-LIVE (FIRST CROSS-HOST EVIDENCE IN 23 MILESTONES).**
+  Live LLM probe table on `localhost` (gemma2:9b) +
+  `192.168.12.191` (qwen2.5:14b); **128 cross-host probe calls**;
+  **5592 LAN bytes**; ensemble ratifies 10/16 cells with real LLM
+  disagreement on 6/16; trust precision 1.000; W28 correctness
+  1.000.
+* **W27-C-CROSS-HOST infrastructure-discharged.** The conjecture's
+  *infrastructure axis* (real cross-host probing) is empirically
+  discharged via W28's two-host topology probe. The
+  *variance-reduction magnitude* axis becomes the new named open
+  conjecture **W28-C-CROSS-HOST-VARIANCE**.
+* **Stable-vs-experimental boundary tightened.** New explicit
+  ``vision_mvp.wevra.__experimental__`` tuple lists every
+  dense-control symbol (W22..W28); SDK_VERSION bumped to
+  ``wevra.sdk.v3.29``; pyproject.toml 0.5.2; ARCHITECTURE.md
+  gains a "Stable-vs-Experimental Boundary" section.
+
+**Master-plan-level questions (the post-W27 audit board, refreshed
+for W28).**
+
+1. **Did denser capsule-native latent/control integration
+   *and* the explicit-capsule trust line **synthesise** materially?**
+   *YES.* The W21 ``OracleRegistration`` interface threads
+   directly through to W28's probe table; the
+   ``OracleConsultationProbe`` is a literal bridge. The trust
+   prior semantics are byte-identical between W21 quorum and W28
+   ratification.
+2. **Did trust/audit survive?** *YES, sharply, with a brand-new
+   verifier covering ensemble-decision integrity (probe forgery,
+   weight forgery, quorum forgery) — 11 failure modes that did
+   not exist in any W22..W27 verifier.*
+3. **Did bounded-context efficiency improve in a real way?** *YES
+   on backward-compat (K=1 W28 = W27 byte-for-byte) and YES on
+   honest overhead bound (max 1 token/cell across all banks).*
+   The W28 layer adds at most 1 producer-side ``<ratify_ref:DDDD>``
+   token per ratifying cell; consumers pay 0.
+4. **Did two-Mac evaluation materially broaden the evidence?**
+   *YES — for the first time in 23 milestones.* The W28
+   ``LLMSignatureProbe`` is the first programme component to
+   actually use *two reachable hosts with different model
+   families* inside one bench cell (`localhost` gemma2:9b +
+   `192.168.12.191` qwen2.5:14b). Mac 2 (192.168.12.248) remains
+   ARP-incomplete, but the *other* reachable host (.191) has been
+   recharacterised as the second host of the topology, and the
+   probe table accepts a third backend with zero code changes
+   when Mac 2 returns.
+5. **Which earlier paper loose ends were closed versus only
+   sharpened?** *Closed: the W21 / W27 synthesis target named in
+   the post-W27 next-steps section is operational; the
+   infrastructure axis of W27-C-CROSS-HOST is discharged.
+   Sharpened: the variance-reduction magnitude axis becomes
+   W28-C-CROSS-HOST-VARIANCE; the synthetic R-75 banks do not
+   exercise W27 mistakes (every bank has W27 correctness = 1.000),
+   so the magnitude is only honestly measurable on a regime where
+   W27 itself fails — open.*
+6. **Did release readiness improve?** *YES, on four axes.* (a)
+   Stable-vs-experimental boundary now explicit
+   (``__experimental__`` tuple). (b) SDK version bumped to v3.29 /
+   0.5.2. (c) ARCHITECTURE.md gains a "Stable-vs-Experimental
+   Boundary" section. (d) Focused regression W3..W28 = 534/534 in
+   ~95s, fast + reproducible.
+7. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on
+   the synthesis axis (old + new lines now compose); the deeper
+   wall is the variance-reduction magnitude on a regime where W27
+   itself fails.* Named open frontier for SDK v3.30:
+   **W28-C-CROSS-HOST-VARIANCE** (live cross-host variance
+   reduction on a regime where W27 alone is wrong),
+   **W28-C-CALIBRATED-TRUST** (calibrated priors strictly
+   outperform uniform), **W28-Λ-coordinated-drift in the wild**
+   (correlated probes in real LLM ensembles).
+
+---
+
 *End of master plan. Changelog lives in the results notes, not
 here. If this document ever becomes a changelog, delete the
 changelog and restore the plan.*

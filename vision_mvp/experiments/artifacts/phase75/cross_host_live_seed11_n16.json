@@ -1,0 +1,60 @@
+{
+  "bank": "cross_host_live",
+  "T_decoder": null,
+  "K_consumers": 3,
+  "n_cells": 16,
+  "bank_seed": 11,
+  "chain_persist_window": 16,
+  "max_active_chains": 8,
+  "signature_period": 4,
+  "registry_meta": {
+    "bank": "cross_host_live",
+    "topology": "two_host",
+    "hosts_used": [
+      {
+        "host_id": "localhost",
+        "selected_model": "gemma2:9b"
+      },
+      {
+        "host_id": "192.168.12.191",
+        "selected_model": "qwen2.5:14b"
+      }
+    ],
+    "n_probes": 3
+  },
+  "mean_total_w26_visible_tokens": 5.5,
+  "mean_total_w27_visible_tokens": 7.0,
+  "mean_total_w28_visible_tokens": 9.5,
+  "mean_overhead_w28_vs_w27_per_cell": 0.625,
+  "max_overhead_w28_vs_w27_per_cell": 1,
+  "byte_equivalent_w28_w27": false,
+  "correctness_ratified_rate_w26": 1.0,
+  "correctness_ratified_rate_w27": 1.0,
+  "correctness_ratified_rate_w28": 1.0,
+  "correctness_stddev_w26": 0.0,
+  "correctness_stddev_w27": 0.0,
+  "correctness_stddev_w28": 0.0,
+  "n_ratified": 10,
+  "n_quorum_below_threshold": 6,
+  "n_passthrough_w28_eq_w27": 0,
+  "n_no_ratify_needed": 0,
+  "n_fallback_w27": 0,
+  "n_disabled_w28": 0,
+  "branch_counts_w28": {
+    "quorum_below_threshold": 6,
+    "ratified": 10
+  },
+  "n_ratified_correct": 10,
+  "n_ratified_wrong": 0,
+  "n_unratified_correct": 6,
+  "n_unratified_wrong": 0,
+  "trust_precision": 1.0,
+  "trust_coverage": 0.625,
+  "n_probe_calls_total": 192,
+  "n_cross_host_probe_calls": 128,
+  "cross_host_round_trip_bytes": 5592,
+  "n_ratifications_registered": 40,
+  "n_ratifications_rejected": 0,
+  "n_tamper_attempts": 0,
+  "n_tampered_rejected": 0
+}

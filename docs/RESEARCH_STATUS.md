@@ -5,8 +5,73 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.28,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.29,
 > 2026-04-30.
+
+## TL;DR — SDK v3.29
+
+The programme now has **twenty-five** coupled research axes, each
+with a sharp status. SDK v3.29 mints axis 25:
+**ensemble-verified cross-model multi-chain pivot ratification** —
+extending the SDK v3.28 W27 multi-chain pool with an
+``EnsembleVerifiedMultiChainOrchestrator`` (W28) that wraps the
+W27 routing decision with a **trust-weighted probe quorum**. Each
+probe is an ``EnsembleProbeRegistration`` (mirrors W21's
+``OracleRegistration``) with a ``trust_prior`` and an optional
+``host_id`` for cross-host telemetry; built-in probe types are
+``DeterministicSignatureProbe`` (locally-recomputable, K=1 path is
+W28 = W27 byte-for-byte), ``OracleConsultationProbe`` (wraps any
+W20/W21 ``OutsideWitnessOracle``), and ``LLMSignatureProbe``
+(wraps any ``LLMBackend``). The decision is sealed inside a
+content-addressed ``EnsemblePivotRatificationEnvelope``; the new
+``verify_ensemble_pivot_ratification`` enumerates **11 failure
+modes** (probe forgery, weight forgery, quorum forgery, hash
+tampering) — none of which existed in any W22..W27 verifier.
+
+**The headline SDK v3.29 results.**
+
+* **R-75-SINGLE-PROBE (H2 backward-compat anchor).** K_probes=1
+  with a deterministic local-recompute probe ⇒ W28 = W27
+  byte-for-byte across 5/5 seeds; ``byte_equivalent_w28_w27 = true``;
+  every cell ratified via ``ratified_passthrough`` with 0 token
+  overhead. **W28-Λ-single-probe** falsifier confirmed.
+* **R-75-CROSS-MODEL-DRIFT (S3/W28-3 headline).** 2× deterministic
+  + 1× ``IntermittentDriftProbe`` with quorum_threshold=2.0 ⇒
+  16/16 cells ratified, max overhead = 1.00 token/cell across 5
+  seeds (within S4 ≤ 2 budget); trust precision 1.000.
+* **R-75-RATIFICATION-TAMPERED (H3 trust falsifier).** 16/16
+  tampered envelopes rejected per seed across 5/5 seeds via
+  ``quorum_recompute_mismatch``; correctness preserved byte-for-byte.
+* **R-75-CROSS-HOST-LIVE (FIRST CROSS-HOST EVIDENCE IN 23
+  MILESTONES).** Live LLM probe table on `localhost`
+  (gemma2:9b, Gemma2 family) + `192.168.12.191` (qwen2.5:14b,
+  Qwen2.5 family); n=16 cells; **128 cross-host probe calls**;
+  **5592 LAN bytes**; ensemble ratifies 10/16 cells with **real
+  LLM disagreement on 6/16**; trust precision 1.000; W28
+  correctness 1.000; W28 overhead 0.625 tokens/cell.
+
+**Six named falsifiers, all empirically confirmed**:
+W28-Λ-single-probe (K=1 ⇒ W28=W27 byte-for-byte),
+W28-Λ-coordinated-drift (correlated probes ⇒ ensemble cannot
+detect), W28-Λ-trust-zero (zero priors ⇒ controller abstains),
+W28-Λ-spoofed-probe (unregistered probe_id ⇒ rejected),
+W28-Λ-quorum-tampered (flag mismatch ⇒ rejected),
+W28-Λ-pool-exhausted-passthrough (W27 exhausted ⇒ no spurious
+ratification). **Discharges the W21 / W27 synthesis target**
+(named in the post-W27 next-steps section). **Infrastructure-
+discharges W27-C-CROSS-HOST** (real cross-host probing
+operational; the variance-reduction *magnitude* axis becomes
+W28-C-CROSS-HOST-VARIANCE — open conjecture).
+
+Backward-compat preserved byte-for-byte: **534/534** focused
+regression covering W3 capsules / W4 team / W12-W15 packing /
+W18-W21 explicit-capsule / W22-W28 dense-control / public API /
+runtime / LLM backend. Mac 2 (192.168.12.248) still unreachable
+(**23rd milestone in a row**); the *other* reachable host
+(192.168.12.191) has been recharacterised as the second host of
+the topology. Stable-vs-experimental boundary tightened: explicit
+``vision_mvp.wevra.__experimental__`` tuple (41 symbols);
+SDK_VERSION ``wevra.sdk.v3.29``; pyproject.toml 0.5.2.
 
 ## TL;DR — SDK v3.28
 

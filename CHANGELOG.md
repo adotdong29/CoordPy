@@ -5,6 +5,129 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.2 / 3.29] — 2026-04-30 — SDK v3.29 — ensemble-verified cross-model multi-chain pivot ratification + Phase-75 R-75 benchmark family + W28 family + first cross-host live LLM evidence in 23 milestones + stable-vs-experimental boundary tightened
+
+*Strictly additive on SDK v3.28. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W28 surface
+composes the W21 trust-weighted multi-oracle quorum (the **old**
+explicit-capsule line) with the W27 multi-chain salience-keyed
+pool (the **new** dense-control line) inside one decision, behind
+a controller-verified ratification envelope with 11 new enumerated
+failure modes.*
+
+**New surface (W28 family, multi-agent-coordination research slice):**
+
+* `vision_mvp.wevra.team_coord.ProbeVote` — frozen probe-vote
+  dataclass with strict invariants (ratify ⊕ reject; trust_weight ≥ 0).
+* `vision_mvp.wevra.team_coord.EnsembleProbe` — duck-typed Protocol
+  surface for any object with `probe_id` + `vote(...)`.
+* `vision_mvp.wevra.team_coord.EnsembleProbeRegistration` — mirrors
+  `OracleRegistration` (the W21 entry); carries `trust_prior`,
+  `role_label`, `host_id` for cross-host telemetry.
+* `vision_mvp.wevra.team_coord.DeterministicSignatureProbe` —
+  locally-recomputable probe; trivially trustworthy;
+  `wire_required = False` (the K=1-byte-for-W27 path).
+* `vision_mvp.wevra.team_coord.OracleConsultationProbe` — wraps any
+  W20/W21 `OutsideWitnessOracle` (composes with `ServiceGraphOracle`,
+  `ChangeHistoryOracle`, etc.).
+* `vision_mvp.wevra.team_coord.LLMSignatureProbe` — wraps any
+  `LLMBackend` (Ollama or MLX-distributed); designed for the
+  two-host topology with cross-host round-trip-bytes telemetry.
+* `vision_mvp.wevra.team_coord.EnsemblePivotRatificationEnvelope`
+  — content-addressed ensemble decision envelope (signature_cid,
+  probe_votes, quorum_threshold, quorum_weight, ratified flag,
+  ratification_cid). 11 enumerated failure modes via
+  `verify_ensemble_pivot_ratification`.
+* `vision_mvp.wevra.team_coord.EnsembleRatificationRegistry` —
+  controller-side ratification registry with cross-host telemetry.
+* `vision_mvp.wevra.team_coord.EnsembleVerifiedMultiChainOrchestrator`
+  — the load-bearing W28 wrapper around
+  `MultiChainPersistedFanoutOrchestrator`.
+* `vision_mvp.wevra.team_coord.W28EnsembleResult` — per-cell audit
+  record with probe vote summary, quorum weight, ratification CID,
+  cross-host bytes.
+* `vision_mvp.wevra.team_coord.verify_ensemble_pivot_ratification`
+  — 11-mode pure verifier (rejects: empty, schema-version, schema-cid,
+  signature-cid-empty, signature-cid-mismatch, probe-table-empty,
+  probe-id-unregistered, probe-vote-malformed, trust-weight-negative,
+  hash-mismatch, quorum-below-threshold, quorum-recompute-mismatch).
+* Convenience factories: `build_default_ensemble_registry`,
+  `build_two_probe_oracle_ensemble_registry`,
+  `build_cross_host_llm_ensemble_registry`.
+* W28 branch vocabulary (8 branches): `ratified`,
+  `ratified_passthrough`, `quorum_below_threshold`, `probe_rejected`,
+  `no_ratify_needed`, `fallback_w27`, `no_trigger`, `disabled`.
+
+**New benchmark family (R-75):**
+
+* `vision_mvp/experiments/phase75_ensemble_verified_multi_chain.py`
+  — eight pre-committed sub-banks (single_probe, chain_shared,
+  cross_model_drift, coordinated_drift, trust_zero,
+  ratification_tampered, pool_exhausted, cross_host_live) +
+  `discover_two_host_topology()` + cross_regime + seed_sweep CLI.
+* `vision_mvp/tests/test_phase75_ensemble_verified_multi_chain.py`
+  — 34 unit + integration tests covering every probe, every
+  verifier failure mode, every named falsifier, byte-for-byte W27
+  equivalence, disabled/no-trigger paths, two-host topology.
+* `vision_mvp/experiments/artifacts/phase75/` — 9 result JSONs
+  (1 cross_regime, 7 seed sweeps, 1 topology, 1 cross_host_live).
+
+**Headline empirical results.**
+
+* **R-75-SINGLE-PROBE (H2 anchor)**: W28 = W27 byte-for-byte across
+  5/5 seeds; `byte_equivalent_w28_w27 = true`; 16/16 cells ratified
+  via the `ratified_passthrough` branch with 0 token overhead.
+* **R-75-CROSS-MODEL-DRIFT (S3 / W28-3 headline, synthetic)**: W28
+  overhead = 1.00 token/cell across 5/5 seeds (within S4 ≤ 2 budget);
+  16/16 ratified; trust precision 1.000.
+* **R-75-RATIFICATION-TAMPERED (H3 trust falsifier)**: 16/16
+  tampered envelopes rejected per seed (5/5 seeds), reject reason
+  `quorum_recompute_mismatch`.
+* **R-75-CROSS-HOST-LIVE (S1/S2, FIRST CROSS-HOST EVIDENCE IN 23
+  MILESTONES)**: 16-cell live run on localhost (gemma2:9b) +
+  192.168.12.191 (qwen2.5:14b); 128 cross-host probe calls; 5592
+  bytes serialised over LAN; **10/16 ratified by ensemble; 6/16
+  fell to quorum_below_threshold (real LLM disagreement);
+  trust_precision 1.000; W28 correctness 1.000**.
+
+**Falsifiers all empirically confirmed:** W28-Λ-single-probe,
+W28-Λ-coordinated-drift, W28-Λ-trust-zero, W28-Λ-spoofed-probe,
+W28-Λ-quorum-tampered, W28-Λ-pool-exhausted-passthrough.
+
+**Conjectures introduced:** W28-C-CROSS-HOST-VARIANCE (variance
+reduction magnitude on a regime where W27 itself makes mistakes —
+open; the synthetic bench is already 1.000-correct under W27 so the
+S3 headline is null but honest); W28-C-CALIBRATED-TRUST (calibrated
+trust priors strictly outperform uniform; not exercised in this
+milestone — natural follow-up).
+
+**Old-line discharges:** the W21 / W27 *synthesis target* named in
+the master plan post-W27 next-steps section is operational —
+`OracleConsultationProbe` makes the W21 oracle interface a
+first-class W28 probe; W21 trust priors thread directly into W28
+quorum weights; the same `OutsideWitnessOracle` duck-type drives
+both W21 quorum and W28 ratification.
+
+**Stable-vs-experimental boundary tightened (H7 release-readiness):**
+
+* `vision_mvp.wevra.__init__.SDK_VERSION` bumped to
+  `"wevra.sdk.v3.29"`.
+* `vision_mvp.wevra.__init__.__experimental__` — new explicit tuple
+  listing every dense-control symbol (W22..W28); external callers
+  should pin a specific SDK version when depending on these.
+* `pyproject.toml` version bump 0.5.1 → 0.5.2.
+
+**Regression:** 222/222 W23..W28 stack tests + 534/534 wider
+focused regression (W3 capsules, W4 team, W12-W15 packing/decoder
+ladder, W18-W21 explicit-capsule trust line, W22-W28 dense-control
+line, public API, runtime, LLM backend) — **all preserved
+byte-for-byte**.
+
+**Two-host topology used:**
+- `localhost` → `gemma2:9b` (Gemma2 family)
+- `192.168.12.191` → `qwen2.5:14b` (Qwen2.5 family)
+- `192.168.12.248` → ARP-incomplete (23rd consecutive milestone).
+
 ## [3.28] — 2026-04-30 — SDK v3.28 — multi-chain salience-keyed dense-control fanout + per-signature scoping + Phase-74 R-74 benchmark family + W27 family + W26-C-DIVERGENCE-RECOVERY discharged (first capsule-native multi-agent-coordination method that simultaneously improves both efficiency AND correctness over W26 on a regime where W26's single-stack scope architecturally limits correctness — measured −76.27% total token reduction AND +0.500 correctness gain over W26 on R-74-XORACLE-RECOVER at 5/5 seeds, trust boundary sound via 12 enumerated failure modes across 2 new verify_* functions, four named W27-Λ falsifiers all empirically confirmed)
 
 *Strictly additive on SDK v3.27. The Wevra single-run product

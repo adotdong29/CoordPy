@@ -7,7 +7,39 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.28 (April 2026).** Multi-chain
+**Latest milestone: SDK v3.29 (April 2026).** Ensemble-verified
+cross-model multi-chain pivot ratification (W28 family). The W28
+``EnsembleVerifiedMultiChainOrchestrator`` wraps the W27 multi-
+chain pool with a controller-side **trust-weighted probe quorum**
+(each probe is an ``EnsembleProbeRegistration`` with a
+``trust_prior`` mirroring W21's ``OracleRegistration``) that
+ratifies or rejects every pivot/anchor decision via a content-
+addressed ``EnsemblePivotRatificationEnvelope``;
+``verify_ensemble_pivot_ratification`` enumerates **11 new
+failure modes** (probe forgery, weight forgery, quorum forgery,
+hash tampering, schema/signature drift) — none of which existed
+in any W22..W27 verifier. **First capsule-native mechanism that
+synthesises the explicit-capsule trust line (W21 multi-oracle
+adjudication) with the dense-control line (W27 multi-chain
+salience-keyed pool) inside one decision.** On
+R-75-SINGLE-PROBE the W28 layer is **W27 byte-for-byte across
+5/5 seeds** (W28-Λ-single-probe falsifier confirmed); on
+R-75-CROSS-MODEL-DRIFT the trust-weighted ensemble ratifies all
+16 cells with overhead = 1.00 token/cell (within S4 ≤ 2 budget);
+on R-75-RATIFICATION-TAMPERED the verifier rejects 16/16
+tampered envelopes per seed (5/5 seeds). **First cross-host
+live LLM evidence in 23 milestones**: R-75-CROSS-HOST-LIVE on
+localhost (gemma2:9b) + 192.168.12.191 (qwen2.5:14b) records 128
+cross-host probe calls and 5592 LAN bytes; ensemble ratifies
+10/16 cells (real LLM disagreement on 6/16) with trust precision
+1.000 and W28 correctness 1.000. Stable-vs-experimental
+boundary tightened: dense-control surface (W22..W28) now lives
+under an explicit ``__experimental__`` tuple; SDK_VERSION
+``wevra.sdk.v3.29``; pyproject.toml 0.5.2. See
+[`docs/RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md`](docs/RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md)
+and [`CHANGELOG.md`](CHANGELOG.md) for details.
+
+**Previous milestone: SDK v3.28 (April 2026).** Multi-chain
 salience-keyed dense-control fanout + per-signature scoping
 (W27 family). The W27
 ``MultiChainPersistedFanoutOrchestrator`` maintains a bounded
@@ -31,8 +63,7 @@ limits correctness. Four named falsifiers
 (W27-Λ-single-signature / -pool-exhausted / -pivot-tampered /
 -signature-drift). **Discharges W26-C-DIVERGENCE-RECOVERY** on
 the per-signature scoping axis. See
-[`docs/RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md`](docs/RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md)
-and [`CHANGELOG.md`](CHANGELOG.md) for details.
+[`docs/RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md`](docs/RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md).
 
 **Previous milestone: SDK v3.27 (April 2026).** Chain-persisted
 dense-control fanout + per-consumer projections (W26 family). The

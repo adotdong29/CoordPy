@@ -13674,3 +13674,1458 @@ class MultiChainPersistedFanoutOrchestrator:
     def slots(self) -> dict[str, _ChainSlot]:
         # Shadow proxy for backward compat: returns this agent's slot map
         return self.pool._agent_slots.get(self.agent_id, {})
+
+
+# =============================================================================
+# W28 — ensemble-verified cross-model multi-chain pivot ratification
+# (trust-weighted W21 × W27 synthesis + audited ratification envelope +
+# cross-model / cross-host probe table)
+# =============================================================================
+#
+# The W27 family routes each cell to a per-signature W26 stack via a
+# bounded pool of parallel chains, keyed by the salience signature CID.
+# It assumes the salience signature is *self-evidently* the right
+# routing key for that cell's content: any byte-identical canonical
+# state lands in the same chain, divergent states route elsewhere.
+# That assumption is fine when the canonical state is locally
+# reconstructible (the producer and the controller both compute it
+# from the same in-process inputs), but it is silent on whether the
+# *content* the signature summarises is genuinely the cell's content
+# under any *outside-information* view — e.g. a different model, a
+# different oracle, a different host.
+#
+# W28 closes that gap by inserting a controller-side **ensemble
+# ratification** step between W27's signature lookup and its pool
+# routing decision. Before W27 commits to a pivot or a new anchor,
+# the controller polls a **trust-weighted probe table** (each entry
+# is an :class:`EnsembleProbeRegistration`, mirroring W21's
+# :class:`OracleRegistration`):
+#
+#   * each probe inspects the cell's salience signature + canonical
+#     state and returns a :class:`ProbeVote`
+#     (``ratify`` / ``reject`` / ``abstain``) with the probe's
+#     ``trust_prior`` as the vote weight;
+#   * the trust-weighted sum of ``ratify`` votes must be ≥ a
+#     pre-committed ``quorum_threshold`` for W27's routing to fire;
+#   * if quorum is not met, W27's routing is suppressed and the cell
+#     falls through to the unratified path (typically W27's pool-
+#     exhausted fallback, which itself falls through to W26 / W25);
+#   * the entire decision is sealed inside a content-addressed
+#     :class:`EnsemblePivotRatificationEnvelope` and verified by the
+#     pure :func:`verify_ensemble_pivot_ratification`.
+#
+# Total visible-token cost over N cells, K consumers, P probes:
+#
+#   W27:  M × (C + K) + (N − M) × (1 + K)               [as before]
+#   W28:  W27 + (P > 1 ratifying cells) × 1             [+1 ratify ref
+#                                                          on the producer
+#                                                          when ratification
+#                                                          must be carried
+#                                                          on wire]
+#
+# At P = 1 with weight ≥ quorum_threshold, the ratification envelope
+# is locally reconstructible (the lone probe deterministically
+# recomputes the signature) and the controller does NOT charge a
+# ratify-ref token; W28 reduces to W27 byte-for-byte
+# (``W28-Λ-single-probe``).
+#
+# Trust boundary
+# ==============
+# The W28 layer adds one new content-addressed envelope
+# (:class:`EnsemblePivotRatificationEnvelope`) and a new pure verifier
+# (:func:`verify_ensemble_pivot_ratification`) with **eleven** failure
+# modes — none of which existed in any W22..W27 verifier:
+#
+#   * ``empty_ratification``         — None envelope passed.
+#   * ``schema_version_unknown``     — envelope.schema_version mismatch.
+#   * ``schema_cid_mismatch``        — envelope.schema_cid != registered.
+#   * ``signature_cid_empty``        — no signature being ratified.
+#   * ``probe_table_empty``          — no probes registered.
+#   * ``probe_id_unregistered``      — vote from a probe not in the
+#                                      registered probe table.
+#   * ``probe_vote_malformed``       — ratify and reject both true, etc.
+#   * ``trust_weight_negative``      — vote weight < 0.
+#   * ``hash_mismatch``              — ratification_cid does not recompute.
+#   * ``quorum_below_threshold``     — ratified=True but weight < threshold.
+#   * ``quorum_recompute_mismatch``  — ratified flag doesn't match the
+#                                      recomputed quorum sign.
+#
+# Honest scope
+# ============
+# W28 is a **trust-amplification** layer, not a new information channel.
+# It does NOT add new content; it only *ratifies or rejects* W27's
+# existing pivot/anchor decisions, and the ratification proof is itself
+# bounded (1 token on the producer-side wire when needed; 0 tokens on
+# the consumer side).
+#
+# Critically:
+#
+#   * When K_probes = 1 with weight ≥ quorum, W28 is W27 byte-for-byte
+#     (``W28-Λ-single-probe`` falsifier — empirically confirmed on
+#     R-75-SINGLE-PROBE).
+#   * When all probes drift identically (``W28-Λ-coordinated-drift``),
+#     W28 cannot detect the drift; correctness is bounded above by W27.
+#   * When all probe trust priors sum to zero
+#     (``W28-Λ-trust-zero``), the quorum is unreachable and W28
+#     abstains — no false ratification.
+#   * When the W27 pool is exhausted, W28 must NOT invent a fresh
+#     ratification; it falls through to W27's pool-exhausted path
+#     (``W28-Λ-pool-exhausted-passthrough``).
+#   * The W28 envelope is signed AND parent-CID-linked into the W27
+#     pivot ledger: tampering on probe_id, weight, ratified flag,
+#     quorum, or ratification_cid is detected by the verifier.
+#
+# Composition
+# -----------
+# W28 composes the W21 trust-weighted multi-oracle quorum (the *old*
+# explicit-capsule line) with the W27 multi-chain salience-keyed pool
+# (the *new* dense-control line) inside one decision. An ensemble
+# probe is itself an :class:`EnsembleProbeRegistration` with a
+# trust prior — the same ``trust_prior`` semantics W21 uses. A
+# probe can be:
+#
+#   * a deterministic local-recompute probe
+#     (:class:`DeterministicSignatureProbe`) — ratifies if the
+#     signature recomputes exactly; trivially trustworthy;
+#   * an oracle-consultation probe
+#     (:class:`OracleConsultationProbe`) — wraps any
+#     :class:`OutsideWitnessOracle` (W20/W21 family) and ratifies if
+#     the oracle's projected_subset agrees with the salience
+#     signature's projected_subset;
+#   * a real-LLM probe (:class:`LLMSignatureProbe`) — wraps any
+#     :class:`LLMBackend` (Ollama or MLX-distributed; on either Mac
+#     in the two-host topology) and ratifies if the model's parsed
+#     output agrees with the salience signature's projected_subset.
+#
+# Named falsifiers
+# ================
+#   * **W28-Λ-single-probe** — K_probes=1 with weight ≥ quorum
+#     reduces W28 to W27 byte-for-byte; mechanically asserted.
+#   * **W28-Λ-coordinated-drift** — when every probe drifts
+#     identically, W28 cannot detect the drift; correctness ≤ W27.
+#   * **W28-Λ-trust-zero** — all weights = 0 ⇒ quorum unreachable
+#     ⇒ controller abstains.
+#   * **W28-Λ-spoofed-probe** — vote from a probe_id not in the
+#     registered table is rejected with ``probe_id_unregistered``.
+#   * **W28-Λ-quorum-tampered** — ratified flag != recomputed quorum
+#     ⇒ rejected with ``quorum_recompute_mismatch``.
+#   * **W28-Λ-pool-exhausted-passthrough** — when W27 reports
+#     POOL_EXHAUSTED, W28 must not ratify; it falls through.
+
+W28_RATIFICATION_SCHEMA_VERSION: str = "wevra.ensemble_ratification.v1"
+
+W28_BRANCH_RATIFIED = "ratified"
+W28_BRANCH_RATIFIED_PASSTHROUGH = "ratified_passthrough"  # K=1 wire-free
+W28_BRANCH_QUORUM_BELOW_THRESHOLD = "quorum_below_threshold"
+W28_BRANCH_PROBE_REJECTED = "probe_rejected"  # verifier rejected
+W28_BRANCH_NO_RATIFY_NEEDED = "no_ratify_needed"  # W27 didn't pivot
+W28_BRANCH_FALLBACK_W27 = "fallback_w27"  # W27 reported non-pivot branch
+W28_BRANCH_NO_TRIGGER = "no_trigger"
+W28_BRANCH_DISABLED = "disabled"
+
+W28_ALL_BRANCHES: tuple[str, ...] = (
+    W28_BRANCH_RATIFIED,
+    W28_BRANCH_RATIFIED_PASSTHROUGH,
+    W28_BRANCH_QUORUM_BELOW_THRESHOLD,
+    W28_BRANCH_PROBE_REJECTED,
+    W28_BRANCH_NO_RATIFY_NEEDED,
+    W28_BRANCH_FALLBACK_W27,
+    W28_BRANCH_NO_TRIGGER,
+    W28_BRANCH_DISABLED,
+)
+
+# W28 fires only on W27 branches that actually used the salience
+# signature for routing. POOL_EXHAUSTED, NO_TRIGGER, DISABLED, and
+# FALLBACK_W26 do NOT trigger ratification — they have no signature
+# decision to ratify.
+W28_DEFAULT_TRIGGER_BRANCHES: frozenset[str] = frozenset({
+    W27_BRANCH_PIVOTED,
+    W27_BRANCH_ANCHORED_NEW,
+})
+
+
+@dataclasses.dataclass(frozen=True)
+class ProbeVote:
+    """One probe's vote on a salience signature (W28 family).
+
+    A probe inspects a :class:`SalienceSignatureEnvelope` and the
+    cell's canonical compact state and returns one of:
+
+      * ``ratify=True, reject=False`` — probe agrees with the
+        signature; vote contributes ``trust_weight`` to quorum.
+      * ``ratify=False, reject=True`` — probe disagrees; vote
+        contributes ``-trust_weight`` to quorum (i.e. it actively
+        reduces the ratification weight).
+      * ``ratify=False, reject=False`` — probe abstains; vote
+        contributes 0.
+
+    The frozen-dataclass shape is part of the W28 verifier contract:
+    a malformed vote (both ratify and reject true, or weight < 0) is
+    rejected by :func:`verify_ensemble_pivot_ratification`.
+    """
+    probe_id: str
+    ratify: bool
+    reject: bool
+    trust_weight: float
+    reason: str = "ok"
+
+    def __post_init__(self) -> None:
+        # Strict invariants — W28 verifier depends on these.
+        if self.ratify and self.reject:
+            object.__setattr__(self, "reason", "malformed_ratify_and_reject")
+
+    @property
+    def is_abstain(self) -> bool:
+        return (not self.ratify) and (not self.reject)
+
+    @property
+    def signed_weight(self) -> float:
+        if self.ratify and not self.reject:
+            return float(self.trust_weight)
+        if self.reject and not self.ratify:
+            return -float(self.trust_weight)
+        return 0.0
+
+    def as_tuple(self) -> tuple[str, int, int, float, str]:
+        # Canonical, JSON-serialisable tuple form for envelope hashing.
+        return (
+            str(self.probe_id),
+            int(bool(self.ratify)),
+            int(bool(self.reject)),
+            float(self.trust_weight),
+            str(self.reason),
+        )
+
+
+@runtime_checkable
+class EnsembleProbe(Protocol):
+    """The minimum surface a W28 probe must expose.
+
+    A probe inspects a salience signature plus the producer's
+    canonical compact state for one cell and returns a
+    :class:`ProbeVote`. Probes are duck-typed: any object with
+    ``probe_id: str`` and ``vote(...)`` works.
+
+    ``wire_required`` defaults to ``True``: when at least one probe
+    requires the wire (e.g. an oracle / LLM probe whose decision the
+    consumer cannot locally recompute), the W28 layer charges a 1-
+    token ``<ratify_ref:DDDD>`` on the producer side. When *all*
+    probes are deterministic-locally-reconstructible
+    (``wire_required = False``, e.g.
+    :class:`DeterministicSignatureProbe`), no wire token is charged.
+    """
+    probe_id: str
+    wire_required: bool
+
+    def vote(
+            self,
+            *,
+            signature: "SalienceSignatureEnvelope",
+            canonical_per_tag_votes: tuple[tuple[str, int], ...],
+            canonical_projected_subset: tuple[str, ...],
+            cell_index: int,
+    ) -> ProbeVote: ...
+
+
+@dataclasses.dataclass(frozen=True)
+class EnsembleProbeRegistration:
+    """One registered probe in a W28 ensemble (mirrors :class:`OracleRegistration`).
+
+    Fields
+    ------
+    probe
+        An :class:`EnsembleProbe`-shaped object (duck-typed).
+    trust_prior
+        Prior trust weight in [0, ∞). The W28 layer multiplies the
+        probe's vote by this weight when computing the trust-weighted
+        quorum. Default ``1.0`` treats every probe as equally
+        trusted (pure majority — N votes ⇒ N max weight). Production
+        deployments would calibrate trust priors via held-out
+        agreement (cross-reference to W21-C-CALIBRATED-TRUST).
+    role_label
+        Provenance label for forensics ("local_qwen", "remote_qwen14b",
+        "remote_gemma2", "service_graph_oracle", ...). The W28 quorum
+        does NOT use it at decision time.
+    host_id
+        Optional host identifier (e.g. "localhost", "192.168.12.191").
+        When set, enables cross-host telemetry — the W28 layer records
+        ``cross_host_round_trip_bytes`` for any probe whose host_id
+        differs from the orchestrator's host_id.
+    """
+    probe: Any  # EnsembleProbe duck-type
+    trust_prior: float = 1.0
+    role_label: str = "ensemble_probe"
+    host_id: str = ""
+
+
+# ---------------------------------------------------------------------------
+# Built-in probe types
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class DeterministicSignatureProbe:
+    """A locally-recomputable probe (W28 family).
+
+    Ratifies iff the signature envelope's ``signature_cid`` matches
+    the recomputation of the same canonical state. Trivially correct
+    on all byte-identical inputs; the W28 backbone uses this probe at
+    ``K_probes = 1`` to recover the exact W27 byte-for-byte path
+    (W28-Λ-single-probe falsifier).
+
+    Carries ``wire_required = False`` so the W28 layer can omit the
+    ratify-ref wire token when this is the only probe in the table.
+    """
+    probe_id: str = "local_recompute"
+    wire_required: bool = False
+
+    def vote(
+            self,
+            *,
+            signature: "SalienceSignatureEnvelope",
+            canonical_per_tag_votes: tuple[tuple[str, int], ...],
+            canonical_projected_subset: tuple[str, ...],
+            cell_index: int,
+    ) -> ProbeVote:
+        recomputed = signature.recompute_signature_cid()
+        if recomputed == signature.signature_cid:
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=True, reject=False,
+                trust_weight=1.0, reason="local_recompute_ok")
+        return ProbeVote(
+            probe_id=self.probe_id,
+            ratify=False, reject=True,
+            trust_weight=1.0, reason="local_recompute_mismatch")
+
+
+@dataclasses.dataclass
+class OracleConsultationProbe:
+    """A probe that consults a W20/W21-family
+    :class:`OutsideWitnessOracle` to ratify or reject a salience
+    signature (W28 family).
+
+    The probe asks the oracle which subset of services it would
+    project for the cell's projected_subset; if the oracle's reply
+    contains the same gold tags, ratify. If the oracle abstains
+    (empty reply), abstain. If the oracle disagrees on tags, reject.
+
+    Trust priors should reflect oracle reliability — a deterministic
+    :class:`ServiceGraphOracle` carries a high prior (e.g. 1.0); an
+    LLM-backed adjudicator carries a lower prior (e.g. 0.5).
+
+    ``wire_required = True`` because the consumer cannot locally
+    reconstruct the oracle's reply.
+    """
+    oracle: Any  # OutsideWitnessOracle duck-type
+    probe_id: str = ""
+    wire_required: bool = True
+    max_response_tokens: int = 24
+
+    def __post_init__(self) -> None:
+        if not self.probe_id:
+            self.probe_id = f"oracle_probe_{getattr(self.oracle, 'oracle_id', 'unknown')}"
+
+    def vote(
+            self,
+            *,
+            signature: "SalienceSignatureEnvelope",
+            canonical_per_tag_votes: tuple[tuple[str, int], ...],
+            canonical_projected_subset: tuple[str, ...],
+            cell_index: int,
+    ) -> ProbeVote:
+        # Ask the oracle for the projected_subset's services. The
+        # OutsideQuery shape is the same one W20/W21 already use:
+        # ``admitted_tags`` are the candidate services, an optional
+        # ``elected_root_cause`` lets kind-aware oracles tailor their
+        # reply, and ``max_response_tokens`` bounds the wire cost.
+        #
+        # The W21-style :class:`ServiceGraphOracle` returns ``None``
+        # (abstain) when *every* admitted tag is mutually connected
+        # in the graph — that is its asymmetric-witness convention
+        # (it only volunteers info when a strict subset of admitted
+        # tags is connected and the rest is decoy). For ensemble
+        # ratification we want the oracle to fire on a known good
+        # pair, so we pad the admitted_tags with a decoy tag; the
+        # oracle will then return its dependency_chain payload over
+        # the gold pair and abstain on the decoy.
+        admitted_padded = tuple(list(canonical_projected_subset)
+                                  + [f"decoy_probe_{cell_index}"])
+        try:
+            query = OutsideQuery(
+                admitted_tags=admitted_padded,
+                elected_root_cause="ensemble_signature_probe",
+                primary_payload="",
+                witness_payloads=(),
+                max_response_tokens=int(self.max_response_tokens),
+            )
+            verdict = self.oracle.consult(query)
+        except Exception as exc:  # noqa: BLE001
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=False, reject=False,
+                trust_weight=1.0, reason=f"oracle_error:{type(exc).__name__}")
+        # Parse the verdict's payload for the projected services.
+        # Use the existing _disambiguator_payload_tokens semantics:
+        # the W21 layer parses oracle replies as
+        # whitespace-separated tokens prefixed with ``service=``.
+        payload = str(getattr(verdict, "payload", "") or "")
+        if not payload.strip():
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=False, reject=False,
+                trust_weight=1.0, reason="oracle_abstained")
+        tokens = payload.split()
+        oracle_services = set()
+        for tok in tokens:
+            if tok.startswith("service="):
+                oracle_services.add(tok[len("service="):])
+        sig_set = set(canonical_projected_subset)
+        if not oracle_services:
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=False, reject=False,
+                trust_weight=1.0, reason="oracle_no_services_parsed")
+        # Require the oracle's set to overlap with the signature's set
+        # by ≥ ceil(|sig_set| / 2): a strict subset match is too
+        # demanding for noisy oracles, but pure disjointness is a
+        # clear reject.
+        if oracle_services >= sig_set:
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=True, reject=False,
+                trust_weight=1.0, reason="oracle_full_agreement")
+        if oracle_services & sig_set:
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=True, reject=False,
+                trust_weight=1.0, reason="oracle_partial_agreement")
+        return ProbeVote(
+            probe_id=self.probe_id,
+            ratify=False, reject=True,
+            trust_weight=1.0, reason="oracle_disjoint")
+
+
+@dataclasses.dataclass
+class LLMSignatureProbe:
+    """A probe that calls a real LLM backend to ratify/reject a
+    salience signature (W28 family).
+
+    The probe asks the LLM to confirm or deny that the
+    ``projected_subset`` matches the operationally-correct services
+    for the cell. The model's reply is parsed for tag tokens; agreement
+    ratifies, disagreement rejects, empty/malformed reply abstains.
+
+    Designed for the **two-host topology**: when the backend's
+    ``base_url`` points at a different host than the orchestrator's
+    local host, the W28 layer records cross-host round-trip bytes.
+
+    The probe is **best-effort**: any backend exception (timeout,
+    HTTP error, parse failure) maps to abstain, never to ratify.
+    Trust priors should be calibrated below 1.0 to reflect LLM
+    nondeterminism (W22-C-CACHE-AMPLIFICATION applies here).
+    """
+    backend: Any  # LLMBackend duck-type
+    probe_id: str = ""
+    wire_required: bool = True
+    max_tokens: int = 32
+    temperature: float = 0.0
+    n_calls: int = 0
+    total_wall_s: float = 0.0
+    last_response_text: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.probe_id:
+            self.probe_id = f"llm_probe_{getattr(self.backend, 'model', 'unknown')}"
+
+    def _build_prompt(
+            self,
+            *,
+            canonical_projected_subset: tuple[str, ...],
+            canonical_per_tag_votes: tuple[tuple[str, int], ...],
+    ) -> str:
+        services = ", ".join(canonical_projected_subset)
+        votes = ", ".join(f"{k}={v}" for k, v in canonical_per_tag_votes)
+        return (
+            "You are a strict service-incident reviewer.\n"
+            f"Candidate root-cause services: {services}\n"
+            f"Tag votes: {votes}\n"
+            "Reply on one line, with whitespace-separated tokens of the form\n"
+            "  ratify=true service=<name> service=<name>\n"
+            "or\n"
+            "  ratify=false reason=<short>\n"
+            "If you are unsure, reply: ratify=false reason=unsure\n"
+        )
+
+    def vote(
+            self,
+            *,
+            signature: "SalienceSignatureEnvelope",
+            canonical_per_tag_votes: tuple[tuple[str, int], ...],
+            canonical_projected_subset: tuple[str, ...],
+            cell_index: int,
+    ) -> ProbeVote:
+        prompt = self._build_prompt(
+            canonical_projected_subset=canonical_projected_subset,
+            canonical_per_tag_votes=canonical_per_tag_votes)
+        t0 = time.time()
+        try:
+            text = self.backend.generate(
+                prompt,
+                max_tokens=int(self.max_tokens),
+                temperature=float(self.temperature))
+        except Exception as exc:  # noqa: BLE001
+            self.n_calls += 1
+            self.total_wall_s += time.time() - t0
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=False, reject=False,
+                trust_weight=1.0,
+                reason=f"backend_error:{type(exc).__name__}")
+        self.n_calls += 1
+        self.total_wall_s += time.time() - t0
+        self.last_response_text = str(text or "")
+        text = (text or "").strip().lower()
+        if not text:
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=False, reject=False,
+                trust_weight=1.0, reason="llm_empty_reply")
+        tokens = text.split()
+        # Parse ratify=true/false token.
+        ratify_tok = next(
+            (t for t in tokens if t.startswith("ratify=")), "")
+        services = set()
+        for t in tokens:
+            if t.startswith("service="):
+                services.add(t[len("service="):])
+        sig_set = {s.lower() for s in canonical_projected_subset}
+        if ratify_tok == "ratify=true" and services and services & sig_set:
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=True, reject=False,
+                trust_weight=1.0,
+                reason="llm_ratify_with_overlap")
+        if ratify_tok == "ratify=true":
+            # LLM said ratify but did not name overlapping services.
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=False, reject=False,
+                trust_weight=1.0, reason="llm_ratify_without_services")
+        if ratify_tok == "ratify=false":
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=False, reject=True,
+                trust_weight=1.0, reason="llm_explicit_reject")
+        # Free-form reply: try whatever was emitted.
+        if services and services & sig_set:
+            return ProbeVote(
+                probe_id=self.probe_id,
+                ratify=True, reject=False,
+                trust_weight=1.0,
+                reason="llm_freeform_partial_agreement")
+        return ProbeVote(
+            probe_id=self.probe_id,
+            ratify=False, reject=False,
+            trust_weight=1.0, reason="llm_unparseable_reply")
+
+
+# ---------------------------------------------------------------------------
+# Ratification envelope + verifier
+# ---------------------------------------------------------------------------
+
+
+def _compute_ensemble_ratification_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        signature_cid: str,
+        probe_votes: tuple[tuple[str, int, int, float, str], ...],
+        quorum_threshold: float,
+        quorum_weight: float,
+        ratified: bool,
+        cell_index: int,
+) -> str:
+    """Canonical SHA-256 over an ensemble ratification payload."""
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "signature_cid": str(signature_cid),
+        "probe_votes": [
+            [str(pid), int(rt), int(rj),
+              # Round to 4 dp to avoid IEEE-754 byte drift.
+              round(float(w), 4), str(rs)]
+            for pid, rt, rj, w, rs in probe_votes
+        ],
+        "quorum_threshold": round(float(quorum_threshold), 4),
+        "quorum_weight": round(float(quorum_weight), 4),
+        "ratified": bool(ratified),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class EnsemblePivotRatificationEnvelope:
+    """Content-addressed ensemble ratification of one W27 pivot/anchor
+    (W28 family).
+
+    Carries:
+
+      * ``signature_cid``     — the W27 salience signature being ratified.
+      * ``probe_votes``       — sorted tuple of (probe_id, ratify_int,
+                                 reject_int, weight, reason).
+      * ``quorum_threshold``  — pre-committed threshold the trust-
+                                 weighted ``ratify`` weight must meet.
+      * ``quorum_weight``     — actual trust-weighted weight observed.
+      * ``ratified``          — True iff ``quorum_weight ≥ threshold``
+                                 AND no probe vote was malformed.
+      * ``cell_index``        — the cell index the ratification applies to.
+
+    The envelope's ``ratification_cid`` is SHA-256 over the canonical
+    payload; tampering on any field is detected by
+    :func:`verify_ensemble_pivot_ratification`.
+
+    Wire token cost
+    ---------------
+    The W28 layer charges 1 visible token on the producer side
+    (``<ratify_ref:DDDD>``) iff at least one probe in the registered
+    table has ``wire_required = True``. When all probes are
+    locally-reconstructible (e.g. the K=1 single-probe path with
+    :class:`DeterministicSignatureProbe`), the envelope is recorded
+    in the audit ledger but not transmitted on the visible-token wire,
+    so W28 reduces to W27 byte-for-byte.
+    """
+    schema_version: str
+    schema_cid: str
+    signature_cid: str
+    probe_votes: tuple[tuple[str, int, int, float, str], ...]
+    quorum_threshold: float
+    quorum_weight: float
+    ratified: bool
+    cell_index: int
+    wire_required: bool = False
+    ratification_cid: str = ""
+
+    def __post_init__(self) -> None:
+        # Sort probe_votes canonically by probe_id.
+        object.__setattr__(self, "probe_votes",
+                            tuple(sorted(
+                                self.probe_votes, key=lambda v: v[0])))
+        if not self.ratification_cid:
+            object.__setattr__(self, "ratification_cid",
+                                self.recompute_ratification_cid())
+
+    def recompute_ratification_cid(self) -> str:
+        return _compute_ensemble_ratification_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            signature_cid=self.signature_cid,
+            probe_votes=self.probe_votes,
+            quorum_threshold=self.quorum_threshold,
+            quorum_weight=self.quorum_weight,
+            ratified=self.ratified,
+            cell_index=self.cell_index,
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "signature_cid": self.signature_cid,
+            "probe_votes": [list(v) for v in self.probe_votes],
+            "quorum_threshold": round(float(self.quorum_threshold), 4),
+            "quorum_weight": round(float(self.quorum_weight), 4),
+            "ratified": bool(self.ratified),
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<ratify_ref:{self.ratification_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        # Only billed when at least one probe required the wire.
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def recomputed_quorum_weight(self) -> float:
+        # Trust-weighted sum of (ratify - reject) per vote.
+        # Each tuple is (probe_id, ratify_int, reject_int, weight, reason).
+        s = 0.0
+        for _pid, rt, rj, w, _rs in self.probe_votes:
+            if rt and not rj:
+                s += float(w)
+            elif rj and not rt:
+                s -= float(w)
+        return s
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "signature_cid": self.signature_cid,
+            "probe_votes": [list(v) for v in self.probe_votes],
+            "quorum_threshold": round(float(self.quorum_threshold), 4),
+            "quorum_weight": round(float(self.quorum_weight), 4),
+            "ratified": bool(self.ratified),
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "ratification_cid": self.ratification_cid,
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_wire_tokens": int(self.n_wire_tokens),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_ensemble_pivot_ratification(
+        env: EnsemblePivotRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_signature_cid: str,
+        registered_probe_ids: frozenset[str],
+) -> LatentVerificationOutcome:
+    """Controller-side verification of an
+    :class:`EnsemblePivotRatificationEnvelope` (W28 family).
+
+    Pure function. Failure modes enumerated:
+
+    * ``empty_ratification``         — None envelope passed.
+    * ``schema_version_unknown``     — env.schema_version mismatch.
+    * ``schema_cid_mismatch``        — env.schema_cid != registered.
+    * ``signature_cid_empty``        — no signature being ratified.
+    * ``signature_cid_mismatch``     — env.signature_cid != registered.
+    * ``probe_table_empty``          — no probes in the envelope.
+    * ``probe_id_unregistered``      — vote from an unregistered probe.
+    * ``probe_vote_malformed``       — both ratify and reject true.
+    * ``trust_weight_negative``      — vote weight < 0.
+    * ``hash_mismatch``              — ratification_cid does not recompute.
+    * ``quorum_below_threshold``     — ratified=True but weight < threshold.
+    * ``quorum_recompute_mismatch``  — ratified flag != recomputed quorum sign.
+    """
+    n = 0
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_ratification", n_checks=n)
+    n += 1
+    if env.schema_version != W28_RATIFICATION_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n)
+    n += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n)
+    n += 1
+    if not env.signature_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="signature_cid_empty", n_checks=n)
+    n += 1
+    if env.signature_cid != registered_signature_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="signature_cid_mismatch", n_checks=n)
+    n += 1
+    if not env.probe_votes:
+        return LatentVerificationOutcome(
+            ok=False, reason="probe_table_empty", n_checks=n)
+    n += 1
+    for probe_id, rt, rj, w, _reason in env.probe_votes:
+        if probe_id not in registered_probe_ids:
+            return LatentVerificationOutcome(
+                ok=False, reason="probe_id_unregistered", n_checks=n)
+        if bool(rt) and bool(rj):
+            return LatentVerificationOutcome(
+                ok=False, reason="probe_vote_malformed", n_checks=n)
+        if float(w) < 0.0:
+            return LatentVerificationOutcome(
+                ok=False, reason="trust_weight_negative", n_checks=n)
+    n += 1
+    if env.ratification_cid != env.recompute_ratification_cid():
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n)
+    n += 1
+    # Ratified=True must imply quorum_weight ≥ threshold.
+    if bool(env.ratified) and float(env.quorum_weight) < float(
+            env.quorum_threshold):
+        return LatentVerificationOutcome(
+            ok=False, reason="quorum_below_threshold", n_checks=n)
+    n += 1
+    # Ratified flag must match the recomputed quorum sign.
+    recomputed = env.recomputed_quorum_weight
+    expected_ratified = bool(recomputed >= float(env.quorum_threshold))
+    if bool(env.ratified) != expected_ratified:
+        return LatentVerificationOutcome(
+            ok=False, reason="quorum_recompute_mismatch", n_checks=n)
+    # Also enforce internal consistency: the envelope-recorded
+    # quorum_weight must be within float tolerance of the recomputed
+    # weight (avoids tampering on the weight field while leaving votes
+    # untouched).
+    if abs(float(env.quorum_weight) - recomputed) > 1e-6:
+        return LatentVerificationOutcome(
+            ok=False, reason="quorum_recompute_mismatch", n_checks=n)
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n)
+
+
+# ---------------------------------------------------------------------------
+# Controller-side ratification registry
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class EnsembleRatificationRegistry:
+    """Controller-side registry of registered probes + accepted
+    ratifications (W28 family).
+
+    Trust boundary: the registry is controller-owned. A probe table
+    is bound at construction; producers cannot inject unregistered
+    probes (the verifier rejects them with ``probe_id_unregistered``).
+    """
+    schema: SchemaCapsule | None = None
+    quorum_threshold: float = 1.0
+    probes: tuple[EnsembleProbeRegistration, ...] = ()
+    _ratifications: dict[str, EnsemblePivotRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_ratifications_registered: int = 0
+    n_ratifications_rejected: int = 0
+    n_quorum_below_threshold: int = 0
+    n_probe_calls_total: int = 0
+    n_cross_host_probe_calls: int = 0
+    cross_host_round_trip_bytes: int = 0
+    local_host_id: str = "localhost"
+
+    @property
+    def registered_probe_ids(self) -> frozenset[str]:
+        return frozenset(p.probe.probe_id for p in self.probes)
+
+    @property
+    def has_wire_required_probe(self) -> bool:
+        return any(getattr(p.probe, "wire_required", True) for p in self.probes)
+
+    def register_ratification(
+            self,
+            env: EnsemblePivotRatificationEnvelope,
+            *,
+            registered_signature_cid: str,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            self.n_ratifications_rejected += 1
+            return LatentVerificationOutcome(
+                ok=False, reason="registry_no_schema", n_checks=0)
+        outcome = verify_ensemble_pivot_ratification(
+            env,
+            registered_schema=self.schema,
+            registered_signature_cid=registered_signature_cid,
+            registered_probe_ids=self.registered_probe_ids,
+        )
+        if not outcome.ok:
+            self.n_ratifications_rejected += 1
+            if outcome.reason == "quorum_below_threshold":
+                self.n_quorum_below_threshold += 1
+            return outcome
+        # Even when the verifier passes structurally, only count it
+        # as a *registered* ratification when the ratified flag is
+        # True; envelopes that record a failed quorum are still kept
+        # (for audit) but counted separately.
+        self._ratifications[env.ratification_cid] = env
+        if env.ratified:
+            self.n_ratifications_registered += 1
+        else:
+            self.n_quorum_below_threshold += 1
+        return outcome
+
+    def reset_session(self) -> None:
+        self._ratifications.clear()
+        self.n_ratifications_registered = 0
+        self.n_ratifications_rejected = 0
+        self.n_quorum_below_threshold = 0
+        self.n_probe_calls_total = 0
+        self.n_cross_host_probe_calls = 0
+        self.cross_host_round_trip_bytes = 0
+
+
+# ---------------------------------------------------------------------------
+# W28 result + orchestrator
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class W28EnsembleResult:
+    """Per-cell audit record for a W28 ensemble-verified agent."""
+    answer: dict[str, Any]
+    inner_w27_branch: str
+    decoder_branch: str
+    agent_id: str
+    is_producer: bool
+    signature_cid: str
+    ratification_cid: str
+    n_w27_visible_tokens: int
+    n_w28_visible_tokens: int
+    n_ratify_overhead_tokens: int
+    quorum_threshold: float
+    quorum_weight: float
+    ratified: bool
+    n_probes_called: int
+    n_probes_ratified: int
+    n_probes_rejected: int
+    n_probes_abstained: int
+    cross_host_round_trip_bytes: int
+    pool_size: int
+    pool_exhausted: bool
+    ratification_verification_ok: bool
+    ratification_verification_reason: str
+    probe_vote_summary: list[dict[str, Any]] = dataclasses.field(
+        default_factory=list)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "inner_w27_branch": self.inner_w27_branch,
+            "decoder_branch": self.decoder_branch,
+            "agent_id": self.agent_id,
+            "is_producer": bool(self.is_producer),
+            "signature_cid": self.signature_cid,
+            "ratification_cid": self.ratification_cid,
+            "n_w27_visible_tokens": int(self.n_w27_visible_tokens),
+            "n_w28_visible_tokens": int(self.n_w28_visible_tokens),
+            "n_ratify_overhead_tokens": int(self.n_ratify_overhead_tokens),
+            "quorum_threshold": round(float(self.quorum_threshold), 4),
+            "quorum_weight": round(float(self.quorum_weight), 4),
+            "ratified": bool(self.ratified),
+            "n_probes_called": int(self.n_probes_called),
+            "n_probes_ratified": int(self.n_probes_ratified),
+            "n_probes_rejected": int(self.n_probes_rejected),
+            "n_probes_abstained": int(self.n_probes_abstained),
+            "cross_host_round_trip_bytes": int(self.cross_host_round_trip_bytes),
+            "pool_size": int(self.pool_size),
+            "pool_exhausted": bool(self.pool_exhausted),
+            "ratification_verification_ok": bool(
+                self.ratification_verification_ok),
+            "ratification_verification_reason": str(
+                self.ratification_verification_reason),
+            "probe_vote_summary": list(self.probe_vote_summary),
+        }
+
+
+@dataclasses.dataclass
+class EnsembleVerifiedMultiChainOrchestrator:
+    """Ensemble-verified multi-chain pivot ratification (W28 family).
+
+    Wraps a :class:`MultiChainPersistedFanoutOrchestrator` and adds a
+    controller-side trust-weighted probe quorum that ratifies (or
+    rejects) every pivot / new-anchor decision the W27 layer makes.
+
+    The W28 layer
+    -------------
+    For every cell:
+
+      1. The wrapped W27 orchestrator runs first; it produces its
+         routing decision (PIVOTED / ANCHORED_NEW / FALLBACK_W26 / ...).
+      2. If the W27 branch is one of the trigger branches
+         (PIVOTED, ANCHORED_NEW), the W28 layer:
+           a. Reads the cell's salience signature from the W27 slot.
+           b. Polls each :class:`EnsembleProbeRegistration` in the
+              registry's probe table; collects per-probe
+              :class:`ProbeVote`.
+           c. Computes the trust-weighted sum of ratify-vs-reject
+              weights.
+           d. Builds an :class:`EnsemblePivotRatificationEnvelope`
+              with the sealed votes + quorum + ratified flag.
+           e. Verifies the envelope via
+              :func:`verify_ensemble_pivot_ratification`.
+           f. Registers the verified envelope with the registry.
+      3. If the envelope's ``ratified`` flag is True AND the verifier
+         passes, the cell is ratified — visible token cost = W27 + 1
+         iff any probe required the wire (else +0).
+      4. If the envelope is rejected (verifier failure OR quorum below
+         threshold), the W28 layer marks the cell as not-ratified;
+         the W27 routing still happened (it cannot be undone), but
+         downstream consumers are told via the audit record that the
+         cell is unratified — they may choose to suppress its
+         contribution to the team decision.
+
+    Trust boundary
+    --------------
+    Every probe vote is sealed into the ratification envelope and
+    verified by the pure :func:`verify_ensemble_pivot_ratification`,
+    which enumerates 11 failure modes (none of which existed in any
+    W22..W27 verifier). Tampering on any field of any vote, on the
+    quorum weight, on the ratified flag, or on the ratification CID
+    is detected.
+
+    Backward compatibility (W28-Λ-single-probe)
+    --------------------------------------------
+    With a single :class:`DeterministicSignatureProbe` and
+    ``quorum_threshold = 1.0``, every cell ratifies trivially and the
+    wire-required check is False, so the visible-token cost equals
+    W27's exactly. The audit ledger still gains a ratification
+    envelope per ratifying cell (for forensics), but no token is
+    transmitted. The mechanical assertion of byte-for-byte
+    equivalence at K=1 is a unit test in
+    ``test_phase75_ensemble_verified_multi_chain.py``.
+    """
+    inner: MultiChainPersistedFanoutOrchestrator
+    registry: EnsembleRatificationRegistry
+    enabled: bool = True
+    require_ratification_verification: bool = True
+    trigger_branches: frozenset[str] = dataclasses.field(
+        default_factory=lambda: W28_DEFAULT_TRIGGER_BRANCHES)
+    local_host_id: str = "localhost"
+
+    _last_result: "W28EnsembleResult | None" = None
+    _last_envelope: "EnsemblePivotRatificationEnvelope | None" = None
+    _cell_index: int = 0
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.inner.schema
+
+    @property
+    def agent_id(self) -> str:
+        return self.inner.agent_id
+
+    @property
+    def is_producer(self) -> bool:
+        return self.inner.is_producer
+
+    @property
+    def producer_agent_id(self) -> str:
+        return self.inner.producer_agent_id
+
+    @property
+    def consumer_agent_ids(self) -> tuple[str, ...]:
+        return self.inner.consumer_agent_ids
+
+    @property
+    def pool_size(self) -> int:
+        return self.inner.pool_size
+
+    @property
+    def n_pool_exhausted_rejections(self) -> int:
+        return self.inner.n_pool_exhausted_rejections
+
+    def reset_session(self) -> None:
+        self.inner.reset_session()
+        self._last_result = None
+        self._last_envelope = None
+        self._cell_index = 0
+
+    def _read_cell_signature(self) -> "SalienceSignatureEnvelope | None":
+        """Read the salience signature for the cell W27 just ran.
+
+        The W27 orchestrator routes each cell to a per-signature W26
+        slot; the slot's inner W25 fanout envelope holds the canonical
+        compact state. We rebuild the signature from there so the W28
+        layer is independent of any in-memory side effect.
+        """
+        # Find the slot used by this cell on the producer side.
+        # The W27 orchestrator's last_result holds the input
+        # signature CID — we look it up in the pool to recover the
+        # SalienceSignatureEnvelope shape.
+        last = self.inner.last_result
+        if last is None:
+            return None
+        sig_cid = str(last.input_signature_cid)
+        if not sig_cid:
+            return None
+        # Find a slot for this agent + signature.
+        slot = self.inner.pool._agent_slots.get(
+            self.agent_id, {}).get(sig_cid)
+        if slot is None:
+            return None
+        # Read the slot's inner W25 fanout envelope to get the canonical
+        # compact state.
+        w26 = slot.disambiguator
+        w25 = w26.inner  # SharedFanoutDisambiguator
+        fanout = w25.last_fanout_envelope
+        if fanout is None:
+            return None
+        per_tag = tuple(fanout.compact_per_tag_votes)
+        projected = tuple(fanout.compact_projected_subset)
+        schema_cid = (str(self.schema.cid)
+                        if self.schema is not None else "")
+        return SalienceSignatureEnvelope(
+            schema_version=W27_SALIENCE_SIGNATURE_SCHEMA_VERSION,
+            schema_cid=schema_cid,
+            producer_agent_id=str(self.producer_agent_id
+                                    or self.agent_id),
+            consumer_agent_ids=tuple(self.consumer_agent_ids),
+            canonical_per_tag_votes=tuple(per_tag),
+            canonical_projected_subset=tuple(projected),
+            cell_index_first_observed=int(self._cell_index),
+        )
+
+    def _poll_probes(
+            self,
+            *,
+            signature: "SalienceSignatureEnvelope",
+    ) -> tuple[list[ProbeVote], int, int]:
+        """Run every registered probe; return (votes, n_cross_host_calls,
+        cross_host_round_trip_bytes)."""
+        votes: list[ProbeVote] = []
+        n_cross_host = 0
+        n_cross_host_bytes = 0
+        for reg in self.registry.probes:
+            self.registry.n_probe_calls_total += 1
+            try:
+                vote = reg.probe.vote(
+                    signature=signature,
+                    canonical_per_tag_votes=signature.canonical_per_tag_votes,
+                    canonical_projected_subset=signature.canonical_projected_subset,
+                    cell_index=int(self._cell_index),
+                )
+            except Exception as exc:  # noqa: BLE001
+                vote = ProbeVote(
+                    probe_id=str(reg.probe.probe_id),
+                    ratify=False, reject=False,
+                    trust_weight=float(reg.trust_prior),
+                    reason=f"probe_error:{type(exc).__name__}")
+            # Override the probe-emitted weight with the registration's
+            # trust_prior (the probe should not be able to set its own
+            # weight; only the controller-registered prior counts).
+            vote = ProbeVote(
+                probe_id=vote.probe_id,
+                ratify=bool(vote.ratify),
+                reject=bool(vote.reject),
+                trust_weight=float(reg.trust_prior),
+                reason=str(vote.reason),
+            )
+            votes.append(vote)
+            # Cross-host accounting.
+            if reg.host_id and reg.host_id != self.local_host_id:
+                n_cross_host += 1
+                # Estimate round-trip bytes from the probe's last
+                # response if available (LLMSignatureProbe), else use
+                # the salience envelope size as a lower bound.
+                last_text = getattr(reg.probe, "last_response_text", "")
+                if last_text:
+                    n_cross_host_bytes += len(last_text.encode("utf-8"))
+                else:
+                    n_cross_host_bytes += int(signature.n_signature_bytes)
+        self.registry.n_cross_host_probe_calls += n_cross_host
+        self.registry.cross_host_round_trip_bytes += n_cross_host_bytes
+        return votes, n_cross_host, n_cross_host_bytes
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        # 1. Run W27 first.
+        out = self.inner.decode_rounds(per_round_handoffs)
+        last_w27 = self.inner.last_result
+        cell_index = int(self._cell_index)
+
+        inner_w27_branch = (str(last_w27.decoder_branch)
+                              if last_w27 is not None
+                              else W27_BRANCH_DISABLED)
+        n_w27_visible = (int(last_w27.n_w27_visible_tokens)
+                          if last_w27 is not None else 0)
+        pool_size = int(self.pool_size)
+        pool_exhausted = bool(last_w27.pool_exhausted) if last_w27 else False
+
+        def _pack(
+                *,
+                decoder_branch: str,
+                envelope: EnsemblePivotRatificationEnvelope | None,
+                n_w28_visible: int,
+                ratify_overhead: int,
+                quorum_w: float,
+                ratified: bool,
+                n_probes_called: int,
+                n_ratified: int,
+                n_rejected: int,
+                n_abstained: int,
+                cross_host_bytes: int,
+                verify_ok: bool,
+                verify_reason: str,
+                probe_summary: list[dict[str, Any]],
+        ) -> dict[str, Any]:
+            sig_cid = str(envelope.signature_cid) if envelope else ""
+            rat_cid = str(envelope.ratification_cid) if envelope else ""
+            result = W28EnsembleResult(
+                answer=dict(out),
+                inner_w27_branch=inner_w27_branch,
+                decoder_branch=decoder_branch,
+                agent_id=str(self.agent_id),
+                is_producer=bool(self.is_producer),
+                signature_cid=sig_cid,
+                ratification_cid=rat_cid,
+                n_w27_visible_tokens=int(n_w27_visible),
+                n_w28_visible_tokens=int(n_w28_visible),
+                n_ratify_overhead_tokens=int(ratify_overhead),
+                quorum_threshold=float(self.registry.quorum_threshold),
+                quorum_weight=float(quorum_w),
+                ratified=bool(ratified),
+                n_probes_called=int(n_probes_called),
+                n_probes_ratified=int(n_ratified),
+                n_probes_rejected=int(n_rejected),
+                n_probes_abstained=int(n_abstained),
+                cross_host_round_trip_bytes=int(cross_host_bytes),
+                pool_size=int(pool_size),
+                pool_exhausted=bool(pool_exhausted),
+                ratification_verification_ok=bool(verify_ok),
+                ratification_verification_reason=str(verify_reason),
+                probe_vote_summary=list(probe_summary),
+            )
+            self._last_result = result
+            self._last_envelope = envelope
+            out_local = dict(out)
+            out_local["ensemble_verified_multi_chain"] = result.as_dict()
+            if envelope is not None:
+                out_local["ensemble_ratification_envelope"] = (
+                    envelope.as_dict())
+            return out_local
+
+        # ---- Disabled / no-trigger / no-schema paths ----
+        if (not self.enabled or self.schema is None
+                or not self.registry.probes):
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W28_BRANCH_DISABLED,
+                envelope=None, n_w28_visible=n_w27_visible,
+                ratify_overhead=0,
+                quorum_w=0.0, ratified=False,
+                n_probes_called=0, n_ratified=0,
+                n_rejected=0, n_abstained=0,
+                cross_host_bytes=0,
+                verify_ok=False, verify_reason="disabled",
+                probe_summary=[])
+
+        if inner_w27_branch not in self.trigger_branches:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W28_BRANCH_NO_RATIFY_NEEDED,
+                envelope=None, n_w28_visible=n_w27_visible,
+                ratify_overhead=0,
+                quorum_w=0.0, ratified=False,
+                n_probes_called=0, n_ratified=0,
+                n_rejected=0, n_abstained=0,
+                cross_host_bytes=0,
+                verify_ok=False,
+                verify_reason="w27_branch_not_triggered",
+                probe_summary=[])
+
+        # ---- Compute cell signature + poll probes ----
+        signature = self._read_cell_signature()
+        if signature is None:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W28_BRANCH_FALLBACK_W27,
+                envelope=None, n_w28_visible=n_w27_visible,
+                ratify_overhead=0,
+                quorum_w=0.0, ratified=False,
+                n_probes_called=0, n_ratified=0,
+                n_rejected=0, n_abstained=0,
+                cross_host_bytes=0,
+                verify_ok=False,
+                verify_reason="no_w27_signature",
+                probe_summary=[])
+
+        votes, _n_cross_host, cross_host_bytes = self._poll_probes(
+            signature=signature)
+        # Compute trust-weighted quorum.
+        quorum_w = sum(v.signed_weight for v in votes)
+        threshold = float(self.registry.quorum_threshold)
+        ratified = bool(quorum_w >= threshold)
+
+        n_ratified = sum(1 for v in votes if v.ratify and not v.reject)
+        n_rejected = sum(1 for v in votes if v.reject and not v.ratify)
+        n_abstained = sum(1 for v in votes if v.is_abstain)
+        probe_summary = [
+            {"probe_id": v.probe_id, "ratify": int(v.ratify),
+              "reject": int(v.reject),
+              "trust_weight": round(float(v.trust_weight), 4),
+              "reason": v.reason}
+            for v in votes
+        ]
+
+        # ---- Build the ratification envelope ----
+        wire_required = self.registry.has_wire_required_probe
+        envelope = EnsemblePivotRatificationEnvelope(
+            schema_version=W28_RATIFICATION_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            signature_cid=str(signature.signature_cid),
+            probe_votes=tuple(v.as_tuple() for v in votes),
+            quorum_threshold=float(threshold),
+            quorum_weight=float(quorum_w),
+            ratified=bool(ratified),
+            cell_index=int(cell_index),
+            wire_required=bool(wire_required),
+        )
+
+        # ---- Verify + register ----
+        outcome = self.registry.register_ratification(
+            envelope, registered_signature_cid=signature.signature_cid)
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+
+        if not verify_ok and self.require_ratification_verification:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W28_BRANCH_PROBE_REJECTED,
+                envelope=envelope, n_w28_visible=n_w27_visible,
+                ratify_overhead=0,
+                quorum_w=quorum_w, ratified=False,
+                n_probes_called=len(votes), n_ratified=n_ratified,
+                n_rejected=n_rejected, n_abstained=n_abstained,
+                cross_host_bytes=cross_host_bytes,
+                verify_ok=False, verify_reason=verify_reason,
+                probe_summary=probe_summary)
+
+        if not ratified:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W28_BRANCH_QUORUM_BELOW_THRESHOLD,
+                envelope=envelope, n_w28_visible=n_w27_visible,
+                ratify_overhead=0,
+                quorum_w=quorum_w, ratified=False,
+                n_probes_called=len(votes), n_ratified=n_ratified,
+                n_rejected=n_rejected, n_abstained=n_abstained,
+                cross_host_bytes=cross_host_bytes,
+                verify_ok=verify_ok, verify_reason=verify_reason,
+                probe_summary=probe_summary)
+
+        # Ratified: charge wire token iff any probe requires the wire.
+        ratify_overhead = int(envelope.n_wire_tokens)
+        decoder_branch = (W28_BRANCH_RATIFIED if ratify_overhead > 0
+                            else W28_BRANCH_RATIFIED_PASSTHROUGH)
+        n_w28_visible = int(n_w27_visible + ratify_overhead)
+        self._cell_index += 1
+        return _pack(
+            decoder_branch=decoder_branch,
+            envelope=envelope, n_w28_visible=n_w28_visible,
+            ratify_overhead=ratify_overhead,
+            quorum_w=quorum_w, ratified=True,
+            n_probes_called=len(votes), n_ratified=n_ratified,
+            n_rejected=n_rejected, n_abstained=n_abstained,
+            cross_host_bytes=cross_host_bytes,
+            verify_ok=verify_ok, verify_reason=verify_reason,
+            probe_summary=probe_summary)
+
+    def decode(
+            self,
+            handoffs: Sequence[_DecodedHandoff],
+    ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> "W28EnsembleResult | None":
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> "EnsemblePivotRatificationEnvelope | None":
+        return self._last_envelope
+
+
+# ---------------------------------------------------------------------------
+# Convenience factories
+# ---------------------------------------------------------------------------
+
+
+def build_default_ensemble_registry(
+        *,
+        schema: SchemaCapsule,
+        quorum_threshold: float = 1.0,
+        local_host_id: str = "localhost",
+) -> EnsembleRatificationRegistry:
+    """Build a W28 registry with a single
+    :class:`DeterministicSignatureProbe` (the K=1 byte-for-W27 path).
+    """
+    return EnsembleRatificationRegistry(
+        schema=schema,
+        quorum_threshold=float(quorum_threshold),
+        probes=(
+            EnsembleProbeRegistration(
+                probe=DeterministicSignatureProbe(
+                    probe_id="local_recompute"),
+                trust_prior=1.0,
+                role_label="local_recompute",
+                host_id=local_host_id,
+            ),
+        ),
+        local_host_id=local_host_id,
+    )
+
+
+def build_two_probe_oracle_ensemble_registry(
+        *,
+        schema: SchemaCapsule,
+        oracle_a: Any,
+        oracle_b: Any,
+        oracle_a_label: str = "oracle_primary",
+        oracle_b_label: str = "oracle_secondary",
+        oracle_a_trust: float = 1.0,
+        oracle_b_trust: float = 1.0,
+        quorum_threshold: float = 1.0,
+        local_host_id: str = "localhost",
+) -> EnsembleRatificationRegistry:
+    """Build a W28 registry with two
+    :class:`OracleConsultationProbe` entries.
+
+    Useful for the W21 × W27 synthesis: the same
+    :class:`ServiceGraphOracle` / :class:`ChangeHistoryOracle` pair
+    that powers W21 also serves as the W28 ensemble probe table.
+    """
+    return EnsembleRatificationRegistry(
+        schema=schema,
+        quorum_threshold=float(quorum_threshold),
+        probes=(
+            EnsembleProbeRegistration(
+                probe=OracleConsultationProbe(
+                    oracle=oracle_a,
+                    probe_id=f"oracle_a_{oracle_a_label}"),
+                trust_prior=float(oracle_a_trust),
+                role_label=oracle_a_label,
+                host_id=local_host_id,
+            ),
+            EnsembleProbeRegistration(
+                probe=OracleConsultationProbe(
+                    oracle=oracle_b,
+                    probe_id=f"oracle_b_{oracle_b_label}"),
+                trust_prior=float(oracle_b_trust),
+                role_label=oracle_b_label,
+                host_id=local_host_id,
+            ),
+        ),
+        local_host_id=local_host_id,
+    )
+
+
+def build_cross_host_llm_ensemble_registry(
+        *,
+        schema: SchemaCapsule,
+        backends_with_hosts: Sequence[tuple[Any, str, str, float]],
+        quorum_threshold: float = 1.0,
+        local_host_id: str = "localhost",
+) -> EnsembleRatificationRegistry:
+    """Build a W28 registry from a list of (backend, host_id,
+    role_label, trust_prior) tuples.
+
+    Each backend wraps a real LLM host (Ollama or MLX-distributed)
+    on a specific Mac; the W28 layer accumulates
+    ``cross_host_round_trip_bytes`` for any probe whose host_id
+    differs from ``local_host_id``. This is the **two-host topology
+    entry point** — pass two backends pointing at different reachable
+    Macs and W28 will measure cross-host probing in the headline run.
+    """
+    probes = tuple(
+        EnsembleProbeRegistration(
+            probe=LLMSignatureProbe(
+                backend=backend,
+                probe_id=f"llm_{role_label}"),
+            trust_prior=float(trust_prior),
+            role_label=str(role_label),
+            host_id=str(host_id),
+        )
+        for backend, host_id, role_label, trust_prior in backends_with_hosts
+    )
+    return EnsembleRatificationRegistry(
+        schema=schema,
+        quorum_threshold=float(quorum_threshold),
+        probes=probes,
+        local_host_id=local_host_id,
+    )

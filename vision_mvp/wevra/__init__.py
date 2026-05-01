@@ -324,6 +324,26 @@ from .team_coord import (
     W27_BRANCH_FALLBACK_W26, W27_BRANCH_NO_TRIGGER,
     W27_BRANCH_DISABLED,
     W27_DEFAULT_TRIGGER_BRANCHES,
+    # SDK v3.29 — ensemble-verified cross-model multi-chain pivot
+    # ratification (W28 family). EXPERIMENTAL — see __experimental__.
+    ProbeVote, EnsembleProbe, EnsembleProbeRegistration,
+    DeterministicSignatureProbe, OracleConsultationProbe,
+    LLMSignatureProbe,
+    EnsemblePivotRatificationEnvelope,
+    EnsembleRatificationRegistry,
+    EnsembleVerifiedMultiChainOrchestrator,
+    W28EnsembleResult,
+    verify_ensemble_pivot_ratification,
+    build_default_ensemble_registry,
+    build_two_probe_oracle_ensemble_registry,
+    build_cross_host_llm_ensemble_registry,
+    W28_RATIFICATION_SCHEMA_VERSION,
+    W28_ALL_BRANCHES,
+    W28_BRANCH_RATIFIED, W28_BRANCH_RATIFIED_PASSTHROUGH,
+    W28_BRANCH_QUORUM_BELOW_THRESHOLD, W28_BRANCH_PROBE_REJECTED,
+    W28_BRANCH_NO_RATIFY_NEEDED, W28_BRANCH_FALLBACK_W27,
+    W28_BRANCH_NO_TRIGGER, W28_BRANCH_DISABLED,
+    W28_DEFAULT_TRIGGER_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -337,13 +357,55 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.28"
+SDK_VERSION = "wevra.sdk.v3.29"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
 PRODUCT_REPORT_SCHEMA_V1 = "phase45.product_report.v1"
 CI_VERDICT_SCHEMA = "phase46.ci_verdict.v1"
 IMPORT_AUDIT_SCHEMA = "phase46.import_audit.v1"
+
+# SDK v3.29 (W28) — explicit stable-vs-experimental boundary. The
+# symbols enumerated below are part of the *research-grade* dense-
+# control / multi-agent-coordination surface and may evolve between
+# minor versions. The stable runtime contract (RunSpec → run report,
+# capsule primitives, lifecycle audit) is NOT in this tuple. External
+# callers depending on these symbols should pin a specific SDK version
+# and watch the CHANGELOG for breaking changes.
+__experimental__: tuple[str, ...] = (
+    # W22 family — capsule + audited latent-state-sharing hybrid.
+    "SchemaCapsule", "LatentDigestEnvelope", "LatentDigestDisambiguator",
+    "verify_latent_digest", "SharedReadCache", "CachingOracleAdapter",
+    "EnvelopeTamperer",
+    # W25 family — shared-fanout dense-control.
+    "FanoutEnvelope", "SharedFanoutRegistry", "SharedFanoutDisambiguator",
+    "verify_fanout",
+    # W26 family — chain-persisted dense-control fanout.
+    "ChainAnchorEnvelope", "ChainAdvanceEnvelope",
+    "ChainPersistedFanoutRegistry", "ChainPersistedFanoutDisambiguator",
+    "ProjectionSlot",
+    "verify_chain_anchor", "verify_chain_advance",
+    "verify_projection_subscription",
+    # W27 family — multi-chain salience-keyed dense-control fanout.
+    "SalienceSignatureEnvelope", "ChainPivotEnvelope",
+    "MultiChainPersistedFanoutRegistry",
+    "MultiChainPersistedFanoutDisambiguator",
+    "MultiChainPersistedFanoutOrchestrator",
+    "SharedMultiChainPool",
+    "verify_salience_signature", "verify_chain_pivot",
+    "compute_input_signature_cid",
+    # W28 family — ensemble-verified cross-model pivot ratification.
+    "ProbeVote", "EnsembleProbe", "EnsembleProbeRegistration",
+    "DeterministicSignatureProbe", "OracleConsultationProbe",
+    "LLMSignatureProbe",
+    "EnsemblePivotRatificationEnvelope",
+    "EnsembleRatificationRegistry",
+    "EnsembleVerifiedMultiChainOrchestrator",
+    "verify_ensemble_pivot_ratification",
+    "build_default_ensemble_registry",
+    "build_two_probe_oracle_ensemble_registry",
+    "build_cross_host_llm_ensemble_registry",
+)
 
 __all__ = [
     # Execution
@@ -533,6 +595,26 @@ __all__ = [
     "W27_BRANCH_FALLBACK_W26", "W27_BRANCH_NO_TRIGGER",
     "W27_BRANCH_DISABLED",
     "W27_DEFAULT_TRIGGER_BRANCHES",
+    # SDK v3.29 — W28 family (ensemble-verified cross-model multi-chain
+    # pivot ratification). EXPERIMENTAL — see __experimental__ tuple.
+    "ProbeVote", "EnsembleProbe", "EnsembleProbeRegistration",
+    "DeterministicSignatureProbe", "OracleConsultationProbe",
+    "LLMSignatureProbe",
+    "EnsemblePivotRatificationEnvelope",
+    "EnsembleRatificationRegistry",
+    "EnsembleVerifiedMultiChainOrchestrator",
+    "W28EnsembleResult",
+    "verify_ensemble_pivot_ratification",
+    "build_default_ensemble_registry",
+    "build_two_probe_oracle_ensemble_registry",
+    "build_cross_host_llm_ensemble_registry",
+    "W28_RATIFICATION_SCHEMA_VERSION",
+    "W28_ALL_BRANCHES",
+    "W28_BRANCH_RATIFIED", "W28_BRANCH_RATIFIED_PASSTHROUGH",
+    "W28_BRANCH_QUORUM_BELOW_THRESHOLD", "W28_BRANCH_PROBE_REJECTED",
+    "W28_BRANCH_NO_RATIFY_NEEDED", "W28_BRANCH_FALLBACK_W27",
+    "W28_BRANCH_NO_TRIGGER", "W28_BRANCH_DISABLED",
+    "W28_DEFAULT_TRIGGER_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

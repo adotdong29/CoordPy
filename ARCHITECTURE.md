@@ -1401,3 +1401,43 @@ The boundary layer does not change any programme-internal
 semantics; see `vision_mvp/RESULTS_PHASE46.md` and
 `docs/context_zero_master_plan.md` §9.9 for the endogenous /
 exogenous split.
+
+
+---
+
+## Stable-vs-Experimental Boundary (SDK v3.29 / W28)
+
+As of SDK v3.29 the Wevra public surface is split into **stable**
+and **experimental** tiers, named explicitly in
+`vision_mvp/wevra/__init__.py`:
+
+* **Stable surface** (everything in `__all__` *not* in
+  `__experimental__`): the run boundary (`RunSpec`, `run`),
+  capsule primitives (`ContextCapsule`, `CapsuleLedger`,
+  `CapsuleView`, lifecycle audit), provenance, the LLM backend
+  abstraction (`LLMBackend`, `OllamaBackend`,
+  `MLXDistributedBackend`), the team coordination ledger primitives
+  (`capsule_team_handoff`, `capsule_role_view`, `capsule_team_decision`,
+  `T_INVARIANTS`), and the layered API (`WevraSimpleAPI`,
+  `WevraBuilderAPI`, `WevraAdvancedAPI`). The W3 capsule contract,
+  the W4 team-lifecycle audit, and the run-boundary product
+  runtime contract are all in the stable surface and are subject
+  to semantic-version compatibility within the 0.5.x line.
+* **Experimental surface** (`vision_mvp.wevra.__experimental__`):
+  the dense-control / multi-agent-coordination research line —
+  W22 latent digest, W23 cross-cell delta, W24 session compaction,
+  W25 shared fanout, W26 chain-persisted fanout, W27 multi-chain
+  pivot, W28 ensemble-verified ratification. These symbols may
+  evolve between minor versions; external callers should pin a
+  specific SDK version (`__version__` / `SDK_VERSION`) and watch
+  the CHANGELOG for breaking changes.
+
+The split is *additive* on the v3.28 surface — every prior
+exported symbol remains exported; the `__experimental__` tuple
+is a *marker*, not a removal. External callers depending only on
+the stable surface should see no behavioural change crossing the
+v3.28 → v3.29 boundary.
+
+The stability of the stable surface is mechanically asserted by
+`test_wevra_public_api.py`; the experimental surface is asserted
+by the W22..W28 phase tests.
