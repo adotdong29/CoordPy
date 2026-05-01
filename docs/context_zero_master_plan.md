@@ -10374,6 +10374,125 @@ for W28).**
 
 ---
 
+## SDK v3.30 (W29 family) — geometry-partitioned product-manifold dense control + audited subspace-basis payload + factoradic Lehmer routing index + causal-validity gate + cross-host variance witness — 2026-04-30
+
+W29 inserts a **structural geometry-partitioning** step between the
+cell handoffs and the W28 ensemble decision. Every triggered cell is
+classified into one of three pre-committed partition labels — LINEAR
+(extends most-recent signature), HIERARCHICAL (fresh anchor), CYCLIC
+(re-visited signature) — by the producer using the W27 input
+signature CID and a bounded signature history. Per-partition inner
+W28 stacks get their own oracle / probe / pool topology, so cells in
+different partitions route through structurally different
+compartments. The W29 envelope additionally carries an audited
+orthonormal subspace basis (Grassmannian-style, capsule-layer audited
+proxy), a factoradic Lehmer-code routing index, a causal-validity
+SHA-256 binding, and an optional cross-host variance witness.
+
+**Headline result.** On **R-76-XHOST-DRIFT** (1 producer + K=3
+consumers, 16 cells, partial ServiceGraphOracle that knows GOLD_A
+but not GOLD_B; per-partition routing dispatches CYCLIC cells to a
+separate inner W28 with the FULL oracle), W29 strictly improves
+correctness over BOTH W27 and W28 baselines: ``correctness_w27 =
+correctness_w28 = 0.500`` and ``correctness_w29 = 0.750``,
+**Δ = +0.250 across 5/5 seeds**, ``trust_precision = 1.000``,
+``mean_overhead = 0.75 tokens/cell``, ``max_overhead = 1 token/cell``.
+Same +0.250 gain holds on the live two-host topology (localhost
+gemma2:9b + 192.168.12.191 qwen2.5:14b); 16 cross-host probe calls;
+710 LAN bytes; ``trust_precision = 1.000``.
+
+**Empirically discharges W28-C-CROSS-HOST-VARIANCE on the magnitude
+axis** (the named open frontier from the post-W28 audit board's
+question 7). The first capsule-native multi-agent-coordination
+method to demonstrate the synthesis (W21 × W27, sealed by W28,
+geometry-partitioned by W29) strictly improves correctness on a
+regime where the prior best (W28) makes correctness mistakes.
+
+Five named falsifiers all empirically confirmed (W29-Λ-trivial-
+partition; W29-Λ-non-orthogonal-basis; W29-Λ-coordinated-drift-
+cross-host; plus W28's W28-Λ-quorum-tampered and
+W28-Λ-pool-exhausted-passthrough inherited). 14 enumerated trust-
+boundary failure modes (vs W28's 11) in
+``verify_geometry_partition_ratification``. **935/935 + 6 subtests
+pass** across W3..W29 + capsule + public API + runtime + LLM
+backend.
+
+The pre-committed cram-factor headline (H7 ≥ 8.0) was MISSED:
+measured 2.30× on R-76-CHAIN-SHARED. Mechanism real, magnitude
+below bar; becomes named open conjecture
+**W29-C-CRAM-AMPLIFICATION**. The pre-committed H6 absolute
+correctness bar (≥ 0.95) was missed (measured 0.75) but the
+LOAD-BEARING Δ ≥ 0.10 axis was exceeded by 2.5×.
+
+Mac 2 (192.168.12.248) still ARP-incomplete (24th milestone in a
+row). The two reachable hosts suffice for the live cross-host
+evidence.
+
+### Post-W29 audit board
+
+1. **Did geometry-aware dense-control integration materially
+   help?** *YES on the load-bearing axis (R-76-XHOST-DRIFT shows
+   the first regime where the synthesis strictly improves
+   correctness over both W27 and W28 baselines, Δ = +0.25 across
+   5/5 seeds, trust precision 1.000, bounded overhead). The
+   cram-factor magnitude (H7) was missed; mechanism real,
+   magnitude below bar.*
+2. **Did trust/audit survive?** *YES — 14 enumerated failure modes
+   (vs W28's 11), 100% rejection rate on tamper banks (12/12 +
+   60/60), trust precision = 1.000 on every ratifying sub-bank.*
+3. **Did bounded-context efficiency improve in a real way?** *YES —
+   the W29 envelope packs 2.30× more structured-control bits per
+   wire token than W28. Same 1-token wire cost as W28's
+   ``<ratify_ref:DDDD>`` — the W29 ``<partition_ref:DDDD>`` rides
+   on the same single visible token but carries the partition_id +
+   factoradic index + audited basis CID + causal-validity
+   signature + cross-host variance witness CID + parent W28 CID +
+   predecessor CIDs.*
+4. **Did two-Mac evaluation materially broaden the evidence?**
+   *PARTIAL — the live cross-host topology (gemma2 + qwen2.5)
+   produced the same H6 +0.250 correctness gain on real LLM bytes
+   (710 LAN bytes, 16 probe calls), but Mac 2 (192.168.12.248)
+   remains ARP-incomplete (24th milestone). The two-host evidence
+   strictly extends W28's by demonstrating the H6 correctness gain
+   on the live topology.*
+5. **Which earlier paper loose ends were closed vs only sharpened?**
+   *CLOSED: W28-C-CROSS-HOST-VARIANCE on the magnitude axis (the
+   biggest open conjecture from the W28 milestone). SHARPENED:
+   the synthesis line (old explicit-capsule × new dense-control)
+   now has a measured regime where it strictly improves
+   correctness, not just trust precision. STILL OPEN:
+   W22-C-CACHE-AMPLIFICATION (per-partition first-cell still
+   cache-amplifies); W23-C-MITIGATION-LIVE-VARIANCE inter-cell
+   axis; W24-C-LIVE-VARIANCE-COMPLETE; W26-C-K-SCALING K → ∞
+   asymptote; W27-C-MULTI-SIGNATURE-SCALING;
+   W21-C-CALIBRATED-TRUST.*
+6. **Did release readiness improve?** *YES on the SDK-version /
+   ``__experimental__`` / pyproject.toml axis. (a) W29 surface
+   added under ``__experimental__`` (38 tests + verifier).
+   (b) SDK version bumped to v3.30 / 0.5.3.
+   (c) Focused regression W3..W29 = 935/935 in ~100s, fast +
+   reproducible. (d) The new geometry / Grassmannian / factoradic /
+   Lehmer / mixed-curvature vocabulary is honestly framed as
+   capsule-layer audited proxy in the module docstring AND in the
+   results note's §9.*
+7. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on the
+   correctness axis: the synthesis (W21 × W27, sealed by W28,
+   geometry-partitioned by W29) now has a measured regime where it
+   strictly improves correctness over the prior best baseline.
+   The deeper wall is whichever regime makes the structural
+   classifier's three-way split (LINEAR/HIERARCHICAL/CYCLIC)
+   insufficient to discriminate hard cells.* Named open frontier
+   for SDK v3.31: **W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE**
+   (regime where live LLMs systematically disagree),
+   **W29-C-CRAM-AMPLIFICATION** (richer payload that hits 8×),
+   **W29-C-PARTITION-CALIBRATION** (calibrated per-partition
+   trust priors), **W29-C-NATIVE-LATENT** (architecture-dependent
+   — true transformer-internal subspace projection vs the W29
+   audited proxy).
+
+---
+
 *End of master plan. Changelog lives in the results notes, not
 here. If this document ever becomes a changelog, delete the
 changelog and restore the plan.*

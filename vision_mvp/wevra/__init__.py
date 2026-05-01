@@ -344,6 +344,39 @@ from .team_coord import (
     W28_BRANCH_NO_RATIFY_NEEDED, W28_BRANCH_FALLBACK_W27,
     W28_BRANCH_NO_TRIGGER, W28_BRANCH_DISABLED,
     W28_DEFAULT_TRIGGER_BRANCHES,
+    # SDK v3.30 — geometry-partitioned product-manifold dense control +
+    # audited subspace-basis payload + factoradic routing index +
+    # causal-validity gate + cross-host variance witness (W29 family).
+    # EXPERIMENTAL — see __experimental__.
+    SubspaceBasis, verify_subspace_basis,
+    compute_structural_subspace_basis,
+    encode_permutation_to_factoradic,
+    decode_factoradic_to_permutation,
+    CrossHostVarianceWitness,
+    GeometryPartitionedRatificationEnvelope,
+    PartitionRegistration,
+    GeometryPartitionRegistry,
+    W29PartitionResult,
+    GeometryPartitionedOrchestrator,
+    classify_partition_id_for_cell,
+    verify_geometry_partition_ratification,
+    build_trivial_partition_registry,
+    build_three_partition_registry,
+    W29_PARTITION_SCHEMA_VERSION,
+    W29_PARTITION_LINEAR, W29_PARTITION_HIERARCHICAL,
+    W29_PARTITION_CYCLIC,
+    W29_REGISTERED_PARTITION_IDS, W29_PARTITION_LABEL,
+    W29_DEFAULT_ORTHOGONALITY_TOL,
+    W29_BRANCH_PARTITION_RESOLVED,
+    W29_BRANCH_TRIVIAL_PARTITION_PASSTHROUGH,
+    W29_BRANCH_PARTITION_REJECTED,
+    W29_BRANCH_PARTITION_BELOW_THRESHOLD,
+    W29_BRANCH_CROSS_HOST_VARIANCE_WITNESSED,
+    W29_BRANCH_NO_PARTITION_NEEDED,
+    W29_BRANCH_FALLBACK_W28,
+    W29_BRANCH_NO_TRIGGER, W29_BRANCH_DISABLED,
+    W29_ALL_BRANCHES,
+    W29_DEFAULT_TRIGGER_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -357,7 +390,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.29"
+SDK_VERSION = "wevra.sdk.v3.30"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -365,7 +398,7 @@ PRODUCT_REPORT_SCHEMA_V1 = "phase45.product_report.v1"
 CI_VERDICT_SCHEMA = "phase46.ci_verdict.v1"
 IMPORT_AUDIT_SCHEMA = "phase46.import_audit.v1"
 
-# SDK v3.29 (W28) — explicit stable-vs-experimental boundary. The
+# SDK v3.30 (W29) — explicit stable-vs-experimental boundary. The
 # symbols enumerated below are part of the *research-grade* dense-
 # control / multi-agent-coordination surface and may evolve between
 # minor versions. The stable runtime contract (RunSpec → run report,
@@ -405,6 +438,22 @@ __experimental__: tuple[str, ...] = (
     "build_default_ensemble_registry",
     "build_two_probe_oracle_ensemble_registry",
     "build_cross_host_llm_ensemble_registry",
+    # W29 family — geometry-partitioned product-manifold dense control +
+    # audited subspace-basis payload + factoradic routing index +
+    # causal-validity gate + cross-host variance witness.
+    "SubspaceBasis", "verify_subspace_basis",
+    "compute_structural_subspace_basis",
+    "encode_permutation_to_factoradic",
+    "decode_factoradic_to_permutation",
+    "CrossHostVarianceWitness",
+    "GeometryPartitionedRatificationEnvelope",
+    "PartitionRegistration",
+    "GeometryPartitionRegistry",
+    "GeometryPartitionedOrchestrator",
+    "classify_partition_id_for_cell",
+    "verify_geometry_partition_ratification",
+    "build_trivial_partition_registry",
+    "build_three_partition_registry",
 )
 
 __all__ = [
@@ -615,6 +664,37 @@ __all__ = [
     "W28_BRANCH_NO_RATIFY_NEEDED", "W28_BRANCH_FALLBACK_W27",
     "W28_BRANCH_NO_TRIGGER", "W28_BRANCH_DISABLED",
     "W28_DEFAULT_TRIGGER_BRANCHES",
+    # SDK v3.30 — W29 family (geometry-partitioned product-manifold
+    # dense control + audited subspace-basis payload + factoradic
+    # routing + causal-validity gate + cross-host variance witness).
+    # EXPERIMENTAL — see __experimental__ tuple.
+    "SubspaceBasis", "verify_subspace_basis",
+    "compute_structural_subspace_basis",
+    "encode_permutation_to_factoradic",
+    "decode_factoradic_to_permutation",
+    "CrossHostVarianceWitness",
+    "GeometryPartitionedRatificationEnvelope",
+    "PartitionRegistration", "GeometryPartitionRegistry",
+    "W29PartitionResult", "GeometryPartitionedOrchestrator",
+    "classify_partition_id_for_cell",
+    "verify_geometry_partition_ratification",
+    "build_trivial_partition_registry",
+    "build_three_partition_registry",
+    "W29_PARTITION_SCHEMA_VERSION",
+    "W29_PARTITION_LINEAR", "W29_PARTITION_HIERARCHICAL",
+    "W29_PARTITION_CYCLIC",
+    "W29_REGISTERED_PARTITION_IDS", "W29_PARTITION_LABEL",
+    "W29_DEFAULT_ORTHOGONALITY_TOL",
+    "W29_BRANCH_PARTITION_RESOLVED",
+    "W29_BRANCH_TRIVIAL_PARTITION_PASSTHROUGH",
+    "W29_BRANCH_PARTITION_REJECTED",
+    "W29_BRANCH_PARTITION_BELOW_THRESHOLD",
+    "W29_BRANCH_CROSS_HOST_VARIANCE_WITNESSED",
+    "W29_BRANCH_NO_PARTITION_NEEDED",
+    "W29_BRANCH_FALLBACK_W28",
+    "W29_BRANCH_NO_TRIGGER", "W29_BRANCH_DISABLED",
+    "W29_ALL_BRANCHES",
+    "W29_DEFAULT_TRIGGER_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

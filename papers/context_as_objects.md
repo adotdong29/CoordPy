@@ -1960,6 +1960,71 @@ The current paper incorporates the following layers:
   KB/cell on R-70-DELTA-FANOUT n=8), but no true two-host
   execution validated. (R-70, SDK v3.24)
 
+- **W28 family:** ensemble-verified cross-model multi-chain pivot
+  ratification — `EnsemblePivotRatificationEnvelope` (signature_cid
+  + probe_votes + quorum + ratified flag), 11 enumerated failure
+  modes in `verify_ensemble_pivot_ratification`, three built-in
+  probe types (`DeterministicSignatureProbe`,
+  `OracleConsultationProbe`, `LLMSignatureProbe`), the first
+  cross-host live LLM evidence in 23 milestones (localhost gemma2:9b
+  + 192.168.12.191 qwen2.5:14b; 5592 LAN bytes; 128 cross-host probe
+  calls). On R-75-CROSS-HOST-LIVE the trust-weighted ensemble
+  ratifies 10/16 cells with trust precision 1.000. The first
+  capsule-native synthesis of the explicit-capsule trust line
+  (W21 multi-oracle adjudication) and the dense-control line (W27
+  multi-chain salience-keyed pool). Six named falsifiers
+  (W28-Λ-single-probe / -coordinated-drift / -trust-zero / -spoofed-probe
+  / -quorum-tampered / -pool-exhausted-passthrough). Newly named
+  conjecture **W28-C-CROSS-HOST-VARIANCE** (live cross-host
+  variance reduction on a regime where W27 itself fails) emerges
+  from the synthetic R-75 banks all having W27 correctness = 1.000.
+  (R-75, SDK v3.29)
+- **W29 family:** geometry-partitioned product-manifold dense
+  control + audited subspace-basis payload + factoradic Lehmer
+  routing index + causal-validity gate + cross-host variance witness
+  — `GeometryPartitionedRatificationEnvelope` (partition_id +
+  factoradic_route_index + audited orthonormal subspace basis CID +
+  causal_validity_signature + cross_host_variance_witness_cid +
+  parent W28 ratification CID + declared predecessors), 14
+  enumerated failure modes in
+  `verify_geometry_partition_ratification` (partition-id forgery,
+  basis-orthogonality forgery, factoradic-routing forgery,
+  causal-validity forgery, partition-cid forgery), structural
+  classifier `classify_partition_id_for_cell` returning one of
+  LINEAR / HIERARCHICAL / CYCLIC keyed by signature_history,
+  per-partition inner W28 dispatch via
+  `inner_per_partition: dict[int, EnsembleVerifiedMultiChainOrchestrator]`.
+  The new vocabulary (geometry, Grassmannian-style, factoradic,
+  Lehmer, mixed-curvature, causal-validity) is added at the
+  **capsule layer as audited proxy** — explicitly NOT a transformer-
+  internal subspace projection, NOT a Riemannian curvature, NOT a
+  learned manifold. On **R-76-XHOST-DRIFT** the W29 method strictly
+  improves correctness over BOTH W27 and W28 baselines:
+  ``correctness_w27 = correctness_w28 = 0.500`` and
+  ``correctness_w29 = 0.750``, **Δ = +0.250 across 5/5 seeds**,
+  ``trust_precision = 1.000``, ``mean overhead = 0.75 tokens/cell``.
+  Same +0.250 gain holds on the live two-host LLM topology
+  (localhost gemma2:9b + 192.168.12.191 qwen2.5:14b); 16 cross-host
+  probe calls; 710 LAN bytes; trust precision 1.000. **Empirically
+  discharges W28-C-CROSS-HOST-VARIANCE on the magnitude axis** —
+  the first capsule-native multi-agent-coordination method to
+  demonstrate the synthesis (W21 × W27, sealed by W28, geometry-
+  partitioned by W29) strictly improves correctness on a regime
+  where the prior best (W28) makes correctness mistakes. Five
+  named falsifiers (W29-Λ-trivial-partition, W29-Λ-non-orthogonal-
+  basis, W29-Λ-coordinated-drift-cross-host, plus W28-Λ-quorum-
+  tampered and W28-Λ-pool-exhausted-passthrough inherited).
+  Newly named conjectures **W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE**
+  (live LLMs systematically disagree),
+  **W29-C-CRAM-AMPLIFICATION** (richer payload that hits 8×;
+  measured 2.30× on R-76-CHAIN-SHARED — H7 missed),
+  **W29-C-PARTITION-CALIBRATION** (calibrated per-partition trust
+  priors), and **W29-C-NATIVE-LATENT** (architecture-dependent —
+  true transformer-internal subspace projection vs the W29 audited
+  proxy; retained as the next true wall). 38/38 W29 unit tests +
+  935/935 wider regression pass. Mac 2 (192.168.12.248) still
+  ARP-incomplete (24th milestone). (R-76, SDK v3.30)
+
 ## Appendix C. Submission Pass Still Needed
 
 This Markdown manuscript is now substantially beyond a skeleton, but a

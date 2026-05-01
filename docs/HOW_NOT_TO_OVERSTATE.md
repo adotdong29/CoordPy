@@ -1695,3 +1695,89 @@ Permitted phrasings:
   on the bounded-window-efficiency + intra-cell-mitigation +
   real-cross-process axes to date."
 
+## SDK v3.30 / W29 — geometry / Grassmannian / factoradic / Lehmer / mixed-curvature / causal-validity vocabulary
+
+W29 introduces new vocabulary that *sounds* model-internal: "geometry
+partition", "subspace basis", "Grassmannian-style", "factoradic
+routing", "Lehmer code", "mixed-curvature compartments", "causal-
+validity gate". Each of these is a **capsule-layer audited proxy**.
+None of them claim transformer-internal machinery.
+
+What you may say (W29 honest scope):
+
+* "On R-76-XHOST-DRIFT, the W29 geometry-partitioning step routes
+  cells to per-partition inner W28 stacks with structurally
+  different oracle topologies; the partition_id is a deterministic
+  3-state label (LINEAR / HIERARCHICAL / CYCLIC) computed from the
+  W27 input signature CID and a bounded signature history."
+* "On R-76-XHOST-DRIFT, the W29 layer **strictly improves
+  correctness** over both W27 and W28 baselines: 0.500 → 0.750,
+  Δ = +0.250 across 5/5 seeds, with bounded overhead (mean 0.75
+  tokens/cell, max 1 token/cell) and trust precision 1.000."
+* "The W29 envelope's audited orthonormal subspace basis is a
+  **Grassmannian-style proxy at the capsule layer** — every basis
+  vector is a deterministic projection over the closed-vocabulary
+  tag space; the verifier checks orthogonality (Gram off-diagonal
+  ≤ 1e-4), dimension, finiteness, and content-address."
+* "The W29 envelope's factoradic Lehmer-code routing index is
+  bounded ``0 ≤ idx < K!`` and audit-friendly; the verifier
+  decodes the index and checks it matches the registered
+  consumer-permutation for the partition."
+* "The W29 envelope's causal-validity signature is SHA-256 over
+  (parent W28 ratification CID || sorted predecessor CIDs); it is
+  a **structural commitment** the bus enforces at admission, NOT
+  a temporal-ordering proof at the model layer."
+* "On R-76-CROSS-HOST-LIVE the same +0.250 correctness gain holds
+  on the live two-host LLM topology; 16 cross-host probe calls;
+  710 LAN bytes; trust precision 1.000."
+* "W29 empirically discharges W28-C-CROSS-HOST-VARIANCE on the
+  magnitude axis — the first synthetic regime in the programme
+  where the synthesis (W21 × W27 × W28 × W29) strictly improves
+  correctness over the prior best baseline."
+
+What you must NOT say (W29 honest scope):
+
+* "W29 implements transformer-internal subspace projection." It
+  does not. The subspace lives at the capsule layer; it is an
+  audited proxy.
+* "W29 implements Riemannian mixed-curvature manifolds." It does
+  not. The "geometry partition" is a structural label
+  (linear / hierarchical / cyclic). Mixed-curvature is invoked as
+  *design metaphor only* in the module docstring.
+* "W29 implements a learned manifold." It does not. Both the
+  basis (``compute_structural_subspace_basis``) and the partition
+  classifier (``classify_partition_id_for_cell``) are pure
+  deterministic functions.
+* "W29 solves transformer-internal cross-host KV sharing." It
+  does not. The cross-host variance witness records LLM-probe
+  disagreement on a content-addressed envelope; it does NOT share
+  hidden states across hosts.
+* "W29 amplifies cram-factor 8× over W28." Measured ratio on
+  R-76-CHAIN-SHARED is 2.30× — the pre-committed H7 ≥ 8× bar was
+  MISSED. Mechanism is real; magnitude is below bar; becomes
+  named open conjecture **W29-C-CRAM-AMPLIFICATION**.
+* "W29 hits 0.95 absolute correctness on R-76-XHOST-DRIFT."
+  Measured 0.750 — the pre-committed H6 absolute bar was missed.
+  The LOAD-BEARING Δ ≥ 0.10 axis IS met cleanly (Δ = +0.250).
+* "W29 brings up Mac 2." It does not. 192.168.12.248 remains
+  ARP-incomplete (24th milestone in a row).
+
+The honest summary one may emit:
+
+* "On R-76-XHOST-DRIFT (the first synthetic regime in the programme
+  where W27 alone makes correctness mistakes), W29's geometry-
+  partitioning + per-partition inner W28 dispatch strictly improves
+  correctness over both W27 and W28 baselines by Δ = +0.250 across
+  5/5 seeds at trust precision 1.000, on real LLM bytes too. We
+  have not solved multi-agent context; we have empirically
+  discharged the named open conjecture
+  **W28-C-CROSS-HOST-VARIANCE** on the magnitude axis, on a regime
+  where the synthesis (old explicit-capsule trust line × new
+  dense-control line) is the load-bearing reason correctness
+  improves. The next true wall — whichever regime makes the
+  structural classifier's three-way split insufficient to
+  discriminate hard cells — is the named open frontier
+  **W29-C-NATIVE-LATENT** (architecture-dependent: true
+  transformer-internal subspace projection vs the W29 audited
+  proxy)."
+

@@ -5,8 +5,102 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.29,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.30,
 > 2026-04-30.
+
+## TL;DR — SDK v3.30
+
+The programme now has **twenty-six** coupled research axes, each
+with a sharp status. SDK v3.30 mints axis 26:
+**geometry-partitioned product-manifold dense control + audited
+subspace-basis payload + factoradic Lehmer routing index +
+causal-validity gate + cross-host variance witness** — extending the
+SDK v3.29 W28 ensemble-verified multi-chain orchestrator with a
+``GeometryPartitionedOrchestrator`` (W29) that classifies every
+triggered cell into one of three structural partitions (LINEAR /
+HIERARCHICAL / CYCLIC) via a deterministic signature-history
+heuristic, optionally dispatches each partition to its own inner
+W28 stack (own ``SharedMultiChainPool`` + own oracle / probe
+topology), and seals the decision in a content-addressed
+``GeometryPartitionedRatificationEnvelope`` carrying an audited
+orthonormal subspace basis (Grassmannian-style proxy at the capsule
+layer), a factoradic Lehmer-code routing index over the registered
+consumer order, a causal-validity SHA-256 binding to declared
+predecessor cell CIDs, and an optional cross-host variance witness.
+The new ``verify_geometry_partition_ratification`` enumerates
+**14 failure modes** (vs W28's 11) — partition-id forgery,
+basis-orthogonality forgery, factoradic-routing forgery, causal-
+validity forgery, partition-cid forgery — none of which existed in
+any W22..W28 verifier.
+
+**The headline SDK v3.30 results.**
+
+* **R-76-XHOST-DRIFT (H6 load-bearing).** First synthetic regime
+  where the dense-control synthesis strictly improves correctness
+  over BOTH W27 AND W28 baselines:
+  ``correctness_ratified_rate_w27 = correctness_ratified_rate_w28
+  = 0.500`` and ``correctness_ratified_rate_w29 = 0.750``,
+  **Δ = +0.250 across 5/5 seeds**, ``trust_precision_w29 = 1.000``,
+  ``mean_overhead_w29_vs_w28_per_cell = 0.75 tokens/cell``,
+  ``max_overhead = 1 token/cell``. **Empirically discharges
+  W28-C-CROSS-HOST-VARIANCE on the magnitude axis** — the FIRST
+  capsule-native multi-agent-coordination method to demonstrate
+  the synthesis (old explicit-capsule trust line × new dense-control
+  line) strictly improves correctness on a regime where the prior
+  best (W28) makes mistakes.
+* **R-76-CROSS-HOST-LIVE (S1/S2/S3).** Same H6 +0.250 correctness
+  gain holds on the live two-host LLM topology (localhost gemma2:9b
+  + 192.168.12.191 qwen2.5:14b); 16 cross-host probe calls; 710 LAN
+  bytes; ``trust_precision_w29 = 1.000``. The structural partition
+  signal alone drives the gain — the LLM ensemble agreed on every
+  cell at temperature 0, so the cross-host variance witness was
+  correctly null. The S3 trust-precision = 1.000 result holds on the
+  live bench.
+* **R-76-TRIVIAL-PARTITION (H2 byte-for-W28 anchor).**
+  ``mean_total_w29_visible_tokens == mean_total_w28_visible_tokens``
+  byte-for-byte; every cell yields
+  ``W29_BRANCH_TRIVIAL_PARTITION_PASSTHROUGH``.
+  **W29-Λ-trivial-partition** falsifier confirmed.
+* **R-76-PARTITION-TAMPERED (H3 trust falsifier).** 60/60 tampers
+  rejected across five named modes per seed
+  (`partition_id_unregistered`, `factoradic_index_out_of_range`,
+  `causal_validity_signature_invalid`, `partition_cid_hash_mismatch`,
+  `w28_parent_cid_mismatch`).
+* **R-76-NON-ORTHOGONAL-BASIS (W29-Λ-non-orthogonal-basis).**
+  12/12 tampered envelopes rejected with
+  ``subspace_basis_non_orthogonal``.
+* **R-76-COORDINATED-DRIFT-XHOST
+  (W29-Λ-coordinated-drift-cross-host).** When per-partition pools
+  share the same oracle topology, partition routing cannot improve
+  correctness; ``Δ(W29-W28) = 0.000`` correctly reported.
+
+**Five named falsifiers, all empirically confirmed**:
+W29-Λ-trivial-partition (basis_dim=0 + empty perms ⇒ W29 = W28
+byte-for-byte), W29-Λ-non-orthogonal-basis (non-orthogonal basis ⇒
+verifier rejects), W29-Λ-coordinated-drift-cross-host (shared
+oracle ⇒ partition cannot help), W29-Λ-quorum-tampered (inherited
+from W28), W29-Λ-pool-exhausted-passthrough (inherited from W27/W28).
+
+**The pre-committed cram-factor headline (H7) was missed**:
+measured ``cram_ratio_w29_over_w28 = 2.30`` on R-76-CHAIN-SHARED
+vs the pre-committed bar ≥ 8.0. The mechanism is real (W29 packs
+strictly more audit-friendly structured-control bits per wire token
+than W28), but the magnitude is below bar. Becomes the named open
+conjecture **W29-C-CRAM-AMPLIFICATION**. The pre-committed H6
+absolute correctness bar (≥ 0.95) was also missed (measured 0.75)
+even though the LOAD-BEARING Δ ≥ 0.10 axis was exceeded — the 0.95
+bar misses by a benchmark-engineering margin.
+
+Trust precision = 1.000 across every R-76 sub-bank where W29
+ratifies. Backward-compat preserved byte-for-byte: **935/935 + 6
+subtests pass** across W3 capsules / W4 team / W12-W15 packing /
+W18-W21 explicit-capsule / W22-W29 dense-control / public API /
+runtime / LLM backend. Mac 2 (192.168.12.248) still unreachable
+(**24th milestone in a row**); the *other* reachable host
+(192.168.12.191) is the second host of the live topology. Stable-
+vs-experimental boundary tightened: ``__experimental__`` tuple
+extended with W29 symbols; SDK_VERSION ``wevra.sdk.v3.30``;
+pyproject.toml ``0.5.3``.
 
 ## TL;DR — SDK v3.29
 

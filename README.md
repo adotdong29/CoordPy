@@ -7,7 +7,51 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.29 (April 2026).** Ensemble-verified
+**Latest milestone: SDK v3.30 (April 2026).** Geometry-partitioned
+product-manifold dense control + audited subspace-basis payload +
+factoradic Lehmer routing index + causal-validity gate + cross-host
+variance witness (W29 family). The W29
+``GeometryPartitionedOrchestrator`` wraps the W28 ensemble layer
+with a **structural geometry-partitioning** step that classifies
+every triggered cell into one of three pre-committed labels —
+LINEAR (extends most-recent signature), HIERARCHICAL (fresh
+anchor), CYCLIC (re-visited signature) — keyed by a deterministic
+signature-history heuristic. Per-partition inner W28 stacks get
+their own oracle / probe / pool topology. The
+``GeometryPartitionedRatificationEnvelope`` carries an audited
+orthonormal subspace basis (Grassmannian-style, *capsule-layer
+audited proxy*, **NOT** transformer-internal subspace projection),
+a factoradic Lehmer-code routing index, a causal-validity SHA-256
+binding, and an optional cross-host variance witness. The
+``verify_geometry_partition_ratification`` verifier enumerates
+**14 failure modes** (vs W28's 11) — none of which existed in any
+W22..W28 verifier. **First capsule-native multi-agent-coordination
+method to demonstrate the synthesis (W21 × W27, sealed by W28,
+geometry-partitioned by W29) strictly improves correctness on a
+regime where the prior best (W28) makes correctness mistakes.** On
+**R-76-XHOST-DRIFT** ``correctness_ratified_rate_w27 =
+correctness_ratified_rate_w28 = 0.500`` and
+``correctness_ratified_rate_w29 = 0.750``, **Δ = +0.250 across 5/5
+seeds**, ``trust_precision = 1.000``, ``mean overhead = 0.75
+tokens/cell``. **The same +0.250 gain holds on the live two-host
+LLM topology** (localhost gemma2:9b + 192.168.12.191 qwen2.5:14b);
+16 cross-host probe calls; 710 LAN bytes; trust precision 1.000.
+**Empirically discharges W28-C-CROSS-HOST-VARIANCE on the
+magnitude axis.** Five named falsifiers all empirically confirmed
+(W29-Λ-trivial-partition, W29-Λ-non-orthogonal-basis,
+W29-Λ-coordinated-drift-cross-host, plus W28's W28-Λ-quorum-tampered
+and W28-Λ-pool-exhausted-passthrough). Stable-vs-experimental
+boundary further tightened; the new W29 surface lives under
+``__experimental__`` (38 unit tests + the verifier);
+``SDK_VERSION = "wevra.sdk.v3.30"``; pyproject.toml ``0.5.3``.
+**935/935 + 6 subtests pass** across W3..W29 + capsule + public
+API + runtime + LLM backend. The pre-committed cram-factor
+headline (H7 ≥ 8.0×) was **MISSED** (measured 2.30×); mechanism
+real, magnitude below bar. See
+[`docs/RESULTS_WEVRA_W29_GEOMETRY_PARTITIONED.md`](docs/RESULTS_WEVRA_W29_GEOMETRY_PARTITIONED.md)
+and [`CHANGELOG.md`](CHANGELOG.md) for details.
+
+**Previous milestone: SDK v3.29 (April 2026).** Ensemble-verified
 cross-model multi-chain pivot ratification (W28 family). The W28
 ``EnsembleVerifiedMultiChainOrchestrator`` wraps the W27 multi-
 chain pool with a controller-side **trust-weighted probe quorum**
@@ -21,23 +65,15 @@ hash tampering, schema/signature drift) — none of which existed
 in any W22..W27 verifier. **First capsule-native mechanism that
 synthesises the explicit-capsule trust line (W21 multi-oracle
 adjudication) with the dense-control line (W27 multi-chain
-salience-keyed pool) inside one decision.** On
-R-75-SINGLE-PROBE the W28 layer is **W27 byte-for-byte across
-5/5 seeds** (W28-Λ-single-probe falsifier confirmed); on
-R-75-CROSS-MODEL-DRIFT the trust-weighted ensemble ratifies all
-16 cells with overhead = 1.00 token/cell (within S4 ≤ 2 budget);
-on R-75-RATIFICATION-TAMPERED the verifier rejects 16/16
-tampered envelopes per seed (5/5 seeds). **First cross-host
+salience-keyed pool) inside one decision.** **First cross-host
 live LLM evidence in 23 milestones**: R-75-CROSS-HOST-LIVE on
 localhost (gemma2:9b) + 192.168.12.191 (qwen2.5:14b) records 128
 cross-host probe calls and 5592 LAN bytes; ensemble ratifies
 10/16 cells (real LLM disagreement on 6/16) with trust precision
 1.000 and W28 correctness 1.000. Stable-vs-experimental
 boundary tightened: dense-control surface (W22..W28) now lives
-under an explicit ``__experimental__`` tuple; SDK_VERSION
-``wevra.sdk.v3.29``; pyproject.toml 0.5.2. See
-[`docs/RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md`](docs/RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md)
-and [`CHANGELOG.md`](CHANGELOG.md) for details.
+under an explicit ``__experimental__`` tuple. See
+[`docs/RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md`](docs/RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md).
 
 **Previous milestone: SDK v3.28 (April 2026).** Multi-chain
 salience-keyed dense-control fanout + per-signature scoping

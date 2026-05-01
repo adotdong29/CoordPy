@@ -5,6 +5,89 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.3 / 3.30] — 2026-04-30 — SDK v3.30 — geometry-partitioned product-manifold dense control + audited subspace-basis payload + factoradic Lehmer routing index + causal-validity gate + cross-host variance witness + first empirical discharge of W28-C-CROSS-HOST-VARIANCE on the magnitude axis
+
+*Strictly additive on SDK v3.29. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W29 surface wraps
+the W28 ensemble-verified multi-chain orchestrator with a structural
+geometry-partitioning step (linear / hierarchical / cyclic) that
+optionally dispatches each cell through a per-partition inner W28
+stack with its own oracle / probe topology. The new geometry /
+Grassmannian / factoradic / Lehmer / mixed-curvature / causal-
+validity vocabulary is added at the **capsule layer as audited
+proxy** — explicitly NOT a transformer-internal subspace projection,
+NOT a Riemannian curvature, NOT a learned manifold.*
+
+**New surface (W29 family, multi-agent-coordination research slice).**
+
+`SubspaceBasis`, `verify_subspace_basis`,
+`compute_structural_subspace_basis`,
+`encode_permutation_to_factoradic`, `decode_factoradic_to_permutation`,
+`CrossHostVarianceWitness`,
+`GeometryPartitionedRatificationEnvelope`,
+`PartitionRegistration`, `GeometryPartitionRegistry`,
+`W29PartitionResult`, `GeometryPartitionedOrchestrator`
+(supports optional `inner_per_partition` per-partition dispatch +
+`pre_dispatch_by_partition`), `classify_partition_id_for_cell`,
+`verify_geometry_partition_ratification` (14 enumerated failure
+modes), `build_trivial_partition_registry`,
+`build_three_partition_registry`. W29 branch constants
+(`W29_BRANCH_*`). New benchmark phase
+`vision_mvp.experiments.phase76_geometry_partitioned_product_manifold`.
+
+`__experimental__` tuple in `vision_mvp.wevra.__init__` extended
+with all new W29 symbols. `SDK_VERSION` bumped to
+`wevra.sdk.v3.30`. `pyproject.toml` version `0.5.3`.
+
+**Headline empirical results (W29 family).**
+
+* **R-76-XHOST-DRIFT (H6 load-bearing).** First synthetic regime
+  where the dense-control synthesis strictly improves correctness
+  over BOTH W27 AND W28 baselines:
+  `correctness_ratified_rate_w27 =
+  correctness_ratified_rate_w28 = 0.500` and
+  `correctness_ratified_rate_w29 = 0.750`, **Δ = +0.250 across 5/5
+  seeds (11, 17, 23, 29, 31)**, `trust_precision_w29 = 1.000`,
+  `mean_overhead_w29_vs_w28_per_cell = 0.75`, `max_overhead = 1`.
+  **Discharges W28-C-CROSS-HOST-VARIANCE on the empirical-magnitude
+  axis.**
+* **R-76-CROSS-HOST-LIVE (S1/S2/S3).** Same H6 +0.250 gain holds on
+  the live two-host LLM topology (localhost gemma2:9b +
+  192.168.12.191 qwen2.5:14b); 16 cross-host probe calls; 710 LAN
+  bytes; `trust_precision_w29 = 1.000`. Structural partition signal
+  alone drives the gain even when the LLM ensemble agrees.
+* **R-76-TRIVIAL-PARTITION (H2 byte-for-W28).** W29 = W28
+  byte-for-byte (`byte_equivalent_w29_w28 = true`); every cell yields
+  `W29_BRANCH_TRIVIAL_PARTITION_PASSTHROUGH`.
+* **R-76-NON-ORTHOGONAL-BASIS (H5).** 12/12 tampered envelopes
+  rejected with `subspace_basis_non_orthogonal`.
+* **R-76-PARTITION-TAMPERED (H3).** 60/60 tampers rejected across
+  five named modes.
+* **R-76-COORDINATED-DRIFT-XHOST (H5).** When per-partition pools
+  share the same oracle, partition routing cannot improve
+  correctness; `Δ(W29-W28) = 0.000` correctly reported.
+* **Cram-factor (H7).** Measured 2.30× on R-76-CHAIN-SHARED — short
+  of the pre-committed 8× bar. Mechanism real, magnitude below bar;
+  becomes `W29-C-CRAM-AMPLIFICATION` (open).
+
+Trust boundary: tampered envelopes rejected **100%** across every
+sub-bank, every seed, every named mode. **935/935 + 6 subtests pass**
+across W3..W29 + capsule + public API + runtime + LLM backend.
+
+**Honest scope (what W29 does NOT claim).**
+
+* W29 does NOT claim transformer-internal subspace projection. The
+  basis lives at the capsule layer; verifier checks orthogonality,
+  finiteness, content-address.
+* W29 does NOT claim Riemannian curvature. The "geometry partition"
+  is a structural label.
+* W29 does NOT claim a learned manifold. Basis and classifier are
+  pure functions over deterministic structural inputs.
+* Mac 2 (192.168.12.248) remains ARP-incomplete (24th consecutive
+  milestone).
+* W29 does NOT solve `W22-C-CACHE-AMPLIFICATION` or full live LLM
+  disagreement reduction. Both retained as named open conjectures.
+
 ## [0.5.2 / 3.29] — 2026-04-30 — SDK v3.29 — ensemble-verified cross-model multi-chain pivot ratification + Phase-75 R-75 benchmark family + W28 family + first cross-host live LLM evidence in 23 milestones + stable-vs-experimental boundary tightened
 
 *Strictly additive on SDK v3.28. The Wevra single-run product

@@ -114,6 +114,7 @@ from __future__ import annotations
 import dataclasses
 import hashlib
 import json
+import math
 import time
 from typing import Any, Callable, Iterable, Protocol, Sequence, runtime_checkable
 
@@ -15127,5 +15128,1946 @@ def build_cross_host_llm_ensemble_registry(
         schema=schema,
         quorum_threshold=float(quorum_threshold),
         probes=probes,
+        local_host_id=local_host_id,
+    )
+
+# =============================================================================
+# SDK v3.30 — W29 family
+# Geometry-partitioned product-manifold dense control + audited subspace
+# basis payload + factoradic routing index + causal-validity gate +
+# cross-host variance witness (research-grade; experimental).
+# =============================================================================
+#
+# W29 wraps the W28 ensemble-verified multi-chain orchestrator with a
+# **structural geometry partition** on every triggered cell, an audited
+# **subspace-basis payload** over the closed-vocabulary tag space, an
+# audited **factoradic routing index** (Lehmer code) over the registered
+# consumer order, an audited **causal-validity binding** to the cell's
+# declared predecessors, and an optional **cross-host variance witness**
+# that fires when ensemble probes on different hosts disagree.
+#
+# Honest scope (the load-bearing soundness statement)
+# ---------------------------------------------------
+#
+# * W29 does NOT touch transformer KV caches, hidden states, attention
+#   weights, embedding tables, or any model-internal state.  The
+#   "subspace basis" lives at the **capsule layer**; it is an honest
+#   **proxy** for the LatentMAS Grassmannian / shared-substrate
+#   direction, not a runtime KV transplant.  Every basis vector is a
+#   deterministic projection over the closed-vocabulary tag space; the
+#   verifier checks orthogonality, finiteness, and dimension.
+# * The "geometry partition" is a **structural label** — one of
+#   ``LINEAR`` / ``HIERARCHICAL`` / ``CYCLIC`` — derived from the W27
+#   inner branch and the recent signature history.  It is NOT a
+#   learned manifold and NOT a curvature in any Riemannian sense.
+#   Mixed-curvature is invoked as design metaphor only.
+# * The "factoradic routing index" is a Lehmer code of a permutation
+#   over the registered consumer order; bounded ``0 ≤ idx < K!``;
+#   audit-friendly; NOT a learned routing function.
+# * The "causal-validity signature" is SHA-256 over the parent W28
+#   ratification CID concatenated with the sorted predecessor cell CIDs;
+#   it does NOT prove temporal ordering at the model layer; it is a
+#   structural commitment the controller enforces at admission time.
+# * W29 does NOT claim "we solved context."
+#
+# Wire-token economics
+# --------------------
+#
+# When the registered partition table contains > 1 partition AND
+# basis_dim > 0 AND/OR len(consumer_order) > 1, W29 charges **1 visible
+# token** per triggered cell on the producer side
+# (``<partition_ref:DDDD>``) — the entire partition_id + factoradic
+# index + basis CID + causal-validity signature + cross-host variance
+# witness CID rides on that single content-addressed reference.  When
+# every component is trivial (partition_table size 1, basis_dim 0, K=1,
+# no predecessors), wire_required is False and W29 reduces to W28
+# **byte-for-byte** (the W29-Λ-trivial-partition falsifier; see H2 in
+# ``docs/SUCCESS_CRITERION_W29_GEOMETRY_PARTITIONED.md``).
+#
+# Trust boundary: 14 enumerated failure modes
+# -------------------------------------------
+#
+# :func:`verify_geometry_partition_ratification` rejects:
+#
+#   * ``empty_partition_envelope``       — None envelope passed.
+#   * ``schema_version_unknown``         — schema_version mismatch.
+#   * ``schema_cid_mismatch``            — schema_cid != registered.
+#   * ``w28_parent_cid_mismatch``        — env.w28_ratification_cid !=
+#     the registered W28 envelope's ratification_cid.
+#   * ``partition_id_unregistered``      — env.partition_id not in the
+#     registered partition table.
+#   * ``subspace_basis_dim_mismatch``    — basis_dim != registered, OR
+#     len(basis_vectors) != basis_dim, OR per-vector length != ambient_dim.
+#   * ``subspace_basis_non_orthogonal``  — Gram off-diagonals exceed
+#     orthogonality_tol (default 1e-4).
+#   * ``subspace_basis_nan_inf``         — NaN/Inf in any coefficient.
+#   * ``factoradic_index_out_of_range``  — index < 0 OR index >= K!.
+#   * ``factoradic_route_inverse_mismatch`` — decode(idx) != registered
+#     permutation rank for this partition.
+#   * ``causal_predecessor_unregistered`` — a predecessor CID not in
+#     the registered predecessor set.
+#   * ``causal_validity_signature_invalid`` — recomputed
+#     SHA-256(parent_w28_cid || sorted(predecessors)) != envelope.
+#   * ``cross_host_variance_witness_unsealed`` — when the controller
+#     observed cross-host disagreement, env.cross_host_variance_witness_cid
+#     must be non-empty.
+#   * ``partition_cid_hash_mismatch``    — recomputed partition_cid
+#     does not match the envelope's stored partition_cid.
+#
+# Every failure mode is mechanically asserted by a unit test in
+# ``test_phase76_geometry_partitioned.py``.
+
+W29_PARTITION_SCHEMA_VERSION: str = "wevra.geometry_partition_ratification.v1"
+
+# Registered partition labels.  These are the only legal values for
+# ``GeometryPartitionedRatificationEnvelope.partition_id`` until the
+# next milestone enlarges the registry.
+W29_PARTITION_LINEAR: int = 0
+W29_PARTITION_HIERARCHICAL: int = 1
+W29_PARTITION_CYCLIC: int = 2
+W29_REGISTERED_PARTITION_IDS: frozenset[int] = frozenset({
+    W29_PARTITION_LINEAR,
+    W29_PARTITION_HIERARCHICAL,
+    W29_PARTITION_CYCLIC,
+})
+
+# String labels for forensics; the canonical wire identity is the int.
+W29_PARTITION_LABEL: dict[int, str] = {
+    W29_PARTITION_LINEAR: "linear",
+    W29_PARTITION_HIERARCHICAL: "hierarchical",
+    W29_PARTITION_CYCLIC: "cyclic",
+}
+
+# W29 decoder branches.
+W29_BRANCH_PARTITION_RESOLVED = "partition_resolved"
+W29_BRANCH_TRIVIAL_PARTITION_PASSTHROUGH = "trivial_partition_passthrough"
+W29_BRANCH_PARTITION_REJECTED = "partition_rejected"
+W29_BRANCH_PARTITION_BELOW_THRESHOLD = "partition_below_threshold"
+W29_BRANCH_CROSS_HOST_VARIANCE_WITNESSED = "cross_host_variance_witnessed"
+W29_BRANCH_NO_PARTITION_NEEDED = "no_partition_needed"
+W29_BRANCH_FALLBACK_W28 = "fallback_w28"
+W29_BRANCH_NO_TRIGGER = "no_trigger"
+W29_BRANCH_DISABLED = "disabled"
+
+W29_ALL_BRANCHES: tuple[str, ...] = (
+    W29_BRANCH_PARTITION_RESOLVED,
+    W29_BRANCH_TRIVIAL_PARTITION_PASSTHROUGH,
+    W29_BRANCH_PARTITION_REJECTED,
+    W29_BRANCH_PARTITION_BELOW_THRESHOLD,
+    W29_BRANCH_CROSS_HOST_VARIANCE_WITNESSED,
+    W29_BRANCH_NO_PARTITION_NEEDED,
+    W29_BRANCH_FALLBACK_W28,
+    W29_BRANCH_NO_TRIGGER,
+    W29_BRANCH_DISABLED,
+)
+
+# W29 fires only on W28 branches that committed a ratification (the
+# trust-boundary anchor).  Disabled / no-trigger / fallback are passed
+# through unchanged.
+W29_DEFAULT_TRIGGER_BRANCHES: frozenset[str] = frozenset({
+    W28_BRANCH_RATIFIED,
+    W28_BRANCH_RATIFIED_PASSTHROUGH,
+})
+
+W29_DEFAULT_ORTHOGONALITY_TOL: float = 1e-4
+
+
+# ---------------------------------------------------------------------------
+# Subspace basis (Grassmannian-style audited proxy)
+# ---------------------------------------------------------------------------
+
+
+def _compute_subspace_basis_cid(
+        *,
+        basis_vectors: tuple[tuple[float, ...], ...],
+        ambient_dim: int,
+        ambient_vocabulary: tuple[str, ...],
+) -> str:
+    """Canonical SHA-256 over a tuple of basis vectors.
+
+    Floats are rounded to 4 dp before hashing (same convention as the
+    W22..W28 surface) to avoid IEEE-754 byte drift.  Ambient dimension
+    and ambient vocabulary are part of the canonical payload so two
+    bases over different vocabularies do not collide.
+    """
+    payload = _canonical_json_bytes({
+        "ambient_dim": int(ambient_dim),
+        "ambient_vocabulary": list(ambient_vocabulary),
+        "basis_vectors": [
+            [round(float(c), 4) for c in v] for v in basis_vectors
+        ],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class SubspaceBasis:
+    """An audited orthonormal-style subspace basis over the closed-
+    vocabulary tag space (W29 family).
+
+    A point on a Grassmannian-style manifold at the **capsule layer** —
+    NOT a transformer-internal subspace projection.  Each basis vector
+    is a tuple of floats over the closed-vocabulary tag basis; the
+    verifier checks orthogonality, dimension, finiteness, and content
+    address.
+
+    Fields
+    ------
+    dim
+        Number of basis vectors (the subspace's rank).  ``0`` means
+        no basis is carried (trivial-partition path).
+    ambient_dim
+        Dimension of the ambient closed-vocabulary tag space.  Must
+        equal ``len(ambient_vocabulary)`` and ``len(basis_vectors[i])``.
+    ambient_vocabulary
+        Sorted closed-vocabulary tag names that index the basis vectors'
+        coordinates.  Part of the canonical payload so different
+        vocabularies do not collide.
+    basis_vectors
+        ``dim`` vectors, each of length ``ambient_dim``.  Floats rounded
+        to 4 dp at construction for deterministic hashing.
+    orthogonality_tol
+        Tolerance below which off-diagonal Gram entries are accepted.
+        Default 1e-4.
+    basis_cid
+        SHA-256 over the canonical payload (auto-computed at
+        construction).
+    """
+    dim: int
+    ambient_dim: int
+    ambient_vocabulary: tuple[str, ...]
+    basis_vectors: tuple[tuple[float, ...], ...]
+    orthogonality_tol: float = W29_DEFAULT_ORTHOGONALITY_TOL
+    basis_cid: str = ""
+
+    def __post_init__(self) -> None:
+        # Round basis coefficients deterministically and freeze the
+        # ambient vocabulary order.
+        rounded = tuple(
+            tuple(round(float(c), 4) for c in v)
+            for v in self.basis_vectors
+        )
+        object.__setattr__(self, "basis_vectors", rounded)
+        object.__setattr__(self, "ambient_vocabulary",
+                           tuple(self.ambient_vocabulary))
+        if not self.basis_cid:
+            object.__setattr__(self, "basis_cid", self._recompute_cid())
+
+    def _recompute_cid(self) -> str:
+        return _compute_subspace_basis_cid(
+            basis_vectors=self.basis_vectors,
+            ambient_dim=self.ambient_dim,
+            ambient_vocabulary=self.ambient_vocabulary,
+        )
+
+    @property
+    def gram_off_diag_max(self) -> float:
+        """Largest absolute off-diagonal entry of the Gram matrix
+        ``B B^T``.  Returns 0.0 when ``dim ≤ 1``.
+        """
+        n = int(self.dim)
+        if n <= 1:
+            return 0.0
+        max_off = 0.0
+        for i in range(n):
+            for j in range(i + 1, n):
+                s = sum(
+                    float(a) * float(b)
+                    for a, b in zip(self.basis_vectors[i],
+                                     self.basis_vectors[j])
+                )
+                if abs(s) > max_off:
+                    max_off = abs(s)
+        return float(max_off)
+
+    @property
+    def per_vector_norm_max_dev(self) -> float:
+        """Largest absolute deviation of any basis vector's norm from
+        1.0.  Returns 0.0 when ``dim == 0``.
+        """
+        if int(self.dim) == 0:
+            return 0.0
+        max_dev = 0.0
+        for v in self.basis_vectors:
+            n2 = sum(float(c) * float(c) for c in v)
+            d = abs(math.sqrt(n2) - 1.0)
+            if d > max_dev:
+                max_dev = d
+        return float(max_dev)
+
+    @property
+    def has_nan_or_inf(self) -> bool:
+        for v in self.basis_vectors:
+            for c in v:
+                f = float(c)
+                if math.isnan(f) or math.isinf(f):
+                    return True
+        return False
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "dim": int(self.dim),
+            "ambient_dim": int(self.ambient_dim),
+            "ambient_vocabulary": list(self.ambient_vocabulary),
+            "basis_vectors": [
+                [round(float(c), 4) for c in v]
+                for v in self.basis_vectors
+            ],
+        })
+
+    @property
+    def n_basis_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "dim": int(self.dim),
+            "ambient_dim": int(self.ambient_dim),
+            "ambient_vocabulary": list(self.ambient_vocabulary),
+            "basis_vectors": [list(v) for v in self.basis_vectors],
+            "basis_cid": self.basis_cid,
+            "gram_off_diag_max": round(self.gram_off_diag_max, 6),
+            "per_vector_norm_max_dev": round(
+                self.per_vector_norm_max_dev, 6),
+            "n_basis_bytes": self.n_basis_bytes,
+        }
+
+
+def verify_subspace_basis(
+        basis: SubspaceBasis | None,
+        *,
+        expected_dim: int,
+        expected_ambient_dim: int,
+        orthogonality_tol: float = W29_DEFAULT_ORTHOGONALITY_TOL,
+) -> LatentVerificationOutcome:
+    """Pure-function controller-side verification of a
+    :class:`SubspaceBasis` (W29 family).
+
+    Failure modes (subset of W29's full enumeration):
+
+      * ``empty_basis``                  — None passed AND expected_dim > 0.
+      * ``subspace_basis_dim_mismatch``  — dim, ambient_dim, or per-vector
+                                            length does not match.
+      * ``subspace_basis_nan_inf``       — any NaN/Inf coefficient.
+      * ``subspace_basis_non_orthogonal`` — Gram off-diagonal exceeds tol.
+      * ``hash_mismatch``                — basis_cid does not recompute.
+
+    Note: when ``expected_dim == 0`` the function accepts ``None`` AND
+    accepts a basis with ``dim == 0``.
+    """
+    if expected_dim == 0:
+        if basis is None:
+            return LatentVerificationOutcome(
+                ok=True, reason="ok", n_checks=0)
+        # A basis can be supplied with dim=0; that is acceptable.
+        if int(basis.dim) == 0:
+            return LatentVerificationOutcome(
+                ok=True, reason="ok", n_checks=1)
+        # If expected_dim is 0 but a non-empty basis is supplied, that
+        # is a dim mismatch.
+        return LatentVerificationOutcome(
+            ok=False, reason="subspace_basis_dim_mismatch", n_checks=1)
+    if basis is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_basis", n_checks=0)
+    n = 1
+    if int(basis.dim) != int(expected_dim):
+        return LatentVerificationOutcome(
+            ok=False, reason="subspace_basis_dim_mismatch", n_checks=n)
+    n += 1
+    if int(basis.ambient_dim) != int(expected_ambient_dim):
+        return LatentVerificationOutcome(
+            ok=False, reason="subspace_basis_dim_mismatch", n_checks=n)
+    n += 1
+    if len(basis.basis_vectors) != int(basis.dim):
+        return LatentVerificationOutcome(
+            ok=False, reason="subspace_basis_dim_mismatch", n_checks=n)
+    for v in basis.basis_vectors:
+        if len(v) != int(basis.ambient_dim):
+            return LatentVerificationOutcome(
+                ok=False, reason="subspace_basis_dim_mismatch", n_checks=n)
+    n += 1
+    if basis.has_nan_or_inf:
+        return LatentVerificationOutcome(
+            ok=False, reason="subspace_basis_nan_inf", n_checks=n)
+    n += 1
+    if basis.gram_off_diag_max > float(orthogonality_tol):
+        return LatentVerificationOutcome(
+            ok=False, reason="subspace_basis_non_orthogonal", n_checks=n)
+    n += 1
+    if basis.basis_cid != basis._recompute_cid():
+        return LatentVerificationOutcome(
+            ok=False, reason="hash_mismatch", n_checks=n)
+    return LatentVerificationOutcome(ok=True, reason="ok", n_checks=n)
+
+
+def compute_structural_subspace_basis(
+        *,
+        canonical_per_tag_votes: tuple[tuple[str, int], ...],
+        ambient_vocabulary: tuple[str, ...],
+        partition_id: int,
+        basis_dim: int = 2,
+) -> SubspaceBasis:
+    """Deterministic structural subspace basis over the closed
+    vocabulary (W29 family).
+
+    Honest construction (audit-friendly, NOT a learned manifold):
+
+      * ``basis_vectors[0]`` — the per-tag-vote vector projected onto
+        ``ambient_vocabulary`` and L2-normalised.  Captures the cell's
+        salience direction in tag space.
+      * ``basis_vectors[1]`` — a partition-indicator vector (the
+        canonical partition's primary axis) Gram-Schmidt-orthogonalised
+        against ``basis_vectors[0]``.  Captures the cell's geometry-
+        partition direction independent of its salience.
+
+    Edge cases:
+
+      * If the salience vector has zero norm (no tags voted), use the
+        first standard basis vector e_0.
+      * If the partition-indicator vector becomes ~0 after
+        Gram-Schmidt (parallel to v_0), pick the first standard basis
+        vector orthogonal to v_0.
+
+    For ``basis_dim ∈ {0, 1, 2}`` only.  For higher dimensions, callers
+    should compose multiple cells via a chain — out of scope for v3.30.
+    """
+    ambient = tuple(ambient_vocabulary)
+    n = len(ambient)
+    if int(basis_dim) == 0:
+        return SubspaceBasis(
+            dim=0,
+            ambient_dim=n,
+            ambient_vocabulary=ambient,
+            basis_vectors=(),
+        )
+    if int(basis_dim) > 2:
+        # Cap at 2 — higher rank requires multi-cell history; not
+        # supported in v3.30.  Caller should reduce basis_dim or pin
+        # at 2 explicitly.
+        basis_dim = 2
+
+    # ----- v0: salience direction -----
+    counts = {t: int(c) for t, c in canonical_per_tag_votes}
+    v0 = [float(counts.get(t, 0)) for t in ambient]
+    norm0 = math.sqrt(sum(x * x for x in v0))
+    if norm0 == 0.0:
+        # Use e_0 as a deterministic fallback.
+        v0 = [0.0] * n
+        if n > 0:
+            v0[0] = 1.0
+        norm0 = 1.0
+    v0 = [x / norm0 for x in v0]
+
+    if int(basis_dim) == 1:
+        return SubspaceBasis(
+            dim=1,
+            ambient_dim=n,
+            ambient_vocabulary=ambient,
+            basis_vectors=(tuple(v0),),
+        )
+
+    # ----- v1: partition-indicator axis, Gram-Schmidt against v0 -----
+    # Partition-indicator: a deterministic indicator pattern over the
+    # ambient vocabulary keyed by partition_id.  Concretely:
+    #   * partition_id == 0 (linear)       → indicator on even indices
+    #   * partition_id == 1 (hierarchical) → indicator on odd indices
+    #   * partition_id == 2 (cyclic)       → indicator on indices
+    #                                        ≡ 0 mod 3, 1 mod 3 staggered
+    #
+    # Any well-defined indicator works for the verifier; the check is
+    # orthogonality, dimension, finiteness — not "the indicator was
+    # computed correctly."  Different indicators on the same partition
+    # produce different basis_cids; that is fine, the verifier accepts
+    # all valid bases on a given partition.
+    pid = int(partition_id)
+    raw1 = [0.0] * n
+    if pid == W29_PARTITION_LINEAR:
+        for i in range(0, n, 2):
+            raw1[i] = 1.0
+    elif pid == W29_PARTITION_HIERARCHICAL:
+        for i in range(1, n, 2):
+            raw1[i] = 1.0
+    else:  # cyclic
+        for i in range(n):
+            if i % 3 == 0:
+                raw1[i] = 1.0
+            elif i % 3 == 1:
+                raw1[i] = 0.5
+
+    # Gram-Schmidt against v0.
+    dot = sum(a * b for a, b in zip(raw1, v0))
+    v1 = [a - dot * b for a, b in zip(raw1, v0)]
+    norm1 = math.sqrt(sum(x * x for x in v1))
+    if norm1 < 1e-9:
+        # raw1 was parallel to v0 — pick the first standard basis
+        # vector orthogonal to v0.  v0[i] != 1 ⇒ e_i has component
+        # along v0; subtract.
+        for i in range(n):
+            ei = [0.0] * n
+            ei[i] = 1.0
+            d = sum(a * b for a, b in zip(ei, v0))
+            cand = [a - d * b for a, b in zip(ei, v0)]
+            ncand = math.sqrt(sum(x * x for x in cand))
+            if ncand > 1e-9:
+                v1 = [x / ncand for x in cand]
+                break
+    else:
+        v1 = [x / norm1 for x in v1]
+
+    return SubspaceBasis(
+        dim=2,
+        ambient_dim=n,
+        ambient_vocabulary=ambient,
+        basis_vectors=(tuple(v0), tuple(v1)),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Factoradic (Lehmer-code) routing index
+# ---------------------------------------------------------------------------
+
+
+def encode_permutation_to_factoradic(
+        perm: tuple[int, ...],
+) -> int:
+    """Encode a permutation of ``(0, 1, ..., K-1)`` to a factoradic
+    integer via its Lehmer code (W29 family).
+
+    The Lehmer code at position ``i`` is the number of remaining-after-
+    ``i`` elements that are smaller than ``perm[i]``.  The factoradic
+    integer is ``Σ lehmer[i] * (K - 1 - i)!``; bounded by ``0 ≤ idx < K!``.
+
+    Raises ``ValueError`` if ``perm`` is not a permutation of
+    ``range(K)``.
+    """
+    p = list(perm)
+    K = len(p)
+    if sorted(p) != list(range(K)):
+        raise ValueError(
+            f"encode_permutation_to_factoradic: not a permutation: {perm!r}")
+    idx = 0
+    remaining = list(range(K))
+    for i, x in enumerate(p):
+        rank = remaining.index(int(x))
+        idx += rank * math.factorial(K - 1 - i)
+        remaining.pop(rank)
+    return int(idx)
+
+
+def decode_factoradic_to_permutation(
+        idx: int,
+        n_factors: int,
+) -> tuple[int, ...]:
+    """Decode a factoradic integer to a permutation of
+    ``(0, 1, ..., n_factors-1)`` (W29 family).
+
+    Inverse of :func:`encode_permutation_to_factoradic`.
+    """
+    K = int(n_factors)
+    if K < 0:
+        raise ValueError("decode_factoradic_to_permutation: n_factors < 0")
+    if K == 0:
+        if int(idx) != 0:
+            raise ValueError(
+                "decode_factoradic_to_permutation: K=0 but idx != 0")
+        return ()
+    K_fact = math.factorial(K)
+    if int(idx) < 0 or int(idx) >= K_fact:
+        raise ValueError(
+            f"decode_factoradic_to_permutation: idx={idx} out of [0, {K_fact})")
+    remaining = list(range(K))
+    perm: list[int] = []
+    rest = int(idx)
+    for i in range(K):
+        f = math.factorial(K - 1 - i)
+        rank = rest // f
+        rest = rest % f
+        perm.append(remaining.pop(rank))
+    return tuple(perm)
+
+
+# ---------------------------------------------------------------------------
+# Causal-validity binding
+# ---------------------------------------------------------------------------
+
+
+def _compute_causal_validity_signature(
+        *,
+        parent_w28_cid: str,
+        predecessor_cids: tuple[str, ...],
+) -> str:
+    """Canonical SHA-256 over (parent_w28_cid, sorted predecessor CIDs).
+    """
+    payload = _canonical_json_bytes({
+        "parent_w28_cid": str(parent_w28_cid),
+        "predecessor_cids": sorted(str(p) for p in predecessor_cids),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# Cross-host variance witness
+# ---------------------------------------------------------------------------
+
+
+def _compute_cross_host_variance_witness_cid(
+        *,
+        cell_index: int,
+        disagreement_pairs: tuple[tuple[str, str, str, str], ...],
+        total_pairs_seen: int,
+) -> str:
+    """Canonical SHA-256 over a cell's per-probe-pair disagreement
+    record.
+
+    Each disagreement_pair entry is
+    ``(probe_id_a, host_id_a, probe_id_b, host_id_b)``; sorted at
+    construction.
+    """
+    payload = _canonical_json_bytes({
+        "cell_index": int(cell_index),
+        "disagreement_pairs": [
+            list(p) for p in disagreement_pairs
+        ],
+        "total_pairs_seen": int(total_pairs_seen),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class CrossHostVarianceWitness:
+    """A content-addressed witness of cross-host probe disagreement on
+    one cell (W29 family).
+
+    Carries:
+      * ``cell_index``         — the cell that produced the witness.
+      * ``disagreement_pairs`` — sorted tuple of (probe_id_a, host_id_a,
+                                  probe_id_b, host_id_b) tuples for
+                                  every (i, j) probe pair where the
+                                  votes disagreed.
+      * ``cross_host_disagreements`` — count of pairs where host_id_a
+                                        != host_id_b.
+      * ``total_pairs_seen``   — number of probe pairs evaluated.
+      * ``witness_cid``        — SHA-256 over the canonical payload.
+    """
+    cell_index: int
+    disagreement_pairs: tuple[tuple[str, str, str, str], ...]
+    cross_host_disagreements: int
+    total_pairs_seen: int
+    witness_cid: str = ""
+
+    def __post_init__(self) -> None:
+        # Sort pairs canonically so identical disagreement sets collide
+        # to identical witness_cids.
+        sorted_pairs = tuple(sorted(
+            (str(a), str(ha), str(b), str(hb))
+            for a, ha, b, hb in self.disagreement_pairs
+        ))
+        object.__setattr__(self, "disagreement_pairs", sorted_pairs)
+        if not self.witness_cid:
+            object.__setattr__(self, "witness_cid", self._recompute_cid())
+
+    def _recompute_cid(self) -> str:
+        return _compute_cross_host_variance_witness_cid(
+            cell_index=self.cell_index,
+            disagreement_pairs=self.disagreement_pairs,
+            total_pairs_seen=self.total_pairs_seen,
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "cell_index": int(self.cell_index),
+            "disagreement_pairs": [
+                list(p) for p in self.disagreement_pairs],
+            "cross_host_disagreements": int(self.cross_host_disagreements),
+            "total_pairs_seen": int(self.total_pairs_seen),
+        })
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "cell_index": int(self.cell_index),
+            "disagreement_pairs": [
+                list(p) for p in self.disagreement_pairs],
+            "cross_host_disagreements": int(self.cross_host_disagreements),
+            "total_pairs_seen": int(self.total_pairs_seen),
+            "witness_cid": self.witness_cid,
+        }
+
+
+# ---------------------------------------------------------------------------
+# Geometry-partitioned ratification envelope + verifier
+# ---------------------------------------------------------------------------
+
+
+def _compute_geometry_partition_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        w28_ratification_cid: str,
+        partition_id: int,
+        basis_cid: str,
+        basis_dim: int,
+        ambient_dim: int,
+        factoradic_route_index: int,
+        factoradic_route_n_factors: int,
+        causal_validity_signature: str,
+        predecessor_cids: tuple[str, ...],
+        cross_host_variance_witness_cid: str,
+        cell_index: int,
+) -> str:
+    """Canonical SHA-256 over a geometry-partition envelope payload."""
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "w28_ratification_cid": str(w28_ratification_cid),
+        "partition_id": int(partition_id),
+        "basis_cid": str(basis_cid),
+        "basis_dim": int(basis_dim),
+        "ambient_dim": int(ambient_dim),
+        "factoradic_route_index": int(factoradic_route_index),
+        "factoradic_route_n_factors": int(factoradic_route_n_factors),
+        "causal_validity_signature": str(causal_validity_signature),
+        "predecessor_cids": sorted(str(p) for p in predecessor_cids),
+        "cross_host_variance_witness_cid": str(
+            cross_host_variance_witness_cid),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class GeometryPartitionedRatificationEnvelope:
+    """Content-addressed geometry-partitioned ratification of one W28
+    decision (W29 family).
+
+    Carries:
+
+      * ``w28_ratification_cid``        — the parent W28 envelope's CID.
+      * ``partition_id``                — registered structural label.
+      * ``basis``                       — :class:`SubspaceBasis` (or
+                                            ``None`` when ``basis_dim==0``).
+      * ``factoradic_route_index``      — Lehmer-code permutation index
+                                            over the registered consumer
+                                            order.
+      * ``causal_validity_signature``   — SHA-256 over (parent W28 CID,
+                                            sorted predecessor CIDs).
+      * ``predecessor_cids``            — declared cell predecessors
+                                            (audit only; the signature
+                                            binds them).
+      * ``cross_host_variance_witness_cid`` — non-empty when the W29
+                                            layer observed cross-host
+                                            disagreement on this cell.
+
+    The envelope's ``partition_cid`` is SHA-256 over the canonical
+    payload; tampering on any field is detected by
+    :func:`verify_geometry_partition_ratification`.
+
+    Wire token cost
+    ---------------
+
+    The W29 layer charges 1 visible token on the producer side
+    (``<partition_ref:DDDD>``) iff ``wire_required`` is True (i.e. the
+    partition table is non-trivial OR ``basis_dim > 0`` OR the
+    registered consumer order has K > 1 OR the registered predecessor
+    set is non-empty).  When every component is trivial (single
+    partition, basis_dim 0, K=1, no predecessors), the envelope is
+    recorded in the audit ledger only and no token is transmitted, so
+    W29 reduces to W28 byte-for-byte (W29-Λ-trivial-partition).
+    """
+    schema_version: str
+    schema_cid: str
+    w28_ratification_cid: str
+    partition_id: int
+    basis: SubspaceBasis | None
+    basis_dim: int
+    ambient_dim: int
+    factoradic_route_index: int
+    factoradic_route_n_factors: int
+    causal_validity_signature: str
+    predecessor_cids: tuple[str, ...]
+    cross_host_variance_witness_cid: str
+    cell_index: int
+    wire_required: bool = False
+    partition_cid: str = ""
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "predecessor_cids",
+                           tuple(sorted(str(p)
+                                        for p in self.predecessor_cids)))
+        if not self.partition_cid:
+            object.__setattr__(self, "partition_cid",
+                                self.recompute_partition_cid())
+
+    def recompute_partition_cid(self) -> str:
+        return _compute_geometry_partition_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            w28_ratification_cid=self.w28_ratification_cid,
+            partition_id=self.partition_id,
+            basis_cid=(self.basis.basis_cid if self.basis is not None
+                        else ""),
+            basis_dim=self.basis_dim,
+            ambient_dim=self.ambient_dim,
+            factoradic_route_index=self.factoradic_route_index,
+            factoradic_route_n_factors=self.factoradic_route_n_factors,
+            causal_validity_signature=self.causal_validity_signature,
+            predecessor_cids=self.predecessor_cids,
+            cross_host_variance_witness_cid=(
+                self.cross_host_variance_witness_cid),
+            cell_index=self.cell_index,
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "w28_ratification_cid": self.w28_ratification_cid,
+            "partition_id": int(self.partition_id),
+            "basis_cid": (self.basis.basis_cid if self.basis is not None
+                          else ""),
+            "basis_dim": int(self.basis_dim),
+            "ambient_dim": int(self.ambient_dim),
+            "factoradic_route_index": int(self.factoradic_route_index),
+            "factoradic_route_n_factors": int(
+                self.factoradic_route_n_factors),
+            "causal_validity_signature": self.causal_validity_signature,
+            "predecessor_cids": list(self.predecessor_cids),
+            "cross_host_variance_witness_cid": (
+                self.cross_host_variance_witness_cid),
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<partition_ref:{self.partition_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_structured_bits(self) -> int:
+        """Approximate count of structured-control bits packed into
+        this envelope's canonical payload.  Used for the cram-factor
+        metric.
+
+        Uses ``8 * len(canonical_bytes)`` as a faithful upper bound on
+        the audit-friendly content the envelope carries; the wire-side
+        cost is at most 1 visible token.
+        """
+        if self.basis is not None:
+            basis_bits = 8 * self.basis.n_basis_bytes
+        else:
+            basis_bits = 0
+        return 8 * self.n_envelope_bytes + basis_bits
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "w28_ratification_cid": self.w28_ratification_cid,
+            "partition_id": int(self.partition_id),
+            "partition_label": W29_PARTITION_LABEL.get(
+                int(self.partition_id), "unknown"),
+            "basis": (self.basis.as_dict() if self.basis is not None
+                       else None),
+            "basis_dim": int(self.basis_dim),
+            "ambient_dim": int(self.ambient_dim),
+            "factoradic_route_index": int(self.factoradic_route_index),
+            "factoradic_route_n_factors": int(
+                self.factoradic_route_n_factors),
+            "causal_validity_signature": self.causal_validity_signature,
+            "predecessor_cids": list(self.predecessor_cids),
+            "cross_host_variance_witness_cid": (
+                self.cross_host_variance_witness_cid),
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "partition_cid": self.partition_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+@dataclasses.dataclass(frozen=True)
+class PartitionRegistration:
+    """One registered partition in a W29 partition table (mirrors
+    :class:`EnsembleProbeRegistration`).
+
+    Fields
+    ------
+    partition_id
+        Integer identifier in :data:`W29_REGISTERED_PARTITION_IDS`.
+    label
+        Optional forensics label ("linear" / "hierarchical" / "cyclic").
+    consumer_permutation
+        The permutation of the registered consumer order this
+        partition routes to.  Must be a permutation of
+        ``range(len(consumer_order))``.  Encoded by the producer as
+        the factoradic_route_index and decoded by the verifier.
+    trust_prior
+        Per-partition prior weight used by the partition layer's quorum
+        check.  Default ``1.0``.
+    """
+    partition_id: int
+    label: str = ""
+    consumer_permutation: tuple[int, ...] = ()
+    trust_prior: float = 1.0
+
+
+def verify_geometry_partition_ratification(
+        env: GeometryPartitionedRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_w28_ratification_cid: str,
+        registered_partition_table: tuple[PartitionRegistration, ...],
+        registered_basis_dim: int,
+        registered_ambient_dim: int,
+        registered_consumer_order: tuple[str, ...],
+        registered_predecessor_cids: frozenset[str] = frozenset(),
+        cross_host_disagreement_observed: bool = False,
+        orthogonality_tol: float = W29_DEFAULT_ORTHOGONALITY_TOL,
+) -> LatentVerificationOutcome:
+    """Pure-function controller-side verification of a
+    :class:`GeometryPartitionedRatificationEnvelope` (W29 family).
+
+    Failure modes enumerated:
+
+      * ``empty_partition_envelope``
+      * ``schema_version_unknown``
+      * ``schema_cid_mismatch``
+      * ``w28_parent_cid_mismatch``
+      * ``partition_id_unregistered``
+      * ``subspace_basis_dim_mismatch``
+      * ``subspace_basis_non_orthogonal``
+      * ``subspace_basis_nan_inf``
+      * ``factoradic_index_out_of_range``
+      * ``factoradic_route_inverse_mismatch``
+      * ``causal_predecessor_unregistered``
+      * ``causal_validity_signature_invalid``
+      * ``cross_host_variance_witness_unsealed``
+      * ``partition_cid_hash_mismatch``
+    """
+    n = 0
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_partition_envelope", n_checks=n)
+    n += 1
+    if env.schema_version != W29_PARTITION_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_version_unknown", n_checks=n)
+    n += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="schema_cid_mismatch", n_checks=n)
+    n += 1
+    if env.w28_ratification_cid != registered_w28_ratification_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w28_parent_cid_mismatch", n_checks=n)
+    n += 1
+    registered_ids = frozenset(p.partition_id
+                                for p in registered_partition_table)
+    if int(env.partition_id) not in registered_ids:
+        return LatentVerificationOutcome(
+            ok=False, reason="partition_id_unregistered", n_checks=n)
+    n += 1
+    # Basis verification.
+    basis_outcome = verify_subspace_basis(
+        env.basis,
+        expected_dim=int(registered_basis_dim),
+        expected_ambient_dim=int(registered_ambient_dim),
+        orthogonality_tol=float(orthogonality_tol),
+    )
+    if not basis_outcome.ok:
+        # Re-export the basis verifier's reason in W29's enumeration.
+        rsn = str(basis_outcome.reason)
+        if rsn in (
+                "empty_basis", "subspace_basis_dim_mismatch",
+                "hash_mismatch"):
+            return LatentVerificationOutcome(
+                ok=False, reason="subspace_basis_dim_mismatch", n_checks=n)
+        if rsn == "subspace_basis_nan_inf":
+            return LatentVerificationOutcome(
+                ok=False, reason="subspace_basis_nan_inf", n_checks=n)
+        if rsn == "subspace_basis_non_orthogonal":
+            return LatentVerificationOutcome(
+                ok=False, reason="subspace_basis_non_orthogonal",
+                n_checks=n)
+        return LatentVerificationOutcome(
+            ok=False, reason=str(basis_outcome.reason), n_checks=n)
+    if env.basis is not None and int(env.basis_dim) != int(env.basis.dim):
+        return LatentVerificationOutcome(
+            ok=False, reason="subspace_basis_dim_mismatch", n_checks=n)
+    n += 1
+    K = int(env.factoradic_route_n_factors)
+    K_registered = len(registered_consumer_order)
+    if K < 0 or K != K_registered:
+        return LatentVerificationOutcome(
+            ok=False, reason="factoradic_index_out_of_range", n_checks=n)
+    if K > 0:
+        K_fact = math.factorial(K)
+        if (int(env.factoradic_route_index) < 0
+                or int(env.factoradic_route_index) >= K_fact):
+            return LatentVerificationOutcome(
+                ok=False, reason="factoradic_index_out_of_range",
+                n_checks=n)
+    elif int(env.factoradic_route_index) != 0:
+        # K=0 ⇒ idx must be 0.
+        return LatentVerificationOutcome(
+            ok=False, reason="factoradic_index_out_of_range", n_checks=n)
+    n += 1
+    # Decode-and-compare against the partition's registered permutation.
+    if K > 0:
+        try:
+            decoded = decode_factoradic_to_permutation(
+                int(env.factoradic_route_index), K)
+        except ValueError:
+            return LatentVerificationOutcome(
+                ok=False, reason="factoradic_index_out_of_range",
+                n_checks=n)
+        # Find the partition's registered permutation.
+        partition_perm: tuple[int, ...] | None = None
+        for p in registered_partition_table:
+            if int(p.partition_id) == int(env.partition_id):
+                partition_perm = tuple(int(x) for x in p.consumer_permutation)
+                break
+        if (partition_perm is not None
+                and len(partition_perm) == K
+                and tuple(decoded) != partition_perm):
+            return LatentVerificationOutcome(
+                ok=False, reason="factoradic_route_inverse_mismatch",
+                n_checks=n)
+    n += 1
+    # Predecessor closure.
+    if registered_predecessor_cids:
+        for p in env.predecessor_cids:
+            if str(p) not in registered_predecessor_cids:
+                return LatentVerificationOutcome(
+                    ok=False, reason="causal_predecessor_unregistered",
+                    n_checks=n)
+    n += 1
+    # Causal-validity signature recompute.
+    expected_sig = _compute_causal_validity_signature(
+        parent_w28_cid=env.w28_ratification_cid,
+        predecessor_cids=env.predecessor_cids,
+    )
+    if expected_sig != env.causal_validity_signature:
+        return LatentVerificationOutcome(
+            ok=False, reason="causal_validity_signature_invalid",
+            n_checks=n)
+    n += 1
+    # Cross-host variance witness consistency.
+    if (cross_host_disagreement_observed
+            and not env.cross_host_variance_witness_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="cross_host_variance_witness_unsealed",
+            n_checks=n)
+    n += 1
+    # Partition-cid hash recompute (last — catches any field tampering
+    # missed by the structural checks above).
+    if env.partition_cid != env.recompute_partition_cid():
+        return LatentVerificationOutcome(
+            ok=False, reason="partition_cid_hash_mismatch", n_checks=n)
+    return LatentVerificationOutcome(ok=True, reason="ok", n_checks=n)
+
+
+# ---------------------------------------------------------------------------
+# Partition classifier
+# ---------------------------------------------------------------------------
+
+
+def classify_partition_id_for_cell(
+        *,
+        w28_branch: str,
+        signature_cid: str,
+        signature_history: tuple[str, ...],
+        cycle_window: int = 4,
+) -> int:
+    """Deterministic structural classifier for the W29 partition_id.
+
+    Pure function; relies only on the W28 branch and the cell's recent
+    signature history.
+
+    Heuristic (sound by inspection): we identify the *most recent run*
+    of identical signatures at the tail of the history, treat that run
+    as the "current branch", and look at everything before the run for
+    cyclic membership:
+
+      * ``HIERARCHICAL`` — first-cell case OR the cell's signature is
+        a fresh anchor (never appears in ``signature_history``).
+      * ``CYCLIC``       — the cell's signature appears in the
+        pre-run history within ``cycle_window`` (we have visited this
+        signature *before* the current run; the producer is cycling
+        back to a prior compartment).
+      * ``LINEAR``       — the cell's signature equals the last entry
+        AND the signature does NOT appear before the current run
+        (i.e. the producer is extending the current run without
+        cycling).
+
+    The classifier is purely structural and replayable; the verifier
+    does NOT re-classify (it only checks that the producer's
+    partition_id is in the registered partition table).
+    """
+    if not signature_history:
+        # First cell: no history, can only be a fresh anchor.
+        return W29_PARTITION_HIERARCHICAL
+    last = signature_history[-1]
+    # Walk back to find the start index of the most recent run of
+    # identical signatures (suffix run with signature == last).
+    run_start = 0
+    for i in range(len(signature_history) - 1, -1, -1):
+        if signature_history[i] != last:
+            run_start = i + 1
+            break
+    # Pre-run = everything before the current run.
+    pre_run = signature_history[:run_start]
+    pre_run_window = pre_run[-int(cycle_window):]
+    if signature_cid in pre_run_window:
+        return W29_PARTITION_CYCLIC
+    if signature_cid == last:
+        return W29_PARTITION_LINEAR
+    return W29_PARTITION_HIERARCHICAL
+
+
+# ---------------------------------------------------------------------------
+# Geometry partition registry + result + orchestrator
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class GeometryPartitionRegistry:
+    """Controller-side registry for the W29 partition table (mirrors
+    :class:`EnsembleRatificationRegistry`).
+    """
+    schema: SchemaCapsule | None = None
+    partition_table: tuple[PartitionRegistration, ...] = ()
+    basis_dim: int = 2
+    ambient_dim: int = 0
+    ambient_vocabulary: tuple[str, ...] = ()
+    consumer_order: tuple[str, ...] = ()
+    registered_predecessor_cids: frozenset[str] = frozenset()
+    cycle_window: int = 4
+    quorum_threshold: float = 1.0
+    orthogonality_tol: float = W29_DEFAULT_ORTHOGONALITY_TOL
+    local_host_id: str = "localhost"
+
+    _envelopes: dict[str, GeometryPartitionedRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_partitions_registered: int = 0
+    n_partitions_rejected: int = 0
+    n_cross_host_variance_witnessed: int = 0
+    n_partition_below_threshold: int = 0
+    n_per_partition_routed: dict[int, int] = dataclasses.field(
+        default_factory=dict)
+
+    @property
+    def is_trivial(self) -> bool:
+        """True iff this registry is on the byte-for-W28 path:
+        ``basis_dim = 0`` AND ``len(consumer_order) <= 1`` AND no
+        predecessors AND every registered partition has an empty
+        ``consumer_permutation``.
+
+        Note: we permit MULTIPLE partition entries in the trivial
+        registry as long as each is empty-permutation — that lets the
+        structural classifier hand any cell to any registered partition
+        (LINEAR / HIERARCHICAL / CYCLIC) without forcing the wire-token
+        charge on the trivial path.
+        """
+        all_empty_perms = all(
+            (not p.consumer_permutation)
+            for p in self.partition_table
+        )
+        return (
+            int(self.basis_dim) == 0
+            and len(self.consumer_order) <= 1
+            and not self.registered_predecessor_cids
+            and all_empty_perms
+        )
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        """True iff this registry will charge a wire token on
+        triggered cells (i.e. the partition layer is NOT trivial).
+        """
+        return not self.is_trivial
+
+    @property
+    def registered_partition_ids(self) -> frozenset[int]:
+        return frozenset(
+            int(p.partition_id) for p in self.partition_table)
+
+    def register_envelope(
+            self,
+            env: GeometryPartitionedRatificationEnvelope,
+            *,
+            cross_host_disagreement_observed: bool,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            self.n_partitions_rejected += 1
+            return LatentVerificationOutcome(
+                ok=False, reason="registry_no_schema", n_checks=0)
+        outcome = verify_geometry_partition_ratification(
+            env,
+            registered_schema=self.schema,
+            registered_w28_ratification_cid=env.w28_ratification_cid,
+            registered_partition_table=self.partition_table,
+            registered_basis_dim=int(self.basis_dim),
+            registered_ambient_dim=int(self.ambient_dim),
+            registered_consumer_order=self.consumer_order,
+            registered_predecessor_cids=self.registered_predecessor_cids,
+            cross_host_disagreement_observed=bool(
+                cross_host_disagreement_observed),
+            orthogonality_tol=float(self.orthogonality_tol),
+        )
+        if not outcome.ok:
+            self.n_partitions_rejected += 1
+            return outcome
+        self._envelopes[env.partition_cid] = env
+        self.n_partitions_registered += 1
+        pid = int(env.partition_id)
+        self.n_per_partition_routed[pid] = (
+            self.n_per_partition_routed.get(pid, 0) + 1)
+        if env.cross_host_variance_witness_cid:
+            self.n_cross_host_variance_witnessed += 1
+        return outcome
+
+    def reset_session(self) -> None:
+        self._envelopes.clear()
+        self.n_partitions_registered = 0
+        self.n_partitions_rejected = 0
+        self.n_cross_host_variance_witnessed = 0
+        self.n_partition_below_threshold = 0
+        self.n_per_partition_routed = {}
+
+
+@dataclasses.dataclass
+class W29PartitionResult:
+    """Per-cell audit record for a W29 geometry-partitioned agent."""
+    answer: dict[str, Any]
+    inner_w28_branch: str
+    decoder_branch: str
+    agent_id: str
+    is_producer: bool
+    w28_ratification_cid: str
+    partition_id: int
+    partition_label: str
+    basis_dim: int
+    factoradic_route_index: int
+    factoradic_route_n_factors: int
+    causal_validity_signature: str
+    cross_host_variance_witness_cid: str
+    cross_host_disagreement_count: int
+    n_w28_visible_tokens: int
+    n_w29_visible_tokens: int
+    n_partition_overhead_tokens: int
+    partition_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w29: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "inner_w28_branch": self.inner_w28_branch,
+            "decoder_branch": self.decoder_branch,
+            "agent_id": self.agent_id,
+            "is_producer": bool(self.is_producer),
+            "w28_ratification_cid": self.w28_ratification_cid,
+            "partition_id": int(self.partition_id),
+            "partition_label": self.partition_label,
+            "basis_dim": int(self.basis_dim),
+            "factoradic_route_index": int(self.factoradic_route_index),
+            "factoradic_route_n_factors": int(
+                self.factoradic_route_n_factors),
+            "causal_validity_signature": self.causal_validity_signature,
+            "cross_host_variance_witness_cid": (
+                self.cross_host_variance_witness_cid),
+            "cross_host_disagreement_count": int(
+                self.cross_host_disagreement_count),
+            "n_w28_visible_tokens": int(self.n_w28_visible_tokens),
+            "n_w29_visible_tokens": int(self.n_w29_visible_tokens),
+            "n_partition_overhead_tokens": int(
+                self.n_partition_overhead_tokens),
+            "partition_cid": self.partition_cid,
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": self.verification_reason,
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w29": round(float(self.cram_factor_w29), 4),
+        }
+
+
+@dataclasses.dataclass
+class GeometryPartitionedOrchestrator:
+    """Geometry-partitioned product-manifold orchestrator (W29 family).
+
+    Wraps an :class:`EnsembleVerifiedMultiChainOrchestrator` and adds a
+    structural geometry partition + audited subspace-basis payload +
+    factoradic routing index + causal-validity gate + cross-host
+    variance witness on every triggered cell.
+
+    Per-cell flow:
+
+      1. Run the inner W28 orchestrator.
+      2. If the W28 branch is not in the trigger set, pass through
+         (W29_BRANCH_NO_PARTITION_NEEDED, no token charged).
+      3. Else classify the cell's partition_id using the W28 branch
+         and the recent signature history.
+      4. Compute the audited subspace basis (deterministic structural
+         projection over the closed vocabulary).
+      5. Compute the factoradic_route_index from the partition's
+         registered permutation.
+      6. Compute the causal-validity signature over (parent_w28_cid,
+         declared predecessor_cids).
+      7. Compute the cross-host variance witness from the registered
+         W28 probes' last-vote disagreement matrix.
+      8. Build a :class:`GeometryPartitionedRatificationEnvelope`.
+      9. Verify the envelope via the pure verifier.
+      10. Register with the controller's
+          :class:`GeometryPartitionRegistry`.
+      11. Charge 1 wire token iff ``registry.has_wire_required_layer``.
+
+    Trust boundary: every envelope is sealed and verified before it
+    contributes to the audit ledger; tampering on any field is detected.
+    The W29-Λ-trivial-partition path is the byte-for-W28 reduction
+    (registry.is_trivial = True ⇒ no token charged, partition recorded
+    in audit only).
+    """
+    inner: EnsembleVerifiedMultiChainOrchestrator
+    registry: GeometryPartitionRegistry
+    enabled: bool = True
+    require_partition_verification: bool = True
+    trigger_branches: frozenset[str] = dataclasses.field(
+        default_factory=lambda: W29_DEFAULT_TRIGGER_BRANCHES)
+    cycle_window: int = 4
+    declared_predecessor_cids: tuple[str, ...] = ()
+    # Optional per-partition inner W28 dispatch.  When a partition_id
+    # appears as a key, that partition's inner W28 stack runs INSTEAD of
+    # ``inner`` for cells classified to that partition.  This is the
+    # honest mixed-curvature compartmentalisation: each partition gets
+    # its own inner stack (its own oracle config / probe table / pool),
+    # and W29's partition decision routes the cell into the right
+    # compartment before W28 commits.  When unused (``{}``), the
+    # orchestrator falls back to the unified ``inner`` for every cell.
+    inner_per_partition: dict[
+        int, EnsembleVerifiedMultiChainOrchestrator] = dataclasses.field(
+        default_factory=dict)
+    # When ``True`` AND ``inner_per_partition`` is non-empty, the
+    # orchestrator computes the input signature from the cell handoffs
+    # FIRST (via :func:`compute_input_signature_cid`), classifies the
+    # partition_id, then dispatches to the chosen inner W28 stack.  When
+    # ``False``, the orchestrator runs ``inner`` first (the simpler,
+    # backwards-compatible path used by the H2 byte-for-W28 anchor and
+    # the cram-factor headline).
+    pre_dispatch_by_partition: bool = False
+
+    _last_result: "W29PartitionResult | None" = None
+    _last_envelope: "GeometryPartitionedRatificationEnvelope | None" = None
+    _signature_history: list[str] = dataclasses.field(default_factory=list)
+    _cell_index: int = 0
+    _last_active_inner: "EnsembleVerifiedMultiChainOrchestrator | None" = None
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.inner.schema
+
+    @property
+    def agent_id(self) -> str:
+        return self.inner.agent_id
+
+    @property
+    def is_producer(self) -> bool:
+        return self.inner.is_producer
+
+    @property
+    def producer_agent_id(self) -> str:
+        return self.inner.producer_agent_id
+
+    @property
+    def consumer_agent_ids(self) -> tuple[str, ...]:
+        return self.inner.consumer_agent_ids
+
+    def reset_session(self) -> None:
+        self.inner.reset_session()
+        for inner in self.inner_per_partition.values():
+            inner.reset_session()
+        self._last_result = None
+        self._last_envelope = None
+        self._signature_history = []
+        self._cell_index = 0
+        self._last_active_inner = None
+
+    def _resolve_inner_for_partition(
+            self,
+            partition_id: int,
+    ) -> EnsembleVerifiedMultiChainOrchestrator:
+        """Pick the inner W28 stack for a given partition_id.  Falls
+        back to ``self.inner`` when the partition is not in the
+        per-partition dispatch table.
+        """
+        return self.inner_per_partition.get(int(partition_id), self.inner)
+
+    def _read_w28_envelope_and_branch(
+            self,
+            out: dict[str, Any],
+    ) -> tuple[EnsemblePivotRatificationEnvelope | None, str, int]:
+        ev = None
+        branch = ""
+        n_w28_visible = 0
+        if "ensemble_verified_multi_chain" in out:
+            audit = out["ensemble_verified_multi_chain"]
+            branch = str(audit.get("decoder_branch", ""))
+            n_w28_visible = int(audit.get("n_w28_visible_tokens", 0))
+            ev = self.inner.last_envelope
+        return ev, branch, n_w28_visible
+
+    def _compute_cross_host_variance_witness(
+            self,
+            *,
+            active_inner: "EnsembleVerifiedMultiChainOrchestrator | None" = None,
+    ) -> tuple[CrossHostVarianceWitness | None, int, bool]:
+        """Inspect the last W28 poll's per-probe votes and emit a
+        CrossHostVarianceWitness when ≥1 cross-host probe pair
+        disagreed.
+
+        Returns ``(witness, n_disagreements_cross_host, observed_flag)``.
+        """
+        inner = active_inner or self.inner
+        last_w28 = inner.last_result
+        if last_w28 is None or not last_w28.probe_vote_summary:
+            return None, 0, False
+        # Pull host ids from the inner registry's probes (matching by
+        # probe_id).
+        registry = inner.registry
+        host_for: dict[str, str] = {
+            str(reg.probe.probe_id): str(reg.host_id)
+            for reg in registry.probes
+        }
+        votes: list[tuple[str, str, int, int]] = []
+        for v in last_w28.probe_vote_summary:
+            pid = str(v.get("probe_id", ""))
+            host = host_for.get(pid, "")
+            votes.append((
+                pid, host,
+                int(v.get("ratify", 0)),
+                int(v.get("reject", 0)),
+            ))
+        # Pairwise disagreement: probe_a's signed vote != probe_b's.
+        # We treat (ratify=1, reject=0) and (ratify=0, reject=1) as the
+        # two opposed strict states; abstain (0,0) does NOT count as a
+        # disagreement.
+        disagreements: list[tuple[str, str, str, str]] = []
+        n_cross_host_disagreements = 0
+        n_pairs = 0
+        for i in range(len(votes)):
+            for j in range(i + 1, len(votes)):
+                p_a, h_a, rt_a, rj_a = votes[i]
+                p_b, h_b, rt_b, rj_b = votes[j]
+                a_strict = (rt_a, rj_a) in {(1, 0), (0, 1)}
+                b_strict = (rt_b, rj_b) in {(1, 0), (0, 1)}
+                if not (a_strict and b_strict):
+                    continue
+                n_pairs += 1
+                if (rt_a, rj_a) != (rt_b, rj_b):
+                    disagreements.append((p_a, h_a, p_b, h_b))
+                    if h_a and h_b and h_a != h_b:
+                        n_cross_host_disagreements += 1
+        if n_pairs == 0:
+            return None, 0, False
+        observed = n_cross_host_disagreements > 0
+        if not disagreements:
+            return None, 0, False
+        witness = CrossHostVarianceWitness(
+            cell_index=int(self._cell_index),
+            disagreement_pairs=tuple(disagreements),
+            cross_host_disagreements=int(n_cross_host_disagreements),
+            total_pairs_seen=int(n_pairs),
+        )
+        return witness, n_cross_host_disagreements, observed
+
+    def _read_signature_for_cell(self) -> str:
+        last_w27 = self.inner.inner.last_result
+        if last_w27 is None:
+            return ""
+        return str(last_w27.input_signature_cid or "")
+
+    def _classify_partition_pre_dispatch(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> tuple[int, str]:
+        """Compute the input signature CID from cell handoffs ALONE
+        (no inner W28 run yet) and classify the partition_id.
+
+        Used by the per-partition pre-dispatch path so the W29 layer
+        picks the inner W28 stack to run BEFORE that stack commits its
+        answer.  Pure function over the handoffs + signature_history.
+        """
+        if self.schema is None:
+            return W29_PARTITION_LINEAR, ""
+        sig_cid = compute_input_signature_cid(
+            per_round_handoffs,
+            producer_agent_id=str(self.producer_agent_id
+                                    or self.agent_id),
+            consumer_agent_ids=tuple(self.consumer_agent_ids),
+            schema_cid=str(self.schema.cid),
+        )
+        partition_id = classify_partition_id_for_cell(
+            w28_branch="",  # not yet known
+            signature_cid=str(sig_cid),
+            signature_history=tuple(self._signature_history),
+            cycle_window=int(self.cycle_window),
+        )
+        return int(partition_id), str(sig_cid)
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        # 1. Optionally pre-dispatch by partition.  When per-partition
+        # inner W28 stacks are registered AND ``pre_dispatch_by_partition``
+        # is True, classify the cell's partition BEFORE running any W28
+        # so the right compartment runs.
+        active_inner = self.inner
+        pre_dispatched_partition: int | None = None
+        if self.pre_dispatch_by_partition and self.inner_per_partition:
+            pid, _pre_sig = self._classify_partition_pre_dispatch(
+                per_round_handoffs)
+            pre_dispatched_partition = int(pid)
+            active_inner = self._resolve_inner_for_partition(int(pid))
+        self._last_active_inner = active_inner
+
+        # 2. Run the chosen inner W28 (which runs W27 inside).
+        out = active_inner.decode_rounds(per_round_handoffs)
+        # Read W28 audit from the active inner.
+        w28_envelope: EnsemblePivotRatificationEnvelope | None = None
+        inner_w28_branch = ""
+        n_w28_visible = 0
+        if "ensemble_verified_multi_chain" in out:
+            audit = out["ensemble_verified_multi_chain"]
+            inner_w28_branch = str(audit.get("decoder_branch", ""))
+            n_w28_visible = int(audit.get("n_w28_visible_tokens", 0))
+            w28_envelope = active_inner.last_envelope
+        cell_index = int(self._cell_index)
+
+        def _pack(
+                *,
+                decoder_branch: str,
+                envelope: GeometryPartitionedRatificationEnvelope | None,
+                n_w29_visible: int,
+                partition_overhead: int,
+                ratified: bool,
+                verify_ok: bool,
+                verify_reason: str,
+                cross_host_disagreement_count: int,
+                witness_cid: str,
+                partition_id: int,
+                basis_dim: int,
+                factoradic_route_index: int,
+                factoradic_route_n_factors: int,
+                causal_validity_signature: str,
+                w28_ratification_cid: str,
+        ) -> dict[str, Any]:
+            envelope_bytes = (envelope.n_envelope_bytes
+                               if envelope is not None else 0)
+            structured_bits = (envelope.n_structured_bits
+                                 if envelope is not None else 0)
+            wire = max(1, partition_overhead)
+            cram_factor = (
+                float(structured_bits) / float(wire)
+                if structured_bits > 0 else 0.0
+            )
+            partition_cid = (envelope.partition_cid
+                              if envelope is not None else "")
+            result = W29PartitionResult(
+                answer=dict(out),
+                inner_w28_branch=str(inner_w28_branch),
+                decoder_branch=str(decoder_branch),
+                agent_id=str(self.agent_id),
+                is_producer=bool(self.is_producer),
+                w28_ratification_cid=str(w28_ratification_cid),
+                partition_id=int(partition_id),
+                partition_label=W29_PARTITION_LABEL.get(
+                    int(partition_id), "unknown"),
+                basis_dim=int(basis_dim),
+                factoradic_route_index=int(factoradic_route_index),
+                factoradic_route_n_factors=int(factoradic_route_n_factors),
+                causal_validity_signature=str(causal_validity_signature),
+                cross_host_variance_witness_cid=str(witness_cid),
+                cross_host_disagreement_count=int(
+                    cross_host_disagreement_count),
+                n_w28_visible_tokens=int(n_w28_visible),
+                n_w29_visible_tokens=int(n_w29_visible),
+                n_partition_overhead_tokens=int(partition_overhead),
+                partition_cid=str(partition_cid),
+                ratified=bool(ratified),
+                verification_ok=bool(verify_ok),
+                verification_reason=str(verify_reason),
+                n_envelope_bytes=int(envelope_bytes),
+                n_structured_bits=int(structured_bits),
+                cram_factor_w29=float(cram_factor),
+            )
+            self._last_result = result
+            self._last_envelope = envelope
+            out_local = dict(out)
+            out_local["geometry_partitioned"] = result.as_dict()
+            if envelope is not None:
+                out_local["geometry_partition_envelope"] = envelope.as_dict()
+            return out_local
+
+        # ---- Read the active inner's signature_cid for history bookkeeping
+        # ----
+        # We need to record this signature in self._signature_history
+        # *regardless* of which downstream branch fires, so that the
+        # next cell's classifier sees the correct cumulative history.
+        last_w27_active = active_inner.inner.last_result
+        sig_cid_from_inner = ""
+        if last_w27_active is not None:
+            sig_cid_from_inner = str(
+                last_w27_active.input_signature_cid or "")
+
+        # ---- Disabled / no-trigger / no-schema paths ----
+        if (not self.enabled or self.schema is None
+                or not self.registry.partition_table):
+            self._cell_index += 1
+            self._signature_history.append(str(sig_cid_from_inner))
+            return _pack(
+                decoder_branch=W29_BRANCH_DISABLED,
+                envelope=None, n_w29_visible=n_w28_visible,
+                partition_overhead=0, ratified=False,
+                verify_ok=False, verify_reason="disabled",
+                cross_host_disagreement_count=0,
+                witness_cid="",
+                partition_id=int(pre_dispatched_partition or 0),
+                basis_dim=0, factoradic_route_index=0,
+                factoradic_route_n_factors=0,
+                causal_validity_signature="",
+                w28_ratification_cid="")
+
+        if inner_w28_branch not in self.trigger_branches:
+            self._cell_index += 1
+            self._signature_history.append(str(sig_cid_from_inner))
+            return _pack(
+                decoder_branch=W29_BRANCH_NO_PARTITION_NEEDED,
+                envelope=None, n_w29_visible=n_w28_visible,
+                partition_overhead=0, ratified=False,
+                verify_ok=False, verify_reason="w28_branch_not_triggered",
+                cross_host_disagreement_count=0,
+                witness_cid="",
+                partition_id=int(pre_dispatched_partition or 0),
+                basis_dim=0, factoradic_route_index=0,
+                factoradic_route_n_factors=0,
+                causal_validity_signature="",
+                w28_ratification_cid="")
+
+        if w28_envelope is None:
+            self._cell_index += 1
+            self._signature_history.append(str(sig_cid_from_inner))
+            return _pack(
+                decoder_branch=W29_BRANCH_FALLBACK_W28,
+                envelope=None, n_w29_visible=n_w28_visible,
+                partition_overhead=0, ratified=False,
+                verify_ok=False, verify_reason="no_w28_envelope",
+                cross_host_disagreement_count=0,
+                witness_cid="",
+                partition_id=int(pre_dispatched_partition or 0),
+                basis_dim=0, factoradic_route_index=0,
+                factoradic_route_n_factors=0,
+                causal_validity_signature="",
+                w28_ratification_cid="")
+
+        # ---- Reuse the signature_cid we already read above + classify ----
+        last_w27 = last_w27_active
+        sig_cid = sig_cid_from_inner
+        if pre_dispatched_partition is not None:
+            partition_id = int(pre_dispatched_partition)
+        else:
+            partition_id = classify_partition_id_for_cell(
+                w28_branch=inner_w28_branch,
+                signature_cid=sig_cid,
+                signature_history=tuple(self._signature_history),
+                cycle_window=int(self.cycle_window),
+            )
+        # Append to history AFTER classification so the current cell's
+        # signature does not leak into its own classification.
+        self._signature_history.append(str(sig_cid))
+
+        # ---- Compute basis ----
+        basis: SubspaceBasis | None
+        canonical_per_tag_votes: tuple[tuple[str, int], ...] = ()
+        # Pull the canonical state from the active inner W27 layer's
+        # last signature.
+        if last_w27 is not None:
+            sig_env = active_inner._read_cell_signature()
+            if sig_env is not None:
+                canonical_per_tag_votes = tuple(sig_env.canonical_per_tag_votes)
+        if int(self.registry.basis_dim) == 0:
+            basis = None
+        else:
+            basis = compute_structural_subspace_basis(
+                canonical_per_tag_votes=canonical_per_tag_votes,
+                ambient_vocabulary=self.registry.ambient_vocabulary,
+                partition_id=int(partition_id),
+                basis_dim=int(self.registry.basis_dim),
+            )
+
+        # ---- Factoradic route index from the partition's permutation ----
+        partition_perm: tuple[int, ...] = ()
+        for p in self.registry.partition_table:
+            if int(p.partition_id) == int(partition_id):
+                partition_perm = tuple(int(x) for x in p.consumer_permutation)
+                break
+        K = len(self.registry.consumer_order)
+        if K > 0 and partition_perm and len(partition_perm) == K:
+            try:
+                fact_idx = encode_permutation_to_factoradic(partition_perm)
+            except ValueError:
+                fact_idx = 0
+        else:
+            fact_idx = 0
+
+        # ---- Causal-validity signature ----
+        predecessor_cids = tuple(self.declared_predecessor_cids)
+        causal_sig = _compute_causal_validity_signature(
+            parent_w28_cid=str(w28_envelope.ratification_cid),
+            predecessor_cids=predecessor_cids,
+        )
+
+        # ---- Cross-host variance witness ----
+        witness, n_cross_disagree, disagreement_observed = (
+            self._compute_cross_host_variance_witness(
+                active_inner=active_inner))
+        witness_cid = (witness.witness_cid if witness is not None else "")
+
+        # ---- Build envelope ----
+        wire_required = self.registry.has_wire_required_layer
+        envelope = GeometryPartitionedRatificationEnvelope(
+            schema_version=W29_PARTITION_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            w28_ratification_cid=str(w28_envelope.ratification_cid),
+            partition_id=int(partition_id),
+            basis=basis,
+            basis_dim=int(self.registry.basis_dim),
+            ambient_dim=int(self.registry.ambient_dim),
+            factoradic_route_index=int(fact_idx),
+            factoradic_route_n_factors=int(K),
+            causal_validity_signature=str(causal_sig),
+            predecessor_cids=predecessor_cids,
+            cross_host_variance_witness_cid=str(witness_cid),
+            cell_index=int(cell_index),
+            wire_required=bool(wire_required),
+        )
+
+        # ---- Verify + register ----
+        outcome = self.registry.register_envelope(
+            envelope,
+            cross_host_disagreement_observed=bool(disagreement_observed),
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+
+        if not verify_ok and self.require_partition_verification:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W29_BRANCH_PARTITION_REJECTED,
+                envelope=envelope, n_w29_visible=n_w28_visible,
+                partition_overhead=0, ratified=False,
+                verify_ok=False, verify_reason=verify_reason,
+                cross_host_disagreement_count=int(n_cross_disagree),
+                witness_cid=str(witness_cid),
+                partition_id=int(partition_id),
+                basis_dim=int(self.registry.basis_dim),
+                factoradic_route_index=int(fact_idx),
+                factoradic_route_n_factors=int(K),
+                causal_validity_signature=str(causal_sig),
+                w28_ratification_cid=str(w28_envelope.ratification_cid))
+
+        # Trivial partition: no wire token charged; pass through.
+        if self.registry.is_trivial:
+            self._cell_index += 1
+            return _pack(
+                decoder_branch=W29_BRANCH_TRIVIAL_PARTITION_PASSTHROUGH,
+                envelope=envelope, n_w29_visible=n_w28_visible,
+                partition_overhead=0, ratified=True,
+                verify_ok=verify_ok, verify_reason=verify_reason,
+                cross_host_disagreement_count=int(n_cross_disagree),
+                witness_cid=str(witness_cid),
+                partition_id=int(partition_id),
+                basis_dim=int(self.registry.basis_dim),
+                factoradic_route_index=int(fact_idx),
+                factoradic_route_n_factors=int(K),
+                causal_validity_signature=str(causal_sig),
+                w28_ratification_cid=str(w28_envelope.ratification_cid))
+
+        # Non-trivial: charge 1 wire token.
+        partition_overhead = int(envelope.n_wire_tokens)
+        n_w29_visible = int(n_w28_visible + partition_overhead)
+        decoder_branch = (
+            W29_BRANCH_CROSS_HOST_VARIANCE_WITNESSED
+            if disagreement_observed
+            else W29_BRANCH_PARTITION_RESOLVED
+        )
+        self._cell_index += 1
+        return _pack(
+            decoder_branch=decoder_branch,
+            envelope=envelope, n_w29_visible=n_w29_visible,
+            partition_overhead=partition_overhead, ratified=True,
+            verify_ok=verify_ok, verify_reason=verify_reason,
+            cross_host_disagreement_count=int(n_cross_disagree),
+            witness_cid=str(witness_cid),
+            partition_id=int(partition_id),
+            basis_dim=int(self.registry.basis_dim),
+            factoradic_route_index=int(fact_idx),
+            factoradic_route_n_factors=int(K),
+            causal_validity_signature=str(causal_sig),
+            w28_ratification_cid=str(w28_envelope.ratification_cid))
+
+    def decode(
+            self,
+            handoffs: Sequence[_DecodedHandoff],
+    ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> "W29PartitionResult | None":
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> "GeometryPartitionedRatificationEnvelope | None":
+        return self._last_envelope
+
+
+# ---------------------------------------------------------------------------
+# Convenience factories (W29 family)
+# ---------------------------------------------------------------------------
+
+
+def build_trivial_partition_registry(
+        *,
+        schema: SchemaCapsule,
+        local_host_id: str = "localhost",
+) -> GeometryPartitionRegistry:
+    """Build a W29 registry where every structural partition is
+    registered but the layer is "trivial" in the H2 sense:
+    ``basis_dim = 0``, no consumers, no predecessors, and no wire token
+    is charged (W29-Λ-trivial-partition).
+
+    All three partition_ids are registered (with empty
+    ``consumer_permutation``) so that every cell — regardless of
+    whether the structural classifier sends it to LINEAR /
+    HIERARCHICAL / CYCLIC — verifies and passes through.  The byte-
+    for-W28 invariant is enforced by ``registry.is_trivial == True``
+    making the orchestrator emit
+    ``W29_BRANCH_TRIVIAL_PARTITION_PASSTHROUGH`` on every triggered
+    cell.
+    """
+    return GeometryPartitionRegistry(
+        schema=schema,
+        partition_table=(
+            PartitionRegistration(
+                partition_id=W29_PARTITION_LINEAR,
+                label=W29_PARTITION_LABEL[W29_PARTITION_LINEAR],
+                consumer_permutation=(),
+                trust_prior=1.0,
+            ),
+            PartitionRegistration(
+                partition_id=W29_PARTITION_HIERARCHICAL,
+                label=W29_PARTITION_LABEL[W29_PARTITION_HIERARCHICAL],
+                consumer_permutation=(),
+                trust_prior=1.0,
+            ),
+            PartitionRegistration(
+                partition_id=W29_PARTITION_CYCLIC,
+                label=W29_PARTITION_LABEL[W29_PARTITION_CYCLIC],
+                consumer_permutation=(),
+                trust_prior=1.0,
+            ),
+        ),
+        basis_dim=0,
+        ambient_dim=0,
+        ambient_vocabulary=(),
+        consumer_order=(),
+        local_host_id=local_host_id,
+    )
+
+
+def build_three_partition_registry(
+        *,
+        schema: SchemaCapsule,
+        consumer_order: Sequence[str],
+        ambient_vocabulary: Sequence[str],
+        basis_dim: int = 2,
+        cycle_window: int = 4,
+        registered_predecessor_cids: frozenset[str] = frozenset(),
+        orthogonality_tol: float = W29_DEFAULT_ORTHOGONALITY_TOL,
+        local_host_id: str = "localhost",
+) -> GeometryPartitionRegistry:
+    """Build a W29 registry with all three structural partitions
+    (linear / hierarchical / cyclic), basis_dim=2 by default, and a
+    K-consumer factoradic-permutation table.
+
+    The default per-partition consumer permutation is a deterministic
+    cyclic rotation:
+
+      * LINEAR        — identity (consumer_order as-is).
+      * HIERARCHICAL  — cyclic shift by 1.
+      * CYCLIC        — reversed.
+
+    Different partitions therefore route to different consumer-
+    priority orders; the verifier checks the factoradic_route_index
+    matches the registered permutation.
+    """
+    co = tuple(consumer_order)
+    K = len(co)
+    if K > 0:
+        identity = tuple(range(K))
+        shift1 = tuple((i + 1) % K for i in range(K))
+        reverse = tuple(range(K - 1, -1, -1))
+    else:
+        identity = ()
+        shift1 = ()
+        reverse = ()
+
+    table = (
+        PartitionRegistration(
+            partition_id=W29_PARTITION_LINEAR,
+            label=W29_PARTITION_LABEL[W29_PARTITION_LINEAR],
+            consumer_permutation=identity,
+            trust_prior=1.0,
+        ),
+        PartitionRegistration(
+            partition_id=W29_PARTITION_HIERARCHICAL,
+            label=W29_PARTITION_LABEL[W29_PARTITION_HIERARCHICAL],
+            consumer_permutation=shift1,
+            trust_prior=1.0,
+        ),
+        PartitionRegistration(
+            partition_id=W29_PARTITION_CYCLIC,
+            label=W29_PARTITION_LABEL[W29_PARTITION_CYCLIC],
+            consumer_permutation=reverse,
+            trust_prior=1.0,
+        ),
+    )
+
+    av = tuple(ambient_vocabulary)
+    return GeometryPartitionRegistry(
+        schema=schema,
+        partition_table=table,
+        basis_dim=int(basis_dim),
+        ambient_dim=len(av),
+        ambient_vocabulary=av,
+        consumer_order=co,
+        registered_predecessor_cids=frozenset(
+            str(p) for p in registered_predecessor_cids),
+        cycle_window=int(cycle_window),
+        orthogonality_tol=float(orthogonality_tol),
         local_host_id=local_host_id,
     )

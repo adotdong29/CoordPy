@@ -1,0 +1,32 @@
+{
+  "topology": "two_host",
+  "hosts": [
+    {
+      "url": "http://localhost:11434",
+      "host_id": "localhost",
+      "models": [
+        "qwen2.5:0.5b",
+        "lexi-coder:latest",
+        "taozhiyuai/llama-3-8b-lexi-uncensored:v1_q4_k_m",
+        "gemma2:9b",
+        "llama3.1:8b",
+        "mixtral:8x7b",
+        "qwen2.5-coder:7b",
+        "deepseek-r1:7b"
+      ],
+      "selected_model": "gemma2:9b"
+    },
+    {
+      "url": "http://192.168.12.191:11434",
+      "host_id": "192.168.12.191",
+      "models": [
+        "qwen2.5:14b-32k",
+        "qwen2.5:14b",
+        "qwen2.5-coder:14b-32k",
+        "qwen3.5:35b",
+        "qwen2.5-coder:14b"
+      ],
+      "selected_model": "qwen2.5:14b"
+    }
+  ]
+}
