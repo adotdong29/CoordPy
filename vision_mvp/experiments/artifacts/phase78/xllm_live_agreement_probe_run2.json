@@ -1,0 +1,118 @@
+{
+  "agreement_rate": 0.75,
+  "disagreement_rate": 0.25,
+  "hosts": [
+    {
+      "host_id": "localhost",
+      "model": "gemma2:9b",
+      "url": "http://localhost:11434"
+    },
+    {
+      "host_id": "192.168.12.191",
+      "model": "qwen2.5:14b",
+      "url": "http://192.168.12.191:11434"
+    }
+  ],
+  "n_agreement": 6,
+  "n_disagreement": 2,
+  "n_total": 8,
+  "results": [
+    {
+      "agree": true,
+      "dt_a": 5.28,
+      "dt_b": 0.8,
+      "host_a": "gemma2:9b",
+      "host_b": "qwen2.5:14b",
+      "raw_a": "Payments",
+      "raw_b": "payments",
+      "tag": "Q1",
+      "word_a": "payments",
+      "word_b": "payments"
+    },
+    {
+      "agree": true,
+      "dt_a": 5.26,
+      "dt_b": 1.4,
+      "host_a": "gemma2:9b",
+      "host_b": "qwen2.5:14b",
+      "raw_a": "api",
+      "raw_b": "api",
+      "tag": "Q2",
+      "word_a": "api",
+      "word_b": "api"
+    },
+    {
+      "agree": true,
+      "dt_a": 5.21,
+      "dt_b": 0.79,
+      "host_a": "gemma2:9b",
+      "host_b": "qwen2.5:14b",
+      "raw_a": "storage",
+      "raw_b": "storage",
+      "tag": "Q3",
+      "word_a": "storage",
+      "word_b": "storage"
+    },
+    {
+      "agree": true,
+      "dt_a": 4.98,
+      "dt_b": 0.73,
+      "host_a": "gemma2:9b",
+      "host_b": "qwen2.5:14b",
+      "raw_a": "Payments",
+      "raw_b": "payments",
+      "tag": "Q4",
+      "word_a": "payments",
+      "word_b": "payments"
+    },
+    {
+      "agree": false,
+      "dt_a": 6.31,
+      "dt_b": 0.81,
+      "host_a": "gemma2:9b",
+      "host_b": "qwen2.5:14b",
+      "raw_a": "db_query",
+      "raw_b": "logs_pipeline",
+      "tag": "Q5",
+      "word_a": "db_query",
+      "word_b": "logs_pipeline"
+    },
+    {
+      "agree": true,
+      "dt_a": 5.82,
+      "dt_b": 0.85,
+      "host_a": "gemma2:9b",
+      "host_b": "qwen2.5:14b",
+      "raw_a": "Orders",
+      "raw_b": "orders",
+      "tag": "Q6",
+      "word_a": "orders",
+      "word_b": "orders"
+    },
+    {
+      "agree": false,
+      "dt_a": 5.74,
+      "dt_b": 0.9,
+      "host_a": "gemma2:9b",
+      "host_b": "qwen2.5:14b",
+      "raw_a": "api",
+      "raw_b": "storage",
+      "tag": "Q7",
+      "word_a": "api",
+      "word_b": "storage"
+    },
+    {
+      "agree": true,
+      "dt_a": 5.43,
+      "dt_b": 0.86,
+      "host_a": "gemma2:9b",
+      "host_b": "qwen2.5:14b",
+      "raw_a": "payments",
+      "raw_b": "payments",
+      "tag": "Q8",
+      "word_a": "payments",
+      "word_b": "payments"
+    }
+  ],
+  "timestamp": "Fri May  1 18:28:14 2026"
+}

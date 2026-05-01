@@ -2076,6 +2076,71 @@ The current paper incorporates the following layers:
   capsule-layer mechanism). 36/36 W30 unit tests + 357/357
   focused regression pass. Mac 2 (192.168.12.248) still ARP-
   incomplete (25th milestone). (R-77, SDK v3.31)
+- **W31 family:** online self-calibrated geometry-aware dense
+  control + sealed prior trajectory + adaptive threshold + W31
+  manifest CID + first measured live cross-architecture LLM
+  disagreement at temperature 0 —
+  ``OnlineCalibratedRatificationEnvelope`` (``PriorTrajectoryEntry``
+  tuple sealed by SHA-256 of canonical bytes carrying
+  (cell_idx, partition_id, observed_agreement, prior_after);
+  threshold trajectory sealed by SHA-256; ``manifest_cid`` over
+  six component CIDs; outer ``w31_cid`` over the canonical
+  envelope bytes), 14 disjoint enumerated failure modes in
+  ``verify_online_calibrated_ratification`` (cumulative 42 across
+  W29 + W30 + W31; the load-bearing addition is the
+  ``registered_prior_trajectory_cid`` cross-cell check that
+  catches a swap whose components are individually self-consistent
+  AND whose manifest CID has been recomputed self-consistently).
+  The W31 ``OnlineCalibratedOrchestrator`` adds an
+  ``online_enabled`` closed-loop running-mean update on every cell
+  (driven by the deterministic per-cell agreement signal
+  ``ratified AND no cross-host disagreement`` ⇒ 1.0; else 0.0)
+  fed into the existing
+  ``update_partition_calibration_running_mean`` primitive shipped
+  in W30, an ``adaptive_threshold`` clipped-median update on the
+  live calibration vector (bounded to ``[0.20, 0.80]`` via
+  registered constants), and a sealed trajectory truncated to
+  ``trajectory_window``. The new vocabulary (online running-mean
+  / adaptive threshold / sealed trajectory / manifest CID) is
+  added at the **capsule layer as audited proxy** — **NOT** a
+  learned model in the deep-learning sense (zero parameters,
+  zero gradients, zero training step), **NOT** transformer-
+  internal subspace projection, **NOT** a runtime KV transplant.
+  On **R-78-NONSTATIONARY-PRIOR** (inverted partition layout)
+  the W30 baseline with uniform priors gets
+  ``correctness_ratified_rate_w30 = 0.750`` (no reroute fires);
+  W31 with online learning observes per-cell failures on CYCLIC,
+  drops the prior to 0.6667, and the clipped-median adaptive
+  threshold (0.8) fires the W30 reroute on subsequent CYCLIC
+  cells — strictly improving correctness to 0.875,
+  ``Δ(W31 − W30) = +0.125`` across 5/5 seeds at trust precision
+  1.000. **Empirically discharges W30-C-PRIOR-LEARNING.** On
+  **R-78-ADAPTIVE-THRESHOLD vs R-78-FROZEN-THRESHOLD** the
+  adaptive contribution isolates at +0.125 across 5/5 seeds
+  (frozen yields 0). On **R-78-MANIFEST-TAMPER** the manifest
+  CID + cross-cell prior_trajectory_cid check together yield
+  **65/65 = 1.000 tamper rejection rate** across five named
+  tampers per cell-position. Three named falsifiers all
+  empirically confirmed (W31-Λ-trivial-online ⇒ byte-for-W30
+  passthrough; W31-Λ-no-drift ⇒ no help on stationary regime;
+  W31-Λ-frozen-threshold ⇒ no adaptive contribution at fixed
+  0.5 threshold). **First measured live cross-architecture LLM
+  disagreement at temperature 0 in the programme** (28th
+  milestone): gemma2:9b on localhost vs qwen2.5:14b on
+  192.168.12.191 disagree on **2/8 = 0.250 of structured-
+  decision prompts at temp 0**, reproducible byte-for-byte
+  across two runs. **Sharpens W30-C-CROSS-HOST-VARIANCE-LIVE-
+  MAGNITUDE-LIVE on the infrastructure-discharge axis.** Newly
+  named open conjectures **W31-C-CROSS-HOST-VARIANCE-LIVE-
+  MAGNITUDE-LIVE** (gold-correlation axis),
+  **W31-C-NATIVE-LATENT** (architecture-dependent — true
+  transformer-internal subspace projection vs the W31 audited
+  proxy; retained as the next true wall),
+  **W31-C-MULTI-HOST** (3+ host topology, hardware-bounded),
+  **W31-C-LONG-WINDOW-CONVERGENCE** (longer trajectory windows).
+  41/41 W31 unit tests + 437/437 phase69-78 regression + 68/68
+  wider wevra suite pass. Mac 2 (192.168.12.248) still ARP-
+  incomplete (26th milestone). (R-78, SDK v3.32)
 
 ## Appendix C. Submission Pass Still Needed
 

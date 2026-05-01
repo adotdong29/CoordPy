@@ -402,6 +402,29 @@ from .team_coord import (
     W30_BRANCH_NO_TRIGGER,
     W30_BRANCH_DISABLED,
     W30_ALL_BRANCHES,
+    # SDK v3.32 — online self-calibrated geometry-aware dense control +
+    # sealed prior trajectory + adaptive threshold + W31 manifest CID
+    # (W31 family).  EXPERIMENTAL — see __experimental__.
+    PriorTrajectoryEntry,
+    OnlineCalibratedRatificationEnvelope,
+    OnlineCalibratedRegistry,
+    W31OnlineResult,
+    OnlineCalibratedOrchestrator,
+    verify_online_calibrated_ratification,
+    derive_per_cell_agreement_signal,
+    compute_adaptive_threshold,
+    build_trivial_online_registry,
+    build_online_calibrated_registry,
+    W31_ONLINE_SCHEMA_VERSION,
+    W31_DEFAULT_THRESHOLD_MIN,
+    W31_DEFAULT_THRESHOLD_MAX,
+    W31_DEFAULT_TRAJECTORY_WINDOW,
+    W31_BRANCH_ONLINE_RESOLVED,
+    W31_BRANCH_TRIVIAL_ONLINE_PASSTHROUGH,
+    W31_BRANCH_ONLINE_REJECTED,
+    W31_BRANCH_ONLINE_DISABLED,
+    W31_BRANCH_ONLINE_NO_TRIGGER,
+    W31_ALL_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -415,7 +438,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.31"
+SDK_VERSION = "wevra.sdk.v3.32"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -491,6 +514,18 @@ __experimental__: tuple[str, ...] = (
     "update_partition_calibration_running_mean",
     "build_trivial_calibrated_registry",
     "build_calibrated_registry",
+    # W31 family — online self-calibrated geometry-aware dense control +
+    # sealed prior trajectory + adaptive threshold + W31 manifest CID.
+    "PriorTrajectoryEntry",
+    "OnlineCalibratedRatificationEnvelope",
+    "OnlineCalibratedRegistry",
+    "W31OnlineResult",
+    "OnlineCalibratedOrchestrator",
+    "verify_online_calibrated_ratification",
+    "derive_per_cell_agreement_signal",
+    "compute_adaptive_threshold",
+    "build_trivial_online_registry",
+    "build_online_calibrated_registry",
 )
 
 __all__ = [
@@ -756,6 +791,29 @@ __all__ = [
     "W30_BRANCH_FALLBACK_W29",
     "W30_BRANCH_NO_TRIGGER", "W30_BRANCH_DISABLED",
     "W30_ALL_BRANCHES",
+    # SDK v3.32 — W31 family (online self-calibrated geometry-aware
+    # dense control + sealed prior trajectory + adaptive threshold +
+    # W31 manifest CID).  EXPERIMENTAL — see __experimental__ tuple.
+    "PriorTrajectoryEntry",
+    "OnlineCalibratedRatificationEnvelope",
+    "OnlineCalibratedRegistry",
+    "W31OnlineResult",
+    "OnlineCalibratedOrchestrator",
+    "verify_online_calibrated_ratification",
+    "derive_per_cell_agreement_signal",
+    "compute_adaptive_threshold",
+    "build_trivial_online_registry",
+    "build_online_calibrated_registry",
+    "W31_ONLINE_SCHEMA_VERSION",
+    "W31_DEFAULT_THRESHOLD_MIN",
+    "W31_DEFAULT_THRESHOLD_MAX",
+    "W31_DEFAULT_TRAJECTORY_WINDOW",
+    "W31_BRANCH_ONLINE_RESOLVED",
+    "W31_BRANCH_TRIVIAL_ONLINE_PASSTHROUGH",
+    "W31_BRANCH_ONLINE_REJECTED",
+    "W31_BRANCH_ONLINE_DISABLED",
+    "W31_BRANCH_ONLINE_NO_TRIGGER",
+    "W31_ALL_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

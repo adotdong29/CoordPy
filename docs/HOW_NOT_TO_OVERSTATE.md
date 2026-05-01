@@ -2,7 +2,7 @@
 
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: SDK
+> README-of-README must satisfy these rules. Last touched: SDK v3.32 (W31 family) 2026-05-01. Earlier: SDK
 > v3.25, 2026-04-29.
 
 The programme has a long history of moves where a candidate result
@@ -1884,3 +1884,117 @@ The honest summary one may emit:
   the audited capsule-layer proxy is insufficient and real
   transformer-internal subspace projection is required — is the
   named open frontier **W30-C-NATIVE-LATENT**."
+
+### W31 forbidden moves
+
+W31 introduces another wave of vocabulary that *sounds* learned or
+model-internal: "online learning", "running-mean update inside the
+orchestrator", "adaptive threshold", "sealed prior trajectory",
+"manifest CID".  Each of these is a **capsule-layer audited proxy**.
+None of them claim a learned model in the deep-learning sense (zero
+parameters, zero gradients, zero training step), transformer-
+internal manipulation, or temporal-ordering proofs at the model
+layer.
+
+What you may say (W31 honest scope):
+
+* "On R-78-NONSTATIONARY-PRIOR, the W31 closed-form running-mean
+  update inside the orchestrator drives the per-partition
+  calibration prior down on observed CYCLIC failures and the
+  clipped-median adaptive threshold (0.8) makes the W30 reroute
+  fire — strictly improving correctness over the W30 uniform-priors
+  baseline by Δ = +0.125 across 5/5 seeds at trust precision 1.000.
+  This is the W30-C-PRIOR-LEARNING empirical discharge on the
+  magnitude axis."
+* "On R-78-ADAPTIVE-THRESHOLD vs R-78-FROZEN-THRESHOLD, the
+  adaptive axis isolates: with the same online-learned prior,
+  clipped-median adaptive threshold yields Δ = +0.125 vs Δ = 0 for
+  frozen 0.5 threshold; the difference (+0.125 ≥ +0.05) attributes
+  the gain to the adaptive contribution."
+* "On R-78-MANIFEST-TAMPER, the W31 manifest CID + cross-cell
+  ``registered_prior_trajectory_cid`` check together detect five
+  named tampers per cell-position; rejection rate = 1.000 across
+  65 named tampers including the cross-cell trajectory swap that
+  self-consistently recomputes the manifest CID."
+* "On R-78-XLLM-LIVE, gemma2:9b on localhost vs qwen2.5:14b on
+  192.168.12.191 disagree on 2/8 = 0.250 of structured-decision
+  prompts at temperature 0, reproducible byte-for-byte across two
+  runs.  This is the first measured live cross-architecture LLM
+  disagreement at temp 0 in the programme; it sharpens
+  W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE on the
+  infrastructure-discharge axis."
+
+What you must NOT say (W31 honest scope):
+
+* "W31 implements a learned trust model."  It does not.  The
+  online running-mean update is closed-form arithmetic
+  (``new = (prev * n + obs) / (n + 1)``) shipped in W30 and now
+  fired inside the W31 orchestrator on every cell.  Zero
+  parameters; zero gradients; zero training step.  A truly-learned
+  variant remains the named open conjecture
+  **W31-C-LONG-WINDOW-CONVERGENCE** at the trajectory-window
+  scaling axis (open).
+* "W31 implements transformer-internal latent control."  It does
+  not.  The sealed prior trajectory is a capsule-layer accumulator
+  over W30's deterministic per-cell agreement signal; an honest
+  **proxy** for the LatentMAS online-calibration direction, not a
+  runtime hidden-state transplant.  W31 does not touch transformer
+  KV caches, hidden states, attention weights, or embedding
+  tables.
+* "W31 proves temporal ordering at the model layer."  It does not.
+  The prior trajectory is a sealed tuple of
+  ``(cell_idx, partition_id, observed_agreement, prior_after)``
+  bytes; the controller's bus enforces structural commitment to
+  the declared trajectory, not to a particular execution sequence
+  at the model layer.
+* "W31 solves the live cross-host disagreement → strict correctness
+  improvement axis."  Not yet.  The S1 result records
+  2/8 = 0.250 cross-architecture disagreement at temp 0 (the
+  FIRST live disagreement signal in the programme), but the full
+  mechanism integration where W31 reroutes the disagreed cell to
+  a registered high-trust partition AND the gold-correctness
+  label correlates with one or the other model's answer is the
+  named open **W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE**
+  (gold-correlation axis).
+* "W31 brings up Mac 2."  It does not.  192.168.12.248 remains
+  ARP-incomplete (26th consecutive milestone).
+* "W31 closes W30-C-NATIVE-LATENT."  It does not.  W31 is a
+  capsule-layer mechanism extension; the architecture-dependent
+  native-latent question carries forward as
+  **W31-C-NATIVE-LATENT**.
+* "W31 solves multi-agent context."  One named conjecture
+  discharged (W30-C-PRIOR-LEARNING) + one sharpened
+  (W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE on the
+  infrastructure-discharge axis) is a strong step, but real
+  multi-agent reality has more axes than any 5-seed synthetic
+  bench + 8-prompt live probe can test.
+
+The honest summary one may emit:
+
+* "On R-78-NONSTATIONARY-PRIOR, R-78-ADAPTIVE-THRESHOLD vs
+  R-78-FROZEN-THRESHOLD, and R-78-MANIFEST-TAMPER (three
+  pre-committed regimes), the W31 online self-calibrated geometry-
+  aware dense control mechanism simultaneously discharges
+  W30-C-PRIOR-LEARNING (Δ correctness w31 vs w30 = +0.125 across
+  5/5 seeds, trust precision 1.000) AND isolates the adaptive-
+  threshold contribution (+0.125 ≥ +0.05 over frozen 0.5
+  threshold) AND closes the cross-component swap avenue (manifest
+  CID + cross-cell trajectory CID check, 65/65 = 1.000 rejection
+  rate).  The R-78-XLLM-LIVE probe also records the FIRST measured
+  live cross-architecture LLM disagreement at temperature 0 in the
+  programme (gemma2:9b vs qwen2.5:14b, 2/8 = 0.250 disagreement
+  rate, reproducible byte-for-byte).  We have not solved multi-
+  agent context; we have empirically discharged one named open
+  conjecture (W30-C-PRIOR-LEARNING) and sharpened another
+  (W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE on the
+  infrastructure-discharge axis) on a milestone where the
+  synthesis (W30 calibration + W31 closed-loop online learning +
+  adaptive threshold + manifest CID + first live cross-arch
+  disagreement) is the load-bearing reason correctness AND audit
+  precision AND infrastructure-completeness all improve
+  simultaneously.  The next true wall — the regime where the
+  audited capsule-layer proxy is insufficient and real
+  transformer-internal subspace projection is required — remains
+  the named open frontier **W30-C-NATIVE-LATENT** /
+  **W31-C-NATIVE-LATENT**, plus the gold-correlation axis of
+  **W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE**."

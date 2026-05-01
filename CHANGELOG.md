@@ -5,6 +5,117 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.5 / 3.32] — 2026-05-01 — SDK v3.32 — online self-calibrated geometry-aware dense control + sealed prior trajectory + adaptive threshold + W31 manifest CID + first measured live cross-architecture LLM disagreement at temperature 0 + W30-C-PRIOR-LEARNING discharged + W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE sharpened on the infrastructure axis
+
+*Strictly additive on SDK v3.31. The Wevra single-run product
+runtime contract is byte-for-byte unchanged. The W31 surface wraps
+the W30 ``CalibratedGeometryOrchestrator`` with three NEW audited
+proxies at the capsule layer: an online closed-loop running-mean
+update for the per-partition calibration prior, a closed-form
+clipped-median adaptive threshold, and a sealed prior + threshold
+trajectory CID + cross-component manifest CID.  The new "online
+running-mean / adaptive threshold / sealed trajectory / manifest
+CID" vocabulary is added at the **capsule layer as audited proxy**
+— explicitly NOT a learned model in the deep-learning sense, NOT
+transformer-internal subspace projection, NOT a runtime KV
+transplant.  W31 also records the **first measured live cross-
+architecture LLM disagreement at temperature 0** in 28 milestones
+(gemma2:9b vs qwen2.5:14b on 2/8 = 0.250 of structured-decision
+prompts, reproducible byte-for-byte).*
+
+**New surface (W31 family, multi-agent-coordination research slice).**
+
+``PriorTrajectoryEntry``,
+``OnlineCalibratedRatificationEnvelope``,
+``OnlineCalibratedRegistry``, ``W31OnlineResult``,
+``OnlineCalibratedOrchestrator``,
+``verify_online_calibrated_ratification`` (14 enumerated failure
+modes — disjoint from W29's 14 and W30's 14; cumulative 42-mode
+trust boundary across W29 + W30 + W31),
+``derive_per_cell_agreement_signal``,
+``compute_adaptive_threshold``,
+``build_trivial_online_registry``,
+``build_online_calibrated_registry``,
+W31 branch constants (``W31_BRANCH_*``),
+``W31_ONLINE_SCHEMA_VERSION``,
+``W31_DEFAULT_THRESHOLD_MIN = 0.20``,
+``W31_DEFAULT_THRESHOLD_MAX = 0.80``,
+``W31_DEFAULT_TRAJECTORY_WINDOW = 16``.
+
+**New benchmark family (R-78).**
+
+``vision_mvp.experiments.phase78_online_calibrated_dense_control``
+ships seven sub-banks: R-78-TRIVIAL-W31 (H2 byte-for-W30 anchor),
+R-78-NONSTATIONARY-PRIOR (H6 main load-bearing claim — discharges
+W30-C-PRIOR-LEARNING), R-78-ADAPTIVE-THRESHOLD vs R-78-FROZEN-
+THRESHOLD (H7 isolating axis), R-78-NO-DRIFT (W31-Λ-no-drift
+falsifier), R-78-MANIFEST-TAMPER (H8 cross-component swap detection),
+R-78-XLLM-LIVE (S1/S2 best-effort live cross-architecture probe
+running gemma2:9b on localhost + qwen2.5:14b on 192.168.12.191).
+Standalone live cross-architecture probe at
+``vision_mvp/experiments/scripts/phase78_xllm_live_probe.py``.
+
+**Headline measurements (5/5 seeds — byte-for-byte stable).**
+
+* R-78-NONSTATIONARY-PRIOR: ``Δ(W31 − W30) = +0.125`` correctness
+  gain across 5/5 seeds at trust precision 1.000; W30 baseline
+  0.750 → W31 online 0.875.  Discharges
+  **W30-C-PRIOR-LEARNING** on the magnitude axis.
+* R-78-ADAPTIVE-THRESHOLD vs R-78-FROZEN-THRESHOLD: adaptive Δ =
+  +0.125, frozen Δ = 0.000; difference = +0.125 ≥ +0.05 across 5/5
+  seeds.  Isolates the adaptive-threshold contribution.
+* R-78-MANIFEST-TAMPER: 65/65 = 1.000 tamper rejection rate across
+  five named tampers per cell-position (cross-cell trajectory swap +
+  manifest CID corruption + observed_agreement out of range +
+  threshold value out of range + outer w31_cid corruption).
+* R-78-TRIVIAL-W31: byte-for-W30 invariant on 5/5 seeds.
+* R-78-NO-DRIFT: stationary regime ⇒ Δ = 0.000; W31-Λ-no-drift
+  confirmed.
+* R-78-XLLM-LIVE: gemma2:9b (localhost) vs qwen2.5:14b
+  (192.168.12.191) systematically disagree on 2/8 = 0.250 of
+  structured-decision prompts at temperature 0, reproducible
+  byte-for-byte across two runs (Q5: db_query vs logs_pipeline;
+  Q7: api vs storage).  **First measured live cross-architecture
+  LLM disagreement at temp 0 in the programme** (28th milestone).
+* Mean overhead w31/w30 ≤ 1.0 token/cell across all R-78 sub-banks;
+  max overhead = 1; mean cumulative overhead w31/w28 ≤ 3.0.
+
+**Theorem-style claims added to the registry.**
+
+W31-1 (proved + mechanically-checked), W31-2 (proved + empirical),
+W31-3 (proved-conditional + empirical — W30-C-PRIOR-LEARNING
+discharge), W31-4 (proved-conditional + empirical — adaptive vs
+frozen), W31-5 (proved-conditional + empirical — manifest tamper
+detection).  Three named falsifiers (W31-Λ-trivial-online,
+W31-Λ-no-drift, W31-Λ-frozen-threshold) all empirically confirmed.
+Three new W31-named open conjectures inherit forward to v3.33:
+W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE (gold-correlation
+axis), W31-C-NATIVE-LATENT (architecture-dependent next true wall),
+W31-C-MULTI-HOST (hardware-bounded; Mac 2 ARP-incomplete 26
+milestones).
+
+**Tests + validation runs.**
+
+437/437 phase69-78 regression tests pass byte-for-byte (was 396 in
+v3.31; the new 41 tests in ``test_phase78_online_calibrated.py``
+cover every enumerated H1 failure mode + falsifiers + bench
+discharge).  68/68 wevra_team_coord/runtime/public_api/extensions/
+provenance tests pass.
+
+**Honest scope (what W31 does NOT claim).**
+
+* W31 does NOT claim "we solved context."
+* W31 does NOT claim a learned model in the deep-learning sense.
+  The "online learning" is a closed-form Bayesian-style running
+  mean over a per-cell agreement signal; zero parameters.
+* W31 does NOT claim transformer-internal latent control.
+* W31 does NOT bring up Mac 2 (192.168.12.248 still ARP-incomplete).
+* W31 does NOT close W30-C-NATIVE-LATENT (architecture-dependent).
+
+See `docs/RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md` and
+`docs/SUCCESS_CRITERION_W31_ONLINE_CALIBRATED_GEOMETRY.md` for the
+full milestone note + pre-committed bar.
+
 ## [0.5.4 / 3.31] — 2026-05-01 — SDK v3.31 — calibrated geometry-aware dense control + multi-stride basis history + per-partition calibration prior + cross-host disagreement-routing + ancestor-chain causal binding + simultaneous discharge of W29-C-CRAM-AMPLIFICATION AND W29-C-PARTITION-CALIBRATION
 
 *Strictly additive on SDK v3.30. The Wevra single-run product

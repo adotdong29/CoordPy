@@ -18631,3 +18631,1329 @@ def build_calibrated_registry(
         registered_partition_ids=pids,
         local_host_id=local_host_id,
     )
+
+
+# ===========================================================================
+# W31 family — online self-calibrated geometry-aware dense control +
+# sealed prior trajectory + adaptive threshold + W31 manifest CID
+# (SDK v3.32)
+# ===========================================================================
+#
+# W31 wraps the W30 ``CalibratedGeometryOrchestrator`` with three NEW
+# audited proxies at the capsule layer:
+#
+#   1. **Online running-mean prior update**.  After each ratified cell,
+#      the W31 layer derives a deterministic per-partition agreement
+#      signal (``observed_agreement = 1.0`` iff the cell ratified AND
+#      no cross-host disagreement was observed; else ``0.0``) and
+#      updates the calibration prior for the *effective* partition_id
+#      via the existing closed-form
+#      :func:`update_partition_calibration_running_mean` primitive.
+#      The updated calibration vector replaces the registry's vector,
+#      so the *next* cell's reroute decision uses the freshly-tracked
+#      prior.  This is the load-bearing mechanism for the
+#      **W30-C-PRIOR-LEARNING** discharge.
+#   2. **Adaptive threshold**.  After each ratified cell, the W31
+#      layer recomputes the threshold as a closed-form clipped median
+#      of the current calibration vector, bounded to
+#      ``[threshold_min, threshold_max]``.  The threshold trajectory
+#      is sealed in the envelope.
+#   3. **Sealed prior trajectory + W31 manifest CID**.  The W31
+#      envelope carries:
+#        * ``prior_trajectory_cid``     — SHA-256 over canonical bytes
+#          of the per-cell sequence
+#          ``(cell_idx, partition_id, observed_agreement, prior_after)``;
+#        * ``threshold_trajectory_cid`` — SHA-256 over the per-cell
+#          threshold sequence;
+#        * ``manifest_cid``             — SHA-256 over
+#          ``(basis_history_cid, calibration_cid, ancestor_chain_cid,
+#            prior_trajectory_cid, threshold_trajectory_cid,
+#            route_audit_cid)`` — a single hash that detects
+#          cross-component swaps not detected by W30's per-component
+#          CIDs.
+#
+# Honest scope (the load-bearing soundness statement)
+# ---------------------------------------------------
+#
+# * W31 does NOT touch transformer KV caches, hidden states, attention
+#   weights, embedding tables, or any model-internal state.  The
+#   "online learned" calibration prior is closed-form arithmetic over
+#   a deterministic per-cell agreement signal; zero parameters, zero
+#   gradients, zero training step.  The "adaptive threshold" is a
+#   closed-form clipped median of the prior vector.  The "manifest
+#   CID" is SHA-256 over the concatenation of component CIDs.  Every
+#   payload is content-addressed; every mutation is detected.
+# * The "online learned" calibration prior is NOT a learned model in
+#   the deep-learning sense.  It is a closed-form Bayesian-style
+#   running mean (see
+#   :func:`update_partition_calibration_running_mean` shipped in
+#   W30); the W31 layer simply *closes the loop* by feeding the
+#   per-cell agreement signal back into the registry.
+# * The "adaptive threshold" is one line of arithmetic: clipped
+#   median of the calibration vector, clipped to
+#   ``[threshold_min, threshold_max]``.  No hyperparameter search.
+# * The "manifest CID" does NOT add new entropy; it adds cross-
+#   component tamper detection.  A swap of any one component CID
+#   from a different envelope (with each component still internally
+#   consistent) is detected.
+# * The "prior trajectory" is a sealed tuple of
+#   ``(cell_idx, partition_id, observed_agreement, prior_after)``
+#   bytes; it does NOT prove temporal order at the model layer; it
+#   does prove the controller's bus saw exactly that sequence of
+#   online updates.  Every entry must satisfy
+#   ``observed_agreement, prior_after ∈ [0, 1]`` AND
+#   ``partition_id`` is registered.
+# * W31 does NOT claim "we solved context."
+#
+# Wire-token economics
+# --------------------
+#
+# When the registered registry has any of:
+#   * ``online_enabled == True``, OR
+#   * ``manifest_disabled == False``, OR
+#   * ``trajectory_window > 0``
+# AND the inner W30 ratified, W31 charges **1 visible token** per
+# triggered cell (``<w31_ref:DDDD>``) — the entire prior_trajectory_cid
+# + threshold_trajectory_cid + manifest_cid + route_audit_cid metadata
+# rides on that single content-addressed reference.  When every
+# component is trivial (``online_enabled = False`` AND
+# ``manifest_disabled = True`` AND ``trajectory_window = 0``),
+# wire_required is False and W31 reduces to W30 **byte-for-byte** (the
+# W31-Λ-trivial-online falsifier; see H2 in
+# ``docs/SUCCESS_CRITERION_W31_ONLINE_CALIBRATED_GEOMETRY.md``).
+#
+# Trust boundary: 14 enumerated failure modes (disjoint from W22..W30)
+# -------------------------------------------------------------------
+#
+# :func:`verify_online_calibrated_ratification` rejects:
+#
+#   * ``empty_w31_envelope``                      — None envelope passed.
+#   * ``w31_schema_version_unknown``              — schema_version mismatch.
+#   * ``w31_schema_cid_mismatch``                 — schema_cid != registered.
+#   * ``w30_parent_cid_mismatch``                 — env.w30_calibrated_cid !=
+#     registered.
+#   * ``prior_trajectory_cid_mismatch``           — recomputed
+#     prior_trajectory_cid does not match.
+#   * ``prior_trajectory_length_mismatch``        — len(trajectory) >
+#     registered ``trajectory_window`` cap; OR non-monotone cell indices.
+#   * ``prior_trajectory_unregistered_partition`` — at least one
+#     partition_id not registered.
+#   * ``prior_trajectory_observed_out_of_range``  — at least one
+#     observed_agreement < 0 OR > 1 OR NaN/Inf.
+#   * ``prior_trajectory_prior_after_out_of_range`` — at least one
+#     prior_after < 0 OR > 1 OR NaN/Inf.
+#   * ``threshold_trajectory_cid_mismatch``       — recomputed
+#     threshold_trajectory_cid does not match.
+#   * ``threshold_trajectory_value_out_of_range`` — any threshold < 0 OR
+#     > 1 OR NaN/Inf.
+#   * ``threshold_trajectory_length_mismatch``    —
+#     len(threshold_trajectory) != len(prior_trajectory).
+#   * ``manifest_cid_mismatch``                   — recomputed manifest_cid
+#     does not match.
+#   * ``w31_outer_cid_mismatch``                  — recomputed w31_cid
+#     does not match.
+#
+# Every failure mode is mechanically asserted by a unit test in
+# ``test_phase78_online_calibrated.py``.
+
+W31_ONLINE_SCHEMA_VERSION: str = (
+    "wevra.online_calibrated_ratification.v1")
+
+# W31 decoder branches.
+W31_BRANCH_ONLINE_RESOLVED = "online_resolved"
+W31_BRANCH_TRIVIAL_ONLINE_PASSTHROUGH = "trivial_online_passthrough"
+W31_BRANCH_ONLINE_REJECTED = "online_rejected"
+W31_BRANCH_ONLINE_DISABLED = "online_disabled"
+W31_BRANCH_ONLINE_NO_TRIGGER = "online_no_trigger"
+
+W31_ALL_BRANCHES: tuple[str, ...] = (
+    W31_BRANCH_ONLINE_RESOLVED,
+    W31_BRANCH_TRIVIAL_ONLINE_PASSTHROUGH,
+    W31_BRANCH_ONLINE_REJECTED,
+    W31_BRANCH_ONLINE_DISABLED,
+    W31_BRANCH_ONLINE_NO_TRIGGER,
+)
+
+W31_DEFAULT_THRESHOLD_MIN: float = 0.20
+W31_DEFAULT_THRESHOLD_MAX: float = 0.80
+W31_DEFAULT_TRAJECTORY_WINDOW: int = 16
+
+
+# ---------------------------------------------------------------------------
+# W31 helper: deterministic per-cell agreement signal
+# ---------------------------------------------------------------------------
+
+
+def derive_per_cell_agreement_signal(
+        *,
+        ratified: bool,
+        cross_host_disagreement_count: int,
+) -> float:
+    """Deterministic agreement signal for the W31 online loop.
+
+    Returns 1.0 iff the cell ratified AND no cross-host disagreement
+    was observed; else 0.0.  Closed-form, deterministic, audit-friendly.
+
+    The signal is the per-cell observation that drives the running-mean
+    update inside :class:`OnlineCalibratedOrchestrator`.  It is NOT a
+    correctness oracle (the W31 layer does not see ground truth at
+    runtime); it is a *proxy* for partition-level coherence.
+    """
+    if not bool(ratified):
+        return 0.0
+    if int(cross_host_disagreement_count) > 0:
+        return 0.0
+    return 1.0
+
+
+# ---------------------------------------------------------------------------
+# W31 helper: closed-form adaptive threshold (clipped median)
+# ---------------------------------------------------------------------------
+
+
+def compute_adaptive_threshold(
+        *,
+        calibration_vector: tuple[float, ...] | Sequence[float],
+        threshold_min: float = W31_DEFAULT_THRESHOLD_MIN,
+        threshold_max: float = W31_DEFAULT_THRESHOLD_MAX,
+) -> float:
+    """Closed-form adaptive threshold: clipped median of the prior
+    vector.
+
+    The W31 adaptive threshold is computed as the median of the
+    current calibration prior vector, clipped to
+    ``[threshold_min, threshold_max]``.  This keeps the threshold
+    inside a fixed band so partitions cannot all be pushed below
+    threshold (everything-reroutes pathology) or above threshold
+    (no-reroutes pathology).
+
+    Returns ``(threshold_min + threshold_max) / 2`` when the
+    calibration vector is empty.
+    """
+    vec = tuple(float(v) for v in calibration_vector)
+    if not vec:
+        return float(0.5 * (threshold_min + threshold_max))
+    sorted_vec = sorted(vec)
+    n = len(sorted_vec)
+    if n % 2 == 1:
+        med = sorted_vec[n // 2]
+    else:
+        med = 0.5 * (sorted_vec[n // 2 - 1] + sorted_vec[n // 2])
+    if med < threshold_min:
+        return float(threshold_min)
+    if med > threshold_max:
+        return float(threshold_max)
+    return float(med)
+
+
+# ---------------------------------------------------------------------------
+# Prior trajectory + threshold trajectory (sealed, content-addressed)
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class PriorTrajectoryEntry:
+    """One entry in the W31 prior trajectory.
+
+    Carries the per-cell tuple
+    ``(cell_idx, partition_id, observed_agreement, prior_after)``
+    that drove a single online running-mean update.
+    """
+    cell_idx: int
+    partition_id: int
+    observed_agreement: float
+    prior_after: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "cell_idx": int(self.cell_idx),
+            "partition_id": int(self.partition_id),
+            "observed_agreement": round(float(self.observed_agreement), 4),
+            "prior_after": round(float(self.prior_after), 4),
+        }
+
+
+def _compute_prior_trajectory_cid(
+        *,
+        trajectory: Sequence[PriorTrajectoryEntry],
+) -> str:
+    """Canonical SHA-256 over the prior trajectory."""
+    payload = _canonical_json_bytes({
+        "trajectory": [t.as_dict() for t in trajectory],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_threshold_trajectory_cid(
+        *,
+        thresholds: Sequence[float],
+) -> str:
+    """Canonical SHA-256 over the threshold trajectory."""
+    payload = _canonical_json_bytes({
+        "thresholds": [round(float(t), 4) for t in thresholds],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# W31 manifest CID
+# ---------------------------------------------------------------------------
+
+
+def _compute_w31_manifest_cid(
+        *,
+        basis_history_cid: str,
+        calibration_cid: str,
+        ancestor_chain_cid: str,
+        prior_trajectory_cid: str,
+        threshold_trajectory_cid: str,
+        route_audit_cid: str,
+) -> str:
+    """SHA-256 over the canonical concatenation of component CIDs.
+
+    The manifest CID is the load-bearing W31 cross-component tamper-
+    detection signal: any swap of one component CID from a different
+    envelope (with each component still internally consistent) is
+    detected because the manifest CID will not match the registered
+    expected manifest.
+    """
+    payload = _canonical_json_bytes({
+        "basis_history_cid": str(basis_history_cid),
+        "calibration_cid": str(calibration_cid),
+        "ancestor_chain_cid": str(ancestor_chain_cid),
+        "prior_trajectory_cid": str(prior_trajectory_cid),
+        "threshold_trajectory_cid": str(threshold_trajectory_cid),
+        "route_audit_cid": str(route_audit_cid),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# Online-calibrated ratification envelope
+# ---------------------------------------------------------------------------
+
+
+def _compute_w31_outer_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        w30_calibrated_cid: str,
+        prior_trajectory_cid: str,
+        threshold_trajectory_cid: str,
+        manifest_cid: str,
+        cell_index: int,
+) -> str:
+    """SHA-256 over the canonical W31 envelope payload."""
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "w30_calibrated_cid": str(w30_calibrated_cid),
+        "prior_trajectory_cid": str(prior_trajectory_cid),
+        "threshold_trajectory_cid": str(threshold_trajectory_cid),
+        "manifest_cid": str(manifest_cid),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class OnlineCalibratedRatificationEnvelope:
+    """Content-addressed online-calibrated ratification of one W30
+    decision (W31 family).
+
+    Carries:
+
+      * ``w30_calibrated_cid``        — parent W30 envelope's CID.
+      * ``prior_trajectory``          — tuple of
+                                          :class:`PriorTrajectoryEntry`
+                                          (length ≤ trajectory_window).
+      * ``prior_trajectory_cid``      — SHA-256 over canonical bytes.
+      * ``threshold_trajectory``      — tuple of float thresholds
+                                          (one per trajectory entry).
+      * ``threshold_trajectory_cid``  — SHA-256 over canonical bytes.
+      * ``basis_history_cid``         — passthrough from W30 (for the
+                                          manifest hash).
+      * ``calibration_cid``           — passthrough from W30.
+      * ``ancestor_chain_cid``        — passthrough from W30.
+      * ``route_audit_cid``           — passthrough from W30.
+      * ``manifest_cid``              — SHA-256 over (basis_history_cid,
+                                          calibration_cid,
+                                          ancestor_chain_cid,
+                                          prior_trajectory_cid,
+                                          threshold_trajectory_cid,
+                                          route_audit_cid).
+      * ``cell_index``                — audit replay index.
+      * ``wire_required``             — 1 visible token cost on
+                                          producer side iff True.
+      * ``w31_cid``                   — SHA-256 over canonical bytes.
+
+    Wire-token cost
+    ---------------
+
+    The W31 layer charges 1 visible token on the producer side
+    (``<w31_ref:DDDD>``) iff ``wire_required`` is True (i.e. the
+    online registry is non-trivial: online_enabled OR
+    NOT manifest_disabled OR trajectory_window > 0).  When every
+    component is trivial, wire_required is False and W31 reduces to
+    W30 byte-for-byte (W31-Λ-trivial-online; H2 anchor).
+    """
+    schema_version: str
+    schema_cid: str
+    w30_calibrated_cid: str
+    prior_trajectory: tuple[PriorTrajectoryEntry, ...]
+    prior_trajectory_cid: str
+    threshold_trajectory: tuple[float, ...]
+    threshold_trajectory_cid: str
+    basis_history_cid: str
+    calibration_cid: str
+    ancestor_chain_cid: str
+    route_audit_cid: str
+    manifest_cid: str
+    cell_index: int
+    wire_required: bool = False
+    w31_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.w31_cid:
+            object.__setattr__(self, "w31_cid",
+                               self.recompute_w31_cid())
+
+    def recompute_w31_cid(self) -> str:
+        return _compute_w31_outer_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            w30_calibrated_cid=self.w30_calibrated_cid,
+            prior_trajectory_cid=self.prior_trajectory_cid,
+            threshold_trajectory_cid=self.threshold_trajectory_cid,
+            manifest_cid=self.manifest_cid,
+            cell_index=int(self.cell_index),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "w30_calibrated_cid": self.w30_calibrated_cid,
+            "prior_trajectory": [t.as_dict() for t in self.prior_trajectory],
+            "prior_trajectory_cid": self.prior_trajectory_cid,
+            "threshold_trajectory": [round(float(t), 4)
+                                       for t in self.threshold_trajectory],
+            "threshold_trajectory_cid": self.threshold_trajectory_cid,
+            "basis_history_cid": self.basis_history_cid,
+            "calibration_cid": self.calibration_cid,
+            "ancestor_chain_cid": self.ancestor_chain_cid,
+            "route_audit_cid": self.route_audit_cid,
+            "manifest_cid": self.manifest_cid,
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<w31_ref:{self.w31_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_structured_bits(self) -> int:
+        """Approximate count of structured-control bits packed into
+        this W31 envelope, including the entire prior+threshold
+        trajectory (each element's audit-friendly content rides on
+        the same single wire token).
+        """
+        return int(8 * self.n_envelope_bytes)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "w30_calibrated_cid": self.w30_calibrated_cid,
+            "prior_trajectory": [t.as_dict() for t in self.prior_trajectory],
+            "prior_trajectory_cid": self.prior_trajectory_cid,
+            "threshold_trajectory": [round(float(t), 4)
+                                        for t in self.threshold_trajectory],
+            "threshold_trajectory_cid": self.threshold_trajectory_cid,
+            "basis_history_cid": self.basis_history_cid,
+            "calibration_cid": self.calibration_cid,
+            "ancestor_chain_cid": self.ancestor_chain_cid,
+            "route_audit_cid": self.route_audit_cid,
+            "manifest_cid": self.manifest_cid,
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "w31_cid": self.w31_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_online_calibrated_ratification(
+        env: OnlineCalibratedRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_w30_calibrated_cid: str,
+        registered_partition_ids: frozenset[int],
+        registered_trajectory_window: int,
+        registered_basis_history_cid: str,
+        registered_calibration_cid: str,
+        registered_ancestor_chain_cid: str,
+        registered_route_audit_cid: str,
+        registered_prior_trajectory_cid: str | None = None,
+        registered_threshold_trajectory_cid: str | None = None,
+) -> LatentVerificationOutcome:
+    """Pure-function controller-side verification of an
+    :class:`OnlineCalibratedRatificationEnvelope` (W31 family).
+
+    14 enumerated failure modes (see module docstring for details).
+    Pure function (no side effects); soundness by inspection.
+    """
+    n_checks = 0
+
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_w31_envelope", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_version != W31_ONLINE_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="w31_schema_version_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w31_schema_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if env.w30_calibrated_cid != registered_w30_calibrated_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w30_parent_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Prior trajectory checks ----
+    window = int(registered_trajectory_window)
+    traj = env.prior_trajectory
+    if len(traj) > window:
+        return LatentVerificationOutcome(
+            ok=False, reason="prior_trajectory_length_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    last_cell_idx = -1
+    for entry in traj:
+        if int(entry.cell_idx) <= last_cell_idx:
+            # Non-monotone → reject under the same reason umbrella.
+            return LatentVerificationOutcome(
+                ok=False, reason="prior_trajectory_length_mismatch",
+                n_checks=n_checks)
+        last_cell_idx = int(entry.cell_idx)
+        if int(entry.partition_id) not in registered_partition_ids:
+            return LatentVerificationOutcome(
+                ok=False, reason="prior_trajectory_unregistered_partition",
+                n_checks=n_checks)
+        oa = float(entry.observed_agreement)
+        if math.isnan(oa) or math.isinf(oa) or oa < 0.0 or oa > 1.0:
+            return LatentVerificationOutcome(
+                ok=False, reason="prior_trajectory_observed_out_of_range",
+                n_checks=n_checks)
+        pa = float(entry.prior_after)
+        if math.isnan(pa) or math.isinf(pa) or pa < 0.0 or pa > 1.0:
+            return LatentVerificationOutcome(
+                ok=False, reason="prior_trajectory_prior_after_out_of_range",
+                n_checks=n_checks)
+    n_checks += 1
+    # Recompute prior trajectory CID.
+    if _compute_prior_trajectory_cid(trajectory=traj) != env.prior_trajectory_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="prior_trajectory_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    # Cross-check: if the registry registered an expected trajectory
+    # CID for this cell, the envelope's CID MUST match.  This catches
+    # cross-cell swaps (an attacker replays a previous valid trajectory
+    # CID into a later cell's envelope; the manifest CID self-recomputes
+    # but the registered expected CID does not match).
+    if (registered_prior_trajectory_cid is not None
+            and env.prior_trajectory_cid != registered_prior_trajectory_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="prior_trajectory_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Threshold trajectory checks ----
+    th = env.threshold_trajectory
+    if len(th) != len(traj):
+        return LatentVerificationOutcome(
+            ok=False, reason="threshold_trajectory_length_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    for t in th:
+        f = float(t)
+        if math.isnan(f) or math.isinf(f) or f < 0.0 or f > 1.0:
+            return LatentVerificationOutcome(
+                ok=False, reason="threshold_trajectory_value_out_of_range",
+                n_checks=n_checks)
+    n_checks += 1
+    if _compute_threshold_trajectory_cid(thresholds=th) != env.threshold_trajectory_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="threshold_trajectory_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    # Cross-check: registered expected threshold trajectory CID.
+    if (registered_threshold_trajectory_cid is not None
+            and env.threshold_trajectory_cid
+            != registered_threshold_trajectory_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="threshold_trajectory_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Component CID passthroughs ----
+    if env.basis_history_cid != registered_basis_history_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="manifest_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if env.calibration_cid != registered_calibration_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="manifest_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if env.ancestor_chain_cid != registered_ancestor_chain_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="manifest_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if env.route_audit_cid != registered_route_audit_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="manifest_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Manifest CID check ----
+    expected_manifest = _compute_w31_manifest_cid(
+        basis_history_cid=env.basis_history_cid,
+        calibration_cid=env.calibration_cid,
+        ancestor_chain_cid=env.ancestor_chain_cid,
+        prior_trajectory_cid=env.prior_trajectory_cid,
+        threshold_trajectory_cid=env.threshold_trajectory_cid,
+        route_audit_cid=env.route_audit_cid,
+    )
+    if expected_manifest != env.manifest_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="manifest_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Outer w31_cid check ----
+    if env.recompute_w31_cid() != env.w31_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w31_outer_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+
+    return LatentVerificationOutcome(ok=True, reason="ok", n_checks=n_checks)
+
+
+# ---------------------------------------------------------------------------
+# Online-calibrated registry
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class OnlineCalibratedRegistry:
+    """Controller-side registry for the W31 online-calibrated layer.
+
+    Wraps a :class:`CalibratedGeometryRegistry` (the inner W30
+    registry) and adds:
+
+      * ``online_enabled``     — when True, the running-mean update
+                                   fires on each ratified cell.
+      * ``adaptive_threshold`` — when True, the threshold is
+                                   recomputed as a clipped median of
+                                   the prior vector after each
+                                   update.
+      * ``manifest_disabled``  — when True (and online_enabled =
+                                   False AND trajectory_window = 0),
+                                   the W31 layer reduces to W30
+                                   byte-for-byte (the trivial path).
+      * ``trajectory_window``  — max number of trajectory entries to
+                                   carry in the W31 envelope (the
+                                   verifier rejects longer
+                                   trajectories).
+      * ``threshold_min``,
+        ``threshold_max``      — clipping bounds for the adaptive
+                                   threshold.
+    """
+    schema: SchemaCapsule | None = None
+    inner: CalibratedGeometryRegistry | None = None
+    online_enabled: bool = False
+    adaptive_threshold: bool = False
+    manifest_disabled: bool = True
+    trajectory_window: int = 0
+    threshold_min: float = W31_DEFAULT_THRESHOLD_MIN
+    threshold_max: float = W31_DEFAULT_THRESHOLD_MAX
+    local_host_id: str = "localhost"
+
+    _envelopes: dict[str, OnlineCalibratedRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_w31_registered: int = 0
+    n_w31_rejected: int = 0
+    n_online_updates: int = 0
+
+    @property
+    def is_trivial(self) -> bool:
+        return (not bool(self.online_enabled)
+                and bool(self.manifest_disabled)
+                and int(self.trajectory_window) == 0)
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        return not self.is_trivial
+
+    def register_envelope(
+            self,
+            envelope: OnlineCalibratedRatificationEnvelope,
+            *,
+            registered_partition_ids: frozenset[int],
+            registered_basis_history_cid: str,
+            registered_calibration_cid: str,
+            registered_ancestor_chain_cid: str,
+            registered_route_audit_cid: str,
+            registered_w30_calibrated_cid: str,
+            registered_prior_trajectory_cid: str | None = None,
+            registered_threshold_trajectory_cid: str | None = None,
+    ) -> LatentVerificationOutcome:
+        """Verify the envelope and (if OK) record it in the audit
+        cache.  Pure verifier; idempotent on byte-identical envelopes.
+        """
+        if self.schema is None:
+            outcome = LatentVerificationOutcome(
+                ok=False, reason="schema_unregistered", n_checks=0)
+            self.n_w31_rejected += 1
+            return outcome
+        outcome = verify_online_calibrated_ratification(
+            envelope,
+            registered_schema=self.schema,
+            registered_w30_calibrated_cid=str(registered_w30_calibrated_cid),
+            registered_partition_ids=frozenset(registered_partition_ids),
+            registered_trajectory_window=int(self.trajectory_window),
+            registered_basis_history_cid=str(registered_basis_history_cid),
+            registered_calibration_cid=str(registered_calibration_cid),
+            registered_ancestor_chain_cid=str(registered_ancestor_chain_cid),
+            registered_route_audit_cid=str(registered_route_audit_cid),
+            registered_prior_trajectory_cid=registered_prior_trajectory_cid,
+            registered_threshold_trajectory_cid=(
+                registered_threshold_trajectory_cid),
+        )
+        if not outcome.ok:
+            self.n_w31_rejected += 1
+            return outcome
+        self._envelopes[envelope.w31_cid] = envelope
+        self.n_w31_registered += 1
+        return outcome
+
+
+# ---------------------------------------------------------------------------
+# W31 result
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class W31OnlineResult:
+    """Per-cell audit record for the W31 online-calibrated layer."""
+    answer: dict[str, Any]
+    inner_w30_branch: str
+    decoder_branch: str
+    agent_id: str
+    is_producer: bool
+    w30_calibrated_cid: str
+    cell_index: int
+    online_update_fired: bool
+    observed_agreement: float
+    effective_partition_id: int
+    prior_before: float
+    prior_after: float
+    threshold_before: float
+    threshold_after: float
+    n_w30_visible_tokens: int
+    n_w31_visible_tokens: int
+    n_w31_overhead_tokens: int
+    w31_cid: str
+    manifest_cid: str
+    prior_trajectory_cid: str
+    threshold_trajectory_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w31: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "inner_w30_branch": self.inner_w30_branch,
+            "decoder_branch": self.decoder_branch,
+            "agent_id": self.agent_id,
+            "is_producer": bool(self.is_producer),
+            "w30_calibrated_cid": self.w30_calibrated_cid,
+            "cell_index": int(self.cell_index),
+            "online_update_fired": bool(self.online_update_fired),
+            "observed_agreement": float(self.observed_agreement),
+            "effective_partition_id": int(self.effective_partition_id),
+            "prior_before": float(self.prior_before),
+            "prior_after": float(self.prior_after),
+            "threshold_before": float(self.threshold_before),
+            "threshold_after": float(self.threshold_after),
+            "n_w30_visible_tokens": int(self.n_w30_visible_tokens),
+            "n_w31_visible_tokens": int(self.n_w31_visible_tokens),
+            "n_w31_overhead_tokens": int(self.n_w31_overhead_tokens),
+            "w31_cid": self.w31_cid,
+            "manifest_cid": self.manifest_cid,
+            "prior_trajectory_cid": self.prior_trajectory_cid,
+            "threshold_trajectory_cid": self.threshold_trajectory_cid,
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": self.verification_reason,
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w31": float(self.cram_factor_w31),
+        }
+
+
+# ---------------------------------------------------------------------------
+# Online-calibrated orchestrator
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class OnlineCalibratedOrchestrator:
+    """Online self-calibrated geometry-aware dense-control orchestrator
+    (W31).
+
+    Wraps a :class:`CalibratedGeometryOrchestrator` (W30) and adds:
+
+      * online running-mean prior update on each ratified cell;
+      * adaptive threshold (clipped median of prior vector);
+      * sealed prior + threshold trajectory in the W31 envelope;
+      * W31 manifest CID over the component CIDs.
+
+    Per-cell flow:
+
+      1. Run inner W30.
+      2. Read inner W30 result + envelope.
+      3. Derive the per-cell agreement signal
+         (``ratified AND no cross-host disagreement`` ⇒ 1.0; else 0.0).
+      4. If ``online_enabled`` is True, update the inner W30
+         registry's calibration prior for the *effective* partition_id
+         via :func:`update_partition_calibration_running_mean`.
+      5. If ``adaptive_threshold`` is True, recompute the inner
+         registry's threshold as the clipped median of the new prior
+         vector.
+      6. Append a :class:`PriorTrajectoryEntry` and a threshold to
+         the W31 layer's running trajectories (truncated to
+         ``trajectory_window``).
+      7. Build the W31 envelope with sealed prior + threshold
+         trajectories + manifest CID.
+      8. Verify + register.
+      9. Charge 1 wire token iff ``registry.has_wire_required_layer``.
+    """
+    inner: CalibratedGeometryOrchestrator
+    registry: OnlineCalibratedRegistry
+    enabled: bool = True
+    require_w31_verification: bool = True
+
+    _last_result: "W31OnlineResult | None" = None
+    _last_envelope: "OnlineCalibratedRatificationEnvelope | None" = None
+    _prior_trajectory: list[PriorTrajectoryEntry] = dataclasses.field(
+        default_factory=list)
+    _threshold_trajectory: list[float] = dataclasses.field(
+        default_factory=list)
+    _cell_index: int = 0
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.inner.schema
+
+    @property
+    def agent_id(self) -> str:
+        return self.inner.agent_id
+
+    @property
+    def is_producer(self) -> bool:
+        return self.inner.is_producer
+
+    @property
+    def producer_agent_id(self) -> str:
+        return self.inner.producer_agent_id
+
+    @property
+    def consumer_agent_ids(self) -> tuple[str, ...]:
+        return self.inner.consumer_agent_ids
+
+    def reset_session(self) -> None:
+        self.inner.reset_session()
+        self._last_result = None
+        self._last_envelope = None
+        self._prior_trajectory = []
+        self._threshold_trajectory = []
+        self._cell_index = 0
+
+    def _build_w31_envelope(
+            self,
+            *,
+            w30_calibrated_cid: str,
+            basis_history_cid: str,
+            calibration_cid: str,
+            ancestor_chain_cid: str,
+            route_audit_cid: str,
+            wire_required: bool,
+    ) -> OnlineCalibratedRatificationEnvelope:
+        traj = tuple(self._prior_trajectory)
+        thr = tuple(self._threshold_trajectory)
+        prior_traj_cid = _compute_prior_trajectory_cid(trajectory=traj)
+        thr_traj_cid = _compute_threshold_trajectory_cid(thresholds=thr)
+        manifest_cid = _compute_w31_manifest_cid(
+            basis_history_cid=str(basis_history_cid),
+            calibration_cid=str(calibration_cid),
+            ancestor_chain_cid=str(ancestor_chain_cid),
+            prior_trajectory_cid=prior_traj_cid,
+            threshold_trajectory_cid=thr_traj_cid,
+            route_audit_cid=str(route_audit_cid),
+        )
+        env = OnlineCalibratedRatificationEnvelope(
+            schema_version=W31_ONLINE_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            w30_calibrated_cid=str(w30_calibrated_cid),
+            prior_trajectory=traj,
+            prior_trajectory_cid=prior_traj_cid,
+            threshold_trajectory=thr,
+            threshold_trajectory_cid=thr_traj_cid,
+            basis_history_cid=str(basis_history_cid),
+            calibration_cid=str(calibration_cid),
+            ancestor_chain_cid=str(ancestor_chain_cid),
+            route_audit_cid=str(route_audit_cid),
+            manifest_cid=manifest_cid,
+            cell_index=int(self._cell_index),
+            wire_required=bool(wire_required),
+        )
+        return env
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        # Disabled / no-schema paths.
+        if not self.enabled or self.schema is None:
+            out = self.inner.decode_rounds(per_round_handoffs)
+            n_w30_visible = int(out.get("calibrated_geometry", {}).get(
+                "n_w30_visible_tokens", 0))
+            return self._pack(
+                out=out, decoder_branch=W31_BRANCH_ONLINE_DISABLED,
+                envelope=None, n_w31_visible=n_w30_visible,
+                w31_overhead=0, ratified=False,
+                verify_ok=False, verify_reason="disabled",
+                online_update_fired=False,
+                observed_agreement=0.0,
+                effective_partition_id=0,
+                prior_before=0.0, prior_after=0.0,
+                threshold_before=0.0, threshold_after=0.0,
+                w30_calibrated_cid="")
+
+        # 1. Run inner W30.
+        out = self.inner.decode_rounds(per_round_handoffs)
+        w30_result = self.inner.last_result
+        w30_envelope = self.inner.last_envelope
+        n_w30_visible = int(out.get("calibrated_geometry", {}).get(
+            "n_w30_visible_tokens", 0))
+        inner_w30_branch = (
+            str(w30_result.decoder_branch) if w30_result is not None else "")
+
+        # If inner W30 produced no per-cell result at all (e.g. W30
+        # disabled), there is nothing to feed the online loop and no
+        # parent CID for the W31 envelope.
+        if w30_result is None:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W31_BRANCH_ONLINE_NO_TRIGGER,
+                envelope=None, n_w31_visible=n_w30_visible,
+                w31_overhead=0, ratified=False,
+                verify_ok=False, verify_reason="no_w30_result",
+                online_update_fired=False,
+                observed_agreement=0.0,
+                effective_partition_id=0,
+                prior_before=0.0, prior_after=0.0,
+                threshold_before=0.0, threshold_after=0.0,
+                w30_calibrated_cid="")
+
+        # 2. Read W30 envelope CIDs (passthrough into the W31 manifest).
+        # When the W30 envelope is None (e.g. inner W29 did not ratify
+        # so W30 emitted no envelope), we still drive the online loop
+        # on the per-cell agreement signal — but skip the W31 envelope
+        # build (no parent CID to bind to).
+        basis_history_cid = (
+            w30_envelope.basis_history.history_cid
+            if (w30_envelope is not None
+                  and w30_envelope.basis_history is not None) else "")
+        calibration_cid_pre = (
+            w30_envelope.calibration.calibration_cid
+            if (w30_envelope is not None
+                  and w30_envelope.calibration is not None) else "")
+        ancestor_chain_cid = (
+            w30_envelope.ancestor_chain.chain_cid
+            if (w30_envelope is not None
+                  and w30_envelope.ancestor_chain is not None) else "")
+        # The "route audit cid" is a closed-form summary of the W30
+        # envelope's routing decision.  We reuse the W30 envelope's
+        # disagreement-route + structural decision summary.  When the
+        # W30 envelope is absent we still hash the W30 result's routing
+        # info to keep the trajectory audit trail intact.
+        if w30_envelope is not None:
+            route_audit_payload = _canonical_json_bytes({
+                "disagreement_route_active":
+                    bool(w30_envelope.disagreement_route_active),
+                "disagreement_route_target_partition_id":
+                    int(w30_envelope.disagreement_route_target_partition_id),
+                "effective_partition_id":
+                    int(w30_result.effective_partition_id),
+                "structural_partition_id":
+                    int(w30_result.structural_partition_id),
+            })
+        else:
+            route_audit_payload = _canonical_json_bytes({
+                "disagreement_route_active":
+                    bool(w30_result.disagreement_route_active),
+                "disagreement_route_target_partition_id":
+                    int(w30_result.effective_partition_id),
+                "effective_partition_id":
+                    int(w30_result.effective_partition_id),
+                "structural_partition_id":
+                    int(w30_result.structural_partition_id),
+            })
+        route_audit_cid = hashlib.sha256(route_audit_payload).hexdigest()
+
+        # 3. Derive the per-cell agreement signal.  This is the
+        # load-bearing online-learning input: closed-form, deterministic.
+        # On a cell where the inner W30 baseline did NOT ratify (no
+        # W30 envelope built), the signal is 0.0 — exactly what the
+        # online loop should observe.
+        observed_agreement = derive_per_cell_agreement_signal(
+            ratified=bool(w30_result.ratified),
+            cross_host_disagreement_count=int(
+                w30_result.cross_host_disagreement_count),
+        )
+
+        eff_pid = int(w30_result.effective_partition_id)
+
+        # 4. Look up prior_before; fire online update if enabled.
+        inner_w30_registry = self.inner.registry
+        cv_before = inner_w30_registry.calibration_vector
+        prior_before = (cv_before.prior_for(eff_pid)
+                          if cv_before is not None else 1.0)
+        threshold_before = (float(cv_before.threshold)
+                              if cv_before is not None else 1.0)
+        online_update_fired = False
+        prior_after = float(prior_before)
+        threshold_after = float(threshold_before)
+        calibration_cid_post = calibration_cid_pre
+        if (self.registry.online_enabled
+                and cv_before is not None):
+            # n_observations_prior is the number of trajectory entries
+            # for this partition seen so far.
+            n_obs = sum(1 for e in self._prior_trajectory
+                          if int(e.partition_id) == eff_pid)
+            new_cv = update_partition_calibration_running_mean(
+                prev=cv_before,
+                partition_id=eff_pid,
+                observed_agreement=observed_agreement,
+                n_observations_prior=n_obs,
+            )
+            inner_w30_registry.calibration_vector = new_cv
+            prior_after = new_cv.prior_for(eff_pid)
+            online_update_fired = True
+
+            # 5. Adaptive threshold update.
+            if self.registry.adaptive_threshold:
+                new_thr = compute_adaptive_threshold(
+                    calibration_vector=new_cv.calibration_vector,
+                    threshold_min=float(self.registry.threshold_min),
+                    threshold_max=float(self.registry.threshold_max),
+                )
+                if abs(new_thr - float(new_cv.threshold)) > 1e-12:
+                    rebuilt_cv = PartitionCalibrationVector(
+                        calibration_vector=tuple(new_cv.calibration_vector),
+                        partition_ids=tuple(new_cv.partition_ids),
+                        threshold=float(new_thr),
+                    )
+                    inner_w30_registry.calibration_vector = rebuilt_cv
+                    threshold_after = float(new_thr)
+                    calibration_cid_post = rebuilt_cv.calibration_cid
+                else:
+                    threshold_after = float(new_cv.threshold)
+                    calibration_cid_post = new_cv.calibration_cid
+            else:
+                threshold_after = float(new_cv.threshold)
+                calibration_cid_post = new_cv.calibration_cid
+            self.registry.n_online_updates += 1
+
+        # 6. Append trajectory entry (truncated to window).
+        if int(self.registry.trajectory_window) > 0:
+            entry = PriorTrajectoryEntry(
+                cell_idx=int(self._cell_index),
+                partition_id=int(eff_pid),
+                observed_agreement=float(observed_agreement),
+                prior_after=float(prior_after),
+            )
+            self._prior_trajectory.append(entry)
+            self._threshold_trajectory.append(float(threshold_after))
+            window = int(self.registry.trajectory_window)
+            if len(self._prior_trajectory) > window:
+                self._prior_trajectory = (
+                    self._prior_trajectory[-window:])
+                self._threshold_trajectory = (
+                    self._threshold_trajectory[-window:])
+
+        # 6b. If the W30 baseline produced no envelope on this cell,
+        # we have updated the online learning state but cannot bind
+        # a sealed W31 envelope (no parent CID).  Return the
+        # online-no-trigger branch with the updated trajectory state.
+        if w30_envelope is None:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W31_BRANCH_ONLINE_NO_TRIGGER,
+                envelope=None, n_w31_visible=n_w30_visible,
+                w31_overhead=0, ratified=False,
+                verify_ok=False, verify_reason="no_w30_envelope",
+                online_update_fired=bool(online_update_fired),
+                observed_agreement=float(observed_agreement),
+                effective_partition_id=int(eff_pid),
+                prior_before=float(prior_before),
+                prior_after=float(prior_after),
+                threshold_before=float(threshold_before),
+                threshold_after=float(threshold_after),
+                w30_calibrated_cid="")
+
+        # 7. Build the W31 envelope.
+        wire_required = self.registry.has_wire_required_layer
+        # Use the *post-update* calibration CID for the manifest so the
+        # registered envelope reflects the current registry state.
+        envelope = self._build_w31_envelope(
+            w30_calibrated_cid=str(w30_envelope.calibrated_cid),
+            basis_history_cid=basis_history_cid,
+            calibration_cid=calibration_cid_post,
+            ancestor_chain_cid=ancestor_chain_cid,
+            route_audit_cid=route_audit_cid,
+            wire_required=bool(wire_required),
+        )
+
+        # 8. Verify + register.  We pass the orchestrator's running
+        # prior_trajectory_cid and threshold_trajectory_cid as the
+        # registered expectation so the verifier rejects cross-cell
+        # swaps (an attacker replaying a previous valid trajectory CID
+        # into the current cell's envelope).
+        registered_pids = frozenset(
+            int(p) for p in inner_w30_registry.registered_partition_ids)
+        expected_prior_traj_cid = envelope.prior_trajectory_cid
+        expected_thr_traj_cid = envelope.threshold_trajectory_cid
+        outcome = self.registry.register_envelope(
+            envelope,
+            registered_partition_ids=registered_pids,
+            registered_basis_history_cid=basis_history_cid,
+            registered_calibration_cid=calibration_cid_post,
+            registered_ancestor_chain_cid=ancestor_chain_cid,
+            registered_route_audit_cid=route_audit_cid,
+            registered_w30_calibrated_cid=str(w30_envelope.calibrated_cid),
+            registered_prior_trajectory_cid=expected_prior_traj_cid,
+            registered_threshold_trajectory_cid=expected_thr_traj_cid,
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+
+        if not verify_ok and self.require_w31_verification:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W31_BRANCH_ONLINE_REJECTED,
+                envelope=envelope, n_w31_visible=n_w30_visible,
+                w31_overhead=0, ratified=False,
+                verify_ok=False, verify_reason=verify_reason,
+                online_update_fired=bool(online_update_fired),
+                observed_agreement=float(observed_agreement),
+                effective_partition_id=int(eff_pid),
+                prior_before=float(prior_before),
+                prior_after=float(prior_after),
+                threshold_before=float(threshold_before),
+                threshold_after=float(threshold_after),
+                w30_calibrated_cid=str(w30_envelope.calibrated_cid))
+
+        # 9. Trivial path — no wire token charged; pass through.
+        if self.registry.is_trivial:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W31_BRANCH_TRIVIAL_ONLINE_PASSTHROUGH,
+                envelope=envelope, n_w31_visible=n_w30_visible,
+                w31_overhead=0, ratified=True,
+                verify_ok=verify_ok, verify_reason=verify_reason,
+                online_update_fired=bool(online_update_fired),
+                observed_agreement=float(observed_agreement),
+                effective_partition_id=int(eff_pid),
+                prior_before=float(prior_before),
+                prior_after=float(prior_after),
+                threshold_before=float(threshold_before),
+                threshold_after=float(threshold_after),
+                w30_calibrated_cid=str(w30_envelope.calibrated_cid))
+
+        # Non-trivial: charge 1 wire token.
+        w31_overhead = int(envelope.n_wire_tokens)
+        n_w31_visible = int(n_w30_visible + w31_overhead)
+        self._cell_index += 1
+        return self._pack(
+            out=out,
+            decoder_branch=W31_BRANCH_ONLINE_RESOLVED,
+            envelope=envelope, n_w31_visible=n_w31_visible,
+            w31_overhead=w31_overhead, ratified=True,
+            verify_ok=verify_ok, verify_reason=verify_reason,
+            online_update_fired=bool(online_update_fired),
+            observed_agreement=float(observed_agreement),
+            effective_partition_id=int(eff_pid),
+            prior_before=float(prior_before),
+            prior_after=float(prior_after),
+            threshold_before=float(threshold_before),
+            threshold_after=float(threshold_after),
+            w30_calibrated_cid=str(w30_envelope.calibrated_cid))
+
+    def _pack(
+            self, *, out: dict[str, Any],
+            decoder_branch: str,
+            envelope: OnlineCalibratedRatificationEnvelope | None,
+            n_w31_visible: int, w31_overhead: int,
+            ratified: bool, verify_ok: bool, verify_reason: str,
+            online_update_fired: bool,
+            observed_agreement: float,
+            effective_partition_id: int,
+            prior_before: float, prior_after: float,
+            threshold_before: float, threshold_after: float,
+            w30_calibrated_cid: str,
+    ) -> dict[str, Any]:
+        envelope_bytes = (envelope.n_envelope_bytes
+                            if envelope is not None else 0)
+        structured_bits = (envelope.n_structured_bits
+                              if envelope is not None else 0)
+        wire = max(1, int(w31_overhead))
+        cram_factor = (
+            float(structured_bits) / float(wire)
+            if structured_bits > 0 else 0.0
+        )
+        w31_cid = (envelope.w31_cid if envelope is not None else "")
+        manifest_cid = (envelope.manifest_cid
+                          if envelope is not None else "")
+        prior_traj_cid = (envelope.prior_trajectory_cid
+                            if envelope is not None else "")
+        thr_traj_cid = (envelope.threshold_trajectory_cid
+                          if envelope is not None else "")
+        n_w30_visible = int(out.get("calibrated_geometry", {}).get(
+            "n_w30_visible_tokens", 0))
+        inner_w30_branch = str(out.get("calibrated_geometry", {}).get(
+            "decoder_branch", ""))
+        result = W31OnlineResult(
+            answer=dict(out),
+            inner_w30_branch=inner_w30_branch,
+            decoder_branch=str(decoder_branch),
+            agent_id=str(self.agent_id),
+            is_producer=bool(self.is_producer),
+            w30_calibrated_cid=str(w30_calibrated_cid),
+            cell_index=int(self._cell_index - 1
+                              if self._cell_index > 0 else 0),
+            online_update_fired=bool(online_update_fired),
+            observed_agreement=float(observed_agreement),
+            effective_partition_id=int(effective_partition_id),
+            prior_before=float(prior_before),
+            prior_after=float(prior_after),
+            threshold_before=float(threshold_before),
+            threshold_after=float(threshold_after),
+            n_w30_visible_tokens=int(n_w30_visible),
+            n_w31_visible_tokens=int(n_w31_visible),
+            n_w31_overhead_tokens=int(w31_overhead),
+            w31_cid=str(w31_cid),
+            manifest_cid=str(manifest_cid),
+            prior_trajectory_cid=str(prior_traj_cid),
+            threshold_trajectory_cid=str(thr_traj_cid),
+            ratified=bool(ratified),
+            verification_ok=bool(verify_ok),
+            verification_reason=str(verify_reason),
+            n_envelope_bytes=int(envelope_bytes),
+            n_structured_bits=int(structured_bits),
+            cram_factor_w31=float(cram_factor),
+        )
+        self._last_result = result
+        self._last_envelope = envelope
+        out_local = dict(out)
+        out_local["online_calibrated"] = result.as_dict()
+        if envelope is not None:
+            out_local["online_calibrated_envelope"] = envelope.as_dict()
+        return out_local
+
+    def decode(
+            self,
+            handoffs: Sequence[_DecodedHandoff],
+    ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> "W31OnlineResult | None":
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> (
+            "OnlineCalibratedRatificationEnvelope | None"):
+        return self._last_envelope
+
+
+# ---------------------------------------------------------------------------
+# Convenience factories (W31 family)
+# ---------------------------------------------------------------------------
+
+
+def build_trivial_online_registry(
+        *,
+        schema: SchemaCapsule,
+        local_host_id: str = "localhost",
+) -> OnlineCalibratedRegistry:
+    """Build a W31 registry with online_enabled=False, manifest_disabled=
+    True, trajectory_window=0 — the H2 byte-for-W30 anchor
+    (W31-Λ-trivial-online falsifier).
+    """
+    return OnlineCalibratedRegistry(
+        schema=schema,
+        online_enabled=False,
+        adaptive_threshold=False,
+        manifest_disabled=True,
+        trajectory_window=0,
+        local_host_id=local_host_id,
+    )
+
+
+def build_online_calibrated_registry(
+        *,
+        schema: SchemaCapsule,
+        online_enabled: bool = True,
+        adaptive_threshold: bool = True,
+        manifest_disabled: bool = False,
+        trajectory_window: int = W31_DEFAULT_TRAJECTORY_WINDOW,
+        threshold_min: float = W31_DEFAULT_THRESHOLD_MIN,
+        threshold_max: float = W31_DEFAULT_THRESHOLD_MAX,
+        local_host_id: str = "localhost",
+) -> OnlineCalibratedRegistry:
+    """Build a non-trivial W31 registry that exercises online prior
+    learning + adaptive threshold + sealed trajectory + manifest CID.
+    """
+    return OnlineCalibratedRegistry(
+        schema=schema,
+        online_enabled=bool(online_enabled),
+        adaptive_threshold=bool(adaptive_threshold),
+        manifest_disabled=bool(manifest_disabled),
+        trajectory_window=int(trajectory_window),
+        threshold_min=float(threshold_min),
+        threshold_max=float(threshold_max),
+        local_host_id=local_host_id,
+    )

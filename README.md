@@ -7,7 +7,62 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.31 (May 2026).** Calibrated
+**Latest milestone: SDK v3.32 (May 2026).** Online self-calibrated
+geometry-aware dense control + sealed prior trajectory + adaptive
+threshold + W31 manifest CID + first measured live cross-architecture
+LLM disagreement at temperature 0 (W31 family).  The W31
+``OnlineCalibratedOrchestrator`` wraps the W30
+``CalibratedGeometryOrchestrator`` with a **closed-form online
+running-mean update** for the per-partition calibration prior driven
+by a deterministic per-cell agreement signal
+(``ratified AND no cross-host disagreement`` ⇒ 1.0; else 0.0), a
+**closed-form clipped-median adaptive threshold** bounded to
+``[0.20, 0.80]``, and a **content-addressed prior + threshold
+trajectory + manifest CID** that closes every cross-component swap
+avenue.  W31 is **NOT** a learned model in the deep-learning sense:
+zero parameters, zero gradients, zero training step.  The
+``OnlineCalibratedRatificationEnvelope`` adds a sealed trajectory of
+``(cell_idx, partition_id, observed_agreement, prior_after)``
+entries plus a ``manifest_cid`` over (basis_history_cid,
+calibration_cid, ancestor_chain_cid, prior_trajectory_cid,
+threshold_trajectory_cid, route_audit_cid); the new
+``verify_online_calibrated_ratification`` enumerates **14 disjoint
+failure modes** (cumulative 42 across W29 + W30 + W31).  **First
+capsule-native multi-agent-coordination method to discharge
+W30-C-PRIOR-LEARNING on a non-stationary regime**: on
+**R-78-NONSTATIONARY-PRIOR**
+``correctness_ratified_rate_w30 = 0.750`` (uniform priors cannot
+reroute) vs ``correctness_ratified_rate_w31 = 0.875``,
+**Δ = +0.125 across 5/5 seeds at trust precision 1.000**, mean
+overhead 0.875 tokens/cell, max overhead 1.  On
+**R-78-ADAPTIVE-THRESHOLD vs R-78-FROZEN-THRESHOLD** the adaptive
+contribution isolates at +0.125 across 5/5 seeds (frozen yields 0).
+On **R-78-MANIFEST-TAMPER** the manifest CID + cross-cell trajectory
+CID check together yield **65/65 = 1.000 tamper rejection rate**
+across five named tampers including the cross-cell prior_trajectory
+swap that self-consistently recomputes the manifest CID.  **First
+measured live cross-architecture LLM disagreement at temperature 0
+in the programme** (28th milestone): gemma2:9b on localhost +
+qwen2.5:14b on 192.168.12.191 disagree on **2/8 = 0.250 of
+structured-decision prompts at temp 0**, reproducible byte-for-byte
+across two runs (Q5: db_query vs logs_pipeline; Q7: api vs storage).
+Three named falsifiers all empirically confirmed
+(W31-Λ-trivial-online ⇒ byte-for-W30 passthrough; W31-Λ-no-drift ⇒
+no help on stationary regime; W31-Λ-frozen-threshold ⇒ no adaptive
+contribution when threshold is fixed at 0.5).
+**Sharpens W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE on the
+infrastructure-discharge axis.**  Stable-vs-experimental boundary
+further tightened; the new W31 surface lives under
+``__experimental__`` (41 unit tests + the verifier);
+``SDK_VERSION = "wevra.sdk.v3.32"``; pyproject.toml ``0.5.5``.
+**437/437 phase69-78 regression pass byte-for-byte** (was 357/357
+in v3.31; +41 W31 unit tests + 39 unchanged from v3.31 + 1
+unchanged); 68/68 wider wevra suite passes.  Mac 2 (192.168.12.248)
+**still ARP-incomplete (26th consecutive milestone)**.  See
+[`docs/RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md`](docs/RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md)
+and [`CHANGELOG.md`](CHANGELOG.md) for details.
+
+**Previous milestone: SDK v3.31 (May 2026).** Calibrated
 geometry-partitioned dense control + multi-stride basis-history +
 per-partition calibration prior + cross-host disagreement-routing +
 ancestor-chain causal binding (W30 family). The W30

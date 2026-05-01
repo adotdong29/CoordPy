@@ -10641,6 +10641,166 @@ honestly null (not failure).
 
 ---
 
+## SDK v3.32 (W31 family) — online self-calibrated geometry-aware dense control + sealed prior trajectory + adaptive threshold + W31 manifest CID + first measured live cross-architecture LLM disagreement at temperature 0 — 2026-05-01
+
+W31 wraps the W30 ``CalibratedGeometryOrchestrator`` with an
+``OnlineCalibratedOrchestrator`` that **closes the loop** on the W30
+calibration prior — a closed-form Bayesian-style running-mean
+update inside the orchestrator, fed by a deterministic per-cell
+agreement signal (``ratified AND no cross-host disagreement`` ⇒
+1.0; else 0.0).  The W31 layer is **NOT** a learned model: zero
+parameters, zero gradients, zero training step.  The threshold is
+recomputed as a closed-form clipped median of the live prior vector
+(bounded to ``[0.20, 0.80]`` via registered constants).  The prior
++ threshold trajectories are sealed in a content-addressed envelope
+along with a manifest CID over (basis_history_cid, calibration_cid,
+ancestor_chain_cid, prior_trajectory_cid, threshold_trajectory_cid,
+route_audit_cid).
+
+The ``OnlineCalibratedRatificationEnvelope`` adds three new
+content-addressed primitives over the W30 envelope: a
+``PriorTrajectoryEntry`` tuple sealed by SHA-256 of canonical bytes
+(observed_agreement, prior_after, partition_id, cell_idx), a
+threshold trajectory sealed by SHA-256, and a manifest CID that
+ties all six component CIDs together — closing the cross-component
+swap avenue.  The new ``verify_online_calibrated_ratification``
+enumerates **14 disjoint failure modes** (cumulative 42 across W29
++ W30 + W31) — none of which existed in any W22..W30 verifier.
+
+**Headline result.** On **R-78-NONSTATIONARY-PRIOR** (inverted
+partition layout, CYCLIC=PARTIAL oracle, LINEAR=FULL oracle), the
+W30 baseline with uniform priors (1.0, 1.0, 1.0) cannot reroute and
+gets ``correctness_ratified_rate_w30 = 0.750``; W31 with online
+learning observes per-cell failures on CYCLIC, drops the prior to
+0.6667 over two failed cells, and the clipped-median adaptive
+threshold (0.8) fires the reroute on subsequent CYCLIC cells —
+strictly improving correctness to ``0.875`` across **5/5 seeds at
+trust precision 1.000**, ``Δ(W31 − W30) = +0.125``.  **Empirically
+discharges W30-C-PRIOR-LEARNING**.
+
+On **R-78-ADAPTIVE-THRESHOLD vs R-78-FROZEN-THRESHOLD** the
+adaptive axis isolates: with frozen threshold = 0.5, Δ = 0.000 (the
+running mean of CYCLIC = 0.6667 > 0.5); with adaptive
+clipped-median threshold (0.8), Δ = +0.125.  Adaptive contribution
+is +0.125 ≥ +0.05 across 5/5 seeds.
+
+On **R-78-MANIFEST-TAMPER** the W31 manifest CID + cross-cell
+prior_trajectory_cid check together detect five named tampers per
+cell-position: cross-cell trajectory swap (with self-consistent
+manifest recompute), manifest_cid byte corruption,
+observed_agreement out of range, threshold_trajectory value out of
+range, outer w31_cid byte corruption.  **65/65 = 1.000 rejection
+rate** at seed 11.
+
+On **R-78-XLLM-LIVE** (live cross-architecture probe at temp 0,
+seed 0) gemma2:9b on localhost vs qwen2.5:14b on 192.168.12.191
+**systematically disagree on 2/8 = 0.250 of structured-decision
+prompts**, reproducible byte-for-byte across two runs (Q5: db_query
+vs logs_pipeline; Q7: api vs storage).  **First measured live
+cross-architecture LLM disagreement at temperature 0 in the
+programme** (28th milestone).  This **sharpens W30-C-CROSS-HOST-
+VARIANCE-LIVE-MAGNITUDE-LIVE** on the **infrastructure-discharge
+axis**: the disagreement signal exists at temp 0; the gold-
+correlation axis remains open.
+
+Three named falsifiers all empirically confirmed
+(W31-Λ-trivial-online, W31-Λ-no-drift, W31-Λ-frozen-threshold).
+14 enumerated trust-boundary failure modes (vs W30's 14, vs W29's
+14; cumulative 42-mode trust boundary across W29 + W30 + W31).
+**437/437 focused regression pass** (was 357 in v3.31; +41 W31
+unit tests + 39 unchanged from v3.31 + 1 unchanged).  68/68 wider
+wevra suite passes.
+
+Mac 2 (192.168.12.248) **still ARP-incomplete (26th milestone)**;
+ping 100% packet loss; port 11434 unreachable.  The two reachable
+hosts (localhost + 192.168.12.191) suffice for the live cross-arch
+probe.
+
+### Post-W31 audit board
+
+1. **Did online closed-loop prior-learning materially help?**
+   *YES on the load-bearing axis: H6 nonstationary prior (Δ +0.125
+   ≥ pre-committed +0.10 bar across 5/5 seeds at trust precision
+   1.000).  The first capsule-native milestone to discharge a W30
+   open conjecture (W30-C-PRIOR-LEARNING) on a regime where the
+   per-partition agreement-rate distribution is non-stationary.*
+2. **Did adaptive threshold contribute strictly?** *YES — H7
+   isolates the contribution at +0.125 across 5/5 seeds; frozen
+   threshold (W30 default 0.5) yields zero gain on the same
+   regime; the clipped-median adaptive bound is the load-bearing
+   trigger.*
+3. **Did trust/audit survive?** *YES — 14 enumerated failure
+   modes (disjoint from W29's 14 and W30's 14), 100 % rejection
+   rate on R-78-MANIFEST-TAMPER (65/65) including the cross-cell
+   trajectory swap that self-consistently recomputes the manifest
+   CID — caught by the registered_prior_trajectory_cid check.
+   Cumulative trust boundary 42 modes across W29 + W30 + W31.*
+4. **Did bounded-context efficiency improve in a real way?**
+   *PARTIAL — W31 charges 1 visible token / cell on top of W30
+   (mean overhead 0.875, max overhead 1) so cumulative overhead
+   vs W28 is ≤ 3 tokens.  The cram-factor is not the load-bearing
+   gain on this milestone — the load-bearing gain is correctness
+   on a non-stationary regime that the W30 baseline cannot handle
+   without ground-truth-trained priors.*
+5. **Did two-Mac evaluation materially broaden the evidence?**
+   *YES — the live cross-architecture probe (gemma2:9b +
+   qwen2.5:14b) recorded **the first measured live cross-
+   architecture LLM disagreement at temp 0 in the programme**
+   (2/8 = 0.250 disagreement rate, reproducible byte-for-byte
+   across two runs).  This sharpens W30-C-CROSS-HOST-VARIANCE-
+   LIVE-MAGNITUDE-LIVE on the infrastructure-discharge axis.
+   Mac 2 (192.168.12.248) remains ARP-incomplete (26th
+   milestone).*
+6. **Which earlier loose ends were closed vs only sharpened?**
+   *CLOSED: W30-C-PRIOR-LEARNING on the magnitude axis (the
+   conjectural status promoted to proved-conditional + proved-
+   empirical via W31-3).  SHARPENED: W30-C-CROSS-HOST-VARIANCE-
+   LIVE-MAGNITUDE-LIVE on the infrastructure-discharge axis (the
+   live disagreement signal exists; the gold-correlation axis
+   remains open as the renamed W31-C-CROSS-HOST-VARIANCE-LIVE-
+   MAGNITUDE-LIVE).  STILL OPEN: W22-C-CACHE-AMPLIFICATION;
+   W23-C-MITIGATION-LIVE-VARIANCE; W24-C-LIVE-VARIANCE-COMPLETE;
+   W26-C-K-SCALING K → ∞ asymptote; W27-C-MULTI-SIGNATURE-SCALING;
+   W30-C-NATIVE-LATENT (architecture-dependent: true transformer-
+   internal subspace projection vs the W31 audited proxy);
+   W30-C-MULTI-HOST (3+ host topology, blocked on Mac 2 ARP);
+   W31-C-LONG-WINDOW-CONVERGENCE (longer trajectory windows).*
+7. **Did release readiness improve?** *YES on the SDK-version /
+   ``__experimental__`` / pyproject.toml axis.  (a) W31 surface
+   added under ``__experimental__`` (41 unit tests + verifier +
+   10 W31 primitives).  (b) SDK version bumped to v3.32 / 0.5.5.
+   (c) Focused regression W3..W31 phase suite + wider wevra =
+   505/505 in ~115s, reproducible.  (d) The online running-mean /
+   adaptive threshold / sealed trajectory / manifest CID
+   vocabulary is honestly framed as capsule-layer audited proxy
+   in the module docstring AND in the results note's §9.  (e)
+   First live cross-architecture LLM disagreement evidence at
+   temp 0 in the programme — concrete infrastructure progress
+   beyond synthetic benches.*
+8. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on
+   FOUR axes simultaneously: closed-loop online prior learning
+   (W30-C-PRIOR-LEARNING discharged), adaptive threshold (W31-4
+   isolated), cross-component manifest-CID tamper detection
+   (W31-5), first live cross-architecture LLM disagreement at
+   temp 0 (W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE
+   infrastructure-discharged).  The deeper wall remains whichever
+   regime the audited capsule-layer proxy cannot resolve: a regime
+   where the live LLM disagreement systematically aligns with the
+   gold-correctness label (W31-C-CROSS-HOST-VARIANCE-LIVE-
+   MAGNITUDE-LIVE on the gold-correlation axis), or true
+   transformer-internal subspace projection
+   (W31-C-NATIVE-LATENT — architecture-dependent), or a regime
+   where 3-host majority is needed (W31-C-MULTI-HOST — hardware-
+   bounded; blocked on Mac 2 ARP).* Named open frontier for SDK
+   v3.33: **W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE** on
+   the gold-correlation axis, **W31-C-NATIVE-LATENT**
+   (architecture-dependent), **W31-C-MULTI-HOST** (hardware-
+   bounded), **W31-C-LONG-WINDOW-CONVERGENCE** (trajectory window
+   scaling).
+
+---
+
 *End of master plan. Changelog lives in the results notes, not
 here. If this document ever becomes a changelog, delete the
 changelog and restore the plan.*

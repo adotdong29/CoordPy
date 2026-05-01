@@ -17,7 +17,9 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.31)         | [`RESULTS_WEVRA_W30_CALIBRATED_GEOMETRY.md`](RESULTS_WEVRA_W30_CALIBRATED_GEOMETRY.md) |
+> | Latest milestone (SDK v3.32)         | [`RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md`](RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md) |
+> | Pre-committed success bar (SDK v3.32)| [`SUCCESS_CRITERION_W31_ONLINE_CALIBRATED_GEOMETRY.md`](SUCCESS_CRITERION_W31_ONLINE_CALIBRATED_GEOMETRY.md) |
+> | Previous milestone (SDK v3.31)       | [`RESULTS_WEVRA_W30_CALIBRATED_GEOMETRY.md`](RESULTS_WEVRA_W30_CALIBRATED_GEOMETRY.md) |
 > | Pre-committed success bar (SDK v3.31)| [`SUCCESS_CRITERION_W30_CALIBRATED_GEOMETRY.md`](SUCCESS_CRITERION_W30_CALIBRATED_GEOMETRY.md) |
 > | Previous milestone (SDK v3.30)       | [`RESULTS_WEVRA_W29_GEOMETRY_PARTITIONED.md`](RESULTS_WEVRA_W29_GEOMETRY_PARTITIONED.md) |
 > | Pre-committed success bar (SDK v3.30)| [`SUCCESS_CRITERION_W29_GEOMETRY_PARTITIONED.md`](SUCCESS_CRITERION_W29_GEOMETRY_PARTITIONED.md) |

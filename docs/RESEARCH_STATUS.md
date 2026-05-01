@@ -5,13 +5,112 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.31,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.32,
 > 2026-05-01.
 
-## TL;DR — SDK v3.31
+## TL;DR — SDK v3.32
 
-The programme now has **twenty-seven** coupled research axes, each
-with a sharp status. SDK v3.31 mints axis 27:
+The programme now has **twenty-eight** coupled research axes, each
+with a sharp status. SDK v3.32 mints axis 28: **online self-
+calibrated geometry-aware dense control + sealed prior trajectory
++ adaptive threshold + W31 manifest CID + first measured live
+cross-architecture LLM disagreement at temperature 0** — extending
+the SDK v3.31 W30 ``CalibratedGeometryOrchestrator`` with an
+``OnlineCalibratedOrchestrator`` (W31) that closes the loop on the
+W30 calibration prior.  At each cell, W31 derives a closed-form
+deterministic per-cell agreement signal (``ratified AND no cross-
+host disagreement`` ⇒ 1.0; else 0.0), updates the inner W30
+registry's calibration vector via the existing
+``update_partition_calibration_running_mean`` primitive, recomputes
+the threshold as a clipped median of the live prior vector, and
+seals a content-addressed prior + threshold trajectory + manifest
+CID in the W31 envelope.  The new "online running-mean / adaptive
+threshold / sealed trajectory / manifest CID" vocabulary is
+**capsule-layer audited proxy** — explicitly NOT a learned model
+in the deep-learning sense, NOT transformer-internal, NOT a
+runtime KV transplant.
+
+**The headline SDK v3.32 results.**
+
+* **R-78-NONSTATIONARY-PRIOR (H6 — load-bearing).**  On the
+  inverted-partition regime (CYCLIC=PARTIAL, LINEAR=FULL) with
+  W30 baseline uniform priors, the W30 baseline cannot reroute
+  and gets ``correctness = 0.750``; W31 with online learning
+  observes per-cell failures on CYCLIC, drops the prior to 0.6667,
+  and the clipped-median adaptive threshold (0.8) fires the
+  reroute on subsequent CYCLIC cells — strictly improving
+  correctness to ``0.875`` across **5/5 seeds at trust precision
+  1.000**, ``Δ(W31 − W30) = +0.125``, mean overhead 0.875
+  tokens/cell, max overhead 1.  **Empirically discharges
+  W30-C-PRIOR-LEARNING** on the magnitude axis.
+* **R-78-ADAPTIVE-THRESHOLD vs R-78-FROZEN-THRESHOLD (H7).**  The
+  adaptive axis isolates: with frozen threshold = 0.5 (W30
+  default), Δ = 0.000 (the running mean of CYCLIC = 0.6667 > 0.5
+  on this regime); with adaptive clipped-median threshold, Δ =
+  +0.125.  Adaptive minus frozen = +0.125 ≥ +0.05 across 5/5 seeds.
+* **R-78-MANIFEST-TAMPER (H8).**  The W31 envelope's manifest CID
+  + cross-cell trajectory CID check together detect five named
+  tampers per cell: cross-cell prior_trajectory swap, manifest_cid
+  byte corruption, observed_agreement out of range,
+  threshold_trajectory value out of range, outer w31_cid byte
+  corruption.  **65/65 = 1.000 rejection rate.**
+* **R-78-TRIVIAL-W31 (H2 byte-for-W30 anchor).**  When ``online
+  enabled = False`` AND ``manifest disabled = True`` AND
+  ``trajectory window = 0``, W31 reduces to W30 byte-for-byte
+  across 5/5 seeds; every cell yields
+  ``W31_BRANCH_TRIVIAL_ONLINE_PASSTHROUGH``.
+* **R-78-NO-DRIFT (W31-Λ-no-drift).**  On a stationary regime
+  (every partition has FULL oracle), every cell ratifies cleanly
+  and the running-mean update preserves every prior at 1.0; W31
+  online learning gives no help over the W30 baseline (which is
+  already at 1.000 correctness).  Δ = 0.000 across 5/5 seeds.
+* **R-78-FROZEN-THRESHOLD (W31-Λ-frozen-threshold).**  Same regime
+  as nonstationary, but ``adaptive_threshold = False``; the
+  threshold stays at 0.5; the running mean of CYCLIC (0.6667 >
+  0.5) does not cross threshold; no reroute fires; Δ = 0.000
+  across 5/5 seeds.  Isolates the contribution of the adaptive
+  threshold axis.
+* **R-78-XLLM-LIVE (S1 best-effort).**  gemma2:9b on localhost
+  vs qwen2.5:14b on 192.168.12.191 systematically **disagree on
+  2/8 = 0.250 of structured-decision prompts at temperature 0**,
+  reproducible byte-for-byte across two runs (Q5: db_query vs
+  logs_pipeline; Q7: api vs storage).  **First measured live
+  cross-architecture LLM disagreement at temp 0 in the
+  programme** (28th milestone).  **Sharpens W30-C-CROSS-HOST-
+  VARIANCE-LIVE-MAGNITUDE-LIVE** on the **infrastructure-discharge
+  axis**: the disagreement signal exists at temp 0; the gold-
+  correlation axis remains open.
+
+**Three named falsifiers, all empirically confirmed**:
+W31-Λ-trivial-online (online disabled + manifest disabled +
+window=0 ⇒ W31 = W30 byte-for-byte), W31-Λ-no-drift (stationary
+regime ⇒ no online help), W31-Λ-frozen-threshold (frozen threshold
+⇒ no adaptive contribution; isolates online-prior axis from
+adaptive-threshold axis).
+
+Trust precision = 1.000 across every R-78 sub-bank where W31
+ratifies. Backward-compat preserved byte-for-byte on the trivial-
+online anchor: **437/437 focused regression pass** (was 357 in
+v3.31; now +41 W31 unit tests + 39 unchanged + 1 unchanged).
+68/68 wider wevra suite passes.  Mac 2 (192.168.12.248) **still
+unreachable** (26th milestone in a row, ping 100% packet loss);
+the other reachable host (192.168.12.191) was used for the live
+R-78-XLLM-LIVE probe.  Stable-vs-experimental boundary tightened:
+``__experimental__`` tuple extended with W31 symbols; SDK_VERSION
+``wevra.sdk.v3.32``; pyproject.toml ``0.5.5``.
+
+W30-C-PRIOR-LEARNING discharged at the magnitude axis;
+W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE sharpened on the
+infrastructure-discharge axis (live cross-architecture
+disagreement signal exists at temp 0); W30-C-NATIVE-LATENT remains
+the next true wall (architecture-dependent); W30-C-MULTI-HOST
+remains hardware-bounded.  See
+``docs/RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md`` for the
+full milestone note + pre-committed bar.
+
+## TL;DR — SDK v3.31 (previous frontier)
+
+SDK v3.31 minted axis 27:
 **calibrated geometry-partitioned dense control + multi-stride
 basis-history + per-partition calibration prior + cross-host
 disagreement-routing + ancestor-chain causal binding** —
