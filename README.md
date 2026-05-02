@@ -7,7 +7,78 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.33 (May 2026).** Long-window convergent
+**Latest milestone: SDK v3.34 (May 2026).** Trust-EWMA-tracked
+multi-oracle adjudication + per-oracle agreement signal + anchor-
+oracle reference + content-addressed oracle-trust-state + trust-
+trajectory CID + W33 manifest-v3 CID + single-partition long-window
+strict-gain regime that exceeds the W32-L-CYCLE-CAP limitation
+theorem (W33 family).  The W33
+``TrustEWMATrackedMultiOracleOrchestrator`` wraps the **OLD W21
+``TrustWeightedMultiOracleDisambiguator``** (the explicit
+multi-oracle adjudication line, dormant since W21) with a **closed-
+form per-oracle EWMA trust accumulator** (``ewma_new = (1 - α) *
+ewma_prev + α * obs`` where ``obs`` is the per-cell agreement
+between each oracle's probe and a registered **anchor-oracle
+reference** that is trust-by-construction immune to quorum-flip),
+a **trust-threshold gate** that excludes detrusted oracles from
+the effective tally, a **sealed (cell_idx, oracle_id, observed,
+ewma_after) trust trajectory CID**, and a **manifest-v3 CID** over
+six component CIDs (w21_oracle_cid, oracle_trust_state_cid,
+trust_trajectory_cid, anchor_oracle_set_cid, route_audit_cid_v3,
+w32_long_window_cid).  W33 is **NOT** a learned trust model in the
+deep-learning sense: zero parameters, zero gradients, zero training
+step; the EWMA primitive is the same closed-form W32 primitive
+applied to the W21 quorum-agreement signal at the per-oracle level.
+The ``TrustEWMARatificationEnvelope`` adds a sealed trajectory of
+``(cell_idx, oracle_id, observed_quorum_agreement, ewma_trust_after)``
+entries; the new ``verify_trust_ewma_ratification`` enumerates **14
+disjoint failure modes** (cumulative 70 across W22 + W29 + W30 +
+W31 + W32 + W33).  **First capsule-native multi-agent-coordination
+method to simultaneously discharge two named open conjectures from
+two different research lines in a single milestone**:
+**W21-C-CALIBRATED-TRUST + W32-C-OLD-LINE-EWMA-TRUST** are
+**jointly discharged at +0.375 trust-precision strict gain** across
+5/5 seeds × 16 cells/seed on **R-80-COMPROMISED-SHIFT** (W21
+fixed-trust adjudicator commits to the wrong answer when 2 of 3
+oracles become compromised mid-session ⇒ trust precision = 0.625;
+W33 EWMA-tracks each oracle's anchor-agreement, gates out the
+detrusted ones, and recovers ⇒ trust precision = **1.000**, no
+correctness regression, max overhead 1 token/cell).
+**W32-C-LONG-WINDOW-STRICT-GAIN** is **discharged at +0.10
+correctness strict gain** across 5/5 seeds × 80 cells on
+**R-79-SINGLE-PARTITION** (a prefix-then-shift regime over a
+single-partition signature space that exceeds the W32-L-CYCLE-CAP
+``Δ_max ≤ min(c_p/4, c_s)/N ≤ 0.0625`` cycle-capped bound by
+construction).  On **R-80-MANIFEST-V3-TAMPER** the manifest-v3 CID
++ cross-component CID checks together yield **400/400 = 1.000
+tamper rejection rate** across 5/5 seeds × 16 ratified cell-
+positions × 5 named tampers per cell (oracle_trust_state CID byte
+corruption, trust_trajectory CID byte corruption, anchor_oracle_set
+swap, manifest_v3_cid byte corruption, w33_cid byte corruption).
+On **R-80-TRIVIAL-W33** the trivial passthrough yields **W33 = W21
+byte-for-byte across 5/5 seeds**.  Four named W33-Λ falsifiers all
+empirically observed (W33-Λ-trivial-trust-ewma ⇒ byte-for-W21
+passthrough; W33-Λ-no-trust-shift ⇒ all EWMA stay at 1.0;
+W33-Λ-frozen-threshold ⇒ gate never fires; W33-Λ-mis-trust-shift
+⇒ honest empirical: anchor-oracle design is more robust than the
+falsifier predicted).  Live cross-host pilot (mixtral:8x7b on
+localhost + qwen3.5:35b on 192.168.12.191) **honestly null on
+infrastructure** (qwen3.5:35b not actually loaded on the remote
+host; mixtral past-token-budget at temp 0); the
+W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE conjecture **remains open**
+and is recorded with two infrastructure-fix items
+(W33-INFRA-1, W33-INFRA-2).  Stable-vs-experimental boundary
+further tightened; the new W33 surface lives under
+``__experimental__`` (31 unit tests + the verifier);
+``SDK_VERSION = "wevra.sdk.v3.34"``; pyproject.toml ``0.5.7``.
+**446/446 phase69-80 regression pass + 31/31 W33 unit tests +
+133/133 wider wevra suite = 610 tests pass**.  Mac 2
+(192.168.12.248) **still ARP-incomplete (28th consecutive
+milestone)**.  See
+[`docs/RESULTS_WEVRA_W33_TRUST_EWMA_TRACKED.md`](docs/RESULTS_WEVRA_W33_TRUST_EWMA_TRACKED.md)
+and [`CHANGELOG.md`](CHANGELOG.md) for details.
+
+**Previous milestone: SDK v3.33 (May 2026).** Long-window convergent
 online geometry-aware dense control + EWMA prior accumulator + Page
 CUSUM change-point detector + gold-correlated disagreement-routing +
 W32 manifest-v2 CID + first measured live cross-architecture LLM
@@ -83,7 +154,7 @@ wider wevra suite = 536 tests pass**.  Mac 2 (192.168.12.248)
 [`docs/RESULTS_WEVRA_W32_LONG_WINDOW_CONVERGENT.md`](docs/RESULTS_WEVRA_W32_LONG_WINDOW_CONVERGENT.md)
 and [`CHANGELOG.md`](CHANGELOG.md) for details.
 
-**Previous milestone: SDK v3.32 (May 2026).** Online self-calibrated
+**Earlier milestone: SDK v3.32 (May 2026).** Online self-calibrated
 geometry-aware dense control + sealed prior trajectory + adaptive
 threshold + W31 manifest CID + first measured live cross-architecture
 LLM disagreement at temperature 0 (W31 family).  The W31

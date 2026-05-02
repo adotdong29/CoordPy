@@ -1,0 +1,574 @@
+{
+  "bank": "compromised_shift",
+  "n_eval": 16,
+  "bank_seed": 11,
+  "trust_ewma_enabled": true,
+  "manifest_v3_disabled": false,
+  "trust_trajectory_window": 16,
+  "trust_threshold": 0.5,
+  "ewma_alpha": 0.2,
+  "quorum_min": 2,
+  "n_correct_w21": 10,
+  "n_correct_w33": 10,
+  "n_ratified_w21": 16,
+  "n_ratified_w33": 10,
+  "correctness_ratified_rate_w21": 0.625,
+  "correctness_ratified_rate_w33": 0.625,
+  "trust_precision_w21": 0.625,
+  "trust_precision_w33": 1.0,
+  "delta_correctness_w33_w21": 0.0,
+  "delta_trust_precision_w33_w21": 0.375,
+  "mean_total_w21_visible_tokens": 11.0,
+  "mean_total_w33_visible_tokens": 12.0,
+  "mean_overhead_w33_per_cell": 1.0,
+  "max_overhead_w33_per_cell": 1,
+  "n_oracles_detrusted": 7,
+  "n_trust_ewma_updates": 48,
+  "n_w33_registered": 16,
+  "n_w33_rejected": 0,
+  "byte_equivalent_w33_w21": false,
+  "records": [
+    {
+      "cell_idx": 0,
+      "expected": [
+        "orders",
+        "payments"
+      ],
+      "correct_w21": true,
+      "correct_w33": true,
+      "ratified_w21": true,
+      "ratified_w33": true,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_resolved",
+      "w21_visible": 12,
+      "w33_visible": 13,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 0,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          1.0
+        ],
+        [
+          "oncall_notes",
+          1.0
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 8424,
+      "w33_cram_factor": 8424.0
+    },
+    {
+      "cell_idx": 1,
+      "expected": [
+        "orders",
+        "payments"
+      ],
+      "correct_w21": true,
+      "correct_w33": true,
+      "ratified_w21": true,
+      "ratified_w33": true,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_resolved",
+      "w21_visible": 12,
+      "w33_visible": 13,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 0,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          1.0
+        ],
+        [
+          "oncall_notes",
+          1.0
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 10776,
+      "w33_cram_factor": 10776.0
+    },
+    {
+      "cell_idx": 2,
+      "expected": [
+        "orders",
+        "payments"
+      ],
+      "correct_w21": true,
+      "correct_w33": true,
+      "ratified_w21": true,
+      "ratified_w33": true,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_resolved",
+      "w21_visible": 12,
+      "w33_visible": 13,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 0,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          1.0
+        ],
+        [
+          "oncall_notes",
+          1.0
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 13128,
+      "w33_cram_factor": 13128.0
+    },
+    {
+      "cell_idx": 3,
+      "expected": [
+        "orders",
+        "payments"
+      ],
+      "correct_w21": true,
+      "correct_w33": true,
+      "ratified_w21": true,
+      "ratified_w33": true,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_resolved",
+      "w21_visible": 12,
+      "w33_visible": 13,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 0,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          1.0
+        ],
+        [
+          "oncall_notes",
+          1.0
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 15480,
+      "w33_cram_factor": 15480.0
+    },
+    {
+      "cell_idx": 4,
+      "expected": [
+        "api",
+        "db"
+      ],
+      "correct_w21": true,
+      "correct_w33": true,
+      "ratified_w21": true,
+      "ratified_w33": true,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_resolved",
+      "w21_visible": 12,
+      "w33_visible": 13,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 0,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          1.0
+        ],
+        [
+          "oncall_notes",
+          1.0
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 17832,
+      "w33_cram_factor": 17832.0
+    },
+    {
+      "cell_idx": 5,
+      "expected": [
+        "api",
+        "db"
+      ],
+      "correct_w21": true,
+      "correct_w33": true,
+      "ratified_w21": true,
+      "ratified_w33": true,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_resolved",
+      "w21_visible": 12,
+      "w33_visible": 13,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 0,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          1.0
+        ],
+        [
+          "oncall_notes",
+          1.0
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 18608,
+      "w33_cram_factor": 18608.0
+    },
+    {
+      "cell_idx": 6,
+      "expected": [
+        "api",
+        "db"
+      ],
+      "correct_w21": true,
+      "correct_w33": true,
+      "ratified_w21": true,
+      "ratified_w33": true,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_resolved",
+      "w21_visible": 11,
+      "w33_visible": 12,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 0,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          1.0
+        ],
+        [
+          "oncall_notes",
+          0.8
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 18608,
+      "w33_cram_factor": 18608.0
+    },
+    {
+      "cell_idx": 7,
+      "expected": [
+        "api",
+        "db"
+      ],
+      "correct_w21": true,
+      "correct_w33": true,
+      "ratified_w21": true,
+      "ratified_w33": true,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_resolved",
+      "w21_visible": 11,
+      "w33_visible": 12,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 0,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          1.0
+        ],
+        [
+          "oncall_notes",
+          0.6400000000000001
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 18624,
+      "w33_cram_factor": 18624.0
+    },
+    {
+      "cell_idx": 8,
+      "expected": [
+        "logs_pipeline",
+        "storage"
+      ],
+      "correct_w21": true,
+      "correct_w33": true,
+      "ratified_w21": true,
+      "ratified_w33": true,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_resolved",
+      "w21_visible": 11,
+      "w33_visible": 12,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 0,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          1.0
+        ],
+        [
+          "oncall_notes",
+          0.5120000000000001
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 18648,
+      "w33_cram_factor": 18648.0
+    },
+    {
+      "cell_idx": 9,
+      "expected": [
+        "logs_pipeline",
+        "storage"
+      ],
+      "correct_w21": true,
+      "correct_w33": true,
+      "ratified_w21": true,
+      "ratified_w33": true,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_resolved",
+      "w21_visible": 11,
+      "w33_visible": 12,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 1,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          1.0
+        ],
+        [
+          "oncall_notes",
+          0.40960000000000013
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 18680,
+      "w33_cram_factor": 18680.0
+    },
+    {
+      "cell_idx": 10,
+      "expected": [
+        "logs_pipeline",
+        "storage"
+      ],
+      "correct_w21": false,
+      "correct_w33": false,
+      "ratified_w21": true,
+      "ratified_w33": false,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_detrusted_abstain",
+      "w21_visible": 10,
+      "w33_visible": 11,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 1,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          0.8
+        ],
+        [
+          "oncall_notes",
+          0.32768000000000014
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 18736,
+      "w33_cram_factor": 18736.0
+    },
+    {
+      "cell_idx": 11,
+      "expected": [
+        "logs_pipeline",
+        "storage"
+      ],
+      "correct_w21": false,
+      "correct_w33": false,
+      "ratified_w21": true,
+      "ratified_w33": false,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_detrusted_abstain",
+      "w21_visible": 10,
+      "w33_visible": 11,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 1,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          0.6400000000000001
+        ],
+        [
+          "oncall_notes",
+          0.2621440000000001
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 18800,
+      "w33_cram_factor": 18800.0
+    },
+    {
+      "cell_idx": 12,
+      "expected": [
+        "db_query",
+        "web"
+      ],
+      "correct_w21": false,
+      "correct_w33": false,
+      "ratified_w21": true,
+      "ratified_w33": false,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_detrusted_abstain",
+      "w21_visible": 10,
+      "w33_visible": 11,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 1,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          0.5120000000000001
+        ],
+        [
+          "oncall_notes",
+          0.2097152000000001
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 18872,
+      "w33_cram_factor": 18872.0
+    },
+    {
+      "cell_idx": 13,
+      "expected": [
+        "db_query",
+        "web"
+      ],
+      "correct_w21": false,
+      "correct_w33": false,
+      "ratified_w21": true,
+      "ratified_w33": false,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_detrusted_abstain",
+      "w21_visible": 10,
+      "w33_visible": 11,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 2,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          0.40960000000000013
+        ],
+        [
+          "oncall_notes",
+          0.1677721600000001
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 18944,
+      "w33_cram_factor": 18944.0
+    },
+    {
+      "cell_idx": 14,
+      "expected": [
+        "db_query",
+        "web"
+      ],
+      "correct_w21": false,
+      "correct_w33": false,
+      "ratified_w21": true,
+      "ratified_w33": false,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_detrusted_abstain",
+      "w21_visible": 10,
+      "w33_visible": 11,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 2,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          0.32768000000000014
+        ],
+        [
+          "oncall_notes",
+          0.13421772800000006
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 19000,
+      "w33_cram_factor": 19000.0
+    },
+    {
+      "cell_idx": 15,
+      "expected": [
+        "db_query",
+        "web"
+      ],
+      "correct_w21": false,
+      "correct_w33": false,
+      "ratified_w21": true,
+      "ratified_w33": false,
+      "w21_branch": "quorum_resolved",
+      "w33_branch": "trust_ewma_detrusted_abstain",
+      "w21_visible": 10,
+      "w33_visible": 11,
+      "w33_overhead": 1,
+      "w33_n_detrusted_oracles": 2,
+      "w33_oracle_trust_state": [
+        [
+          "change_history",
+          0.2621440000000001
+        ],
+        [
+          "oncall_notes",
+          0.10737418240000006
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ],
+      "w33_n_structured_bits": 19032,
+      "w33_cram_factor": 19032.0
+    }
+  ],
+  "final_oracle_trust_state": [
+    [
+      "change_history",
+      0.2621440000000001
+    ],
+    [
+      "oncall_notes",
+      0.10737418240000006
+    ],
+    [
+      "service_graph",
+      1.0
+    ]
+  ]
+}

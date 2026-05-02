@@ -1,0 +1,240 @@
+{
+  "bank": "compromised_shift",
+  "seeds": [
+    11,
+    17,
+    23,
+    29,
+    31
+  ],
+  "min_delta_correctness_w33_w21": 0.0,
+  "max_delta_correctness_w33_w21": 0.0,
+  "min_delta_trust_precision_w33_w21": 0.375,
+  "max_delta_trust_precision_w33_w21": 0.375,
+  "min_trust_precision_w33": 1.0,
+  "min_correctness_ratified_rate_w33": 0.625,
+  "max_overhead_w33_per_cell": 1,
+  "all_byte_equivalent_w33_w21": false,
+  "seed_results": [
+    {
+      "bank": "compromised_shift",
+      "n_eval": 16,
+      "bank_seed": 11,
+      "trust_ewma_enabled": true,
+      "manifest_v3_disabled": false,
+      "trust_trajectory_window": 16,
+      "trust_threshold": 0.5,
+      "ewma_alpha": 0.2,
+      "quorum_min": 2,
+      "n_correct_w21": 10,
+      "n_correct_w33": 10,
+      "n_ratified_w21": 16,
+      "n_ratified_w33": 10,
+      "correctness_ratified_rate_w21": 0.625,
+      "correctness_ratified_rate_w33": 0.625,
+      "trust_precision_w21": 0.625,
+      "trust_precision_w33": 1.0,
+      "delta_correctness_w33_w21": 0.0,
+      "delta_trust_precision_w33_w21": 0.375,
+      "mean_total_w21_visible_tokens": 11.0,
+      "mean_total_w33_visible_tokens": 12.0,
+      "mean_overhead_w33_per_cell": 1.0,
+      "max_overhead_w33_per_cell": 1,
+      "n_oracles_detrusted": 7,
+      "n_trust_ewma_updates": 48,
+      "n_w33_registered": 16,
+      "n_w33_rejected": 0,
+      "byte_equivalent_w33_w21": false,
+      "final_oracle_trust_state": [
+        [
+          "change_history",
+          0.2621440000000001
+        ],
+        [
+          "oncall_notes",
+          0.10737418240000006
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ]
+    },
+    {
+      "bank": "compromised_shift",
+      "n_eval": 16,
+      "bank_seed": 17,
+      "trust_ewma_enabled": true,
+      "manifest_v3_disabled": false,
+      "trust_trajectory_window": 16,
+      "trust_threshold": 0.5,
+      "ewma_alpha": 0.2,
+      "quorum_min": 2,
+      "n_correct_w21": 10,
+      "n_correct_w33": 10,
+      "n_ratified_w21": 16,
+      "n_ratified_w33": 10,
+      "correctness_ratified_rate_w21": 0.625,
+      "correctness_ratified_rate_w33": 0.625,
+      "trust_precision_w21": 0.625,
+      "trust_precision_w33": 1.0,
+      "delta_correctness_w33_w21": 0.0,
+      "delta_trust_precision_w33_w21": 0.375,
+      "mean_total_w21_visible_tokens": 11.0,
+      "mean_total_w33_visible_tokens": 12.0,
+      "mean_overhead_w33_per_cell": 1.0,
+      "max_overhead_w33_per_cell": 1,
+      "n_oracles_detrusted": 7,
+      "n_trust_ewma_updates": 48,
+      "n_w33_registered": 16,
+      "n_w33_rejected": 0,
+      "byte_equivalent_w33_w21": false,
+      "final_oracle_trust_state": [
+        [
+          "change_history",
+          0.2621440000000001
+        ],
+        [
+          "oncall_notes",
+          0.10737418240000006
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ]
+    },
+    {
+      "bank": "compromised_shift",
+      "n_eval": 16,
+      "bank_seed": 23,
+      "trust_ewma_enabled": true,
+      "manifest_v3_disabled": false,
+      "trust_trajectory_window": 16,
+      "trust_threshold": 0.5,
+      "ewma_alpha": 0.2,
+      "quorum_min": 2,
+      "n_correct_w21": 10,
+      "n_correct_w33": 10,
+      "n_ratified_w21": 16,
+      "n_ratified_w33": 10,
+      "correctness_ratified_rate_w21": 0.625,
+      "correctness_ratified_rate_w33": 0.625,
+      "trust_precision_w21": 0.625,
+      "trust_precision_w33": 1.0,
+      "delta_correctness_w33_w21": 0.0,
+      "delta_trust_precision_w33_w21": 0.375,
+      "mean_total_w21_visible_tokens": 11.0,
+      "mean_total_w33_visible_tokens": 12.0,
+      "mean_overhead_w33_per_cell": 1.0,
+      "max_overhead_w33_per_cell": 1,
+      "n_oracles_detrusted": 7,
+      "n_trust_ewma_updates": 48,
+      "n_w33_registered": 16,
+      "n_w33_rejected": 0,
+      "byte_equivalent_w33_w21": false,
+      "final_oracle_trust_state": [
+        [
+          "change_history",
+          0.2621440000000001
+        ],
+        [
+          "oncall_notes",
+          0.10737418240000006
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ]
+    },
+    {
+      "bank": "compromised_shift",
+      "n_eval": 16,
+      "bank_seed": 29,
+      "trust_ewma_enabled": true,
+      "manifest_v3_disabled": false,
+      "trust_trajectory_window": 16,
+      "trust_threshold": 0.5,
+      "ewma_alpha": 0.2,
+      "quorum_min": 2,
+      "n_correct_w21": 10,
+      "n_correct_w33": 10,
+      "n_ratified_w21": 16,
+      "n_ratified_w33": 10,
+      "correctness_ratified_rate_w21": 0.625,
+      "correctness_ratified_rate_w33": 0.625,
+      "trust_precision_w21": 0.625,
+      "trust_precision_w33": 1.0,
+      "delta_correctness_w33_w21": 0.0,
+      "delta_trust_precision_w33_w21": 0.375,
+      "mean_total_w21_visible_tokens": 11.0,
+      "mean_total_w33_visible_tokens": 12.0,
+      "mean_overhead_w33_per_cell": 1.0,
+      "max_overhead_w33_per_cell": 1,
+      "n_oracles_detrusted": 7,
+      "n_trust_ewma_updates": 48,
+      "n_w33_registered": 16,
+      "n_w33_rejected": 0,
+      "byte_equivalent_w33_w21": false,
+      "final_oracle_trust_state": [
+        [
+          "change_history",
+          0.2621440000000001
+        ],
+        [
+          "oncall_notes",
+          0.10737418240000006
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ]
+    },
+    {
+      "bank": "compromised_shift",
+      "n_eval": 16,
+      "bank_seed": 31,
+      "trust_ewma_enabled": true,
+      "manifest_v3_disabled": false,
+      "trust_trajectory_window": 16,
+      "trust_threshold": 0.5,
+      "ewma_alpha": 0.2,
+      "quorum_min": 2,
+      "n_correct_w21": 10,
+      "n_correct_w33": 10,
+      "n_ratified_w21": 16,
+      "n_ratified_w33": 10,
+      "correctness_ratified_rate_w21": 0.625,
+      "correctness_ratified_rate_w33": 0.625,
+      "trust_precision_w21": 0.625,
+      "trust_precision_w33": 1.0,
+      "delta_correctness_w33_w21": 0.0,
+      "delta_trust_precision_w33_w21": 0.375,
+      "mean_total_w21_visible_tokens": 11.0,
+      "mean_total_w33_visible_tokens": 12.0,
+      "mean_overhead_w33_per_cell": 1.0,
+      "max_overhead_w33_per_cell": 1,
+      "n_oracles_detrusted": 7,
+      "n_trust_ewma_updates": 48,
+      "n_w33_registered": 16,
+      "n_w33_rejected": 0,
+      "byte_equivalent_w33_w21": false,
+      "final_oracle_trust_state": [
+        [
+          "change_history",
+          0.2621440000000001
+        ],
+        [
+          "oncall_notes",
+          0.10737418240000006
+        ],
+        [
+          "service_graph",
+          1.0
+        ]
+      ]
+    }
+  ]
+}

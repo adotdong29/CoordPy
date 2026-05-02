@@ -5,6 +5,170 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.7 / 3.34] — 2026-05-01 — SDK v3.34 — trust-EWMA-tracked multi-oracle adjudication + per-oracle agreement signal + anchor-oracle reference + content-addressed oracle-trust-state + trust-trajectory CID + W33 manifest-v3 CID + single-partition long-window strict-gain regime + R-80 Phase-80 benchmark family + W33 family + W21-C-CALIBRATED-TRUST + W32-C-OLD-LINE-EWMA-TRUST + W32-C-LONG-WINDOW-STRICT-GAIN jointly discharged at a single milestone
+
+*Strictly additive on SDK v3.33.  The Wevra single-run product
+runtime contract is byte-for-byte unchanged.  The W33 surface wraps
+the **OLD W21 ``TrustWeightedMultiOracleDisambiguator``** (the
+explicit multi-oracle adjudication line, dormant since W21) with
+six NEW audited proxies at the capsule layer: a **closed-form
+per-oracle EWMA trust accumulator** (``ewma_new = (1 - α) *
+ewma_prev + α * obs`` with α=W32_DEFAULT_EWMA_ALPHA=0.20), a
+**per-oracle agreement signal** that compares each oracle's probe
+top_set to a registered **anchor-oracle reference** (a
+trust-by-construction reference immune to quorum-flip), a
+**closed-form trust-threshold gate** (default 0.50; oracles with
+EWMA below threshold are excluded from the effective tally), a
+**content-addressed oracle-trust-state CID** + **content-addressed
+trust-trajectory CID** + **content-addressed anchor-oracle-set
+CID**, and a **manifest-v3 CID** over six component CIDs that
+detects cross-component swaps that per-component CIDs alone miss.
+The new "trust-EWMA-tracked / per-oracle agreement signal /
+anchor-oracle reference / oracle-trust-state CID / trust-trajectory
+CID / manifest-v3 CID / single-partition strict-gain bench"
+vocabulary is added at the **capsule layer as audited proxy** —
+explicitly NOT a learned trust model in the deep-learning sense,
+NOT transformer-internal subspace projection, NOT a runtime
+hidden-state transplant; the per-oracle agreement signal is a
+deterministic top-set comparison against a registered closed-vocab
+anchor, NOT a runtime oracle.*
+
+**New surface (W33 family, multi-agent-coordination research slice).**
+
+``derive_per_oracle_agreement_signal``,
+``TrustTrajectoryEntry``, ``TrustEWMARatificationEnvelope``,
+``TrustEWMARegistry`` (with ``anchor_oracle_ids: frozenset[str]``),
+``W33TrustEWMAResult``,
+``TrustEWMATrackedMultiOracleOrchestrator``,
+``verify_trust_ewma_ratification`` (14 enumerated failure modes —
+disjoint from W22 + W29 + W30 + W31 + W32's 14-mode sets;
+cumulative 70-mode trust boundary across W22 + W29 + W30 + W31 +
+W32 + W33), ``build_trivial_trust_ewma_registry``,
+``build_trust_ewma_registry``, W33 branch constants
+(``W33_BRANCH_TRUST_EWMA_RESOLVED``,
+``W33_BRANCH_TRIVIAL_TRUST_EWMA_PASSTHROUGH``,
+``W33_BRANCH_TRUST_EWMA_REJECTED``,
+``W33_BRANCH_TRUST_EWMA_DISABLED``,
+``W33_BRANCH_TRUST_EWMA_NO_TRIGGER``,
+``W33_BRANCH_TRUST_EWMA_DETRUSTED_ABSTAIN``,
+``W33_BRANCH_TRUST_EWMA_DETRUSTED_REROUTE``),
+``W33_TRUST_EWMA_SCHEMA_VERSION``,
+``W33_DEFAULT_TRUST_THRESHOLD = 0.50``,
+``W33_DEFAULT_TRUST_TRAJECTORY_WINDOW = 16``,
+``W33_DEFAULT_EWMA_ALPHA = 0.20``.
+
+**New benchmark family (R-80 + R-79 single-partition).**
+
+``vision_mvp.experiments.phase80_trust_ewma_tracked`` ships six
+sub-banks: R-80-TRIVIAL-W33 (H2 byte-for-W21 anchor),
+R-80-COMPROMISED-SHIFT (H6 strict-gain on a three-phase oracle-
+compromise regime: K1=3N/8 calibration / K2=5N/8 single compromise
+/ K3=N double compromise; W33 detrusts ch + oc and falls back to
+the anchor sg ⇒ +0.375 trust precision strict gain), R-80-NO-
+TRUST-SHIFT (W33-Λ-no-trust-shift falsifier), R-80-FROZEN-TRUST-
+THRESHOLD (W33-Λ-frozen-threshold falsifier), R-80-MIS-TRUST-SHIFT
+(W33-Λ-mis-trust-shift falsifier — honest empirical correction:
+the anchor-oracle design is more robust than predicted),
+R-80-MANIFEST-V3-TAMPER (H8 cross-component swap detection at
+400/400 = 1.000 reject rate).
+``vision_mvp.experiments.phase79_long_window_convergent`` adds the
+new R-79-SINGLE-PARTITION sub-bank (a prefix-then-shift regime
+over a single-partition signature space that exceeds the
+W32-L-CYCLE-CAP cycle-capped Δ_max ≤ 0.0625 bound by
+construction).  Standalone live cross-architecture trust-
+calibration probe at
+``vision_mvp/experiments/scripts/phase80_xllm_trust_pilot.py``.
+
+**Headline measurements (5/5 seeds — byte-for-byte stable).**
+
+* R-80-COMPROMISED-SHIFT: ``W33 trust precision = 1.000 vs W21 =
+  0.625 ⇒ Δ = +0.375`` across 5/5 seeds × 16 cells/seed,
+  correctness tied at 0.625, max overhead 1 token/cell.
+  **Jointly discharges W21-C-CALIBRATED-TRUST AND W32-C-OLD-LINE-
+  EWMA-TRUST** in a single milestone.
+* R-79-SINGLE-PARTITION: ``Δ(W32 - W31) = +0.100`` across 5/5
+  seeds × 80 cells.  **Discharges W32-C-LONG-WINDOW-STRICT-GAIN**
+  on a regime that exceeds the W32-L-CYCLE-CAP cycle-capped bound.
+* R-80-MANIFEST-V3-TAMPER: ``400/400 = 1.000 cross-component
+  tamper rejection`` across 5/5 seeds × 16 ratified cell-positions
+  × 5 named tampers per cell.
+* R-80-TRIVIAL-W33: ``W33 = W21 byte-for-byte across 5/5 seeds``
+  on the trivial-passthrough config.
+
+**Live cross-architecture LLM trust-calibration probe (S1 best-
+effort, honestly null on infrastructure).**
+
+mixtral:8x7b on localhost + qwen3.5:35b on 192.168.12.191 across
+20 trust-calibration prompts at temperature 0.  qwen3.5:35b
+returned empty/timeout on every prompt (model not actually loaded
+on the remote host); mixtral:8x7b ignored the "EXACTLY one word"
+constraint and emitted full chain-of-thought past the
+``num_predict=60`` budget.  Two named infrastructure-fix items
+recorded (W33-INFRA-1: pre-flight ``/api/tags`` model verification;
+W33-INFRA-2: stricter token-budget / chat-template for one-word
+probes).  The W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE conjecture
+**remains open**; the W33 mechanism's discharge claims do not
+depend on this live probe.
+
+**Falsifiers (all empirically observed at temp 0 on synthetic).**
+
+* W33-Λ-trivial-trust-ewma ⇒ byte-for-W21 passthrough on
+  R-80-TRIVIAL-W33;
+* W33-Λ-no-trust-shift ⇒ all EWMA stay at 1.0 on
+  R-80-NO-TRUST-SHIFT (no compromise event);
+* W33-Λ-frozen-threshold ⇒ gate never fires when the threshold is
+  pinned at 1.0 on R-80-FROZEN-TRUST-THRESHOLD;
+* W33-Λ-mis-trust-shift ⇒ honest empirical correction: the
+  anchor-oracle design is more robust than the falsifier
+  predicted (anchor-relative agreement signal is immune to
+  quorum-flip).
+
+**Theory.**
+
+* **W33-1** through **W33-5** named theorems (envelope determinism,
+  manifest-v3 cross-component soundness, joint discharge of
+  W21-C-CALIBRATED-TRUST + W32-C-OLD-LINE-EWMA-TRUST,
+  W32-C-LONG-WINDOW-STRICT-GAIN single-partition discharge, and
+  the cumulative 70-mode trust boundary across
+  W22 + W29 + W30 + W31 + W32 + W33).
+* **Three named open conjectures discharged**:
+  W21-C-CALIBRATED-TRUST, W32-C-OLD-LINE-EWMA-TRUST,
+  W32-C-LONG-WINDOW-STRICT-GAIN.
+* **Open conjectures carried forward**:
+  W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE (live infrastructure-
+  bounded), W33-C-NATIVE-LATENT (architecture-dependent —
+  transformer-internal trust subspace projection vs the W33
+  audited proxy; out of capsule-layer scope), W33-C-MULTI-HOST
+  (3+ host topology, hardware-bounded), W33-C-LATENT-CROSS-AGENT-
+  TRUST (latent-state trust-EWMA tracking — not capsule-layer).
+
+**Files changed.**
+
+* New: `vision_mvp/wevra/team_coord.py` (W33 surface ~600 lines
+  appended).
+* Modified: `vision_mvp/wevra/__init__.py` (W33 imports;
+  ``SDK_VERSION = "wevra.sdk.v3.34"``;
+  ``__experimental__`` = 98 entries; ``__all__`` = 440 entries).
+* New: `vision_mvp/experiments/phase80_trust_ewma_tracked.py`.
+* New: `vision_mvp/experiments/scripts/phase80_xllm_trust_pilot.py`.
+* New: `vision_mvp/tests/test_phase80_trust_ewma_tracked.py`
+  (31 tests).
+* Modified: `vision_mvp/experiments/phase79_long_window_convergent.py`
+  (new ``single_partition`` sub-bank).
+* Modified: `vision_mvp/tests/test_phase79_long_window_convergent.py`
+  (new ``test_h7b_single_partition_strict_gain``).
+* New: `docs/SUCCESS_CRITERION_W33_TRUST_EWMA_TRACKED.md`.
+* New: `docs/RESULTS_WEVRA_W33_TRUST_EWMA_TRACKED.md`.
+* Modified: `docs/THEOREM_REGISTRY.md`,
+  `docs/RESEARCH_STATUS.md`, `README.md`, `CHANGELOG.md`,
+  `pyproject.toml` (0.5.7).
+
+**Tests.**
+
+31/31 W33 unit tests + 46/46 phase79 (45 prior + 1 new
+single_partition) + 446/446 phase69-80 regression + 133/133 wider
+wevra suite pass.
+
 ## [0.5.6 / 3.33] — 2026-05-01 — SDK v3.33 — long-window convergent online geometry-aware dense control + EWMA prior accumulator + Page CUSUM change-point detector + gold-correlated disagreement-routing + W32 manifest-v2 CID + first measured live cross-architecture LLM gold-verifiable agreement at temperature 0 + W31-C-LONG-WINDOW-CONVERGENCE discharged on the scaling-stability axis + W32-L-CYCLE-CAP limitation theorem + W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE sharpened on the prompt-class-dependent agreement frontier
 
 *Strictly additive on SDK v3.32. The Wevra single-run product

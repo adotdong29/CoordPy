@@ -2,8 +2,8 @@
 
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: SDK v3.33 (W32 family) 2026-05-01. Earlier: SDK
-> v3.32 (W31 family) 2026-05-01.
+> README-of-README must satisfy these rules. Last touched: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
+> v3.33 (W32 family) 2026-05-01.
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or
@@ -2123,3 +2123,111 @@ The honest summary one may emit:
   requires a regime that exceeds the W32-L-CYCLE-CAP limitation
   theorem), and the EWMA-tracked-trust integration axis of
   **W32-C-OLD-LINE-EWMA-TRUST**."
+
+### W33 forbidden moves
+
+W33 introduces another wave of vocabulary that *sounds* like a
+learned trust model: "trust-EWMA-tracked", "per-oracle agreement
+signal", "oracle-trust-state CID", "trust-trajectory CID", "anchor-
+oracle reference", "manifest-v3 CID".  Each of these is a **capsule-
+layer audited proxy** for the multi-oracle adjudication line that
+W21 opened in 2025.  None of them claim a learned trust model in
+the deep-learning sense (zero parameters, zero gradients, zero
+training step), transformer-internal hidden-state manipulation, or
+a runtime ground-truth oracle; the per-oracle agreement signal is a
+**deterministic top-set comparison** against a registered closed-
+vocabulary anchor.
+
+What you may say (W33 honest scope):
+
+* "On R-80-COMPROMISED-SHIFT (a three-phase oracle-compromise
+  regime: K1 = 3N/8 calibration / K2 = 5N/8 single compromise /
+  K3 = N double compromise), W33 EWMA-tracks each oracle's per-cell
+  agreement against a registered anchor-oracle reference; oracles
+  whose EWMA falls below the trust threshold are excluded from the
+  effective tally; the resulting trust precision is **1.000 across
+  5/5 seeds × 16 cells/seed vs W21 = 0.625 ⇒ Δ = +0.375**, with
+  zero correctness regression and max overhead 1 token/cell.  This
+  jointly discharges **W21-C-CALIBRATED-TRUST** AND **W32-C-OLD-
+  LINE-EWMA-TRUST** in a single milestone."
+* "On R-79-SINGLE-PARTITION (a prefix-then-shift regime over a
+  single-partition signature space whose effective signature
+  diversity exceeds the W32-L-CYCLE-CAP cycle-capped Δ_max ≤ 0.0625
+  bound by construction), Δ(W32 - W31) = +0.100 across 5/5 seeds ×
+  80 cells.  This is the **W32-C-LONG-WINDOW-STRICT-GAIN empirical
+  discharge** on a regime that the cycle-cap does not bound."
+* "On R-80-MANIFEST-V3-TAMPER, the W33 manifest-v3 CID + cross-
+  component CID checks together detect five named tampers per
+  ratified cell; rejection rate = 1.000 across 400 named tampers
+  (5/5 seeds × 16 cells × 5 tampers).  The manifest-v3 CID closes
+  cross-component swap avenues that the W21/W32 manifests alone
+  cannot detect (the W33 manifest binds w21_oracle_cid +
+  oracle_trust_state_cid + trust_trajectory_cid +
+  anchor_oracle_set_cid + route_audit_cid_v3 + w32_long_window_cid
+  together)."
+
+What you must NOT say (W33 honest scope):
+
+* "W33 implements a learned trust model."  It does not.  The
+  per-oracle EWMA accumulator is closed-form arithmetic with zero
+  parameters; the agreement signal is a deterministic top-set
+  comparison.
+* "W33 implements transformer-internal trust subspace projection."
+  It does not.  The W33 trust state lives at the capsule layer; an
+  honest **proxy** for the LatentMAS cross-agent-trust direction,
+  not a runtime hidden-state transplant.  The architecture-
+  dependent native-trust question carries forward as
+  **W33-C-NATIVE-LATENT**.
+* "W33 observes runtime ground truth."  It does not.  The anchor-
+  oracle reference is a *registered subset of the same oracle
+  registrations the controller already trusts*; the W33 layer
+  derives the agreement signal from the controller's own probes,
+  never from out-of-band ground truth.  If the anchor itself
+  becomes compromised, the **W33-Λ-mis-trust-shift** falsifier
+  documents the failure mode.
+* "W33 closes the live cross-host trust-magnitude axis."  It does
+  not.  The S1 live probe (mixtral:8x7b vs qwen3.5:35b) is honestly
+  null on infrastructure (qwen3.5:35b not actually loaded on the
+  remote host; mixtral past-token-budget at temp 0).  Two named
+  infrastructure-fix items (W33-INFRA-1, W33-INFRA-2) are recorded;
+  **W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE** remains an open
+  conjecture.
+* "W33 brings up Mac 2."  It does not.  192.168.12.248 remains
+  ARP-incomplete (**28th consecutive milestone**, ping 100% packet
+  loss).
+* "W33 strictly improves trust precision on every multi-oracle
+  regime."  It does not.  On regimes where no oracle is
+  compromised (R-80-NO-TRUST-SHIFT) or where the trust threshold
+  is pinned at 1.0 (R-80-FROZEN-TRUST-THRESHOLD), the gate never
+  fires and Δ = 0; the falsifiers W33-Λ-no-trust-shift and
+  W33-Λ-frozen-threshold document this.
+* "W33 solves multi-oracle adjudication."  Three rivets tightened
+  in one milestone (W21-C-CALIBRATED-TRUST + W32-C-OLD-LINE-EWMA-
+  TRUST joint discharge, W32-C-LONG-WINDOW-STRICT-GAIN discharge
+  on a single-partition regime, manifest-v3 cross-component tamper
+  detection at 1.000 reject rate) is a strong step, but real
+  multi-oracle reality has more axes than any 5-seed × 16-cell
+  synthetic sweep can test.
+
+The honest summary one may emit:
+
+* "On R-80-COMPROMISED-SHIFT, R-80-MANIFEST-V3-TAMPER, R-80-TRIVIAL-
+  W33, and R-79-SINGLE-PARTITION (four pre-committed regimes), the
+  W33 trust-EWMA-tracked multi-oracle adjudication mechanism
+  simultaneously discharges **W21-C-CALIBRATED-TRUST** AND
+  **W32-C-OLD-LINE-EWMA-TRUST** AND **W32-C-LONG-WINDOW-STRICT-
+  GAIN** (a joint three-conjecture discharge in a single milestone)
+  AND closes the cross-component swap avenue beyond the W21 / W32
+  manifests (manifest-v3 CID + cross-component CID check, 400/400
+  = 1.000 rejection rate).  We have not solved multi-oracle
+  adjudication; we have empirically discharged three named open
+  conjectures across two research lines (the OLD W21 multi-oracle
+  line AND the NEW W32 long-window-convergent line).  The next
+  true wall — the regime where the audited capsule-layer trust
+  proxy is insufficient and real transformer-internal trust
+  subspace projection is required — remains the named open
+  frontier **W33-C-NATIVE-LATENT**, plus the live cross-host
+  trust-magnitude axis of **W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE**
+  (currently infrastructure-bounded), the multi-host topology axis
+  of **W33-C-MULTI-HOST**, and the latent cross-agent-trust axis
+  of **W33-C-LATENT-CROSS-AGENT-TRUST**."

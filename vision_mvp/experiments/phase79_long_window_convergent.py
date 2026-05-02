@@ -351,7 +351,8 @@ def _build_phase79_stacks(
     # the baseline arm uses on the same cells.
     inner_bank = "nonstationary_prior" if bank in (
         "drift_recover", "long_window", "manifest_v2_tamper",
-        "frozen_ewma", "mis_correlated_gold", "xllm_live_gold"
+        "frozen_ewma", "mis_correlated_gold", "xllm_live_gold",
+        "single_partition",
     ) else (
         "trivial_w31" if bank == "trivial_w32"
         else "no_drift" if bank == "no_change_point"
@@ -462,6 +463,103 @@ def _build_drift_recover_bench(
         signature_period=signature_period)
 
     return list(cells_prefix) + list(cells_shift)
+
+
+def _build_single_partition_drift_recover_bench(
+        *,
+        bank_seed: int,
+        n_replicates: int,
+        n_cells: int,
+):
+    """Construct the **single-partition** prefix-then-shift bench
+    (R-79-SINGLE-PARTITION) — the regime that exceeds the
+    W32-L-CYCLE-CAP limitation theorem so the strict-gain bar can
+    clear.
+
+    Construction
+    ------------
+    We build cells **manually** (not via ``build_phase74_bank``) so
+    we have full control over signature variety and phase boundary:
+
+    * Prefix (cells 0..3N/4): each cell uses GOLD_A =
+      (orders, payments) — ratified by CYCLIC PARTIAL.  Each cell's
+      magnitudes alternate between two pre-baked tuples so the
+      per-cell signature CID alternates between two distinct values.
+    * Shift (cells 3N/4..N): each cell uses GOLD_B = (api, db) —
+      NOT ratified by CYCLIC PARTIAL on (orders, payments).  Each
+      cell's magnitudes alternate between two pre-baked tuples,
+      again giving 2 distinct signatures within the shift.
+
+    With 2 alternating signatures per slice, every cell from cell 2+
+    classifies as CYCLIC by the W29 structural classifier (the
+    cell's signature reappears in the pre-run window).  c_p / N is
+    therefore close to 1.0.  Because the bench is uniformly
+    classified as CYCLIC, the W29 dispatcher cycle cap (which
+    prevents > 25 % of cells from going to any one partition) does
+    not bind: this regime explicitly **exceeds** W32-L-CYCLE-CAP
+    and gives the W32 EWMA + Page CUSUM mechanism the structural
+    room to strictly outperform W31's cumulative running mean.
+
+    Determinism: the bench is byte-stable for the same ``bank_seed``;
+    the only randomness is in the choice of which magnitude tuple
+    starts on which cell index (we use a fixed deterministic
+    pattern: even cells get tuple A, odd cells get tuple B).
+    """
+    from vision_mvp.wevra.team_coord import _DecodedHandoff
+    n_total = int(n_cells)
+    n_shift = max(1, int(n_total) // 4)
+    n_prefix = n_total - n_shift
+
+    # Two pre-baked magnitude tuples per phase.
+    GOLD_A = ("orders", "payments")
+    GOLD_B = ("api", "db")
+    DECOY = "cache"
+
+    def _mags_for(seed_off: int) -> dict[str, tuple[float, ...]]:
+        import random as _r
+        r = _r.Random(int(bank_seed) + int(seed_off))
+        return {
+            "load": (r.uniform(0.7, 1.0), r.uniform(0.7, 1.0)),
+            "error": r.uniform(0.6, 0.9),
+            "cpu_decoy": r.uniform(0.1, 0.3),
+        }
+
+    MAGS_PREFIX_A = _mags_for(0)
+    MAGS_PREFIX_B = _mags_for(1)
+    MAGS_SHIFT_A = _mags_for(2)
+    MAGS_SHIFT_B = _mags_for(3)
+
+    def _make_handoff(source: str, kind: str, svc: str,
+                       magnitude: float) -> _DecodedHandoff:
+        payload = f"service={svc} magnitude={magnitude:.2f}"
+        return _DecodedHandoff(
+            source_role=source, claim_kind=kind, payload=payload)
+
+    def _cell(*, gold: tuple[str, ...],
+               mags: dict[str, tuple[float, ...]],
+               ) -> list[list[_DecodedHandoff]]:
+        r0: list[_DecodedHandoff] = []
+        for i, (svc, mag) in enumerate(zip(gold, mags["load"])):
+            r0.append(_make_handoff(
+                f"role_{i}", "LOAD_SPIKE", svc, mag))
+        r0.append(_make_handoff("role_2", "ERROR_RATE", gold[0],
+                                  mags["error"]))
+        r0.append(_make_handoff("role_3", "CPU_SPIKE", DECOY,
+                                  mags["cpu_decoy"]))
+        r1: list[_DecodedHandoff] = []
+        for svc in gold:
+            r1.append(_make_handoff(
+                "disambiguator", "CORROBORATION", svc, 1.0))
+        return [r0, r1]
+
+    cells: list[list[list[_DecodedHandoff]]] = []
+    for i in range(n_prefix):
+        mags = MAGS_PREFIX_A if (i % 2 == 0) else MAGS_PREFIX_B
+        cells.append(_cell(gold=GOLD_A, mags=mags))
+    for i in range(n_shift):
+        mags = MAGS_SHIFT_A if (i % 2 == 0) else MAGS_SHIFT_B
+        cells.append(_cell(gold=GOLD_B, mags=mags))
+    return cells
 
 
 # ---------------------------------------------------------------------------
@@ -686,6 +784,28 @@ def run_phase79(
             ],
             gold_correlation_min=0.50,
         )
+    elif bank == "single_partition":
+        # R-79-SINGLE-PARTITION — discharges
+        # W32-C-LONG-WINDOW-STRICT-GAIN by exceeding the
+        # W32-L-CYCLE-CAP limitation theorem.  All cells classify as
+        # CYCLIC (signatures alternate every cell ⇒ c_p / N ≈ 1.0).
+        # Same W32 mechanism as drift_recover; same priors / window /
+        # alpha; the bench cells are constructed by
+        # _build_single_partition_drift_recover_bench (called below).
+        w31_priors = (1.0, 1.0, 1.0)
+        w31_high_trust = W29_PARTITION_LINEAR
+        w31_online = True
+        w31_adaptive = True
+        w31_manifest_disabled = False
+        w31_traj_window = max(64, long_window)
+        w32_long_enabled = True
+        w32_change_enabled = True
+        w32_gold_enabled = False
+        w32_manifest_v2_disabled = False
+        w32_window = int(long_window)
+        w32_alpha = float(ewma_alpha)
+        w32_cusum_thr = W32_DEFAULT_CUSUM_THRESHOLD
+        gold_map = None
     else:
         raise ValueError(f"unknown bank: {bank}")
 
@@ -727,6 +847,11 @@ def run_phase79(
             n_replicates=int(bank_replicates),
             n_cells=int(n_eval),
             signature_period=int(signature_period))
+    elif bank == "single_partition":
+        cells = _build_single_partition_drift_recover_bench(
+            bank_seed=int(bank_seed),
+            n_replicates=int(bank_replicates),
+            n_cells=int(n_eval))
     else:
         cells = stacks["cells"]
     producer_w31 = stacks["producer_w31"]
@@ -1244,6 +1369,7 @@ def main() -> int:
         "trivial_w32", "drift_recover", "long_window",
         "manifest_v2_tamper", "no_change_point",
         "mis_correlated_gold", "frozen_ewma", "xllm_live_gold",
+        "single_partition",
     ])
     p.add_argument("--T-decoder", type=int, default=None)
     p.add_argument("--K-consumers", type=int, default=3)

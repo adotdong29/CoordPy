@@ -21465,3 +21465,1270 @@ def build_long_window_convergent_registry(
         gold_correlation_map=gold_correlation_map,
         local_host_id=local_host_id,
     )
+
+
+# =============================================================================
+# SDK v3.34 — Trust-EWMA-tracked multi-oracle adjudication (W33 family).
+#
+# W33 is the first capsule-native multi-agent-coordination method that
+# **integrates the W32 EWMA primitive with the W21 multi-oracle
+# adjudicator** to give per-oracle online trust calibration.  The
+# original old-line W21 trust priors were **fixed at registration
+# time** (every oracle gets a static ``trust_prior`` in [0, 1]); under
+# a regime where an oracle becomes compromised mid-session, the W21
+# layer cannot adapt.  W33 closes that loop:
+#
+#   * On every cell where the inner W21 ratifies a quorum, derive a
+#     deterministic per-oracle agreement signal:
+#       - 1.0 if the oracle's ``top_set`` is a non-empty proper subset
+#         of the W21-resolved ``top_set`` (the oracle voted *with* the
+#         consortium winner).
+#       - 0.0 if the oracle's ``top_set`` is non-empty AND disjoint
+#         from the W21-resolved ``top_set`` (the oracle voted *against*
+#         the consortium winner).
+#       - 1.0 if the oracle abstained (no information against it).
+#   * Apply the W32 ``update_ewma_prior`` primitive to the per-oracle
+#     EWMA-tracked trust:
+#       ewma_trust_new = (1 - alpha) * ewma_trust_prev + alpha * agree
+#     with ``alpha = W32_DEFAULT_EWMA_ALPHA`` by default.
+#   * Re-aggregate the W21 vote tally with EWMA-thresholded weights:
+#     an oracle whose EWMA falls below ``trust_threshold`` (default
+#     0.5) has its vote *excluded* from the effective vote count.
+#   * Project the W33 answer using the effective tally.
+#   * Seal the per-oracle EWMA-trust state + the per-cell trust
+#     trajectory + a W33 manifest-v3 CID over the inner W21 / W32
+#     parent CIDs and the new W33 components.
+#
+# What W33 does NOT do (do-not-overstate):
+#
+#   * does NOT touch transformer KV caches, embedding tables, attention
+#     weights, or any model-internal state.  The "trust state" lives at
+#     the capsule layer; it is an honest *audited proxy* for online
+#     trust calibration, not a runtime KV transplant.
+#   * does NOT learn a trust model in the deep-learning sense.  The
+#     EWMA update is closed-form arithmetic; zero parameters, zero
+#     gradients, zero training step.  W33's "online learning" is the
+#     same closed-form Bayesian-style running mean the W31 / W32
+#     layers use, applied to oracle-level rather than partition-level
+#     observations.
+#   * does NOT prove temporal ordering at the model layer.  The
+#     trust-trajectory is a *sealed tuple* of (cell_idx, oracle_id,
+#     observed_quorum_agreement, ewma_trust_after) bytes; it proves
+#     byte-stable replay but not that the underlying decisions
+#     actually executed in that order at the model layer.
+#
+# The W33 surface is purely additive on top of the W21 surface:
+# decode_rounds returns the same answer dict W21 returns plus a single
+# new ``"trust_ewma_tracked"`` audit block; existing decoders and the
+# W22..W32 stacks are unchanged.
+# =============================================================================
+
+
+W33_TRUST_EWMA_SCHEMA_VERSION: str = (
+    "wevra.trust_ewma_ratification.v1")
+
+
+W33_BRANCH_TRUST_EWMA_RESOLVED = "trust_ewma_resolved"
+W33_BRANCH_TRIVIAL_TRUST_EWMA_PASSTHROUGH = (
+    "trivial_trust_ewma_passthrough")
+W33_BRANCH_TRUST_EWMA_REJECTED = "trust_ewma_rejected"
+W33_BRANCH_TRUST_EWMA_DISABLED = "trust_ewma_disabled"
+W33_BRANCH_TRUST_EWMA_NO_TRIGGER = "trust_ewma_no_trigger"
+W33_BRANCH_TRUST_EWMA_DETRUSTED_ABSTAIN = (
+    "trust_ewma_detrusted_abstain")
+W33_BRANCH_TRUST_EWMA_DETRUSTED_REROUTE = (
+    "trust_ewma_detrusted_reroute")
+
+W33_ALL_BRANCHES: tuple[str, ...] = (
+    W33_BRANCH_TRUST_EWMA_RESOLVED,
+    W33_BRANCH_TRIVIAL_TRUST_EWMA_PASSTHROUGH,
+    W33_BRANCH_TRUST_EWMA_REJECTED,
+    W33_BRANCH_TRUST_EWMA_DISABLED,
+    W33_BRANCH_TRUST_EWMA_NO_TRIGGER,
+    W33_BRANCH_TRUST_EWMA_DETRUSTED_ABSTAIN,
+    W33_BRANCH_TRUST_EWMA_DETRUSTED_REROUTE,
+)
+
+
+W33_DEFAULT_TRUST_THRESHOLD: float = 0.50
+W33_DEFAULT_TRUST_TRAJECTORY_WINDOW: int = 16
+W33_DEFAULT_EWMA_ALPHA: float = W32_DEFAULT_EWMA_ALPHA
+
+
+# ---------------------------------------------------------------------------
+# W33 helper: derive per-oracle agreement signal from a W21 result.
+# ---------------------------------------------------------------------------
+
+
+def derive_per_oracle_agreement_signal(
+        *,
+        probe_top_set: tuple[str, ...],
+        probe_abstained: bool,
+        resolved_top_set: tuple[str, ...],
+) -> float:
+    """Closed-form deterministic per-oracle agreement signal.
+
+    Returns:
+
+      * 1.0 if the probe abstained — no information against the oracle.
+      * 1.0 if the probe's top_set is a non-empty subset of the
+        resolved top_set — the oracle voted with the reference.
+      * 0.0 if the probe's top_set is non-empty AND disjoint from the
+        resolved top_set — the oracle voted against the reference.
+      * 0.5 if the probe's top_set partially overlaps the resolved
+        top_set (some agreement, some disagreement).
+
+    Pure function; no side effects.  Closed-vocabulary; output bounded
+    to [0, 1] by construction.  Used by the W33 EWMA update.
+
+    The ``resolved_top_set`` is the *reference* against which the
+    probe's vote is compared.  The W33 orchestrator chooses the
+    reference: if the registry has ``anchor_oracle_ids`` configured,
+    the reference is the union of anchor probes' top_sets (a stable
+    "trust-by-construction" anchor); otherwise the reference is the
+    W21 quorum-resolved top_set (which can flip under double-
+    compromise — see W33-Λ-mis-trust-shift).
+    """
+    if bool(probe_abstained):
+        return 1.0
+    probe_set = frozenset(probe_top_set or ())
+    res_set = frozenset(resolved_top_set or ())
+    if not probe_set:
+        return 1.0
+    if not res_set:
+        # No reference (e.g. NO_QUORUM, anchor abstained) — treat as
+        # "no info" so the EWMA holds at its prior.
+        return 1.0
+    if probe_set.issubset(res_set):
+        return 1.0
+    if probe_set.isdisjoint(res_set):
+        return 0.0
+    # Partial overlap — split the difference.
+    return 0.5
+
+
+# ---------------------------------------------------------------------------
+# W33 oracle-trust-state CID + trust trajectory CID
+# ---------------------------------------------------------------------------
+
+
+def _compute_oracle_trust_state_cid(
+        *,
+        oracle_to_trust: Sequence[tuple[str, float]],
+) -> str:
+    """Canonical SHA-256 over the per-oracle EWMA-trust state."""
+    payload = _canonical_json_bytes({
+        "oracle_to_trust": [
+            [str(oid), round(float(t), 4)]
+            for oid, t in sorted(oracle_to_trust, key=lambda x: str(x[0]))
+        ],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class TrustTrajectoryEntry:
+    """One entry in the W33 trust-trajectory.
+
+    Carries the per-cell-per-oracle tuple
+    ``(cell_idx, oracle_id, observed_quorum_agreement, ewma_trust_after)``
+    that records a single EWMA trust update.
+    """
+    cell_idx: int
+    oracle_id: str
+    observed_quorum_agreement: float
+    ewma_trust_after: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "cell_idx": int(self.cell_idx),
+            "oracle_id": str(self.oracle_id),
+            "observed_quorum_agreement": round(
+                float(self.observed_quorum_agreement), 4),
+            "ewma_trust_after": round(float(self.ewma_trust_after), 4),
+        }
+
+
+def _compute_trust_trajectory_cid(
+        *,
+        trajectory: Sequence[TrustTrajectoryEntry],
+) -> str:
+    """Canonical SHA-256 over the trust-trajectory."""
+    payload = _canonical_json_bytes({
+        "trajectory": [t.as_dict() for t in trajectory],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# W33 manifest-v3 CID
+# ---------------------------------------------------------------------------
+
+
+def _compute_w33_manifest_v3_cid(
+        *,
+        parent_cid: str,
+        oracle_trust_state_cid: str,
+        trust_trajectory_cid: str,
+        trust_route_audit_cid: str,
+) -> str:
+    """SHA-256 over the canonical concatenation of W33 component CIDs.
+
+    The manifest-v3 CID is the load-bearing W33 cross-component
+    tamper-detection signal: any swap of one component CID from a
+    different envelope (with each component still internally
+    consistent AND the parent CID still self-consistent) is detected
+    because the W33 manifest-v3 CID is a SHA-256 over the *outer*
+    component CIDs.
+    """
+    payload = _canonical_json_bytes({
+        "parent_cid": str(parent_cid),
+        "oracle_trust_state_cid": str(oracle_trust_state_cid),
+        "trust_trajectory_cid": str(trust_trajectory_cid),
+        "trust_route_audit_cid": str(trust_route_audit_cid),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w33_outer_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        parent_cid: str,
+        oracle_trust_state_cid: str,
+        trust_trajectory_cid: str,
+        manifest_v3_cid: str,
+        cell_index: int,
+) -> str:
+    """SHA-256 over the canonical W33 envelope payload."""
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "parent_cid": str(parent_cid),
+        "oracle_trust_state_cid": str(oracle_trust_state_cid),
+        "trust_trajectory_cid": str(trust_trajectory_cid),
+        "manifest_v3_cid": str(manifest_v3_cid),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# Trust-EWMA ratification envelope
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class TrustEWMARatificationEnvelope:
+    """Content-addressed trust-EWMA-tracked ratification of one
+    W21-or-deeper decision (W33 family).
+
+    Carries:
+
+      * ``parent_cid``                 — parent envelope's CID (the W21
+                                          / W22 / ... / W32 inner that
+                                          W33 wraps; empty string when
+                                          W33 wraps the bare
+                                          :class:`TrustWeightedMultiOracleDisambiguator`).
+      * ``oracle_trust_state``         — tuple of
+                                          ``(oracle_id, ewma_trust)`` for
+                                          every registered oracle.
+      * ``oracle_trust_state_cid``     — SHA-256 over canonical bytes.
+      * ``trust_trajectory``           — tuple of
+                                          :class:`TrustTrajectoryEntry`
+                                          (length ≤ trust_trajectory_window).
+      * ``trust_trajectory_cid``       — SHA-256 over canonical bytes.
+      * ``trust_threshold``            — registered trust threshold
+                                          (default 0.50).
+      * ``ewma_alpha``                 — registered EWMA alpha (default
+                                          0.20, same as W32).
+      * ``trust_route_audit_cid``      — closed-form summary of W33
+                                          de-trust decisions for this
+                                          cell.
+      * ``manifest_v3_cid``            — SHA-256 over (parent_cid,
+                                          oracle_trust_state_cid,
+                                          trust_trajectory_cid,
+                                          trust_route_audit_cid).
+      * ``cell_index``                 — audit replay index.
+      * ``wire_required``              — 1 visible token cost on
+                                          producer side iff True.
+      * ``w33_cid``                    — SHA-256 over canonical bytes.
+
+    Wire-token cost
+    ---------------
+
+    The W33 layer charges 1 visible token on the producer side
+    (``<w33_ref:DDDD>``) iff ``wire_required`` is True (i.e. the
+    trust-EWMA registry is non-trivial).  When every component is
+    trivial, wire_required is False and W33 reduces to W21
+    byte-for-byte (W33-Λ-trivial-trust-ewma; H2 anchor).
+    """
+    schema_version: str
+    schema_cid: str
+    parent_cid: str
+    oracle_trust_state: tuple[tuple[str, float], ...]
+    oracle_trust_state_cid: str
+    trust_trajectory: tuple[TrustTrajectoryEntry, ...]
+    trust_trajectory_cid: str
+    trust_threshold: float
+    ewma_alpha: float
+    trust_route_audit_cid: str
+    manifest_v3_cid: str
+    cell_index: int
+    n_detrusted_oracles: int = 0
+    wire_required: bool = False
+    w33_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.w33_cid:
+            object.__setattr__(self, "w33_cid", self.recompute_w33_cid())
+
+    def recompute_w33_cid(self) -> str:
+        return _compute_w33_outer_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            parent_cid=self.parent_cid,
+            oracle_trust_state_cid=self.oracle_trust_state_cid,
+            trust_trajectory_cid=self.trust_trajectory_cid,
+            manifest_v3_cid=self.manifest_v3_cid,
+            cell_index=int(self.cell_index),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_cid": self.parent_cid,
+            "oracle_trust_state": [
+                [str(oid), round(float(t), 4)]
+                for oid, t in self.oracle_trust_state
+            ],
+            "oracle_trust_state_cid": self.oracle_trust_state_cid,
+            "trust_trajectory": [t.as_dict()
+                                 for t in self.trust_trajectory],
+            "trust_trajectory_cid": self.trust_trajectory_cid,
+            "trust_threshold": round(float(self.trust_threshold), 4),
+            "ewma_alpha": round(float(self.ewma_alpha), 4),
+            "trust_route_audit_cid": self.trust_route_audit_cid,
+            "manifest_v3_cid": self.manifest_v3_cid,
+            "cell_index": int(self.cell_index),
+            "n_detrusted_oracles": int(self.n_detrusted_oracles),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<w33_ref:{self.w33_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_structured_bits(self) -> int:
+        return int(8 * self.n_envelope_bytes)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_cid": self.parent_cid,
+            "oracle_trust_state": [
+                [str(oid), round(float(t), 4)]
+                for oid, t in self.oracle_trust_state
+            ],
+            "oracle_trust_state_cid": self.oracle_trust_state_cid,
+            "trust_trajectory": [t.as_dict()
+                                 for t in self.trust_trajectory],
+            "trust_trajectory_cid": self.trust_trajectory_cid,
+            "trust_threshold": round(float(self.trust_threshold), 4),
+            "ewma_alpha": round(float(self.ewma_alpha), 4),
+            "trust_route_audit_cid": self.trust_route_audit_cid,
+            "manifest_v3_cid": self.manifest_v3_cid,
+            "cell_index": int(self.cell_index),
+            "n_detrusted_oracles": int(self.n_detrusted_oracles),
+            "wire_required": bool(self.wire_required),
+            "w33_cid": self.w33_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+# ---------------------------------------------------------------------------
+# W33 verifier — 14 enumerated failure modes (disjoint from W22..W32)
+# ---------------------------------------------------------------------------
+
+
+def verify_trust_ewma_ratification(
+        env: TrustEWMARatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_parent_cid: str,
+        registered_oracle_ids: frozenset[str],
+        registered_trust_trajectory_window: int,
+        registered_oracle_trust_state_cid: str | None = None,
+) -> LatentVerificationOutcome:
+    """Pure-function controller-side verification of a
+    :class:`TrustEWMARatificationEnvelope` (W33 family).
+
+    14 enumerated failure modes (see module docstring for details).
+    Pure function (no side effects); soundness by inspection.
+    """
+    n_checks = 0
+
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_w33_envelope", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_version != W33_TRUST_EWMA_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="w33_schema_version_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w33_schema_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.parent_cid != registered_parent_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w32_parent_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Trust threshold range ----
+    tt = float(env.trust_threshold)
+    if math.isnan(tt) or math.isinf(tt) or tt < 0.0 or tt > 1.0:
+        return LatentVerificationOutcome(
+            ok=False, reason="trust_threshold_out_of_range",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Oracle trust state checks ----
+    state = env.oracle_trust_state
+    for oid, t in state:
+        if str(oid) not in registered_oracle_ids:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="oracle_trust_state_unregistered_oracle",
+                n_checks=n_checks)
+        f = float(t)
+        if math.isnan(f) or math.isinf(f) or f < 0.0 or f > 1.0:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="oracle_trust_state_ewma_out_of_range",
+                n_checks=n_checks)
+    n_checks += 1
+    # Recompute oracle trust state CID.
+    expected_state_cid = _compute_oracle_trust_state_cid(
+        oracle_to_trust=state)
+    if expected_state_cid != env.oracle_trust_state_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="oracle_trust_state_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    # Cross-check: registered expected oracle trust state CID.
+    if (registered_oracle_trust_state_cid is not None
+            and env.oracle_trust_state_cid
+            != registered_oracle_trust_state_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="oracle_trust_state_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Trust trajectory checks ----
+    window = int(registered_trust_trajectory_window)
+    traj = env.trust_trajectory
+    if len(traj) > window:
+        return LatentVerificationOutcome(
+            ok=False, reason="trust_trajectory_length_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    last_cell_idx = -1
+    for entry in traj:
+        if int(entry.cell_idx) < last_cell_idx:
+            return LatentVerificationOutcome(
+                ok=False, reason="trust_trajectory_length_mismatch",
+                n_checks=n_checks)
+        last_cell_idx = int(entry.cell_idx)
+        if str(entry.oracle_id) not in registered_oracle_ids:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="trust_trajectory_unregistered_oracle",
+                n_checks=n_checks)
+        oa = float(entry.observed_quorum_agreement)
+        if math.isnan(oa) or math.isinf(oa) or oa < 0.0 or oa > 1.0:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="trust_trajectory_observed_out_of_range",
+                n_checks=n_checks)
+        ta = float(entry.ewma_trust_after)
+        if math.isnan(ta) or math.isinf(ta) or ta < 0.0 or ta > 1.0:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="trust_trajectory_observed_out_of_range",
+                n_checks=n_checks)
+    n_checks += 1
+    # Recompute trust trajectory CID.
+    if (_compute_trust_trajectory_cid(trajectory=traj)
+            != env.trust_trajectory_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="trust_trajectory_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Manifest-v3 CID check ----
+    expected_manifest_v3 = _compute_w33_manifest_v3_cid(
+        parent_cid=env.parent_cid,
+        oracle_trust_state_cid=env.oracle_trust_state_cid,
+        trust_trajectory_cid=env.trust_trajectory_cid,
+        trust_route_audit_cid=env.trust_route_audit_cid,
+    )
+    if expected_manifest_v3 != env.manifest_v3_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="manifest_v3_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Outer w33_cid check ----
+    if env.recompute_w33_cid() != env.w33_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w33_outer_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+# ---------------------------------------------------------------------------
+# Trust-EWMA registry
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class TrustEWMARegistry:
+    """Controller-side registry for the W33 trust-EWMA-tracked layer.
+
+    Wraps a :class:`TrustWeightedMultiOracleDisambiguator` (the inner
+    W21 disambiguator) and adds:
+
+      * ``trust_ewma_enabled``           — when True, the EWMA-tracked
+                                             trust update fires on each
+                                             cell where the inner W21
+                                             produced any decision.
+      * ``manifest_v3_disabled``         — when True (and all other
+                                             knobs trivial), W33
+                                             reduces to W21
+                                             byte-for-byte.
+      * ``trust_trajectory_window``      — max number of trust
+                                             trajectory entries the
+                                             envelope carries; verifier
+                                             rejects longer histories.
+      * ``trust_threshold``              — minimum EWMA trust required
+                                             for an oracle's vote to
+                                             count in W33's projection.
+      * ``ewma_alpha``                   — registered EWMA smoothing
+                                             factor.
+      * ``registered_oracle_ids``        — frozenset of registered
+                                             oracle IDs (must match the
+                                             inner W21's
+                                             oracle_registrations).
+    """
+    schema: SchemaCapsule | None = None
+    trust_ewma_enabled: bool = False
+    manifest_v3_disabled: bool = True
+    trust_trajectory_window: int = 0
+    trust_threshold: float = W33_DEFAULT_TRUST_THRESHOLD
+    ewma_alpha: float = W33_DEFAULT_EWMA_ALPHA
+    registered_oracle_ids: frozenset[str] = frozenset()
+    # Optional set of oracle IDs whose votes form the reference for
+    # the per-oracle agreement signal.  When non-empty, the W33
+    # orchestrator computes agreement against the union of anchor
+    # probes' top_sets — a stable trust-by-construction reference
+    # that survives double-compromise.  When empty, the orchestrator
+    # falls back to the W21 quorum-resolved top_set (which can flip
+    # under double-compromise — see W33-Λ-mis-trust-shift).
+    anchor_oracle_ids: frozenset[str] = frozenset()
+    local_host_id: str = "localhost"
+
+    _envelopes: dict[str, TrustEWMARatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_w33_registered: int = 0
+    n_w33_rejected: int = 0
+    n_trust_ewma_updates: int = 0
+    n_oracles_detrusted: int = 0
+
+    @property
+    def is_trivial(self) -> bool:
+        return (not bool(self.trust_ewma_enabled)
+                and bool(self.manifest_v3_disabled)
+                and int(self.trust_trajectory_window) == 0)
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        return not self.is_trivial
+
+    def register_envelope(
+            self,
+            envelope: TrustEWMARatificationEnvelope,
+            *,
+            registered_parent_cid: str,
+            registered_oracle_trust_state_cid: str | None = None,
+    ) -> LatentVerificationOutcome:
+        """Verify the envelope and (if OK) record it."""
+        if self.schema is None:
+            outcome = LatentVerificationOutcome(
+                ok=False, reason="schema_unregistered", n_checks=0)
+            self.n_w33_rejected += 1
+            return outcome
+        outcome = verify_trust_ewma_ratification(
+            envelope,
+            registered_schema=self.schema,
+            registered_parent_cid=str(registered_parent_cid),
+            registered_oracle_ids=frozenset(self.registered_oracle_ids),
+            registered_trust_trajectory_window=int(
+                self.trust_trajectory_window),
+            registered_oracle_trust_state_cid=(
+                registered_oracle_trust_state_cid),
+        )
+        if outcome.ok:
+            self._envelopes[envelope.w33_cid] = envelope
+            self.n_w33_registered += 1
+        else:
+            self.n_w33_rejected += 1
+        return outcome
+
+
+# ---------------------------------------------------------------------------
+# W33 result + orchestrator
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class W33TrustEWMAResult:
+    """Audit record for one
+    ``TrustEWMATrackedMultiOracleOrchestrator.decode_rounds`` call.
+
+    Fields
+    ------
+    answer
+        The W33-projected answer dict.
+    inner_w21_branch
+        The W21 branch that fired before the W33 layer ran.
+    decoder_branch
+        The W33 branch (one of :data:`W33_ALL_BRANCHES`).
+    parent_cid
+        The parent envelope's CID (W21 outer; empty when no W21 envelope).
+    cell_index
+        The W33 audit replay index (incremented once per cell).
+    oracle_trust_state
+        The per-oracle EWMA-trust state after this cell's update.
+    n_detrusted_oracles
+        Number of oracles whose EWMA-tracked trust is < trust_threshold
+        at projection time on this cell.
+    n_w21_visible_tokens
+        Inner W21 visible-token cost.
+    n_w33_visible_tokens
+        Total visible token cost (W21 + W33 envelope).
+    n_w33_overhead_tokens
+        Per-cell additional W33 overhead (0 or 1).
+    w33_cid
+        Outer envelope CID.
+    manifest_v3_cid
+        Manifest-v3 CID.
+    oracle_trust_state_cid
+        Oracle-trust-state CID.
+    trust_trajectory_cid
+        Trust-trajectory CID.
+    ratified
+        True iff the W33 envelope was registered AND verified.
+    verification_ok
+        Mirror of registry.register_envelope outcome.ok.
+    verification_reason
+        Mirror of registry.register_envelope outcome.reason.
+    n_envelope_bytes / n_structured_bits / cram_factor_w33
+        Envelope cost / payload metrics.
+    """
+    answer: dict[str, Any]
+    inner_w21_branch: str
+    decoder_branch: str
+    parent_cid: str
+    cell_index: int
+    oracle_trust_state: tuple[tuple[str, float], ...]
+    n_detrusted_oracles: int
+    n_w21_visible_tokens: int
+    n_w33_visible_tokens: int
+    n_w33_overhead_tokens: int
+    w33_cid: str
+    manifest_v3_cid: str
+    oracle_trust_state_cid: str
+    trust_trajectory_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w33: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get(
+                "remediation", "investigate")),
+            "inner_w21_branch": str(self.inner_w21_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "parent_cid": str(self.parent_cid),
+            "cell_index": int(self.cell_index),
+            "oracle_trust_state": [
+                [str(oid), round(float(t), 4)]
+                for oid, t in self.oracle_trust_state
+            ],
+            "n_detrusted_oracles": int(self.n_detrusted_oracles),
+            "n_w21_visible_tokens": int(self.n_w21_visible_tokens),
+            "n_w33_visible_tokens": int(self.n_w33_visible_tokens),
+            "n_w33_overhead_tokens": int(self.n_w33_overhead_tokens),
+            "w33_cid": str(self.w33_cid),
+            "manifest_v3_cid": str(self.manifest_v3_cid),
+            "oracle_trust_state_cid": str(self.oracle_trust_state_cid),
+            "trust_trajectory_cid": str(self.trust_trajectory_cid),
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": str(self.verification_reason),
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w33": float(self.cram_factor_w33),
+        }
+
+
+@dataclasses.dataclass
+class TrustEWMATrackedMultiOracleOrchestrator:
+    """Trust-EWMA-tracked multi-oracle orchestrator (W33 family).
+
+    Wraps a :class:`TrustWeightedMultiOracleDisambiguator` (W21) and
+    adds:
+
+      * per-oracle EWMA-tracked trust state;
+      * deterministic per-cell agreement signal derived from
+        ``W21OracleProbe.top_set`` vs the W21-resolved ``top_set``;
+      * trust-threshold-gated quorum projection (excludes votes from
+        oracles whose EWMA falls below the registered threshold);
+      * sealed trust trajectory in the W33 envelope;
+      * W33 manifest-v3 CID over the component CIDs.
+
+    Per-cell flow:
+
+      1. Run inner W21.
+      2. Read inner W21 result.
+      3. Derive per-oracle agreement signal from probe.top_set vs
+         W21-resolved top_set.
+      4. EWMA-update each oracle's trust:
+         ``ewma_new = (1-alpha) * ewma_prev + alpha * agreement``.
+         (Initial EWMA = 1.0 at registration; the W21 trust_prior is
+         not used as an initial EWMA — that would weight legacy priors
+         on the running mean.  Initial 1.0 is the conservative starting
+         point.)
+      5. If ``trust_ewma_enabled``, recompute the W33 effective tally:
+         ``effective_votes[tag] = sum over oracles where EWMA >=
+         trust_threshold of (1 if probe.top_set contains tag else 0)``;
+         project the W33 answer.
+      6. Append :class:`TrustTrajectoryEntry` per oracle for this cell.
+      7. Build the W33 envelope.
+      8. Verify + register.
+      9. Charge 1 wire token iff ``registry.has_wire_required_layer``.
+
+    Backward-compat
+    ----------------
+    * **W33-3** (vs W21, trivial path).  With ``trust_ewma_enabled
+      = False``, ``manifest_v3_disabled = True``, AND
+      ``trust_trajectory_window = 0``, the W33 layer reduces to the
+      inner W21 byte-for-byte.  Every cell yields
+      ``W33_BRANCH_TRIVIAL_TRUST_EWMA_PASSTHROUGH``.
+    """
+    inner: TrustWeightedMultiOracleDisambiguator
+    registry: TrustEWMARegistry
+    enabled: bool = True
+    require_w33_verification: bool = True
+
+    _last_result: "W33TrustEWMAResult | None" = None
+    _last_envelope: "TrustEWMARatificationEnvelope | None" = None
+    _trust_trajectory: list[TrustTrajectoryEntry] = dataclasses.field(
+        default_factory=list)
+    # Per-oracle EWMA trust state.  Initial: 1.0 (every oracle starts
+    # fully trusted).  The W21 trust_prior is NOT used as initial EWMA
+    # — keeping the EWMA on the [0, 1] agreement-signal scale lets the
+    # W33-Λ-no-trust-shift falsifier hold byte-for-byte (every cell
+    # where every oracle agrees with the consortium quorum keeps the
+    # EWMA at 1.0; W33 ties W21).
+    _ewma_trust_state: dict[str, float] = dataclasses.field(
+        default_factory=dict)
+    _cell_index: int = 0
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.registry.schema
+
+    def reset_session(self) -> None:
+        self._last_result = None
+        self._last_envelope = None
+        self._trust_trajectory = []
+        self._ewma_trust_state = {}
+        self._cell_index = 0
+
+    def _initial_ewma_for_oracle(self, oracle_id: str) -> float:
+        return float(self._ewma_trust_state.get(oracle_id, 1.0))
+
+    def _build_w33_envelope(
+            self,
+            *,
+            parent_cid: str,
+            n_detrusted_oracles: int,
+            wire_required: bool,
+    ) -> TrustEWMARatificationEnvelope:
+        # Canonicalise the oracle trust state — sort by oracle_id.
+        oracle_trust_state = tuple(
+            (str(oid), float(self._ewma_trust_state[oid]))
+            for oid in sorted(self._ewma_trust_state.keys())
+        )
+        oracle_trust_state_cid = _compute_oracle_trust_state_cid(
+            oracle_to_trust=oracle_trust_state)
+        trust_trajectory = tuple(self._trust_trajectory)
+        trust_trajectory_cid = _compute_trust_trajectory_cid(
+            trajectory=trust_trajectory)
+        trust_route_audit_payload = _canonical_json_bytes({
+            "n_detrusted_oracles": int(n_detrusted_oracles),
+            "trust_threshold": round(
+                float(self.registry.trust_threshold), 4),
+            "ewma_alpha": round(float(self.registry.ewma_alpha), 4),
+        })
+        trust_route_audit_cid = hashlib.sha256(
+            trust_route_audit_payload).hexdigest()
+        manifest_v3_cid = _compute_w33_manifest_v3_cid(
+            parent_cid=str(parent_cid),
+            oracle_trust_state_cid=oracle_trust_state_cid,
+            trust_trajectory_cid=trust_trajectory_cid,
+            trust_route_audit_cid=trust_route_audit_cid,
+        )
+        env = TrustEWMARatificationEnvelope(
+            schema_version=W33_TRUST_EWMA_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            parent_cid=str(parent_cid),
+            oracle_trust_state=oracle_trust_state,
+            oracle_trust_state_cid=oracle_trust_state_cid,
+            trust_trajectory=trust_trajectory,
+            trust_trajectory_cid=trust_trajectory_cid,
+            trust_threshold=float(self.registry.trust_threshold),
+            ewma_alpha=float(self.registry.ewma_alpha),
+            trust_route_audit_cid=trust_route_audit_cid,
+            manifest_v3_cid=manifest_v3_cid,
+            cell_index=int(self._cell_index),
+            n_detrusted_oracles=int(n_detrusted_oracles),
+            wire_required=bool(wire_required),
+        )
+        return env
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        # Disabled / no-schema paths.
+        if not self.enabled or self.schema is None:
+            out = self.inner.decode_rounds(per_round_handoffs)
+            return self._pack(
+                out=out,
+                decoder_branch=W33_BRANCH_TRUST_EWMA_DISABLED,
+                envelope=None, n_w33_visible=0, w33_overhead=0,
+                ratified=False, verify_ok=False,
+                verify_reason="disabled",
+                n_detrusted_oracles=0, parent_cid="")
+
+        # 1. Run inner W21.
+        out = self.inner.decode_rounds(per_round_handoffs)
+        w21_result = self.inner.last_result
+        inner_w21_branch = (
+            str(w21_result.decoder_branch)
+            if w21_result is not None
+            else W21_BRANCH_DISABLED)
+
+        if w21_result is None:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W33_BRANCH_TRUST_EWMA_NO_TRIGGER,
+                envelope=None, n_w33_visible=0, w33_overhead=0,
+                ratified=False, verify_ok=False,
+                verify_reason="no_w21_result",
+                n_detrusted_oracles=0, parent_cid="")
+
+        # Inner W21 visible-token cost (multi-oracle queries).
+        n_w21_visible = int(w21_result.n_outside_tokens_total)
+
+        # 2-3. Per-oracle agreement signals.
+        # The reference (against which each probe's vote is compared)
+        # is one of:
+        #   (a) the union of anchor probes' top_sets, when
+        #       ``registry.anchor_oracle_ids`` is non-empty.  This is
+        #       the stable trust-by-construction reference that
+        #       survives double-compromise.
+        #   (b) the W21-resolved top_set (only valid when W21 produced
+        #       a QUORUM_RESOLVED branch).  Falls back to () when W21
+        #       did not resolve a quorum.
+        resolved_top_set: tuple[str, ...]
+        if self.registry.anchor_oracle_ids:
+            anchor_set: set[str] = set()
+            for probe in w21_result.probes:
+                if (str(probe.oracle_id)
+                        in self.registry.anchor_oracle_ids
+                        and not probe.abstained):
+                    anchor_set.update(probe.top_set or ())
+            resolved_top_set = tuple(sorted(anchor_set))
+        elif (w21_result.decoder_branch
+                == W21_BRANCH_QUORUM_RESOLVED):
+            resolved_top_set = tuple(
+                w21_result.answer.get("services", ()))
+        else:
+            resolved_top_set = ()
+
+        # If W33 is disabled (trivial registry), pass through W21
+        # byte-for-byte without firing the EWMA update or charging a
+        # wire token.
+        if self.registry.is_trivial:
+            self._cell_index += 1
+            # Initialize EWMA state on first observation so the cid is
+            # stable across calls.  But do NOT charge wire token.
+            for reg in self.inner.oracle_registrations:
+                oid = str(getattr(reg.oracle, "oracle_id", "no_oracle"))
+                if oid not in self._ewma_trust_state:
+                    self._ewma_trust_state[oid] = 1.0
+            return self._pack(
+                out=out,
+                decoder_branch=W33_BRANCH_TRIVIAL_TRUST_EWMA_PASSTHROUGH,
+                envelope=None, n_w33_visible=n_w21_visible,
+                w33_overhead=0, ratified=True, verify_ok=True,
+                verify_reason="trivial_passthrough",
+                n_detrusted_oracles=0, parent_cid="")
+
+        # 4. EWMA-update each oracle's trust based on probe agreement.
+        updated_ids: list[str] = []
+        for probe in w21_result.probes:
+            oid = str(probe.oracle_id)
+            agreement = derive_per_oracle_agreement_signal(
+                probe_top_set=tuple(probe.top_set),
+                probe_abstained=bool(probe.abstained),
+                resolved_top_set=resolved_top_set,
+            )
+            prev_ewma = self._initial_ewma_for_oracle(oid)
+            new_ewma = update_ewma_prior(
+                prev_ewma=prev_ewma,
+                observation=float(agreement),
+                alpha=float(self.registry.ewma_alpha),
+            )
+            self._ewma_trust_state[oid] = float(new_ewma)
+            self.registry.n_trust_ewma_updates += 1
+            entry = TrustTrajectoryEntry(
+                cell_idx=int(self._cell_index),
+                oracle_id=oid,
+                observed_quorum_agreement=float(agreement),
+                ewma_trust_after=float(new_ewma),
+            )
+            self._trust_trajectory.append(entry)
+            updated_ids.append(oid)
+
+        # Truncate the trust trajectory to the configured window.
+        window = int(self.registry.trust_trajectory_window)
+        if window > 0 and len(self._trust_trajectory) > window:
+            self._trust_trajectory = self._trust_trajectory[-window:]
+
+        # 5. Trust-threshold-gated effective tally.  We re-aggregate
+        # votes excluding oracles whose EWMA falls below threshold.
+        # Then re-project the W33 answer if W33 changes the W21
+        # decision.
+        threshold = float(self.registry.trust_threshold)
+        detrusted_oracle_ids = sorted(
+            oid for oid, ewma in self._ewma_trust_state.items()
+            if float(ewma) < threshold
+        )
+        n_detrusted = len(detrusted_oracle_ids)
+        if n_detrusted > 0:
+            self.registry.n_oracles_detrusted += 1
+
+        # Re-aggregate votes excluding detrusted oracles.
+        admitted_tags = sorted(set(w21_result.per_tag_votes.keys()))
+        eff_votes: dict[str, int] = {tag: 0 for tag in admitted_tags}
+        eff_trust_sum: dict[str, float] = {
+            tag: 0.0 for tag in admitted_tags}
+        for probe in w21_result.probes:
+            oid = str(probe.oracle_id)
+            ewma = float(self._ewma_trust_state.get(oid, 1.0))
+            if ewma < threshold:
+                continue
+            if probe.abstained:
+                continue
+            for tag in admitted_tags:
+                if int(probe.per_tag_count.get(tag, 0)) > 0:
+                    eff_votes[tag] += 1
+                    eff_trust_sum[tag] += float(ewma)
+        # Apply same quorum logic as W21 but with effective trust.
+        quorum_min = int(self.inner.quorum_min)
+        min_trust_sum = float(self.inner.min_trust_sum)
+        eff_top_set = tuple(sorted(
+            tag for tag in admitted_tags
+            if eff_votes[tag] >= quorum_min
+            and eff_trust_sum[tag] >= min_trust_sum
+        ))
+        # Decide the W33 branch.
+        w33_branch = W33_BRANCH_TRUST_EWMA_RESOLVED
+        w33_answer = dict(w21_result.answer)
+        # If W33's effective tally produces a different non-empty
+        # proper subset than W21's resolved top_set (or W21 was
+        # NO_QUORUM and W33 finds one), W33 commits to its own answer.
+        if (eff_top_set
+                and len(eff_top_set) < len(admitted_tags)):
+            if (tuple(w21_result.answer.get("services", ()))
+                    != eff_top_set):
+                # W33 reroutes the answer.
+                w33_answer = dict(out)
+                w33_answer["services"] = eff_top_set
+                w33_branch = W33_BRANCH_TRUST_EWMA_DETRUSTED_REROUTE
+        else:
+            # W33 cannot form a quorum (either empty or covers all
+            # admitted tags) — abstain.
+            if (tuple(w21_result.answer.get("services", ()))
+                    != tuple(admitted_tags)):
+                # W21 had a resolved answer but W33 cannot form a
+                # quorum after de-trusting; W33 abstains by passing
+                # through the substrate FIFO answer.
+                w33_answer = {k: v for k, v in out.items()}
+                # Drop the W21-projected services if any.
+                if "services" in w33_answer:
+                    w33_answer.pop("services", None)
+                if (w21_result.decoder_branch
+                        == W21_BRANCH_QUORUM_RESOLVED
+                        and n_detrusted > 0):
+                    w33_branch = (
+                        W33_BRANCH_TRUST_EWMA_DETRUSTED_ABSTAIN)
+        # When no oracles are detrusted, W33 ties W21 byte-for-byte
+        # (mechanism falsifier W33-Λ-no-trust-shift).
+        if n_detrusted == 0:
+            w33_answer = dict(w21_result.answer)
+            w33_branch = W33_BRANCH_TRUST_EWMA_RESOLVED
+
+        # 6-7. Build the W33 envelope.
+        # Parent CID: derive from W22..W32 chain if available; else
+        # use a stable CID derived from the W21 result's per_tag_votes
+        # canonical bytes (since W21 has no envelope of its own).
+        w22_envelope = out.get("latent_hybrid")
+        if isinstance(w22_envelope, dict):
+            parent_cid = str(w22_envelope.get(
+                "outer_cid", w22_envelope.get(
+                    "latent_envelope_cid", "")))
+        else:
+            parent_cid = ""
+        if not parent_cid:
+            # Stable fallback: hash W21 audit payload bytes.
+            parent_payload = _canonical_json_bytes({
+                "inner_branch": w21_result.decoder_branch,
+                "per_tag_votes": dict(w21_result.per_tag_votes),
+                "per_tag_trust_sum": {
+                    k: round(float(v), 4)
+                    for k, v in w21_result.per_tag_trust_sum.items()
+                },
+                "n_outside_queries": int(
+                    w21_result.n_outside_queries),
+                "cell_index": int(self._cell_index),
+            })
+            parent_cid = hashlib.sha256(parent_payload).hexdigest()
+
+        wire_required = self.registry.has_wire_required_layer
+        envelope = self._build_w33_envelope(
+            parent_cid=parent_cid,
+            n_detrusted_oracles=int(n_detrusted),
+            wire_required=bool(wire_required),
+        )
+
+        # 8. Verify + register.
+        outcome = self.registry.register_envelope(
+            envelope,
+            registered_parent_cid=parent_cid,
+            registered_oracle_trust_state_cid=(
+                envelope.oracle_trust_state_cid),
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+
+        if not verify_ok and self.require_w33_verification:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W33_BRANCH_TRUST_EWMA_REJECTED,
+                envelope=envelope, n_w33_visible=n_w21_visible,
+                w33_overhead=0, ratified=False,
+                verify_ok=False, verify_reason=verify_reason,
+                n_detrusted_oracles=n_detrusted,
+                parent_cid=parent_cid)
+
+        # 9. Charge 1 wire token if non-trivial.
+        w33_overhead = int(envelope.n_wire_tokens)
+        n_w33_visible = int(n_w21_visible + w33_overhead)
+        # Apply the W33-routed answer to the surface output.  When W33
+        # abstains (services dropped from w33_answer), explicitly set
+        # services to () so callers see the abstention.
+        out_local = dict(out)
+        for k, v in w33_answer.items():
+            out_local[k] = v
+        if "services" not in w33_answer:
+            out_local["services"] = ()
+        self._cell_index += 1
+        return self._pack(
+            out=out_local,
+            decoder_branch=str(w33_branch),
+            envelope=envelope, n_w33_visible=n_w33_visible,
+            w33_overhead=w33_overhead, ratified=True,
+            verify_ok=verify_ok, verify_reason=verify_reason,
+            n_detrusted_oracles=n_detrusted,
+            parent_cid=parent_cid)
+
+    def _pack(
+            self, *, out: dict[str, Any], decoder_branch: str,
+            envelope: TrustEWMARatificationEnvelope | None,
+            n_w33_visible: int, w33_overhead: int,
+            ratified: bool, verify_ok: bool, verify_reason: str,
+            n_detrusted_oracles: int, parent_cid: str,
+    ) -> dict[str, Any]:
+        envelope_bytes = (envelope.n_envelope_bytes
+                           if envelope is not None else 0)
+        structured_bits = (envelope.n_structured_bits
+                            if envelope is not None else 0)
+        wire = max(1, int(w33_overhead))
+        cram_factor = (
+            float(structured_bits) / float(wire)
+            if structured_bits > 0 else 0.0
+        )
+        w33_cid = (envelope.w33_cid if envelope is not None else "")
+        manifest_v3_cid = (envelope.manifest_v3_cid
+                           if envelope is not None else "")
+        oracle_trust_state_cid = (
+            envelope.oracle_trust_state_cid
+            if envelope is not None else "")
+        trust_trajectory_cid = (
+            envelope.trust_trajectory_cid
+            if envelope is not None else "")
+        # Snapshot oracle trust state from current registry (not from
+        # envelope, so trivial path also has stable state).
+        oracle_trust_state_snapshot = tuple(
+            (oid, float(self._ewma_trust_state[oid]))
+            for oid in sorted(self._ewma_trust_state.keys())
+        )
+        n_w21_visible = int(out.get("multi_oracle", {}).get(
+            "n_outside_tokens_total", 0))
+        inner_branch = str(out.get("multi_oracle", {}).get(
+            "decoder_branch", ""))
+        result = W33TrustEWMAResult(
+            answer=dict(out),
+            inner_w21_branch=inner_branch,
+            decoder_branch=str(decoder_branch),
+            parent_cid=str(parent_cid),
+            cell_index=int(self._cell_index - 1
+                            if self._cell_index > 0 else 0),
+            oracle_trust_state=oracle_trust_state_snapshot,
+            n_detrusted_oracles=int(n_detrusted_oracles),
+            n_w21_visible_tokens=int(n_w21_visible),
+            n_w33_visible_tokens=int(n_w33_visible),
+            n_w33_overhead_tokens=int(w33_overhead),
+            w33_cid=str(w33_cid),
+            manifest_v3_cid=str(manifest_v3_cid),
+            oracle_trust_state_cid=str(oracle_trust_state_cid),
+            trust_trajectory_cid=str(trust_trajectory_cid),
+            ratified=bool(ratified),
+            verification_ok=bool(verify_ok),
+            verification_reason=str(verify_reason),
+            n_envelope_bytes=int(envelope_bytes),
+            n_structured_bits=int(structured_bits),
+            cram_factor_w33=float(cram_factor),
+        )
+        self._last_result = result
+        self._last_envelope = envelope
+        out_local = dict(out)
+        out_local["trust_ewma_tracked"] = result.as_dict()
+        if envelope is not None:
+            out_local["trust_ewma_tracked_envelope"] = envelope.as_dict()
+        return out_local
+
+    def decode(self,
+               handoffs: Sequence[_DecodedHandoff],
+               ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> "W33TrustEWMAResult | None":
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> "TrustEWMARatificationEnvelope | None":
+        return self._last_envelope
+
+
+# ---------------------------------------------------------------------------
+# Convenience factories (W33 family)
+# ---------------------------------------------------------------------------
+
+
+def build_trivial_trust_ewma_registry(
+        *,
+        schema: SchemaCapsule,
+        registered_oracle_ids: Iterable[str] = (),
+        local_host_id: str = "localhost",
+) -> TrustEWMARegistry:
+    """Build a W33 registry with all knobs trivial — the H2 byte-for-W21
+    anchor (W33-Λ-trivial-trust-ewma falsifier).
+    """
+    return TrustEWMARegistry(
+        schema=schema,
+        trust_ewma_enabled=False,
+        manifest_v3_disabled=True,
+        trust_trajectory_window=0,
+        trust_threshold=W33_DEFAULT_TRUST_THRESHOLD,
+        ewma_alpha=W33_DEFAULT_EWMA_ALPHA,
+        registered_oracle_ids=frozenset(str(o) for o in registered_oracle_ids),
+        anchor_oracle_ids=frozenset(),
+        local_host_id=local_host_id,
+    )
+
+
+def build_trust_ewma_registry(
+        *,
+        schema: SchemaCapsule,
+        registered_oracle_ids: Iterable[str] = (),
+        anchor_oracle_ids: Iterable[str] = (),
+        trust_ewma_enabled: bool = True,
+        manifest_v3_disabled: bool = False,
+        trust_trajectory_window: int = W33_DEFAULT_TRUST_TRAJECTORY_WINDOW,
+        trust_threshold: float = W33_DEFAULT_TRUST_THRESHOLD,
+        ewma_alpha: float = W33_DEFAULT_EWMA_ALPHA,
+        local_host_id: str = "localhost",
+) -> TrustEWMARegistry:
+    """Build a non-trivial W33 registry that exercises EWMA-tracked
+    per-oracle trust + manifest-v3 CID.
+
+    ``anchor_oracle_ids`` (optional) names oracles whose votes form
+    the reference for the per-oracle agreement signal.  If empty,
+    falls back to the W21 quorum-resolved top_set as the reference.
+    """
+    return TrustEWMARegistry(
+        schema=schema,
+        trust_ewma_enabled=bool(trust_ewma_enabled),
+        manifest_v3_disabled=bool(manifest_v3_disabled),
+        trust_trajectory_window=int(trust_trajectory_window),
+        trust_threshold=float(trust_threshold),
+        ewma_alpha=float(ewma_alpha),
+        registered_oracle_ids=frozenset(str(o) for o in registered_oracle_ids),
+        anchor_oracle_ids=frozenset(str(o) for o in anchor_oracle_ids),
+        local_host_id=local_host_id,
+    )

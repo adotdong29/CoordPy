@@ -542,6 +542,31 @@ class W32BenchTests(unittest.TestCase):
         self.assertEqual(r["min_delta_w32_minus_w31"], 0.0)
         self.assertEqual(r["max_delta_w32_minus_w31"], 0.0)
 
+    def test_h7b_single_partition_strict_gain(self) -> None:
+        """R-79-SINGLE-PARTITION (W33 milestone discharge of
+        W32-C-LONG-WINDOW-STRICT-GAIN): on a regime that exceeds the
+        W32-L-CYCLE-CAP limitation theorem (c_p / N ≈ 1.0 because
+        every cell classifies as CYCLIC), the W32 EWMA + Page CUSUM
+        mechanism strictly improves over W31's cumulative running
+        mean by Δ ≥ +0.10 across 5/5 seeds.
+        """
+        from vision_mvp.experiments.phase79_long_window_convergent import (
+            run_phase79)
+        deltas = []
+        for seed in (11, 17, 23, 29, 31):
+            r = run_phase79(
+                bank="single_partition", n_eval=80, bank_seed=int(seed),
+                long_window=64, ewma_alpha=0.20)
+            deltas.append(
+                float(r["correctness_ratified_rate_w32"])
+                - float(r["correctness_ratified_rate_w31"]))
+        # Strict-gain bar: Δ ≥ +0.10 across all 5 seeds.  Use a
+        # 1e-6 tolerance for floating-point comparisons.
+        self.assertGreaterEqual(min(deltas), 0.10 - 1e-6)
+        # Trust precision should still be > 0 (W32 ratifies cells).
+        # We don't enforce 1.0 here because the bench is constructed
+        # to exercise reroute under failure, not strict abstention.
+
     def test_w32_orchestrator_branch_set(self) -> None:
         # Cross-check that every W32 decoder branch label is
         # registered in W32_ALL_BRANCHES.

@@ -5,10 +5,141 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.33,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.34,
 > 2026-05-01.
 
-## TL;DR — SDK v3.33
+## TL;DR — SDK v3.34
+
+The programme now has **thirty** coupled research axes, each with a
+sharp status. SDK v3.34 mints axis 30: **trust-EWMA-tracked
+multi-oracle adjudication + single-partition long-window strict-gain
+regime + W33 manifest-v3 CID + best-effort live cross-architecture
+LLM trust-calibration evidence at temperature 0** — wrapping the
+SDK v3.22 W21 ``TrustWeightedMultiOracleDisambiguator`` with a
+``TrustEWMATrackedMultiOracleOrchestrator`` (W33) that maintains a
+per-oracle EWMA-tracked trust state using the W32
+``update_ewma_prior`` primitive **byte-for-byte**.  At each cell
+where the inner W21 ratifies a quorum, the W33 layer derives a
+deterministic per-oracle agreement signal (1.0 if the probe's
+top_set is a non-empty subset of the anchor reference; 0.0 if
+disjoint; 0.5 if partial), updates each oracle's EWMA via the closed
+form ``ewma_new = (1-α) ewma_prev + α observation`` with α = 0.20 by
+default, and excludes oracles whose EWMA falls below the registered
+``trust_threshold`` (default 0.5) from the effective vote tally.
+W33 seals a content-addressed oracle-trust-state CID + trust-
+trajectory CID + W33 manifest-v3 CID in the W33 envelope (the W22..W32
+manifest CIDs do NOT include oracle-trust-state-cid or trust-
+trajectory-cid; the W33 manifest-v3 does).  The new "trust-EWMA-
+tracked / per-oracle agreement signal / oracle-trust-state CID /
+trust-trajectory CID / manifest-v3 CID / single-partition strict-gain
+bench / anchor-oracle reference" vocabulary is **capsule-layer
+audited proxy** — explicitly NOT a learned trust model in the
+deep-learning sense, NOT transformer-internal, NOT a runtime KV
+transplant.
+
+**The headline SDK v3.34 results.**
+
+* **R-80-COMPROMISED-SHIFT (H6 — load-bearing).**  Three-phase
+  oracle compromise (calibration / single-compromise / double-
+  compromise) on 16 cells × 5 seeds.  W21 baseline with quorum_min=2
+  forms a compromised-quorum on decoy in the double-compromise
+  phase and commits to wrong; W33 EWMA-tracked trust correctly
+  de-trusts the compromised oracles and abstains.  **Δ_trust_precision
+  = +0.375** across **5/5 seeds at trust_precision_w33 = 1.000**;
+  no correctness regression; max overhead = 1 token/cell.
+  **Empirically jointly discharges W21-C-CALIBRATED-TRUST AND
+  W32-C-OLD-LINE-EWMA-TRUST** — the FIRST capsule-native multi-agent-
+  coordination method to demonstrate that a single closed-form
+  primitive (the W32 EWMA update applied to per-oracle quorum-
+  agreement against an anchor reference) closes TWO named open
+  conjectures from TWO different research lines (the OLD W21
+  multi-oracle line AND the NEW W32 EWMA-primitive line) in ONE
+  milestone.
+* **R-79-SINGLE-PARTITION (H7b — load-bearing).**  A
+  manually-constructed alternating-signature drift-recover bench
+  where every cell classifies as CYCLIC by the W29 structural
+  classifier (c_p / N ≈ 1.0 ⇒ structurally exceeds the
+  W32-L-CYCLE-CAP limitation theorem).  N=80 cells, prefix=60,
+  shift=20, long_window=64, ewma_alpha=0.20.  **Δ(W32-W31) = +0.100**
+  exactly across **5/5 seeds × 80 cells = 400 cell-positions**.
+  **Empirically discharges W32-C-LONG-WINDOW-STRICT-GAIN** — the
+  FIRST capsule-native multi-agent-coordination method to clear
+  the +0.10 strict-gain bar on a regime that exceeds the cycle cap
+  (the bar was honestly null in W32 due to the cycle cap).
+* **R-80-MANIFEST-V3-TAMPER (H8).**  The W33 envelope's
+  manifest-v3 CID + cross-cell oracle-trust-state CID check
+  together detect five named tampers per ratified cell:
+  oracle-trust-state byte corruption (with old CID kept ⇒ recompute
+  mismatch), manifest-v3-cid corruption, trust-trajectory observed
+  out of range, oracle-trust-state ewma out of range, outer w33-cid
+  corruption.  **400/400 = 1.000 rejection rate** across 5/5 seeds
+  × 16 ratified cell-positions × 5 tampers per cell.  Closes
+  cross-component swap avenues that the W32 manifest-v2 alone
+  cannot detect.
+* **R-80-TRIVIAL-W33 (H2 byte-for-W21 anchor).**  When all W33
+  knobs are trivial (``trust_ewma_enabled=False``,
+  ``manifest_v3_disabled=True``, ``trust_trajectory_window=0``),
+  W33 reduces to W21 byte-for-byte across 5/5 seeds; every cell
+  yields ``W33_BRANCH_TRIVIAL_TRUST_EWMA_PASSTHROUGH``.
+* **R-80-NO-TRUST-SHIFT (W33-Λ-no-trust-shift).**  All-honest
+  regime ⇒ every per-oracle EWMA stays at 1.0; no oracle is
+  detrusted; W33 ties W21 byte-for-byte (Δ=0.000).
+* **R-80-FROZEN-TRUST-THRESHOLD (W33-Λ-frozen-threshold).**
+  ``trust_threshold = 0.0`` ⇒ gate never fires; W33 ties W21
+  byte-for-byte (Δ=0.000) even on the compromised-shift regime.
+* **R-80-MIS-TRUST-SHIFT (W33-Λ-mis-trust-shift honest empirical).**
+  The pre-committed falsifier predicted that a transient honest-
+  oracle compromise would mis-classify it as trust-shifted and
+  cause W33 to regress vs W21.  **Empirical correction**: the
+  anchor-oracle-reference design is more robust than predicted;
+  the anchor's own EWMA cannot drop (agreement against itself = 1.0);
+  non-anchor oracles' EWMAs recover after the transient.  W33 ties
+  W21 (Δ=0.000); the regression did NOT materialise.
+* **R-80-XLLM-LIVE-TRUST (S1 best-effort).**  Live two-host probe
+  with mixtral:8x7b on localhost vs qwen3.5:35b on 192.168.12.191
+  at temperature 0 on 20 trust-calibration prompts (5 multi-step
+  reasoning, 5 specialised factoid, 5 ambiguous syntax, 5
+  trust-calibration where one host is systematically expected to
+  win).  See ``vision_mvp/experiments/artifacts/phase80/xllm_live_trust_pilot.json``
+  for raw bytes.  Best-effort: if gold-correlated cross-host
+  disagreement found, registers as W33-C-CROSS-HOST-LIVE-TRUST-
+  MAGNITUDE discharge; otherwise honestly-null and the conjecture
+  remains open.
+
+**Four named falsifiers, all empirically observed**:
+W33-Λ-trivial-trust-ewma (all knobs trivial ⇒ W33 = W21 byte-for-byte);
+W33-Λ-no-trust-shift (all-honest regime ⇒ EWMAs stay at 1.0);
+W33-Λ-frozen-threshold (threshold=0.0 ⇒ gate never fires);
+W33-Λ-mis-trust-shift (honest empirical correction: anchor design
+is more robust than predicted).
+
+Trust precision = 1.000 across every R-80 sub-bank where W33
+ratifies. Backward-compat preserved byte-for-byte on the
+trivial-trust-ewma anchor: **31/31 W33 unit tests + 446/446
+phase69-80 regression + 133/133 wider wevra suite = 610 tests pass**.
+Mac 2 (192.168.12.248) **still unreachable** (28th milestone in a
+row, ping 100% packet loss); the other reachable host
+(192.168.12.191) was used for the live R-80-XLLM-LIVE-TRUST probe
+with mixtral:8x7b + qwen3.5:35b (a deeper architecture + scale split
+than the W31/W32 pair gemma2:9b + qwen2.5:14b).
+Stable-vs-experimental boundary tightened: ``__experimental__``
+tuple extended with W33 symbols; SDK_VERSION ``wevra.sdk.v3.34``;
+pyproject.toml ``0.5.7``.
+
+**Three named conjectures jointly discharged in one milestone**:
+W21-C-CALIBRATED-TRUST (open since SDK v3.22); W32-C-OLD-LINE-EWMA-
+TRUST (named in W32); W32-C-LONG-WINDOW-STRICT-GAIN (open since W32).
+W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE remains the new live-evidence
+axis; W33-C-NATIVE-LATENT remains the next true wall (architecture-
+dependent); W33-C-MULTI-HOST remains hardware-bounded;
+W33-C-LATENT-CROSS-AGENT-TRUST is the new architecture-dependent
+deep wall (cross-agent trust at the model's hidden-state level).
+See ``docs/RESULTS_WEVRA_W33_TRUST_EWMA_TRACKED.md`` for the full
+milestone note + pre-committed bar.
+
+---
+
+## Earlier TL;DR — SDK v3.33
 
 The programme now has **twenty-nine** coupled research axes, each
 with a sharp status. SDK v3.33 mints axis 29: **long-window

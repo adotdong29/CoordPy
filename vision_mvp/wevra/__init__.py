@@ -455,6 +455,29 @@ from .team_coord import (
     W32_BRANCH_GOLD_CORRELATED_REROUTED,
     W32_BRANCH_CHANGE_POINT_RESET,
     W32_ALL_BRANCHES,
+    # SDK v3.34 — Trust-EWMA-tracked multi-oracle adjudication (W33).
+    # EXPERIMENTAL — see __experimental__.
+    TrustTrajectoryEntry,
+    TrustEWMARatificationEnvelope,
+    TrustEWMARegistry,
+    W33TrustEWMAResult,
+    TrustEWMATrackedMultiOracleOrchestrator,
+    verify_trust_ewma_ratification,
+    derive_per_oracle_agreement_signal,
+    build_trivial_trust_ewma_registry,
+    build_trust_ewma_registry,
+    W33_TRUST_EWMA_SCHEMA_VERSION,
+    W33_DEFAULT_TRUST_THRESHOLD,
+    W33_DEFAULT_TRUST_TRAJECTORY_WINDOW,
+    W33_DEFAULT_EWMA_ALPHA,
+    W33_BRANCH_TRUST_EWMA_RESOLVED,
+    W33_BRANCH_TRIVIAL_TRUST_EWMA_PASSTHROUGH,
+    W33_BRANCH_TRUST_EWMA_REJECTED,
+    W33_BRANCH_TRUST_EWMA_DISABLED,
+    W33_BRANCH_TRUST_EWMA_NO_TRIGGER,
+    W33_BRANCH_TRUST_EWMA_DETRUSTED_ABSTAIN,
+    W33_BRANCH_TRUST_EWMA_DETRUSTED_REROUTE,
+    W33_ALL_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -468,7 +491,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.33"
+SDK_VERSION = "wevra.sdk.v3.34"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -572,6 +595,16 @@ __experimental__: tuple[str, ...] = (
     "detect_change_point",
     "build_trivial_long_window_registry",
     "build_long_window_convergent_registry",
+    # W33 family — trust-EWMA-tracked multi-oracle adjudication.
+    "TrustTrajectoryEntry",
+    "TrustEWMARatificationEnvelope",
+    "TrustEWMARegistry",
+    "W33TrustEWMAResult",
+    "TrustEWMATrackedMultiOracleOrchestrator",
+    "verify_trust_ewma_ratification",
+    "derive_per_oracle_agreement_signal",
+    "build_trivial_trust_ewma_registry",
+    "build_trust_ewma_registry",
 )
 
 __all__ = [
@@ -889,6 +922,30 @@ __all__ = [
     "W32_BRANCH_GOLD_CORRELATED_REROUTED",
     "W32_BRANCH_CHANGE_POINT_RESET",
     "W32_ALL_BRANCHES",
+    # SDK v3.34 — W33 family (trust-EWMA-tracked multi-oracle
+    # adjudication + manifest-v3 CID).  EXPERIMENTAL — see
+    # __experimental__ tuple.
+    "TrustTrajectoryEntry",
+    "TrustEWMARatificationEnvelope",
+    "TrustEWMARegistry",
+    "W33TrustEWMAResult",
+    "TrustEWMATrackedMultiOracleOrchestrator",
+    "verify_trust_ewma_ratification",
+    "derive_per_oracle_agreement_signal",
+    "build_trivial_trust_ewma_registry",
+    "build_trust_ewma_registry",
+    "W33_TRUST_EWMA_SCHEMA_VERSION",
+    "W33_DEFAULT_TRUST_THRESHOLD",
+    "W33_DEFAULT_TRUST_TRAJECTORY_WINDOW",
+    "W33_DEFAULT_EWMA_ALPHA",
+    "W33_BRANCH_TRUST_EWMA_RESOLVED",
+    "W33_BRANCH_TRIVIAL_TRUST_EWMA_PASSTHROUGH",
+    "W33_BRANCH_TRUST_EWMA_REJECTED",
+    "W33_BRANCH_TRUST_EWMA_DISABLED",
+    "W33_BRANCH_TRUST_EWMA_NO_TRIGGER",
+    "W33_BRANCH_TRUST_EWMA_DETRUSTED_ABSTAIN",
+    "W33_BRANCH_TRUST_EWMA_DETRUSTED_REROUTE",
+    "W33_ALL_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",
