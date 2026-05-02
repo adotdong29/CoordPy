@@ -478,6 +478,34 @@ from .team_coord import (
     W33_BRANCH_TRUST_EWMA_DETRUSTED_ABSTAIN,
     W33_BRANCH_TRUST_EWMA_DETRUSTED_REROUTE,
     W33_ALL_BRANCHES,
+    # SDK v3.35 — Live-aware multi-anchor adjudication + native-latent
+    # audited response-feature proxy + W34 manifest-v4 CID (W34).
+    # EXPERIMENTAL — see __experimental__.
+    LiveOracleAttestation,
+    LiveAwareMultiAnchorRatificationEnvelope,
+    LiveAwareMultiAnchorRegistry,
+    HostRegistration,
+    W34LiveAwareResult,
+    LiveAwareMultiAnchorOrchestrator,
+    verify_live_aware_multi_anchor_ratification,
+    derive_multi_anchor_consensus_reference,
+    compute_response_feature_signature,
+    apply_host_decay,
+    build_trivial_live_aware_registry,
+    build_live_aware_registry,
+    W34_LIVE_AWARE_SCHEMA_VERSION,
+    W34_DEFAULT_ANCHOR_QUORUM_MIN,
+    W34_DEFAULT_HOST_DECAY_FACTOR,
+    W34_DEFAULT_LIVE_ATTESTATION_TIMEOUT_MS_BUCKET,
+    W34_BRANCH_LIVE_AWARE_RESOLVED,
+    W34_BRANCH_TRIVIAL_MULTI_ANCHOR_PASSTHROUGH,
+    W34_BRANCH_LIVE_AWARE_REJECTED,
+    W34_BRANCH_LIVE_AWARE_DISABLED,
+    W34_BRANCH_LIVE_AWARE_NO_TRIGGER,
+    W34_BRANCH_MULTI_ANCHOR_CONSENSUS,
+    W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS,
+    W34_BRANCH_HOST_DECAY_FIRED,
+    W34_ALL_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -491,7 +519,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.34"
+SDK_VERSION = "wevra.sdk.v3.35"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -605,6 +633,20 @@ __experimental__: tuple[str, ...] = (
     "derive_per_oracle_agreement_signal",
     "build_trivial_trust_ewma_registry",
     "build_trust_ewma_registry",
+    # W34 family — live-aware multi-anchor adjudication + native-latent
+    # audited response-feature proxy + W34 manifest-v4 CID.
+    "LiveOracleAttestation",
+    "LiveAwareMultiAnchorRatificationEnvelope",
+    "LiveAwareMultiAnchorRegistry",
+    "HostRegistration",
+    "W34LiveAwareResult",
+    "LiveAwareMultiAnchorOrchestrator",
+    "verify_live_aware_multi_anchor_ratification",
+    "derive_multi_anchor_consensus_reference",
+    "compute_response_feature_signature",
+    "apply_host_decay",
+    "build_trivial_live_aware_registry",
+    "build_live_aware_registry",
 )
 
 __all__ = [
@@ -946,6 +988,34 @@ __all__ = [
     "W33_BRANCH_TRUST_EWMA_DETRUSTED_ABSTAIN",
     "W33_BRANCH_TRUST_EWMA_DETRUSTED_REROUTE",
     "W33_ALL_BRANCHES",
+    # SDK v3.35 — W34 family (live-aware multi-anchor adjudication +
+    # native-latent audited response-feature proxy + manifest-v4 CID).
+    # EXPERIMENTAL — see __experimental__ tuple.
+    "LiveOracleAttestation",
+    "LiveAwareMultiAnchorRatificationEnvelope",
+    "LiveAwareMultiAnchorRegistry",
+    "HostRegistration",
+    "W34LiveAwareResult",
+    "LiveAwareMultiAnchorOrchestrator",
+    "verify_live_aware_multi_anchor_ratification",
+    "derive_multi_anchor_consensus_reference",
+    "compute_response_feature_signature",
+    "apply_host_decay",
+    "build_trivial_live_aware_registry",
+    "build_live_aware_registry",
+    "W34_LIVE_AWARE_SCHEMA_VERSION",
+    "W34_DEFAULT_ANCHOR_QUORUM_MIN",
+    "W34_DEFAULT_HOST_DECAY_FACTOR",
+    "W34_DEFAULT_LIVE_ATTESTATION_TIMEOUT_MS_BUCKET",
+    "W34_BRANCH_LIVE_AWARE_RESOLVED",
+    "W34_BRANCH_TRIVIAL_MULTI_ANCHOR_PASSTHROUGH",
+    "W34_BRANCH_LIVE_AWARE_REJECTED",
+    "W34_BRANCH_LIVE_AWARE_DISABLED",
+    "W34_BRANCH_LIVE_AWARE_NO_TRIGGER",
+    "W34_BRANCH_MULTI_ANCHOR_CONSENSUS",
+    "W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS",
+    "W34_BRANCH_HOST_DECAY_FIRED",
+    "W34_ALL_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

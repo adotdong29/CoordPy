@@ -5,6 +5,139 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.8 / 3.35] — 2026-05-01 — SDK v3.35 — live-aware multi-anchor adjudication + native-latent audited response-feature proxy + W34 manifest-v4 CID + W33 infra-blocker closure (preflight `/api/tags` + chat-template + `num_predict=4`) + R-81 Phase-81 benchmark family + W34 family + W33 single-anchor fragility closed via multi-anchor consensus + W33-INFRA-1 + W33-INFRA-2 jointly discharged
+
+*Strictly additive on SDK v3.34.  The Wevra single-run product
+runtime contract is byte-for-byte unchanged.  The W34 surface wraps
+the **W33 ``TrustEWMATrackedMultiOracleOrchestrator``** (the
+EWMA-tracked multi-oracle line) with six NEW audited proxies at
+the capsule layer: a **multi-anchor consensus reference**
+(intersection of K registered anchors' top_sets when at least
+``anchor_quorum_min`` non-abstaining anchors agree), a **NO_CONSENSUS
+abstention branch** (when anchors disagree, W34 drops services
+from the answer — anchor disagreement is itself a trust signal), a
+**closed-form 64-bit response-feature signature** (SHA-256 prefix
+over first_token_class + length_bucket + structural_hash; the W34
+audited proxy for native-latent), a **content-addressed
+LiveOracleAttestation** (host_id, model_id,
+response_feature_signature, latency_ms_bucket, preflight_ok), a
+**closed-form host-aware EWMA decay** (multiplicative
+host_decay_factor in [0.5, 1.0] applied to oracles whose host is
+unhealthy), and a **manifest-v4 CID** over four component CIDs
+(parent_w33_cid, live_attestation_cid, multi_anchor_cid,
+host_topology_cid) that detects cross-component swaps the W33
+manifest-v3 alone cannot catch.
+
+The W34 milestone also closes two named W33 infrastructure
+follow-ups load-bearing in the live pilot:
+
+* **W33-INFRA-1 closure** — closed-form preflight ``/api/tags``
+  check.  *Honest empirical correction*: the W33 milestone diagnosed
+  qwen3.5:35b on 192.168.12.191 as "model not loaded" but a fresh
+  ``/api/tags`` curl on 2026-05-01 confirms the model IS loaded.
+  The real W33 infra failure was timeout-budget exhaustion +
+  chat-template mismatch, NOT model absence.
+
+* **W33-INFRA-2 closure** — chat-template (``/api/chat`` with
+  system+user messages) + ``num_predict=4`` + stop tokens.  Stops
+  chain-of-thought emit at temperature 0 for mixtral:8x7b within
+  the first 4 tokens.  Adaptive timeout per host: small models 30 s,
+  medium 60 s, large (>= 30B) 240 s.
+
+The new "live-aware multi-anchor / response-feature signature /
+live oracle attestation / host-aware EWMA decay / manifest-v4 CID
+/ preflight discipline" vocabulary is added at the **capsule layer
+as audited proxy** — explicitly NOT a learned feature-signature
+model in the deep-learning sense, NOT transformer-internal subspace
+projection, NOT a runtime hidden-state transplant.*
+
+**New surface (W34 family, multi-agent-coordination research slice).**
+
+``derive_multi_anchor_consensus_reference``,
+``compute_response_feature_signature``, ``apply_host_decay``,
+``LiveOracleAttestation``,
+``LiveAwareMultiAnchorRatificationEnvelope``,
+``LiveAwareMultiAnchorRegistry`` (with
+``multi_anchor_quorum_min: int``,
+``live_attestation_disabled: bool``,
+``manifest_v4_disabled: bool``,
+``host_decay_factor: float``,
+``registered_hosts: dict[str, HostRegistration]``),
+``HostRegistration``,
+``W34LiveAwareResult``,
+``LiveAwareMultiAnchorOrchestrator``,
+``verify_live_aware_multi_anchor_ratification``,
+``build_trivial_live_aware_registry``,
+``build_live_aware_registry``,
+plus W34_*_SCHEMA_VERSION / W34_DEFAULT_* constants and
+W34_BRANCH_* labels.
+
+**Headline empirical results (W34 family).**
+
+* **R-81-DOUBLE-ANCHOR-COMPROMISE (H6).**  Three-phase oracle
+  compromise where the W33 single-anchor (service_graph) itself
+  becomes compromised in the final phase.  W33: trust precision
+  0.625 (commits to wrong decoy when sg flips).  W34 with K=2
+  (sg+ch) anchors + ``anchor_quorum_min=2``: intersection of
+  anchor top_sets is empty in the double-compromise phase ⇒
+  NO_CONSENSUS branch fires ⇒ W34 abstains.  **Δ_trust_precision
+  = +0.375** across **5/5 seeds at trust_precision_w34 = 1.000**;
+  no correctness regression; max overhead = 1 token/cell.
+
+* **R-81-MANIFEST-V4-TAMPER (H3).**  400/400 = 1.000 reject rate
+  across 5/5 seeds × 16 cells × 5 named tampers per cell.
+
+* **R-81-RESPONSE-FEATURE-SIGNATURE (H8).**  10 fixtures × 3 runs
+  = 30/30 byte-equal calls.  Signature length = 16 hex chars (64
+  bits).
+
+* **R-81-TRIVIAL-W34 (H2).**  Byte-for-W33 equivalent across
+  5/5 seeds.
+
+* **R-81-NO-ANCHOR-DISAGREEMENT (W34-Λ-no-anchor-disagreement).**
+  Δ = 0.000 (all anchors agree ⇒ W34 = W33).
+
+* **R-81-FROZEN-HOST-DECAY (W34-Λ-frozen-host-decay).**
+  Δ = 0.000 (host_decay_factor=1.0 ⇒ no decay).
+
+* **W33-INFRA-1 + W33-INFRA-2 closure** in the live xLLM pilot.
+
+**Five named falsifiers, all empirically observed:**
+W34-Λ-trivial-multi-anchor; W34-Λ-no-anchor-disagreement;
+W34-Λ-anchor-betrays; W34-Λ-frozen-host-decay;
+W34-Λ-mis-feature-signature.
+
+**Trust boundary: 14 enumerated W34 failure modes**, disjoint from
+W22..W33's 70 ⇒ **84 cumulative across W22+W29+W30+W31+W32+W33+W34**.
+
+**Limitation theorem proved**: **W34-L-MULTI-ANCHOR-CAP** — when
+all K anchors are simultaneously compromised at the capsule layer,
+no multi-anchor mechanism (including W34) can recover.  Native-
+latent (architecture-dependent) is required to break this.
+
+**Conjectures inheriting forward**:
+W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE (open),
+W33-C-NATIVE-LATENT (open),
+W33-C-MULTI-HOST (open; Mac 2 ARP-incomplete 29th milestone),
+W33-C-LATENT-CROSS-AGENT-TRUST (open),
+W34-C-CROSS-HOST-LIVE-MULTI-ANCHOR (new; live anchor compromise
+detection on real cross-host topology),
+W34-C-MULTI-HOST (new; ≥ 3 reachable hosts).
+
+**Tests + regression**: 48/48 W34 unit tests + 494/494 phase69-81
+regression + 211/211 wider wevra suite = **753 tests pass**.
+Backward-compat byte-for-byte preserved on the trivial-W34 path
+(W34-Λ-trivial-multi-anchor falsifier).
+
+**Stable-vs-experimental boundary**: ``__experimental__`` extended
+with W34 symbols; ``SDK_VERSION = wevra.sdk.v3.35``; pyproject
+``0.5.8``.  Stable runtime contract byte-for-byte unchanged from
+v3.34.
+
+See ``docs/RESULTS_WEVRA_W34_LIVE_AWARE_MULTI_ANCHOR.md`` for the
+full milestone note + ``docs/SUCCESS_CRITERION_W34_LIVE_AWARE_MULTI_ANCHOR.md``
+for the pre-committed bar.
+
 ## [0.5.7 / 3.34] — 2026-05-01 — SDK v3.34 — trust-EWMA-tracked multi-oracle adjudication + per-oracle agreement signal + anchor-oracle reference + content-addressed oracle-trust-state + trust-trajectory CID + W33 manifest-v3 CID + single-partition long-window strict-gain regime + R-80 Phase-80 benchmark family + W33 family + W21-C-CALIBRATED-TRUST + W32-C-OLD-LINE-EWMA-TRUST + W32-C-LONG-WINDOW-STRICT-GAIN jointly discharged at a single milestone
 
 *Strictly additive on SDK v3.33.  The Wevra single-run product

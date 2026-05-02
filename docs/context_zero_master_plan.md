@@ -1,5 +1,44 @@
 # Context-Zero — Master Plan
 
+> **Latest milestone marker (SDK v3.35 / W34, 2026-05-01).**
+> *Live-aware multi-anchor adjudication + native-latent audited
+> response-feature proxy + W34 manifest-v4 CID + W33 infra-blocker
+> closure (preflight ``/api/tags`` + chat-template + ``num_predict=4``)*.
+> The W33 single-anchor design had an unrecognised structural
+> *fragility*: when the W33 anchor itself becomes compromised, every
+> honest non-anchor oracle's agreement signal drops to 0 against the
+> wrong reference and the (compromised) anchor remains trusted.  W34
+> (this milestone) closes that fragility with a *multi-anchor
+> consensus reference* (the *intersection* of K registered anchors'
+> top_sets when at least ``anchor_quorum_min`` agree); when the
+> intersection is empty, W34 *abstains* — the inter-anchor
+> disagreement is itself a trust signal.  Measured **+0.375
+> trust-precision strict gain over W33 single-anchor across 5/5
+> seeds at min trust precision = 1.000** on R-81-DOUBLE-ANCHOR-
+> COMPROMISE.  The `compute_response_feature_signature` is the
+> closed-form 64-bit audited proxy for native-latent (NOT a
+> transformer-internal hidden-state projection; NOT a learned
+> feature embedding).  The W33 milestone's two named infra
+> follow-ups are now closed: **W33-INFRA-1** (preflight
+> ``/api/tags`` discipline; an honest empirical correction —
+> qwen3.5:35b on 192.168.12.191 IS in fact loaded; the W33
+> diagnosis was wrong, the real W33 infra failure was timeout +
+> chat-template), **W33-INFRA-2** (chat-template + num_predict=4 +
+> stop tokens for one-word probes).  Both fixes load-bearing in
+> the W34 live pilot.  Trust boundary tightened to **84 cumulative
+> enumerated failure modes** across W22..W34.  Mac 2 still ARP-
+> incomplete (29th milestone).  **Net effect on the original
+> goal**: solve context for multi-agent teams remains open; W34
+> closes a structural weakness in the W33 trust mechanism + closes
+> two infrastructure follow-ups + adds an audited proxy step
+> toward native-latent — but the architecture-dependent walls
+> (W33-C-NATIVE-LATENT, W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE,
+> W34-C-CROSS-HOST-LIVE-MULTI-ANCHOR) remain the next frontier.
+> See ``docs/RESULTS_WEVRA_W34_LIVE_AWARE_MULTI_ANCHOR.md`` for the
+> milestone note +
+> ``docs/SUCCESS_CRITERION_W34_LIVE_AWARE_MULTI_ANCHOR.md`` for the
+> pre-committed bar.
+
 > Canonical long-running document for the research programme behind
 > `context-zero`. This is a plan for a body of work, not a changelog.
 > Phase-by-phase diaries live in `vision_mvp/RESULTS_PHASE*.md`;

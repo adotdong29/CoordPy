@@ -7,7 +7,65 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.34 (May 2026).** Trust-EWMA-tracked
+**Latest milestone: SDK v3.35 (May 2026).** Live-aware multi-anchor
+adjudication + native-latent audited response-feature proxy + W34
+manifest-v4 CID + W33 infra-blocker closure (preflight ``/api/tags``
++ chat-template + ``num_predict=4`` + stop tokens for one-word
+probes) (W34 family).  The W34
+``LiveAwareMultiAnchorOrchestrator`` wraps the W33
+``TrustEWMATrackedMultiOracleOrchestrator`` with: (a) a
+**multi-anchor consensus reference** that takes the *intersection*
+of K registered anchors' top_sets when at least
+``anchor_quorum_min`` non-abstaining anchors agree, with
+NO_CONSENSUS abstention when the intersection is empty (anchor
+disagreement is itself a trust signal — closes the W33
+single-anchor *fragility* where a flipped anchor caused W33 to
+detrust the honest oracles); (b) a **closed-form 64-bit
+response-feature signature** (``compute_response_feature_signature``
+returns a SHA-256 hex prefix over (first_token_class, length_bucket,
+structural_hash)) — the W34 audited proxy for native-latent;
+explicitly NOT a transformer-internal hidden-state projection, NOT
+a learned feature embedding, NOT a runtime KV transplant; (c) a
+content-addressed **LiveOracleAttestation** per cell (host_id,
+model_id, response_feature_signature, latency_ms_bucket,
+preflight_ok); (d) a closed-form **host-aware EWMA decay** with
+``host_decay_factor ∈ [0.5, 1.0]`` applied multiplicatively to
+oracles whose host failed preflight; (e) a **manifest-v4 CID** over
+four component CIDs (parent_w33_cid, live_attestation_cid,
+multi_anchor_cid, host_topology_cid).  The new
+``verify_live_aware_multi_anchor_ratification`` enumerates **14
+disjoint failure modes** (cumulative 84 across W22 + W29 + W30 +
+W31 + W32 + W33 + W34).  **First capsule-native multi-agent-
+coordination method to defeat anchor-itself-flips attacks at the
+capsule layer**: on **R-81-DOUBLE-ANCHOR-COMPROMISE** (where the
+W33 anchor itself becomes compromised in the final phase), W33
+single-anchor commits to wrong with trust precision 0.625; W34
+multi-anchor with K=2 + ``anchor_quorum_min=2`` abstains via the
+NO_CONSENSUS branch ⇒ trust precision = **1.000** at
+**Δ_trust_precision_w34_w33 = +0.375 across 5/5 seeds**, no
+correctness regression, max overhead 1 token/cell.  On
+**R-81-MANIFEST-V4-TAMPER** the manifest-v4 CID + cross-component
+CID checks yield **400/400 = 1.000 tamper rejection rate**.  On
+**R-81-RESPONSE-FEATURE-SIGNATURE** the audited proxy is
+byte-stable across 10 fixtures × 3 runs = 30/30 byte-equal calls.
+On **R-81-TRIVIAL-W34** the trivial passthrough yields **W34 = W33
+byte-for-byte across 5/5 seeds**.  Five named W34-Λ falsifiers all
+empirically observed.  **W33-INFRA-1 + W33-INFRA-2 jointly closed**:
+preflight discipline (an honest empirical correction recorded —
+qwen3.5:35b on 192.168.12.191 IS in fact loaded; W33's diagnosis
+was wrong, the real W33 infra failure was timeout-budget
+exhaustion + chat-template) + ``/api/chat`` + ``num_predict=4`` +
+stop tokens + adaptive timeout (small models 30 s, medium 60 s,
+large >= 30B 240 s) — both load-bearing in the W34 live xLLM pilot.
+**W34-L-MULTI-ANCHOR-CAP limitation theorem**: when all K anchors
+are simultaneously compromised at the capsule layer, no
+multi-anchor mechanism (including W34) can recover; native-latent
+(architecture-dependent; ``W33-C-NATIVE-LATENT``) is required to
+break this.  Mac 2 (192.168.12.248) still ARP-incomplete (29th
+consecutive milestone).  Stable runtime contract byte-for-byte
+unchanged from v3.34.
+
+**Earlier milestone: SDK v3.34 (May 2026).** Trust-EWMA-tracked
 multi-oracle adjudication + per-oracle agreement signal + anchor-
 oracle reference + content-addressed oracle-trust-state + trust-
 trajectory CID + W33 manifest-v3 CID + single-partition long-window

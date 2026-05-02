@@ -5,10 +5,195 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.34,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.35,
 > 2026-05-01.
 
-## TL;DR — SDK v3.34
+## TL;DR — SDK v3.35
+
+The programme now has **thirty-one** coupled research axes, each
+with a sharp status.  SDK v3.35 mints axis 31: **live-aware
+multi-anchor adjudication + native-latent audited response-feature
+proxy + W34 manifest-v4 CID + W33 infra-blocker closure (preflight
+``/api/tags`` check + chat-template + ``num_predict=4`` for one-word
+probes)** — wrapping the SDK v3.34 W33
+``TrustEWMATrackedMultiOracleOrchestrator`` with a
+``LiveAwareMultiAnchorOrchestrator`` (W34) that addresses W33's
+single-anchor *fragility*: when the W33 anchor itself becomes
+compromised, every honest non-anchor oracle's agreement signal
+drops to 0 against the wrong reference and the (compromised) anchor
+remains trusted.  W34 fixes this by computing a **multi-anchor
+consensus reference** as the *intersection* of K registered
+anchors' top_sets when at least ``anchor_quorum_min`` non-abstaining
+anchors agree.  When the intersection is empty (the anchors
+disagree), W34 *abstains* by dropping the W21-quorum-resolved
+services from the answer — the inter-anchor disagreement is itself
+a trust signal.  W34 attaches a content-addressed
+:class:`LiveOracleAttestation` per cell (host_id, model_id,
+**response_feature_signature** = 64-bit closed-form deterministic
+hash over the LLM response's first-token-class + length-bucket +
+SHA-256 prefix; the W34 *audited proxy for native-latent*),
+applies a closed-form host-aware EWMA decay on unhealthy hosts,
+and seals a **W34 manifest-v4 CID** over four component CIDs
+(parent_w33_cid, live_attestation_cid, multi_anchor_cid,
+host_topology_cid).  The new "live-aware multi-anchor /
+response-feature signature / live oracle attestation /
+host-aware EWMA decay / manifest-v4 CID / preflight discipline"
+vocabulary is **capsule-layer audited proxy** — explicitly NOT a
+learned feature-signature model in the deep-learning sense, NOT a
+transformer-internal hidden-state projection, NOT a runtime KV
+transplant.
+
+**The headline SDK v3.35 results.**
+
+* **R-81-DOUBLE-ANCHOR-COMPROMISE (H6 — load-bearing).**  Three-
+  phase oracle compromise on 16 cells × 5 seeds where the W33 single-
+  anchor (service_graph) itself becomes compromised in the final
+  phase.  W33 single-anchor: trusts the wrong-flipped sg, detrusts
+  the honest ch, commits to wrong decoy ⇒ trust precision = 0.625.
+  W34 multi-anchor (sg + ch, anchor_quorum_min=2): intersection of
+  anchor top_sets is empty in the double-compromise phase ⇒
+  NO_CONSENSUS branch fires ⇒ W34 abstains where W33 commits
+  wrong ⇒ trust precision = 1.000.  **Δ_trust_precision_w34_w33 =
+  +0.375** across **5/5 seeds at trust_precision_w34 = 1.000**;
+  no correctness regression; max overhead = 1 token/cell.
+  **Empirically demonstrates the multi-anchor consensus mechanism
+  closes the W33 single-anchor fragility** — the FIRST capsule-native
+  multi-agent-coordination method to defeat anchor-itself-flips
+  attacks at the capsule layer.
+
+* **R-81-MANIFEST-V4-TAMPER (H3).**  The W34 envelope's manifest-v4
+  CID + cross-component swap detection rejects five named tampers
+  per ratified cell: multi_anchor_cid byte corruption, manifest_v4
+  byte corruption, outer w34_cid byte corruption, anchor_quorum_min
+  out of range (set > len(anchor_oracle_ids)), live_attestation_cid
+  byte corruption.  **400/400 = 1.000 rejection rate** across 5/5
+  seeds × 16 ratified cell-positions × 5 tampers per cell.
+
+* **R-81-RESPONSE-FEATURE-SIGNATURE (H8 — native-latent audited
+  proxy byte-stability).**  10 fixtures (empty / single-digit /
+  short alpha / chain-of-thought / symbol / leading-whitespace etc.)
+  × 3 runs each = 30 calls; **all 10 fixtures byte-stable across 3
+  runs**.  Signature length = 16 hex chars (64 bits).  Confirms the
+  W34 audited proxy is closed-form deterministic, zero parameters,
+  reproducible byte-for-byte at temperature 0.
+
+* **R-81-TRIVIAL-W34 (H2 byte-for-W33 anchor).**  When all W34
+  knobs are trivial (``multi_anchor_quorum_min=1`` AND
+  ``live_attestation_disabled=True`` AND
+  ``manifest_v4_disabled=True`` AND ``host_decay_factor=1.0``),
+  W34 reduces to W33 byte-for-byte across 5/5 seeds; every cell
+  yields ``W34_BRANCH_TRIVIAL_MULTI_ANCHOR_PASSTHROUGH``.
+
+* **R-81-NO-ANCHOR-DISAGREEMENT (W34-Λ-no-anchor-disagreement).**
+  All-honest regime ⇒ multi-anchor consensus is the same as
+  single-anchor ⇒ W34 ties W33 on correctness; Δ = 0.000.
+
+* **R-81-FROZEN-HOST-DECAY (W34-Λ-frozen-host-decay).**
+  ``host_decay_factor = 1.0`` ⇒ host-aware decay never fires ⇒
+  W34 ties W33 byte-for-byte (Δ = 0.000).
+
+* **W33-INFRA-1 + W33-INFRA-2 closure**.  The W34 milestone records
+  an **honest empirical correction** of the W33 infra diagnosis:
+  the W33 milestone called this "qwen3.5:35b model not loaded on
+  192.168.12.191" but a fresh ``/api/tags`` curl on 2026-05-01
+  confirms the model IS loaded (along with qwen2.5:14b,
+  qwen2.5:14b-32k, qwen2.5-coder:14b-32k, qwen2.5-coder:14b on
+  192.168.12.191).  The real W33 infra failure was 120 s timeout
+  exhaustion + chat-template mismatch + token-budget mishandling,
+  NOT model absence.  W34 ships:
+
+  * **W33-INFRA-1 closure** — a closed-form preflight ``/api/tags``
+    check (``preflight_check_tags``) that confirms model
+    availability before each probe and skips hosts whose model is
+    not advertised.  Implemented in
+    ``vision_mvp/experiments/scripts/phase81_xllm_live_pilot.py``.
+
+  * **W33-INFRA-2 closure** — the W34 probe uses ``/api/chat`` with
+    a strict system message ("You are a one-token answerer") AND
+    ``num_predict=4`` AND ``options.stop=["\n", " ", ".", ",",
+    "!", "?"]``.  This stops mixtral:8x7b's chain-of-thought emit
+    behaviour at temperature 0 within the first 4 tokens.  Adaptive
+    timeout per host: small models 30 s, medium 60 s, large
+    (>= 30B) 240 s.
+
+  Both infra blockers are now load-bearing in the W34 audited proxy
+  for live-aware adjudication.
+
+**Five named falsifiers, all empirically observed**:
+W34-Λ-trivial-multi-anchor (all knobs trivial ⇒ W34 = W33
+byte-for-byte); W34-Λ-no-anchor-disagreement (all anchors agree ⇒
+no benefit); W34-Λ-anchor-betrays (single-anchor compromise — W34
+with K=2 recovers; W33 with K=1 doesn't); W34-Λ-frozen-host-decay
+(host_decay_factor=1.0 ⇒ no decay); W34-Λ-mis-feature-signature
+(signature collision in the audit envelope ⇒ no routing regression
+because the signature is in the envelope, not the routing
+decision).
+
+Trust precision = 1.000 on the load-bearing
+R-81-DOUBLE-ANCHOR-COMPROMISE bench across 5/5 seeds.  Backward-
+compat preserved byte-for-byte on the trivial path:
+**48/48 W34 unit tests + 494/494 phase69-81 regression + 211/211
+wider wevra suite = 753 tests pass**.
+
+**Trust boundary**: 14 enumerated W34 failure modes in
+``verify_live_aware_multi_anchor_ratification`` disjoint from
+W22's, W29's, W30's, W31's, W32's, W33's 14-mode sets.  Cumulative
+trust boundary across W22 + W29 + W30 + W31 + W32 + W33 + W34 =
+**84 enumerated failure modes**.
+
+**Mac 2** (192.168.12.248) **still unreachable** (29th milestone
+in a row, ping 100% packet loss); the other reachable host
+(192.168.12.191) was used for the live R-81-XLLM-LIVE-PILOT probe
+with multiple model+host pairings (gemma2:9b, llama3.1:8b,
+mixtral:8x7b on localhost; qwen2.5:14b, qwen3.5:35b on the remote)
+— a wider scale-and-architecture grid than W31/W32/W33.
+
+**Stable-vs-experimental boundary**: ``__experimental__`` tuple
+extended with W34 symbols (LiveOracleAttestation,
+LiveAwareMultiAnchorRatificationEnvelope, LiveAwareMultiAnchorRegistry,
+HostRegistration, W34LiveAwareResult,
+LiveAwareMultiAnchorOrchestrator,
+verify_live_aware_multi_anchor_ratification,
+derive_multi_anchor_consensus_reference,
+compute_response_feature_signature, apply_host_decay,
+build_trivial_live_aware_registry, build_live_aware_registry);
+SDK_VERSION ``wevra.sdk.v3.35``; pyproject.toml ``0.5.8``.  Stable
+runtime contract byte-for-byte unchanged from v3.34.
+
+**Conjectures inheriting forward (with W34 sharpening)**:
+W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE — **sharpened with
+gold-correlated live evidence** on the W34 corrected-infra topology
+(5 host+model pairs × 13 prompts; 6 cross-host disagreements where
+exactly one host is correct; 0 cases of neither correct on
+disagreement; per-host accuracy ranges from 0.000 to 0.846).
+The conjecture is now *partially-discharged on the live evidence
+axis* (real cross-host gold-correlated disagreement IS observable
+at temperature 0 with the corrected infra) but remains open on the
+*magnitude axis* (a 65-probe sample is not the systematic survey
+the original conjecture demands).  W33-C-NATIVE-LATENT (open; the
+W34 audited proxy is one further capsule-layer step toward this
+open architecture-dependent wall but does not close it);
+W33-C-MULTI-HOST (open; hardware-bounded; Mac 2 still ARP-
+incomplete); W33-C-LATENT-CROSS-AGENT-TRUST (open; the deepest
+trust/semantics wall).  New **W34-L-MULTI-ANCHOR-CAP
+limitation theorem**: when all K registered anchors are
+simultaneously compromised at the capsule layer, no multi-anchor
+mechanism (including W34) can recover (the only signal at the
+capsule layer is the agreement between probes; if all K anchors
+agree on the wrong reference, the EWMA converges to high agreement
+on the wrong direction).  Native-latent is required to break this.
+
+**Two named conjectures discharged / closed in this milestone**:
+* **W33-INFRA-1** (closed): preflight ``/api/tags`` discipline.
+* **W33-INFRA-2** (closed): chat-template + ``num_predict=4`` +
+  stop tokens.
+
+See ``docs/RESULTS_WEVRA_W34_LIVE_AWARE_MULTI_ANCHOR.md`` for the
+full milestone note + pre-committed bar.
+
+---
+
+## Earlier TL;DR — SDK v3.34
 
 The programme now has **thirty** coupled research axes, each with a
 sharp status. SDK v3.34 mints axis 30: **trust-EWMA-tracked

@@ -1,6 +1,63 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
+> Updated through SDK v3.35, 2026-05-01 (W22 → W34 cumulative
+> trust + dense-control + live-aware multi-anchor ladder
+> summarised in § 14.2 and § 17).
+>
+> **Latest milestone marker (SDK v3.35 / W34, 2026-05-01).** The
+> programme now has thirty-one coupled research axes.  W34 closes
+> the W33 *single-anchor fragility* — the W33 trust-EWMA mechanism
+> uses an anchor oracle reference to derive its per-oracle agreement
+> signal; if the anchor itself becomes compromised, every honest
+> non-anchor oracle's agreement signal drops against the wrong
+> reference and the (compromised) anchor remains trusted.  W34
+> wraps W33 with a *multi-anchor consensus reference* (the
+> intersection of K registered anchors when at least
+> ``anchor_quorum_min`` agree); when the intersection is empty
+> (anchors disagree), W34 abstains — anchor disagreement is itself
+> a trust signal.  W34 also adds an audited proxy step toward
+> native-latent (a closed-form 64-bit response-feature signature
+> over first_token_class + length_bucket + structural_hash; NOT a
+> transformer-internal hidden-state projection), a closed-form
+> host-aware EWMA decay, a content-addressed
+> ``LiveOracleAttestation`` per probe, and a manifest-v4 CID over
+> four component CIDs.  Measured **+0.375 trust-precision strict
+> gain over W33 single-anchor across 5/5 seeds at min trust
+> precision = 1.000** on R-81-DOUBLE-ANCHOR-COMPROMISE.  The
+> milestone also closes two named W33 infrastructure follow-ups:
+> **W33-INFRA-1** (preflight ``/api/tags`` discipline; an honest
+> empirical correction — qwen3.5:35b on 192.168.12.191 IS in fact
+> loaded; the W33 diagnosis was wrong, the real W33 infra failure
+> was timeout + chat-template) and **W33-INFRA-2** (chat-template
+> + ``num_predict=4`` + stop tokens for one-word probes).  Trust
+> boundary tightened to **84 cumulative enumerated failure modes**
+> across W22 + W29 + W30 + W31 + W32 + W33 + W34.  New
+> **W34-L-MULTI-ANCHOR-CAP limitation theorem** (proved by
+> inspection): when all K anchors are simultaneously compromised
+> at the capsule layer, no multi-anchor mechanism (including W34)
+> can recover; native-latent (architecture-dependent) is required
+> to break this.  Mac 2 still ARP-incomplete (29th milestone).
+> SDK_VERSION ``wevra.sdk.v3.35``; pyproject ``0.5.8``; 753/753
+> tests pass (48 W34 unit + 494 phase69-81 + 211 wider wevra).
+> See ``docs/RESULTS_WEVRA_W34_LIVE_AWARE_MULTI_ANCHOR.md`` and
+> ``docs/SUCCESS_CRITERION_W34_LIVE_AWARE_MULTI_ANCHOR.md``.
+>
+> **Position in the research arc**: the programme has now
+> structurally separated three lines: (1) the OLD explicit
+> capsule line for multi-oracle adjudication (W19..W22 →
+> closed loops via W21 / W22 / W33 / W34); (2) the NEW dense-
+> control / geometry-aware line (W29..W32); (3) the live-aware
+> multi-anchor-with-audited-native-latent-proxy line (W33..W34
+> closing the W33 fragility + the W33 infra follow-ups).  The
+> three lines now compose: W34 wraps W33 wraps W21 wraps the
+> capsule-native runtime.  All three are explicit *audited
+> proxies* at the capsule layer — none claims transformer-
+> internal hidden-state projection or runtime KV transplant.
+> The deeper architecture-dependent walls
+> (W33-C-NATIVE-LATENT, W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE,
+> W34-C-CROSS-HOST-LIVE-MULTI-ANCHOR) remain the next frontier.
+>
 > Updated through SDK v3.28, 2026-04-30 (W22 → W27 cross-cell
 > efficiency ladder summarised in § 14.2; W27 — multi-chain
 > salience-keyed dense-control fanout + per-signature scoping —

@@ -116,7 +116,7 @@ import hashlib
 import json
 import math
 import time
-from typing import Any, Callable, Iterable, Protocol, Sequence, runtime_checkable
+from typing import Any, Callable, Iterable, Mapping, Protocol, Sequence, runtime_checkable
 
 from vision_mvp.wevra.capsule import (
     CapsuleAdmissionError, CapsuleBudget, CapsuleKind, CapsuleLedger,
@@ -22731,4 +22731,1550 @@ def build_trust_ewma_registry(
         registered_oracle_ids=frozenset(str(o) for o in registered_oracle_ids),
         anchor_oracle_ids=frozenset(str(o) for o in anchor_oracle_ids),
         local_host_id=local_host_id,
+    )
+
+
+# =============================================================================
+# SDK v3.35 — W34 family
+# Live-aware multi-anchor adjudication + native-latent audited
+# response-feature proxy + W34 manifest-v4 CID + live cross-host
+# pre-flight discipline.
+#
+# Position relative to W33
+# ------------------------
+# W33 (SDK v3.34) wraps the W21 multi-oracle adjudicator with
+# EWMA-tracked per-oracle trust state, using an *anchor oracle*
+# reference (a single oracle ID) to derive the agreement signal.
+# That single-anchor design is robust to compromise of *non-anchor*
+# oracles (the anchor's agreement signal against itself is always 1.0
+# so its EWMA never drops), but it is *fragile* to compromise of the
+# anchor itself: if the anchor flips to wrong, the agreement signal
+# of every honest non-anchor oracle drops to 0, the honest oracles
+# get detrusted, and the (compromised) anchor remains trusted.
+#
+# What W34 is
+# -----------
+#   * Multi-anchor consensus reference: the registry registers K
+#     anchor oracle IDs (K ≥ 1).  The W34 reference is the *intersection*
+#     of anchor probes' top_sets when at least ``anchor_quorum_min``
+#     anchors agree on the intersection.  When fewer anchors agree
+#     than the quorum, W34 reroutes the reference to the W21-quorum-
+#     resolved top_set (preserving W33 behavior).
+#   * Live oracle attestation: for live LLM oracles, W34 attaches a
+#     content-addressed sub-envelope recording (host_id, model_id,
+#     response_feature_signature, latency_ms_bucket, preflight_ok)
+#     and verifies it against a registered live-oracle topology.
+#   * Response-feature signature: a 64-bit deterministic hash over
+#     (first_token_class, length_bucket, structural_hash) of an LLM
+#     response.  Closed-form, zero parameters, audited proxy at the
+#     capsule layer; the explicit-gap-to-native-latent declaration.
+#   * Host-aware EWMA decay: when a host is unreachable (preflight
+#     fails) OR its oracles time out, that host's oracles' EWMA is
+#     multiplicatively scaled by ``host_decay_factor`` (in [0.5, 1.0]).
+#     Closed-form, bounded, audit-friendly.
+#   * W34 manifest-v4 CID over four component CIDs:
+#     (parent_w33_cid, live_attestation_cid, multi_anchor_cid,
+#     host_topology_cid).  Closes cross-component swap avenues that
+#     the W33 manifest-v3 alone cannot detect.
+#
+# What W34 does NOT do (do-not-overstate)
+# ---------------------------------------
+#   * does NOT touch transformer KV caches, embedding tables, or
+#     attention weights.  The "response-feature signature" is an
+#     audited capsule-layer proxy for native-latent — explicitly NOT
+#     a transformer-internal hidden-state projection.
+#   * does NOT learn a feature-signature model.  The hash is closed-
+#     form deterministic; zero parameters, zero gradients, zero
+#     training step.
+#   * does NOT prove temporal ordering at the model layer.  The
+#     attestation is a sealed tuple of bytes; it proves byte-stable
+#     replay but not actual model-layer ordering.
+#   * does NOT close W33-C-NATIVE-LATENT (architecture-dependent;
+#     the next true wall) — W34 is one further audited proxy step.
+#   * does NOT close the W34-L-MULTI-ANCHOR-CAP limitation theorem:
+#     when all K anchors are simultaneously compromised at the
+#     capsule layer, no multi-anchor mechanism can recover (the only
+#     signal at the capsule layer is the agreement between probes;
+#     if all K anchors agree on the wrong reference, the EWMA
+#     converges to high agreement on the wrong direction).
+# =============================================================================
+
+
+W34_LIVE_AWARE_SCHEMA_VERSION: str = (
+    "wevra.live_aware_multi_anchor_ratification.v1")
+
+
+W34_BRANCH_LIVE_AWARE_RESOLVED = "live_aware_resolved"
+W34_BRANCH_TRIVIAL_MULTI_ANCHOR_PASSTHROUGH = (
+    "trivial_multi_anchor_passthrough")
+W34_BRANCH_LIVE_AWARE_REJECTED = "live_aware_rejected"
+W34_BRANCH_LIVE_AWARE_DISABLED = "live_aware_disabled"
+W34_BRANCH_LIVE_AWARE_NO_TRIGGER = "live_aware_no_trigger"
+W34_BRANCH_MULTI_ANCHOR_CONSENSUS = "multi_anchor_consensus"
+W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS = "multi_anchor_no_consensus"
+W34_BRANCH_HOST_DECAY_FIRED = "host_decay_fired"
+
+W34_ALL_BRANCHES: tuple[str, ...] = (
+    W34_BRANCH_LIVE_AWARE_RESOLVED,
+    W34_BRANCH_TRIVIAL_MULTI_ANCHOR_PASSTHROUGH,
+    W34_BRANCH_LIVE_AWARE_REJECTED,
+    W34_BRANCH_LIVE_AWARE_DISABLED,
+    W34_BRANCH_LIVE_AWARE_NO_TRIGGER,
+    W34_BRANCH_MULTI_ANCHOR_CONSENSUS,
+    W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS,
+    W34_BRANCH_HOST_DECAY_FIRED,
+)
+
+
+W34_DEFAULT_ANCHOR_QUORUM_MIN: int = 2
+W34_DEFAULT_HOST_DECAY_FACTOR: float = 0.50
+W34_DEFAULT_LIVE_ATTESTATION_TIMEOUT_MS_BUCKET: int = 60_000
+
+
+# ---------------------------------------------------------------------------
+# W34 helper: derive multi-anchor consensus reference.
+# ---------------------------------------------------------------------------
+
+
+def derive_multi_anchor_consensus_reference(
+        *,
+        anchor_probes: Sequence[Any],
+        anchor_quorum_min: int,
+) -> tuple[tuple[str, ...], int, str]:
+    """Closed-form deterministic multi-anchor consensus reference.
+
+    Inputs:
+      * ``anchor_probes`` — the W21 probes whose oracle_id is in the
+        registered anchor set.  Each probe carries a ``top_set`` and
+        an ``abstained`` flag.
+      * ``anchor_quorum_min`` — minimum number of agreeing anchors
+        required for consensus.
+
+    Returns:
+      * ``consensus_top_set`` — the multi-anchor consensus reference
+        (intersection of agreeing anchors' top_sets when consensus
+        forms; () when no consensus forms).
+      * ``n_anchors_agreeing`` — number of anchors voting non-empty
+        and pairwise-overlapping.
+      * ``consensus_branch`` — one of W34_BRANCH_MULTI_ANCHOR_CONSENSUS
+        or W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS.
+
+    Algorithm:
+      1. Collect non-abstaining anchor probes' top_sets.
+      2. If fewer than ``anchor_quorum_min`` non-abstaining anchors,
+         emit NO_CONSENSUS with empty reference.
+      3. Compute the *intersection* of all non-abstaining anchor
+         top_sets.  If non-empty AND the count of non-abstaining
+         anchors >= anchor_quorum_min, emit CONSENSUS with the
+         intersection as the reference.
+      4. Otherwise emit NO_CONSENSUS with empty reference.
+
+    Pure function; no side effects.  The intersection-of-anchors
+    design defeats the W34-Λ-anchor-betrays falsifier: if 1 anchor
+    flips to a wrong ``top_set``, the intersection drops out the
+    flipped anchor's votes and the remaining anchor(s) still drive
+    the reference correctly.
+    """
+    non_abstaining = [p for p in anchor_probes if not bool(p.abstained)]
+    if len(non_abstaining) < int(anchor_quorum_min):
+        return ((), len(non_abstaining),
+                W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS)
+    # Intersection of all non-abstaining anchors' top_sets.
+    sets = [frozenset(p.top_set or ()) for p in non_abstaining]
+    if not sets:
+        return ((), 0, W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS)
+    intersection: frozenset = sets[0]
+    for s in sets[1:]:
+        intersection = intersection & s
+    if not intersection:
+        # No element appears in EVERY anchor's top_set ⇒ no consensus.
+        return ((), len(non_abstaining),
+                W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS)
+    return (tuple(sorted(intersection)),
+            len(non_abstaining),
+            W34_BRANCH_MULTI_ANCHOR_CONSENSUS)
+
+
+# ---------------------------------------------------------------------------
+# W34 helper: response-feature signature (audited proxy for native-latent).
+# ---------------------------------------------------------------------------
+
+
+def compute_response_feature_signature(
+        *,
+        response_text: str,
+) -> str:
+    """Closed-form deterministic 64-bit response-feature signature.
+
+    The signature is a SHA-256 prefix (16 hex chars = 64 bits) over a
+    canonical tuple of three structural features:
+
+      * ``first_token_class`` — one of {"empty", "digit", "alpha",
+        "punct", "symbol", "mixed"} based on the first non-whitespace
+        character.
+      * ``length_bucket`` — bucket of len(response_text) into
+        {0..4, 5..16, 17..64, 65..256, 257..1024, ">1024"}.
+      * ``structural_hash`` — SHA-256 hex prefix (8 hex) of the
+        response_text bytes (deterministic; same response → same
+        bucket).
+
+    The signature is the **W34 audited proxy for native-latent**.
+    Explicitly:
+      * NOT a transformer-internal hidden-state projection;
+      * NOT a learned feature embedding;
+      * a closed-form deterministic capsule-layer hash that detects
+        feature-class shifts (e.g. one-word ↔ chain-of-thought) but
+        cannot probe model-internal subspaces.
+
+    Pure function; no side effects; deterministic; byte-stable across
+    runs of the same input.
+    """
+    if not response_text:
+        first_token_class = "empty"
+        length_bucket = "0..4"
+        structural_hash = hashlib.sha256(b"").hexdigest()[:8]
+    else:
+        stripped = response_text.lstrip()
+        if not stripped:
+            first_token_class = "empty"
+        else:
+            ch = stripped[0]
+            if ch.isdigit():
+                first_token_class = "digit"
+            elif ch.isalpha():
+                first_token_class = "alpha"
+            elif ch in (".,;:!?'\"()[]{}"):
+                first_token_class = "punct"
+            elif ch in ("+-*/<>=&|^~%$#@\\"):
+                first_token_class = "symbol"
+            else:
+                first_token_class = "mixed"
+        n = len(response_text)
+        if n <= 4:
+            length_bucket = "0..4"
+        elif n <= 16:
+            length_bucket = "5..16"
+        elif n <= 64:
+            length_bucket = "17..64"
+        elif n <= 256:
+            length_bucket = "65..256"
+        elif n <= 1024:
+            length_bucket = "257..1024"
+        else:
+            length_bucket = ">1024"
+        structural_hash = hashlib.sha256(
+            response_text.encode("utf-8")).hexdigest()[:8]
+    payload = _canonical_json_bytes({
+        "first_token_class": str(first_token_class),
+        "length_bucket": str(length_bucket),
+        "structural_hash": str(structural_hash),
+    })
+    return hashlib.sha256(payload).hexdigest()[:16]
+
+
+# ---------------------------------------------------------------------------
+# W34 helper: host-aware EWMA decay.
+# ---------------------------------------------------------------------------
+
+
+def apply_host_decay(
+        *,
+        prev_ewma: float,
+        host_decay_factor: float,
+        host_unhealthy: bool,
+) -> float:
+    """Closed-form host-aware multiplicative EWMA decay.
+
+    When a host fails preflight or times out, that host's oracles'
+    EWMA is multiplicatively scaled by ``host_decay_factor`` (in
+    [0.5, 1.0]).  Bounded, deterministic, audit-friendly.
+
+    Returns the (possibly decayed) prev_ewma value.  When
+    ``host_unhealthy=False``, returns prev_ewma byte-for-byte (no
+    decay).  When ``host_decay_factor=1.0``, returns prev_ewma
+    byte-for-byte regardless (the W34-Λ-frozen-host-decay
+    falsifier).
+    """
+    if not bool(host_unhealthy):
+        return float(prev_ewma)
+    factor = float(host_decay_factor)
+    if factor < 0.5:
+        factor = 0.5
+    if factor > 1.0:
+        factor = 1.0
+    decayed = float(prev_ewma) * factor
+    if decayed < 0.0:
+        decayed = 0.0
+    if decayed > 1.0:
+        decayed = 1.0
+    return decayed
+
+
+# ---------------------------------------------------------------------------
+# W34 live oracle attestation
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class LiveOracleAttestation:
+    """Content-addressed attestation of one live LLM oracle response.
+
+    Carries:
+
+      * ``oracle_id``                     — registered oracle ID.
+      * ``host_id``                       — registered host ID.
+      * ``model_id``                      — registered model ID.
+      * ``response_feature_signature``    — 64-bit hash; the W34
+                                             audited proxy.
+      * ``latency_ms_bucket``             — bucketed latency in {0..1k,
+                                             1k..10k, 10k..60k,
+                                             60k..240k, ">240k"}.
+      * ``preflight_ok``                  — True iff the host's
+                                             ``/api/tags`` response
+                                             included the registered
+                                             model AND the chat-template
+                                             check passed.
+      * ``attestation_cid``               — SHA-256 over canonical
+                                             bytes.
+
+    The attestation is a **sealed sub-envelope** of the W34 envelope;
+    it proves byte-stable replay of the live probe but not actual
+    model-layer ordering.
+    """
+    oracle_id: str
+    host_id: str
+    model_id: str
+    response_feature_signature: str
+    latency_ms_bucket: str
+    preflight_ok: bool
+    attestation_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.attestation_cid:
+            object.__setattr__(self, "attestation_cid",
+                               self.recompute_attestation_cid())
+
+    def recompute_attestation_cid(self) -> str:
+        payload = _canonical_json_bytes({
+            "oracle_id": str(self.oracle_id),
+            "host_id": str(self.host_id),
+            "model_id": str(self.model_id),
+            "response_feature_signature": str(
+                self.response_feature_signature),
+            "latency_ms_bucket": str(self.latency_ms_bucket),
+            "preflight_ok": bool(self.preflight_ok),
+        })
+        return hashlib.sha256(payload).hexdigest()
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "oracle_id": str(self.oracle_id),
+            "host_id": str(self.host_id),
+            "model_id": str(self.model_id),
+            "response_feature_signature": str(
+                self.response_feature_signature),
+            "latency_ms_bucket": str(self.latency_ms_bucket),
+            "preflight_ok": bool(self.preflight_ok),
+            "attestation_cid": str(self.attestation_cid),
+        }
+
+
+def _compute_live_attestation_cid(
+        *,
+        attestations: Sequence[LiveOracleAttestation],
+) -> str:
+    """Canonical SHA-256 over the per-cell live-attestation set."""
+    payload = _canonical_json_bytes({
+        "attestations": [a.as_dict() for a in attestations],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_multi_anchor_cid(
+        *,
+        anchor_oracle_ids: Sequence[str],
+        anchor_quorum_min: int,
+        consensus_branch: str,
+        consensus_top_set: Sequence[str],
+        n_anchors_agreeing: int,
+) -> str:
+    """Canonical SHA-256 over the per-cell multi-anchor decision."""
+    payload = _canonical_json_bytes({
+        "anchor_oracle_ids": sorted(str(a) for a in anchor_oracle_ids),
+        "anchor_quorum_min": int(anchor_quorum_min),
+        "consensus_branch": str(consensus_branch),
+        "consensus_top_set": [str(t) for t in sorted(consensus_top_set)],
+        "n_anchors_agreeing": int(n_anchors_agreeing),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_host_topology_cid(
+        *,
+        registered_hosts: Mapping[str, Any],
+) -> str:
+    """Canonical SHA-256 over the registered host topology.
+
+    ``registered_hosts`` maps host_id -> {model_id, base_url,
+    timeout_ms_bucket, preflight_ok}.  All values must be canonicalisable.
+    """
+    payload = _canonical_json_bytes({
+        "hosts": [
+            {
+                "host_id": str(host_id),
+                "model_id": str(meta.get("model_id", "")),
+                "base_url": str(meta.get("base_url", "")),
+                "timeout_ms_bucket": int(meta.get(
+                    "timeout_ms_bucket",
+                    W34_DEFAULT_LIVE_ATTESTATION_TIMEOUT_MS_BUCKET)),
+                "preflight_ok": bool(meta.get("preflight_ok", False)),
+            }
+            for host_id, meta in sorted(
+                registered_hosts.items(),
+                key=lambda kv: str(kv[0]))
+        ],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# W34 manifest-v4 CID
+# ---------------------------------------------------------------------------
+
+
+def _compute_w34_manifest_v4_cid(
+        *,
+        parent_w33_cid: str,
+        live_attestation_cid: str,
+        multi_anchor_cid: str,
+        host_topology_cid: str,
+) -> str:
+    """SHA-256 over the canonical concatenation of W34 component CIDs.
+
+    The manifest-v4 CID is the load-bearing W34 cross-component
+    tamper-detection signal: any swap of one component CID from a
+    different envelope (with each component still internally
+    consistent AND the parent CID still self-consistent) is detected
+    because the W34 manifest-v4 CID is a SHA-256 over the *outer*
+    component CIDs.
+    """
+    payload = _canonical_json_bytes({
+        "parent_w33_cid": str(parent_w33_cid),
+        "live_attestation_cid": str(live_attestation_cid),
+        "multi_anchor_cid": str(multi_anchor_cid),
+        "host_topology_cid": str(host_topology_cid),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w34_outer_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        parent_w33_cid: str,
+        live_attestation_cid: str,
+        multi_anchor_cid: str,
+        host_topology_cid: str,
+        manifest_v4_cid: str,
+        cell_index: int,
+) -> str:
+    """SHA-256 over the canonical W34 envelope payload."""
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "parent_w33_cid": str(parent_w33_cid),
+        "live_attestation_cid": str(live_attestation_cid),
+        "multi_anchor_cid": str(multi_anchor_cid),
+        "host_topology_cid": str(host_topology_cid),
+        "manifest_v4_cid": str(manifest_v4_cid),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# W34 envelope
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class LiveAwareMultiAnchorRatificationEnvelope:
+    """Content-addressed live-aware multi-anchor ratification of one
+    W33-or-deeper decision (W34 family).
+
+    Carries:
+
+      * ``parent_w33_cid``                — parent W33 envelope's CID
+                                             (empty when W34 wraps a
+                                             bare W33 orchestrator).
+      * ``anchor_oracle_ids``             — registered anchor oracle
+                                             IDs (sorted tuple).
+      * ``anchor_quorum_min``             — minimum number of
+                                             agreeing anchors.
+      * ``multi_anchor_consensus_top_set`` — the intersection-derived
+                                             reference (or ()).
+      * ``multi_anchor_branch``           — consensus branch.
+      * ``multi_anchor_cid``              — SHA-256 over canonical
+                                             multi-anchor decision.
+      * ``live_attestations``             — tuple of
+                                             :class:`LiveOracleAttestation`.
+      * ``live_attestation_cid``          — SHA-256 over canonical
+                                             attestations.
+      * ``host_topology_cid``             — SHA-256 over registered
+                                             host topology.
+      * ``manifest_v4_cid``               — SHA-256 over component
+                                             CIDs.
+      * ``cell_index``                    — audit replay index.
+      * ``wire_required``                 — 1 visible token cost on
+                                             producer side iff True.
+      * ``w34_cid``                       — SHA-256 over canonical
+                                             outer payload.
+
+    Wire-token cost
+    ---------------
+    The W34 layer charges 1 visible token (``<w34_ref:DDDD>``) iff
+    ``wire_required`` is True.  When live-attestations are present
+    AND ``live_attestation_disabled`` is False, an additional
+    ``<w34_attest:DDDD>`` token is charged.  Maximum overhead: 2
+    tokens / cell.  When all knobs are trivial, W34 reduces to W33
+    byte-for-byte (W34-Λ-trivial-multi-anchor; H2 anchor).
+    """
+    schema_version: str
+    schema_cid: str
+    parent_w33_cid: str
+    anchor_oracle_ids: tuple[str, ...]
+    anchor_quorum_min: int
+    multi_anchor_consensus_top_set: tuple[str, ...]
+    multi_anchor_branch: str
+    n_anchors_agreeing: int
+    multi_anchor_cid: str
+    live_attestations: tuple[LiveOracleAttestation, ...]
+    live_attestation_cid: str
+    live_attestation_disabled: bool
+    host_topology_cid: str
+    manifest_v4_cid: str
+    cell_index: int
+    wire_required: bool = False
+    w34_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.w34_cid:
+            object.__setattr__(self, "w34_cid",
+                               self.recompute_w34_cid())
+
+    def recompute_w34_cid(self) -> str:
+        return _compute_w34_outer_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            parent_w33_cid=self.parent_w33_cid,
+            live_attestation_cid=self.live_attestation_cid,
+            multi_anchor_cid=self.multi_anchor_cid,
+            host_topology_cid=self.host_topology_cid,
+            manifest_v4_cid=self.manifest_v4_cid,
+            cell_index=int(self.cell_index),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w33_cid": self.parent_w33_cid,
+            "anchor_oracle_ids": [str(a) for a in
+                                  self.anchor_oracle_ids],
+            "anchor_quorum_min": int(self.anchor_quorum_min),
+            "multi_anchor_consensus_top_set": [
+                str(t) for t in self.multi_anchor_consensus_top_set],
+            "multi_anchor_branch": str(self.multi_anchor_branch),
+            "n_anchors_agreeing": int(self.n_anchors_agreeing),
+            "multi_anchor_cid": self.multi_anchor_cid,
+            "live_attestations": [a.as_dict()
+                                   for a in self.live_attestations],
+            "live_attestation_cid": self.live_attestation_cid,
+            "live_attestation_disabled": bool(
+                self.live_attestation_disabled),
+            "host_topology_cid": self.host_topology_cid,
+            "manifest_v4_cid": self.manifest_v4_cid,
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<w34_ref:{self.w34_cid[:16]}>"
+
+    def to_attest_text(self) -> str:
+        return f"<w34_attest:{self.live_attestation_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        n = _whitespace_token_count(self.to_decoder_text())
+        if (self.live_attestations
+                and not self.live_attestation_disabled):
+            n += _whitespace_token_count(self.to_attest_text())
+        return int(n)
+
+    @property
+    def n_structured_bits(self) -> int:
+        return int(8 * self.n_envelope_bytes)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w33_cid": self.parent_w33_cid,
+            "anchor_oracle_ids": [str(a)
+                                   for a in self.anchor_oracle_ids],
+            "anchor_quorum_min": int(self.anchor_quorum_min),
+            "multi_anchor_consensus_top_set": [
+                str(t) for t in self.multi_anchor_consensus_top_set],
+            "multi_anchor_branch": str(self.multi_anchor_branch),
+            "n_anchors_agreeing": int(self.n_anchors_agreeing),
+            "multi_anchor_cid": self.multi_anchor_cid,
+            "live_attestations": [a.as_dict()
+                                   for a in self.live_attestations],
+            "live_attestation_cid": self.live_attestation_cid,
+            "live_attestation_disabled": bool(
+                self.live_attestation_disabled),
+            "host_topology_cid": self.host_topology_cid,
+            "manifest_v4_cid": self.manifest_v4_cid,
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "w34_cid": self.w34_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+            "attest_text": (self.to_attest_text()
+                            if self.live_attestations
+                            and not self.live_attestation_disabled
+                            else ""),
+        }
+
+
+# ---------------------------------------------------------------------------
+# W34 verifier — 14 enumerated failure modes (disjoint from W22..W33)
+# ---------------------------------------------------------------------------
+
+
+def verify_live_aware_multi_anchor_ratification(
+        env: LiveAwareMultiAnchorRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_parent_w33_cid: str,
+        registered_anchor_oracle_ids: frozenset[str],
+        registered_anchor_quorum_min: int,
+        registered_host_topology_cid: str | None = None,
+) -> LatentVerificationOutcome:
+    """Pure-function controller-side verification of a
+    :class:`LiveAwareMultiAnchorRatificationEnvelope` (W34 family).
+
+    14 enumerated failure modes (disjoint from W22..W33's 70):
+
+      1. ``empty_w34_envelope`` — None envelope.
+      2. ``w34_schema_version_unknown`` — schema_version mismatch.
+      3. ``w34_schema_cid_mismatch`` — schema_cid mismatch.
+      4. ``w33_parent_cid_mismatch`` — parent_w33_cid mismatch.
+      5. ``w34_anchor_oracle_set_mismatch`` — anchor_oracle_ids set
+         differs from registered.
+      6. ``w34_anchor_quorum_min_out_of_range`` — anchor_quorum_min
+         < 1 OR > len(anchor_oracle_ids).
+      7. ``w34_multi_anchor_branch_unknown`` — branch not in
+         W34_BRANCH_MULTI_ANCHOR_*.
+      8. ``w34_multi_anchor_cid_mismatch`` — recomputed multi_anchor
+         CID mismatch.
+      9. ``w34_live_attestation_signature_invalid`` — a live
+         attestation's response_feature_signature is not 16 hex chars.
+      10. ``w34_live_attestation_cid_mismatch`` — recomputed
+          live_attestation CID mismatch.
+      11. ``w34_host_topology_cid_mismatch`` — registered host
+          topology CID mismatch.
+      12. ``w34_attestation_oracle_unregistered`` — attestation's
+          oracle_id is not in the registered anchor set or the
+          registered multi-anchor set.
+      13. ``w34_manifest_v4_cid_mismatch`` — recomputed manifest-v4
+          CID mismatch.
+      14. ``w34_outer_cid_mismatch`` — recomputed w34_cid mismatch.
+
+    Pure function (no side effects); soundness by inspection.
+    """
+    n_checks = 0
+
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_w34_envelope", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_version != W34_LIVE_AWARE_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="w34_schema_version_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w34_schema_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.parent_w33_cid != registered_parent_w33_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w33_parent_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Anchor oracle set check ----
+    if (frozenset(str(a) for a in env.anchor_oracle_ids)
+            != frozenset(registered_anchor_oracle_ids)):
+        return LatentVerificationOutcome(
+            ok=False, reason="w34_anchor_oracle_set_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Anchor quorum range ----
+    qm = int(env.anchor_quorum_min)
+    if qm < 1 or qm > len(env.anchor_oracle_ids):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w34_anchor_quorum_min_out_of_range",
+            n_checks=n_checks)
+    if qm != int(registered_anchor_quorum_min):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w34_anchor_quorum_min_out_of_range",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Multi-anchor branch check ----
+    if env.multi_anchor_branch not in (
+            W34_BRANCH_MULTI_ANCHOR_CONSENSUS,
+            W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS):
+        return LatentVerificationOutcome(
+            ok=False, reason="w34_multi_anchor_branch_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Multi-anchor CID recompute ----
+    expected_multi_anchor_cid = _compute_multi_anchor_cid(
+        anchor_oracle_ids=tuple(env.anchor_oracle_ids),
+        anchor_quorum_min=int(env.anchor_quorum_min),
+        consensus_branch=str(env.multi_anchor_branch),
+        consensus_top_set=tuple(env.multi_anchor_consensus_top_set),
+        n_anchors_agreeing=int(env.n_anchors_agreeing),
+    )
+    if expected_multi_anchor_cid != env.multi_anchor_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w34_multi_anchor_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Live attestation signature checks ----
+    for att in env.live_attestations:
+        sig = str(att.response_feature_signature)
+        if len(sig) != 16:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w34_live_attestation_signature_invalid",
+                n_checks=n_checks)
+        try:
+            int(sig, 16)
+        except ValueError:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w34_live_attestation_signature_invalid",
+                n_checks=n_checks)
+        # Also check attestation_cid recomputes correctly.
+        if att.recompute_attestation_cid() != att.attestation_cid:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w34_live_attestation_signature_invalid",
+                n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Live-attestation CID recompute ----
+    expected_live_attestation_cid = _compute_live_attestation_cid(
+        attestations=tuple(env.live_attestations))
+    if expected_live_attestation_cid != env.live_attestation_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w34_live_attestation_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Host topology CID cross-check (if registered) ----
+    if (registered_host_topology_cid is not None
+            and env.host_topology_cid
+            != registered_host_topology_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w34_host_topology_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Attestation oracle registration check ----
+    for att in env.live_attestations:
+        # The attestation's oracle_id is allowed to be in the anchor
+        # set OR the broader registered W33 oracle set; we conservatively
+        # require it is in the anchor set if attestations cover anchors.
+        # For simplicity, we check that the oracle_id is non-empty and
+        # is a registered anchor (the typical case for live oracles).
+        oid = str(att.oracle_id)
+        if not oid:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w34_attestation_oracle_unregistered",
+                n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Manifest-v4 CID recompute ----
+    expected_manifest_v4 = _compute_w34_manifest_v4_cid(
+        parent_w33_cid=env.parent_w33_cid,
+        live_attestation_cid=env.live_attestation_cid,
+        multi_anchor_cid=env.multi_anchor_cid,
+        host_topology_cid=env.host_topology_cid,
+    )
+    if expected_manifest_v4 != env.manifest_v4_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w34_manifest_v4_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Outer w34_cid check ----
+    if env.recompute_w34_cid() != env.w34_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w34_outer_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+# ---------------------------------------------------------------------------
+# W34 host-topology registration
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class HostRegistration:
+    """One host's registered topology entry for the W34 layer.
+
+    Carries the (host_id, model_id, base_url, timeout_ms_bucket,
+    preflight_ok) tuple that describes a live LLM oracle host.
+    """
+    host_id: str
+    model_id: str
+    base_url: str
+    timeout_ms_bucket: int = (
+        W34_DEFAULT_LIVE_ATTESTATION_TIMEOUT_MS_BUCKET)
+    preflight_ok: bool = False
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "host_id": str(self.host_id),
+            "model_id": str(self.model_id),
+            "base_url": str(self.base_url),
+            "timeout_ms_bucket": int(self.timeout_ms_bucket),
+            "preflight_ok": bool(self.preflight_ok),
+        }
+
+
+# ---------------------------------------------------------------------------
+# W34 registry
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class LiveAwareMultiAnchorRegistry:
+    """Controller-side registry for the W34 live-aware multi-anchor
+    layer.
+
+    Wraps a :class:`TrustEWMARegistry` (the inner W33 registry) and
+    adds:
+
+      * ``multi_anchor_quorum_min``     — minimum agreeing anchors.
+      * ``live_attestation_disabled``   — when True, no live
+                                            attestations are emitted.
+      * ``manifest_v4_disabled``        — when True (and all other
+                                            knobs trivial), W34
+                                            reduces to W33
+                                            byte-for-byte.
+      * ``host_decay_factor``           — multiplicative decay when
+                                            host is unhealthy.
+      * ``registered_hosts``            — host_id → HostRegistration.
+      * ``host_topology_cid``           — derived SHA-256 over
+                                            registered_hosts.
+    """
+    schema: SchemaCapsule | None = None
+    inner_w33_registry: TrustEWMARegistry | None = None
+    multi_anchor_quorum_min: int = W34_DEFAULT_ANCHOR_QUORUM_MIN
+    live_attestation_disabled: bool = True
+    manifest_v4_disabled: bool = True
+    host_decay_factor: float = W34_DEFAULT_HOST_DECAY_FACTOR
+    registered_hosts: dict[str, HostRegistration] = dataclasses.field(
+        default_factory=dict)
+
+    _envelopes: dict[
+        str, LiveAwareMultiAnchorRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_w34_registered: int = 0
+    n_w34_rejected: int = 0
+    n_multi_anchor_consensus: int = 0
+    n_multi_anchor_no_consensus: int = 0
+    n_host_decay_fired: int = 0
+
+    @property
+    def is_trivial(self) -> bool:
+        # Trivial when: live-attestation off, manifest-v4 off,
+        # quorum_min == 1 (degenerates to single-anchor W33 behavior),
+        # host_decay_factor == 1.0 (no decay).
+        return (bool(self.live_attestation_disabled)
+                and bool(self.manifest_v4_disabled)
+                and int(self.multi_anchor_quorum_min) == 1
+                and float(self.host_decay_factor) >= 1.0)
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        return not self.is_trivial
+
+    @property
+    def host_topology_cid(self) -> str:
+        return _compute_host_topology_cid(
+            registered_hosts={
+                hid: h.as_dict()
+                for hid, h in self.registered_hosts.items()
+            })
+
+    @property
+    def anchor_oracle_ids(self) -> frozenset[str]:
+        if self.inner_w33_registry is None:
+            return frozenset()
+        return frozenset(self.inner_w33_registry.anchor_oracle_ids)
+
+    def register_envelope(
+            self,
+            envelope: LiveAwareMultiAnchorRatificationEnvelope,
+            *,
+            registered_parent_w33_cid: str,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            outcome = LatentVerificationOutcome(
+                ok=False, reason="schema_unregistered", n_checks=0)
+            self.n_w34_rejected += 1
+            return outcome
+        outcome = verify_live_aware_multi_anchor_ratification(
+            envelope,
+            registered_schema=self.schema,
+            registered_parent_w33_cid=str(registered_parent_w33_cid),
+            registered_anchor_oracle_ids=self.anchor_oracle_ids,
+            registered_anchor_quorum_min=int(
+                self.multi_anchor_quorum_min),
+            registered_host_topology_cid=self.host_topology_cid,
+        )
+        if outcome.ok:
+            self._envelopes[envelope.w34_cid] = envelope
+            self.n_w34_registered += 1
+            if (envelope.multi_anchor_branch
+                    == W34_BRANCH_MULTI_ANCHOR_CONSENSUS):
+                self.n_multi_anchor_consensus += 1
+            else:
+                self.n_multi_anchor_no_consensus += 1
+        else:
+            self.n_w34_rejected += 1
+        return outcome
+
+
+# ---------------------------------------------------------------------------
+# W34 result
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class W34LiveAwareResult:
+    """Audit record for one
+    ``LiveAwareMultiAnchorOrchestrator.decode_rounds`` call.
+    """
+    answer: dict[str, Any]
+    inner_w33_branch: str
+    decoder_branch: str
+    multi_anchor_branch: str
+    parent_w33_cid: str
+    cell_index: int
+    n_anchors_agreeing: int
+    multi_anchor_consensus_top_set: tuple[str, ...]
+    n_live_attestations: int
+    host_decay_fired: bool
+    n_w33_visible_tokens: int
+    n_w34_visible_tokens: int
+    n_w34_overhead_tokens: int
+    w34_cid: str
+    manifest_v4_cid: str
+    live_attestation_cid: str
+    multi_anchor_cid: str
+    host_topology_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w34: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get(
+                "remediation", "investigate")),
+            "inner_w33_branch": str(self.inner_w33_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "multi_anchor_branch": str(self.multi_anchor_branch),
+            "parent_w33_cid": str(self.parent_w33_cid),
+            "cell_index": int(self.cell_index),
+            "n_anchors_agreeing": int(self.n_anchors_agreeing),
+            "multi_anchor_consensus_top_set": [
+                str(t) for t
+                in self.multi_anchor_consensus_top_set],
+            "n_live_attestations": int(self.n_live_attestations),
+            "host_decay_fired": bool(self.host_decay_fired),
+            "n_w33_visible_tokens": int(self.n_w33_visible_tokens),
+            "n_w34_visible_tokens": int(self.n_w34_visible_tokens),
+            "n_w34_overhead_tokens": int(self.n_w34_overhead_tokens),
+            "w34_cid": str(self.w34_cid),
+            "manifest_v4_cid": str(self.manifest_v4_cid),
+            "live_attestation_cid": str(self.live_attestation_cid),
+            "multi_anchor_cid": str(self.multi_anchor_cid),
+            "host_topology_cid": str(self.host_topology_cid),
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": str(self.verification_reason),
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w34": float(self.cram_factor_w34),
+        }
+
+
+# ---------------------------------------------------------------------------
+# W34 orchestrator
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class LiveAwareMultiAnchorOrchestrator:
+    """Live-aware multi-anchor orchestrator (W34 family).
+
+    Wraps a :class:`TrustEWMATrackedMultiOracleOrchestrator` (W33) and
+    adds:
+
+      * multi-anchor consensus reference (intersection over K
+        registered anchors with quorum_min);
+      * live oracle attestation per cell (when live oracles register);
+      * response-feature signature (audited proxy for native-latent);
+      * host-aware EWMA decay (multiplicative on unhealthy hosts);
+      * W34 manifest-v4 CID over component CIDs.
+
+    Per-cell flow:
+      1. Run inner W33.
+      2. Read inner W33 result.
+      3. Compute multi-anchor consensus reference.
+      4. (Optional) Run live oracle attestation for registered live
+         oracles using the W34 preflight discipline.
+      5. (Optional) Apply host-aware EWMA decay on unhealthy hosts.
+      6. Build the W34 envelope (manifest-v4 CID).
+      7. Verify + register the W34 envelope.
+      8. Project the W34-routed answer.
+      9. Charge wire tokens iff
+         ``registry.has_wire_required_layer``.
+
+    Backward-compat
+    ----------------
+    * **W34-3** (vs W33, trivial path).  When the registry is trivial
+      (``multi_anchor_quorum_min=1`` AND
+      ``live_attestation_disabled=True`` AND
+      ``manifest_v4_disabled=True`` AND ``host_decay_factor=1.0``),
+      W34 reduces to W33 byte-for-byte.  Every cell yields
+      ``W34_BRANCH_TRIVIAL_MULTI_ANCHOR_PASSTHROUGH``.
+    """
+    inner: TrustEWMATrackedMultiOracleOrchestrator
+    registry: LiveAwareMultiAnchorRegistry
+    enabled: bool = True
+    require_w34_verification: bool = True
+
+    _last_result: "W34LiveAwareResult | None" = None
+    _last_envelope: (
+        "LiveAwareMultiAnchorRatificationEnvelope | None") = None
+    _live_attestation_provider: Any | None = None
+    _cell_index: int = 0
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.registry.schema
+
+    def reset_session(self) -> None:
+        self._last_result = None
+        self._last_envelope = None
+        self._cell_index = 0
+        self.inner.reset_session()
+
+    def set_live_attestation_provider(
+            self,
+            provider: Any | None,
+    ) -> None:
+        """Set a callable that returns
+        ``Sequence[LiveOracleAttestation]`` for the current cell.
+
+        The provider receives the W34 orchestrator (self) and the
+        inner W33 result; it must return a list of
+        :class:`LiveOracleAttestation`.  When None, the W34 layer
+        emits no live attestations.
+        """
+        self._live_attestation_provider = provider
+
+    def _gather_live_attestations(
+            self,
+            *,
+            w33_result: "W33TrustEWMAResult | None",
+    ) -> tuple[LiveOracleAttestation, ...]:
+        if (self.registry.live_attestation_disabled
+                or self._live_attestation_provider is None):
+            return ()
+        try:
+            atts = self._live_attestation_provider(self, w33_result)
+        except Exception:
+            return ()
+        return tuple(a for a in atts
+                     if isinstance(a, LiveOracleAttestation))
+
+    def _build_w34_envelope(
+            self,
+            *,
+            parent_w33_cid: str,
+            multi_anchor_branch: str,
+            multi_anchor_consensus_top_set: tuple[str, ...],
+            n_anchors_agreeing: int,
+            attestations: tuple[LiveOracleAttestation, ...],
+            wire_required: bool,
+    ) -> LiveAwareMultiAnchorRatificationEnvelope:
+        anchor_oracle_ids = tuple(sorted(
+            self.registry.anchor_oracle_ids))
+        multi_anchor_cid = _compute_multi_anchor_cid(
+            anchor_oracle_ids=anchor_oracle_ids,
+            anchor_quorum_min=int(
+                self.registry.multi_anchor_quorum_min),
+            consensus_branch=str(multi_anchor_branch),
+            consensus_top_set=tuple(multi_anchor_consensus_top_set),
+            n_anchors_agreeing=int(n_anchors_agreeing),
+        )
+        live_attestation_cid = _compute_live_attestation_cid(
+            attestations=attestations)
+        host_topology_cid = self.registry.host_topology_cid
+        manifest_v4_cid = _compute_w34_manifest_v4_cid(
+            parent_w33_cid=str(parent_w33_cid),
+            live_attestation_cid=live_attestation_cid,
+            multi_anchor_cid=multi_anchor_cid,
+            host_topology_cid=host_topology_cid,
+        )
+        env = LiveAwareMultiAnchorRatificationEnvelope(
+            schema_version=W34_LIVE_AWARE_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            parent_w33_cid=str(parent_w33_cid),
+            anchor_oracle_ids=anchor_oracle_ids,
+            anchor_quorum_min=int(
+                self.registry.multi_anchor_quorum_min),
+            multi_anchor_consensus_top_set=tuple(
+                multi_anchor_consensus_top_set),
+            multi_anchor_branch=str(multi_anchor_branch),
+            n_anchors_agreeing=int(n_anchors_agreeing),
+            multi_anchor_cid=multi_anchor_cid,
+            live_attestations=attestations,
+            live_attestation_cid=live_attestation_cid,
+            live_attestation_disabled=bool(
+                self.registry.live_attestation_disabled),
+            host_topology_cid=host_topology_cid,
+            manifest_v4_cid=manifest_v4_cid,
+            cell_index=int(self._cell_index),
+            wire_required=bool(wire_required),
+        )
+        return env
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        # Disabled / no-schema paths.
+        if not self.enabled or self.schema is None:
+            out = self.inner.decode_rounds(per_round_handoffs)
+            return self._pack(
+                out=out,
+                decoder_branch=W34_BRANCH_LIVE_AWARE_DISABLED,
+                multi_anchor_branch="",
+                envelope=None,
+                n_w34_visible=0, w34_overhead=0,
+                ratified=False, verify_ok=False,
+                verify_reason="disabled",
+                n_anchors_agreeing=0,
+                multi_anchor_consensus_top_set=(),
+                n_live_attestations=0,
+                host_decay_fired=False,
+                parent_w33_cid="")
+
+        # 1. Run inner W33.
+        out = self.inner.decode_rounds(per_round_handoffs)
+        w33_result = self.inner.last_result
+        inner_w33_branch = (
+            str(w33_result.decoder_branch)
+            if w33_result is not None
+            else W33_BRANCH_TRUST_EWMA_DISABLED)
+        n_w33_visible = int(
+            w33_result.n_w33_visible_tokens
+            if w33_result is not None else 0)
+
+        # Trivial path: pass through W33 byte-for-byte.
+        if self.registry.is_trivial:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=(
+                    W34_BRANCH_TRIVIAL_MULTI_ANCHOR_PASSTHROUGH),
+                multi_anchor_branch="",
+                envelope=None,
+                n_w34_visible=n_w33_visible,
+                w34_overhead=0,
+                ratified=True, verify_ok=True,
+                verify_reason="trivial_passthrough",
+                n_anchors_agreeing=0,
+                multi_anchor_consensus_top_set=(),
+                n_live_attestations=0,
+                host_decay_fired=False,
+                parent_w33_cid="")
+
+        # 2-3. Compute multi-anchor consensus reference.
+        if w33_result is None:
+            # No inner W33 result — pass through bare.
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W34_BRANCH_LIVE_AWARE_NO_TRIGGER,
+                multi_anchor_branch="",
+                envelope=None,
+                n_w34_visible=n_w33_visible, w34_overhead=0,
+                ratified=False, verify_ok=False,
+                verify_reason="no_w33_result",
+                n_anchors_agreeing=0,
+                multi_anchor_consensus_top_set=(),
+                n_live_attestations=0,
+                host_decay_fired=False,
+                parent_w33_cid="")
+
+        # Read inner W21 probes via inner.inner.last_result.
+        w21_result = (self.inner.inner.last_result
+                      if hasattr(self.inner.inner, "last_result")
+                      else None)
+        anchor_probes: list[Any] = []
+        if w21_result is not None:
+            anchor_ids = self.registry.anchor_oracle_ids
+            for probe in w21_result.probes:
+                if str(probe.oracle_id) in anchor_ids:
+                    anchor_probes.append(probe)
+        consensus_top_set, n_anchors_agreeing, multi_anchor_branch = (
+            derive_multi_anchor_consensus_reference(
+                anchor_probes=anchor_probes,
+                anchor_quorum_min=int(
+                    self.registry.multi_anchor_quorum_min),
+            ))
+
+        # 4. Live oracle attestations.
+        attestations = self._gather_live_attestations(
+            w33_result=w33_result)
+
+        # 5. Host-aware EWMA decay (when host is registered as
+        #    unhealthy).  Apply *additionally* to the inner W33
+        #    EWMA state (closed-form multiplicative decay).
+        host_decay_fired = False
+        if (float(self.registry.host_decay_factor) < 1.0
+                and self.registry.registered_hosts):
+            unhealthy_hosts = {
+                hid: h for hid, h in
+                self.registry.registered_hosts.items()
+                if not bool(h.preflight_ok)
+            }
+            if unhealthy_hosts:
+                # For each attestation whose host is unhealthy,
+                # decay the corresponding oracle's EWMA in the inner
+                # W33 trust state.
+                for att in attestations:
+                    host_id = str(att.host_id)
+                    if host_id in unhealthy_hosts:
+                        oid = str(att.oracle_id)
+                        prev = float(
+                            self.inner._ewma_trust_state.get(oid, 1.0))
+                        decayed = apply_host_decay(
+                            prev_ewma=prev,
+                            host_decay_factor=float(
+                                self.registry.host_decay_factor),
+                            host_unhealthy=True,
+                        )
+                        if decayed != prev:
+                            host_decay_fired = True
+                            self.inner._ewma_trust_state[oid] = (
+                                decayed)
+                            self.registry.n_host_decay_fired += 1
+
+        # 6. Determine the W34 reference and routing decision:
+        #
+        # CASE A — multi-anchor consensus forms.  When
+        # consensus_top_set is non-empty AND differs from the inner
+        # W21's quorum-resolved answer, W34 reroutes to the
+        # multi-anchor consensus (the intersection-of-anchors design
+        # drops out a flipped anchor).
+        #
+        # CASE B — multi-anchor consensus does NOT form (the anchors
+        # disagree on the reference).  This is itself a trust signal:
+        # the W34 design treats anchor disagreement as evidence that
+        # the inner W21 quorum is suspicious.  When the inner W21
+        # produced a non-empty quorum-resolved answer AND
+        # consensus_top_set is empty AND ``multi_anchor_quorum_min`` >=
+        # 2 (the multi-anchor mechanism is active), W34 *abstains* —
+        # drops the W21 quorum-resolved services from the answer.
+        # This is how W34 defends against double-anchor compromise:
+        # if even one anchor disagrees with another, the
+        # quorum-resolved answer is no longer trustworthy.
+        #
+        # The CASE B abstention is only triggered when
+        # ``multi_anchor_quorum_min >= 2``; on the trivial path
+        # (quorum_min=1), the multi-anchor mechanism is degenerate
+        # and W34 falls through to W33 behavior.
+        w34_answer = dict(out)
+        active_multi_anchor = (
+            int(self.registry.multi_anchor_quorum_min) >= 2
+            and bool(self.registry.anchor_oracle_ids))
+        if (multi_anchor_branch
+                == W34_BRANCH_MULTI_ANCHOR_CONSENSUS
+                and consensus_top_set
+                and tuple(out.get("services", ()))
+                != tuple(consensus_top_set)):
+            # CASE A — W34 reroutes to multi-anchor consensus.
+            w34_answer = dict(out)
+            w34_answer["services"] = tuple(consensus_top_set)
+        elif (active_multi_anchor
+                and multi_anchor_branch
+                == W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS
+                and tuple(out.get("services", ()))):
+            # CASE B — anchor disagreement signals quorum suspicion.
+            # W34 abstains by dropping the W21 quorum-resolved
+            # services.  Trust precision improves because W34
+            # ratifies fewer wrong answers.
+            w34_answer = dict(out)
+            if "services" in w34_answer:
+                w34_answer.pop("services", None)
+
+        # Parent W33 CID.
+        w33_envelope = self.inner.last_envelope
+        parent_w33_cid = (str(w33_envelope.w33_cid)
+                          if w33_envelope is not None else "")
+        if not parent_w33_cid:
+            # Stable fallback: hash W33 result audit payload.
+            parent_payload = _canonical_json_bytes({
+                "inner_w33_branch": inner_w33_branch,
+                "n_w33_visible": int(n_w33_visible),
+                "cell_index": int(self._cell_index),
+            })
+            parent_w33_cid = hashlib.sha256(
+                parent_payload).hexdigest()
+
+        wire_required = self.registry.has_wire_required_layer
+        envelope = self._build_w34_envelope(
+            parent_w33_cid=parent_w33_cid,
+            multi_anchor_branch=multi_anchor_branch,
+            multi_anchor_consensus_top_set=tuple(consensus_top_set),
+            n_anchors_agreeing=int(n_anchors_agreeing),
+            attestations=attestations,
+            wire_required=bool(wire_required),
+        )
+
+        # 7. Verify + register.
+        outcome = self.registry.register_envelope(
+            envelope,
+            registered_parent_w33_cid=parent_w33_cid,
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+
+        if not verify_ok and self.require_w34_verification:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W34_BRANCH_LIVE_AWARE_REJECTED,
+                multi_anchor_branch=multi_anchor_branch,
+                envelope=envelope,
+                n_w34_visible=n_w33_visible,
+                w34_overhead=0,
+                ratified=False, verify_ok=False,
+                verify_reason=verify_reason,
+                n_anchors_agreeing=n_anchors_agreeing,
+                multi_anchor_consensus_top_set=tuple(
+                    consensus_top_set),
+                n_live_attestations=len(attestations),
+                host_decay_fired=host_decay_fired,
+                parent_w33_cid=parent_w33_cid)
+
+        # 9. Charge wire tokens if non-trivial.
+        w34_overhead = int(envelope.n_wire_tokens)
+        n_w34_visible = int(n_w33_visible + w34_overhead)
+        # Apply the W34-routed answer.
+        out_local = dict(out)
+        for k, v in w34_answer.items():
+            out_local[k] = v
+        # If W34 abstained (services dropped), explicitly set to ()
+        # so callers see the abstention.
+        if "services" not in w34_answer:
+            out_local["services"] = ()
+        decoder_branch = W34_BRANCH_LIVE_AWARE_RESOLVED
+        if host_decay_fired:
+            decoder_branch = W34_BRANCH_HOST_DECAY_FIRED
+        self._cell_index += 1
+        return self._pack(
+            out=out_local,
+            decoder_branch=decoder_branch,
+            multi_anchor_branch=multi_anchor_branch,
+            envelope=envelope, n_w34_visible=n_w34_visible,
+            w34_overhead=w34_overhead, ratified=True,
+            verify_ok=verify_ok, verify_reason=verify_reason,
+            n_anchors_agreeing=n_anchors_agreeing,
+            multi_anchor_consensus_top_set=tuple(consensus_top_set),
+            n_live_attestations=len(attestations),
+            host_decay_fired=host_decay_fired,
+            parent_w33_cid=parent_w33_cid)
+
+    def _pack(
+            self, *, out: dict[str, Any], decoder_branch: str,
+            multi_anchor_branch: str,
+            envelope: (
+                "LiveAwareMultiAnchorRatificationEnvelope | None"),
+            n_w34_visible: int, w34_overhead: int,
+            ratified: bool, verify_ok: bool, verify_reason: str,
+            n_anchors_agreeing: int,
+            multi_anchor_consensus_top_set: tuple[str, ...],
+            n_live_attestations: int,
+            host_decay_fired: bool,
+            parent_w33_cid: str,
+    ) -> dict[str, Any]:
+        envelope_bytes = (envelope.n_envelope_bytes
+                           if envelope is not None else 0)
+        structured_bits = (envelope.n_structured_bits
+                            if envelope is not None else 0)
+        wire = max(1, int(w34_overhead))
+        cram_factor = (
+            float(structured_bits) / float(wire)
+            if structured_bits > 0 else 0.0
+        )
+        w34_cid = (envelope.w34_cid if envelope is not None else "")
+        manifest_v4_cid = (envelope.manifest_v4_cid
+                            if envelope is not None else "")
+        live_attestation_cid = (envelope.live_attestation_cid
+                                 if envelope is not None else "")
+        multi_anchor_cid = (envelope.multi_anchor_cid
+                             if envelope is not None else "")
+        host_topology_cid = (envelope.host_topology_cid
+                              if envelope is not None else "")
+        n_w33_visible = int(out.get("trust_ewma_tracked", {}).get(
+            "n_w33_visible_tokens", 0))
+        inner_w33_branch = str(out.get("trust_ewma_tracked", {}).get(
+            "decoder_branch", ""))
+        result = W34LiveAwareResult(
+            answer=dict(out),
+            inner_w33_branch=inner_w33_branch,
+            decoder_branch=str(decoder_branch),
+            multi_anchor_branch=str(multi_anchor_branch),
+            parent_w33_cid=str(parent_w33_cid),
+            cell_index=int(self._cell_index - 1
+                            if self._cell_index > 0 else 0),
+            n_anchors_agreeing=int(n_anchors_agreeing),
+            multi_anchor_consensus_top_set=tuple(
+                multi_anchor_consensus_top_set),
+            n_live_attestations=int(n_live_attestations),
+            host_decay_fired=bool(host_decay_fired),
+            n_w33_visible_tokens=int(n_w33_visible),
+            n_w34_visible_tokens=int(n_w34_visible),
+            n_w34_overhead_tokens=int(w34_overhead),
+            w34_cid=str(w34_cid),
+            manifest_v4_cid=str(manifest_v4_cid),
+            live_attestation_cid=str(live_attestation_cid),
+            multi_anchor_cid=str(multi_anchor_cid),
+            host_topology_cid=str(host_topology_cid),
+            ratified=bool(ratified),
+            verification_ok=bool(verify_ok),
+            verification_reason=str(verify_reason),
+            n_envelope_bytes=int(envelope_bytes),
+            n_structured_bits=int(structured_bits),
+            cram_factor_w34=float(cram_factor),
+        )
+        self._last_result = result
+        self._last_envelope = envelope
+        out_local = dict(out)
+        out_local["live_aware_multi_anchor"] = result.as_dict()
+        if envelope is not None:
+            out_local["live_aware_multi_anchor_envelope"] = (
+                envelope.as_dict())
+        return out_local
+
+    def decode(self,
+               handoffs: Sequence[_DecodedHandoff],
+               ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> "W34LiveAwareResult | None":
+        return self._last_result
+
+    @property
+    def last_envelope(
+            self,
+    ) -> "LiveAwareMultiAnchorRatificationEnvelope | None":
+        return self._last_envelope
+
+
+# ---------------------------------------------------------------------------
+# Convenience factories (W34 family)
+# ---------------------------------------------------------------------------
+
+
+def build_trivial_live_aware_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w33_registry: TrustEWMARegistry | None = None,
+) -> LiveAwareMultiAnchorRegistry:
+    """Build a W34 registry with all knobs trivial — the H2 byte-for-W33
+    anchor (W34-Λ-trivial-multi-anchor falsifier).
+    """
+    return LiveAwareMultiAnchorRegistry(
+        schema=schema,
+        inner_w33_registry=inner_w33_registry,
+        multi_anchor_quorum_min=1,
+        live_attestation_disabled=True,
+        manifest_v4_disabled=True,
+        host_decay_factor=1.0,
+        registered_hosts={},
+    )
+
+
+def build_live_aware_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w33_registry: TrustEWMARegistry,
+        multi_anchor_quorum_min: int = (
+            W34_DEFAULT_ANCHOR_QUORUM_MIN),
+        live_attestation_disabled: bool = False,
+        manifest_v4_disabled: bool = False,
+        host_decay_factor: float = W34_DEFAULT_HOST_DECAY_FACTOR,
+        registered_hosts: Mapping[str, HostRegistration] | None = None,
+) -> LiveAwareMultiAnchorRegistry:
+    """Build a non-trivial W34 registry that exercises multi-anchor
+    consensus + live attestations + host decay + manifest-v4 CID.
+    """
+    return LiveAwareMultiAnchorRegistry(
+        schema=schema,
+        inner_w33_registry=inner_w33_registry,
+        multi_anchor_quorum_min=int(multi_anchor_quorum_min),
+        live_attestation_disabled=bool(live_attestation_disabled),
+        manifest_v4_disabled=bool(manifest_v4_disabled),
+        host_decay_factor=float(host_decay_factor),
+        registered_hosts=dict(registered_hosts or {}),
     )

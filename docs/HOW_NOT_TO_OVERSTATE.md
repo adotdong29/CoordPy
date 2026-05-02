@@ -2,7 +2,7 @@
 
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
+> README-of-README must satisfy these rules. Last touched: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
 > v3.33 (W32 family) 2026-05-01.
 
 The programme has a long history of moves where a candidate result
@@ -2231,3 +2231,122 @@ The honest summary one may emit:
   (currently infrastructure-bounded), the multi-host topology axis
   of **W33-C-MULTI-HOST**, and the latent cross-agent-trust axis
   of **W33-C-LATENT-CROSS-AGENT-TRUST**."
+
+### W34 forbidden moves
+
+W34 introduces another wave of vocabulary that *sounds* like
+runtime LLM hidden-state inspection: "live oracle attestation",
+"response-feature signature", "native-latent audited proxy",
+"host-aware EWMA decay", "manifest-v4 CID", "preflight ``/api/tags``
+discipline".  Each of these is a **capsule-layer audited proxy**
+for the live-aware multi-anchor trust mechanism.  None of them
+claims a learned feature-signature model in the deep-learning sense
+(zero parameters, zero gradients, zero training step), transformer-
+internal hidden-state manipulation, runtime KV transplant, or
+out-of-band live ground-truth.  The response-feature signature is
+a **closed-form deterministic SHA-256 prefix** over (first-token-
+class, length-bucket, structural-hash); the multi-anchor consensus
+is a **deterministic intersection** of registered anchor probes'
+top_sets; the host-aware EWMA decay is a **closed-form
+multiplicative scalar** in [0.5, 1.0].
+
+What you may say (W34 honest scope):
+
+* "On R-81-DOUBLE-ANCHOR-COMPROMISE (a three-phase compromise
+  regime where the W33 single-anchor itself is compromised in the
+  final phase), the W34 multi-anchor consensus reference correctly
+  collapses to NO_CONSENSUS when the anchors disagree, and W34
+  abstains where W33 commits to wrong; trust precision rises from
+  0.625 to **1.000 across 5/5 seeds × 16 cells/seed ⇒ Δ = +0.375**,
+  with zero correctness regression and max overhead 1 token/cell.
+  This **closes the W33 single-anchor fragility** at the capsule
+  layer."
+* "On R-81-MANIFEST-V4-TAMPER, the W34 manifest-v4 CID + cross-
+  component CID checks together detect five named tampers per
+  ratified cell; rejection rate = **1.000 across 400 named tampers**
+  (5/5 seeds × 16 cells × 5 tampers).  The manifest-v4 CID closes
+  cross-component swap avenues that the W33 manifest-v3 alone
+  cannot detect."
+* "On R-81-RESPONSE-FEATURE-SIGNATURE, the closed-form 64-bit
+  signature is byte-stable across 10 fixtures × 3 runs = 30/30
+  byte-equal calls."
+* "The W34 milestone closes the two named W33 infrastructure
+  follow-ups via load-bearing mechanism in the live xLLM pilot:
+  preflight ``/api/tags`` (W33-INFRA-1) — *honest empirical
+  correction* recorded that the W33 'qwen3.5:35b not loaded'
+  diagnosis was wrong; the model IS loaded — and chat-template +
+  ``num_predict=4`` + stop tokens (W33-INFRA-2)."
+
+What you must NOT say (W34 honest scope):
+
+* "W34 implements a learned feature-signature model."  It does
+  not.  ``compute_response_feature_signature`` is a closed-form
+  SHA-256 hex prefix; zero parameters, zero gradients, zero
+  training step.
+* "W34 implements transformer-internal hidden-state projection."
+  It does not.  The response-feature signature lives at the
+  capsule layer; an honest **proxy** for native-latent (the
+  architecture-dependent direction), not a runtime hidden-state
+  transplant.  The W34 audited proxy detects feature-class
+  shifts (one-word ↔ chain-of-thought, alpha ↔ digit, short ↔
+  long) but cannot probe the model's hidden subspaces.
+  ``W33-C-NATIVE-LATENT`` carries forward.
+* "W34 solves the live cross-host trust-magnitude axis."  It does
+  not.  The S1 live probe (5 host+model pairs × 13 prompts at
+  temp 0) records best-effort evidence with the corrected infra
+  discipline; the agreement-magnitude question is independent of
+  the infra question and is honestly null on any prompt class
+  where the available LLMs at temp 0 happen to agree.
+  ``W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE`` and
+  ``W34-C-CROSS-HOST-LIVE-MULTI-ANCHOR`` carry forward.
+* "W34 brings up Mac 2."  It does not.  192.168.12.248 remains
+  ARP-incomplete (**29th consecutive milestone**, ping 100%
+  packet loss; port 11434 unreachable).
+* "W34 strictly improves trust precision on every regime."  It
+  does not.  On regimes where no anchor is compromised
+  (R-81-NO-ANCHOR-DISAGREEMENT) or where the host-decay factor
+  is pinned at 1.0 (R-81-FROZEN-HOST-DECAY), the multi-anchor
+  consensus matches single-anchor and the host-aware decay never
+  fires; Δ = 0.  The falsifiers W34-Λ-no-anchor-disagreement and
+  W34-Λ-frozen-host-decay document this.
+* "W34 defeats double-anchor compromise."  It does not — only
+  *single*-anchor compromise.  The new
+  **W34-L-MULTI-ANCHOR-CAP** limitation theorem (proved by
+  inspection) names the structural ceiling: when all K anchors
+  are simultaneously compromised at the capsule layer, no
+  multi-anchor mechanism (including W34) can recover.  Native-
+  latent (architecture-dependent) is required to break this.
+* "W34 solves multi-anchor adjudication."  Two rivets closed in
+  one milestone (W33 single-anchor fragility via multi-anchor
+  consensus + manifest-v4 cross-component tamper detection at
+  1.000 reject rate; W33-INFRA-1 + W33-INFRA-2 jointly closed)
+  is a strong step, but real multi-anchor reality has more axes
+  than any 5-seed × 16-cell synthetic sweep can test.
+
+The honest summary one may emit:
+
+* "On R-81-DOUBLE-ANCHOR-COMPROMISE, R-81-MANIFEST-V4-TAMPER,
+  R-81-TRIVIAL-W34, R-81-RESPONSE-FEATURE-SIGNATURE,
+  R-81-NO-ANCHOR-DISAGREEMENT, R-81-FROZEN-HOST-DECAY (six pre-
+  committed regimes), the W34 live-aware multi-anchor adjudication
+  mechanism closes the W33 single-anchor fragility AND closes the
+  cross-component swap avenue beyond the W33 manifest-v3 (manifest-
+  v4 CID, 400/400 = 1.000 rejection rate) AND adds an audited
+  proxy step toward native-latent (response-feature signature,
+  byte-stable) AND closes two named infrastructure follow-ups
+  (W33-INFRA-1 + W33-INFRA-2).  We have not solved multi-anchor
+  adjudication; we have empirically closed a structural fragility
+  in the W33 trust mechanism + closed two named infra follow-ups
+  + tightened the trust boundary by 14 more enumerated failure
+  modes (cumulative 84 across W22 + W29 + W30 + W31 + W32 + W33
+  + W34) + proved a small but sharp limitation theorem
+  (W34-L-MULTI-ANCHOR-CAP).  The next true wall — the regime
+  where the audited capsule-layer multi-anchor proxy is
+  insufficient and real transformer-internal hidden-state-level
+  cross-agent trust evidence is required — remains the named open
+  frontier **W33-C-NATIVE-LATENT**, plus the live cross-host
+  trust-magnitude axis of **W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE**
+  AND **W34-C-CROSS-HOST-LIVE-MULTI-ANCHOR**, the multi-host
+  topology axis of **W33-C-MULTI-HOST** AND **W34-C-MULTI-HOST**,
+  and the latent cross-agent-trust axis of
+  **W33-C-LATENT-CROSS-AGENT-TRUST**."

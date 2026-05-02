@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "wevra"
-version = "0.5.7"
+version = "0.5.8"
 description = "Wevra — bounded-context orchestration and evaluation SDK (first shipped product from the Context Zero research programme)."
 readme = "README.md"
 requires-python = ">=3.10"
