@@ -1,0 +1,165 @@
+{
+  "n_total_probes": 10,
+  "n_preflight_passed": 9,
+  "n_preflight_failed": 1,
+  "n_unreachable_hosts": 1,
+  "verdict": "preflight_discipline_load_bearing",
+  "honest_correction_recorded": "W33-INFRA-1 diagnosis 'qwen3.5:35b not loaded on 192.168.12.191' was WRONG. The model IS loaded; the real W33 infra failure was timeout-budget exhaustion + chat-template mismatch, NOT model absence.",
+  "W33_INFRA_1_closed": true,
+  "results": [
+    {
+      "host_id": "localhost",
+      "model_id": "gemma2:9b",
+      "host_url": "http://localhost:11434",
+      "preflight_ok": true,
+      "n_available_tags": 8,
+      "available_tags_sample": [
+        "qwen2.5:0.5b",
+        "lexi-coder:latest",
+        "taozhiyuai/llama-3-8b-lexi-uncensored:v1_q4_k_m",
+        "gemma2:9b",
+        "llama3.1:8b"
+      ],
+      "error": "",
+      "latency_s": 0.027
+    },
+    {
+      "host_id": "localhost",
+      "model_id": "llama3.1:8b",
+      "host_url": "http://localhost:11434",
+      "preflight_ok": true,
+      "n_available_tags": 8,
+      "available_tags_sample": [
+        "qwen2.5:0.5b",
+        "lexi-coder:latest",
+        "taozhiyuai/llama-3-8b-lexi-uncensored:v1_q4_k_m",
+        "gemma2:9b",
+        "llama3.1:8b"
+      ],
+      "error": "",
+      "latency_s": 0.002
+    },
+    {
+      "host_id": "localhost",
+      "model_id": "mixtral:8x7b",
+      "host_url": "http://localhost:11434",
+      "preflight_ok": true,
+      "n_available_tags": 8,
+      "available_tags_sample": [
+        "qwen2.5:0.5b",
+        "lexi-coder:latest",
+        "taozhiyuai/llama-3-8b-lexi-uncensored:v1_q4_k_m",
+        "gemma2:9b",
+        "llama3.1:8b"
+      ],
+      "error": "",
+      "latency_s": 0.002
+    },
+    {
+      "host_id": "localhost",
+      "model_id": "qwen2.5-coder:7b",
+      "host_url": "http://localhost:11434",
+      "preflight_ok": true,
+      "n_available_tags": 8,
+      "available_tags_sample": [
+        "qwen2.5:0.5b",
+        "lexi-coder:latest",
+        "taozhiyuai/llama-3-8b-lexi-uncensored:v1_q4_k_m",
+        "gemma2:9b",
+        "llama3.1:8b"
+      ],
+      "error": "",
+      "latency_s": 0.003
+    },
+    {
+      "host_id": "localhost",
+      "model_id": "deepseek-r1:7b",
+      "host_url": "http://localhost:11434",
+      "preflight_ok": true,
+      "n_available_tags": 8,
+      "available_tags_sample": [
+        "qwen2.5:0.5b",
+        "lexi-coder:latest",
+        "taozhiyuai/llama-3-8b-lexi-uncensored:v1_q4_k_m",
+        "gemma2:9b",
+        "llama3.1:8b"
+      ],
+      "error": "",
+      "latency_s": 0.003
+    },
+    {
+      "host_id": "192.168.12.191",
+      "model_id": "qwen2.5:14b",
+      "host_url": "http://192.168.12.191:11434",
+      "preflight_ok": true,
+      "n_available_tags": 5,
+      "available_tags_sample": [
+        "qwen2.5:14b-32k",
+        "qwen2.5:14b",
+        "qwen2.5-coder:14b-32k",
+        "qwen3.5:35b",
+        "qwen2.5-coder:14b"
+      ],
+      "error": "",
+      "latency_s": 0.035
+    },
+    {
+      "host_id": "192.168.12.191",
+      "model_id": "qwen2.5:14b-32k",
+      "host_url": "http://192.168.12.191:11434",
+      "preflight_ok": true,
+      "n_available_tags": 5,
+      "available_tags_sample": [
+        "qwen2.5:14b-32k",
+        "qwen2.5:14b",
+        "qwen2.5-coder:14b-32k",
+        "qwen3.5:35b",
+        "qwen2.5-coder:14b"
+      ],
+      "error": "",
+      "latency_s": 0.012
+    },
+    {
+      "host_id": "192.168.12.191",
+      "model_id": "qwen2.5-coder:14b-32k",
+      "host_url": "http://192.168.12.191:11434",
+      "preflight_ok": true,
+      "n_available_tags": 5,
+      "available_tags_sample": [
+        "qwen2.5:14b-32k",
+        "qwen2.5:14b",
+        "qwen2.5-coder:14b-32k",
+        "qwen3.5:35b",
+        "qwen2.5-coder:14b"
+      ],
+      "error": "",
+      "latency_s": 0.011
+    },
+    {
+      "host_id": "192.168.12.191",
+      "model_id": "qwen3.5:35b",
+      "host_url": "http://192.168.12.191:11434",
+      "preflight_ok": true,
+      "n_available_tags": 5,
+      "available_tags_sample": [
+        "qwen2.5:14b-32k",
+        "qwen2.5:14b",
+        "qwen2.5-coder:14b-32k",
+        "qwen3.5:35b",
+        "qwen2.5-coder:14b"
+      ],
+      "error": "",
+      "latency_s": 0.013
+    },
+    {
+      "host_id": "192.168.12.248",
+      "model_id": "any",
+      "host_url": "http://192.168.12.248:11434",
+      "preflight_ok": false,
+      "n_available_tags": 0,
+      "available_tags_sample": [],
+      "error": "URLError: <urlopen error timed out>",
+      "latency_s": 5.001
+    }
+  ]
+}

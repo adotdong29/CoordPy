@@ -1,0 +1,207 @@
+{
+  "cross_host_disagreement_rate": 0.8,
+  "date": "2026-05-02",
+  "gold_correlated_disagreement_rate": 1.0,
+  "hosts": [
+    {
+      "host_id": "localhost",
+      "host_role": "producer_candidate",
+      "model": "qwen2.5:0.5b",
+      "url": "http://127.0.0.1:11434"
+    },
+    {
+      "host_id": "192.168.12.191",
+      "host_role": "adjudicator_candidate",
+      "model": "qwen2.5:14b",
+      "url": "http://192.168.12.191:11434"
+    }
+  ],
+  "mac2_192_168_12_248_status": "unreachable_by_api_tags_timeout_in_preflight",
+  "n_prompts": 5,
+  "n_responsive_probe_calls": 10,
+  "n_total_probe_calls": 10,
+  "preflights": {
+    "192.168.12.191::qwen2.5:14b": {
+      "available_tags": [
+        "qwen2.5:14b-32k",
+        "qwen2.5:14b",
+        "qwen2.5-coder:14b-32k",
+        "qwen3.5:35b",
+        "qwen2.5-coder:14b"
+      ],
+      "error": "",
+      "latency_s": 0.032,
+      "preflight_ok": true
+    },
+    "localhost::qwen2.5:0.5b": {
+      "available_tags": [
+        "qwen2.5:0.5b",
+        "lexi-coder:latest",
+        "taozhiyuai/llama-3-8b-lexi-uncensored:v1_q4_k_m",
+        "gemma2:9b",
+        "llama3.1:8b",
+        "mixtral:8x7b",
+        "qwen2.5-coder:7b",
+        "deepseek-r1:7b"
+      ],
+      "error": "",
+      "latency_s": 0.025,
+      "preflight_ok": true
+    }
+  },
+  "protocol": "bounded_W36_two_reachable_host_gold_probe",
+  "responsive_accuracy": 0.6,
+  "results": [
+    {
+      "answers": [
+        {
+          "answer": "sha",
+          "correct": false,
+          "error": "",
+          "host_id": "localhost",
+          "host_role": "producer_candidate",
+          "latency_s": 1.536,
+          "model": "qwen2.5:0.5b",
+          "raw": "sha-25"
+        },
+        {
+          "answer": "sha256",
+          "correct": true,
+          "error": "",
+          "host_id": "192.168.12.191",
+          "host_role": "adjudicator_candidate",
+          "latency_s": 2.624,
+          "model": "qwen2.5:14b",
+          "raw": "sha256"
+        }
+      ],
+      "cross_host_agreement": false,
+      "cross_host_disagreement": true,
+      "gold": "sha256",
+      "gold_correlated_disagreement": true,
+      "prompt_id": "K4",
+      "responsive_count": 2
+    },
+    {
+      "answers": [
+        {
+          "answer": ">`>&",
+          "correct": false,
+          "error": "",
+          "host_id": "localhost",
+          "host_role": "producer_candidate",
+          "latency_s": 0.242,
+          "model": "qwen2.5:0.5b",
+          "raw": ">`>&`"
+        },
+        {
+          "answer": ">>",
+          "correct": true,
+          "error": "",
+          "host_id": "192.168.12.191",
+          "host_role": "adjudicator_candidate",
+          "latency_s": 0.446,
+          "model": "qwen2.5:14b",
+          "raw": ">>"
+        }
+      ],
+      "cross_host_agreement": false,
+      "cross_host_disagreement": true,
+      "gold": ">>",
+      "gold_correlated_disagreement": true,
+      "prompt_id": "S4",
+      "responsive_count": 2
+    },
+    {
+      "answers": [
+        {
+          "answer": "pseudopolynomial",
+          "correct": false,
+          "error": "",
+          "host_id": "localhost",
+          "host_role": "producer_candidate",
+          "latency_s": 0.277,
+          "model": "qwen2.5:0.5b",
+          "raw": "pseudopolynomial"
+        },
+        {
+          "answer": "np",
+          "correct": true,
+          "error": "",
+          "host_id": "192.168.12.191",
+          "host_role": "adjudicator_candidate",
+          "latency_s": 0.426,
+          "model": "qwen2.5:14b",
+          "raw": "np"
+        }
+      ],
+      "cross_host_agreement": false,
+      "cross_host_disagreement": true,
+      "gold": "np",
+      "gold_correlated_disagreement": true,
+      "prompt_id": "T1",
+      "responsive_count": 2
+    },
+    {
+      "answers": [
+        {
+          "answer": "application",
+          "correct": false,
+          "error": "",
+          "host_id": "localhost",
+          "host_role": "producer_candidate",
+          "latency_s": 0.194,
+          "model": "qwen2.5:0.5b",
+          "raw": "application"
+        },
+        {
+          "answer": "transport",
+          "correct": true,
+          "error": "",
+          "host_id": "192.168.12.191",
+          "host_role": "adjudicator_candidate",
+          "latency_s": 0.382,
+          "model": "qwen2.5:14b",
+          "raw": "transport"
+        }
+      ],
+      "cross_host_agreement": false,
+      "cross_host_disagreement": true,
+      "gold": "transport",
+      "gold_correlated_disagreement": true,
+      "prompt_id": "K2",
+      "responsive_count": 2
+    },
+    {
+      "answers": [
+        {
+          "answer": "//",
+          "correct": true,
+          "error": "",
+          "host_id": "localhost",
+          "host_role": "producer_candidate",
+          "latency_s": 0.194,
+          "model": "qwen2.5:0.5b",
+          "raw": "//"
+        },
+        {
+          "answer": "//",
+          "correct": true,
+          "error": "",
+          "host_id": "192.168.12.191",
+          "host_role": "adjudicator_candidate",
+          "latency_s": 0.491,
+          "model": "qwen2.5:14b",
+          "raw": "//"
+        }
+      ],
+      "cross_host_agreement": true,
+      "cross_host_disagreement": false,
+      "gold": "//",
+      "gold_correlated_disagreement": false,
+      "prompt_id": "S1",
+      "responsive_count": 2
+    }
+  ],
+  "verdict": "two_reachable_host_live_disagreement_observed"
+}

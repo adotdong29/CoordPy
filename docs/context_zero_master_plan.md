@@ -1,36 +1,33 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (SDK v3.36 / W35, 2026-05-02).**
-> *Trust-subspace dense-control proxy + basis-history projection +
-> W35 manifest-v5 CID*.  W35 wraps W34's live-aware multi-anchor
-> abstention path with a controller-verified dense basis over W21
-> probe top_sets, W33 EWMA trust, W34 live-attestation/response-
-> feature state, top-set stability, and host health.  The integration
-> materially helped on the specific blocker where W34 could only
-> abstain: on R-82-TRUST-SUBSPACE-SHIFT, W34 abstains on 6 disputed
-> cells; W35 safely reroutes 5/6 through the stable basis direction,
-> raising correctness from 0.625 to **0.9375** (**+0.3125**) across
-> 5/5 seeds, with trust precision preserved at **1.000** and one
-> visible-token overhead/cell.  Trust/audit survived: W35 adds 14
-> mechanically tested verifier failure modes and manifest-v5 CID
-> binding, bringing the cumulative W22..W35 trust boundary to **98
-> enumerated failure modes**.  Bounded-context efficiency improved in
-> the dense-state sense: mean **13,016.5 structured bits per visible
-> W35 token** on the load-bearing regime.  Multi-host evidence did not
-> materially broaden: local Ollama and `192.168.12.191` are usable,
-> but `192.168.12.248` still times out; the bounded two-host fallback
-> observed 3/5 cross-host disagreements, all gold-correlated.  Earlier
-> loose ends closed versus sharpened: the old explicit oracle line and
-> dense-control/geometry line now compose in one mechanism; native-
-> latent remains open because W35 is not transformer-internal hidden
-> state projection; live magnitude remains open as a systematic survey;
-> Mac 2 remains hardware-bounded.  Release readiness improves only as
-> a consequence: W35 is experimental, stable runtime unchanged, version
-> bumped to SDK v3.36 / 0.5.9.  **Net effect on the original thesis**:
-> materially stronger than W34 on the audited-proxy path, still blocked
-> by a deeper trust/semantics wall for true native latent.
-> See ``docs/RESULTS_WEVRA_W35_TRUST_SUBSPACE_DENSE_CONTROL.md`` and
-> ``docs/SUCCESS_CRITERION_W35_TRUST_SUBSPACE_DENSE_CONTROL.md``.
+> **Latest milestone marker (SDK v3.37 / W36, 2026-05-02).**
+> *Host-diverse trust-subspace guard + manifest-v6 CID*.  W36 wraps
+> W35's trust-subspace dense-control proxy with a controller-verified
+> host-diversity precondition: dense support must be attested by at
+> least two distinct registered healthy hosts.  Geometry-aware dense-
+> control integration materially helped at the host-trust boundary:
+> on R-83-HOST-DIVERSE-RECOVER, W36 improves over W35 from 0.625 to
+> **0.9375** correctness (**+0.3125**) across 5/5 seeds and restores
+> trust precision from 0.6667 to **1.000**.  Trust/audit survived:
+> W36 adds 14 mechanically tested verifier failure modes and
+> manifest-v6 CID binding, bringing the cumulative W22..W36 trust
+> boundary to **112 enumerated failure modes**.  Bounded-context
+> efficiency improved in the dense-state sense: about **13.95k
+> structured bits per visible W36 token** on the load-bearing regime.
+> Multi-host evidence broadened only within the two-reachable-host
+> topology: local Ollama and `192.168.12.191` are usable and a bounded
+> probe observed 4/5 cross-host disagreements, all gold-correlated;
+> `192.168.12.248` still times out and true three-host evidence remains
+> blocked.  Earlier loose ends closed versus sharpened: W36 closes a
+> W35 unsafe host-support case and sharpens the no-live-attestation
+> wall; it does not close native latent or systematic live magnitude.
+> Release readiness improves as a consequence: W36 is experimental,
+> stable runtime unchanged, version bumped to SDK v3.37 / 0.5.10.
+> **Net effect on the original thesis**: materially stronger than W35
+> at the audited host-trust proxy boundary, still blocked by a deeper
+> trust/semantics wall for true native latent and by Mac 2 unavailability.
+> See ``docs/RESULTS_WEVRA_W36_HOST_DIVERSE_TRUST_SUBSPACE.md`` and
+> ``docs/SUCCESS_CRITERION_W36_HOST_DIVERSE_TRUST_SUBSPACE.md``.
 
 > Canonical long-running document for the research programme behind
 > `context-zero`. This is a plan for a body of work, not a changelog.

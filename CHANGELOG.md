@@ -5,6 +5,62 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.10 / 3.37] — 2026-05-02 — SDK v3.37 — host-diverse trust-subspace guard + manifest-v6 CID + R-83 Phase-83 benchmark family + live two-reachable-host probe
+
+*Strictly additive on SDK v3.36.  The stable Wevra product/runtime
+contract is unchanged.  The W36 surface is experimental and wraps the
+W35 `TrustSubspaceDenseControlOrchestrator` with a host-diverse
+trust-subspace guard.  W36 requires dense-control projection support
+to be independently attested by distinct registered healthy hosts;
+unsafe, unverifiable, spoofed, or no-live-attestation branches reject
+or abstain.  It is explicitly not native latent transfer, not
+transformer-internal hidden-state projection, and not a KV-cache
+transplant.*
+
+**New experimental surface.**
+
+`HostDiverseBasisEntry`, `HostDiverseRatificationEnvelope`,
+`HostDiverseRegistry`, `W36HostDiverseResult`,
+`HostDiverseTrustSubspaceOrchestrator`,
+`select_host_diverse_projection`,
+`verify_host_diverse_ratification`,
+`build_trivial_host_diverse_registry`,
+`build_host_diverse_registry`, plus W36 schema/branch/default
+constants.
+
+**Headline empirical results.**
+
+* **R-83-HOST-DIVERSE-RECOVER.**  W36 improves over W35 from 0.625 to
+  **0.9375** correctness (**+0.3125**) across 5/5 seeds and restores
+  trust precision from 0.6667 to **1.000**; overhead is one visible
+  token/cell.
+
+* **R-83-HOST-SPOOFED-CONSENSUS.**  W36 does not improve correctness
+  (0.625 remains 0.625), but trust precision rises from 0.625 to
+  **1.000** by abstaining on 6 unsafe W35 ratifications per seed.
+
+* **R-83-TRIVIAL-W36.**  W36 disabled + manifest-v6 disabled reduces
+  to W35 byte-for-byte across 5/5 seeds.
+
+* **R-83-NO-LIVE-ATTESTATION.**  Hard falsifier: W36 without live
+  attestations abstains on every cell and drops correctness from
+  W35's 1.000 to 0.000.
+
+**Trust boundary.**  14 new W36 failure modes in
+`verify_host_diverse_ratification`, all covered by W36 unit tests;
+cumulative W22 + W29 + W30 + W31 + W32 + W33 + W34 + W35 + W36 trust
+boundary = **112 enumerated failure modes**.
+
+**Live fallback.**  Fresh preflight found local Ollama and
+`192.168.12.191:11434` reachable, with `192.168.12.248:11434`
+timing out.  Bounded two-reachable-host probe on 2026-05-02 across
+local `qwen2.5:0.5b` and remote `qwen2.5:14b` produced 10/10
+responsive probes, 4/5 cross-host disagreements, and 4/4
+gold-correlated disagreement winners.
+
+**Versioning.**  SDK_VERSION `wevra.sdk.v3.37`; package version
+`0.5.10`; W36 exports live under `__experimental__`.
+
 ## [0.5.9 / 3.36] — 2026-05-02 — SDK v3.36 — trust-subspace dense-control proxy + basis-history projection + W35 manifest-v5 CID + R-82 Phase-82 benchmark family + W34 abstention converted to verified reroute where basis history is stable
 
 *Strictly additive on SDK v3.35.  The stable Wevra product/runtime

@@ -7,7 +7,32 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.36 (May 2026).** Trust-subspace dense-
+**Latest milestone: SDK v3.37 (May 2026).** Host-diverse trust-
+subspace guard + manifest-v6 CID (W36 family).  W36 wraps W35's
+trust-subspace dense-control proxy with a host-diverse verifier: a
+dense projection is eligible only when its support is independently
+attested by at least two registered healthy hosts, with unsafe or
+unverifiable branches rejected or abstained.  On **R-83-HOST-
+DIVERSE-RECOVER**, W36 raises correctness over W35 from 0.625 to
+**0.9375** (**+0.3125**) across 5/5 seeds, restores trust precision
+from 0.6667 to **1.000**, and adds one visible token/cell while
+carrying about **13.95k structured bits per visible W36 token**.  On
+**R-83-HOST-SPOOFED-CONSENSUS**, W36 does **not** improve correctness
+(0.625 remains 0.625) but raises trust precision from 0.625 to
+**1.000** by abstaining on 6 unsafe W35 ratifications per seed.  The
+no-live-attestation falsifier is sharp: requiring host diversity when
+live attestations are absent drops correctness from W35's 1.000 to
+0.000 through universal abstention.  W36 adds 14 verifier failure
+modes, bringing the cumulative W22/W29/W30/W31/W32/W33/W34/W35/W36
+trust boundary to **112 enumerated modes**.  This is **not native
+latent transfer** and not transformer-internal hidden-state
+projection; it is an audited capsule-layer host-trust proxy.  Fresh
+preflight found local Ollama and `192.168.12.191` reachable, with
+`192.168.12.248` still timing out; a bounded two-reachable-host probe
+observed 4/5 cross-host disagreements, all gold-correlated.  Stable
+runtime contract unchanged; W36 remains experimental.
+
+**Earlier milestone: SDK v3.36 (May 2026).** Trust-subspace dense-
 control proxy + basis-history projection + W35 manifest-v5 CID (W35
 family).  W35 wraps W34's live-aware multi-anchor abstention path
 with a controller-verified dense basis over W21 probe top_sets, W33
@@ -17,19 +42,7 @@ W34 abstains on 6 disputed cells; W35 safely reroutes 5/6 through the
 stable `change_history` basis direction, raising correctness from
 0.625 to **0.9375** (**+0.3125**) across 5/5 seeds while preserving
 trust precision at **1.000** and adding one visible token/cell.
-The W35 envelope carries about **13,016.5 structured bits per visible
-W35 token** on the load-bearing regime and is verified by 14 new
-failure modes, bringing the cumulative W22/W29/W30/W31/W32/W33/W34/
-W35 trust boundary to **98 enumerated modes**.  The hard falsifier
-**W35-L-ALL-BASIS-COMPROMISED** remains: if every basis direction
-moves together to the same wrong answer, W35 cannot recover at the
-capsule layer.  This is **not native latent transfer** and not a
-transformer-internal hidden-state projection; it is the strongest
-audited capsule-layer proxy currently supported by this repo.
-Mac 2 (`192.168.12.248`) still times out; bounded live fallback on
-local `qwen2.5:0.5b` + remote `qwen2.5:14b` observed 3/5
-cross-host disagreements, all gold-correlated.  Stable runtime
-contract unchanged; W35 remains experimental.
+Stable runtime contract unchanged; W35 remains experimental.
 
 **Earlier milestone: SDK v3.35 (May 2026).** Live-aware multi-anchor
 adjudication + native-latent audited response-feature proxy + W34

@@ -1,13 +1,37 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
-> Updated through SDK v3.36, 2026-05-02 (W22 → W35 cumulative
-> trust + dense-control + live-aware multi-anchor / trust-subspace ladder
-> summarised in § 14.2 and § 17).
+> Updated through SDK v3.37, 2026-05-02 (W22 → W36 cumulative
+> trust + dense-control + live-aware multi-anchor / trust-subspace /
+> host-diverse guard ladder summarised in § 14.2 and § 17).
 >
-> **Latest milestone marker (SDK v3.36 / W35, 2026-05-02).** The
-> programme now has thirty-two coupled research axes.  W35 is the
-> first milestone where the old explicit capsule line and the newer
+> **Latest milestone marker (SDK v3.37 / W36, 2026-05-02).** The
+> programme now has thirty-three coupled research axes.  W36 hardens
+> the W35 trust-subspace proxy at the host/live boundary by requiring
+> dense-control support to be independently attested by at least two
+> distinct registered healthy hosts.  On R-83-HOST-DIVERSE-RECOVER,
+> W36 improves over W35 from 0.625 to **0.9375** correctness
+> (**+0.3125**) across 5/5 seeds and restores trust precision from
+> 0.6667 to **1.000** with one visible-token overhead/cell.  On
+> R-83-HOST-SPOOFED-CONSENSUS, W36 does not recover correctness but
+> improves trust precision from 0.625 to **1.000** by abstaining on
+> unsafe host-spoofed ratifications.  On R-83-NO-LIVE-ATTESTATION,
+> W36 exposes the sharp operational wall: without live attestations it
+> abstains on every cell and destroys correctness relative to W35.
+> The W36 envelope carries about **13.95k structured bits per visible
+> W36 token** on the load-bearing regime and adds 14 mechanically
+> tested verifier failure modes, bringing the cumulative W22..W36
+> trust boundary to **112 enumerated failure modes**.  W36 is
+> explicitly NOT native latent transfer, NOT transformer-internal
+> hidden-state projection, and NOT a KV-cache transplant.  Mac 2 still
+> times out; bounded live fallback across local `qwen2.5:0.5b` and
+> remote `qwen2.5:14b` observed 4/5 cross-host disagreements, all
+> gold-correlated.  See
+> ``docs/RESULTS_WEVRA_W36_HOST_DIVERSE_TRUST_SUBSPACE.md`` and
+> ``docs/SUCCESS_CRITERION_W36_HOST_DIVERSE_TRUST_SUBSPACE.md``.
+>
+> **Previous milestone marker (SDK v3.36 / W35, 2026-05-02).** W35 is
+> the first milestone where the old explicit capsule line and the newer
 > dense-control / geometry-aware line become one mechanism rather than
 > parallel evidence.  W35 wraps W34's live-aware multi-anchor
 > abstention path with a controller-verified trust-subspace dense
@@ -16,21 +40,7 @@
 > R-82-TRUST-SUBSPACE-SHIFT, W34 abstains on 6 disputed cells; W35
 > safely reroutes 5/6 through the stable basis direction, raising
 > correctness from 0.625 to **0.9375** (**+0.3125**) across 5/5
-> seeds, with trust precision preserved at **1.000** and one visible-
-> token overhead/cell.  The W35 envelope carries mean **13,016.5
-> structured bits per visible W35 token** on the load-bearing regime
-> and adds 14 mechanically tested verifier failure modes, bringing the
-> cumulative W22..W35 trust boundary to **98 enumerated failure
-> modes**.  The hard falsifier W35-L-ALL-BASIS-COMPROMISED remains:
-> if every basis direction moves together to the same wrong answer,
-> capsule-layer dense control cannot recover.  W35 is explicitly NOT
-> native latent transfer, NOT transformer-internal hidden-state
-> projection, and NOT a KV-cache transplant.  Mac 2 still times out;
-> bounded live fallback across local `qwen2.5:0.5b` and remote
-> `qwen2.5:14b` observed 3/5 cross-host disagreements, all
-> gold-correlated.  See
-> ``docs/RESULTS_WEVRA_W35_TRUST_SUBSPACE_DENSE_CONTROL.md`` and
-> ``docs/SUCCESS_CRITERION_W35_TRUST_SUBSPACE_DENSE_CONTROL.md``.
+> seeds, with trust precision preserved at **1.000**.
 >
 > **Previous milestone marker (SDK v3.35 / W34, 2026-05-01).** W34 closes
 > the W33 *single-anchor fragility* — the W33 trust-EWMA mechanism
@@ -70,19 +80,21 @@
 > ``docs/SUCCESS_CRITERION_W34_LIVE_AWARE_MULTI_ANCHOR.md``.
 >
 > **Position in the research arc**: W35 changes the synthesis from
-> "three separated lines" to "one composed audited-proxy stack."  The
+> "three separated lines" to "one composed audited-proxy stack"; W36
+> adds the first host-diverse guard around that stack.  The
 > OLD explicit capsule line for multi-oracle adjudication (W19..W22 →
 > W21/W22/W33/W34) supplies the probes and trust evidence; the NEW
 > dense-control / geometry-aware line (W29..W32) supplies the idea of
 > controller-side dense state and projection; the live-aware
-> multi-anchor line (W33..W34) supplies the abstention boundary.  W35
-> composes them: W35 wraps W34 wraps W33 wraps W21 wraps the
-> capsule-native runtime.  The composed stack is still an audited
-> capsule-layer proxy.  It does not claim transformer-internal
-> hidden-state projection or runtime KV transplant.  The deeper
-> architecture-dependent walls (W33-C-NATIVE-LATENT, systematic
-> W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE, and true multi-host
-> W34/W35-C-MULTI-HOST) remain the next frontier.
+> multi-anchor line (W33..W34) supplies the abstention boundary; W36
+> supplies the host-attestation boundary.  The composed stack is now
+> W36 wraps W35 wraps W34 wraps W33 wraps W21 wraps the capsule-native
+> runtime.  It is still an audited capsule-layer proxy.  It does not
+> claim transformer-internal hidden-state projection or runtime KV
+> transplant.  The deeper architecture-dependent walls
+> (W33-C-NATIVE-LATENT, systematic W33-C-CROSS-HOST-LIVE-TRUST-
+> MAGNITUDE, and true multi-host W34/W35/W36-C-MULTI-HOST) remain the
+> next frontier.
 >
 > Updated through SDK v3.28, 2026-04-30 (W22 → W27 cross-cell
 > efficiency ladder summarised in § 14.2; W27 — multi-chain

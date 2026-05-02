@@ -17,7 +17,9 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.36)         | [`RESULTS_WEVRA_W35_TRUST_SUBSPACE_DENSE_CONTROL.md`](RESULTS_WEVRA_W35_TRUST_SUBSPACE_DENSE_CONTROL.md) |
+> | Latest milestone (SDK v3.37)         | [`RESULTS_WEVRA_W36_HOST_DIVERSE_TRUST_SUBSPACE.md`](RESULTS_WEVRA_W36_HOST_DIVERSE_TRUST_SUBSPACE.md) |
+> | Pre-committed success bar (SDK v3.37)| [`SUCCESS_CRITERION_W36_HOST_DIVERSE_TRUST_SUBSPACE.md`](SUCCESS_CRITERION_W36_HOST_DIVERSE_TRUST_SUBSPACE.md) |
+> | Previous milestone (SDK v3.36)       | [`RESULTS_WEVRA_W35_TRUST_SUBSPACE_DENSE_CONTROL.md`](RESULTS_WEVRA_W35_TRUST_SUBSPACE_DENSE_CONTROL.md) |
 > | Pre-committed success bar (SDK v3.36)| [`SUCCESS_CRITERION_W35_TRUST_SUBSPACE_DENSE_CONTROL.md`](SUCCESS_CRITERION_W35_TRUST_SUBSPACE_DENSE_CONTROL.md) |
 > | Previous milestone (SDK v3.35)       | [`RESULTS_WEVRA_W34_LIVE_AWARE_MULTI_ANCHOR.md`](RESULTS_WEVRA_W34_LIVE_AWARE_MULTI_ANCHOR.md) |
 > | Pre-committed success bar (SDK v3.35)| [`SUCCESS_CRITERION_W34_LIVE_AWARE_MULTI_ANCHOR.md`](SUCCESS_CRITERION_W34_LIVE_AWARE_MULTI_ANCHOR.md) |

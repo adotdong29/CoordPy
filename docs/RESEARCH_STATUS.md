@@ -5,10 +5,87 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.36,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.37,
 > 2026-05-02.
 
-## TL;DR — SDK v3.36
+## TL;DR — SDK v3.37
+
+The programme now has **thirty-three** coupled research axes.  SDK
+v3.37 mints axis 33: **host-diverse trust-subspace guard +
+manifest-v6 CID** (W36).  W36 wraps W35's audited trust-subspace
+dense-control proxy with a controller-side host-diversity verifier:
+dense projection support must come from at least two distinct
+registered healthy hosts, and unsafe or unverifiable branches reject
+or abstain.
+
+The load-bearing change is narrower than native latent transfer and
+more operational than another local reroute.  W35 could ratify a
+dense basis projection even when the available capsule-visible support
+was effectively co-located or host-unsafe.  W36 makes host diversity a
+typed audited precondition.
+
+**Headline SDK v3.37 results.**
+
+* **R-83-HOST-DIVERSE-RECOVER.**  W36 improves over W35 from 0.625
+  to **0.9375** correctness across 5/5 seeds, **Δ_correctness_w36_w35
+  = +0.3125**, and restores trust precision from 0.6667 to **1.000**.
+  W36 reroutes 5 cells and abstains on 1 unsafe W35 ratification per
+  seed.  W21 remains at 1.000 on this synthetic regime, so the claim
+  is trust-stack hardening, not universal dominance over every older
+  explicit-capsule baseline.
+
+* **R-83-HOST-SPOOFED-CONSENSUS.**  W36 does not recover correctness:
+  W35 and W36 both stay at 0.625.  It improves trust precision from
+  0.625 to **1.000** by abstaining on 6 unsafe W35 ratifications per
+  seed.  This is the named spoofed-host falsifier.
+
+* **R-83-TRIVIAL-W36.**  With host diversity disabled and manifest-v6
+  disabled, W36 reduces to W35 byte-for-byte across 5/5 seeds.
+
+* **R-83-NO-LIVE-ATTESTATION.**  Falsifier: if host diversity is
+  required but live attestations are absent, W36 abstains on every
+  cell and drops correctness from W35's 1.000 to 0.000 while keeping
+  trust precision at 1.000.
+
+**Density / efficiency**: On R-83-HOST-DIVERSE-RECOVER, W36 carries
+about **13.95k structured bits per visible W36 token** at one visible
+token overhead/cell.  On R-83-HOST-SPOOFED-CONSENSUS it carries about
+**13.74k bits/token**.  This is controller-verified structured state,
+not hidden-state transfer.
+
+**Trust boundary**: 14 new W36 failure modes in
+`verify_host_diverse_ratification`, mechanically tested.  Cumulative
+enumerated trust boundary across W22 + W29 + W30 + W31 + W32 + W33 +
+W34 + W35 + W36 = **112 enumerated failure modes**.
+
+**Live / two-Mac status**: Local Ollama and `192.168.12.191:11434`
+are reachable.  `192.168.12.248:11434` still times out on `/api/tags`.
+The bounded W36 two-reachable-host probe on 2026-05-02 across local
+`qwen2.5:0.5b` and remote `qwen2.5:14b` yielded 10/10 responsive
+probes, 4/5 cross-host disagreements, and 4/4 gold-correlated
+disagreements.  This materially strengthens the two-reachable-host
+motivation for host-diverse control but still does **not** close true
+three-host evidence.
+
+**Stable-vs-experimental boundary**: W36 is exported only under
+`__experimental__`; stable runtime contract remains unchanged.
+SDK_VERSION `wevra.sdk.v3.37`; package version `0.5.10`.
+
+**Open walls after W36**: W33-C-NATIVE-LATENT remains open.  W36 is
+not transformer-internal hidden-state projection, not a KV transplant,
+and not a learned latent controller.  W33-C-CROSS-HOST-LIVE-TRUST-
+MAGNITUDE remains open on the systematic magnitude axis.  W34/W35/
+W36-C-MULTI-HOST remains hardware-bounded until Mac 2 joins the
+topology.  W36 also adds a new operational wall: host-diverse dense
+control is unsafe without real live attestations.
+
+See `docs/RESULTS_WEVRA_W36_HOST_DIVERSE_TRUST_SUBSPACE.md` for the
+full note and `docs/SUCCESS_CRITERION_W36_HOST_DIVERSE_TRUST_SUBSPACE.md`
+for the success bar.
+
+---
+
+## Earlier TL;DR — SDK v3.36
 
 The programme now has **thirty-two** coupled research axes.  SDK
 v3.36 mints axis 32: **trust-subspace dense-control proxy +

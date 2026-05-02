@@ -2,7 +2,7 @@
 
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
+> README-of-README must satisfy these rules. Last touched: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
 > v3.33 (W32 family) 2026-05-01.
 
 The programme has a long history of moves where a candidate result
@@ -89,6 +89,33 @@ precision at 1.000, using one visible token/cell to carry roughly
 W35-L-ALL-BASIS-COMPROMISED remains: if every basis direction moves
 together to the wrong answer, the capsule-layer proxy has no
 independent signal and cannot recover.
+
+### "W36 is native latent" or "W36 proves multi-host release readiness"
+
+> *"W36 implements native latent host trust transfer."*
+
+Forbidden.  W36 implements an **audited capsule-layer host-diverse
+trust-subspace guard**.  It checks whether W35 dense-control support
+is independently attested by distinct registered healthy hosts.  It
+does not read hidden states, transplant KV cache, inspect attention
+weights, project embeddings, or prove that a transformer-internal
+trust subspace has been found.
+
+Permitted phrasing: *"W36 hardens W35 by rejecting, rerouting, or
+abstaining when dense-control support is not host-diverse and
+verifiable."*
+
+Forbidden phrasing: *"W36 closes W33-C-NATIVE-LATENT"*, *"W36 gives
+true three-host evidence"*, *"W36 makes the repo release-ready by
+itself"*, *"W36 solves context for multi-agent teams."*
+
+The honest reading is narrower: on R-83-HOST-DIVERSE-RECOVER, W36
+improves over W35 by +0.3125 correctness and restores trust precision
+to 1.000.  On R-83-HOST-SPOOFED-CONSENSUS, W36 improves trust
+precision by abstaining but does not recover correctness.  On
+R-83-NO-LIVE-ATTESTATION, W36 is a correctness-destroying abstention
+guard.  Mac 2 (`192.168.12.248`) still times out, so the live result
+is two-reachable-host evidence only.
 
 ### "Beats" without a baseline
 

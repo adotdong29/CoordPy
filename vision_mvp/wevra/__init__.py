@@ -533,6 +533,30 @@ from .team_coord import (
     W35_BRANCH_BASIS_HISTORY_UNSAFE,
     W35_BRANCH_BASIS_HISTORY_ABSTAINED,
     W35_ALL_BRANCHES,
+    # SDK v3.37 — host-diverse trust-subspace dense-control guard +
+    # manifest-v6 CID (W36). EXPERIMENTAL — see __experimental__.
+    HostDiverseBasisEntry,
+    HostDiverseRatificationEnvelope,
+    HostDiverseRegistry,
+    W36HostDiverseResult,
+    HostDiverseTrustSubspaceOrchestrator,
+    verify_host_diverse_ratification,
+    select_host_diverse_projection,
+    build_trivial_host_diverse_registry,
+    build_host_diverse_registry,
+    W36_HOST_DIVERSE_SCHEMA_VERSION,
+    W36_DEFAULT_MIN_DISTINCT_HOSTS,
+    W36_DEFAULT_HOST_DIVERSITY_THRESHOLD,
+    W36_DEFAULT_HOST_DIVERSITY_MARGIN_MIN,
+    W36_BRANCH_HOST_DIVERSE_RESOLVED,
+    W36_BRANCH_TRIVIAL_HOST_DIVERSE_PASSTHROUGH,
+    W36_BRANCH_HOST_DIVERSE_REJECTED,
+    W36_BRANCH_HOST_DIVERSE_DISABLED,
+    W36_BRANCH_HOST_DIVERSE_NO_TRIGGER,
+    W36_BRANCH_HOST_DIVERSE_REROUTED,
+    W36_BRANCH_HOST_DIVERSE_UNSAFE,
+    W36_BRANCH_HOST_DIVERSE_ABSTAINED,
+    W36_ALL_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -546,7 +570,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.36"
+SDK_VERSION = "wevra.sdk.v3.37"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -685,6 +709,17 @@ __experimental__: tuple[str, ...] = (
     "select_trust_subspace_projection",
     "build_trivial_trust_subspace_registry",
     "build_trust_subspace_dense_registry",
+    # W36 family — host-diverse trust-subspace dense-control guard +
+    # manifest-v6 CID.
+    "HostDiverseBasisEntry",
+    "HostDiverseRatificationEnvelope",
+    "HostDiverseRegistry",
+    "W36HostDiverseResult",
+    "HostDiverseTrustSubspaceOrchestrator",
+    "verify_host_diverse_ratification",
+    "select_host_diverse_projection",
+    "build_trivial_host_diverse_registry",
+    "build_host_diverse_registry",
 )
 
 __all__ = [
@@ -1081,6 +1116,30 @@ __all__ = [
     "W35_BRANCH_BASIS_HISTORY_UNSAFE",
     "W35_BRANCH_BASIS_HISTORY_ABSTAINED",
     "W35_ALL_BRANCHES",
+    # SDK v3.37 — W36 family (host-diverse trust-subspace guard +
+    # manifest-v6 CID). EXPERIMENTAL — see __experimental__ tuple.
+    "HostDiverseBasisEntry",
+    "HostDiverseRatificationEnvelope",
+    "HostDiverseRegistry",
+    "W36HostDiverseResult",
+    "HostDiverseTrustSubspaceOrchestrator",
+    "verify_host_diverse_ratification",
+    "select_host_diverse_projection",
+    "build_trivial_host_diverse_registry",
+    "build_host_diverse_registry",
+    "W36_HOST_DIVERSE_SCHEMA_VERSION",
+    "W36_DEFAULT_MIN_DISTINCT_HOSTS",
+    "W36_DEFAULT_HOST_DIVERSITY_THRESHOLD",
+    "W36_DEFAULT_HOST_DIVERSITY_MARGIN_MIN",
+    "W36_BRANCH_HOST_DIVERSE_RESOLVED",
+    "W36_BRANCH_TRIVIAL_HOST_DIVERSE_PASSTHROUGH",
+    "W36_BRANCH_HOST_DIVERSE_REJECTED",
+    "W36_BRANCH_HOST_DIVERSE_DISABLED",
+    "W36_BRANCH_HOST_DIVERSE_NO_TRIGGER",
+    "W36_BRANCH_HOST_DIVERSE_REROUTED",
+    "W36_BRANCH_HOST_DIVERSE_UNSAFE",
+    "W36_BRANCH_HOST_DIVERSE_ABSTAINED",
+    "W36_ALL_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

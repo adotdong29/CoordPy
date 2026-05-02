@@ -25398,3 +25398,1085 @@ def build_trust_subspace_dense_registry(
         registered_oracle_ids=frozenset(str(o) for o in registered_oracle_ids),
         abstain_on_unstable_consensus=bool(abstain_on_unstable_consensus),
     )
+
+
+# =============================================================================
+# SDK v3.37 — W36 family
+# Host-diverse trust-subspace dense-control guard + manifest-v6
+# =============================================================================
+#
+# W36 is a narrow hardening layer on top of W35.  W35's strongest remaining
+# falsifier is the case where every capsule-visible basis direction moves to the
+# same wrong answer.  W36 cannot recover if the model-internal semantics are
+# wrong and no independent evidence remains; it can, however, refuse to ratify a
+# dense-control projection when the supporting basis is not independently
+# host-attested.  This targets the live / multi-host blocker directly without
+# claiming transformer-internal latent transfer.
+# =============================================================================
+
+
+W36_HOST_DIVERSE_SCHEMA_VERSION: str = (
+    "wevra.host_diverse_trust_subspace.v1")
+
+W36_BRANCH_HOST_DIVERSE_RESOLVED = "host_diverse_resolved"
+W36_BRANCH_TRIVIAL_HOST_DIVERSE_PASSTHROUGH = (
+    "trivial_host_diverse_passthrough")
+W36_BRANCH_HOST_DIVERSE_REJECTED = "host_diverse_rejected"
+W36_BRANCH_HOST_DIVERSE_DISABLED = "host_diverse_disabled"
+W36_BRANCH_HOST_DIVERSE_NO_TRIGGER = "host_diverse_no_trigger"
+W36_BRANCH_HOST_DIVERSE_REROUTED = "host_diverse_rerouted"
+W36_BRANCH_HOST_DIVERSE_UNSAFE = "host_diverse_unsafe"
+W36_BRANCH_HOST_DIVERSE_ABSTAINED = "host_diverse_abstained"
+
+W36_ALL_BRANCHES: tuple[str, ...] = (
+    W36_BRANCH_HOST_DIVERSE_RESOLVED,
+    W36_BRANCH_TRIVIAL_HOST_DIVERSE_PASSTHROUGH,
+    W36_BRANCH_HOST_DIVERSE_REJECTED,
+    W36_BRANCH_HOST_DIVERSE_DISABLED,
+    W36_BRANCH_HOST_DIVERSE_NO_TRIGGER,
+    W36_BRANCH_HOST_DIVERSE_REROUTED,
+    W36_BRANCH_HOST_DIVERSE_UNSAFE,
+    W36_BRANCH_HOST_DIVERSE_ABSTAINED,
+)
+
+W36_DEFAULT_MIN_DISTINCT_HOSTS: int = 2
+W36_DEFAULT_HOST_DIVERSITY_THRESHOLD: float = 0.86
+W36_DEFAULT_HOST_DIVERSITY_MARGIN_MIN: float = 0.03
+
+
+@dataclasses.dataclass(frozen=True)
+class HostDiverseBasisEntry:
+    """One W36 host-attested view of a W35 basis entry."""
+
+    cell_idx: int
+    oracle_id: str
+    host_id: str
+    model_id: str
+    top_set: tuple[str, ...]
+    projection_score: float
+    host_health: float
+    response_feature_signature: str
+    host_attested: bool
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "cell_idx": int(self.cell_idx),
+            "oracle_id": str(self.oracle_id),
+            "host_id": str(self.host_id),
+            "model_id": str(self.model_id),
+            "top_set": [str(t) for t in self.top_set],
+            "projection_score": round(float(self.projection_score), 4),
+            "host_health": round(float(self.host_health), 4),
+            "response_feature_signature": str(
+                self.response_feature_signature),
+            "host_attested": bool(self.host_attested),
+        }
+
+
+def _compute_host_diverse_basis_state_cid(
+        *,
+        basis_entries: Sequence[HostDiverseBasisEntry],
+) -> str:
+    payload = _canonical_json_bytes({
+        "host_diverse_basis_entries": [b.as_dict() for b in basis_entries],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w36_projection_audit_cid(
+        *,
+        projection_branch: str,
+        selected_oracle_ids: Sequence[str],
+        supporting_host_ids: Sequence[str],
+        projection_top_set: Sequence[str],
+        projection_score: float,
+        projection_margin: float,
+        host_diversity_threshold: float,
+        host_diversity_margin_min: float,
+        min_distinct_hosts: int,
+) -> str:
+    payload = _canonical_json_bytes({
+        "projection_branch": str(projection_branch),
+        "selected_oracle_ids": [str(o) for o in sorted(selected_oracle_ids)],
+        "supporting_host_ids": [str(h) for h in sorted(supporting_host_ids)],
+        "projection_top_set": [str(t) for t in sorted(projection_top_set)],
+        "projection_score": round(float(projection_score), 4),
+        "projection_margin": round(float(projection_margin), 4),
+        "host_diversity_threshold": round(
+            float(host_diversity_threshold), 4),
+        "host_diversity_margin_min": round(
+            float(host_diversity_margin_min), 4),
+        "min_distinct_hosts": int(min_distinct_hosts),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w36_manifest_v6_cid(
+        *,
+        parent_w35_cid: str,
+        host_diverse_basis_state_cid: str,
+        host_topology_cid: str,
+        live_attestation_cid: str,
+        projection_audit_cid: str,
+) -> str:
+    payload = _canonical_json_bytes({
+        "parent_w35_cid": str(parent_w35_cid),
+        "host_diverse_basis_state_cid": str(host_diverse_basis_state_cid),
+        "host_topology_cid": str(host_topology_cid),
+        "live_attestation_cid": str(live_attestation_cid),
+        "projection_audit_cid": str(projection_audit_cid),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w36_outer_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        parent_w35_cid: str,
+        host_diverse_basis_state_cid: str,
+        host_topology_cid: str,
+        live_attestation_cid: str,
+        projection_audit_cid: str,
+        manifest_v6_cid: str,
+        cell_index: int,
+) -> str:
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "parent_w35_cid": str(parent_w35_cid),
+        "host_diverse_basis_state_cid": str(host_diverse_basis_state_cid),
+        "host_topology_cid": str(host_topology_cid),
+        "live_attestation_cid": str(live_attestation_cid),
+        "projection_audit_cid": str(projection_audit_cid),
+        "manifest_v6_cid": str(manifest_v6_cid),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def select_host_diverse_projection(
+        *,
+        basis_entries: Sequence[HostDiverseBasisEntry],
+        min_distinct_hosts: int = W36_DEFAULT_MIN_DISTINCT_HOSTS,
+        host_diversity_threshold: float = (
+            W36_DEFAULT_HOST_DIVERSITY_THRESHOLD),
+        host_diversity_margin_min: float = (
+            W36_DEFAULT_HOST_DIVERSITY_MARGIN_MIN),
+) -> tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...],
+           float, float, str]:
+    """Select a projection supported by independent healthy hosts.
+
+    W36 groups basis entries by ``top_set``.  A group is eligible only
+    when it has at least ``min_distinct_hosts`` distinct attested,
+    healthy hosts.  The group score is the mean of the best score per
+    host, preventing one host from manufacturing several oracle IDs.
+    """
+    per_top_host: dict[tuple[str, ...], dict[str, tuple[float, str]]] = {}
+    for entry in basis_entries:
+        top = tuple(sorted(str(t) for t in entry.top_set))
+        host_id = str(entry.host_id)
+        if not top or not host_id:
+            continue
+        if not bool(entry.host_attested):
+            continue
+        if _bounded_unit(float(entry.host_health)) <= 0.0:
+            continue
+        score = _bounded_unit(float(entry.projection_score))
+        per_host = per_top_host.setdefault(top, {})
+        prev = per_host.get(host_id)
+        if prev is None or score > prev[0]:
+            per_host[host_id] = (score, str(entry.oracle_id))
+    ranked: list[
+        tuple[tuple[str, ...], float, tuple[str, ...], tuple[str, ...]]
+    ] = []
+    for top, host_map in per_top_host.items():
+        if len(host_map) < int(min_distinct_hosts):
+            continue
+        host_ids = tuple(sorted(host_map))
+        score = sum(v[0] for v in host_map.values()) / max(
+            1, len(host_map))
+        oracle_ids = tuple(sorted(v[1] for v in host_map.values()))
+        ranked.append((top, float(score), oracle_ids, host_ids))
+    if not ranked:
+        return ((), (), (), 0.0, 0.0, W36_BRANCH_HOST_DIVERSE_UNSAFE)
+    ranked.sort(key=lambda row: (-row[1], row[0]))
+    best_top, best_score, best_oids, best_hosts = ranked[0]
+    second_score = float(ranked[1][1]) if len(ranked) > 1 else 0.0
+    margin = float(best_score) - float(second_score)
+    if best_score < float(host_diversity_threshold):
+        return ((), (), (), best_score, margin,
+                W36_BRANCH_HOST_DIVERSE_UNSAFE)
+    if len(ranked) > 1 and margin < float(host_diversity_margin_min):
+        return ((), (), (), best_score, margin,
+                W36_BRANCH_HOST_DIVERSE_UNSAFE)
+    return (tuple(best_top), tuple(best_oids), tuple(best_hosts),
+            float(best_score), float(margin),
+            W36_BRANCH_HOST_DIVERSE_REROUTED)
+
+
+@dataclasses.dataclass(frozen=True)
+class HostDiverseRatificationEnvelope:
+    """Content-addressed W36 host-diverse trust-subspace envelope."""
+
+    schema_version: str
+    schema_cid: str
+    parent_w35_cid: str
+    host_diverse_basis_entries: tuple[HostDiverseBasisEntry, ...]
+    host_diverse_basis_state_cid: str
+    host_topology_cid: str
+    live_attestation_cid: str
+    projection_branch: str
+    selected_oracle_ids: tuple[str, ...]
+    supporting_host_ids: tuple[str, ...]
+    projection_top_set: tuple[str, ...]
+    projection_score: float
+    projection_margin: float
+    host_diversity_threshold: float
+    host_diversity_margin_min: float
+    min_distinct_hosts: int
+    projection_audit_cid: str
+    manifest_v6_cid: str
+    cell_index: int
+    wire_required: bool = False
+    w36_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.w36_cid:
+            object.__setattr__(self, "w36_cid",
+                               self.recompute_w36_cid())
+
+    def recompute_w36_cid(self) -> str:
+        return _compute_w36_outer_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            parent_w35_cid=self.parent_w35_cid,
+            host_diverse_basis_state_cid=(
+                self.host_diverse_basis_state_cid),
+            host_topology_cid=self.host_topology_cid,
+            live_attestation_cid=self.live_attestation_cid,
+            projection_audit_cid=self.projection_audit_cid,
+            manifest_v6_cid=self.manifest_v6_cid,
+            cell_index=int(self.cell_index),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w35_cid": self.parent_w35_cid,
+            "host_diverse_basis_entries": [
+                b.as_dict() for b in self.host_diverse_basis_entries],
+            "host_diverse_basis_state_cid":
+                self.host_diverse_basis_state_cid,
+            "host_topology_cid": self.host_topology_cid,
+            "live_attestation_cid": self.live_attestation_cid,
+            "projection_branch": self.projection_branch,
+            "selected_oracle_ids": [str(o) for o in self.selected_oracle_ids],
+            "supporting_host_ids": [str(h) for h in self.supporting_host_ids],
+            "projection_top_set": [str(t) for t in self.projection_top_set],
+            "projection_score": round(float(self.projection_score), 4),
+            "projection_margin": round(float(self.projection_margin), 4),
+            "host_diversity_threshold": round(
+                float(self.host_diversity_threshold), 4),
+            "host_diversity_margin_min": round(
+                float(self.host_diversity_margin_min), 4),
+            "min_distinct_hosts": int(self.min_distinct_hosts),
+            "projection_audit_cid": self.projection_audit_cid,
+            "manifest_v6_cid": self.manifest_v6_cid,
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<w36_ref:{self.w36_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_structured_bits(self) -> int:
+        return int(8 * self.n_envelope_bytes)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w35_cid": self.parent_w35_cid,
+            "host_diverse_basis_entries": [
+                b.as_dict() for b in self.host_diverse_basis_entries],
+            "host_diverse_basis_state_cid":
+                self.host_diverse_basis_state_cid,
+            "host_topology_cid": self.host_topology_cid,
+            "live_attestation_cid": self.live_attestation_cid,
+            "projection_branch": self.projection_branch,
+            "selected_oracle_ids": list(self.selected_oracle_ids),
+            "supporting_host_ids": list(self.supporting_host_ids),
+            "projection_top_set": [str(t) for t in self.projection_top_set],
+            "projection_score": round(float(self.projection_score), 4),
+            "projection_margin": round(float(self.projection_margin), 4),
+            "host_diversity_threshold": round(
+                float(self.host_diversity_threshold), 4),
+            "host_diversity_margin_min": round(
+                float(self.host_diversity_margin_min), 4),
+            "min_distinct_hosts": int(self.min_distinct_hosts),
+            "projection_audit_cid": self.projection_audit_cid,
+            "manifest_v6_cid": self.manifest_v6_cid,
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "w36_cid": self.w36_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_host_diverse_ratification(
+        env: HostDiverseRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_parent_w35_cid: str,
+        registered_oracle_ids: frozenset[str],
+        registered_host_ids: frozenset[str],
+        registered_host_topology_cid: str,
+        registered_basis_state_cid: str | None = None,
+) -> LatentVerificationOutcome:
+    """Pure-function verifier for the W36 envelope.
+
+    Enumerates 14 failure modes, disjoint from W22..W35.
+    """
+    n_checks = 0
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_w36_envelope", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_version != W36_HOST_DIVERSE_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="w36_schema_version_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w36_schema_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if env.parent_w35_cid != str(registered_parent_w35_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w35_parent_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    if env.projection_branch not in W36_ALL_BRANCHES:
+        return LatentVerificationOutcome(
+            ok=False, reason="w36_projection_branch_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    for entry in env.host_diverse_basis_entries:
+        if str(entry.oracle_id) not in registered_oracle_ids:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w36_basis_entry_unregistered_oracle",
+                n_checks=n_checks)
+    n_checks += 1
+    for entry in env.host_diverse_basis_entries:
+        host_id = str(entry.host_id)
+        if host_id and host_id not in registered_host_ids:
+            return LatentVerificationOutcome(
+                ok=False, reason="w36_basis_host_unregistered",
+                n_checks=n_checks)
+    n_checks += 1
+    for entry in env.host_diverse_basis_entries:
+        score = float(entry.projection_score)
+        if math.isnan(score) or math.isinf(score) or score < 0.0 or score > 1.0:
+            return LatentVerificationOutcome(
+                ok=False, reason="w36_basis_score_out_of_range",
+                n_checks=n_checks)
+    n_checks += 1
+    for entry in env.host_diverse_basis_entries:
+        health = float(entry.host_health)
+        if (math.isnan(health) or math.isinf(health)
+                or health < 0.0 or health > 1.0):
+            return LatentVerificationOutcome(
+                ok=False, reason="w36_basis_health_out_of_range",
+                n_checks=n_checks)
+    n_checks += 1
+    expected_basis_cid = _compute_host_diverse_basis_state_cid(
+        basis_entries=env.host_diverse_basis_entries)
+    if expected_basis_cid != env.host_diverse_basis_state_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w36_basis_state_cid_mismatch",
+            n_checks=n_checks)
+    if (registered_basis_state_cid is not None
+            and env.host_diverse_basis_state_cid
+            != registered_basis_state_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w36_basis_state_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    union_top: set[str] = set()
+    for entry in env.host_diverse_basis_entries:
+        union_top.update(str(t) for t in entry.top_set)
+    if not set(str(t) for t in env.projection_top_set).issubset(union_top):
+        return LatentVerificationOutcome(
+            ok=False, reason="w36_projection_top_set_unregistered",
+            n_checks=n_checks)
+    n_checks += 1
+    margin = float(env.projection_margin)
+    threshold = float(env.host_diversity_threshold)
+    margin_min = float(env.host_diversity_margin_min)
+    min_hosts = int(env.min_distinct_hosts)
+    if (math.isnan(margin) or math.isinf(margin)
+            or math.isnan(threshold) or math.isinf(threshold)
+            or math.isnan(margin_min) or math.isinf(margin_min)
+            or margin < -1.0 or margin > 1.0
+            or threshold < 0.0 or threshold > 1.0
+            or margin_min < 0.0 or margin_min > 1.0
+            or min_hosts < 1
+            or env.host_topology_cid != str(registered_host_topology_cid)):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w36_host_diversity_requirement_invalid",
+            n_checks=n_checks)
+    if (env.projection_branch == W36_BRANCH_HOST_DIVERSE_REROUTED
+            and len(set(env.supporting_host_ids)) < min_hosts):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w36_host_diversity_requirement_invalid",
+            n_checks=n_checks)
+    n_checks += 1
+    expected_projection_cid = _compute_w36_projection_audit_cid(
+        projection_branch=env.projection_branch,
+        selected_oracle_ids=env.selected_oracle_ids,
+        supporting_host_ids=env.supporting_host_ids,
+        projection_top_set=env.projection_top_set,
+        projection_score=float(env.projection_score),
+        projection_margin=float(env.projection_margin),
+        host_diversity_threshold=float(env.host_diversity_threshold),
+        host_diversity_margin_min=float(env.host_diversity_margin_min),
+        min_distinct_hosts=int(env.min_distinct_hosts),
+    )
+    expected_manifest = _compute_w36_manifest_v6_cid(
+        parent_w35_cid=env.parent_w35_cid,
+        host_diverse_basis_state_cid=env.host_diverse_basis_state_cid,
+        host_topology_cid=env.host_topology_cid,
+        live_attestation_cid=env.live_attestation_cid,
+        projection_audit_cid=expected_projection_cid,
+    )
+    if (expected_projection_cid != env.projection_audit_cid
+            or expected_manifest != env.manifest_v6_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w36_manifest_v6_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.recompute_w36_cid() != env.w36_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w36_outer_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+@dataclasses.dataclass
+class HostDiverseRegistry:
+    """Controller-side registry for W36 host-diverse dense control."""
+
+    schema: SchemaCapsule | None = None
+    inner_w35_registry: TrustSubspaceDenseRegistry | None = None
+    host_diversity_enabled: bool = True
+    manifest_v6_disabled: bool = False
+    min_distinct_hosts: int = W36_DEFAULT_MIN_DISTINCT_HOSTS
+    host_diversity_threshold: float = W36_DEFAULT_HOST_DIVERSITY_THRESHOLD
+    host_diversity_margin_min: float = (
+        W36_DEFAULT_HOST_DIVERSITY_MARGIN_MIN)
+    registered_oracle_ids: frozenset[str] = frozenset()
+    registered_hosts: dict[str, HostRegistration] = dataclasses.field(
+        default_factory=dict)
+    abstain_on_unverified_host_projection: bool = True
+
+    _envelopes: dict[str, HostDiverseRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_w36_registered: int = 0
+    n_w36_rejected: int = 0
+    n_host_diverse_reroutes: int = 0
+    n_host_diverse_abstentions: int = 0
+
+    @property
+    def is_trivial(self) -> bool:
+        return (not bool(self.host_diversity_enabled)
+                and bool(self.manifest_v6_disabled)
+                and int(self.min_distinct_hosts) <= 1)
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        return not self.is_trivial
+
+    @property
+    def host_topology_cid(self) -> str:
+        return _compute_host_topology_cid(
+            registered_hosts={
+                hid: h.as_dict() for hid, h in self.registered_hosts.items()
+            })
+
+    @property
+    def registered_host_ids(self) -> frozenset[str]:
+        return frozenset(str(h) for h in self.registered_hosts)
+
+    def register_envelope(
+            self,
+            envelope: HostDiverseRatificationEnvelope,
+            *,
+            registered_parent_w35_cid: str,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            outcome = LatentVerificationOutcome(
+                ok=False, reason="schema_unregistered", n_checks=0)
+            self.n_w36_rejected += 1
+            return outcome
+        outcome = verify_host_diverse_ratification(
+            envelope,
+            registered_schema=self.schema,
+            registered_parent_w35_cid=str(registered_parent_w35_cid),
+            registered_oracle_ids=frozenset(self.registered_oracle_ids),
+            registered_host_ids=self.registered_host_ids,
+            registered_host_topology_cid=self.host_topology_cid,
+            registered_basis_state_cid=envelope.host_diverse_basis_state_cid,
+        )
+        if outcome.ok:
+            self._envelopes[envelope.w36_cid] = envelope
+            self.n_w36_registered += 1
+            if envelope.projection_branch == W36_BRANCH_HOST_DIVERSE_REROUTED:
+                self.n_host_diverse_reroutes += 1
+            if envelope.projection_branch == W36_BRANCH_HOST_DIVERSE_ABSTAINED:
+                self.n_host_diverse_abstentions += 1
+        else:
+            self.n_w36_rejected += 1
+        return outcome
+
+
+@dataclasses.dataclass(frozen=True)
+class W36HostDiverseResult:
+    """Audit record for one W36 decode call."""
+
+    answer: dict[str, Any]
+    inner_w35_branch: str
+    decoder_branch: str
+    projection_branch: str
+    selected_oracle_ids: tuple[str, ...]
+    supporting_host_ids: tuple[str, ...]
+    projection_top_set: tuple[str, ...]
+    projection_score: float
+    projection_margin: float
+    parent_w35_cid: str
+    cell_index: int
+    n_host_diverse_basis_entries: int
+    n_distinct_supporting_hosts: int
+    n_w35_visible_tokens: int
+    n_w36_visible_tokens: int
+    n_w36_overhead_tokens: int
+    w36_cid: str
+    manifest_v6_cid: str
+    host_diverse_basis_state_cid: str
+    projection_audit_cid: str
+    host_topology_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w36: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get(
+                "remediation", "investigate")),
+            "inner_w35_branch": str(self.inner_w35_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "projection_branch": str(self.projection_branch),
+            "selected_oracle_ids": list(self.selected_oracle_ids),
+            "supporting_host_ids": list(self.supporting_host_ids),
+            "projection_top_set": [str(t) for t in self.projection_top_set],
+            "projection_score": round(float(self.projection_score), 4),
+            "projection_margin": round(float(self.projection_margin), 4),
+            "parent_w35_cid": str(self.parent_w35_cid),
+            "cell_index": int(self.cell_index),
+            "n_host_diverse_basis_entries": int(
+                self.n_host_diverse_basis_entries),
+            "n_distinct_supporting_hosts": int(
+                self.n_distinct_supporting_hosts),
+            "n_w35_visible_tokens": int(self.n_w35_visible_tokens),
+            "n_w36_visible_tokens": int(self.n_w36_visible_tokens),
+            "n_w36_overhead_tokens": int(self.n_w36_overhead_tokens),
+            "w36_cid": str(self.w36_cid),
+            "manifest_v6_cid": str(self.manifest_v6_cid),
+            "host_diverse_basis_state_cid": str(
+                self.host_diverse_basis_state_cid),
+            "projection_audit_cid": str(self.projection_audit_cid),
+            "host_topology_cid": str(self.host_topology_cid),
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": str(self.verification_reason),
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w36": float(self.cram_factor_w36),
+        }
+
+
+@dataclasses.dataclass
+class HostDiverseTrustSubspaceOrchestrator:
+    """Host-diverse guard around the W35 dense-control proxy."""
+
+    inner: TrustSubspaceDenseControlOrchestrator
+    registry: HostDiverseRegistry
+    enabled: bool = True
+    require_w36_verification: bool = True
+
+    _last_result: "W36HostDiverseResult | None" = None
+    _last_envelope: "HostDiverseRatificationEnvelope | None" = None
+    _cell_index: int = 0
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.registry.schema
+
+    def reset_session(self) -> None:
+        self.inner.reset_session()
+        self._last_result = None
+        self._last_envelope = None
+        self._cell_index = 0
+
+    def _host_diverse_basis_entries(
+            self,
+    ) -> tuple[HostDiverseBasisEntry, ...]:
+        w35_env = self.inner.last_envelope
+        w34_env = self.inner.inner.last_envelope
+        if w35_env is None:
+            return ()
+        attestations = (w34_env.live_attestations
+                        if w34_env is not None else ())
+        att_by_oracle = {str(a.oracle_id): a for a in attestations}
+        entries: list[HostDiverseBasisEntry] = []
+        for basis in w35_env.basis_entries:
+            oid = str(basis.oracle_id)
+            att = att_by_oracle.get(oid)
+            host_id = str(att.host_id) if att is not None else ""
+            model_id = str(att.model_id) if att is not None else ""
+            preflight_ok = bool(att.preflight_ok) if att is not None else False
+            registered_host = self.registry.registered_hosts.get(host_id)
+            host_registered_ok = (
+                registered_host is not None
+                and bool(registered_host.preflight_ok)
+            )
+            host_health = 1.0 if preflight_ok and host_registered_ok else 0.0
+            entries.append(HostDiverseBasisEntry(
+                cell_idx=int(self._cell_index),
+                oracle_id=oid,
+                host_id=host_id,
+                model_id=model_id,
+                top_set=tuple(basis.top_set),
+                projection_score=_bounded_unit(
+                    float(basis.projection_score)),
+                host_health=float(host_health),
+                response_feature_signature=str(
+                    basis.response_feature_signature),
+                host_attested=bool(att is not None and host_id),
+            ))
+        return tuple(entries)
+
+    def _build_w36_envelope(
+            self,
+            *,
+            parent_w35_cid: str,
+            basis_entries: tuple[HostDiverseBasisEntry, ...],
+            host_topology_cid: str,
+            live_attestation_cid: str,
+            projection_branch: str,
+            selected_oracle_ids: tuple[str, ...],
+            supporting_host_ids: tuple[str, ...],
+            projection_top_set: tuple[str, ...],
+            projection_score: float,
+            projection_margin: float,
+            wire_required: bool,
+    ) -> HostDiverseRatificationEnvelope:
+        basis_state_cid = _compute_host_diverse_basis_state_cid(
+            basis_entries=basis_entries)
+        projection_audit_cid = _compute_w36_projection_audit_cid(
+            projection_branch=projection_branch,
+            selected_oracle_ids=selected_oracle_ids,
+            supporting_host_ids=supporting_host_ids,
+            projection_top_set=projection_top_set,
+            projection_score=float(projection_score),
+            projection_margin=float(projection_margin),
+            host_diversity_threshold=float(
+                self.registry.host_diversity_threshold),
+            host_diversity_margin_min=float(
+                self.registry.host_diversity_margin_min),
+            min_distinct_hosts=int(self.registry.min_distinct_hosts),
+        )
+        manifest_v6_cid = _compute_w36_manifest_v6_cid(
+            parent_w35_cid=parent_w35_cid,
+            host_diverse_basis_state_cid=basis_state_cid,
+            host_topology_cid=host_topology_cid,
+            live_attestation_cid=live_attestation_cid,
+            projection_audit_cid=projection_audit_cid,
+        )
+        return HostDiverseRatificationEnvelope(
+            schema_version=W36_HOST_DIVERSE_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            parent_w35_cid=str(parent_w35_cid),
+            host_diverse_basis_entries=basis_entries,
+            host_diverse_basis_state_cid=basis_state_cid,
+            host_topology_cid=str(host_topology_cid),
+            live_attestation_cid=str(live_attestation_cid),
+            projection_branch=str(projection_branch),
+            selected_oracle_ids=tuple(selected_oracle_ids),
+            supporting_host_ids=tuple(supporting_host_ids),
+            projection_top_set=tuple(projection_top_set),
+            projection_score=float(projection_score),
+            projection_margin=float(projection_margin),
+            host_diversity_threshold=float(
+                self.registry.host_diversity_threshold),
+            host_diversity_margin_min=float(
+                self.registry.host_diversity_margin_min),
+            min_distinct_hosts=int(self.registry.min_distinct_hosts),
+            projection_audit_cid=projection_audit_cid,
+            manifest_v6_cid=manifest_v6_cid,
+            cell_index=int(self._cell_index),
+            wire_required=bool(wire_required),
+        )
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        if not self.enabled or self.schema is None:
+            out = self.inner.decode_rounds(per_round_handoffs)
+            n_w35_visible = int(out.get("trust_subspace_dense_control", {}).get(
+                "n_w35_visible_tokens", 0))
+            return self._pack(
+                out=out,
+                decoder_branch=W36_BRANCH_HOST_DIVERSE_DISABLED,
+                projection_branch="",
+                envelope=None,
+                n_w36_visible=n_w35_visible,
+                w36_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason="disabled",
+                selected_oracle_ids=(),
+                supporting_host_ids=(),
+                projection_top_set=(),
+                projection_score=0.0,
+                projection_margin=0.0,
+                parent_w35_cid="",
+                n_basis_entries=0,
+            )
+
+        out = self.inner.decode_rounds(per_round_handoffs)
+        w35_result = self.inner.last_result
+        n_w35_visible = int(w35_result.n_w35_visible_tokens
+                            if w35_result is not None else 0)
+        inner_w35_branch = str(w35_result.decoder_branch
+                               if w35_result is not None else "")
+
+        if self.registry.is_trivial:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W36_BRANCH_TRIVIAL_HOST_DIVERSE_PASSTHROUGH,
+                projection_branch="",
+                envelope=None,
+                n_w36_visible=n_w35_visible,
+                w36_overhead=0,
+                ratified=True,
+                verify_ok=True,
+                verify_reason="trivial_passthrough",
+                selected_oracle_ids=(),
+                supporting_host_ids=(),
+                projection_top_set=(),
+                projection_score=0.0,
+                projection_margin=0.0,
+                parent_w35_cid="",
+                n_basis_entries=0,
+            )
+
+        if w35_result is None:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W36_BRANCH_HOST_DIVERSE_NO_TRIGGER,
+                projection_branch="",
+                envelope=None,
+                n_w36_visible=n_w35_visible,
+                w36_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason="no_w35_result",
+                selected_oracle_ids=(),
+                supporting_host_ids=(),
+                projection_top_set=(),
+                projection_score=0.0,
+                projection_margin=0.0,
+                parent_w35_cid="",
+                n_basis_entries=0,
+            )
+
+        basis_entries = self._host_diverse_basis_entries()
+        (projection_top, selected_oids, supporting_hosts,
+         projection_score, projection_margin, projection_branch) = (
+            select_host_diverse_projection(
+                basis_entries=basis_entries,
+                min_distinct_hosts=int(self.registry.min_distinct_hosts),
+                host_diversity_threshold=float(
+                    self.registry.host_diversity_threshold),
+                host_diversity_margin_min=float(
+                    self.registry.host_diversity_margin_min),
+            ))
+
+        w36_answer = dict(out)
+        w35_services = tuple(sorted(str(t) for t in out.get("services", ())))
+        decoder_branch = W36_BRANCH_HOST_DIVERSE_RESOLVED
+        if (projection_branch == W36_BRANCH_HOST_DIVERSE_REROUTED
+                and projection_top
+                and tuple(projection_top) != w35_services):
+            w36_answer["services"] = tuple(projection_top)
+            decoder_branch = W36_BRANCH_HOST_DIVERSE_REROUTED
+        elif (projection_branch == W36_BRANCH_HOST_DIVERSE_REROUTED
+              and projection_top):
+            decoder_branch = W36_BRANCH_HOST_DIVERSE_RESOLVED
+        elif (self.registry.abstain_on_unverified_host_projection
+              and w35_services
+              and projection_branch == W36_BRANCH_HOST_DIVERSE_UNSAFE):
+            w36_answer = dict(out)
+            w36_answer["services"] = ()
+            projection_branch = W36_BRANCH_HOST_DIVERSE_ABSTAINED
+            decoder_branch = W36_BRANCH_HOST_DIVERSE_ABSTAINED
+        elif projection_branch == W36_BRANCH_HOST_DIVERSE_UNSAFE:
+            decoder_branch = W36_BRANCH_HOST_DIVERSE_UNSAFE
+
+        w35_env = self.inner.last_envelope
+        w34_env = self.inner.inner.last_envelope
+        parent_w35_cid = str(w35_env.w35_cid) if w35_env is not None else ""
+        if not parent_w35_cid:
+            parent_payload = _canonical_json_bytes({
+                "inner_w35_branch": inner_w35_branch,
+                "n_w35_visible": int(n_w35_visible),
+                "cell_index": int(self._cell_index),
+            })
+            parent_w35_cid = hashlib.sha256(parent_payload).hexdigest()
+        host_topology_cid = self.registry.host_topology_cid
+        live_attestation_cid = (
+            str(w34_env.live_attestation_cid)
+            if w34_env is not None
+            else _compute_live_attestation_cid(attestations=())
+        )
+
+        envelope = self._build_w36_envelope(
+            parent_w35_cid=parent_w35_cid,
+            basis_entries=basis_entries,
+            host_topology_cid=host_topology_cid,
+            live_attestation_cid=live_attestation_cid,
+            projection_branch=projection_branch,
+            selected_oracle_ids=tuple(selected_oids),
+            supporting_host_ids=tuple(supporting_hosts),
+            projection_top_set=tuple(projection_top),
+            projection_score=float(projection_score),
+            projection_margin=float(projection_margin),
+            wire_required=self.registry.has_wire_required_layer,
+        )
+        outcome = self.registry.register_envelope(
+            envelope,
+            registered_parent_w35_cid=parent_w35_cid,
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+        if not verify_ok and self.require_w36_verification:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W36_BRANCH_HOST_DIVERSE_REJECTED,
+                projection_branch=projection_branch,
+                envelope=envelope,
+                n_w36_visible=n_w35_visible,
+                w36_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason=verify_reason,
+                selected_oracle_ids=tuple(selected_oids),
+                supporting_host_ids=tuple(supporting_hosts),
+                projection_top_set=tuple(projection_top),
+                projection_score=float(projection_score),
+                projection_margin=float(projection_margin),
+                parent_w35_cid=parent_w35_cid,
+                n_basis_entries=len(basis_entries),
+            )
+
+        w36_overhead = int(envelope.n_wire_tokens)
+        n_w36_visible = int(n_w35_visible + w36_overhead)
+        out_local = dict(out)
+        for k, v in w36_answer.items():
+            out_local[k] = v
+        if "services" not in w36_answer:
+            out_local["services"] = ()
+        self._cell_index += 1
+        return self._pack(
+            out=out_local,
+            decoder_branch=decoder_branch,
+            projection_branch=projection_branch,
+            envelope=envelope,
+            n_w36_visible=n_w36_visible,
+            w36_overhead=w36_overhead,
+            ratified=True,
+            verify_ok=verify_ok,
+            verify_reason=verify_reason,
+            selected_oracle_ids=tuple(selected_oids),
+            supporting_host_ids=tuple(supporting_hosts),
+            projection_top_set=tuple(projection_top),
+            projection_score=float(projection_score),
+            projection_margin=float(projection_margin),
+            parent_w35_cid=parent_w35_cid,
+            n_basis_entries=len(basis_entries),
+        )
+
+    def _pack(
+            self,
+            *,
+            out: dict[str, Any],
+            decoder_branch: str,
+            projection_branch: str,
+            envelope: HostDiverseRatificationEnvelope | None,
+            n_w36_visible: int,
+            w36_overhead: int,
+            ratified: bool,
+            verify_ok: bool,
+            verify_reason: str,
+            selected_oracle_ids: tuple[str, ...],
+            supporting_host_ids: tuple[str, ...],
+            projection_top_set: tuple[str, ...],
+            projection_score: float,
+            projection_margin: float,
+            parent_w35_cid: str,
+            n_basis_entries: int,
+    ) -> dict[str, Any]:
+        envelope_bytes = (envelope.n_envelope_bytes
+                          if envelope is not None else 0)
+        structured_bits = (envelope.n_structured_bits
+                           if envelope is not None else 0)
+        wire = max(1, int(w36_overhead))
+        cram_factor = (float(structured_bits) / float(wire)
+                       if structured_bits > 0 else 0.0)
+        w36_cid = str(envelope.w36_cid) if envelope is not None else ""
+        manifest_v6_cid = (str(envelope.manifest_v6_cid)
+                           if envelope is not None else "")
+        basis_state_cid = (str(envelope.host_diverse_basis_state_cid)
+                           if envelope is not None else "")
+        projection_audit_cid = (str(envelope.projection_audit_cid)
+                                if envelope is not None else "")
+        host_topology_cid = (str(envelope.host_topology_cid)
+                             if envelope is not None else
+                             self.registry.host_topology_cid)
+        n_w35_visible = int(out.get("trust_subspace_dense_control", {}).get(
+            "n_w35_visible_tokens", 0))
+        inner_w35_branch = str(out.get("trust_subspace_dense_control", {}).get(
+            "decoder_branch", ""))
+        result = W36HostDiverseResult(
+            answer=dict(out),
+            inner_w35_branch=inner_w35_branch,
+            decoder_branch=str(decoder_branch),
+            projection_branch=str(projection_branch),
+            selected_oracle_ids=tuple(selected_oracle_ids),
+            supporting_host_ids=tuple(supporting_host_ids),
+            projection_top_set=tuple(projection_top_set),
+            projection_score=float(projection_score),
+            projection_margin=float(projection_margin),
+            parent_w35_cid=str(parent_w35_cid),
+            cell_index=int(self._cell_index - 1
+                           if self._cell_index > 0 else 0),
+            n_host_diverse_basis_entries=int(n_basis_entries),
+            n_distinct_supporting_hosts=len(set(supporting_host_ids)),
+            n_w35_visible_tokens=int(n_w35_visible),
+            n_w36_visible_tokens=int(n_w36_visible),
+            n_w36_overhead_tokens=int(w36_overhead),
+            w36_cid=w36_cid,
+            manifest_v6_cid=manifest_v6_cid,
+            host_diverse_basis_state_cid=basis_state_cid,
+            projection_audit_cid=projection_audit_cid,
+            host_topology_cid=host_topology_cid,
+            ratified=bool(ratified),
+            verification_ok=bool(verify_ok),
+            verification_reason=str(verify_reason),
+            n_envelope_bytes=int(envelope_bytes),
+            n_structured_bits=int(structured_bits),
+            cram_factor_w36=float(cram_factor),
+        )
+        self._last_result = result
+        self._last_envelope = envelope
+        out_local = dict(out)
+        out_local["host_diverse_trust_subspace"] = result.as_dict()
+        if envelope is not None:
+            out_local["host_diverse_trust_subspace_envelope"] = (
+                envelope.as_dict())
+        return out_local
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> "W36HostDiverseResult | None":
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> "HostDiverseRatificationEnvelope | None":
+        return self._last_envelope
+
+
+def build_trivial_host_diverse_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w35_registry: TrustSubspaceDenseRegistry | None = None,
+        registered_oracle_ids: Iterable[str] = (),
+) -> HostDiverseRegistry:
+    return HostDiverseRegistry(
+        schema=schema,
+        inner_w35_registry=inner_w35_registry,
+        host_diversity_enabled=False,
+        manifest_v6_disabled=True,
+        min_distinct_hosts=1,
+        registered_oracle_ids=frozenset(str(o) for o in registered_oracle_ids),
+        registered_hosts={},
+    )
+
+
+def build_host_diverse_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w35_registry: TrustSubspaceDenseRegistry,
+        registered_oracle_ids: Iterable[str] = (),
+        registered_hosts: Mapping[str, HostRegistration] | None = None,
+        host_diversity_enabled: bool = True,
+        manifest_v6_disabled: bool = False,
+        min_distinct_hosts: int = W36_DEFAULT_MIN_DISTINCT_HOSTS,
+        host_diversity_threshold: float = (
+            W36_DEFAULT_HOST_DIVERSITY_THRESHOLD),
+        host_diversity_margin_min: float = (
+            W36_DEFAULT_HOST_DIVERSITY_MARGIN_MIN),
+        abstain_on_unverified_host_projection: bool = True,
+) -> HostDiverseRegistry:
+    return HostDiverseRegistry(
+        schema=schema,
+        inner_w35_registry=inner_w35_registry,
+        host_diversity_enabled=bool(host_diversity_enabled),
+        manifest_v6_disabled=bool(manifest_v6_disabled),
+        min_distinct_hosts=int(min_distinct_hosts),
+        host_diversity_threshold=float(host_diversity_threshold),
+        host_diversity_margin_min=float(host_diversity_margin_min),
+        registered_oracle_ids=frozenset(str(o) for o in registered_oracle_ids),
+        registered_hosts=dict(registered_hosts or {}),
+        abstain_on_unverified_host_projection=bool(
+            abstain_on_unverified_host_projection),
+    )
