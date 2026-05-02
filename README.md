@@ -7,7 +7,31 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.35 (May 2026).** Live-aware multi-anchor
+**Latest milestone: SDK v3.36 (May 2026).** Trust-subspace dense-
+control proxy + basis-history projection + W35 manifest-v5 CID (W35
+family).  W35 wraps W34's live-aware multi-anchor abstention path
+with a controller-verified dense basis over W21 probe top_sets, W33
+EWMA trust, W34 live-attestation/response-feature state, top-set
+stability, and host health.  On **R-82-TRUST-SUBSPACE-SHIFT**,
+W34 abstains on 6 disputed cells; W35 safely reroutes 5/6 through the
+stable `change_history` basis direction, raising correctness from
+0.625 to **0.9375** (**+0.3125**) across 5/5 seeds while preserving
+trust precision at **1.000** and adding one visible token/cell.
+The W35 envelope carries about **13,016.5 structured bits per visible
+W35 token** on the load-bearing regime and is verified by 14 new
+failure modes, bringing the cumulative W22/W29/W30/W31/W32/W33/W34/
+W35 trust boundary to **98 enumerated modes**.  The hard falsifier
+**W35-L-ALL-BASIS-COMPROMISED** remains: if every basis direction
+moves together to the same wrong answer, W35 cannot recover at the
+capsule layer.  This is **not native latent transfer** and not a
+transformer-internal hidden-state projection; it is the strongest
+audited capsule-layer proxy currently supported by this repo.
+Mac 2 (`192.168.12.248`) still times out; bounded live fallback on
+local `qwen2.5:0.5b` + remote `qwen2.5:14b` observed 3/5
+cross-host disagreements, all gold-correlated.  Stable runtime
+contract unchanged; W35 remains experimental.
+
+**Earlier milestone: SDK v3.35 (May 2026).** Live-aware multi-anchor
 adjudication + native-latent audited response-feature proxy + W34
 manifest-v4 CID + W33 infra-blocker closure (preflight ``/api/tags``
 + chat-template + ``num_predict=4`` + stop tokens for one-word

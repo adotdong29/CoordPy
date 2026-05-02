@@ -506,6 +506,33 @@ from .team_coord import (
     W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS,
     W34_BRANCH_HOST_DECAY_FIRED,
     W34_ALL_BRANCHES,
+    # SDK v3.36 — Trust-subspace dense-control proxy + basis-history
+    # projection + manifest-v5 CID (W35). EXPERIMENTAL — see
+    # __experimental__.
+    TrustSubspaceBasisEntry,
+    TrustSubspaceDenseRatificationEnvelope,
+    TrustSubspaceDenseRegistry,
+    W35TrustSubspaceResult,
+    TrustSubspaceDenseControlOrchestrator,
+    verify_trust_subspace_dense_ratification,
+    select_trust_subspace_projection,
+    build_trivial_trust_subspace_registry,
+    build_trust_subspace_dense_registry,
+    W35_TRUST_SUBSPACE_SCHEMA_VERSION,
+    W35_DEFAULT_BASIS_EWMA_ALPHA,
+    W35_DEFAULT_PROJECTION_THRESHOLD,
+    W35_DEFAULT_PROJECTION_MARGIN_MIN,
+    W35_DEFAULT_BASIS_HISTORY_WINDOW,
+    W35_DEFAULT_MIN_BASIS_OBSERVATIONS,
+    W35_BRANCH_TRUST_SUBSPACE_RESOLVED,
+    W35_BRANCH_TRIVIAL_TRUST_SUBSPACE_PASSTHROUGH,
+    W35_BRANCH_TRUST_SUBSPACE_REJECTED,
+    W35_BRANCH_TRUST_SUBSPACE_DISABLED,
+    W35_BRANCH_TRUST_SUBSPACE_NO_TRIGGER,
+    W35_BRANCH_BASIS_HISTORY_REROUTED,
+    W35_BRANCH_BASIS_HISTORY_UNSAFE,
+    W35_BRANCH_BASIS_HISTORY_ABSTAINED,
+    W35_ALL_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -519,7 +546,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.35"
+SDK_VERSION = "wevra.sdk.v3.36"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -647,6 +674,17 @@ __experimental__: tuple[str, ...] = (
     "apply_host_decay",
     "build_trivial_live_aware_registry",
     "build_live_aware_registry",
+    # W35 family — trust-subspace dense-control proxy + basis-history
+    # projection + manifest-v5 CID.
+    "TrustSubspaceBasisEntry",
+    "TrustSubspaceDenseRatificationEnvelope",
+    "TrustSubspaceDenseRegistry",
+    "W35TrustSubspaceResult",
+    "TrustSubspaceDenseControlOrchestrator",
+    "verify_trust_subspace_dense_ratification",
+    "select_trust_subspace_projection",
+    "build_trivial_trust_subspace_registry",
+    "build_trust_subspace_dense_registry",
 )
 
 __all__ = [
@@ -1016,6 +1054,33 @@ __all__ = [
     "W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS",
     "W34_BRANCH_HOST_DECAY_FIRED",
     "W34_ALL_BRANCHES",
+    # SDK v3.36 — W35 family (trust-subspace dense-control proxy +
+    # basis-history projection + manifest-v5 CID).  EXPERIMENTAL —
+    # see __experimental__ tuple.
+    "TrustSubspaceBasisEntry",
+    "TrustSubspaceDenseRatificationEnvelope",
+    "TrustSubspaceDenseRegistry",
+    "W35TrustSubspaceResult",
+    "TrustSubspaceDenseControlOrchestrator",
+    "verify_trust_subspace_dense_ratification",
+    "select_trust_subspace_projection",
+    "build_trivial_trust_subspace_registry",
+    "build_trust_subspace_dense_registry",
+    "W35_TRUST_SUBSPACE_SCHEMA_VERSION",
+    "W35_DEFAULT_BASIS_EWMA_ALPHA",
+    "W35_DEFAULT_PROJECTION_THRESHOLD",
+    "W35_DEFAULT_PROJECTION_MARGIN_MIN",
+    "W35_DEFAULT_BASIS_HISTORY_WINDOW",
+    "W35_DEFAULT_MIN_BASIS_OBSERVATIONS",
+    "W35_BRANCH_TRUST_SUBSPACE_RESOLVED",
+    "W35_BRANCH_TRIVIAL_TRUST_SUBSPACE_PASSTHROUGH",
+    "W35_BRANCH_TRUST_SUBSPACE_REJECTED",
+    "W35_BRANCH_TRUST_SUBSPACE_DISABLED",
+    "W35_BRANCH_TRUST_SUBSPACE_NO_TRIGGER",
+    "W35_BRANCH_BASIS_HISTORY_REROUTED",
+    "W35_BRANCH_BASIS_HISTORY_UNSAFE",
+    "W35_BRANCH_BASIS_HISTORY_ABSTAINED",
+    "W35_ALL_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

@@ -1,43 +1,36 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (SDK v3.35 / W34, 2026-05-01).**
-> *Live-aware multi-anchor adjudication + native-latent audited
-> response-feature proxy + W34 manifest-v4 CID + W33 infra-blocker
-> closure (preflight ``/api/tags`` + chat-template + ``num_predict=4``)*.
-> The W33 single-anchor design had an unrecognised structural
-> *fragility*: when the W33 anchor itself becomes compromised, every
-> honest non-anchor oracle's agreement signal drops to 0 against the
-> wrong reference and the (compromised) anchor remains trusted.  W34
-> (this milestone) closes that fragility with a *multi-anchor
-> consensus reference* (the *intersection* of K registered anchors'
-> top_sets when at least ``anchor_quorum_min`` agree); when the
-> intersection is empty, W34 *abstains* — the inter-anchor
-> disagreement is itself a trust signal.  Measured **+0.375
-> trust-precision strict gain over W33 single-anchor across 5/5
-> seeds at min trust precision = 1.000** on R-81-DOUBLE-ANCHOR-
-> COMPROMISE.  The `compute_response_feature_signature` is the
-> closed-form 64-bit audited proxy for native-latent (NOT a
-> transformer-internal hidden-state projection; NOT a learned
-> feature embedding).  The W33 milestone's two named infra
-> follow-ups are now closed: **W33-INFRA-1** (preflight
-> ``/api/tags`` discipline; an honest empirical correction —
-> qwen3.5:35b on 192.168.12.191 IS in fact loaded; the W33
-> diagnosis was wrong, the real W33 infra failure was timeout +
-> chat-template), **W33-INFRA-2** (chat-template + num_predict=4 +
-> stop tokens for one-word probes).  Both fixes load-bearing in
-> the W34 live pilot.  Trust boundary tightened to **84 cumulative
-> enumerated failure modes** across W22..W34.  Mac 2 still ARP-
-> incomplete (29th milestone).  **Net effect on the original
-> goal**: solve context for multi-agent teams remains open; W34
-> closes a structural weakness in the W33 trust mechanism + closes
-> two infrastructure follow-ups + adds an audited proxy step
-> toward native-latent — but the architecture-dependent walls
-> (W33-C-NATIVE-LATENT, W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE,
-> W34-C-CROSS-HOST-LIVE-MULTI-ANCHOR) remain the next frontier.
-> See ``docs/RESULTS_WEVRA_W34_LIVE_AWARE_MULTI_ANCHOR.md`` for the
-> milestone note +
-> ``docs/SUCCESS_CRITERION_W34_LIVE_AWARE_MULTI_ANCHOR.md`` for the
-> pre-committed bar.
+> **Latest milestone marker (SDK v3.36 / W35, 2026-05-02).**
+> *Trust-subspace dense-control proxy + basis-history projection +
+> W35 manifest-v5 CID*.  W35 wraps W34's live-aware multi-anchor
+> abstention path with a controller-verified dense basis over W21
+> probe top_sets, W33 EWMA trust, W34 live-attestation/response-
+> feature state, top-set stability, and host health.  The integration
+> materially helped on the specific blocker where W34 could only
+> abstain: on R-82-TRUST-SUBSPACE-SHIFT, W34 abstains on 6 disputed
+> cells; W35 safely reroutes 5/6 through the stable basis direction,
+> raising correctness from 0.625 to **0.9375** (**+0.3125**) across
+> 5/5 seeds, with trust precision preserved at **1.000** and one
+> visible-token overhead/cell.  Trust/audit survived: W35 adds 14
+> mechanically tested verifier failure modes and manifest-v5 CID
+> binding, bringing the cumulative W22..W35 trust boundary to **98
+> enumerated failure modes**.  Bounded-context efficiency improved in
+> the dense-state sense: mean **13,016.5 structured bits per visible
+> W35 token** on the load-bearing regime.  Multi-host evidence did not
+> materially broaden: local Ollama and `192.168.12.191` are usable,
+> but `192.168.12.248` still times out; the bounded two-host fallback
+> observed 3/5 cross-host disagreements, all gold-correlated.  Earlier
+> loose ends closed versus sharpened: the old explicit oracle line and
+> dense-control/geometry line now compose in one mechanism; native-
+> latent remains open because W35 is not transformer-internal hidden
+> state projection; live magnitude remains open as a systematic survey;
+> Mac 2 remains hardware-bounded.  Release readiness improves only as
+> a consequence: W35 is experimental, stable runtime unchanged, version
+> bumped to SDK v3.36 / 0.5.9.  **Net effect on the original thesis**:
+> materially stronger than W34 on the audited-proxy path, still blocked
+> by a deeper trust/semantics wall for true native latent.
+> See ``docs/RESULTS_WEVRA_W35_TRUST_SUBSPACE_DENSE_CONTROL.md`` and
+> ``docs/SUCCESS_CRITERION_W35_TRUST_SUBSPACE_DENSE_CONTROL.md``.
 
 > Canonical long-running document for the research programme behind
 > `context-zero`. This is a plan for a body of work, not a changelog.

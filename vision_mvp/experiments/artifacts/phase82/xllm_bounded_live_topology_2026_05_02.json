@@ -1,0 +1,240 @@
+{
+  "date": "2026-05-02",
+  "purpose": "W35 bounded live topology fallback after full W34 xLLM pilot exceeded practical timeout",
+  "preflight_results": {
+    "localhost::qwen2.5:0.5b": {
+      "host_url": "http://localhost:11434",
+      "model_id": "qwen2.5:0.5b",
+      "preflight_ok": true,
+      "error": "",
+      "n_available_tags": 8
+    },
+    "192.168.12.191::qwen2.5:14b": {
+      "host_url": "http://192.168.12.191:11434",
+      "model_id": "qwen2.5:14b",
+      "preflight_ok": true,
+      "error": "",
+      "n_available_tags": 5
+    },
+    "192.168.12.248::unknown": {
+      "host_url": "http://192.168.12.248:11434",
+      "model_id": "unknown",
+      "preflight_ok": false,
+      "error": "URLError: <urlopen error timed out>",
+      "n_available_tags": 0
+    }
+  },
+  "host_topology": {
+    "usable_hosts": [
+      "localhost",
+      "192.168.12.191"
+    ],
+    "mac2_192_168_12_248_reachable": false
+  },
+  "n_prompts": 5,
+  "n_total_probes": 10,
+  "n_total_responsive": 10,
+  "responsive_rate": 1.0,
+  "overall_accuracy_when_responsive": 0.7,
+  "cross_host_per_prompt": {
+    "K4": {
+      "n_responsive": 2,
+      "first_words": [
+        "sha",
+        "sha256"
+      ],
+      "all_agree": false,
+      "any_correct": true
+    },
+    "K1": {
+      "n_responsive": 2,
+      "first_words": [
+        "serializable"
+      ],
+      "all_agree": true,
+      "any_correct": true
+    },
+    "S4": {
+      "n_responsive": 2,
+      "first_words": [
+        ">>",
+        "\\&"
+      ],
+      "all_agree": false,
+      "any_correct": true
+    },
+    "T1": {
+      "n_responsive": 2,
+      "first_words": [
+        "np",
+        "pseudopolynomial"
+      ],
+      "all_agree": false,
+      "any_correct": true
+    },
+    "T2": {
+      "n_responsive": 2,
+      "first_words": [
+        "dijkstra"
+      ],
+      "all_agree": true,
+      "any_correct": true
+    }
+  },
+  "n_cross_host_agreement": 2,
+  "n_cross_host_disagreement": 3,
+  "n_one_correct_on_disagreement": 3,
+  "verdict": "bounded_two_host_gold_correlated_disagreement_observed",
+  "probes": [
+    {
+      "tag": "K4",
+      "gold": "sha256",
+      "host_id": "localhost",
+      "model_id": "qwen2.5:0.5b",
+      "raw_response": "sha-25",
+      "first_word": "sha",
+      "correct": false,
+      "latency_s": 0.49,
+      "latency_bucket": "0..1k",
+      "response_feature_signature": "a38cf72a2f9a70e3",
+      "attestation_cid": "1d3b4565958ebe907b7e3cad8ef3aca4bccf3db1f1c85aeb7191d786833b22ac",
+      "error": "",
+      "preflight_ok": true
+    },
+    {
+      "tag": "K4",
+      "gold": "sha256",
+      "host_id": "192.168.12.191",
+      "model_id": "qwen2.5:14b",
+      "raw_response": "sha256",
+      "first_word": "sha256",
+      "correct": true,
+      "latency_s": 1.15,
+      "latency_bucket": "1k..10k",
+      "response_feature_signature": "e9f28c0019c60351",
+      "attestation_cid": "727eab4f60a22c5f7114ca4107f41ed9089248abc9aaf4897b7fbd31f031bdfe",
+      "error": "",
+      "preflight_ok": true
+    },
+    {
+      "tag": "K1",
+      "gold": "serializable",
+      "host_id": "localhost",
+      "model_id": "qwen2.5:0.5b",
+      "raw_response": "serializable",
+      "first_word": "serializable",
+      "correct": true,
+      "latency_s": 0.24,
+      "latency_bucket": "0..1k",
+      "response_feature_signature": "5840ce9642d7d09f",
+      "attestation_cid": "5c3c5da1843c72e5a87d6b52d7cc4198a64211e7c616b04d833eb908cf8d5535",
+      "error": "",
+      "preflight_ok": true
+    },
+    {
+      "tag": "K1",
+      "gold": "serializable",
+      "host_id": "192.168.12.191",
+      "model_id": "qwen2.5:14b",
+      "raw_response": "serializable",
+      "first_word": "serializable",
+      "correct": true,
+      "latency_s": 0.52,
+      "latency_bucket": "0..1k",
+      "response_feature_signature": "5840ce9642d7d09f",
+      "attestation_cid": "e43322477b7fa71f69124ea66bfb884c2b59d1f549972cfa5be110bfd3f36556",
+      "error": "",
+      "preflight_ok": true
+    },
+    {
+      "tag": "S4",
+      "gold": ">>",
+      "host_id": "localhost",
+      "model_id": "qwen2.5:0.5b",
+      "raw_response": "\\&",
+      "first_word": "\\&",
+      "correct": false,
+      "latency_s": 0.32,
+      "latency_bucket": "0..1k",
+      "response_feature_signature": "cad1314b5b62f9ce",
+      "attestation_cid": "5321873cba0370e79249531f93bb536886a8b23f188055645bd29b1f40bfe569",
+      "error": "",
+      "preflight_ok": true
+    },
+    {
+      "tag": "S4",
+      "gold": ">>",
+      "host_id": "192.168.12.191",
+      "model_id": "qwen2.5:14b",
+      "raw_response": ">>",
+      "first_word": ">>",
+      "correct": true,
+      "latency_s": 0.42,
+      "latency_bucket": "0..1k",
+      "response_feature_signature": "5049adb592e570fb",
+      "attestation_cid": "b21eb2c6771b661ef478927e58878db445d01344ad40159056701af90d59fa1b",
+      "error": "",
+      "preflight_ok": true
+    },
+    {
+      "tag": "T1",
+      "gold": "np",
+      "host_id": "localhost",
+      "model_id": "qwen2.5:0.5b",
+      "raw_response": "pseudopolynomial",
+      "first_word": "pseudopolynomial",
+      "correct": false,
+      "latency_s": 0.32,
+      "latency_bucket": "0..1k",
+      "response_feature_signature": "66a61a196bb0e688",
+      "attestation_cid": "00e40db7cc0c48ea191e5ff5aa09cc3e93bb369f9a737968ca75cd131f702229",
+      "error": "",
+      "preflight_ok": true
+    },
+    {
+      "tag": "T1",
+      "gold": "np",
+      "host_id": "192.168.12.191",
+      "model_id": "qwen2.5:14b",
+      "raw_response": "np",
+      "first_word": "np",
+      "correct": true,
+      "latency_s": 0.43,
+      "latency_bucket": "0..1k",
+      "response_feature_signature": "7a45e8a2c63ac60b",
+      "attestation_cid": "e56e58694b6a6e1dc1e280e609453151331f3c6ba6527e4bd426ebec9d11ba93",
+      "error": "",
+      "preflight_ok": true
+    },
+    {
+      "tag": "T2",
+      "gold": "dijkstra",
+      "host_id": "localhost",
+      "model_id": "qwen2.5:0.5b",
+      "raw_response": "Dijkstra",
+      "first_word": "dijkstra",
+      "correct": true,
+      "latency_s": 0.3,
+      "latency_bucket": "0..1k",
+      "response_feature_signature": "d5cfb8888cfbc50c",
+      "attestation_cid": "edc1e6fcb2b8abbaebcb389eb281f7d0b3d230323a125d908cac5b253f630b40",
+      "error": "",
+      "preflight_ok": true
+    },
+    {
+      "tag": "T2",
+      "gold": "dijkstra",
+      "host_id": "192.168.12.191",
+      "model_id": "qwen2.5:14b",
+      "raw_response": "dijkstra",
+      "first_word": "dijkstra",
+      "correct": true,
+      "latency_s": 0.46,
+      "latency_bucket": "0..1k",
+      "response_feature_signature": "9f6c788f08918350",
+      "attestation_cid": "ed7dea30a9e7a8917c8280417cf776362707f9e1f55b1f7d1fcabc00fa5a5d42",
+      "error": "",
+      "preflight_ok": true
+    }
+  ]
+}

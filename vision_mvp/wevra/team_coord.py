@@ -24278,3 +24278,1123 @@ def build_live_aware_registry(
         host_decay_factor=float(host_decay_factor),
         registered_hosts=dict(registered_hosts or {}),
     )
+
+
+# =============================================================================
+# SDK v3.36 — W35 family
+# Trust-subspace dense-control proxy + basis-history projection + manifest-v5
+# =============================================================================
+#
+# W35 wraps the W34 live-aware multi-anchor path with the strongest honest
+# next-step "native latent" proxy this repo can support without reaching into a
+# transformer runtime: a sealed trust-subspace basis history over the W21 probe
+# table, the W33 EWMA trust state, W34 live attestations, and host health.  The
+# controller computes one dense basis vector per oracle and uses it only when it
+# is strong enough to convert a W34 NO_CONSENSUS abstention into a verified
+# reroute.  This is still NOT transformer-internal hidden-state projection and
+# NOT a runtime KV transplant; it is an audited capsule-layer proxy.
+#
+# The load-bearing distinction from W34:
+#   * W34 treats anchor disagreement as a trust signal and abstains.
+#   * W35 asks whether history identifies a stable trusted basis direction
+#     strongly enough to route the disputed cell.  If not, it preserves W34's
+#     abstention or rejects an unstable consensus.
+#
+# Honest scope:
+#   * W35 can improve correctness when there is an historically stable oracle
+#     whose current top_set remains consistent while another anchor flips.
+#   * W35 cannot recover when every available basis direction moves together
+#     to the same wrong answer.  It can at best abstain after detecting an
+#     unstable joint shift.
+# =============================================================================
+
+
+W35_TRUST_SUBSPACE_SCHEMA_VERSION: str = (
+    "wevra.trust_subspace_dense_control.v1")
+
+W35_BRANCH_TRUST_SUBSPACE_RESOLVED = "trust_subspace_resolved"
+W35_BRANCH_TRIVIAL_TRUST_SUBSPACE_PASSTHROUGH = (
+    "trivial_trust_subspace_passthrough")
+W35_BRANCH_TRUST_SUBSPACE_REJECTED = "trust_subspace_rejected"
+W35_BRANCH_TRUST_SUBSPACE_DISABLED = "trust_subspace_disabled"
+W35_BRANCH_TRUST_SUBSPACE_NO_TRIGGER = "trust_subspace_no_trigger"
+W35_BRANCH_BASIS_HISTORY_REROUTED = "basis_history_rerouted"
+W35_BRANCH_BASIS_HISTORY_UNSAFE = "basis_history_unsafe"
+W35_BRANCH_BASIS_HISTORY_ABSTAINED = "basis_history_abstained"
+
+W35_ALL_BRANCHES: tuple[str, ...] = (
+    W35_BRANCH_TRUST_SUBSPACE_RESOLVED,
+    W35_BRANCH_TRIVIAL_TRUST_SUBSPACE_PASSTHROUGH,
+    W35_BRANCH_TRUST_SUBSPACE_REJECTED,
+    W35_BRANCH_TRUST_SUBSPACE_DISABLED,
+    W35_BRANCH_TRUST_SUBSPACE_NO_TRIGGER,
+    W35_BRANCH_BASIS_HISTORY_REROUTED,
+    W35_BRANCH_BASIS_HISTORY_UNSAFE,
+    W35_BRANCH_BASIS_HISTORY_ABSTAINED,
+)
+
+W35_DEFAULT_BASIS_EWMA_ALPHA: float = 0.50
+W35_DEFAULT_PROJECTION_THRESHOLD: float = 0.90
+W35_DEFAULT_PROJECTION_MARGIN_MIN: float = 0.05
+W35_DEFAULT_BASIS_HISTORY_WINDOW: int = 16
+W35_DEFAULT_MIN_BASIS_OBSERVATIONS: int = 3
+
+
+def _bounded_unit(v: float) -> float:
+    f = float(v)
+    if math.isnan(f) or math.isinf(f):
+        return 0.0
+    if f < 0.0:
+        return 0.0
+    if f > 1.0:
+        return 1.0
+    return f
+
+
+def _top_set_stability_observation(
+        *,
+        previous_top_set: Sequence[str] | None,
+        current_top_set: Sequence[str],
+        abstained: bool,
+) -> float:
+    """Closed-form stability signal for one oracle's projected top_set.
+
+    Returns 1.0 for no-information / unchanged, 0.0 for disjoint
+    movement, and 0.5 for partial overlap.  This is the W35 audited
+    proxy for "latent direction stayed stable"; it is not a model-
+    internal state read.
+    """
+    if bool(abstained):
+        return 1.0
+    cur = frozenset(str(t) for t in current_top_set)
+    if not cur:
+        return 1.0
+    if previous_top_set is None:
+        return 1.0
+    prev = frozenset(str(t) for t in previous_top_set)
+    if not prev:
+        return 1.0
+    if cur == prev:
+        return 1.0
+    if cur.isdisjoint(prev):
+        return 0.0
+    return 0.5
+
+
+@dataclasses.dataclass(frozen=True)
+class TrustSubspaceBasisEntry:
+    """One controller-verified W35 basis vector entry.
+
+    The vector is a dense capsule-layer proxy with four coordinates:
+    W33 EWMA trust, top-set stability EWMA, response-feature stability,
+    and host health.  The projection score is a registered weighted
+    average of those coordinates.
+    """
+
+    cell_idx: int
+    oracle_id: str
+    top_set: tuple[str, ...]
+    ewma_trust_after: float
+    top_set_stability_ewma: float
+    response_feature_signature: str
+    response_feature_stability: float
+    host_health: float
+    n_observations: int
+    projection_score: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "cell_idx": int(self.cell_idx),
+            "oracle_id": str(self.oracle_id),
+            "top_set": [str(t) for t in self.top_set],
+            "ewma_trust_after": round(float(self.ewma_trust_after), 4),
+            "top_set_stability_ewma": round(
+                float(self.top_set_stability_ewma), 4),
+            "response_feature_signature": str(
+                self.response_feature_signature),
+            "response_feature_stability": round(
+                float(self.response_feature_stability), 4),
+            "host_health": round(float(self.host_health), 4),
+            "n_observations": int(self.n_observations),
+            "projection_score": round(float(self.projection_score), 4),
+        }
+
+
+def _compute_trust_subspace_basis_state_cid(
+        *,
+        basis_entries: Sequence[TrustSubspaceBasisEntry],
+) -> str:
+    payload = _canonical_json_bytes({
+        "basis_entries": [b.as_dict() for b in basis_entries],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w35_projection_audit_cid(
+        *,
+        projection_branch: str,
+        selected_oracle_id: str,
+        projection_top_set: Sequence[str],
+        projection_score: float,
+        projection_margin: float,
+        projection_threshold: float,
+        projection_margin_min: float,
+) -> str:
+    payload = _canonical_json_bytes({
+        "projection_branch": str(projection_branch),
+        "selected_oracle_id": str(selected_oracle_id),
+        "projection_top_set": [str(t) for t in sorted(projection_top_set)],
+        "projection_score": round(float(projection_score), 4),
+        "projection_margin": round(float(projection_margin), 4),
+        "projection_threshold": round(float(projection_threshold), 4),
+        "projection_margin_min": round(float(projection_margin_min), 4),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w35_manifest_v5_cid(
+        *,
+        parent_w34_cid: str,
+        basis_state_cid: str,
+        live_attestation_cid: str,
+        projection_audit_cid: str,
+) -> str:
+    payload = _canonical_json_bytes({
+        "parent_w34_cid": str(parent_w34_cid),
+        "basis_state_cid": str(basis_state_cid),
+        "live_attestation_cid": str(live_attestation_cid),
+        "projection_audit_cid": str(projection_audit_cid),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w35_outer_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        parent_w34_cid: str,
+        basis_state_cid: str,
+        live_attestation_cid: str,
+        projection_audit_cid: str,
+        manifest_v5_cid: str,
+        cell_index: int,
+) -> str:
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "parent_w34_cid": str(parent_w34_cid),
+        "basis_state_cid": str(basis_state_cid),
+        "live_attestation_cid": str(live_attestation_cid),
+        "projection_audit_cid": str(projection_audit_cid),
+        "manifest_v5_cid": str(manifest_v5_cid),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def select_trust_subspace_projection(
+        *,
+        basis_entries: Sequence[TrustSubspaceBasisEntry],
+        projection_threshold: float = W35_DEFAULT_PROJECTION_THRESHOLD,
+        projection_margin_min: float = W35_DEFAULT_PROJECTION_MARGIN_MIN,
+        min_basis_observations: int = W35_DEFAULT_MIN_BASIS_OBSERVATIONS,
+) -> tuple[tuple[str, ...], str, float, float, str]:
+    """Select the strongest verified trust-subspace basis direction.
+
+    Group by current ``top_set`` and take the best scoring oracle for
+    each group.  A projection is safe only when the best group is above
+    threshold and separated from the next group by ``projection_margin_min``.
+    """
+    grouped: dict[tuple[str, ...], list[tuple[float, str]]] = {}
+    for entry in basis_entries:
+        if int(entry.n_observations) < int(min_basis_observations):
+            continue
+        top = tuple(sorted(str(t) for t in entry.top_set))
+        if not top:
+            continue
+        score = _bounded_unit(float(entry.projection_score))
+        grouped.setdefault(top, []).append((score, str(entry.oracle_id)))
+    if not grouped:
+        return ((), "", 0.0, 0.0, W35_BRANCH_BASIS_HISTORY_UNSAFE)
+    grouped_scores: dict[tuple[str, ...], tuple[float, str]] = {}
+    for top, vals in grouped.items():
+        avg_score = sum(v[0] for v in vals) / max(1, len(vals))
+        best_oid = sorted(vals, key=lambda x: (-x[0], x[1]))[0][1]
+        grouped_scores[top] = (float(avg_score), str(best_oid))
+    ranked = sorted(
+        grouped_scores.items(), key=lambda kv: (-float(kv[1][0]), kv[0]))
+    best_top, (best_score, best_oid) = ranked[0]
+    second_score = float(ranked[1][1][0]) if len(ranked) > 1 else 0.0
+    margin = float(best_score) - float(second_score)
+    if best_score < float(projection_threshold):
+        return ((), "", best_score, margin,
+                W35_BRANCH_BASIS_HISTORY_UNSAFE)
+    if len(ranked) > 1 and margin < float(projection_margin_min):
+        return ((), "", best_score, margin,
+                W35_BRANCH_BASIS_HISTORY_UNSAFE)
+    return (tuple(best_top), str(best_oid), float(best_score),
+            float(margin), W35_BRANCH_BASIS_HISTORY_REROUTED)
+
+
+@dataclasses.dataclass(frozen=True)
+class TrustSubspaceDenseRatificationEnvelope:
+    """Content-addressed W35 trust-subspace dense-control envelope."""
+
+    schema_version: str
+    schema_cid: str
+    parent_w34_cid: str
+    basis_entries: tuple[TrustSubspaceBasisEntry, ...]
+    basis_state_cid: str
+    live_attestation_cid: str
+    projection_branch: str
+    selected_oracle_id: str
+    projection_top_set: tuple[str, ...]
+    projection_score: float
+    projection_margin: float
+    projection_threshold: float
+    projection_margin_min: float
+    projection_audit_cid: str
+    manifest_v5_cid: str
+    cell_index: int
+    wire_required: bool = False
+    w35_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.w35_cid:
+            object.__setattr__(self, "w35_cid",
+                               self.recompute_w35_cid())
+
+    def recompute_w35_cid(self) -> str:
+        return _compute_w35_outer_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            parent_w34_cid=self.parent_w34_cid,
+            basis_state_cid=self.basis_state_cid,
+            live_attestation_cid=self.live_attestation_cid,
+            projection_audit_cid=self.projection_audit_cid,
+            manifest_v5_cid=self.manifest_v5_cid,
+            cell_index=int(self.cell_index),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w34_cid": self.parent_w34_cid,
+            "basis_entries": [b.as_dict() for b in self.basis_entries],
+            "basis_state_cid": self.basis_state_cid,
+            "live_attestation_cid": self.live_attestation_cid,
+            "projection_branch": self.projection_branch,
+            "selected_oracle_id": self.selected_oracle_id,
+            "projection_top_set": [str(t) for t in self.projection_top_set],
+            "projection_score": round(float(self.projection_score), 4),
+            "projection_margin": round(float(self.projection_margin), 4),
+            "projection_threshold": round(
+                float(self.projection_threshold), 4),
+            "projection_margin_min": round(
+                float(self.projection_margin_min), 4),
+            "projection_audit_cid": self.projection_audit_cid,
+            "manifest_v5_cid": self.manifest_v5_cid,
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<w35_ref:{self.w35_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_structured_bits(self) -> int:
+        return int(8 * self.n_envelope_bytes)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w34_cid": self.parent_w34_cid,
+            "basis_entries": [b.as_dict() for b in self.basis_entries],
+            "basis_state_cid": self.basis_state_cid,
+            "live_attestation_cid": self.live_attestation_cid,
+            "projection_branch": self.projection_branch,
+            "selected_oracle_id": self.selected_oracle_id,
+            "projection_top_set": [str(t) for t in self.projection_top_set],
+            "projection_score": round(float(self.projection_score), 4),
+            "projection_margin": round(float(self.projection_margin), 4),
+            "projection_threshold": round(
+                float(self.projection_threshold), 4),
+            "projection_margin_min": round(
+                float(self.projection_margin_min), 4),
+            "projection_audit_cid": self.projection_audit_cid,
+            "manifest_v5_cid": self.manifest_v5_cid,
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "w35_cid": self.w35_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_trust_subspace_dense_ratification(
+        env: TrustSubspaceDenseRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_parent_w34_cid: str,
+        registered_oracle_ids: frozenset[str],
+        registered_basis_state_cid: str | None = None,
+) -> LatentVerificationOutcome:
+    """Pure-function verifier for the W35 trust-subspace envelope.
+
+    Enumerates 14 failure modes, disjoint from W22..W34.
+    """
+    n_checks = 0
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_w35_envelope", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_version != W35_TRUST_SUBSPACE_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="w35_schema_version_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w35_schema_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.parent_w34_cid != str(registered_parent_w34_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w34_parent_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.projection_branch not in W35_ALL_BRANCHES:
+        return LatentVerificationOutcome(
+            ok=False, reason="w35_projection_branch_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    for entry in env.basis_entries:
+        if str(entry.oracle_id) not in registered_oracle_ids:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w35_basis_entry_unregistered_oracle",
+                n_checks=n_checks)
+    n_checks += 1
+    for entry in env.basis_entries:
+        score = float(entry.projection_score)
+        if math.isnan(score) or math.isinf(score) or score < 0.0 or score > 1.0:
+            return LatentVerificationOutcome(
+                ok=False, reason="w35_basis_score_out_of_range",
+                n_checks=n_checks)
+    n_checks += 1
+    for entry in env.basis_entries:
+        vals = (
+            float(entry.ewma_trust_after),
+            float(entry.top_set_stability_ewma),
+            float(entry.response_feature_stability),
+            float(entry.host_health),
+        )
+        if any(math.isnan(v) or math.isinf(v) or v < 0.0 or v > 1.0
+               for v in vals):
+            return LatentVerificationOutcome(
+                ok=False, reason="w35_basis_stability_out_of_range",
+                n_checks=n_checks)
+    n_checks += 1
+    expected_basis_cid = _compute_trust_subspace_basis_state_cid(
+        basis_entries=env.basis_entries)
+    if expected_basis_cid != env.basis_state_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w35_basis_state_cid_mismatch",
+            n_checks=n_checks)
+    if (registered_basis_state_cid is not None
+            and env.basis_state_cid != registered_basis_state_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w35_basis_state_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    union_top: set[str] = set()
+    for entry in env.basis_entries:
+        union_top.update(str(t) for t in entry.top_set)
+    if not set(str(t) for t in env.projection_top_set).issubset(union_top):
+        return LatentVerificationOutcome(
+            ok=False, reason="w35_projection_top_set_unregistered",
+            n_checks=n_checks)
+    n_checks += 1
+    margin = float(env.projection_margin)
+    threshold = float(env.projection_threshold)
+    margin_min = float(env.projection_margin_min)
+    if (math.isnan(margin) or math.isinf(margin)
+            or math.isnan(threshold) or math.isinf(threshold)
+            or math.isnan(margin_min) or math.isinf(margin_min)
+            or margin < -1.0 or margin > 1.0
+            or threshold < 0.0 or threshold > 1.0
+            or margin_min < 0.0 or margin_min > 1.0):
+        return LatentVerificationOutcome(
+            ok=False, reason="w35_projection_margin_out_of_range",
+            n_checks=n_checks)
+    n_checks += 1
+    if not env.live_attestation_cid or len(env.live_attestation_cid) != 64:
+        return LatentVerificationOutcome(
+            ok=False, reason="w35_live_attestation_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    expected_projection_cid = _compute_w35_projection_audit_cid(
+        projection_branch=env.projection_branch,
+        selected_oracle_id=env.selected_oracle_id,
+        projection_top_set=env.projection_top_set,
+        projection_score=float(env.projection_score),
+        projection_margin=float(env.projection_margin),
+        projection_threshold=float(env.projection_threshold),
+        projection_margin_min=float(env.projection_margin_min),
+    )
+    expected_manifest = _compute_w35_manifest_v5_cid(
+        parent_w34_cid=env.parent_w34_cid,
+        basis_state_cid=env.basis_state_cid,
+        live_attestation_cid=env.live_attestation_cid,
+        projection_audit_cid=expected_projection_cid,
+    )
+    if (expected_projection_cid != env.projection_audit_cid
+            or expected_manifest != env.manifest_v5_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w35_manifest_v5_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.recompute_w35_cid() != env.w35_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w35_outer_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+@dataclasses.dataclass
+class TrustSubspaceDenseRegistry:
+    """Controller-side registry for W35 trust-subspace dense control."""
+
+    schema: SchemaCapsule | None = None
+    inner_w34_registry: LiveAwareMultiAnchorRegistry | None = None
+    trust_subspace_enabled: bool = True
+    manifest_v5_disabled: bool = False
+    basis_history_window: int = W35_DEFAULT_BASIS_HISTORY_WINDOW
+    basis_ewma_alpha: float = W35_DEFAULT_BASIS_EWMA_ALPHA
+    projection_threshold: float = W35_DEFAULT_PROJECTION_THRESHOLD
+    projection_margin_min: float = W35_DEFAULT_PROJECTION_MARGIN_MIN
+    min_basis_observations: int = W35_DEFAULT_MIN_BASIS_OBSERVATIONS
+    registered_oracle_ids: frozenset[str] = frozenset()
+    abstain_on_unstable_consensus: bool = True
+
+    _envelopes: dict[str, TrustSubspaceDenseRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_w35_registered: int = 0
+    n_w35_rejected: int = 0
+    n_basis_reroutes: int = 0
+    n_basis_abstentions: int = 0
+
+    @property
+    def is_trivial(self) -> bool:
+        return (not bool(self.trust_subspace_enabled)
+                and bool(self.manifest_v5_disabled)
+                and int(self.basis_history_window) == 0)
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        return not self.is_trivial
+
+    def register_envelope(
+            self,
+            envelope: TrustSubspaceDenseRatificationEnvelope,
+            *,
+            registered_parent_w34_cid: str,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            outcome = LatentVerificationOutcome(
+                ok=False, reason="schema_unregistered", n_checks=0)
+            self.n_w35_rejected += 1
+            return outcome
+        outcome = verify_trust_subspace_dense_ratification(
+            envelope,
+            registered_schema=self.schema,
+            registered_parent_w34_cid=str(registered_parent_w34_cid),
+            registered_oracle_ids=frozenset(self.registered_oracle_ids),
+            registered_basis_state_cid=envelope.basis_state_cid,
+        )
+        if outcome.ok:
+            self._envelopes[envelope.w35_cid] = envelope
+            self.n_w35_registered += 1
+            if envelope.projection_branch == W35_BRANCH_BASIS_HISTORY_REROUTED:
+                self.n_basis_reroutes += 1
+            if envelope.projection_branch == W35_BRANCH_BASIS_HISTORY_ABSTAINED:
+                self.n_basis_abstentions += 1
+        else:
+            self.n_w35_rejected += 1
+        return outcome
+
+
+@dataclasses.dataclass(frozen=True)
+class W35TrustSubspaceResult:
+    """Audit record for one W35 decode call."""
+
+    answer: dict[str, Any]
+    inner_w34_branch: str
+    decoder_branch: str
+    projection_branch: str
+    selected_oracle_id: str
+    projection_top_set: tuple[str, ...]
+    projection_score: float
+    projection_margin: float
+    parent_w34_cid: str
+    cell_index: int
+    n_basis_entries: int
+    n_w34_visible_tokens: int
+    n_w35_visible_tokens: int
+    n_w35_overhead_tokens: int
+    w35_cid: str
+    manifest_v5_cid: str
+    basis_state_cid: str
+    projection_audit_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w35: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get(
+                "remediation", "investigate")),
+            "inner_w34_branch": str(self.inner_w34_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "projection_branch": str(self.projection_branch),
+            "selected_oracle_id": str(self.selected_oracle_id),
+            "projection_top_set": [str(t) for t in self.projection_top_set],
+            "projection_score": round(float(self.projection_score), 4),
+            "projection_margin": round(float(self.projection_margin), 4),
+            "parent_w34_cid": str(self.parent_w34_cid),
+            "cell_index": int(self.cell_index),
+            "n_basis_entries": int(self.n_basis_entries),
+            "n_w34_visible_tokens": int(self.n_w34_visible_tokens),
+            "n_w35_visible_tokens": int(self.n_w35_visible_tokens),
+            "n_w35_overhead_tokens": int(self.n_w35_overhead_tokens),
+            "w35_cid": str(self.w35_cid),
+            "manifest_v5_cid": str(self.manifest_v5_cid),
+            "basis_state_cid": str(self.basis_state_cid),
+            "projection_audit_cid": str(self.projection_audit_cid),
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": str(self.verification_reason),
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w35": float(self.cram_factor_w35),
+        }
+
+
+@dataclasses.dataclass
+class TrustSubspaceDenseControlOrchestrator:
+    """Trust-subspace dense-control orchestrator (W35 family)."""
+
+    inner: LiveAwareMultiAnchorOrchestrator
+    registry: TrustSubspaceDenseRegistry
+    enabled: bool = True
+    require_w35_verification: bool = True
+
+    _last_result: "W35TrustSubspaceResult | None" = None
+    _last_envelope: "TrustSubspaceDenseRatificationEnvelope | None" = None
+    _last_top_set_by_oracle: dict[str, tuple[str, ...]] = dataclasses.field(
+        default_factory=dict)
+    _top_stability_by_oracle: dict[str, float] = dataclasses.field(
+        default_factory=dict)
+    _last_feature_sig_by_oracle: dict[str, str] = dataclasses.field(
+        default_factory=dict)
+    _feature_stability_by_oracle: dict[str, float] = dataclasses.field(
+        default_factory=dict)
+    _observation_count_by_oracle: dict[str, int] = dataclasses.field(
+        default_factory=dict)
+    _cell_index: int = 0
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.registry.schema
+
+    def reset_session(self) -> None:
+        self.inner.reset_session()
+        self._last_result = None
+        self._last_envelope = None
+        self._last_top_set_by_oracle = {}
+        self._top_stability_by_oracle = {}
+        self._last_feature_sig_by_oracle = {}
+        self._feature_stability_by_oracle = {}
+        self._observation_count_by_oracle = {}
+        self._cell_index = 0
+
+    def _basis_entries_from_inner(self) -> tuple[TrustSubspaceBasisEntry, ...]:
+        w21_result = (self.inner.inner.inner.last_result
+                      if hasattr(self.inner.inner.inner, "last_result")
+                      else None)
+        w33_result = self.inner.inner.last_result
+        w34_result = self.inner.last_result
+        w34_env = self.inner.last_envelope
+        trust_state = dict(w33_result.oracle_trust_state
+                           if w33_result is not None else ())
+        attestations = (w34_env.live_attestations
+                        if w34_env is not None else ())
+        att_by_oracle = {str(a.oracle_id): a for a in attestations}
+        entries: list[TrustSubspaceBasisEntry] = []
+        if w21_result is None:
+            return ()
+        alpha = float(self.registry.basis_ewma_alpha)
+        consensus_reference: tuple[str, ...] = ()
+        if (w34_result is not None
+                and w34_result.multi_anchor_branch
+                == W34_BRANCH_MULTI_ANCHOR_CONSENSUS):
+            consensus_reference = tuple(
+                w34_result.multi_anchor_consensus_top_set)
+        for probe in w21_result.probes:
+            oid = str(probe.oracle_id)
+            top = tuple(sorted(str(t) for t in (probe.top_set or ())))
+            obs = derive_per_oracle_agreement_signal(
+                probe_top_set=top,
+                probe_abstained=bool(probe.abstained),
+                resolved_top_set=consensus_reference,
+            )
+            prev_stability = float(
+                self._top_stability_by_oracle.get(oid, 1.0))
+            top_stability = update_ewma_prior(
+                prev_ewma=prev_stability,
+                observation=float(obs),
+                alpha=alpha,
+            )
+            self._top_stability_by_oracle[oid] = float(top_stability)
+            if top:
+                self._last_top_set_by_oracle[oid] = top
+
+            att = att_by_oracle.get(oid)
+            if att is not None:
+                sig = str(att.response_feature_signature)
+                prev_sig = self._last_feature_sig_by_oracle.get(oid)
+                feature_obs = 1.0 if prev_sig in (None, sig) else 0.0
+                host_health = 1.0 if bool(att.preflight_ok) else 0.0
+            else:
+                sig = compute_response_feature_signature(
+                    response_text=str(probe.payload))
+                feature_obs = 1.0
+                host_health = 1.0
+            prev_feature = float(
+                self._feature_stability_by_oracle.get(oid, 1.0))
+            feature_stability = update_ewma_prior(
+                prev_ewma=prev_feature,
+                observation=float(feature_obs),
+                alpha=alpha,
+            )
+            self._feature_stability_by_oracle[oid] = float(
+                feature_stability)
+            self._last_feature_sig_by_oracle[oid] = sig
+            n_obs = int(self._observation_count_by_oracle.get(oid, 0)) + 1
+            self._observation_count_by_oracle[oid] = n_obs
+            ewma_trust = _bounded_unit(float(trust_state.get(oid, 1.0)))
+            score = (
+                0.45 * ewma_trust
+                + 0.45 * _bounded_unit(float(top_stability))
+                + 0.05 * _bounded_unit(float(feature_stability))
+                + 0.05 * _bounded_unit(float(host_health))
+            )
+            entries.append(TrustSubspaceBasisEntry(
+                cell_idx=int(self._cell_index),
+                oracle_id=oid,
+                top_set=top,
+                ewma_trust_after=float(ewma_trust),
+                top_set_stability_ewma=_bounded_unit(
+                    float(top_stability)),
+                response_feature_signature=sig,
+                response_feature_stability=_bounded_unit(
+                    float(feature_stability)),
+                host_health=_bounded_unit(float(host_health)),
+                n_observations=int(n_obs),
+                projection_score=_bounded_unit(float(score)),
+            ))
+        return tuple(entries)
+
+    def _build_w35_envelope(
+            self,
+            *,
+            parent_w34_cid: str,
+            basis_entries: tuple[TrustSubspaceBasisEntry, ...],
+            live_attestation_cid: str,
+            projection_branch: str,
+            selected_oracle_id: str,
+            projection_top_set: tuple[str, ...],
+            projection_score: float,
+            projection_margin: float,
+            wire_required: bool,
+    ) -> TrustSubspaceDenseRatificationEnvelope:
+        basis_state_cid = _compute_trust_subspace_basis_state_cid(
+            basis_entries=basis_entries)
+        projection_audit_cid = _compute_w35_projection_audit_cid(
+            projection_branch=projection_branch,
+            selected_oracle_id=selected_oracle_id,
+            projection_top_set=projection_top_set,
+            projection_score=float(projection_score),
+            projection_margin=float(projection_margin),
+            projection_threshold=float(self.registry.projection_threshold),
+            projection_margin_min=float(self.registry.projection_margin_min),
+        )
+        manifest_v5_cid = _compute_w35_manifest_v5_cid(
+            parent_w34_cid=parent_w34_cid,
+            basis_state_cid=basis_state_cid,
+            live_attestation_cid=live_attestation_cid,
+            projection_audit_cid=projection_audit_cid,
+        )
+        return TrustSubspaceDenseRatificationEnvelope(
+            schema_version=W35_TRUST_SUBSPACE_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            parent_w34_cid=str(parent_w34_cid),
+            basis_entries=basis_entries,
+            basis_state_cid=basis_state_cid,
+            live_attestation_cid=str(live_attestation_cid),
+            projection_branch=str(projection_branch),
+            selected_oracle_id=str(selected_oracle_id),
+            projection_top_set=tuple(projection_top_set),
+            projection_score=float(projection_score),
+            projection_margin=float(projection_margin),
+            projection_threshold=float(self.registry.projection_threshold),
+            projection_margin_min=float(self.registry.projection_margin_min),
+            projection_audit_cid=projection_audit_cid,
+            manifest_v5_cid=manifest_v5_cid,
+            cell_index=int(self._cell_index),
+            wire_required=bool(wire_required),
+        )
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        if not self.enabled or self.schema is None:
+            out = self.inner.decode_rounds(per_round_handoffs)
+            n_w34_visible = int(out.get("live_aware_multi_anchor", {}).get(
+                "n_w34_visible_tokens", 0))
+            return self._pack(
+                out=out,
+                decoder_branch=W35_BRANCH_TRUST_SUBSPACE_DISABLED,
+                projection_branch="",
+                envelope=None,
+                n_w35_visible=n_w34_visible,
+                w35_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason="disabled",
+                selected_oracle_id="",
+                projection_top_set=(),
+                projection_score=0.0,
+                projection_margin=0.0,
+                parent_w34_cid="",
+                n_basis_entries=0,
+            )
+
+        out = self.inner.decode_rounds(per_round_handoffs)
+        w34_result = self.inner.last_result
+        n_w34_visible = int(w34_result.n_w34_visible_tokens
+                            if w34_result is not None else 0)
+        inner_w34_branch = str(w34_result.decoder_branch
+                               if w34_result is not None else "")
+
+        if self.registry.is_trivial:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=(
+                    W35_BRANCH_TRIVIAL_TRUST_SUBSPACE_PASSTHROUGH),
+                projection_branch="",
+                envelope=None,
+                n_w35_visible=n_w34_visible,
+                w35_overhead=0,
+                ratified=True,
+                verify_ok=True,
+                verify_reason="trivial_passthrough",
+                selected_oracle_id="",
+                projection_top_set=(),
+                projection_score=0.0,
+                projection_margin=0.0,
+                parent_w34_cid="",
+                n_basis_entries=0,
+            )
+
+        if w34_result is None:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W35_BRANCH_TRUST_SUBSPACE_NO_TRIGGER,
+                projection_branch="",
+                envelope=None,
+                n_w35_visible=n_w34_visible,
+                w35_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason="no_w34_result",
+                selected_oracle_id="",
+                projection_top_set=(),
+                projection_score=0.0,
+                projection_margin=0.0,
+                parent_w34_cid="",
+                n_basis_entries=0,
+            )
+
+        basis_entries = self._basis_entries_from_inner()
+        projection_top, selected_oid, projection_score, projection_margin, (
+            projection_branch) = select_trust_subspace_projection(
+                basis_entries=basis_entries,
+                projection_threshold=float(
+                    self.registry.projection_threshold),
+                projection_margin_min=float(
+                    self.registry.projection_margin_min),
+                min_basis_observations=int(
+                    self.registry.min_basis_observations),
+            )
+
+        w35_answer = dict(out)
+        w34_services = tuple(sorted(str(t) for t in out.get("services", ())))
+        multi_anchor_branch = str(w34_result.multi_anchor_branch)
+        decoder_branch = W35_BRANCH_TRUST_SUBSPACE_RESOLVED
+        if (multi_anchor_branch == W34_BRANCH_MULTI_ANCHOR_NO_CONSENSUS
+                and projection_branch == W35_BRANCH_BASIS_HISTORY_REROUTED
+                and projection_top):
+            w35_answer["services"] = tuple(projection_top)
+            decoder_branch = W35_BRANCH_BASIS_HISTORY_REROUTED
+        elif (self.registry.abstain_on_unstable_consensus
+              and multi_anchor_branch == W34_BRANCH_MULTI_ANCHOR_CONSENSUS
+              and w34_services
+              and projection_branch == W35_BRANCH_BASIS_HISTORY_UNSAFE
+              and self._cell_index >= int(
+                  self.registry.min_basis_observations)):
+            consensus_scores = [
+                float(b.projection_score)
+                for b in basis_entries
+                if tuple(sorted(b.top_set)) == w34_services
+            ]
+            if (consensus_scores
+                    and max(consensus_scores) < float(
+                        self.registry.projection_threshold)):
+                w35_answer = dict(out)
+                w35_answer["services"] = ()
+                projection_branch = W35_BRANCH_BASIS_HISTORY_ABSTAINED
+                decoder_branch = W35_BRANCH_BASIS_HISTORY_ABSTAINED
+        elif projection_branch == W35_BRANCH_BASIS_HISTORY_UNSAFE:
+            decoder_branch = W35_BRANCH_BASIS_HISTORY_UNSAFE
+
+        w34_env = self.inner.last_envelope
+        parent_w34_cid = (str(w34_env.w34_cid)
+                          if w34_env is not None else "")
+        live_attestation_cid = (str(w34_env.live_attestation_cid)
+                                if w34_env is not None else
+                                _compute_live_attestation_cid(
+                                    attestations=()))
+        if not parent_w34_cid:
+            parent_payload = _canonical_json_bytes({
+                "inner_w34_branch": inner_w34_branch,
+                "n_w34_visible": int(n_w34_visible),
+                "cell_index": int(self._cell_index),
+            })
+            parent_w34_cid = hashlib.sha256(parent_payload).hexdigest()
+
+        envelope = self._build_w35_envelope(
+            parent_w34_cid=parent_w34_cid,
+            basis_entries=basis_entries,
+            live_attestation_cid=live_attestation_cid,
+            projection_branch=projection_branch,
+            selected_oracle_id=selected_oid,
+            projection_top_set=tuple(projection_top),
+            projection_score=float(projection_score),
+            projection_margin=float(projection_margin),
+            wire_required=self.registry.has_wire_required_layer,
+        )
+        outcome = self.registry.register_envelope(
+            envelope,
+            registered_parent_w34_cid=parent_w34_cid,
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+        if not verify_ok and self.require_w35_verification:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W35_BRANCH_TRUST_SUBSPACE_REJECTED,
+                projection_branch=projection_branch,
+                envelope=envelope,
+                n_w35_visible=n_w34_visible,
+                w35_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason=verify_reason,
+                selected_oracle_id=selected_oid,
+                projection_top_set=tuple(projection_top),
+                projection_score=projection_score,
+                projection_margin=projection_margin,
+                parent_w34_cid=parent_w34_cid,
+                n_basis_entries=len(basis_entries),
+            )
+
+        w35_overhead = int(envelope.n_wire_tokens)
+        n_w35_visible = int(n_w34_visible + w35_overhead)
+        out_local = dict(out)
+        for k, v in w35_answer.items():
+            out_local[k] = v
+        if "services" not in w35_answer:
+            out_local["services"] = ()
+        self._cell_index += 1
+        return self._pack(
+            out=out_local,
+            decoder_branch=decoder_branch,
+            projection_branch=projection_branch,
+            envelope=envelope,
+            n_w35_visible=n_w35_visible,
+            w35_overhead=w35_overhead,
+            ratified=True,
+            verify_ok=verify_ok,
+            verify_reason=verify_reason,
+            selected_oracle_id=selected_oid,
+            projection_top_set=tuple(projection_top),
+            projection_score=projection_score,
+            projection_margin=projection_margin,
+            parent_w34_cid=parent_w34_cid,
+            n_basis_entries=len(basis_entries),
+        )
+
+    def _pack(
+            self,
+            *,
+            out: dict[str, Any],
+            decoder_branch: str,
+            projection_branch: str,
+            envelope: TrustSubspaceDenseRatificationEnvelope | None,
+            n_w35_visible: int,
+            w35_overhead: int,
+            ratified: bool,
+            verify_ok: bool,
+            verify_reason: str,
+            selected_oracle_id: str,
+            projection_top_set: tuple[str, ...],
+            projection_score: float,
+            projection_margin: float,
+            parent_w34_cid: str,
+            n_basis_entries: int,
+    ) -> dict[str, Any]:
+        envelope_bytes = (envelope.n_envelope_bytes
+                          if envelope is not None else 0)
+        structured_bits = (envelope.n_structured_bits
+                           if envelope is not None else 0)
+        wire = max(1, int(w35_overhead))
+        cram_factor = (float(structured_bits) / float(wire)
+                       if structured_bits > 0 else 0.0)
+        w35_cid = str(envelope.w35_cid) if envelope is not None else ""
+        manifest_v5_cid = (str(envelope.manifest_v5_cid)
+                           if envelope is not None else "")
+        basis_state_cid = (str(envelope.basis_state_cid)
+                           if envelope is not None else "")
+        projection_audit_cid = (str(envelope.projection_audit_cid)
+                                if envelope is not None else "")
+        n_w34_visible = int(out.get("live_aware_multi_anchor", {}).get(
+            "n_w34_visible_tokens", 0))
+        inner_w34_branch = str(out.get("live_aware_multi_anchor", {}).get(
+            "decoder_branch", ""))
+        result = W35TrustSubspaceResult(
+            answer=dict(out),
+            inner_w34_branch=inner_w34_branch,
+            decoder_branch=str(decoder_branch),
+            projection_branch=str(projection_branch),
+            selected_oracle_id=str(selected_oracle_id),
+            projection_top_set=tuple(projection_top_set),
+            projection_score=float(projection_score),
+            projection_margin=float(projection_margin),
+            parent_w34_cid=str(parent_w34_cid),
+            cell_index=int(self._cell_index - 1
+                           if self._cell_index > 0 else 0),
+            n_basis_entries=int(n_basis_entries),
+            n_w34_visible_tokens=int(n_w34_visible),
+            n_w35_visible_tokens=int(n_w35_visible),
+            n_w35_overhead_tokens=int(w35_overhead),
+            w35_cid=w35_cid,
+            manifest_v5_cid=manifest_v5_cid,
+            basis_state_cid=basis_state_cid,
+            projection_audit_cid=projection_audit_cid,
+            ratified=bool(ratified),
+            verification_ok=bool(verify_ok),
+            verification_reason=str(verify_reason),
+            n_envelope_bytes=int(envelope_bytes),
+            n_structured_bits=int(structured_bits),
+            cram_factor_w35=float(cram_factor),
+        )
+        self._last_result = result
+        self._last_envelope = envelope
+        out_local = dict(out)
+        out_local["trust_subspace_dense_control"] = result.as_dict()
+        if envelope is not None:
+            out_local["trust_subspace_dense_envelope"] = envelope.as_dict()
+        return out_local
+
+    def decode(self, handoffs: Sequence[_DecodedHandoff]) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> "W35TrustSubspaceResult | None":
+        return self._last_result
+
+    @property
+    def last_envelope(
+            self,
+    ) -> "TrustSubspaceDenseRatificationEnvelope | None":
+        return self._last_envelope
+
+
+def build_trivial_trust_subspace_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w34_registry: LiveAwareMultiAnchorRegistry | None = None,
+        registered_oracle_ids: Iterable[str] = (),
+) -> TrustSubspaceDenseRegistry:
+    return TrustSubspaceDenseRegistry(
+        schema=schema,
+        inner_w34_registry=inner_w34_registry,
+        trust_subspace_enabled=False,
+        manifest_v5_disabled=True,
+        basis_history_window=0,
+        registered_oracle_ids=frozenset(str(o) for o in registered_oracle_ids),
+    )
+
+
+def build_trust_subspace_dense_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w34_registry: LiveAwareMultiAnchorRegistry,
+        registered_oracle_ids: Iterable[str] = (),
+        trust_subspace_enabled: bool = True,
+        manifest_v5_disabled: bool = False,
+        basis_history_window: int = W35_DEFAULT_BASIS_HISTORY_WINDOW,
+        basis_ewma_alpha: float = W35_DEFAULT_BASIS_EWMA_ALPHA,
+        projection_threshold: float = W35_DEFAULT_PROJECTION_THRESHOLD,
+        projection_margin_min: float = W35_DEFAULT_PROJECTION_MARGIN_MIN,
+        min_basis_observations: int = W35_DEFAULT_MIN_BASIS_OBSERVATIONS,
+        abstain_on_unstable_consensus: bool = True,
+) -> TrustSubspaceDenseRegistry:
+    return TrustSubspaceDenseRegistry(
+        schema=schema,
+        inner_w34_registry=inner_w34_registry,
+        trust_subspace_enabled=bool(trust_subspace_enabled),
+        manifest_v5_disabled=bool(manifest_v5_disabled),
+        basis_history_window=int(basis_history_window),
+        basis_ewma_alpha=float(basis_ewma_alpha),
+        projection_threshold=float(projection_threshold),
+        projection_margin_min=float(projection_margin_min),
+        min_basis_observations=int(min_basis_observations),
+        registered_oracle_ids=frozenset(str(o) for o in registered_oracle_ids),
+        abstain_on_unstable_consensus=bool(abstain_on_unstable_consensus),
+    )

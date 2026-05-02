@@ -5,6 +5,60 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.9 / 3.36] — 2026-05-02 — SDK v3.36 — trust-subspace dense-control proxy + basis-history projection + W35 manifest-v5 CID + R-82 Phase-82 benchmark family + W34 abstention converted to verified reroute where basis history is stable
+
+*Strictly additive on SDK v3.35.  The stable Wevra product/runtime
+contract is unchanged.  The W35 surface is experimental and wraps the
+W34 `LiveAwareMultiAnchorOrchestrator` with a controller-verified
+trust-subspace dense-control proxy.  W35 derives one basis entry per
+oracle from W21 probe top_sets, W33 EWMA trust, W34
+live-attestation/response-feature state, top-set stability, and host
+health, then uses that basis only when it can safely convert W34
+NO_CONSENSUS abstention into a verified reroute.  It is explicitly not
+native latent transfer, not transformer-internal hidden-state
+projection, and not a KV-cache transplant.*
+
+**New experimental surface.**
+
+`TrustSubspaceBasisEntry`, `TrustSubspaceDenseRatificationEnvelope`,
+`TrustSubspaceDenseRegistry`, `W35TrustSubspaceResult`,
+`TrustSubspaceDenseControlOrchestrator`,
+`select_trust_subspace_projection`,
+`verify_trust_subspace_dense_ratification`,
+`build_trivial_trust_subspace_registry`,
+`build_trust_subspace_dense_registry`, plus W35 schema/branch/default
+constants.
+
+**Headline empirical results.**
+
+* **R-82-TRUST-SUBSPACE-SHIFT.**  W34 abstains on 6 disputed cells;
+  W35 reroutes 5/6 through the stable `change_history` basis
+  direction.  Correctness rises from 0.625 to **0.9375**
+  (**+0.3125**) across 5/5 seeds; trust precision remains **1.000**;
+  overhead is one visible token/cell.
+
+* **R-82-TRIVIAL-W35.**  W35 disabled + manifest-v5 disabled reduces
+  to W34 byte-for-byte across 5/5 seeds.
+
+* **R-82-ALL-ANCHOR-COMPROMISED.**  Hard falsifier: when every basis
+  direction moves wrong together, W35 cannot recover; W35-W34 delta =
+  0.000 and trust precision remains 0.625.
+
+**Trust boundary.**  14 new W35 failure modes in
+`verify_trust_subspace_dense_ratification`, all covered by W35 unit
+tests; cumulative W22 + W29 + W30 + W31 + W32 + W33 + W34 + W35 trust
+boundary = **98 enumerated failure modes**.
+
+**Live fallback.**  Full W34 xLLM pilot exceeded practical turn-time
+budget and was stopped.  Bounded two-host live probe on 2026-05-02
+across local `qwen2.5:0.5b` and remote `qwen2.5:14b` produced 10/10
+responsive probes, 3/5 cross-host disagreements, and 3/3
+gold-correlated disagreement winners.  `192.168.12.248` still timed
+out on `/api/tags`; true broader multi-host evidence remains open.
+
+**Versioning.**  SDK_VERSION `wevra.sdk.v3.36`; package version
+`0.5.9`; W35 exports live under `__experimental__`.
+
 ## [0.5.8 / 3.35] — 2026-05-01 — SDK v3.35 — live-aware multi-anchor adjudication + native-latent audited response-feature proxy + W34 manifest-v4 CID + W33 infra-blocker closure (preflight `/api/tags` + chat-template + `num_predict=4`) + R-81 Phase-81 benchmark family + W34 family + W33 single-anchor fragility closed via multi-anchor consensus + W33-INFRA-1 + W33-INFRA-2 jointly discharged
 
 *Strictly additive on SDK v3.34.  The Wevra single-run product

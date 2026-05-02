@@ -2,7 +2,7 @@
 
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
+> README-of-README must satisfy these rules. Last touched: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
 > v3.33 (W32 family) 2026-05-01.
 
 The programme has a long history of moves where a candidate result
@@ -62,6 +62,33 @@ must name the *defining gate* and state which side of the gate
 you are on. "Solves the bounded-context problem" is forbidden;
 "closes the per-agent O(log N) bound on the routing-only setting
 of Phases 1–10" is permitted because the bound is named.
+
+### "W35 is native latent" or "W35 found the transformer trust subspace"
+
+> *"W35 implements native latent trust transfer."*
+
+Forbidden.  W35 implements an **audited capsule-layer trust-subspace
+proxy**.  Its basis entries are derived from controller-visible
+signals: W21 probe top_sets, W33 EWMA trust, W34 live-attestation /
+response-feature state, top-set stability, and host health.  It does
+not read hidden states, transplant KV cache, inspect attention weights,
+or project embeddings.
+
+Permitted phrasing: *"W35 is a trust-subspace dense-control proxy that
+turns some W34 NO_CONSENSUS abstentions into verified reroutes when a
+stable high-margin basis direction exists."*
+
+Forbidden phrasing: *"W35 closes W33-C-NATIVE-LATENT"*, *"W35 proves
+native latent transfer"*, *"W35 discovers a transformer-internal trust
+subspace"*, *"W35 solves context for multi-agent teams."*
+
+The honest reading is narrower: on R-82-TRUST-SUBSPACE-SHIFT, W35
+improves correctness over W34 by +0.3125 while preserving trust
+precision at 1.000, using one visible token/cell to carry roughly
+13k bits of controller-verified structured state.  The hard falsifier
+W35-L-ALL-BASIS-COMPROMISED remains: if every basis direction moves
+together to the wrong answer, the capsule-layer proxy has no
+independent signal and cannot recover.
 
 ### "Beats" without a baseline
 

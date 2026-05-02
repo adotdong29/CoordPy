@@ -5,10 +5,88 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.35,
-> 2026-05-01.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.36,
+> 2026-05-02.
 
-## TL;DR — SDK v3.35
+## TL;DR — SDK v3.36
+
+The programme now has **thirty-two** coupled research axes.  SDK
+v3.36 mints axis 32: **trust-subspace dense-control proxy +
+basis-history projection + manifest-v5 CID** (W35).  W35 wraps W34's
+live-aware multi-anchor path with the strongest honest native-latent
+proxy this repo can support without transformer-runtime access: a
+controller-verified dense basis over W21 probe top_sets, W33 EWMA
+trust, W34 live-attestation/response-feature state, top-set stability,
+and host health.
+
+The load-bearing change is narrow and real.  W34 treated anchor
+disagreement as a trust signal and abstained.  W35 asks whether the
+verified basis history contains a stable, high-margin trusted
+direction that can safely convert that abstention into a reroute.  If
+the basis is short, unstable, insufficiently separated, or
+unverifiable, W35 preserves W34's abstention.
+
+**Headline SDK v3.36 results.**
+
+* **R-82-TRUST-SUBSPACE-SHIFT.**  W34 abstains on 6 disputed cells;
+  W35 reroutes 5/6 through the stable `change_history` basis
+  direction.  Correctness rises from 0.625 (W21/W33/W34) to
+  **0.9375** across 5/5 seeds, **Δ_correctness_w35_w34 = +0.3125**,
+  while trust precision stays at **1.000** and overhead is one visible
+  token/cell.
+
+* **R-82-TRIVIAL-W35.**  With trust-subspace disabled and manifest-v5
+  disabled, W35 reduces to W34 byte-for-byte across 5/5 seeds.
+
+* **R-82-NO-ANCHOR-DISAGREEMENT.**  When W34 already has consensus,
+  W35 adds no correctness lift; W35 = W34 = 1.000 correctness/trust
+  precision.
+
+* **R-82-FROZEN-BASIS.**  Weakened basis history attenuates but does
+  not remove the gain: W35 correctness 0.875, delta +0.2500, four
+  reroutes.
+
+* **R-82-ALL-ANCHOR-COMPROMISED.**  Hard falsifier: when every basis
+  direction moves together to the wrong answer, W35 cannot recover.
+  W35-W34 delta = 0.000; trust precision remains 0.625.
+
+**Density / efficiency**: On R-82-TRUST-SUBSPACE-SHIFT, W35 carries
+mean **208,264 structured bits per 16-cell seed** at one visible
+token overhead/cell, or **13,016.5 structured bits per visible W35
+token**.  This is dense controller-verified state transfer, not hidden
+state transfer.
+
+**Trust boundary**: 14 new W35 failure modes in
+`verify_trust_subspace_dense_ratification`, now mechanically tested.
+Cumulative enumerated trust boundary across W22 + W29 + W30 + W31 +
+W32 + W33 + W34 + W35 = **98 enumerated failure modes**.
+
+**Live / two-Mac status**: Local Ollama and `192.168.12.191:11434`
+are reachable.  `192.168.12.248:11434` still times out on `/api/tags`
+despite the user reopening a Mac.  A bounded two-host fallback probe
+on 2026-05-02 across local `qwen2.5:0.5b` and remote `qwen2.5:14b`
+yielded 10/10 responsive probes, 3/5 cross-host disagreements, and
+3/3 gold-correlated disagreements.  This strengthens live disagreement
+evidence but does **not** close the stronger live magnitude survey or
+true multi-host blocker.
+
+**Stable-vs-experimental boundary**: W35 is exported only under
+`__experimental__`; stable runtime contract remains unchanged.
+SDK_VERSION `wevra.sdk.v3.36`; package version `0.5.9`.
+
+**Open walls after W35**: W33-C-NATIVE-LATENT remains open.  W35 is
+not transformer-internal hidden-state projection, not a KV transplant,
+and not a learned latent controller.  W33-C-CROSS-HOST-LIVE-TRUST-
+MAGNITUDE remains open on the systematic magnitude axis.  W34-C-
+MULTI-HOST remains hardware-bounded until Mac 2 joins the topology.
+
+See `docs/RESULTS_WEVRA_W35_TRUST_SUBSPACE_DENSE_CONTROL.md` for the
+full note and `docs/SUCCESS_CRITERION_W35_TRUST_SUBSPACE_DENSE_CONTROL.md`
+for the success bar.
+
+---
+
+## Earlier TL;DR — SDK v3.35
 
 The programme now has **thirty-one** coupled research axes, each
 with a sharp status.  SDK v3.35 mints axis 31: **live-aware
