@@ -2141,6 +2141,90 @@ The current paper incorporates the following layers:
   41/41 W31 unit tests + 437/437 phase69-78 regression + 68/68
   wider wevra suite pass. Mac 2 (192.168.12.248) still ARP-
   incomplete (26th milestone). (R-78, SDK v3.32)
+- **W32 family:** long-window convergent online geometry-aware
+  dense control + EWMA-tracked per-partition prior + Page two-
+  sided CUSUM change-point detector + GoldCorrelationMap +
+  manifest-v2 CID. The first capsule-native multi-agent-
+  coordination method that demonstrates *long-window scaling
+  stability* of the W31 online prior on a regime where the W31
+  baseline has no convergence guarantee. The W32
+  ``LongWindowConvergentOrchestrator`` wraps the W31 orchestrator
+  and adds three closed-form primitives: an EWMA running update
+  ``ewma_new = (1−α)·ewma_prev + α·observation`` written *back*
+  into the W30 calibration vector (load-bearing routing change,
+  not just an audit trail); a Page two-sided CUSUM detector
+  ``cusum_pos / cusum_neg`` bounded by ``cusum_max`` with named
+  change-point firings; and a registered
+  ``GoldCorrelationMap : (partition_id → score)`` table. The
+  manifest-v2 CID seals all of the above into a single SHA-256
+  over four component CIDs (``w31_online_cid``,
+  ``convergence_state_cid``, ``gold_correlation_cid``,
+  ``route_audit_cid_v2``); the verifier
+  :func:`verify_long_window_convergent_ratification` enumerates
+  14 failure modes disjoint from W29's 14 + W30's 14 + W31's 14
+  (cumulative **56 across W29+W30+W31+W32**). On
+  R-79-LONG-WINDOW (4 windows × 5 seeds, all 0.969 byte-equal
+  to W31 baseline), W32 is byte-for-W31 stable across long
+  windows — *long-window scaling stability* is empirically
+  established. **Empirically discharges
+  W31-C-LONG-WINDOW-CONVERGENCE on the scaling-stability axis.**
+  On R-79-MANIFEST-V2-TAMPER, 1525/1525 = 1.000 cross-component
+  manifest-v2 + cross-cell route-audit-v2 tamper rejection
+  across five named tampers per cell-position. A pre-committed
+  hard gate H6 (strict gain ≥ +0.10 over W31 on a long-window
+  regime) is **honestly null**: the **W32-L-CYCLE-CAP**
+  limitation theorem proves that on cycle-capped dispatcher
+  regimes ``Δ_max ≤ min(c_p/4, c_s)/N ≤ 0.0625``, so the bar
+  *cannot* be cleared on the available bench by any
+  EWMA-on-prior method. The remaining gap is converted to the
+  open conjecture **W32-C-LONG-WINDOW-STRICT-GAIN** (requires a
+  regime exceeding the cycle cap). Four named falsifiers
+  (W32-Λ-trivial-long-window ⇒ byte-for-W31 passthrough;
+  W32-Λ-no-change-point ⇒ stable-history regime never fires
+  CUSUM; W32-Λ-frozen-ewma at ``α = 1.0`` *outperforms* W31 by
+  +0.016 on the available regime, an honest empirical
+  correction over the predicted-null falsifier;
+  W32-Λ-mis-correlated-gold ⇒ gate-bounded, never opens on
+  synthetic banks). Live cross-architecture LLM gold-verifiable
+  pilot (gemma2:9b on localhost vs qwen2.5:14b on
+  192.168.12.191, temp 0, 20 prompts, byte-reproducible across
+  two runs): **19/20 = 0.950 agreement**, sole disagreement
+  D5 (TCP handshake) has neither host correct against gold —
+  the first measured live cross-architecture LLM gold-verifiable
+  agreement at temp 0 in the programme. **Sharpens
+  W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE on the
+  prompt-class-dependent disagreement frontier.** Newly named
+  open conjectures **W32-C-LONG-WINDOW-STRICT-GAIN**,
+  **W32-C-CROSS-HOST-LIVE-GOLD-MAGNITUDE**,
+  **W32-C-NATIVE-LATENT** (architecture-dependent — true
+  transformer-internal subspace projection vs the W32 audited
+  proxy; out of capsule-layer scope), **W32-C-MULTI-HOST**
+  (3+ host topology, hardware-bounded), and
+  **W32-C-OLD-LINE-EWMA-TRUST** (W21 EWMA-tracked-trust
+  integration; primitives ship in W32 but the W21 integration
+  is not yet built). 45/45 W32 unit tests + 414/414 phase69-79
+  regression + 77/77 wider wevra suite = 536 tests pass. Mac 2
+  (192.168.12.248) still ARP-incomplete (27th milestone).
+  (R-79, SDK v3.33)
+
+The post-W21 efficiency-and-coordination ladder (W22 → W31)
+discharges, in order, a different family of open conjectures —
+one per layer — concerning amortisation of the working
+capsule-native pipeline across cells, agents, salience
+signatures, host topologies, geometric partitions, and prior
+calibration. The W32 layer is the first one of the post-W21
+ladder that adds *no new structurally-distinct routing move*:
+W32 reuses the W31 routing surface and proves *long-window
+scaling stability* of W31's online prior under EWMA + CUSUM
++ gold-correlation, sealed by a manifest-v2 CID. Strict gain
+on the same regime is honestly null; the remaining wall is
+the **W32-L-CYCLE-CAP** limitation theorem. The natural
+escapes from W32-L-CYCLE-CAP are *named*
+(W32-C-LONG-WINDOW-STRICT-GAIN on regimes exceeding the cycle
+cap; W32-C-CROSS-HOST-LIVE-GOLD-MAGNITUDE on regimes where
+LLMs disagree on gold-verifiable prompts) but currently
+*conjectural*; the W32 release deliberately does not claim
+strict gain where the regime cannot support it.
 
 ## Appendix C. Submission Pass Still Needed
 

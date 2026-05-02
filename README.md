@@ -7,7 +7,83 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.32 (May 2026).** Online self-calibrated
+**Latest milestone: SDK v3.33 (May 2026).** Long-window convergent
+online geometry-aware dense control + EWMA prior accumulator + Page
+CUSUM change-point detector + gold-correlated disagreement-routing +
+W32 manifest-v2 CID + first measured live cross-architecture LLM
+gold-verifiable agreement at temperature 0 (W32 family).  The W32
+``LongWindowConvergentOrchestrator`` wraps the W31
+``OnlineCalibratedOrchestrator`` with a **closed-form EWMA prior
+accumulator** (``ewma_new = (1 - α) * ewma_prev + α * obs`` with
+default α=0.20, ~13× more responsive than W31's effective
+1/(n+1) ≈ 0.015 at trajectory_window=64), a **closed-form Page
+two-sided CUSUM change-point detector** (cusum_pos / cusum_neg
+accumulators bounded by registered cusum_max=16.0; threshold 1.5;
+slack 0.10), a **gold-correlated disagreement-routing primitive**
+against a registered closed-vocabulary ``GoldCorrelationMap`` (the
+map is a structural witness, NOT a runtime ground-truth oracle),
+and a **content-addressed convergence-state trajectory + manifest-v2
+CID** that closes cross-component swap avenues the W31 manifest
+CID cannot detect.  W32 is **NOT** a learned model in the
+deep-learning sense: zero parameters, zero gradients, zero training
+step.  The ``LongWindowConvergentRatificationEnvelope`` adds a
+sealed trajectory of
+``(cell_idx, partition_id, ewma_prior_after, cusum_pos, cusum_neg,
+change_point_fired)`` entries plus a ``manifest_v2_cid`` over
+(w31_online_cid, convergence_state_cid, gold_correlation_cid,
+route_audit_cid_v2); the new
+``verify_long_window_convergent_ratification`` enumerates **14
+disjoint failure modes** (cumulative 56 across W29 + W30 + W31 +
+W32).  **First capsule-native multi-agent-coordination method to
+discharge W31-C-LONG-WINDOW-CONVERGENCE on the scaling-stability
+axis**: on **R-79-LONG-WINDOW** (sweep over long_window ∈
+{16, 32, 64, 128} on the prefix-then-shift drift_recover regime),
+the W32 EWMA + CUSUM mechanism achieves
+**byte-for-W31-equal correctness across 5/5 seeds × 4/4 windows =
+20/20 cell-window pairs at trust precision 1.000; zero
+degradation as window grows**.  On **R-79-MANIFEST-V2-TAMPER** the
+manifest-v2 CID + cross-cell convergence_state_cid check together
+yield **1525/1525 = 1.000 tamper rejection rate** across 5/5
+seeds × 61 ratified cell-positions × 5 named tampers per cell
+(cross-cell convergence_state swap with self-consistent manifest-v2
+recompute, manifest_v2_cid byte corruption, ewma_prior_after out of
+range, cusum_pos out of range, outer w32_cid byte corruption).  On
+**R-79-DRIFT-RECOVER** Δ(W32 - W31) = 0.000 (honestly-null per the
+**W32-L-CYCLE-CAP limitation theorem**: max strict gain is bounded
+above by ``min(c_p / 4, c_s) / N ≤ 0.0625`` on cycle-capped
+dispatcher regimes; the mechanism is empirically validated by
+``n_change_points = 1`` firing exactly at the shift boundary).
+**First measured live cross-architecture LLM gold-verifiable
+agreement at temperature 0 in the programme** (29th milestone):
+gemma2:9b on localhost + qwen2.5:14b on 192.168.12.191 agree on
+**19/20 = 0.950 of gold-verifiable structured-decision prompts at
+temp 0** (5/5 arithmetic + 5/5 syntax + 5/5 factoid + 4/5
+disambiguation; the unique disagreement is a tokenisation boundary
+where neither host matches the registered gold).  **The honest
+converse of W31's R-78-XLLM-LIVE result** (6/8 = 0.750 agreement
+on operational-decision prompts) — together they characterise the
+**prompt-class-dependent cross-architecture disagreement frontier**
+at temp 0.  Four named falsifiers empirically observed
+(W32-Λ-trivial-long-window ⇒ byte-for-W31 passthrough;
+W32-Λ-no-change-point ⇒ stationary regime fires 0 change-points;
+W32-Λ-frozen-ewma ⇒ honest empirical correction (did NOT regress);
+W32-Λ-mis-correlated-gold ⇒ gate-bounded on synthetic).
+**Sharpens W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE on the
+prompt-class-dependent agreement frontier (renamed forward as
+W32-C-CROSS-HOST-LIVE-GOLD-MAGNITUDE).**  Proves the new
+**W32-L-CYCLE-CAP limitation theorem** that bounds strict-gain
+claims on cycle-capped dispatcher regimes — a load-bearing
+honest-scope distinction.  Stable-vs-experimental boundary
+further tightened; the new W32 surface lives under
+``__experimental__`` (45 unit tests + the verifier);
+``SDK_VERSION = "wevra.sdk.v3.33"``; pyproject.toml ``0.5.6``.
+**414/414 phase69-79 regression pass + 45/45 W32 unit tests + 77/77
+wider wevra suite = 536 tests pass**.  Mac 2 (192.168.12.248)
+**still ARP-incomplete (27th consecutive milestone)**.  See
+[`docs/RESULTS_WEVRA_W32_LONG_WINDOW_CONVERGENT.md`](docs/RESULTS_WEVRA_W32_LONG_WINDOW_CONVERGENT.md)
+and [`CHANGELOG.md`](CHANGELOG.md) for details.
+
+**Previous milestone: SDK v3.32 (May 2026).** Online self-calibrated
 geometry-aware dense control + sealed prior trajectory + adaptive
 threshold + W31 manifest CID + first measured live cross-architecture
 LLM disagreement at temperature 0 (W31 family).  The W31
@@ -62,7 +138,7 @@ unchanged); 68/68 wider wevra suite passes.  Mac 2 (192.168.12.248)
 [`docs/RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md`](docs/RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md)
 and [`CHANGELOG.md`](CHANGELOG.md) for details.
 
-**Previous milestone: SDK v3.31 (May 2026).** Calibrated
+**Earlier milestone: SDK v3.31 (May 2026).** Calibrated
 geometry-partitioned dense control + multi-stride basis-history +
 per-partition calibration prior + cross-host disagreement-routing +
 ancestor-chain causal binding (W30 family). The W30

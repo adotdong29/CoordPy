@@ -1,0 +1,71 @@
+{
+  "ewma_alpha": 0.2,
+  "gain_at_window_128": 0.0,
+  "gain_at_window_16": 0.0,
+  "gain_at_window_32": 0.0,
+  "gain_at_window_64": 0.0,
+  "long_windows": [
+    16,
+    32,
+    64,
+    128
+  ],
+  "n_eval": 64,
+  "seeds": [
+    11,
+    17,
+    23,
+    29,
+    31
+  ],
+  "sweep": [
+    {
+      "all_w32_ge_w31": true,
+      "long_window": 16,
+      "max_correctness_w31": 0.96875,
+      "max_correctness_w32": 0.96875,
+      "max_delta_w32_minus_w31": 0.0,
+      "mean_overhead_w32_vs_w31_per_cell": 0.96875,
+      "min_correctness_w31": 0.96875,
+      "min_correctness_w32": 0.96875,
+      "min_delta_w32_minus_w31": 0.0,
+      "min_trust_precision_w32": 1.0
+    },
+    {
+      "all_w32_ge_w31": true,
+      "long_window": 32,
+      "max_correctness_w31": 0.96875,
+      "max_correctness_w32": 0.96875,
+      "max_delta_w32_minus_w31": 0.0,
+      "mean_overhead_w32_vs_w31_per_cell": 0.96875,
+      "min_correctness_w31": 0.96875,
+      "min_correctness_w32": 0.96875,
+      "min_delta_w32_minus_w31": 0.0,
+      "min_trust_precision_w32": 1.0
+    },
+    {
+      "all_w32_ge_w31": true,
+      "long_window": 64,
+      "max_correctness_w31": 0.96875,
+      "max_correctness_w32": 0.96875,
+      "max_delta_w32_minus_w31": 0.0,
+      "mean_overhead_w32_vs_w31_per_cell": 0.96875,
+      "min_correctness_w31": 0.96875,
+      "min_correctness_w32": 0.96875,
+      "min_delta_w32_minus_w31": 0.0,
+      "min_trust_precision_w32": 1.0
+    },
+    {
+      "all_w32_ge_w31": true,
+      "long_window": 128,
+      "max_correctness_w31": 0.96875,
+      "max_correctness_w32": 0.96875,
+      "max_delta_w32_minus_w31": 0.0,
+      "mean_overhead_w32_vs_w31_per_cell": 0.96875,
+      "min_correctness_w31": 0.96875,
+      "min_correctness_w32": 0.96875,
+      "min_delta_w32_minus_w31": 0.0,
+      "min_trust_precision_w32": 1.0
+    }
+  ]
+}

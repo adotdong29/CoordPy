@@ -2,8 +2,8 @@
 
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: SDK v3.32 (W31 family) 2026-05-01. Earlier: SDK
-> v3.25, 2026-04-29.
+> README-of-README must satisfy these rules. Last touched: SDK v3.33 (W32 family) 2026-05-01. Earlier: SDK
+> v3.32 (W31 family) 2026-05-01.
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or
@@ -1998,3 +1998,128 @@ The honest summary one may emit:
   the named open frontier **W30-C-NATIVE-LATENT** /
   **W31-C-NATIVE-LATENT**, plus the gold-correlation axis of
   **W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE**."
+
+### W32 forbidden moves
+
+W32 introduces another wave of vocabulary that *sounds* learned or
+model-internal: "long-window convergence", "EWMA prior accumulator",
+"Page CUSUM change-point detector", "gold-correlation routing",
+"manifest-v2 CID".  Each of these is a **capsule-layer audited
+proxy**.  None of them claim a learned model in the deep-learning
+sense (zero parameters, zero gradients, zero training step),
+transformer-internal manipulation, or a runtime ground-truth
+observation; the gold-correlation map is a **registered closed-
+vocabulary table**, NOT a runtime ground-truth oracle.
+
+What you may say (W32 honest scope):
+
+* "On R-79-LONG-WINDOW (sweep over long_window ∈ {16, 32, 64, 128}
+  on the prefix-then-shift drift_recover regime), the W32 EWMA +
+  Page CUSUM mechanism achieves byte-for-W31-equal correctness
+  across 5/5 seeds × 4/4 windows = 20/20 cell-window pairs at
+  trust precision 1.000; zero degradation as window grows.  This
+  is the W31-C-LONG-WINDOW-CONVERGENCE empirical discharge on the
+  **scaling-stability axis**."
+* "On R-79-DRIFT-RECOVER (the multi-shift load-bearing regime),
+  the strict-gain bar Δ ≥ +0.10 is honestly-null: Δ = 0.000 across
+  5/5 seeds.  The bar is bounded above by the **W32-L-CYCLE-CAP
+  limitation theorem** (max strict gain = ``min(c_p / 4, c_s) / N
+  ≤ 0.0625`` on cycle-capped dispatcher regimes); the mechanism
+  is empirically validated by ``n_change_points = 1`` firing
+  exactly at the shift boundary (cell 61) across 5/5 seeds."
+* "On R-79-MANIFEST-V2-TAMPER, the W32 manifest-v2 CID +
+  cross-cell convergence_state_cid check together detect five
+  named tampers per ratified cell; rejection rate = 1.000 across
+  1525 named tampers (5/5 seeds × 61 ratified cell-positions × 5
+  tampers).  The manifest-v2 CID closes cross-component swap
+  avenues that the W31 manifest CID alone cannot detect (the W31
+  manifest does NOT include convergence_state_cid)."
+* "On R-79-XLLM-LIVE-GOLD, gemma2:9b on localhost vs qwen2.5:14b
+  on 192.168.12.191 agree on 19/20 = 0.950 of gold-verifiable
+  structured-decision prompts at temperature 0.  This is the FIRST
+  measured live cross-architecture LLM gold-verifiable agreement
+  at temp 0 in the programme; combined with W31's R-78-XLLM-LIVE
+  result (0.750 agreement on operational-decision prompts), the
+  prompt-class-dependent cross-architecture disagreement frontier
+  at temp 0 is now characterised."
+
+What you must NOT say (W32 honest scope):
+
+* "W32 implements a learned trust model."  It does not.  EWMA +
+  CUSUM are closed-form arithmetic with zero parameters.
+* "W32 implements transformer-internal latent control."  It does
+  not.  EWMA + CUSUM accumulators live at the capsule layer; an
+  honest **proxy** for the LatentMAS long-window-convergent
+  direction, not a runtime hidden-state transplant.
+* "The W32 gold-correlation map observes ground truth at
+  runtime."  It does not.  The map is a *registered closed-
+  vocabulary table*; the controller registers it up-front; the
+  W32 layer at runtime only reads from the map, never writes to
+  it.  If the map is wrong, the W32-Λ-mis-correlated-gold
+  falsifier fires (gate-bounded on synthetic; will fire on regimes
+  with real cross-host disagreement).
+* "W32 strictly improves correctness over W31 on all long-window
+  regimes."  It does not.  On cycle-capped dispatcher regimes
+  (which is the available R-79 bench infrastructure), the strict
+  gain is bounded above by 0.0625 per the W32-L-CYCLE-CAP
+  limitation theorem.  The strict-gain claim is honestly retained
+  as **W32-C-LONG-WINDOW-STRICT-GAIN** on a regime that exceeds
+  the cycle-cap (single-partition or low-cycle-window dispatcher).
+* "W32 brings up Mac 2."  It does not.  192.168.12.248 remains
+  ARP-incomplete (**27th consecutive milestone**, ping 100% packet
+  loss).
+* "W32 closes W31-C-NATIVE-LATENT."  It does not.  W32 is a
+  capsule-layer mechanism extension; the architecture-dependent
+  native-latent question carries forward as
+  **W32-C-NATIVE-LATENT**.
+* "W32 closes the live cross-host gold-correlation axis."  It does
+  not.  The S1 result records 19/20 = 0.950 agreement on gold-
+  verifiable prompts at temp 0; the unique disagreement (D5: TCP
+  three-way handshake) has neither host correct.  The
+  gold-correlation axis remains open as
+  **W32-C-CROSS-HOST-LIVE-GOLD-MAGNITUDE**.
+* "W32 solves multi-agent context."  Five rivets tightened in one
+  milestone (scaling-stability discharge of W31-C-LONG-WINDOW-
+  CONVERGENCE, Page CUSUM change-point detection, manifest-v2
+  cross-component tamper detection, gold-correlation routing
+  infrastructure, first live cross-architecture LLM gold-
+  verifiable agreement at temp 0) is a strong step, but real
+  multi-agent reality has more axes than any 5-seed × 4-window
+  synthetic sweep + 20-prompt live probe can test.
+
+The honest summary one may emit:
+
+* "On R-79-LONG-WINDOW, R-79-MANIFEST-V2-TAMPER, R-79-DRIFT-RECOVER
+  (with W32-L-CYCLE-CAP limitation theorem), and R-79-XLLM-LIVE-GOLD
+  (four pre-committed regimes), the W32 long-window convergent
+  online geometry-aware dense control mechanism simultaneously
+  discharges W31-C-LONG-WINDOW-CONVERGENCE on the scaling-stability
+  axis (W32 ≥ W31 byte-for-byte across 5/5 seeds × 4/4 windows AT
+  trust precision 1.000) AND closes the cross-component swap
+  avenue beyond the W31 manifest CID (manifest-v2 CID + cross-cell
+  convergence_state_cid check, 1525/1525 = 1.000 rejection rate)
+  AND surfaces the W32-L-CYCLE-CAP limitation theorem (Δ_max ≤
+  0.0625 on cycle-capped dispatcher regimes, structurally bounded)
+  AND records the FIRST measured live cross-architecture LLM
+  gold-verifiable agreement at temperature 0 in the programme
+  (gemma2:9b vs qwen2.5:14b on 19/20 = 0.950 of gold-verifiable
+  prompts, the honest converse of W31's 6/8 = 0.750 agreement on
+  operational prompts).  We have not solved multi-agent context;
+  we have empirically discharged one named open conjecture
+  (W31-C-LONG-WINDOW-CONVERGENCE on the scaling-stability axis),
+  sharpened another (W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE
+  on the prompt-class-dependent agreement frontier), and proved a
+  named limitation theorem (W32-L-CYCLE-CAP) that makes explicit
+  the structural bound on strict-gain claims under cycle-capped
+  dispatcher regimes — a load-bearing honest-scope distinction.
+  The next true wall — the regime where the audited capsule-layer
+  proxy is insufficient and real transformer-internal subspace
+  projection is required — remains the named open frontier
+  **W32-C-NATIVE-LATENT**, plus the gold-correlation axis of
+  **W32-C-CROSS-HOST-LIVE-GOLD-MAGNITUDE** (where the
+  cross-architecture disagreement on gold-verifiable prompts at
+  temp 0 systematically aligns with the gold-correctness label),
+  the strict-gain axis of **W32-C-LONG-WINDOW-STRICT-GAIN** (which
+  requires a regime that exceeds the W32-L-CYCLE-CAP limitation
+  theorem), and the EWMA-tracked-trust integration axis of
+  **W32-C-OLD-LINE-EWMA-TRUST**."

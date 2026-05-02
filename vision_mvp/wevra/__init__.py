@@ -425,6 +425,36 @@ from .team_coord import (
     W31_BRANCH_ONLINE_DISABLED,
     W31_BRANCH_ONLINE_NO_TRIGGER,
     W31_ALL_BRANCHES,
+    # SDK v3.33 — long-window convergent online geometry-aware
+    # dense control + EWMA prior accumulator + Page CUSUM
+    # change-point detector + gold-correlated disagreement-routing
+    # + W32 manifest-v2 CID (W32 family).  EXPERIMENTAL — see
+    # __experimental__.
+    GoldCorrelationMap, build_gold_correlation_map,
+    ConvergenceStateEntry,
+    LongWindowConvergentRatificationEnvelope,
+    LongWindowConvergentRegistry,
+    W32LongWindowResult,
+    LongWindowConvergentOrchestrator,
+    verify_long_window_convergent_ratification,
+    update_ewma_prior, update_cusum_two_sided, detect_change_point,
+    build_trivial_long_window_registry,
+    build_long_window_convergent_registry,
+    W32_LONG_WINDOW_SCHEMA_VERSION,
+    W32_DEFAULT_EWMA_ALPHA,
+    W32_DEFAULT_CUSUM_THRESHOLD,
+    W32_DEFAULT_CUSUM_K,
+    W32_DEFAULT_CUSUM_MAX,
+    W32_DEFAULT_LONG_WINDOW,
+    W32_DEFAULT_GOLD_CORRELATION_MIN,
+    W32_BRANCH_LONG_WINDOW_RESOLVED,
+    W32_BRANCH_TRIVIAL_LONG_WINDOW_PASSTHROUGH,
+    W32_BRANCH_LONG_WINDOW_REJECTED,
+    W32_BRANCH_LONG_WINDOW_DISABLED,
+    W32_BRANCH_LONG_WINDOW_NO_TRIGGER,
+    W32_BRANCH_GOLD_CORRELATED_REROUTED,
+    W32_BRANCH_CHANGE_POINT_RESET,
+    W32_ALL_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -438,7 +468,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.32"
+SDK_VERSION = "wevra.sdk.v3.33"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -526,6 +556,22 @@ __experimental__: tuple[str, ...] = (
     "compute_adaptive_threshold",
     "build_trivial_online_registry",
     "build_online_calibrated_registry",
+    # W32 family — long-window convergent online geometry-aware
+    # dense control + EWMA + Page CUSUM + gold-correlated routing
+    # + manifest-v2 CID.
+    "GoldCorrelationMap",
+    "build_gold_correlation_map",
+    "ConvergenceStateEntry",
+    "LongWindowConvergentRatificationEnvelope",
+    "LongWindowConvergentRegistry",
+    "W32LongWindowResult",
+    "LongWindowConvergentOrchestrator",
+    "verify_long_window_convergent_ratification",
+    "update_ewma_prior",
+    "update_cusum_two_sided",
+    "detect_change_point",
+    "build_trivial_long_window_registry",
+    "build_long_window_convergent_registry",
 )
 
 __all__ = [
@@ -814,6 +860,35 @@ __all__ = [
     "W31_BRANCH_ONLINE_DISABLED",
     "W31_BRANCH_ONLINE_NO_TRIGGER",
     "W31_ALL_BRANCHES",
+    # SDK v3.33 — W32 family (long-window convergent online geometry-
+    # aware dense control + EWMA + Page CUSUM + gold-correlated
+    # routing + manifest-v2 CID).  EXPERIMENTAL — see
+    # __experimental__ tuple.
+    "GoldCorrelationMap", "build_gold_correlation_map",
+    "ConvergenceStateEntry",
+    "LongWindowConvergentRatificationEnvelope",
+    "LongWindowConvergentRegistry",
+    "W32LongWindowResult",
+    "LongWindowConvergentOrchestrator",
+    "verify_long_window_convergent_ratification",
+    "update_ewma_prior", "update_cusum_two_sided", "detect_change_point",
+    "build_trivial_long_window_registry",
+    "build_long_window_convergent_registry",
+    "W32_LONG_WINDOW_SCHEMA_VERSION",
+    "W32_DEFAULT_EWMA_ALPHA",
+    "W32_DEFAULT_CUSUM_THRESHOLD",
+    "W32_DEFAULT_CUSUM_K",
+    "W32_DEFAULT_CUSUM_MAX",
+    "W32_DEFAULT_LONG_WINDOW",
+    "W32_DEFAULT_GOLD_CORRELATION_MIN",
+    "W32_BRANCH_LONG_WINDOW_RESOLVED",
+    "W32_BRANCH_TRIVIAL_LONG_WINDOW_PASSTHROUGH",
+    "W32_BRANCH_LONG_WINDOW_REJECTED",
+    "W32_BRANCH_LONG_WINDOW_DISABLED",
+    "W32_BRANCH_LONG_WINDOW_NO_TRIGGER",
+    "W32_BRANCH_GOLD_CORRELATED_REROUTED",
+    "W32_BRANCH_CHANGE_POINT_RESET",
+    "W32_ALL_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

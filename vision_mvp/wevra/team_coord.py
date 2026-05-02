@@ -19957,3 +19957,1511 @@ def build_online_calibrated_registry(
         threshold_max=float(threshold_max),
         local_host_id=local_host_id,
     )
+
+
+# ===========================================================================
+# W32 family — long-window convergent online geometry-aware dense control +
+# EWMA prior accumulator + Page CUSUM change-point detector + gold-
+# correlated disagreement-routing + W32 manifest-v2 CID
+# (SDK v3.33)
+# ===========================================================================
+#
+# W32 wraps the W31 ``OnlineCalibratedOrchestrator`` with four NEW
+# audited proxies at the capsule layer:
+#
+#   1. **EWMA prior accumulator**.  After each ratified cell, the W32
+#      layer updates a per-partition EWMA prior via the closed-form
+#      ``ewma_new = (1 - alpha) * ewma_prev + alpha * obs`` over the
+#      same deterministic per-cell agreement signal W31 uses.
+#      Crucially, the EWMA *forgets* old observations exponentially —
+#      so at long ``long_window`` (e.g. 64, 128) the W32 prior can
+#      *re-converge* after a regime shift, which W31's cumulative
+#      running-mean cannot do (cumulative mean is anchored to the
+#      stationary prior of the long history).  This is the load-
+#      bearing mechanism for the **W31-C-LONG-WINDOW-CONVERGENCE**
+#      discharge.
+#   2. **Page two-sided CUSUM change-point detector**.  After each
+#      cell, the W32 layer updates two CUSUM accumulators (positive
+#      drift detector + negative drift detector) over the residual
+#      ``obs - target`` (target = registered partition trust prior).
+#      When ``cusum_pos`` OR ``cusum_neg`` crosses a registered
+#      threshold, a **change point** is declared and the EWMA + CUSUM
+#      state is *re-initialised* to the latest observation.  This
+#      makes the W32 layer responsive to abrupt regime shifts, which
+#      a pure EWMA at long window is too slow to track.
+#   3. **Gold-correlation disagreement-routing**.  When the inner
+#      W31's cross-host disagreement-route fires AND the registered
+#      ``GoldCorrelationMap`` indicates a high gold-correlation score
+#      for one specific partition, W32 re-targets the W31 reroute to
+#      that partition.  The ``GoldCorrelationMap`` is a *registered
+#      closed-vocabulary table* — the W32 layer does NOT observe
+#      ground truth at runtime; the map is a *structural witness* the
+#      controller registers up-front (e.g. "on this regime, the
+#      LINEAR partition's oracle is the most reliable on disagreed
+#      cells").  If the registered map is wrong, the
+#      W32-Λ-mis-correlated-gold falsifier fires and W32 regresses
+#      vs W31.
+#   4. **Sealed convergence state + W32 manifest-v2 CID**.  The W32
+#      envelope carries:
+#        * ``convergence_state_cid``  — SHA-256 over canonical bytes
+#          of the per-cell sequence
+#          ``(cell_idx, partition_id, ewma_prior_after, cusum_pos,
+#            cusum_neg, change_point_fired)``;
+#        * ``gold_correlation_cid``   — SHA-256 over the registered
+#          gold-correlation map's canonical bytes;
+#        * ``manifest_v2_cid``        — SHA-256 over
+#          ``(w31_online_cid, convergence_state_cid,
+#            gold_correlation_cid, route_audit_cid_v2)`` — a single
+#          hash that detects cross-component swaps not detected by
+#          the W31 manifest CID alone (the W31 manifest does NOT
+#          include convergence state or gold-correlation; it is
+#          structurally invariant to those swaps).
+#
+# Honest scope (the load-bearing soundness statement)
+# ---------------------------------------------------
+#
+# * W32 does NOT touch transformer KV caches, hidden states, attention
+#   weights, embedding tables, or any model-internal state.  The
+#   "EWMA prior accumulator" is one line of arithmetic per cell; the
+#   "Page CUSUM" is two lines of arithmetic per cell; the "gold-
+#   correlation routing" is a deterministic lookup against a
+#   *registered* closed-vocabulary map; the "manifest-v2 CID" is
+#   SHA-256 over the concatenation of component CIDs.  Every payload
+#   is content-addressed; every mutation is detected.
+# * The "EWMA online learning" is NOT a learned model in the deep-
+#   learning sense.  The smoothing factor ``alpha`` is a registered
+#   constant; zero parameters, zero gradients, zero training step.
+# * The "CUSUM change-point detector" is one closed-form expression
+#   per cell; not a hyperparameter search.
+# * The "gold-correlation map" is a *registered* closed-vocabulary
+#   table; the W32 layer does NOT observe ground truth at runtime.
+#   The map's correctness is a *structural witness*; if the map is
+#   wrong, W32-Λ-mis-correlated-gold fires and W32 regresses.
+# * The "convergence state" is a sealed tuple of bytes; it does NOT
+#   prove temporal order at the model layer; it does prove the
+#   controller's bus saw exactly that sequence of EWMA + CUSUM
+#   updates.  Every entry must satisfy ``ewma_prior_after ∈ [0, 1]``
+#   AND ``cusum_pos, cusum_neg ∈ [0, cusum_max]``.
+# * W32 does NOT claim "we solved context."
+#
+# Wire-token economics
+# --------------------
+#
+# When the registered registry has any of:
+#   * ``long_window_enabled == True``, OR
+#   * ``change_point_enabled == True``, OR
+#   * ``gold_correlation_enabled == True``, OR
+#   * ``manifest_v2_disabled == False``, OR
+#   * ``long_window > 0``
+# AND the inner W31 ratified, W32 charges **1 visible token** per
+# triggered cell (``<w32_ref:DDDD>``) — the entire convergence_state
+# + gold_correlation + manifest-v2 metadata rides on that single
+# content-addressed reference.  When every component is trivial,
+# wire_required is False and W32 reduces to W31 **byte-for-byte** (the
+# W32-Λ-trivial-long-window falsifier; see H2 in
+# ``docs/SUCCESS_CRITERION_W32_LONG_WINDOW_CONVERGENT.md``).
+#
+# Trust boundary: 14 enumerated failure modes (disjoint from W22..W31)
+# -------------------------------------------------------------------
+#
+# :func:`verify_long_window_convergent_ratification` rejects:
+#
+#   * ``empty_w32_envelope``                       — None envelope passed.
+#   * ``w32_schema_version_unknown``               — schema_version mismatch.
+#   * ``w32_schema_cid_mismatch``                  — schema_cid != registered.
+#   * ``w31_parent_cid_mismatch``                  — env.w31_online_cid !=
+#     registered.
+#   * ``convergence_state_cid_mismatch``           — recomputed
+#     convergence_state_cid does not match, OR registered_convergence_
+#     state_cid mismatch (cross-cell swap detection).
+#   * ``convergence_state_length_mismatch``        — len(states) >
+#     registered ``long_window`` cap; OR non-monotone cell indices.
+#   * ``convergence_state_unregistered_partition`` — at least one
+#     partition_id not registered.
+#   * ``convergence_state_ewma_out_of_range``      — at least one
+#     ewma_prior_after < 0 OR > 1 OR NaN/Inf.
+#   * ``convergence_state_cusum_out_of_range``     — at least one
+#     cusum_pos OR cusum_neg < 0 OR > registered cusum_max OR NaN/Inf.
+#   * ``ewma_alpha_out_of_range``                  — env.ewma_alpha < 0
+#     OR > 1 OR NaN/Inf.
+#   * ``cusum_threshold_out_of_range``             — env.cusum_threshold
+#     < 0 OR > registered cusum_max OR NaN/Inf.
+#   * ``gold_correlation_cid_mismatch``            — recomputed gold_
+#     correlation_cid does not match.
+#   * ``manifest_v2_cid_mismatch``                 — recomputed manifest_v2
+#     does not match.
+#   * ``w32_outer_cid_mismatch``                   — recomputed w32_cid
+#     does not match.
+#
+# Every failure mode is mechanically asserted by a unit test in
+# ``test_phase79_long_window_convergent.py``.
+
+W32_LONG_WINDOW_SCHEMA_VERSION: str = (
+    "wevra.long_window_convergent_ratification.v1")
+
+# W32 decoder branches.
+W32_BRANCH_LONG_WINDOW_RESOLVED = "long_window_resolved"
+W32_BRANCH_TRIVIAL_LONG_WINDOW_PASSTHROUGH = (
+    "trivial_long_window_passthrough")
+W32_BRANCH_LONG_WINDOW_REJECTED = "long_window_rejected"
+W32_BRANCH_LONG_WINDOW_DISABLED = "long_window_disabled"
+W32_BRANCH_LONG_WINDOW_NO_TRIGGER = "long_window_no_trigger"
+W32_BRANCH_GOLD_CORRELATED_REROUTED = "gold_correlated_rerouted"
+W32_BRANCH_CHANGE_POINT_RESET = "change_point_reset"
+
+W32_ALL_BRANCHES: tuple[str, ...] = (
+    W32_BRANCH_LONG_WINDOW_RESOLVED,
+    W32_BRANCH_TRIVIAL_LONG_WINDOW_PASSTHROUGH,
+    W32_BRANCH_LONG_WINDOW_REJECTED,
+    W32_BRANCH_LONG_WINDOW_DISABLED,
+    W32_BRANCH_LONG_WINDOW_NO_TRIGGER,
+    W32_BRANCH_GOLD_CORRELATED_REROUTED,
+    W32_BRANCH_CHANGE_POINT_RESET,
+)
+
+W32_DEFAULT_EWMA_ALPHA: float = 0.20
+W32_DEFAULT_CUSUM_THRESHOLD: float = 1.5
+W32_DEFAULT_CUSUM_K: float = 0.10
+W32_DEFAULT_CUSUM_MAX: float = 16.0
+W32_DEFAULT_LONG_WINDOW: int = 64
+W32_DEFAULT_GOLD_CORRELATION_MIN: float = 0.50
+
+
+# ---------------------------------------------------------------------------
+# W32 helper: closed-form EWMA update
+# ---------------------------------------------------------------------------
+
+
+def update_ewma_prior(
+        *,
+        prev_ewma: float,
+        observation: float,
+        alpha: float,
+) -> float:
+    """Closed-form exponentially-weighted moving average update.
+
+    ``ewma_new = (1 - alpha) * ewma_prev + alpha * observation``
+
+    Bounded to [0, 1] when both prev_ewma and observation are in
+    [0, 1] AND alpha ∈ [0, 1] — by linearity of the convex
+    combination.  Closed-form, deterministic, audit-friendly.
+    """
+    a = float(alpha)
+    if a < 0.0:
+        a = 0.0
+    if a > 1.0:
+        a = 1.0
+    p = float(prev_ewma)
+    o = float(observation)
+    return float((1.0 - a) * p + a * o)
+
+
+# ---------------------------------------------------------------------------
+# W32 helper: closed-form Page two-sided CUSUM update
+# ---------------------------------------------------------------------------
+
+
+def update_cusum_two_sided(
+        *,
+        cusum_pos_prev: float,
+        cusum_neg_prev: float,
+        observation: float,
+        target: float,
+        slack_k: float,
+        cusum_max: float,
+) -> tuple[float, float]:
+    """Page two-sided CUSUM update.
+
+    Tracks BOTH a positive drift accumulator (detects upward drift in
+    observation vs target) AND a negative drift accumulator (detects
+    downward drift).  Each accumulator is non-negative and bounded by
+    cusum_max.  Closed-form, deterministic, audit-friendly.
+
+    Returns ``(cusum_pos, cusum_neg)``.
+    """
+    o = float(observation)
+    t = float(target)
+    k = float(slack_k)
+    cmax = float(cusum_max)
+    cp_prev = max(0.0, float(cusum_pos_prev))
+    cn_prev = max(0.0, float(cusum_neg_prev))
+    cp = max(0.0, cp_prev + (o - t) - k)
+    cn = max(0.0, cn_prev - (o - t) - k)
+    if cp > cmax:
+        cp = cmax
+    if cn > cmax:
+        cn = cmax
+    return float(cp), float(cn)
+
+
+def detect_change_point(
+        *,
+        cusum_pos: float,
+        cusum_neg: float,
+        threshold: float,
+) -> bool:
+    """True iff either CUSUM accumulator has crossed the threshold."""
+    return (float(cusum_pos) > float(threshold)
+            or float(cusum_neg) > float(threshold))
+
+
+# ---------------------------------------------------------------------------
+# W32 helper: gold-correlation map (registered closed-vocab table)
+# ---------------------------------------------------------------------------
+
+
+def _compute_gold_correlation_cid(
+        *,
+        partition_to_score: Sequence[tuple[int, float]],
+        gold_correlation_min: float,
+) -> str:
+    """SHA-256 over canonical bytes of the gold-correlation map +
+    threshold."""
+    payload = _canonical_json_bytes({
+        "partition_to_score": [
+            [int(pid), round(float(s), 4)]
+            for pid, s in sorted(partition_to_score, key=lambda x: int(x[0]))
+        ],
+        "gold_correlation_min": round(float(gold_correlation_min), 4),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+@dataclasses.dataclass(frozen=True)
+class GoldCorrelationMap:
+    """Registered closed-vocabulary partition → gold-correlation map.
+
+    Each entry is a tuple ``(partition_id, gold_correlation_score)``
+    where ``score ∈ [0, 1]``.  The W32 gold-correlation route fires
+    on cells where the inner W31 cross-host disagreement-route is
+    active AND there is exactly one partition with score >=
+    ``gold_correlation_min``.
+
+    The map is a *structural witness*: the W32 layer does NOT observe
+    ground truth at runtime; the map is registered up-front by the
+    controller (e.g. "on this regime, the LINEAR partition's oracle
+    has gold-correlation 0.85; CYCLIC has 0.20").  If the map is
+    wrong, the W32-Λ-mis-correlated-gold falsifier fires and W32
+    regresses vs W31.
+    """
+    partition_to_score: tuple[tuple[int, float], ...]
+    gold_correlation_min: float
+    gold_correlation_cid: str
+
+    def __post_init__(self) -> None:
+        for pid, sc in self.partition_to_score:
+            assert isinstance(pid, int), \
+                f"partition_id must be int, got {type(pid)}"
+            sc = float(sc)
+            assert 0.0 <= sc <= 1.0, \
+                f"gold_correlation_score must be in [0, 1], got {sc}"
+        gcm = float(self.gold_correlation_min)
+        assert 0.0 <= gcm <= 1.0, \
+            f"gold_correlation_min must be in [0, 1], got {gcm}"
+
+    def best_partition(self) -> tuple[int, float] | None:
+        """Returns the (partition_id, score) with the highest score
+        if it strictly clears ``gold_correlation_min``, else None.
+
+        Ties at top are resolved as None — there must be a unique
+        winner above threshold for the gold route to fire.
+        """
+        if not self.partition_to_score:
+            return None
+        sorted_ps = sorted(self.partition_to_score,
+                            key=lambda x: float(x[1]),
+                            reverse=True)
+        top_pid, top_score = sorted_ps[0]
+        if float(top_score) < float(self.gold_correlation_min):
+            return None
+        if (len(sorted_ps) > 1
+                and abs(float(sorted_ps[1][1]) - float(top_score)) < 1e-9):
+            return None  # tie at top → no unique winner
+        return int(top_pid), float(top_score)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "partition_to_score": [
+                [int(p), round(float(s), 4)]
+                for p, s in self.partition_to_score
+            ],
+            "gold_correlation_min": round(
+                float(self.gold_correlation_min), 4),
+            "gold_correlation_cid": self.gold_correlation_cid,
+        }
+
+
+def build_gold_correlation_map(
+        *,
+        partition_to_score: Sequence[tuple[int, float]],
+        gold_correlation_min: float = W32_DEFAULT_GOLD_CORRELATION_MIN,
+) -> GoldCorrelationMap:
+    """Construct a content-addressed :class:`GoldCorrelationMap`."""
+    canonical = tuple(
+        (int(pid), float(s))
+        for pid, s in sorted(partition_to_score, key=lambda x: int(x[0]))
+    )
+    cid = _compute_gold_correlation_cid(
+        partition_to_score=canonical,
+        gold_correlation_min=float(gold_correlation_min))
+    return GoldCorrelationMap(
+        partition_to_score=canonical,
+        gold_correlation_min=float(gold_correlation_min),
+        gold_correlation_cid=cid,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Convergence state entry (sealed, content-addressed)
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class ConvergenceStateEntry:
+    """One entry in the W32 convergence-state trajectory.
+
+    Carries the per-cell tuple
+    ``(cell_idx, partition_id, ewma_prior_after, cusum_pos, cusum_neg,
+       change_point_fired)`` that records a single EWMA + CUSUM
+    update.
+    """
+    cell_idx: int
+    partition_id: int
+    ewma_prior_after: float
+    cusum_pos: float
+    cusum_neg: float
+    change_point_fired: bool
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "cell_idx": int(self.cell_idx),
+            "partition_id": int(self.partition_id),
+            "ewma_prior_after": round(float(self.ewma_prior_after), 4),
+            "cusum_pos": round(float(self.cusum_pos), 4),
+            "cusum_neg": round(float(self.cusum_neg), 4),
+            "change_point_fired": bool(self.change_point_fired),
+        }
+
+
+def _compute_convergence_state_cid(
+        *,
+        states: Sequence[ConvergenceStateEntry],
+) -> str:
+    """Canonical SHA-256 over the convergence-state trajectory."""
+    payload = _canonical_json_bytes({
+        "states": [s.as_dict() for s in states],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# W32 manifest-v2 CID
+# ---------------------------------------------------------------------------
+
+
+def _compute_w32_manifest_v2_cid(
+        *,
+        w31_online_cid: str,
+        convergence_state_cid: str,
+        gold_correlation_cid: str,
+        route_audit_cid_v2: str,
+) -> str:
+    """SHA-256 over the canonical concatenation of W32 component CIDs.
+
+    The manifest-v2 CID is the load-bearing W32 cross-component
+    tamper-detection signal: any swap of one component CID from a
+    different envelope (with each component still internally
+    consistent AND the W31 manifest CID still self-consistent) is
+    detected because the W32 manifest-v2 CID is a SHA-256 over the
+    *outer* component CIDs, not the W31 manifest's *inner* set.
+    """
+    payload = _canonical_json_bytes({
+        "w31_online_cid": str(w31_online_cid),
+        "convergence_state_cid": str(convergence_state_cid),
+        "gold_correlation_cid": str(gold_correlation_cid),
+        "route_audit_cid_v2": str(route_audit_cid_v2),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w32_outer_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        w31_online_cid: str,
+        convergence_state_cid: str,
+        gold_correlation_cid: str,
+        manifest_v2_cid: str,
+        cell_index: int,
+) -> str:
+    """SHA-256 over the canonical W32 envelope payload."""
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "w31_online_cid": str(w31_online_cid),
+        "convergence_state_cid": str(convergence_state_cid),
+        "gold_correlation_cid": str(gold_correlation_cid),
+        "manifest_v2_cid": str(manifest_v2_cid),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# Long-window convergent ratification envelope
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class LongWindowConvergentRatificationEnvelope:
+    """Content-addressed long-window convergent ratification of one
+    W31 decision (W32 family).
+
+    Carries:
+
+      * ``w31_online_cid``            — parent W31 envelope's CID.
+      * ``convergence_states``        — tuple of
+                                          :class:`ConvergenceStateEntry`
+                                          (length ≤ long_window).
+      * ``convergence_state_cid``     — SHA-256 over canonical bytes.
+      * ``ewma_alpha``                — registered constant (default 0.20).
+      * ``cusum_threshold``           — registered constant (default 1.5).
+      * ``cusum_k``                   — registered constant (default 0.10).
+      * ``gold_correlation_cid``      — SHA-256 over the gold map.
+      * ``gold_route_target_partition_id`` — partition the gold route
+                                          targets (-1 if no route).
+      * ``gold_route_active``         — True iff the gold-correlation
+                                          route fired this cell.
+      * ``change_point_active``       — True iff a change-point reset
+                                          fired this cell.
+      * ``route_audit_cid_v2``        — closed-form summary of W32
+                                          routing decisions (gold +
+                                          change-point).
+      * ``manifest_v2_cid``           — SHA-256 over (w31_online_cid,
+                                          convergence_state_cid,
+                                          gold_correlation_cid,
+                                          route_audit_cid_v2).
+      * ``cell_index``                — audit replay index.
+      * ``wire_required``             — 1 visible token cost on
+                                          producer side iff True.
+      * ``w32_cid``                   — SHA-256 over canonical bytes.
+
+    Wire-token cost
+    ---------------
+
+    The W32 layer charges 1 visible token on the producer side
+    (``<w32_ref:DDDD>``) iff ``wire_required`` is True (i.e. the
+    long-window registry is non-trivial).  When every component is
+    trivial, wire_required is False and W32 reduces to W31
+    byte-for-byte (W32-Λ-trivial-long-window; H2 anchor).
+    """
+    schema_version: str
+    schema_cid: str
+    w31_online_cid: str
+    convergence_states: tuple[ConvergenceStateEntry, ...]
+    convergence_state_cid: str
+    ewma_alpha: float
+    cusum_threshold: float
+    cusum_k: float
+    gold_correlation_cid: str
+    gold_route_target_partition_id: int
+    gold_route_active: bool
+    change_point_active: bool
+    route_audit_cid_v2: str
+    manifest_v2_cid: str
+    cell_index: int
+    wire_required: bool = False
+    w32_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.w32_cid:
+            object.__setattr__(self, "w32_cid", self.recompute_w32_cid())
+
+    def recompute_w32_cid(self) -> str:
+        return _compute_w32_outer_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            w31_online_cid=self.w31_online_cid,
+            convergence_state_cid=self.convergence_state_cid,
+            gold_correlation_cid=self.gold_correlation_cid,
+            manifest_v2_cid=self.manifest_v2_cid,
+            cell_index=int(self.cell_index),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "w31_online_cid": self.w31_online_cid,
+            "convergence_states": [s.as_dict()
+                                    for s in self.convergence_states],
+            "convergence_state_cid": self.convergence_state_cid,
+            "ewma_alpha": round(float(self.ewma_alpha), 4),
+            "cusum_threshold": round(float(self.cusum_threshold), 4),
+            "cusum_k": round(float(self.cusum_k), 4),
+            "gold_correlation_cid": self.gold_correlation_cid,
+            "gold_route_target_partition_id": int(
+                self.gold_route_target_partition_id),
+            "gold_route_active": bool(self.gold_route_active),
+            "change_point_active": bool(self.change_point_active),
+            "route_audit_cid_v2": self.route_audit_cid_v2,
+            "manifest_v2_cid": self.manifest_v2_cid,
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<w32_ref:{self.w32_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_structured_bits(self) -> int:
+        return int(8 * self.n_envelope_bytes)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "w31_online_cid": self.w31_online_cid,
+            "convergence_states": [s.as_dict()
+                                    for s in self.convergence_states],
+            "convergence_state_cid": self.convergence_state_cid,
+            "ewma_alpha": round(float(self.ewma_alpha), 4),
+            "cusum_threshold": round(float(self.cusum_threshold), 4),
+            "cusum_k": round(float(self.cusum_k), 4),
+            "gold_correlation_cid": self.gold_correlation_cid,
+            "gold_route_target_partition_id": int(
+                self.gold_route_target_partition_id),
+            "gold_route_active": bool(self.gold_route_active),
+            "change_point_active": bool(self.change_point_active),
+            "route_audit_cid_v2": self.route_audit_cid_v2,
+            "manifest_v2_cid": self.manifest_v2_cid,
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "w32_cid": self.w32_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_long_window_convergent_ratification(
+        env: LongWindowConvergentRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_w31_online_cid: str,
+        registered_partition_ids: frozenset[int],
+        registered_long_window: int,
+        registered_cusum_max: float,
+        registered_gold_correlation_cid: str,
+        registered_convergence_state_cid: str | None = None,
+) -> LatentVerificationOutcome:
+    """Pure-function controller-side verification of a
+    :class:`LongWindowConvergentRatificationEnvelope` (W32 family).
+
+    14 enumerated failure modes (see module docstring for details).
+    Pure function (no side effects); soundness by inspection.
+    """
+    n_checks = 0
+
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_w32_envelope", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_version != W32_LONG_WINDOW_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="w32_schema_version_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w32_schema_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.w31_online_cid != registered_w31_online_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w31_parent_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- EWMA alpha range ----
+    a = float(env.ewma_alpha)
+    if math.isnan(a) or math.isinf(a) or a < 0.0 or a > 1.0:
+        return LatentVerificationOutcome(
+            ok=False, reason="ewma_alpha_out_of_range",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- CUSUM threshold range ----
+    ct = float(env.cusum_threshold)
+    cmax = float(registered_cusum_max)
+    if math.isnan(ct) or math.isinf(ct) or ct < 0.0 or ct > cmax:
+        return LatentVerificationOutcome(
+            ok=False, reason="cusum_threshold_out_of_range",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Convergence state checks ----
+    window = int(registered_long_window)
+    states = env.convergence_states
+    if len(states) > window:
+        return LatentVerificationOutcome(
+            ok=False, reason="convergence_state_length_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    last_cell_idx = -1
+    for entry in states:
+        if int(entry.cell_idx) <= last_cell_idx:
+            return LatentVerificationOutcome(
+                ok=False, reason="convergence_state_length_mismatch",
+                n_checks=n_checks)
+        last_cell_idx = int(entry.cell_idx)
+        if int(entry.partition_id) not in registered_partition_ids:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="convergence_state_unregistered_partition",
+                n_checks=n_checks)
+        ew = float(entry.ewma_prior_after)
+        if math.isnan(ew) or math.isinf(ew) or ew < 0.0 or ew > 1.0:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="convergence_state_ewma_out_of_range",
+                n_checks=n_checks)
+        cp = float(entry.cusum_pos)
+        cn = float(entry.cusum_neg)
+        if (math.isnan(cp) or math.isinf(cp) or cp < 0.0 or cp > cmax
+                or math.isnan(cn) or math.isinf(cn)
+                or cn < 0.0 or cn > cmax):
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="convergence_state_cusum_out_of_range",
+                n_checks=n_checks)
+    n_checks += 1
+    # Recompute convergence state CID.
+    if (_compute_convergence_state_cid(states=states)
+            != env.convergence_state_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="convergence_state_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    # Cross-check: registered expected convergence state CID.
+    if (registered_convergence_state_cid is not None
+            and env.convergence_state_cid
+            != registered_convergence_state_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="convergence_state_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Gold correlation CID check ----
+    if env.gold_correlation_cid != registered_gold_correlation_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="gold_correlation_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Manifest-v2 CID check ----
+    expected_manifest_v2 = _compute_w32_manifest_v2_cid(
+        w31_online_cid=env.w31_online_cid,
+        convergence_state_cid=env.convergence_state_cid,
+        gold_correlation_cid=env.gold_correlation_cid,
+        route_audit_cid_v2=env.route_audit_cid_v2,
+    )
+    if expected_manifest_v2 != env.manifest_v2_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="manifest_v2_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    # ---- Outer w32_cid check ----
+    if env.recompute_w32_cid() != env.w32_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w32_outer_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+# ---------------------------------------------------------------------------
+# Long-window convergent registry
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class LongWindowConvergentRegistry:
+    """Controller-side registry for the W32 long-window convergent
+    layer.
+
+    Wraps a :class:`OnlineCalibratedRegistry` (the inner W31 registry)
+    and adds:
+
+      * ``long_window_enabled``     — when True, the EWMA accumulator
+                                        fires on each ratified cell.
+      * ``change_point_enabled``    — when True, the CUSUM detector
+                                        fires; a change-point reset
+                                        re-initialises EWMA + CUSUM.
+      * ``gold_correlation_enabled`` — when True, on cells where the
+                                        inner W31 disagreement-route
+                                        is active, the W32 layer
+                                        re-targets to the registered
+                                        gold-correlation map's best
+                                        partition (if unique above
+                                        threshold).
+      * ``manifest_v2_disabled``    — when True (and all other knobs
+                                        trivial), the W32 layer
+                                        reduces to W31 byte-for-byte
+                                        (the trivial path).
+      * ``long_window``             — max number of convergence-state
+                                        entries to carry in the W32
+                                        envelope (the verifier rejects
+                                        longer histories).
+      * ``ewma_alpha``,
+        ``cusum_threshold``,
+        ``cusum_k``,
+        ``cusum_max``               — registered constants for the
+                                        EWMA + CUSUM math.
+      * ``gold_correlation_map``    — registered :class:`GoldCorrelationMap`
+                                        (None ⇒ no gold route).
+    """
+    schema: SchemaCapsule | None = None
+    inner: OnlineCalibratedRegistry | None = None
+    long_window_enabled: bool = False
+    change_point_enabled: bool = False
+    gold_correlation_enabled: bool = False
+    manifest_v2_disabled: bool = True
+    long_window: int = 0
+    ewma_alpha: float = W32_DEFAULT_EWMA_ALPHA
+    cusum_threshold: float = W32_DEFAULT_CUSUM_THRESHOLD
+    cusum_k: float = W32_DEFAULT_CUSUM_K
+    cusum_max: float = W32_DEFAULT_CUSUM_MAX
+    gold_correlation_map: GoldCorrelationMap | None = None
+    local_host_id: str = "localhost"
+
+    _envelopes: dict[str, LongWindowConvergentRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_w32_registered: int = 0
+    n_w32_rejected: int = 0
+    n_long_window_updates: int = 0
+    n_change_points_fired: int = 0
+    n_gold_routes_fired: int = 0
+
+    @property
+    def is_trivial(self) -> bool:
+        return (not bool(self.long_window_enabled)
+                and not bool(self.change_point_enabled)
+                and not bool(self.gold_correlation_enabled)
+                and bool(self.manifest_v2_disabled)
+                and int(self.long_window) == 0)
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        return not self.is_trivial
+
+    @property
+    def gold_correlation_cid(self) -> str:
+        if self.gold_correlation_map is None:
+            return _compute_gold_correlation_cid(
+                partition_to_score=(),
+                gold_correlation_min=W32_DEFAULT_GOLD_CORRELATION_MIN)
+        return self.gold_correlation_map.gold_correlation_cid
+
+    def register_envelope(
+            self,
+            envelope: LongWindowConvergentRatificationEnvelope,
+            *,
+            registered_partition_ids: frozenset[int],
+            registered_w31_online_cid: str,
+            registered_convergence_state_cid: str | None = None,
+    ) -> LatentVerificationOutcome:
+        """Verify the envelope and (if OK) record it.  Pure verifier;
+        idempotent on byte-identical envelopes.
+        """
+        if self.schema is None:
+            outcome = LatentVerificationOutcome(
+                ok=False, reason="schema_unregistered", n_checks=0)
+            self.n_w32_rejected += 1
+            return outcome
+        outcome = verify_long_window_convergent_ratification(
+            envelope,
+            registered_schema=self.schema,
+            registered_w31_online_cid=str(registered_w31_online_cid),
+            registered_partition_ids=frozenset(registered_partition_ids),
+            registered_long_window=int(self.long_window),
+            registered_cusum_max=float(self.cusum_max),
+            registered_gold_correlation_cid=str(self.gold_correlation_cid),
+            registered_convergence_state_cid=registered_convergence_state_cid,
+        )
+        if not outcome.ok:
+            self.n_w32_rejected += 1
+            return outcome
+        self._envelopes[envelope.w32_cid] = envelope
+        self.n_w32_registered += 1
+        return outcome
+
+
+# ---------------------------------------------------------------------------
+# W32 result
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass(frozen=True)
+class W32LongWindowResult:
+    """Per-cell audit record for the W32 long-window convergent
+    layer."""
+    answer: dict[str, Any]
+    inner_w31_branch: str
+    decoder_branch: str
+    agent_id: str
+    is_producer: bool
+    w31_online_cid: str
+    cell_index: int
+    long_window_update_fired: bool
+    change_point_fired: bool
+    gold_route_active: bool
+    gold_route_target_partition_id: int
+    effective_partition_id: int
+    ewma_prior_after: float
+    cusum_pos_after: float
+    cusum_neg_after: float
+    n_w31_visible_tokens: int
+    n_w32_visible_tokens: int
+    n_w32_overhead_tokens: int
+    w32_cid: str
+    manifest_v2_cid: str
+    convergence_state_cid: str
+    gold_correlation_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w32: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "inner_w31_branch": self.inner_w31_branch,
+            "decoder_branch": self.decoder_branch,
+            "agent_id": self.agent_id,
+            "is_producer": bool(self.is_producer),
+            "w31_online_cid": self.w31_online_cid,
+            "cell_index": int(self.cell_index),
+            "long_window_update_fired": bool(self.long_window_update_fired),
+            "change_point_fired": bool(self.change_point_fired),
+            "gold_route_active": bool(self.gold_route_active),
+            "gold_route_target_partition_id": int(
+                self.gold_route_target_partition_id),
+            "effective_partition_id": int(self.effective_partition_id),
+            "ewma_prior_after": round(float(self.ewma_prior_after), 4),
+            "cusum_pos_after": round(float(self.cusum_pos_after), 4),
+            "cusum_neg_after": round(float(self.cusum_neg_after), 4),
+            "n_w31_visible_tokens": int(self.n_w31_visible_tokens),
+            "n_w32_visible_tokens": int(self.n_w32_visible_tokens),
+            "n_w32_overhead_tokens": int(self.n_w32_overhead_tokens),
+            "w32_cid": self.w32_cid,
+            "manifest_v2_cid": self.manifest_v2_cid,
+            "convergence_state_cid": self.convergence_state_cid,
+            "gold_correlation_cid": self.gold_correlation_cid,
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": self.verification_reason,
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w32": float(self.cram_factor_w32),
+        }
+
+
+# ---------------------------------------------------------------------------
+# Long-window convergent orchestrator
+# ---------------------------------------------------------------------------
+
+
+@dataclasses.dataclass
+class LongWindowConvergentOrchestrator:
+    """Long-window convergent online geometry-aware dense-control
+    orchestrator (W32).
+
+    Wraps a :class:`OnlineCalibratedOrchestrator` (W31) and adds:
+
+      * EWMA prior accumulator on each ratified cell;
+      * Page two-sided CUSUM change-point detector;
+      * gold-correlated disagreement-routing;
+      * sealed convergence-state trajectory in the W32 envelope;
+      * W32 manifest-v2 CID over the component CIDs.
+
+    Per-cell flow:
+
+      1. Run inner W31.
+      2. Read inner W31 result + envelope.
+      3. Derive per-cell agreement signal (already in W31 result).
+      4. If long_window_enabled, EWMA-update the per-partition prior.
+      5. If change_point_enabled, CUSUM-update + detect change point.
+         If a change point is detected, RESET the EWMA + CUSUM state
+         to the latest observation (re-initialise the accumulators).
+      6. If gold_correlation_enabled AND inner W31 disagreement-route
+         is active AND the gold-correlation map has a unique winner
+         above threshold, target the W32 reroute to that partition.
+      7. Append a :class:`ConvergenceStateEntry` to the running state
+         (truncated to long_window).
+      8. Build the W32 envelope.
+      9. Verify + register.
+     10. Charge 1 wire token iff registry.has_wire_required_layer.
+    """
+    inner: OnlineCalibratedOrchestrator
+    registry: LongWindowConvergentRegistry
+    enabled: bool = True
+    require_w32_verification: bool = True
+
+    _last_result: "W32LongWindowResult | None" = None
+    _last_envelope: "LongWindowConvergentRatificationEnvelope | None" = None
+    _convergence_states: list[ConvergenceStateEntry] = dataclasses.field(
+        default_factory=list)
+    # Per-partition EWMA + CUSUM state (running, not capped).
+    _ewma_state: dict[int, float] = dataclasses.field(default_factory=dict)
+    _cusum_pos_state: dict[int, float] = dataclasses.field(
+        default_factory=dict)
+    _cusum_neg_state: dict[int, float] = dataclasses.field(
+        default_factory=dict)
+    _cell_index: int = 0
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.inner.schema
+
+    @property
+    def agent_id(self) -> str:
+        return self.inner.agent_id
+
+    @property
+    def is_producer(self) -> bool:
+        return self.inner.is_producer
+
+    @property
+    def producer_agent_id(self) -> str:
+        return self.inner.producer_agent_id
+
+    @property
+    def consumer_agent_ids(self) -> tuple[str, ...]:
+        return self.inner.consumer_agent_ids
+
+    def reset_session(self) -> None:
+        self.inner.reset_session()
+        self._last_result = None
+        self._last_envelope = None
+        self._convergence_states = []
+        self._ewma_state = {}
+        self._cusum_pos_state = {}
+        self._cusum_neg_state = {}
+        self._cell_index = 0
+
+    def _build_w32_envelope(
+            self,
+            *,
+            w31_online_cid: str,
+            gold_route_target_partition_id: int,
+            gold_route_active: bool,
+            change_point_active: bool,
+            wire_required: bool,
+    ) -> LongWindowConvergentRatificationEnvelope:
+        states = tuple(self._convergence_states)
+        conv_cid = _compute_convergence_state_cid(states=states)
+        gold_cid = self.registry.gold_correlation_cid
+        route_audit_payload_v2 = _canonical_json_bytes({
+            "gold_route_active": bool(gold_route_active),
+            "gold_route_target_partition_id":
+                int(gold_route_target_partition_id),
+            "change_point_active": bool(change_point_active),
+        })
+        route_audit_cid_v2 = hashlib.sha256(
+            route_audit_payload_v2).hexdigest()
+        manifest_v2_cid = _compute_w32_manifest_v2_cid(
+            w31_online_cid=str(w31_online_cid),
+            convergence_state_cid=conv_cid,
+            gold_correlation_cid=gold_cid,
+            route_audit_cid_v2=route_audit_cid_v2,
+        )
+        env = LongWindowConvergentRatificationEnvelope(
+            schema_version=W32_LONG_WINDOW_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            w31_online_cid=str(w31_online_cid),
+            convergence_states=states,
+            convergence_state_cid=conv_cid,
+            ewma_alpha=float(self.registry.ewma_alpha),
+            cusum_threshold=float(self.registry.cusum_threshold),
+            cusum_k=float(self.registry.cusum_k),
+            gold_correlation_cid=gold_cid,
+            gold_route_target_partition_id=int(
+                gold_route_target_partition_id),
+            gold_route_active=bool(gold_route_active),
+            change_point_active=bool(change_point_active),
+            route_audit_cid_v2=route_audit_cid_v2,
+            manifest_v2_cid=manifest_v2_cid,
+            cell_index=int(self._cell_index),
+            wire_required=bool(wire_required),
+        )
+        return env
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        # Disabled / no-schema paths.
+        if not self.enabled or self.schema is None:
+            out = self.inner.decode_rounds(per_round_handoffs)
+            n_w31_visible = int(out.get("online_calibrated", {}).get(
+                "n_w31_visible_tokens", 0))
+            return self._pack(
+                out=out,
+                decoder_branch=W32_BRANCH_LONG_WINDOW_DISABLED,
+                envelope=None, n_w32_visible=n_w31_visible,
+                w32_overhead=0, ratified=False,
+                verify_ok=False, verify_reason="disabled",
+                long_window_update_fired=False,
+                change_point_fired=False,
+                gold_route_active=False,
+                gold_route_target_partition_id=-1,
+                effective_partition_id=0,
+                ewma_prior_after=0.0,
+                cusum_pos_after=0.0, cusum_neg_after=0.0,
+                w31_online_cid="")
+
+        # 1. Run inner W31.
+        out = self.inner.decode_rounds(per_round_handoffs)
+        w31_result = self.inner.last_result
+        w31_envelope = self.inner.last_envelope
+        n_w31_visible = int(out.get("online_calibrated", {}).get(
+            "n_w31_visible_tokens", 0))
+        inner_w31_branch = (
+            str(w31_result.decoder_branch)
+            if w31_result is not None else "")
+
+        if w31_result is None:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W32_BRANCH_LONG_WINDOW_NO_TRIGGER,
+                envelope=None, n_w32_visible=n_w31_visible,
+                w32_overhead=0, ratified=False,
+                verify_ok=False, verify_reason="no_w31_result",
+                long_window_update_fired=False,
+                change_point_fired=False,
+                gold_route_active=False,
+                gold_route_target_partition_id=-1,
+                effective_partition_id=0,
+                ewma_prior_after=0.0,
+                cusum_pos_after=0.0, cusum_neg_after=0.0,
+                w31_online_cid="")
+
+        # 2. Read W31 envelope CIDs.
+        observed_agreement = float(w31_result.observed_agreement)
+        eff_pid = int(w31_result.effective_partition_id)
+
+        # 3-5. EWMA + CUSUM updates.
+        # Initialise per-partition state lazily on first observation;
+        # initial EWMA is the observation itself (so a single FULL-
+        # agreement cell reads as prior 1.0).
+        prev_ewma = float(self._ewma_state.get(eff_pid, observed_agreement))
+        prev_cusum_pos = float(self._cusum_pos_state.get(eff_pid, 0.0))
+        prev_cusum_neg = float(self._cusum_neg_state.get(eff_pid, 0.0))
+
+        change_point_fired = False
+        long_window_update_fired = False
+        new_ewma = float(prev_ewma)
+        new_cusum_pos = float(prev_cusum_pos)
+        new_cusum_neg = float(prev_cusum_neg)
+
+        # The EWMA fires on EVERY cell where the W31 inner ran (even
+        # cells where the inner W31 did not ratify and observed_agreement
+        # is therefore 0.0).  This is what makes the EWMA *re-converge*
+        # on regime shifts where the inner W31 starts failing on a
+        # partition: cumulative running mean stays anchored to the
+        # historical prior, but EWMA forgets exponentially.
+        if self.registry.long_window_enabled:
+            new_ewma = update_ewma_prior(
+                prev_ewma=prev_ewma,
+                observation=observed_agreement,
+                alpha=float(self.registry.ewma_alpha),
+            )
+            long_window_update_fired = True
+            self.registry.n_long_window_updates += 1
+
+        if self.registry.change_point_enabled:
+            new_cusum_pos, new_cusum_neg = update_cusum_two_sided(
+                cusum_pos_prev=prev_cusum_pos,
+                cusum_neg_prev=prev_cusum_neg,
+                observation=observed_agreement,
+                target=float(prev_ewma),
+                slack_k=float(self.registry.cusum_k),
+                cusum_max=float(self.registry.cusum_max),
+            )
+            if detect_change_point(
+                    cusum_pos=new_cusum_pos,
+                    cusum_neg=new_cusum_neg,
+                    threshold=float(self.registry.cusum_threshold)):
+                change_point_fired = True
+                # Reset EWMA + CUSUM accumulators to the latest
+                # observation so the prior tracks the new regime.
+                new_ewma = float(observed_agreement)
+                new_cusum_pos = 0.0
+                new_cusum_neg = 0.0
+                self.registry.n_change_points_fired += 1
+
+        # Persist updated EWMA + CUSUM state.
+        if (self.registry.long_window_enabled
+                or self.registry.change_point_enabled):
+            self._ewma_state[eff_pid] = float(new_ewma)
+            self._cusum_pos_state[eff_pid] = float(new_cusum_pos)
+            self._cusum_neg_state[eff_pid] = float(new_cusum_neg)
+
+        # 5b. Feed the W32 EWMA-derived prior back into the W30
+        # calibration vector so the *next* cell's W30 reroute decision
+        # uses the long-window convergent prior, not the W31
+        # cumulative running mean.  This is what makes W32 strictly
+        # different from W31 on the routing axis at long windows.
+        if (self.registry.long_window_enabled
+                and self.inner.inner is not None):
+            inner_w30_registry = self.inner.inner.registry
+            cv_now = inner_w30_registry.calibration_vector
+            if cv_now is not None:
+                # Build a fresh calibration vector that REPLACES the
+                # W31-running-mean-derived prior for eff_pid with the
+                # W32 EWMA-derived prior.
+                new_priors = list(cv_now.calibration_vector)
+                pids_now = list(cv_now.partition_ids)
+                for i, pid in enumerate(pids_now):
+                    if int(pid) == int(eff_pid):
+                        new_priors[i] = float(new_ewma)
+                # Recompute the adaptive threshold from the W32-
+                # adjusted vector.
+                if self.inner.registry.adaptive_threshold:
+                    new_thr = compute_adaptive_threshold(
+                        calibration_vector=tuple(new_priors),
+                        threshold_min=float(
+                            self.inner.registry.threshold_min),
+                        threshold_max=float(
+                            self.inner.registry.threshold_max),
+                    )
+                else:
+                    new_thr = float(cv_now.threshold)
+                rebuilt_cv = PartitionCalibrationVector(
+                    calibration_vector=tuple(new_priors),
+                    partition_ids=tuple(pids_now),
+                    threshold=float(new_thr),
+                )
+                inner_w30_registry.calibration_vector = rebuilt_cv
+
+        # 6. Gold-correlation route.
+        gold_route_active = False
+        gold_route_target_partition_id = -1
+        if (self.registry.gold_correlation_enabled
+                and self.registry.gold_correlation_map is not None
+                and bool(w31_result.ratified)):
+            best = self.registry.gold_correlation_map.best_partition()
+            inner_route_active = False
+            if w31_envelope is not None:
+                # The inner W31's W30 envelope's disagreement-route
+                # status is what triggers the W32 gold-correlation
+                # rerouting.  Read it through the W30 envelope which
+                # is reachable from the W31 result chain.
+                w30_env = self.inner.inner.last_envelope
+                if (w30_env is not None
+                        and bool(getattr(
+                            w30_env, "disagreement_route_active",
+                            False))):
+                    inner_route_active = True
+            if inner_route_active and best is not None:
+                gold_pid, gold_score = best
+                gold_route_target_partition_id = int(gold_pid)
+                gold_route_active = True
+                self.registry.n_gold_routes_fired += 1
+
+        # 7. Append convergence state entry (every cell where the
+        # W31 inner ran, even non-ratified — the EWMA + CUSUM
+        # accumulators record the trajectory regardless).
+        if int(self.registry.long_window) > 0:
+            entry = ConvergenceStateEntry(
+                cell_idx=int(self._cell_index),
+                partition_id=int(eff_pid),
+                ewma_prior_after=float(new_ewma),
+                cusum_pos=float(new_cusum_pos),
+                cusum_neg=float(new_cusum_neg),
+                change_point_fired=bool(change_point_fired),
+            )
+            self._convergence_states.append(entry)
+            window = int(self.registry.long_window)
+            if len(self._convergence_states) > window:
+                self._convergence_states = (
+                    self._convergence_states[-window:])
+
+        # 7b. If the W31 baseline produced no envelope on this cell,
+        # skip the W32 envelope build but keep the EWMA + CUSUM state
+        # update so the next cell observes the most recent prior.
+        if w31_envelope is None:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W32_BRANCH_LONG_WINDOW_NO_TRIGGER,
+                envelope=None, n_w32_visible=n_w31_visible,
+                w32_overhead=0, ratified=False,
+                verify_ok=False, verify_reason="no_w31_envelope",
+                long_window_update_fired=bool(long_window_update_fired),
+                change_point_fired=bool(change_point_fired),
+                gold_route_active=False,
+                gold_route_target_partition_id=-1,
+                effective_partition_id=int(eff_pid),
+                ewma_prior_after=float(new_ewma),
+                cusum_pos_after=float(new_cusum_pos),
+                cusum_neg_after=float(new_cusum_neg),
+                w31_online_cid="")
+
+        # 8. Build the W32 envelope.
+        wire_required = self.registry.has_wire_required_layer
+        envelope = self._build_w32_envelope(
+            w31_online_cid=str(w31_envelope.w31_cid),
+            gold_route_target_partition_id=int(
+                gold_route_target_partition_id),
+            gold_route_active=bool(gold_route_active),
+            change_point_active=bool(change_point_fired),
+            wire_required=bool(wire_required),
+        )
+
+        # 9. Verify + register.
+        registered_pids = frozenset(
+            int(p) for p in
+            self.inner.inner.registry.registered_partition_ids)
+        expected_conv_cid = envelope.convergence_state_cid
+        outcome = self.registry.register_envelope(
+            envelope,
+            registered_partition_ids=registered_pids,
+            registered_w31_online_cid=str(w31_envelope.w31_cid),
+            registered_convergence_state_cid=expected_conv_cid,
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+
+        if not verify_ok and self.require_w32_verification:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W32_BRANCH_LONG_WINDOW_REJECTED,
+                envelope=envelope, n_w32_visible=n_w31_visible,
+                w32_overhead=0, ratified=False,
+                verify_ok=False, verify_reason=verify_reason,
+                long_window_update_fired=bool(long_window_update_fired),
+                change_point_fired=bool(change_point_fired),
+                gold_route_active=bool(gold_route_active),
+                gold_route_target_partition_id=int(
+                    gold_route_target_partition_id),
+                effective_partition_id=int(eff_pid),
+                ewma_prior_after=float(new_ewma),
+                cusum_pos_after=float(new_cusum_pos),
+                cusum_neg_after=float(new_cusum_neg),
+                w31_online_cid=str(w31_envelope.w31_cid))
+
+        # 10. Trivial path — no wire token charged; pass through.
+        if self.registry.is_trivial:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W32_BRANCH_TRIVIAL_LONG_WINDOW_PASSTHROUGH,
+                envelope=envelope, n_w32_visible=n_w31_visible,
+                w32_overhead=0, ratified=True,
+                verify_ok=verify_ok, verify_reason=verify_reason,
+                long_window_update_fired=bool(long_window_update_fired),
+                change_point_fired=bool(change_point_fired),
+                gold_route_active=bool(gold_route_active),
+                gold_route_target_partition_id=int(
+                    gold_route_target_partition_id),
+                effective_partition_id=int(eff_pid),
+                ewma_prior_after=float(new_ewma),
+                cusum_pos_after=float(new_cusum_pos),
+                cusum_neg_after=float(new_cusum_neg),
+                w31_online_cid=str(w31_envelope.w31_cid))
+
+        # Non-trivial: charge 1 wire token.
+        w32_overhead = int(envelope.n_wire_tokens)
+        n_w32_visible = int(n_w31_visible + w32_overhead)
+        self._cell_index += 1
+        # Choose the resolved branch label.
+        if change_point_fired:
+            branch = W32_BRANCH_CHANGE_POINT_RESET
+        elif gold_route_active:
+            branch = W32_BRANCH_GOLD_CORRELATED_REROUTED
+        else:
+            branch = W32_BRANCH_LONG_WINDOW_RESOLVED
+        return self._pack(
+            out=out,
+            decoder_branch=branch,
+            envelope=envelope, n_w32_visible=n_w32_visible,
+            w32_overhead=w32_overhead, ratified=True,
+            verify_ok=verify_ok, verify_reason=verify_reason,
+            long_window_update_fired=bool(long_window_update_fired),
+            change_point_fired=bool(change_point_fired),
+            gold_route_active=bool(gold_route_active),
+            gold_route_target_partition_id=int(
+                gold_route_target_partition_id),
+            effective_partition_id=int(eff_pid),
+            ewma_prior_after=float(new_ewma),
+            cusum_pos_after=float(new_cusum_pos),
+            cusum_neg_after=float(new_cusum_neg),
+            w31_online_cid=str(w31_envelope.w31_cid))
+
+    def _pack(
+            self, *, out: dict[str, Any],
+            decoder_branch: str,
+            envelope: LongWindowConvergentRatificationEnvelope | None,
+            n_w32_visible: int, w32_overhead: int,
+            ratified: bool, verify_ok: bool, verify_reason: str,
+            long_window_update_fired: bool,
+            change_point_fired: bool,
+            gold_route_active: bool,
+            gold_route_target_partition_id: int,
+            effective_partition_id: int,
+            ewma_prior_after: float,
+            cusum_pos_after: float,
+            cusum_neg_after: float,
+            w31_online_cid: str,
+    ) -> dict[str, Any]:
+        envelope_bytes = (envelope.n_envelope_bytes
+                           if envelope is not None else 0)
+        structured_bits = (envelope.n_structured_bits
+                            if envelope is not None else 0)
+        wire = max(1, int(w32_overhead))
+        cram_factor = (
+            float(structured_bits) / float(wire)
+            if structured_bits > 0 else 0.0
+        )
+        w32_cid = (envelope.w32_cid if envelope is not None else "")
+        manifest_v2_cid = (envelope.manifest_v2_cid
+                            if envelope is not None else "")
+        conv_cid = (envelope.convergence_state_cid
+                     if envelope is not None else "")
+        gold_cid = (envelope.gold_correlation_cid
+                     if envelope is not None else "")
+        n_w31_visible = int(out.get("online_calibrated", {}).get(
+            "n_w31_visible_tokens", 0))
+        inner_w31_branch = str(out.get("online_calibrated", {}).get(
+            "decoder_branch", ""))
+        result = W32LongWindowResult(
+            answer=dict(out),
+            inner_w31_branch=inner_w31_branch,
+            decoder_branch=str(decoder_branch),
+            agent_id=str(self.agent_id),
+            is_producer=bool(self.is_producer),
+            w31_online_cid=str(w31_online_cid),
+            cell_index=int(self._cell_index - 1
+                              if self._cell_index > 0 else 0),
+            long_window_update_fired=bool(long_window_update_fired),
+            change_point_fired=bool(change_point_fired),
+            gold_route_active=bool(gold_route_active),
+            gold_route_target_partition_id=int(
+                gold_route_target_partition_id),
+            effective_partition_id=int(effective_partition_id),
+            ewma_prior_after=float(ewma_prior_after),
+            cusum_pos_after=float(cusum_pos_after),
+            cusum_neg_after=float(cusum_neg_after),
+            n_w31_visible_tokens=int(n_w31_visible),
+            n_w32_visible_tokens=int(n_w32_visible),
+            n_w32_overhead_tokens=int(w32_overhead),
+            w32_cid=str(w32_cid),
+            manifest_v2_cid=str(manifest_v2_cid),
+            convergence_state_cid=str(conv_cid),
+            gold_correlation_cid=str(gold_cid),
+            ratified=bool(ratified),
+            verification_ok=bool(verify_ok),
+            verification_reason=str(verify_reason),
+            n_envelope_bytes=int(envelope_bytes),
+            n_structured_bits=int(structured_bits),
+            cram_factor_w32=float(cram_factor),
+        )
+        self._last_result = result
+        self._last_envelope = envelope
+        out_local = dict(out)
+        out_local["long_window_convergent"] = result.as_dict()
+        if envelope is not None:
+            out_local["long_window_convergent_envelope"] = envelope.as_dict()
+        return out_local
+
+    def decode(
+            self,
+            handoffs: Sequence[_DecodedHandoff],
+    ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> "W32LongWindowResult | None":
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> (
+            "LongWindowConvergentRatificationEnvelope | None"):
+        return self._last_envelope
+
+
+# ---------------------------------------------------------------------------
+# Convenience factories (W32 family)
+# ---------------------------------------------------------------------------
+
+
+def build_trivial_long_window_registry(
+        *,
+        schema: SchemaCapsule,
+        local_host_id: str = "localhost",
+) -> LongWindowConvergentRegistry:
+    """Build a W32 registry with all knobs trivial — the H2 byte-for-W31
+    anchor (W32-Λ-trivial-long-window falsifier).
+    """
+    return LongWindowConvergentRegistry(
+        schema=schema,
+        long_window_enabled=False,
+        change_point_enabled=False,
+        gold_correlation_enabled=False,
+        manifest_v2_disabled=True,
+        long_window=0,
+        gold_correlation_map=None,
+        local_host_id=local_host_id,
+    )
+
+
+def build_long_window_convergent_registry(
+        *,
+        schema: SchemaCapsule,
+        long_window_enabled: bool = True,
+        change_point_enabled: bool = True,
+        gold_correlation_enabled: bool = False,
+        manifest_v2_disabled: bool = False,
+        long_window: int = W32_DEFAULT_LONG_WINDOW,
+        ewma_alpha: float = W32_DEFAULT_EWMA_ALPHA,
+        cusum_threshold: float = W32_DEFAULT_CUSUM_THRESHOLD,
+        cusum_k: float = W32_DEFAULT_CUSUM_K,
+        cusum_max: float = W32_DEFAULT_CUSUM_MAX,
+        gold_correlation_map: GoldCorrelationMap | None = None,
+        local_host_id: str = "localhost",
+) -> LongWindowConvergentRegistry:
+    """Build a non-trivial W32 registry that exercises EWMA + CUSUM
+    + gold-correlation routing + manifest-v2 CID.
+    """
+    return LongWindowConvergentRegistry(
+        schema=schema,
+        long_window_enabled=bool(long_window_enabled),
+        change_point_enabled=bool(change_point_enabled),
+        gold_correlation_enabled=bool(gold_correlation_enabled),
+        manifest_v2_disabled=bool(manifest_v2_disabled),
+        long_window=int(long_window),
+        ewma_alpha=float(ewma_alpha),
+        cusum_threshold=float(cusum_threshold),
+        cusum_k=float(cusum_k),
+        cusum_max=float(cusum_max),
+        gold_correlation_map=gold_correlation_map,
+        local_host_id=local_host_id,
+    )
