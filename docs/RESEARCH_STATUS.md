@@ -5,13 +5,105 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.37,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.38,
 > 2026-05-02.
 
-## TL;DR — SDK v3.37
+## TL;DR — SDK v3.38
 
-The programme now has **thirty-three** coupled research axes.  SDK
-v3.37 mints axis 33: **host-diverse trust-subspace guard +
+The programme now has **thirty-four** coupled research axes.  SDK
+v3.38 mints axis 34: **anchor-cross-host basis-trajectory ratification
++ manifest-v7 CID** (W37).  W37 wraps W36's host-diverse trust-subspace
+guard with a closed-form, zero-parameter, per-(host, oracle, top_set)
+EWMA over *anchored* historical observations.  W36 abstains whenever
+the current cell has fewer than `min_distinct_hosts` healthy attested
+hosts -- even when the remaining single host has been independently
+anchored across multiple earlier cells by other healthy hosts.  W37
+makes that historical cross-host anchoring a typed audited precondition
+for a safe single-host reroute.
+
+The load-bearing change is cross-cell rather than per-cell.  W36 reads
+one cell at a time; W37 maintains a sealed trajectory of which (host,
+oracle, top_set) entries have been *cross-host anchored* and converts
+historically-anchored evidence into a safe reroute on a single-host
+recovery cell.  The trajectory update is gated by *select-before-update*
+so the historical anchoring is not diluted by the recovery cell itself,
+and is gated by *multi-host-only update* so a host is not penalised
+for being the only reachable host when the live infrastructure offers
+no co-attesters.
+
+**Headline SDK v3.38 results.**
+
+* **R-84-SINGLE-HOST-TRAJECTORY-RECOVER.**  W37 improves over W36 from
+  0.500 to **1.000** correctness across 5/5 seeds, **Δ_correctness_
+  w37_w36 = +0.500** (min and max equal), and trust precision stays at
+  **1.000**.  W37 reroutes 8 cells per seed; overhead = 1 visible
+  token/cell.
+
+* **R-84-TRIVIAL-W37.**  With trajectory disabled, single-host reroute
+  disabled, and manifest-v7 disabled, W37 reduces to W36 byte-for-byte
+  across 5/5 seeds; `all_byte_equivalent_w37_w36 = True`.
+
+* **R-84-NO-TRAJECTORY-HISTORY.**  Falsifier: when no cross-host
+  anchoring ever forms (every cell single-host), W37 = W36 = 0.000
+  correctness; W37 trust precision = 1.000; W37 abstains 16/16
+  cells/seed.
+
+* **R-84-POISONED-TRAJECTORY.**  Falsifier: a trajectory accumulated on
+  a single host without cross-host anchoring never satisfies the
+  `min_trajectory_anchored_hosts` requirement; W37 does not reroute and
+  preserves W36 abstention.
+
+* **R-84-TRAJECTORY-DISAGREEMENT.**  Falsifier: when the current
+  cell's basis emits a top_set that does not match the historically
+  anchored trajectory, W37 must not reroute on the historically
+  anchored top_set; W37 = W36 = 0.500 correctness.
+
+**Density / efficiency**: On R-84-SINGLE-HOST-TRAJECTORY-RECOVER, W37
+carries about **29.5k structured bits per visible W37 token** at one
+visible token overhead/cell.  This is controller-verified structured
+trajectory state, not hidden-state transfer.
+
+**Trust boundary**: 14 new W37 failure modes in
+`verify_cross_host_trajectory_ratification`, mechanically tested.
+Cumulative enumerated trust boundary across W22 + W29 + W30 + W31 +
+W32 + W33 + W34 + W35 + W36 + W37 = **126 enumerated failure modes**.
+
+**Live / two-Mac status**: Local Ollama and `192.168.12.191:11434`
+are reachable.  `192.168.12.248:11434` still times out on `/api/tags`
+(Mac 2 ARP-incomplete for the **30th milestone in a row**).  The
+bounded W37 cross-host trajectory probe on 2026-05-02 across local
+`gemma2:9b` and remote `qwen2.5:14b` produced **8/8 responsive
+probes, 8/8 cross-host anchored agreements, and 8/8 gold-correlated
+agreements** at temperature 0 on the 8-prompt panel.  This is the
+strongest two-reachable-host live trajectory evidence the
+infrastructure currently supports; it does not close W37-C-MULTI-HOST.
+
+**Stable-vs-experimental boundary**: W37 is exported only under
+`__experimental__`; stable runtime contract remains unchanged.
+SDK_VERSION `wevra.sdk.v3.38`; package version `0.5.11`.
+
+**Open walls after W37**: W37-L-MULTI-HOST-COLLUSION-CAP is a new
+proved-conditional limitation theorem at the capsule layer (two
+colluding hosts can cross the anchored thresholds; recovery requires
+native-latent evidence outside the capsule layer).  W37-C-NATIVE-LATENT
+remains open.  W37-C-MULTI-HOST remains hardware-bounded until Mac 2
+(or a third reachable host) joins the topology.  Cross-cell trajectory
+audit is now sealed in manifest-v7; per-cell host-diversity audit
+remains in manifest-v6; per-cell live-aware multi-anchor audit remains
+in manifest-v4; the cross-cell × per-cell audit boundary is now
+structurally explicit in the envelope hierarchy.
+
+See `docs/RESULTS_WEVRA_W37_CROSS_HOST_BASIS_TRAJECTORY.md` for the
+full note and
+`docs/SUCCESS_CRITERION_W37_CROSS_HOST_BASIS_TRAJECTORY.md` for the
+success bar.
+
+---
+
+## Earlier TL;DR — SDK v3.37
+
+The programme had **thirty-three** coupled research axes.  SDK
+v3.37 minted axis 33: **host-diverse trust-subspace guard +
 manifest-v6 CID** (W36).  W36 wraps W35's audited trust-subspace
 dense-control proxy with a controller-side host-diversity verifier:
 dense projection support must come from at least two distinct

@@ -1,0 +1,154 @@
+{
+  "verdict": "bounded_two_host_trajectory_probe",
+  "n_probes": 8,
+  "n_available_hosts": 2,
+  "available": [
+    "mac1",
+    "mac_remote"
+  ],
+  "mac2_status": "ARP-incomplete (30th milestone)",
+  "n_responsive_both": 8,
+  "n_anchored": 8,
+  "n_anchored_gold_correlated": 8,
+  "anchored_rate": 1.0,
+  "gold_correlated_anchored_rate": 1.0,
+  "anchored_keys_count": 8,
+  "per_probe": [
+    {
+      "probe_id": "p1",
+      "prompt": "Answer in exactly one word: capital city of France?",
+      "gold": "paris",
+      "responses": {
+        "mac1": {
+          "answer": "paris",
+          "latency_s": 11.396,
+          "model_id": "gemma2:9b"
+        },
+        "mac_remote": {
+          "answer": "paris",
+          "latency_s": 10.191,
+          "model_id": "qwen2.5:14b"
+        }
+      }
+    },
+    {
+      "probe_id": "p2",
+      "prompt": "Answer in exactly one word: chemical symbol for water?",
+      "gold": "h2o",
+      "responses": {
+        "mac1": {
+          "answer": "h2o",
+          "latency_s": 1.782,
+          "model_id": "gemma2:9b"
+        },
+        "mac_remote": {
+          "answer": "h2o",
+          "latency_s": 0.87,
+          "model_id": "qwen2.5:14b"
+        }
+      }
+    },
+    {
+      "probe_id": "p3",
+      "prompt": "Answer in exactly one word: how many continents?",
+      "gold": "seven",
+      "responses": {
+        "mac1": {
+          "answer": "seven",
+          "latency_s": 1.233,
+          "model_id": "gemma2:9b"
+        },
+        "mac_remote": {
+          "answer": "seven",
+          "latency_s": 0.709,
+          "model_id": "qwen2.5:14b"
+        }
+      }
+    },
+    {
+      "probe_id": "p4",
+      "prompt": "Answer in exactly one word: opposite of hot?",
+      "gold": "cold",
+      "responses": {
+        "mac1": {
+          "answer": "cold",
+          "latency_s": 1.236,
+          "model_id": "gemma2:9b"
+        },
+        "mac_remote": {
+          "answer": "cold",
+          "latency_s": 0.707,
+          "model_id": "qwen2.5:14b"
+        }
+      }
+    },
+    {
+      "probe_id": "p5",
+      "prompt": "Answer in exactly one word: planet closest to the sun?",
+      "gold": "mercury",
+      "responses": {
+        "mac1": {
+          "answer": "mercury",
+          "latency_s": 1.416,
+          "model_id": "gemma2:9b"
+        },
+        "mac_remote": {
+          "answer": "mercury",
+          "latency_s": 0.737,
+          "model_id": "qwen2.5:14b"
+        }
+      }
+    },
+    {
+      "probe_id": "p6",
+      "prompt": "Answer in exactly one word: largest ocean by area?",
+      "gold": "pacific",
+      "responses": {
+        "mac1": {
+          "answer": "pacific",
+          "latency_s": 1.321,
+          "model_id": "gemma2:9b"
+        },
+        "mac_remote": {
+          "answer": "pacific",
+          "latency_s": 0.726,
+          "model_id": "qwen2.5:14b"
+        }
+      }
+    },
+    {
+      "probe_id": "p7",
+      "prompt": "Answer in exactly one word: number of sides in a triangle?",
+      "gold": "three",
+      "responses": {
+        "mac1": {
+          "answer": "three",
+          "latency_s": 1.471,
+          "model_id": "gemma2:9b"
+        },
+        "mac_remote": {
+          "answer": "three",
+          "latency_s": 0.642,
+          "model_id": "qwen2.5:14b"
+        }
+      }
+    },
+    {
+      "probe_id": "p8",
+      "prompt": "Answer in exactly one word: color of the sky on a clear day?",
+      "gold": "blue",
+      "responses": {
+        "mac1": {
+          "answer": "blue",
+          "latency_s": 1.666,
+          "model_id": "gemma2:9b"
+        },
+        "mac_remote": {
+          "answer": "blue",
+          "latency_s": 0.744,
+          "model_id": "qwen2.5:14b"
+        }
+      }
+    }
+  ]
+}

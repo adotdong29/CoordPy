@@ -5,6 +5,68 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.11 / 3.38] — 2026-05-02 — SDK v3.38 — anchor-cross-host basis-trajectory ratification + manifest-v7 CID + R-84 Phase-84 benchmark family + bounded live cross-host trajectory probe
+
+*Strictly additive on SDK v3.37.  The stable Wevra product/runtime
+contract is unchanged.  The W37 surface is experimental and wraps the
+W36 `HostDiverseTrustSubspaceOrchestrator` with a closed-form
+per-(host, oracle, top_set) EWMA over anchored historical
+observations.  W37 converts a W36 host-diversity abstention into a
+single-host trajectory-trusted reroute iff the supporting host has a
+cross-host anchored trajectory above threshold across at least
+``min_anchored_observations`` historical cells with at least
+``min_trajectory_anchored_hosts`` distinct anchor hosts.  Without an
+anchored trajectory, W37 preserves W36 behavior byte-for-byte.  It is
+explicitly not native latent transfer, not transformer-internal
+hidden-state projection, and not a KV-cache transplant.*
+
+**New experimental surface.**
+
+`CrossHostBasisTrajectoryEntry`,
+`CrossHostBasisTrajectoryRatificationEnvelope`,
+`CrossHostBasisTrajectoryRegistry`, `W37CrossHostTrajectoryResult`,
+`CrossHostBasisTrajectoryOrchestrator`,
+`select_cross_host_trajectory_projection`,
+`verify_cross_host_trajectory_ratification`,
+`build_trivial_cross_host_trajectory_registry`,
+`build_cross_host_trajectory_registry`, plus W37 schema/branch/default
+constants.
+
+**Headline empirical results.**
+
+* **R-84-SINGLE-HOST-TRAJECTORY-RECOVER.**  W37 improves over W36 from
+  0.500 to **1.000** correctness (`Δ_correctness_w37_w36 = +0.500`,
+  min and max equal across 5/5 seeds) at trust precision **1.000**.
+
+* **R-84-TRIVIAL-W37.**  Trajectory disabled + single-host reroute
+  disabled + manifest-v7 disabled reduces W37 to W36 byte-for-byte
+  across 5/5 seeds.
+
+* **R-84-NO-TRAJECTORY-HISTORY.**  Falsifier: empty trajectory ⇒
+  W37 = W36 abstention (16/16 cells/seed).
+
+* **R-84-POISONED-TRAJECTORY.**  Falsifier: single-host trajectory
+  fails ``min_trajectory_anchored_hosts`` ⇒ W37 does not reroute.
+
+* **R-84-TRAJECTORY-DISAGREEMENT.**  Falsifier: current basis
+  disagrees with anchored trajectory ⇒ W37 does not reroute.
+
+**Trust boundary.**  14 new W37 failure modes in
+`verify_cross_host_trajectory_ratification`, all covered by W37 unit
+tests; cumulative W22 + W29 + W30 + W31 + W32 + W33 + W34 + W35 +
+W36 + W37 trust boundary = **126 enumerated failure modes**.
+
+**Live fallback.**  Fresh preflight 9/10 hosts OK,
+`192.168.12.248` ARP-incomplete for the 30th milestone.  Bounded
+W37 cross-host trajectory probe on 2026-05-02 across local
+`gemma2:9b` and remote `qwen2.5:14b` produced **8/8 responsive
+probes, 8/8 cross-host anchored agreements, and 8/8 gold-correlated
+agreements** at temperature 0.
+
+**Tests.**  26/26 W37 unit tests pass; 563/563 phase69-84 focused
+regression slice green; full ``pytest vision_mvp/tests`` runs to
+completion during the milestone.
+
 ## [0.5.10 / 3.37] — 2026-05-02 — SDK v3.37 — host-diverse trust-subspace guard + manifest-v6 CID + R-83 Phase-83 benchmark family + live two-reachable-host probe
 
 *Strictly additive on SDK v3.36.  The stable Wevra product/runtime

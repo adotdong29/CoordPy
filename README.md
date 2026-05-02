@@ -7,30 +7,50 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.37 (May 2026).** Host-diverse trust-
+**Latest milestone: SDK v3.38 (May 2026).** Anchor-cross-host basis-
+trajectory ratification + manifest-v7 CID (W37 family).  W37 wraps
+W36's host-diverse trust-subspace guard with a closed-form,
+zero-parameter, per-(host, oracle, top_set) EWMA over *anchored*
+historical observations.  W36 abstains whenever the current cell has
+fewer than ``min_distinct_hosts`` healthy attested hosts -- even when
+the remaining single host has been independently anchored across
+earlier cells by other healthy hosts.  W37 makes that historical
+cross-host anchoring a typed audited precondition for a safe
+single-host reroute.  On **R-84-SINGLE-HOST-TRAJECTORY-RECOVER**, W37
+raises correctness over W36 from 0.500 to **1.000**
+(**Δ_correctness_w37_w36 = +0.500**, min and max equal across 5/5
+seeds) at trust precision **1.000**, recovers all 8 W36 abstentions
+per seed, and adds one visible token/cell while carrying about
+**29.5k structured bits per visible W37 token**.  On
+**R-84-NO-TRAJECTORY-HISTORY**, **R-84-POISONED-TRAJECTORY**, and
+**R-84-TRAJECTORY-DISAGREEMENT** falsifiers, W37 preserves W36
+behavior byte-for-byte.  W37 adds 14 verifier failure modes, bringing
+the cumulative W22..W37 trust boundary to **126 enumerated modes**.
+A new proved-conditional limitation theorem
+**W37-L-MULTI-HOST-COLLUSION-CAP** is recorded: two registered hosts
+emitting a coordinated wrong top_set across enough cells can cross
+the anchored thresholds and cannot be separated at the capsule layer.
+This is **not native latent transfer** and not transformer-internal
+hidden-state projection; it is an audited capsule-layer cross-cell
+host-trust proxy.  Fresh preflight found local Ollama and
+`192.168.12.191` reachable, with `192.168.12.248` still timing out
+(Mac 2 ARP-incomplete for the **30th milestone in a row**); the
+bounded W37 cross-host trajectory probe observed **8/8 cross-host
+anchored agreements and 8/8 gold-correlated agreements** across local
+`gemma2:9b` and remote `qwen2.5:14b` at temperature 0.  Stable
+runtime contract unchanged; W37 remains experimental.
+
+**Earlier milestone: SDK v3.37 (May 2026).** Host-diverse trust-
 subspace guard + manifest-v6 CID (W36 family).  W36 wraps W35's
 trust-subspace dense-control proxy with a host-diverse verifier: a
 dense projection is eligible only when its support is independently
-attested by at least two registered healthy hosts, with unsafe or
-unverifiable branches rejected or abstained.  On **R-83-HOST-
+attested by at least two registered healthy hosts.  On **R-83-HOST-
 DIVERSE-RECOVER**, W36 raises correctness over W35 from 0.625 to
-**0.9375** (**+0.3125**) across 5/5 seeds, restores trust precision
-from 0.6667 to **1.000**, and adds one visible token/cell while
-carrying about **13.95k structured bits per visible W36 token**.  On
-**R-83-HOST-SPOOFED-CONSENSUS**, W36 does **not** improve correctness
-(0.625 remains 0.625) but raises trust precision from 0.625 to
-**1.000** by abstaining on 6 unsafe W35 ratifications per seed.  The
-no-live-attestation falsifier is sharp: requiring host diversity when
-live attestations are absent drops correctness from W35's 1.000 to
-0.000 through universal abstention.  W36 adds 14 verifier failure
-modes, bringing the cumulative W22/W29/W30/W31/W32/W33/W34/W35/W36
-trust boundary to **112 enumerated modes**.  This is **not native
-latent transfer** and not transformer-internal hidden-state
-projection; it is an audited capsule-layer host-trust proxy.  Fresh
-preflight found local Ollama and `192.168.12.191` reachable, with
-`192.168.12.248` still timing out; a bounded two-reachable-host probe
-observed 4/5 cross-host disagreements, all gold-correlated.  Stable
-runtime contract unchanged; W36 remains experimental.
+**0.9375** (**+0.3125**) across 5/5 seeds and restores trust
+precision from 0.6667 to **1.000**.  W36 adds 14 verifier failure
+modes, bringing the cumulative W22..W36 trust boundary to
+**112 enumerated modes**.  Stable runtime contract unchanged; W36
+remains experimental.
 
 **Earlier milestone: SDK v3.36 (May 2026).** Trust-subspace dense-
 control proxy + basis-history projection + W35 manifest-v5 CID (W35

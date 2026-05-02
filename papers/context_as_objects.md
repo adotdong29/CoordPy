@@ -1,34 +1,55 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
-> Updated through SDK v3.37, 2026-05-02 (W22 → W36 cumulative
+> Updated through SDK v3.38, 2026-05-02 (W22 → W37 cumulative
 > trust + dense-control + live-aware multi-anchor / trust-subspace /
-> host-diverse guard ladder summarised in § 14.2 and § 17).
+> host-diverse / cross-host trajectory guard ladder summarised in
+> § 14.2 and § 17).
 >
-> **Latest milestone marker (SDK v3.37 / W36, 2026-05-02).** The
-> programme now has thirty-three coupled research axes.  W36 hardens
-> the W35 trust-subspace proxy at the host/live boundary by requiring
-> dense-control support to be independently attested by at least two
-> distinct registered healthy hosts.  On R-83-HOST-DIVERSE-RECOVER,
-> W36 improves over W35 from 0.625 to **0.9375** correctness
+> **Latest milestone marker (SDK v3.38 / W37, 2026-05-02).** The
+> programme now has **thirty-four** coupled research axes.  W37 wraps
+> W36's host-diverse trust-subspace guard with a closed-form,
+> zero-parameter, per-(host, oracle, top_set) EWMA over *anchored*
+> historical observations: a single-host current cell can be safely
+> rerouted iff its (host, oracle, top_set) entry has been cross-host
+> anchored above threshold across at least
+> ``min_anchored_observations`` historical cells with at least
+> ``min_trajectory_anchored_hosts`` distinct anchor hosts.  W37 is
+> explicitly cross-cell where W36 was per-cell; its envelope binds a
+> manifest-v7 CID over (parent_w36_cid, cross_host_trajectory_state_cid,
+> trajectory_audit_cid, trajectory_topology_cid).  On
+> R-84-SINGLE-HOST-TRAJECTORY-RECOVER, W37 improves over W36 from
+> 0.500 to **1.000** correctness (**Δ_correctness_w37_w36 = +0.500**,
+> min and max equal across 5/5 seeds) at trust precision **1.000**
+> with one visible-token overhead/cell.  On the four named falsifiers
+> (R-84-TRIVIAL-W37, R-84-NO-TRAJECTORY-HISTORY,
+> R-84-POISONED-TRAJECTORY, R-84-TRAJECTORY-DISAGREEMENT) W37
+> preserves W36 behavior and trust precision exactly.  The W37
+> envelope carries about **29.5k structured bits per visible W37
+> token** on the load-bearing regime and adds 14 mechanically tested
+> verifier failure modes, bringing the cumulative W22..W37 trust
+> boundary to **126 enumerated failure modes**.  A new
+> proved-conditional limitation theorem
+> **W37-L-MULTI-HOST-COLLUSION-CAP** is recorded: two registered
+> hosts emitting a coordinated wrong top_set across enough cells can
+> cross the anchored thresholds and cannot be separated at the capsule
+> layer.  W37 is explicitly NOT native latent transfer, NOT
+> transformer-internal hidden-state projection, and NOT a KV-cache
+> transplant.  Mac 2 still times out (30th milestone in a row);
+> bounded live cross-host trajectory probe across local `gemma2:9b`
+> and remote `qwen2.5:14b` produced **8/8 responsive probes, 8/8
+> cross-host anchored agreements, and 8/8 gold-correlated agreements**
+> at temperature 0.  See
+> ``docs/RESULTS_WEVRA_W37_CROSS_HOST_BASIS_TRAJECTORY.md`` and
+> ``docs/SUCCESS_CRITERION_W37_CROSS_HOST_BASIS_TRAJECTORY.md``.
+
+> **Previous milestone marker (SDK v3.37 / W36, 2026-05-02).** W36
+> hardens the W35 trust-subspace proxy at the host/live boundary by
+> requiring dense-control support to be independently attested by at
+> least two distinct registered healthy hosts.  On R-83-HOST-DIVERSE-
+> RECOVER, W36 improves over W35 from 0.625 to **0.9375** correctness
 > (**+0.3125**) across 5/5 seeds and restores trust precision from
-> 0.6667 to **1.000** with one visible-token overhead/cell.  On
-> R-83-HOST-SPOOFED-CONSENSUS, W36 does not recover correctness but
-> improves trust precision from 0.625 to **1.000** by abstaining on
-> unsafe host-spoofed ratifications.  On R-83-NO-LIVE-ATTESTATION,
-> W36 exposes the sharp operational wall: without live attestations it
-> abstains on every cell and destroys correctness relative to W35.
-> The W36 envelope carries about **13.95k structured bits per visible
-> W36 token** on the load-bearing regime and adds 14 mechanically
-> tested verifier failure modes, bringing the cumulative W22..W36
-> trust boundary to **112 enumerated failure modes**.  W36 is
-> explicitly NOT native latent transfer, NOT transformer-internal
-> hidden-state projection, and NOT a KV-cache transplant.  Mac 2 still
-> times out; bounded live fallback across local `qwen2.5:0.5b` and
-> remote `qwen2.5:14b` observed 4/5 cross-host disagreements, all
-> gold-correlated.  See
-> ``docs/RESULTS_WEVRA_W36_HOST_DIVERSE_TRUST_SUBSPACE.md`` and
-> ``docs/SUCCESS_CRITERION_W36_HOST_DIVERSE_TRUST_SUBSPACE.md``.
+> 0.6667 to **1.000** with one visible-token overhead/cell.
 >
 > **Previous milestone marker (SDK v3.36 / W35, 2026-05-02).** W35 is
 > the first milestone where the old explicit capsule line and the newer

@@ -557,6 +557,36 @@ from .team_coord import (
     W36_BRANCH_HOST_DIVERSE_UNSAFE,
     W36_BRANCH_HOST_DIVERSE_ABSTAINED,
     W36_ALL_BRANCHES,
+    # SDK v3.38 — anchor-cross-host basis-trajectory ratification +
+    # manifest-v7 CID (W37). EXPERIMENTAL — see __experimental__.
+    CrossHostBasisTrajectoryEntry,
+    CrossHostBasisTrajectoryRatificationEnvelope,
+    CrossHostBasisTrajectoryRegistry,
+    W37CrossHostTrajectoryResult,
+    CrossHostBasisTrajectoryOrchestrator,
+    verify_cross_host_trajectory_ratification,
+    select_cross_host_trajectory_projection,
+    build_trivial_cross_host_trajectory_registry,
+    build_cross_host_trajectory_registry,
+    W37_CROSS_HOST_TRAJECTORY_SCHEMA_VERSION,
+    W37_DEFAULT_TRAJECTORY_EWMA_ALPHA,
+    W37_DEFAULT_TRAJECTORY_THRESHOLD,
+    W37_DEFAULT_TRAJECTORY_MARGIN_MIN,
+    W37_DEFAULT_MIN_ANCHORED_OBSERVATIONS,
+    W37_DEFAULT_MIN_TRAJECTORY_ANCHORED_HOSTS,
+    W37_DEFAULT_TRAJECTORY_HISTORY_WINDOW,
+    W37_BRANCH_TRAJECTORY_RESOLVED,
+    W37_BRANCH_TRIVIAL_TRAJECTORY_PASSTHROUGH,
+    W37_BRANCH_TRAJECTORY_REJECTED,
+    W37_BRANCH_TRAJECTORY_DISABLED,
+    W37_BRANCH_TRAJECTORY_NO_TRIGGER,
+    W37_BRANCH_TRAJECTORY_REROUTED,
+    W37_BRANCH_TRAJECTORY_UNSAFE,
+    W37_BRANCH_TRAJECTORY_ABSTAINED,
+    W37_BRANCH_TRAJECTORY_NO_HISTORY,
+    W37_BRANCH_TRAJECTORY_DISAGREEMENT,
+    W37_BRANCH_TRAJECTORY_POISONED,
+    W37_ALL_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -570,7 +600,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.37"
+SDK_VERSION = "wevra.sdk.v3.38"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -720,6 +750,17 @@ __experimental__: tuple[str, ...] = (
     "select_host_diverse_projection",
     "build_trivial_host_diverse_registry",
     "build_host_diverse_registry",
+    # W37 family — anchor-cross-host basis-trajectory ratification +
+    # manifest-v7 CID.
+    "CrossHostBasisTrajectoryEntry",
+    "CrossHostBasisTrajectoryRatificationEnvelope",
+    "CrossHostBasisTrajectoryRegistry",
+    "W37CrossHostTrajectoryResult",
+    "CrossHostBasisTrajectoryOrchestrator",
+    "verify_cross_host_trajectory_ratification",
+    "select_cross_host_trajectory_projection",
+    "build_trivial_cross_host_trajectory_registry",
+    "build_cross_host_trajectory_registry",
 )
 
 __all__ = [
@@ -1140,6 +1181,37 @@ __all__ = [
     "W36_BRANCH_HOST_DIVERSE_UNSAFE",
     "W36_BRANCH_HOST_DIVERSE_ABSTAINED",
     "W36_ALL_BRANCHES",
+    # SDK v3.38 — W37 family (anchor-cross-host basis-trajectory
+    # ratification + manifest-v7 CID).  EXPERIMENTAL — see
+    # __experimental__ tuple.
+    "CrossHostBasisTrajectoryEntry",
+    "CrossHostBasisTrajectoryRatificationEnvelope",
+    "CrossHostBasisTrajectoryRegistry",
+    "W37CrossHostTrajectoryResult",
+    "CrossHostBasisTrajectoryOrchestrator",
+    "verify_cross_host_trajectory_ratification",
+    "select_cross_host_trajectory_projection",
+    "build_trivial_cross_host_trajectory_registry",
+    "build_cross_host_trajectory_registry",
+    "W37_CROSS_HOST_TRAJECTORY_SCHEMA_VERSION",
+    "W37_DEFAULT_TRAJECTORY_EWMA_ALPHA",
+    "W37_DEFAULT_TRAJECTORY_THRESHOLD",
+    "W37_DEFAULT_TRAJECTORY_MARGIN_MIN",
+    "W37_DEFAULT_MIN_ANCHORED_OBSERVATIONS",
+    "W37_DEFAULT_MIN_TRAJECTORY_ANCHORED_HOSTS",
+    "W37_DEFAULT_TRAJECTORY_HISTORY_WINDOW",
+    "W37_BRANCH_TRAJECTORY_RESOLVED",
+    "W37_BRANCH_TRIVIAL_TRAJECTORY_PASSTHROUGH",
+    "W37_BRANCH_TRAJECTORY_REJECTED",
+    "W37_BRANCH_TRAJECTORY_DISABLED",
+    "W37_BRANCH_TRAJECTORY_NO_TRIGGER",
+    "W37_BRANCH_TRAJECTORY_REROUTED",
+    "W37_BRANCH_TRAJECTORY_UNSAFE",
+    "W37_BRANCH_TRAJECTORY_ABSTAINED",
+    "W37_BRANCH_TRAJECTORY_NO_HISTORY",
+    "W37_BRANCH_TRAJECTORY_DISAGREEMENT",
+    "W37_BRANCH_TRAJECTORY_POISONED",
+    "W37_ALL_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

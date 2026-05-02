@@ -1,33 +1,53 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (SDK v3.37 / W36, 2026-05-02).**
+> **Latest milestone marker (SDK v3.38 / W37, 2026-05-02).**
+> *Anchor-cross-host basis-trajectory ratification + manifest-v7 CID*.
+> W37 wraps W36's host-diverse trust-subspace guard with a closed-form
+> per-(host, oracle, top_set) EWMA over *anchored* historical
+> observations.  W36 abstains whenever the current cell has fewer than
+> ``min_distinct_hosts`` healthy attested hosts -- even when the
+> remaining single host has been independently anchored across earlier
+> cells by other healthy hosts.  W37 makes that historical cross-host
+> anchoring a typed audited precondition for a safe single-host reroute.
+> Geometry-aware dense-control integration materially helped at the
+> cross-cell host-trust boundary: on R-84-SINGLE-HOST-TRAJECTORY-RECOVER,
+> W37 improves over W36 from 0.500 to **1.000** correctness
+> (**Δ_correctness_w37_w36 = +0.500**, min and max equal across 5/5
+> seeds) at trust precision **1.000**.  Trust/audit survived: W37 adds
+> 14 mechanically tested verifier failure modes and manifest-v7 CID
+> binding, bringing the cumulative W22..W37 trust boundary to
+> **126 enumerated failure modes**.  Bounded-context efficiency
+> improved in the dense-state sense: about **29.5k structured bits per
+> visible W37 token** on the load-bearing regime.  Multi-host evidence
+> broadened only within the two-reachable-host topology: local
+> ``gemma2:9b`` and remote ``qwen2.5:14b`` produced 8/8 responsive
+> probes, 8/8 cross-host anchored agreements, and 8/8 gold-correlated
+> agreements at temperature 0; ``192.168.12.248`` still times out (Mac 2
+> ARP-incomplete for the **30th milestone in a row**).  Earlier loose
+> ends closed versus sharpened: W37 closes the W36 single-host recovery
+> case and proves a new ``W37-L-MULTI-HOST-COLLUSION-CAP`` limitation
+> theorem at the capsule layer; it does not close native latent and
+> still cannot recover under two-host collusion at the capsule layer.
+> Release readiness improves as a consequence: W37 is experimental,
+> stable runtime unchanged, version bumped to SDK v3.38 / 0.5.11.
+> **Net effect on the original thesis**: materially stronger than W36
+> at the cross-cell × cross-host audited proxy boundary, still blocked
+> by a deeper trust/semantics wall for true native latent, by two-host
+> collusion at the capsule layer, and by Mac 2 unavailability.
+> See ``docs/RESULTS_WEVRA_W37_CROSS_HOST_BASIS_TRAJECTORY.md`` and
+> ``docs/SUCCESS_CRITERION_W37_CROSS_HOST_BASIS_TRAJECTORY.md``.
+
+> **Earlier milestone marker (SDK v3.37 / W36, 2026-05-02).**
 > *Host-diverse trust-subspace guard + manifest-v6 CID*.  W36 wraps
 > W35's trust-subspace dense-control proxy with a controller-verified
 > host-diversity precondition: dense support must be attested by at
-> least two distinct registered healthy hosts.  Geometry-aware dense-
-> control integration materially helped at the host-trust boundary:
-> on R-83-HOST-DIVERSE-RECOVER, W36 improves over W35 from 0.625 to
-> **0.9375** correctness (**+0.3125**) across 5/5 seeds and restores
-> trust precision from 0.6667 to **1.000**.  Trust/audit survived:
-> W36 adds 14 mechanically tested verifier failure modes and
-> manifest-v6 CID binding, bringing the cumulative W22..W36 trust
-> boundary to **112 enumerated failure modes**.  Bounded-context
-> efficiency improved in the dense-state sense: about **13.95k
-> structured bits per visible W36 token** on the load-bearing regime.
-> Multi-host evidence broadened only within the two-reachable-host
-> topology: local Ollama and `192.168.12.191` are usable and a bounded
-> probe observed 4/5 cross-host disagreements, all gold-correlated;
-> `192.168.12.248` still times out and true three-host evidence remains
-> blocked.  Earlier loose ends closed versus sharpened: W36 closes a
-> W35 unsafe host-support case and sharpens the no-live-attestation
-> wall; it does not close native latent or systematic live magnitude.
-> Release readiness improves as a consequence: W36 is experimental,
-> stable runtime unchanged, version bumped to SDK v3.37 / 0.5.10.
-> **Net effect on the original thesis**: materially stronger than W35
-> at the audited host-trust proxy boundary, still blocked by a deeper
-> trust/semantics wall for true native latent and by Mac 2 unavailability.
-> See ``docs/RESULTS_WEVRA_W36_HOST_DIVERSE_TRUST_SUBSPACE.md`` and
-> ``docs/SUCCESS_CRITERION_W36_HOST_DIVERSE_TRUST_SUBSPACE.md``.
+> least two distinct registered healthy hosts.  On R-83-HOST-DIVERSE-
+> RECOVER, W36 improves over W35 from 0.625 to **0.9375** correctness
+> (**+0.3125**) across 5/5 seeds and restores trust precision from
+> 0.6667 to **1.000**.  W36 added 14 mechanically tested verifier
+> failure modes and manifest-v6 CID binding, bringing the cumulative
+> W22..W36 trust boundary to **112 enumerated failure modes**.
+> SDK v3.37 / 0.5.10.
 
 > Canonical long-running document for the research programme behind
 > `context-zero`. This is a plan for a body of work, not a changelog.

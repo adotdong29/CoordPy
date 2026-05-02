@@ -26480,3 +26480,1424 @@ def build_host_diverse_registry(
         abstain_on_unverified_host_projection=bool(
             abstain_on_unverified_host_projection),
     )
+
+
+# =============================================================================
+# SDK v3.38 — W37 family
+# Anchor-cross-host basis-trajectory ratification + manifest-v7 CID.
+#
+# W37 wraps W36's host-diverse trust-subspace guard with a closed-form
+# cross-host basis-trajectory state.  W36 abstains whenever the current cell
+# has fewer than ``min_distinct_hosts`` healthy attested hosts even if the
+# remaining single host has been independently anchored by other healthy
+# hosts in earlier cells.  W37 maintains a per-(host_id, oracle_id, top_set)
+# closed-form EWMA over *anchored* historical observations and -- only when
+# the supporting host has a cross-host anchored trajectory above threshold
+# -- converts a W36 host-diversity abstention into a safe single-host
+# reroute.  Without an anchored trajectory, W37 preserves W36 behavior
+# byte-for-byte.
+#
+# The trajectory is closed-form deterministic: zero parameters, zero
+# gradients, zero training step.  An "anchored" observation is one where
+# at least one *other* registered healthy host attested the same top_set
+# at the same cell, proving that the trajectory was at one point cross-
+# host validated.
+#
+# What W37 is NOT (do-not-overstate)
+# ----------------------------------
+#   * NOT a transformer-internal hidden-state projection.
+#   * NOT a runtime KV-cache transplant.
+#   * NOT a learned trajectory model (zero parameters).
+#   * NOT proof of temporal ordering at the model layer.
+#   * NOT closure of the W37-L-MULTI-HOST-COLLUSION-CAP limitation theorem
+#     (when two registered hosts simultaneously emit a coordinated wrong
+#     top_set across enough cells, the trajectory crosses the anchored-
+#     observation threshold; recovery requires native-latent evidence
+#     architecturally outside the capsule layer).
+# =============================================================================
+
+
+W37_CROSS_HOST_TRAJECTORY_SCHEMA_VERSION: str = (
+    "wevra.cross_host_basis_trajectory.v1")
+
+W37_BRANCH_TRAJECTORY_RESOLVED = "trajectory_resolved"
+W37_BRANCH_TRIVIAL_TRAJECTORY_PASSTHROUGH = (
+    "trivial_trajectory_passthrough")
+W37_BRANCH_TRAJECTORY_REJECTED = "trajectory_rejected"
+W37_BRANCH_TRAJECTORY_DISABLED = "trajectory_disabled"
+W37_BRANCH_TRAJECTORY_NO_TRIGGER = "trajectory_no_trigger"
+W37_BRANCH_TRAJECTORY_REROUTED = "trajectory_rerouted"
+W37_BRANCH_TRAJECTORY_UNSAFE = "trajectory_unsafe"
+W37_BRANCH_TRAJECTORY_ABSTAINED = "trajectory_abstained"
+W37_BRANCH_TRAJECTORY_NO_HISTORY = "trajectory_no_history"
+W37_BRANCH_TRAJECTORY_DISAGREEMENT = "trajectory_disagreement"
+W37_BRANCH_TRAJECTORY_POISONED = "trajectory_poisoned"
+
+W37_ALL_BRANCHES: tuple[str, ...] = (
+    W37_BRANCH_TRAJECTORY_RESOLVED,
+    W37_BRANCH_TRIVIAL_TRAJECTORY_PASSTHROUGH,
+    W37_BRANCH_TRAJECTORY_REJECTED,
+    W37_BRANCH_TRAJECTORY_DISABLED,
+    W37_BRANCH_TRAJECTORY_NO_TRIGGER,
+    W37_BRANCH_TRAJECTORY_REROUTED,
+    W37_BRANCH_TRAJECTORY_UNSAFE,
+    W37_BRANCH_TRAJECTORY_ABSTAINED,
+    W37_BRANCH_TRAJECTORY_NO_HISTORY,
+    W37_BRANCH_TRAJECTORY_DISAGREEMENT,
+    W37_BRANCH_TRAJECTORY_POISONED,
+)
+
+W37_DEFAULT_TRAJECTORY_EWMA_ALPHA: float = 0.50
+W37_DEFAULT_TRAJECTORY_THRESHOLD: float = 0.80
+W37_DEFAULT_TRAJECTORY_MARGIN_MIN: float = 0.10
+W37_DEFAULT_MIN_ANCHORED_OBSERVATIONS: int = 2
+W37_DEFAULT_MIN_TRAJECTORY_ANCHORED_HOSTS: int = 2
+W37_DEFAULT_TRAJECTORY_HISTORY_WINDOW: int = 32
+
+
+@dataclasses.dataclass(frozen=True)
+class CrossHostBasisTrajectoryEntry:
+    """One W37 per-(host_id, oracle_id, top_set) trajectory entry.
+
+    ``ewma_anchored_match`` is the EWMA over a binary signal that fires
+    whenever the trajectory observation at a given cell was *anchored* --
+    i.e. some other registered healthy host attested the same top_set
+    at that cell.  An entry with high ``ewma_anchored_match`` and high
+    ``n_anchored_observations`` and at least
+    ``min_trajectory_anchored_hosts`` distinct anchor hosts in
+    ``anchored_host_ids`` is a *safe* single-host reroute candidate.
+    """
+
+    host_id: str
+    oracle_id: str
+    top_set: tuple[str, ...]
+    ewma_anchored_match: float
+    n_observations: int
+    n_anchored_observations: int
+    anchored_host_ids: tuple[str, ...]
+    last_cell_idx: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "host_id": str(self.host_id),
+            "oracle_id": str(self.oracle_id),
+            "top_set": [str(t) for t in self.top_set],
+            "ewma_anchored_match": round(
+                float(self.ewma_anchored_match), 4),
+            "n_observations": int(self.n_observations),
+            "n_anchored_observations": int(self.n_anchored_observations),
+            "anchored_host_ids": [
+                str(h) for h in sorted(self.anchored_host_ids)],
+            "last_cell_idx": int(self.last_cell_idx),
+        }
+
+
+def _compute_cross_host_trajectory_state_cid(
+        *,
+        trajectory_entries: Sequence[CrossHostBasisTrajectoryEntry],
+) -> str:
+    payload = _canonical_json_bytes({
+        "cross_host_trajectory_entries": [
+            t.as_dict() for t in trajectory_entries],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w37_trajectory_audit_cid(
+        *,
+        projection_branch: str,
+        selected_oracle_ids: Sequence[str],
+        supporting_host_ids: Sequence[str],
+        trajectory_anchor_host_ids: Sequence[str],
+        projection_top_set: Sequence[str],
+        trajectory_score: float,
+        trajectory_margin: float,
+        trajectory_threshold: float,
+        trajectory_margin_min: float,
+        min_anchored_observations: int,
+        min_trajectory_anchored_hosts: int,
+) -> str:
+    payload = _canonical_json_bytes({
+        "projection_branch": str(projection_branch),
+        "selected_oracle_ids": [
+            str(o) for o in sorted(selected_oracle_ids)],
+        "supporting_host_ids": [
+            str(h) for h in sorted(supporting_host_ids)],
+        "trajectory_anchor_host_ids": [
+            str(h) for h in sorted(trajectory_anchor_host_ids)],
+        "projection_top_set": [
+            str(t) for t in sorted(projection_top_set)],
+        "trajectory_score": round(float(trajectory_score), 4),
+        "trajectory_margin": round(float(trajectory_margin), 4),
+        "trajectory_threshold": round(float(trajectory_threshold), 4),
+        "trajectory_margin_min": round(float(trajectory_margin_min), 4),
+        "min_anchored_observations": int(min_anchored_observations),
+        "min_trajectory_anchored_hosts": int(min_trajectory_anchored_hosts),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w37_trajectory_topology_cid(
+        *,
+        registered_host_ids: Iterable[str],
+        registered_anchor_host_ids: Iterable[str],
+) -> str:
+    payload = _canonical_json_bytes({
+        "registered_host_ids": [
+            str(h) for h in sorted(registered_host_ids)],
+        "registered_anchor_host_ids": [
+            str(h) for h in sorted(registered_anchor_host_ids)],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w37_manifest_v7_cid(
+        *,
+        parent_w36_cid: str,
+        cross_host_trajectory_state_cid: str,
+        trajectory_audit_cid: str,
+        trajectory_topology_cid: str,
+) -> str:
+    payload = _canonical_json_bytes({
+        "parent_w36_cid": str(parent_w36_cid),
+        "cross_host_trajectory_state_cid": str(
+            cross_host_trajectory_state_cid),
+        "trajectory_audit_cid": str(trajectory_audit_cid),
+        "trajectory_topology_cid": str(trajectory_topology_cid),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w37_outer_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        parent_w36_cid: str,
+        cross_host_trajectory_state_cid: str,
+        trajectory_audit_cid: str,
+        trajectory_topology_cid: str,
+        manifest_v7_cid: str,
+        cell_index: int,
+) -> str:
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "parent_w36_cid": str(parent_w36_cid),
+        "cross_host_trajectory_state_cid": str(
+            cross_host_trajectory_state_cid),
+        "trajectory_audit_cid": str(trajectory_audit_cid),
+        "trajectory_topology_cid": str(trajectory_topology_cid),
+        "manifest_v7_cid": str(manifest_v7_cid),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def select_cross_host_trajectory_projection(
+        *,
+        trajectory_entries: Sequence[CrossHostBasisTrajectoryEntry],
+        current_basis_entries: Sequence[
+            tuple[str, str, tuple[str, ...]]],
+        trajectory_threshold: float = W37_DEFAULT_TRAJECTORY_THRESHOLD,
+        trajectory_margin_min: float = W37_DEFAULT_TRAJECTORY_MARGIN_MIN,
+        min_anchored_observations: int = (
+            W37_DEFAULT_MIN_ANCHORED_OBSERVATIONS),
+        min_trajectory_anchored_hosts: int = (
+            W37_DEFAULT_MIN_TRAJECTORY_ANCHORED_HOSTS),
+) -> tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...],
+           tuple[str, ...], float, float, str]:
+    """Select a single-host reroute candidate using cross-host trajectory.
+
+    The selector matches each current-cell basis entry
+    ``(host_id, oracle_id, top_set)`` against the persisted trajectory
+    state.  An entry is *current-trusted* iff:
+
+      * the matching trajectory entry has
+        ``ewma_anchored_match >= trajectory_threshold``;
+      * its ``n_anchored_observations`` is at least
+        ``min_anchored_observations``;
+      * the union of ``anchored_host_ids`` has at least
+        ``min_trajectory_anchored_hosts`` distinct hosts.
+
+    The branch is:
+
+      * ``REROUTED`` -- exactly one top_set is current-trusted
+        (with score-margin >= ``trajectory_margin_min`` against any
+        also-trusted competitor);
+      * ``DISAGREEMENT`` -- two or more current top_sets are trusted
+        within margin;
+      * ``NO_HISTORY`` -- no current basis entry passes the trusted
+        thresholds (covers no-history, poisoned-single-host, and
+        too-few-anchored-observations);
+      * ``UNSAFE`` -- a current top_set passes some thresholds but not
+        all (e.g. score below threshold).
+
+    Returns:
+        (top_set, oracle_ids, host_ids, anchor_host_ids,
+         trajectory_score, trajectory_margin, branch).
+    """
+    by_key: dict[
+        tuple[str, str, tuple[str, ...]],
+        CrossHostBasisTrajectoryEntry] = {}
+    for entry in trajectory_entries:
+        key = (str(entry.host_id), str(entry.oracle_id),
+               tuple(sorted(str(t) for t in entry.top_set)))
+        by_key[key] = entry
+    current_trusted: list[
+        tuple[str, str, tuple[str, ...],
+              CrossHostBasisTrajectoryEntry, float]
+    ] = []
+    current_below_threshold: list[float] = []
+    for host_id, oracle_id, top in current_basis_entries:
+        host_id = str(host_id)
+        oracle_id = str(oracle_id)
+        top_sorted = tuple(sorted(str(t) for t in top))
+        if not host_id or not oracle_id or not top_sorted:
+            continue
+        entry = by_key.get((host_id, oracle_id, top_sorted))
+        if entry is None:
+            continue
+        score = _bounded_unit(float(entry.ewma_anchored_match))
+        n_anchored = int(entry.n_anchored_observations)
+        anchor_hosts = set(str(h) for h in entry.anchored_host_ids)
+        if (n_anchored < int(min_anchored_observations)
+                or len(anchor_hosts)
+                < int(min_trajectory_anchored_hosts)):
+            current_below_threshold.append(score)
+            continue
+        if score < float(trajectory_threshold):
+            current_below_threshold.append(score)
+            continue
+        current_trusted.append(
+            (host_id, oracle_id, top_sorted, entry, score))
+    if not current_trusted:
+        if not trajectory_entries:
+            return ((), (), (), (), 0.0, 0.0,
+                    W37_BRANCH_TRAJECTORY_NO_HISTORY)
+        if current_below_threshold:
+            return ((), (), (), (),
+                    float(max(current_below_threshold)), 0.0,
+                    W37_BRANCH_TRAJECTORY_UNSAFE)
+        return ((), (), (), (), 0.0, 0.0,
+                W37_BRANCH_TRAJECTORY_NO_HISTORY)
+    by_top: dict[
+        tuple[str, ...],
+        list[tuple[str, str, CrossHostBasisTrajectoryEntry, float]]
+    ] = {}
+    for host_id, oracle_id, top, entry, score in current_trusted:
+        by_top.setdefault(top, []).append(
+            (host_id, oracle_id, entry, score))
+    grouped_scores: list[tuple[tuple[str, ...], float]] = []
+    for top, group in by_top.items():
+        group_score = sum(score for _, _, _, score in group) / len(group)
+        grouped_scores.append((top, float(group_score)))
+    grouped_scores.sort(key=lambda row: (-row[1], row[0]))
+    best_top, best_score = grouped_scores[0]
+    second_score = (float(grouped_scores[1][1])
+                    if len(grouped_scores) > 1 else 0.0)
+    margin = float(best_score) - float(second_score)
+    if (len(grouped_scores) > 1
+            and margin < float(trajectory_margin_min)):
+        return ((), (), (), (), float(best_score), float(margin),
+                W37_BRANCH_TRAJECTORY_DISAGREEMENT)
+    group = by_top[best_top]
+    hosts = tuple(sorted({h for h, _, _, _ in group}))
+    oracles = tuple(sorted({o for _, o, _, _ in group}))
+    anchor_hosts: set[str] = set()
+    for _, _, e, _ in group:
+        anchor_hosts.update(str(h) for h in e.anchored_host_ids)
+    return (tuple(best_top), tuple(oracles), tuple(hosts),
+            tuple(sorted(anchor_hosts)),
+            float(best_score), float(margin),
+            W37_BRANCH_TRAJECTORY_REROUTED)
+
+
+@dataclasses.dataclass(frozen=True)
+class CrossHostBasisTrajectoryRatificationEnvelope:
+    """Content-addressed W37 cross-host basis-trajectory envelope."""
+
+    schema_version: str
+    schema_cid: str
+    parent_w36_cid: str
+    trajectory_entries: tuple[CrossHostBasisTrajectoryEntry, ...]
+    cross_host_trajectory_state_cid: str
+    trajectory_topology_cid: str
+    projection_branch: str
+    selected_oracle_ids: tuple[str, ...]
+    supporting_host_ids: tuple[str, ...]
+    trajectory_anchor_host_ids: tuple[str, ...]
+    projection_top_set: tuple[str, ...]
+    trajectory_score: float
+    trajectory_margin: float
+    trajectory_threshold: float
+    trajectory_margin_min: float
+    min_anchored_observations: int
+    min_trajectory_anchored_hosts: int
+    trajectory_audit_cid: str
+    manifest_v7_cid: str
+    cell_index: int
+    wire_required: bool = False
+    w37_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.w37_cid:
+            object.__setattr__(self, "w37_cid",
+                               self.recompute_w37_cid())
+
+    def recompute_w37_cid(self) -> str:
+        return _compute_w37_outer_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            parent_w36_cid=self.parent_w36_cid,
+            cross_host_trajectory_state_cid=(
+                self.cross_host_trajectory_state_cid),
+            trajectory_audit_cid=self.trajectory_audit_cid,
+            trajectory_topology_cid=self.trajectory_topology_cid,
+            manifest_v7_cid=self.manifest_v7_cid,
+            cell_index=int(self.cell_index),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w36_cid": self.parent_w36_cid,
+            "trajectory_entries": [
+                t.as_dict() for t in self.trajectory_entries],
+            "cross_host_trajectory_state_cid":
+                self.cross_host_trajectory_state_cid,
+            "trajectory_topology_cid": self.trajectory_topology_cid,
+            "projection_branch": self.projection_branch,
+            "selected_oracle_ids": [
+                str(o) for o in self.selected_oracle_ids],
+            "supporting_host_ids": [
+                str(h) for h in self.supporting_host_ids],
+            "trajectory_anchor_host_ids": [
+                str(h) for h in self.trajectory_anchor_host_ids],
+            "projection_top_set": [
+                str(t) for t in self.projection_top_set],
+            "trajectory_score": round(float(self.trajectory_score), 4),
+            "trajectory_margin": round(float(self.trajectory_margin), 4),
+            "trajectory_threshold": round(
+                float(self.trajectory_threshold), 4),
+            "trajectory_margin_min": round(
+                float(self.trajectory_margin_min), 4),
+            "min_anchored_observations": int(self.min_anchored_observations),
+            "min_trajectory_anchored_hosts": int(
+                self.min_trajectory_anchored_hosts),
+            "trajectory_audit_cid": self.trajectory_audit_cid,
+            "manifest_v7_cid": self.manifest_v7_cid,
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<w37_ref:{self.w37_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_structured_bits(self) -> int:
+        return int(8 * self.n_envelope_bytes)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w36_cid": self.parent_w36_cid,
+            "trajectory_entries": [
+                t.as_dict() for t in self.trajectory_entries],
+            "cross_host_trajectory_state_cid":
+                self.cross_host_trajectory_state_cid,
+            "trajectory_topology_cid": self.trajectory_topology_cid,
+            "projection_branch": self.projection_branch,
+            "selected_oracle_ids": list(self.selected_oracle_ids),
+            "supporting_host_ids": list(self.supporting_host_ids),
+            "trajectory_anchor_host_ids": list(
+                self.trajectory_anchor_host_ids),
+            "projection_top_set": [
+                str(t) for t in self.projection_top_set],
+            "trajectory_score": round(float(self.trajectory_score), 4),
+            "trajectory_margin": round(float(self.trajectory_margin), 4),
+            "trajectory_threshold": round(
+                float(self.trajectory_threshold), 4),
+            "trajectory_margin_min": round(
+                float(self.trajectory_margin_min), 4),
+            "min_anchored_observations": int(self.min_anchored_observations),
+            "min_trajectory_anchored_hosts": int(
+                self.min_trajectory_anchored_hosts),
+            "trajectory_audit_cid": self.trajectory_audit_cid,
+            "manifest_v7_cid": self.manifest_v7_cid,
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "w37_cid": self.w37_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_cross_host_trajectory_ratification(
+        env: CrossHostBasisTrajectoryRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_parent_w36_cid: str,
+        registered_oracle_ids: frozenset[str],
+        registered_host_ids: frozenset[str],
+        registered_anchor_host_ids: frozenset[str],
+        registered_trajectory_topology_cid: str,
+        registered_trajectory_state_cid: str | None = None,
+) -> LatentVerificationOutcome:
+    """Pure-function verifier for the W37 envelope.
+
+    Enumerates 14 failure modes, disjoint from W22..W36.
+    """
+    n_checks = 0
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_w37_envelope", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_version != W37_CROSS_HOST_TRAJECTORY_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="w37_schema_version_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w37_schema_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.parent_w36_cid != str(registered_parent_w36_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w36_parent_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.projection_branch not in W37_ALL_BRANCHES:
+        return LatentVerificationOutcome(
+            ok=False, reason="w37_projection_branch_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    for entry in env.trajectory_entries:
+        if str(entry.oracle_id) not in registered_oracle_ids:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w37_trajectory_entry_unregistered_oracle",
+                n_checks=n_checks)
+    n_checks += 1
+    for entry in env.trajectory_entries:
+        host_id = str(entry.host_id)
+        if host_id and host_id not in registered_host_ids:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w37_trajectory_entry_unregistered_host",
+                n_checks=n_checks)
+        for anchor_host in entry.anchored_host_ids:
+            if (str(anchor_host)
+                    and str(anchor_host) not in registered_host_ids):
+                return LatentVerificationOutcome(
+                    ok=False,
+                    reason="w37_trajectory_entry_unregistered_host",
+                    n_checks=n_checks)
+    n_checks += 1
+    for entry in env.trajectory_entries:
+        ewma = float(entry.ewma_anchored_match)
+        if (math.isnan(ewma) or math.isinf(ewma)
+                or ewma < 0.0 or ewma > 1.0):
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w37_trajectory_ewma_out_of_range",
+                n_checks=n_checks)
+    n_checks += 1
+    for entry in env.trajectory_entries:
+        n_obs = int(entry.n_observations)
+        n_anch = int(entry.n_anchored_observations)
+        if (n_obs < 0 or n_anch < 0 or n_anch > n_obs
+                or int(entry.last_cell_idx) < 0):
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w37_trajectory_observation_count_invalid",
+                n_checks=n_checks)
+    n_checks += 1
+    expected_state_cid = _compute_cross_host_trajectory_state_cid(
+        trajectory_entries=env.trajectory_entries)
+    if expected_state_cid != env.cross_host_trajectory_state_cid:
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w37_trajectory_state_cid_mismatch",
+            n_checks=n_checks)
+    if (registered_trajectory_state_cid is not None
+            and env.cross_host_trajectory_state_cid
+            != registered_trajectory_state_cid):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w37_trajectory_state_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    union_top: set[str] = set()
+    for entry in env.trajectory_entries:
+        union_top.update(str(t) for t in entry.top_set)
+    if (env.projection_top_set
+            and not set(str(t) for t in env.projection_top_set).issubset(
+                union_top)):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w37_projection_top_set_unregistered",
+            n_checks=n_checks)
+    n_checks += 1
+    threshold = float(env.trajectory_threshold)
+    margin_min = float(env.trajectory_margin_min)
+    margin = float(env.trajectory_margin)
+    score = float(env.trajectory_score)
+    min_obs = int(env.min_anchored_observations)
+    min_anchor_hosts = int(env.min_trajectory_anchored_hosts)
+    if (math.isnan(threshold) or math.isinf(threshold)
+            or math.isnan(margin_min) or math.isinf(margin_min)
+            or math.isnan(margin) or math.isinf(margin)
+            or math.isnan(score) or math.isinf(score)
+            or threshold < 0.0 or threshold > 1.0
+            or margin_min < 0.0 or margin_min > 1.0
+            or margin < -1.0 or margin > 1.0
+            or score < 0.0 or score > 1.0
+            or min_obs < 0 or min_anchor_hosts < 0):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w37_trajectory_requirement_invalid",
+            n_checks=n_checks)
+    if (env.projection_branch == W37_BRANCH_TRAJECTORY_REROUTED
+            and (len(set(env.trajectory_anchor_host_ids))
+                 < min_anchor_hosts)):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w37_trajectory_requirement_invalid",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.trajectory_topology_cid != str(registered_trajectory_topology_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w37_trajectory_topology_cid_mismatch",
+            n_checks=n_checks)
+    expected_anchor_set = set(
+        str(h) for h in registered_anchor_host_ids)
+    for h in env.trajectory_anchor_host_ids:
+        if str(h) and str(h) not in expected_anchor_set:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w37_trajectory_topology_cid_mismatch",
+                n_checks=n_checks)
+    n_checks += 1
+    expected_audit_cid = _compute_w37_trajectory_audit_cid(
+        projection_branch=env.projection_branch,
+        selected_oracle_ids=env.selected_oracle_ids,
+        supporting_host_ids=env.supporting_host_ids,
+        trajectory_anchor_host_ids=env.trajectory_anchor_host_ids,
+        projection_top_set=env.projection_top_set,
+        trajectory_score=float(env.trajectory_score),
+        trajectory_margin=float(env.trajectory_margin),
+        trajectory_threshold=float(env.trajectory_threshold),
+        trajectory_margin_min=float(env.trajectory_margin_min),
+        min_anchored_observations=int(env.min_anchored_observations),
+        min_trajectory_anchored_hosts=int(
+            env.min_trajectory_anchored_hosts),
+    )
+    expected_manifest = _compute_w37_manifest_v7_cid(
+        parent_w36_cid=env.parent_w36_cid,
+        cross_host_trajectory_state_cid=(
+            env.cross_host_trajectory_state_cid),
+        trajectory_audit_cid=expected_audit_cid,
+        trajectory_topology_cid=env.trajectory_topology_cid,
+    )
+    if (expected_audit_cid != env.trajectory_audit_cid
+            or expected_manifest != env.manifest_v7_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w37_manifest_v7_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.recompute_w37_cid() != env.w37_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w37_outer_cid_mismatch", n_checks=n_checks)
+    n_checks += 1
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+@dataclasses.dataclass
+class CrossHostBasisTrajectoryRegistry:
+    """Controller-side registry for W37 cross-host basis trajectory."""
+
+    schema: SchemaCapsule | None = None
+    inner_w36_registry: HostDiverseRegistry | None = None
+    trajectory_enabled: bool = True
+    manifest_v7_disabled: bool = False
+    allow_single_host_trajectory_reroute: bool = True
+    trajectory_ewma_alpha: float = W37_DEFAULT_TRAJECTORY_EWMA_ALPHA
+    trajectory_threshold: float = W37_DEFAULT_TRAJECTORY_THRESHOLD
+    trajectory_margin_min: float = W37_DEFAULT_TRAJECTORY_MARGIN_MIN
+    min_anchored_observations: int = (
+        W37_DEFAULT_MIN_ANCHORED_OBSERVATIONS)
+    min_trajectory_anchored_hosts: int = (
+        W37_DEFAULT_MIN_TRAJECTORY_ANCHORED_HOSTS)
+    trajectory_history_window: int = (
+        W37_DEFAULT_TRAJECTORY_HISTORY_WINDOW)
+    registered_oracle_ids: frozenset[str] = frozenset()
+    registered_host_ids: frozenset[str] = frozenset()
+    registered_anchor_host_ids: frozenset[str] = frozenset()
+
+    _envelopes: dict[
+        str, CrossHostBasisTrajectoryRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_w37_registered: int = 0
+    n_w37_rejected: int = 0
+    n_trajectory_reroutes: int = 0
+    n_trajectory_abstentions: int = 0
+    n_trajectory_disagreements: int = 0
+    n_trajectory_no_history: int = 0
+
+    @property
+    def is_trivial(self) -> bool:
+        return (not bool(self.trajectory_enabled)
+                and bool(self.manifest_v7_disabled)
+                and not bool(self.allow_single_host_trajectory_reroute))
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        return not self.is_trivial
+
+    @property
+    def trajectory_topology_cid(self) -> str:
+        return _compute_w37_trajectory_topology_cid(
+            registered_host_ids=self.registered_host_ids,
+            registered_anchor_host_ids=self.registered_anchor_host_ids,
+        )
+
+    def register_envelope(
+            self,
+            envelope: CrossHostBasisTrajectoryRatificationEnvelope,
+            *,
+            registered_parent_w36_cid: str,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            outcome = LatentVerificationOutcome(
+                ok=False, reason="schema_unregistered", n_checks=0)
+            self.n_w37_rejected += 1
+            return outcome
+        outcome = verify_cross_host_trajectory_ratification(
+            envelope,
+            registered_schema=self.schema,
+            registered_parent_w36_cid=str(registered_parent_w36_cid),
+            registered_oracle_ids=frozenset(self.registered_oracle_ids),
+            registered_host_ids=frozenset(self.registered_host_ids),
+            registered_anchor_host_ids=frozenset(
+                self.registered_anchor_host_ids),
+            registered_trajectory_topology_cid=(
+                self.trajectory_topology_cid),
+            registered_trajectory_state_cid=(
+                envelope.cross_host_trajectory_state_cid),
+        )
+        if outcome.ok:
+            self._envelopes[envelope.w37_cid] = envelope
+            self.n_w37_registered += 1
+            if envelope.projection_branch == W37_BRANCH_TRAJECTORY_REROUTED:
+                self.n_trajectory_reroutes += 1
+            elif envelope.projection_branch == (
+                    W37_BRANCH_TRAJECTORY_ABSTAINED):
+                self.n_trajectory_abstentions += 1
+            elif envelope.projection_branch == (
+                    W37_BRANCH_TRAJECTORY_DISAGREEMENT):
+                self.n_trajectory_disagreements += 1
+            elif envelope.projection_branch in (
+                    W37_BRANCH_TRAJECTORY_NO_HISTORY,
+                    W37_BRANCH_TRAJECTORY_NO_TRIGGER):
+                self.n_trajectory_no_history += 1
+        else:
+            self.n_w37_rejected += 1
+        return outcome
+
+
+@dataclasses.dataclass(frozen=True)
+class W37CrossHostTrajectoryResult:
+    """Audit record for one W37 decode call."""
+
+    answer: dict[str, Any]
+    inner_w36_branch: str
+    decoder_branch: str
+    projection_branch: str
+    selected_oracle_ids: tuple[str, ...]
+    supporting_host_ids: tuple[str, ...]
+    trajectory_anchor_host_ids: tuple[str, ...]
+    projection_top_set: tuple[str, ...]
+    trajectory_score: float
+    trajectory_margin: float
+    parent_w36_cid: str
+    cell_index: int
+    n_trajectory_entries: int
+    n_distinct_supporting_hosts: int
+    n_w36_visible_tokens: int
+    n_w37_visible_tokens: int
+    n_w37_overhead_tokens: int
+    w37_cid: str
+    manifest_v7_cid: str
+    cross_host_trajectory_state_cid: str
+    trajectory_audit_cid: str
+    trajectory_topology_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w37: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get(
+                "remediation", "investigate")),
+            "inner_w36_branch": str(self.inner_w36_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "projection_branch": str(self.projection_branch),
+            "selected_oracle_ids": list(self.selected_oracle_ids),
+            "supporting_host_ids": list(self.supporting_host_ids),
+            "trajectory_anchor_host_ids": list(
+                self.trajectory_anchor_host_ids),
+            "projection_top_set": [
+                str(t) for t in self.projection_top_set],
+            "trajectory_score": round(float(self.trajectory_score), 4),
+            "trajectory_margin": round(float(self.trajectory_margin), 4),
+            "parent_w36_cid": str(self.parent_w36_cid),
+            "cell_index": int(self.cell_index),
+            "n_trajectory_entries": int(self.n_trajectory_entries),
+            "n_distinct_supporting_hosts": int(
+                self.n_distinct_supporting_hosts),
+            "n_w36_visible_tokens": int(self.n_w36_visible_tokens),
+            "n_w37_visible_tokens": int(self.n_w37_visible_tokens),
+            "n_w37_overhead_tokens": int(self.n_w37_overhead_tokens),
+            "w37_cid": str(self.w37_cid),
+            "manifest_v7_cid": str(self.manifest_v7_cid),
+            "cross_host_trajectory_state_cid": str(
+                self.cross_host_trajectory_state_cid),
+            "trajectory_audit_cid": str(self.trajectory_audit_cid),
+            "trajectory_topology_cid": str(self.trajectory_topology_cid),
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": str(self.verification_reason),
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w37": float(self.cram_factor_w37),
+        }
+
+
+@dataclasses.dataclass
+class CrossHostBasisTrajectoryOrchestrator:
+    """Cross-host basis-trajectory guard around W36."""
+
+    inner: HostDiverseTrustSubspaceOrchestrator
+    registry: CrossHostBasisTrajectoryRegistry
+    enabled: bool = True
+    require_w37_verification: bool = True
+
+    _last_result: "W37CrossHostTrajectoryResult | None" = None
+    _last_envelope: (
+        "CrossHostBasisTrajectoryRatificationEnvelope | None") = None
+    _cell_index: int = 0
+    _trajectory_state: dict[
+        tuple[str, str, tuple[str, ...]],
+        list[Any]] = dataclasses.field(default_factory=dict)
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.registry.schema
+
+    def reset_session(self) -> None:
+        self.inner.reset_session()
+        self._last_result = None
+        self._last_envelope = None
+        self._cell_index = 0
+        self._trajectory_state = {}
+
+    def _trajectory_entries_snapshot(
+            self,
+    ) -> tuple[CrossHostBasisTrajectoryEntry, ...]:
+        entries: list[CrossHostBasisTrajectoryEntry] = []
+        for (host_id, oracle_id, top), state in sorted(
+                self._trajectory_state.items()):
+            entries.append(CrossHostBasisTrajectoryEntry(
+                host_id=str(host_id),
+                oracle_id=str(oracle_id),
+                top_set=tuple(top),
+                ewma_anchored_match=_bounded_unit(
+                    float(state[0])),
+                n_observations=int(state[1]),
+                n_anchored_observations=int(state[2]),
+                anchored_host_ids=tuple(sorted(set(state[3]))),
+                last_cell_idx=int(state[4]),
+            ))
+        return tuple(entries)
+
+    def _compute_current_basis(self) -> tuple[
+            tuple[tuple[str, str, tuple[str, ...]], ...],
+            tuple[str, ...], tuple[str, ...],
+            dict[tuple[str, tuple[str, ...]], list[str]]]:
+        """Read the current W36 cell's host-attested basis.
+
+        Returns: (current_basis_entries, current_supporting_host_ids,
+                  current_supporting_oracle_ids,
+                  host_top_oracle_map).
+
+        Pure read; does not mutate trajectory state.
+        """
+        w36_result = self.inner.last_result
+        w35_env = self.inner.inner.last_envelope
+        if w36_result is None or w35_env is None:
+            return ((), (), (), {})
+        current_basis: list[
+            tuple[str, str, tuple[str, ...]]] = []
+        current_supporting_hosts: list[str] = []
+        current_supporting_oracles: list[str] = []
+        host_top_oracle: dict[
+            tuple[str, tuple[str, ...]], list[str]] = {}
+        for entry in self.inner._host_diverse_basis_entries():
+            if not bool(entry.host_attested):
+                continue
+            if _bounded_unit(float(entry.host_health)) <= 0.0:
+                continue
+            host_id = str(entry.host_id)
+            oracle_id = str(entry.oracle_id)
+            top = tuple(sorted(str(t) for t in entry.top_set))
+            if not host_id or not top:
+                continue
+            current_supporting_hosts.append(host_id)
+            current_supporting_oracles.append(oracle_id)
+            current_basis.append((host_id, oracle_id, top))
+            host_top_oracle.setdefault((host_id, top), []).append(oracle_id)
+        return (tuple(current_basis),
+                tuple(current_supporting_hosts),
+                tuple(current_supporting_oracles),
+                host_top_oracle)
+
+    def _record_trajectory_observation(
+            self,
+            host_top_oracle: dict[
+                tuple[str, tuple[str, ...]], list[str]],
+    ) -> None:
+        """Update trajectory EWMA state with the current cell's
+        observation.
+
+        An observation is "anchored" iff at least one OTHER healthy
+        registered host attested the same top_set in the same cell.
+        Cells with fewer than two distinct healthy attested hosts
+        carry no co-attestation signal at all; in that case we record
+        the n_observations count but do *not* decay the EWMA, since a
+        host should not be penalised for being the only reachable host
+        when the live infrastructure offers no co-attesters.  This
+        semantics keeps the trajectory anchored against single-host
+        recovery cells while still tracking real cross-host
+        disagreement when multiple hosts are available.
+        """
+        top_to_hosts: dict[tuple[str, ...], set[str]] = {}
+        for (host_id, top), _oids in host_top_oracle.items():
+            top_to_hosts.setdefault(top, set()).add(host_id)
+        distinct_hosts: set[str] = set()
+        for (host_id, _top) in host_top_oracle:
+            distinct_hosts.add(host_id)
+        is_multi_host_cell = len(distinct_hosts) >= 2
+        alpha = float(self.registry.trajectory_ewma_alpha)
+        for (host_id, top), oids in host_top_oracle.items():
+            other_hosts = top_to_hosts.get(top, set()) - {host_id}
+            anchored = bool(other_hosts)
+            for oracle_id in oids:
+                key = (host_id, oracle_id, top)
+                state = self._trajectory_state.get(key)
+                if state is None:
+                    state = [
+                        float(1.0 if anchored else 0.0),
+                        1,
+                        1 if anchored else 0,
+                        set(other_hosts) if anchored else set(),
+                        int(self._cell_index),
+                    ]
+                    self._trajectory_state[key] = state
+                    continue
+                ewma_prev = float(state[0])
+                if is_multi_host_cell:
+                    obs = 1.0 if anchored else 0.0
+                    ewma_new = (1.0 - alpha) * ewma_prev + alpha * obs
+                else:
+                    ewma_new = ewma_prev
+                state[0] = float(ewma_new)
+                state[1] = int(state[1]) + 1
+                if anchored:
+                    state[2] = int(state[2]) + 1
+                    state[3] = set(state[3]) | other_hosts
+                state[4] = int(self._cell_index)
+                self._trajectory_state[key] = state
+
+    def _build_w37_envelope(
+            self,
+            *,
+            parent_w36_cid: str,
+            trajectory_entries: tuple[
+                CrossHostBasisTrajectoryEntry, ...],
+            projection_branch: str,
+            selected_oracle_ids: tuple[str, ...],
+            supporting_host_ids: tuple[str, ...],
+            trajectory_anchor_host_ids: tuple[str, ...],
+            projection_top_set: tuple[str, ...],
+            trajectory_score: float,
+            trajectory_margin: float,
+            wire_required: bool,
+    ) -> CrossHostBasisTrajectoryRatificationEnvelope:
+        state_cid = _compute_cross_host_trajectory_state_cid(
+            trajectory_entries=trajectory_entries)
+        topology_cid = self.registry.trajectory_topology_cid
+        audit_cid = _compute_w37_trajectory_audit_cid(
+            projection_branch=projection_branch,
+            selected_oracle_ids=selected_oracle_ids,
+            supporting_host_ids=supporting_host_ids,
+            trajectory_anchor_host_ids=trajectory_anchor_host_ids,
+            projection_top_set=projection_top_set,
+            trajectory_score=float(trajectory_score),
+            trajectory_margin=float(trajectory_margin),
+            trajectory_threshold=float(
+                self.registry.trajectory_threshold),
+            trajectory_margin_min=float(
+                self.registry.trajectory_margin_min),
+            min_anchored_observations=int(
+                self.registry.min_anchored_observations),
+            min_trajectory_anchored_hosts=int(
+                self.registry.min_trajectory_anchored_hosts),
+        )
+        manifest_cid = _compute_w37_manifest_v7_cid(
+            parent_w36_cid=parent_w36_cid,
+            cross_host_trajectory_state_cid=state_cid,
+            trajectory_audit_cid=audit_cid,
+            trajectory_topology_cid=topology_cid,
+        )
+        return CrossHostBasisTrajectoryRatificationEnvelope(
+            schema_version=W37_CROSS_HOST_TRAJECTORY_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            parent_w36_cid=str(parent_w36_cid),
+            trajectory_entries=trajectory_entries,
+            cross_host_trajectory_state_cid=state_cid,
+            trajectory_topology_cid=topology_cid,
+            projection_branch=str(projection_branch),
+            selected_oracle_ids=tuple(selected_oracle_ids),
+            supporting_host_ids=tuple(supporting_host_ids),
+            trajectory_anchor_host_ids=tuple(trajectory_anchor_host_ids),
+            projection_top_set=tuple(projection_top_set),
+            trajectory_score=float(trajectory_score),
+            trajectory_margin=float(trajectory_margin),
+            trajectory_threshold=float(
+                self.registry.trajectory_threshold),
+            trajectory_margin_min=float(
+                self.registry.trajectory_margin_min),
+            min_anchored_observations=int(
+                self.registry.min_anchored_observations),
+            min_trajectory_anchored_hosts=int(
+                self.registry.min_trajectory_anchored_hosts),
+            trajectory_audit_cid=audit_cid,
+            manifest_v7_cid=manifest_cid,
+            cell_index=int(self._cell_index),
+            wire_required=bool(wire_required),
+        )
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        if not self.enabled or self.schema is None:
+            out = self.inner.decode_rounds(per_round_handoffs)
+            n_w36_visible = int(
+                out.get("host_diverse_trust_subspace", {}).get(
+                    "n_w36_visible_tokens", 0))
+            return self._pack(
+                out=out,
+                decoder_branch=W37_BRANCH_TRAJECTORY_DISABLED,
+                projection_branch="",
+                envelope=None,
+                n_w37_visible=n_w36_visible,
+                w37_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason="disabled",
+                selected_oracle_ids=(),
+                supporting_host_ids=(),
+                trajectory_anchor_host_ids=(),
+                projection_top_set=(),
+                trajectory_score=0.0,
+                trajectory_margin=0.0,
+                parent_w36_cid="",
+                n_traj_entries=0,
+            )
+
+        out = self.inner.decode_rounds(per_round_handoffs)
+        w36_result = self.inner.last_result
+        n_w36_visible = int(w36_result.n_w36_visible_tokens
+                            if w36_result is not None else 0)
+        inner_w36_branch = str(
+            w36_result.decoder_branch if w36_result is not None else "")
+
+        if self.registry.is_trivial:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W37_BRANCH_TRIVIAL_TRAJECTORY_PASSTHROUGH,
+                projection_branch="",
+                envelope=None,
+                n_w37_visible=n_w36_visible,
+                w37_overhead=0,
+                ratified=True,
+                verify_ok=True,
+                verify_reason="trivial_passthrough",
+                selected_oracle_ids=(),
+                supporting_host_ids=(),
+                trajectory_anchor_host_ids=(),
+                projection_top_set=(),
+                trajectory_score=0.0,
+                trajectory_margin=0.0,
+                parent_w36_cid="",
+                n_traj_entries=0,
+            )
+
+        # SELECT BEFORE UPDATE.  Read the current cell's basis without
+        # touching trajectory state, snapshot the prior trajectory, run
+        # the selector, THEN record the observation.  This preserves
+        # the historical anchored EWMA against single-host recovery
+        # cells (which would otherwise dilute it before selection).
+        (current_basis, current_hosts, current_oracles,
+         host_top_oracle) = self._compute_current_basis()
+        traj_entries = self._trajectory_entries_snapshot()
+        # If single-host trajectory reroute is disabled, W37 is purely an
+        # audit layer that mirrors W36 byte-for-byte except for the
+        # envelope it writes.
+        if not self.registry.allow_single_host_trajectory_reroute:
+            envelope = self._build_w37_envelope(
+                parent_w36_cid=str(
+                    self.inner.last_envelope.w36_cid
+                    if self.inner.last_envelope is not None else ""),
+                trajectory_entries=traj_entries,
+                projection_branch=W37_BRANCH_TRAJECTORY_NO_TRIGGER,
+                selected_oracle_ids=(),
+                supporting_host_ids=(),
+                trajectory_anchor_host_ids=(),
+                projection_top_set=(),
+                trajectory_score=0.0,
+                trajectory_margin=0.0,
+                wire_required=self.registry.has_wire_required_layer,
+            )
+            outcome = self.registry.register_envelope(
+                envelope,
+                registered_parent_w36_cid=envelope.parent_w36_cid,
+            )
+            self._record_trajectory_observation(host_top_oracle)
+            self._cell_index += 1
+            w37_overhead = int(envelope.n_wire_tokens)
+            return self._pack(
+                out=out,
+                decoder_branch=W37_BRANCH_TRAJECTORY_NO_TRIGGER,
+                projection_branch=W37_BRANCH_TRAJECTORY_NO_TRIGGER,
+                envelope=envelope,
+                n_w37_visible=n_w36_visible + w37_overhead,
+                w37_overhead=w37_overhead,
+                ratified=bool(outcome.ok),
+                verify_ok=bool(outcome.ok),
+                verify_reason=str(outcome.reason),
+                selected_oracle_ids=(),
+                supporting_host_ids=(),
+                trajectory_anchor_host_ids=(),
+                projection_top_set=(),
+                trajectory_score=0.0,
+                trajectory_margin=0.0,
+                parent_w36_cid=envelope.parent_w36_cid,
+                n_traj_entries=len(traj_entries),
+            )
+
+        # W36 abstention recovery path: try a single-host trajectory
+        # reroute only when W36 abstained on host-diversity AND there is
+        # at least one current healthy host with anchored trajectory
+        # history.
+        w36_branch = inner_w36_branch
+        w36_abstained = (w36_branch == W36_BRANCH_HOST_DIVERSE_ABSTAINED
+                         or w36_branch == W36_BRANCH_HOST_DIVERSE_UNSAFE)
+        (top_set, sel_oracles, sel_hosts, anchor_hosts,
+         traj_score, traj_margin, traj_branch) = (
+            select_cross_host_trajectory_projection(
+                trajectory_entries=traj_entries,
+                current_basis_entries=current_basis,
+                trajectory_threshold=float(
+                    self.registry.trajectory_threshold),
+                trajectory_margin_min=float(
+                    self.registry.trajectory_margin_min),
+                min_anchored_observations=int(
+                    self.registry.min_anchored_observations),
+                min_trajectory_anchored_hosts=int(
+                    self.registry.min_trajectory_anchored_hosts),
+            ))
+
+        decoder_branch = W37_BRANCH_TRAJECTORY_RESOLVED
+        w37_answer = dict(out)
+        w35_services = tuple(sorted(str(t) for t in out.get("services", ())))
+        if (w36_abstained and traj_branch == W37_BRANCH_TRAJECTORY_REROUTED
+                and top_set):
+            w37_answer["services"] = tuple(top_set)
+            decoder_branch = W37_BRANCH_TRAJECTORY_REROUTED
+        elif w36_abstained and traj_branch in (
+                W37_BRANCH_TRAJECTORY_NO_HISTORY,
+                W37_BRANCH_TRAJECTORY_NO_TRIGGER,
+                W37_BRANCH_TRAJECTORY_UNSAFE):
+            decoder_branch = W37_BRANCH_TRAJECTORY_ABSTAINED
+            traj_branch = W37_BRANCH_TRAJECTORY_ABSTAINED
+        elif w36_abstained and traj_branch == (
+                W37_BRANCH_TRAJECTORY_DISAGREEMENT):
+            decoder_branch = W37_BRANCH_TRAJECTORY_DISAGREEMENT
+        elif not w36_abstained:
+            # W36 already ratified; W37 just attaches an audit envelope
+            # that shows the no-trigger trajectory state.
+            decoder_branch = W37_BRANCH_TRAJECTORY_NO_TRIGGER
+            traj_branch = W37_BRANCH_TRAJECTORY_NO_TRIGGER
+
+        parent_w36_cid = str(
+            self.inner.last_envelope.w36_cid
+            if self.inner.last_envelope is not None else "")
+        if not parent_w36_cid:
+            parent_payload = _canonical_json_bytes({
+                "inner_w36_branch": inner_w36_branch,
+                "n_w36_visible": int(n_w36_visible),
+                "cell_index": int(self._cell_index),
+            })
+            parent_w36_cid = hashlib.sha256(parent_payload).hexdigest()
+
+        envelope = self._build_w37_envelope(
+            parent_w36_cid=parent_w36_cid,
+            trajectory_entries=traj_entries,
+            projection_branch=traj_branch,
+            selected_oracle_ids=tuple(sel_oracles),
+            supporting_host_ids=tuple(sel_hosts),
+            trajectory_anchor_host_ids=tuple(anchor_hosts),
+            projection_top_set=tuple(top_set),
+            trajectory_score=float(traj_score),
+            trajectory_margin=float(traj_margin),
+            wire_required=self.registry.has_wire_required_layer,
+        )
+        outcome = self.registry.register_envelope(
+            envelope,
+            registered_parent_w36_cid=parent_w36_cid,
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+        if not verify_ok and self.require_w37_verification:
+            self._record_trajectory_observation(host_top_oracle)
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W37_BRANCH_TRAJECTORY_REJECTED,
+                projection_branch=traj_branch,
+                envelope=envelope,
+                n_w37_visible=n_w36_visible,
+                w37_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason=verify_reason,
+                selected_oracle_ids=tuple(sel_oracles),
+                supporting_host_ids=tuple(sel_hosts),
+                trajectory_anchor_host_ids=tuple(anchor_hosts),
+                projection_top_set=tuple(top_set),
+                trajectory_score=float(traj_score),
+                trajectory_margin=float(traj_margin),
+                parent_w36_cid=parent_w36_cid,
+                n_traj_entries=len(traj_entries),
+            )
+
+        w37_overhead = int(envelope.n_wire_tokens)
+        n_w37_visible = int(n_w36_visible + w37_overhead)
+        out_local = dict(out)
+        for k, v in w37_answer.items():
+            out_local[k] = v
+        if "services" not in w37_answer:
+            out_local["services"] = ()
+        self._record_trajectory_observation(host_top_oracle)
+        self._cell_index += 1
+        return self._pack(
+            out=out_local,
+            decoder_branch=decoder_branch,
+            projection_branch=traj_branch,
+            envelope=envelope,
+            n_w37_visible=n_w37_visible,
+            w37_overhead=w37_overhead,
+            ratified=True,
+            verify_ok=verify_ok,
+            verify_reason=verify_reason,
+            selected_oracle_ids=tuple(sel_oracles),
+            supporting_host_ids=tuple(sel_hosts),
+            trajectory_anchor_host_ids=tuple(anchor_hosts),
+            projection_top_set=tuple(top_set),
+            trajectory_score=float(traj_score),
+            trajectory_margin=float(traj_margin),
+            parent_w36_cid=parent_w36_cid,
+            n_traj_entries=len(traj_entries),
+        )
+
+    def _pack(
+            self,
+            *,
+            out: dict[str, Any],
+            decoder_branch: str,
+            projection_branch: str,
+            envelope: CrossHostBasisTrajectoryRatificationEnvelope | None,
+            n_w37_visible: int,
+            w37_overhead: int,
+            ratified: bool,
+            verify_ok: bool,
+            verify_reason: str,
+            selected_oracle_ids: tuple[str, ...],
+            supporting_host_ids: tuple[str, ...],
+            trajectory_anchor_host_ids: tuple[str, ...],
+            projection_top_set: tuple[str, ...],
+            trajectory_score: float,
+            trajectory_margin: float,
+            parent_w36_cid: str,
+            n_traj_entries: int,
+    ) -> dict[str, Any]:
+        envelope_bytes = (envelope.n_envelope_bytes
+                          if envelope is not None else 0)
+        structured_bits = (envelope.n_structured_bits
+                           if envelope is not None else 0)
+        wire = max(1, int(w37_overhead))
+        cram_factor = (float(structured_bits) / float(wire)
+                       if structured_bits > 0 else 0.0)
+        w37_cid = str(envelope.w37_cid) if envelope is not None else ""
+        manifest_cid = (str(envelope.manifest_v7_cid)
+                        if envelope is not None else "")
+        state_cid = (str(envelope.cross_host_trajectory_state_cid)
+                     if envelope is not None else "")
+        audit_cid = (str(envelope.trajectory_audit_cid)
+                     if envelope is not None else "")
+        topology_cid = (str(envelope.trajectory_topology_cid)
+                        if envelope is not None
+                        else self.registry.trajectory_topology_cid)
+        n_w36_visible = int(out.get("host_diverse_trust_subspace", {}).get(
+            "n_w36_visible_tokens", 0))
+        inner_w36_branch = str(out.get(
+            "host_diverse_trust_subspace", {}).get("decoder_branch", ""))
+        result = W37CrossHostTrajectoryResult(
+            answer=dict(out),
+            inner_w36_branch=inner_w36_branch,
+            decoder_branch=str(decoder_branch),
+            projection_branch=str(projection_branch),
+            selected_oracle_ids=tuple(selected_oracle_ids),
+            supporting_host_ids=tuple(supporting_host_ids),
+            trajectory_anchor_host_ids=tuple(trajectory_anchor_host_ids),
+            projection_top_set=tuple(projection_top_set),
+            trajectory_score=float(trajectory_score),
+            trajectory_margin=float(trajectory_margin),
+            parent_w36_cid=str(parent_w36_cid),
+            cell_index=int(self._cell_index - 1
+                           if self._cell_index > 0 else 0),
+            n_trajectory_entries=int(n_traj_entries),
+            n_distinct_supporting_hosts=len(set(supporting_host_ids)),
+            n_w36_visible_tokens=int(n_w36_visible),
+            n_w37_visible_tokens=int(n_w37_visible),
+            n_w37_overhead_tokens=int(w37_overhead),
+            w37_cid=w37_cid,
+            manifest_v7_cid=manifest_cid,
+            cross_host_trajectory_state_cid=state_cid,
+            trajectory_audit_cid=audit_cid,
+            trajectory_topology_cid=topology_cid,
+            ratified=bool(ratified),
+            verification_ok=bool(verify_ok),
+            verification_reason=str(verify_reason),
+            n_envelope_bytes=int(envelope_bytes),
+            n_structured_bits=int(structured_bits),
+            cram_factor_w37=float(cram_factor),
+        )
+        self._last_result = result
+        self._last_envelope = envelope
+        out_local = dict(out)
+        out_local["cross_host_basis_trajectory"] = result.as_dict()
+        if envelope is not None:
+            out_local["cross_host_basis_trajectory_envelope"] = (
+                envelope.as_dict())
+        return out_local
+
+    def decode(
+            self,
+            handoffs: Sequence[_DecodedHandoff],
+    ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> "W37CrossHostTrajectoryResult | None":
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> (
+            "CrossHostBasisTrajectoryRatificationEnvelope | None"):
+        return self._last_envelope
+
+
+def build_trivial_cross_host_trajectory_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w36_registry: HostDiverseRegistry | None = None,
+        registered_oracle_ids: Iterable[str] = (),
+) -> CrossHostBasisTrajectoryRegistry:
+    return CrossHostBasisTrajectoryRegistry(
+        schema=schema,
+        inner_w36_registry=inner_w36_registry,
+        trajectory_enabled=False,
+        manifest_v7_disabled=True,
+        allow_single_host_trajectory_reroute=False,
+        registered_oracle_ids=frozenset(
+            str(o) for o in registered_oracle_ids),
+        registered_host_ids=frozenset(),
+        registered_anchor_host_ids=frozenset(),
+    )
+
+
+def build_cross_host_trajectory_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w36_registry: HostDiverseRegistry,
+        registered_oracle_ids: Iterable[str] = (),
+        registered_host_ids: Iterable[str] = (),
+        registered_anchor_host_ids: Iterable[str] = (),
+        trajectory_enabled: bool = True,
+        manifest_v7_disabled: bool = False,
+        allow_single_host_trajectory_reroute: bool = True,
+        trajectory_ewma_alpha: float = (
+            W37_DEFAULT_TRAJECTORY_EWMA_ALPHA),
+        trajectory_threshold: float = W37_DEFAULT_TRAJECTORY_THRESHOLD,
+        trajectory_margin_min: float = W37_DEFAULT_TRAJECTORY_MARGIN_MIN,
+        min_anchored_observations: int = (
+            W37_DEFAULT_MIN_ANCHORED_OBSERVATIONS),
+        min_trajectory_anchored_hosts: int = (
+            W37_DEFAULT_MIN_TRAJECTORY_ANCHORED_HOSTS),
+        trajectory_history_window: int = (
+            W37_DEFAULT_TRAJECTORY_HISTORY_WINDOW),
+) -> CrossHostBasisTrajectoryRegistry:
+    return CrossHostBasisTrajectoryRegistry(
+        schema=schema,
+        inner_w36_registry=inner_w36_registry,
+        trajectory_enabled=bool(trajectory_enabled),
+        manifest_v7_disabled=bool(manifest_v7_disabled),
+        allow_single_host_trajectory_reroute=bool(
+            allow_single_host_trajectory_reroute),
+        trajectory_ewma_alpha=float(trajectory_ewma_alpha),
+        trajectory_threshold=float(trajectory_threshold),
+        trajectory_margin_min=float(trajectory_margin_min),
+        min_anchored_observations=int(min_anchored_observations),
+        min_trajectory_anchored_hosts=int(min_trajectory_anchored_hosts),
+        trajectory_history_window=int(trajectory_history_window),
+        registered_oracle_ids=frozenset(
+            str(o) for o in registered_oracle_ids),
+        registered_host_ids=frozenset(
+            str(h) for h in registered_host_ids),
+        registered_anchor_host_ids=frozenset(
+            str(h) for h in registered_anchor_host_ids),
+    )

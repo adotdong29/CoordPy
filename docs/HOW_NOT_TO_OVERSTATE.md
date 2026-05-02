@@ -2,7 +2,7 @@
 
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
+> README-of-README must satisfy these rules. Last touched: SDK v3.38 (W37 family) 2026-05-02. Earlier: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
 > v3.33 (W32 family) 2026-05-01.
 
 The programme has a long history of moves where a candidate result
@@ -116,6 +116,38 @@ precision by abstaining but does not recover correctness.  On
 R-83-NO-LIVE-ATTESTATION, W36 is a correctness-destroying abstention
 guard.  Mac 2 (`192.168.12.248`) still times out, so the live result
 is two-reachable-host evidence only.
+
+### "W37 is native latent" or "W37 closes the multi-host conjecture"
+
+> *"W37 transplants per-host trust state across the transformer."*
+
+Forbidden.  W37 maintains a **closed-form, zero-parameter,
+per-(host, oracle, top_set) EWMA over anchored historical
+observations**.  It does not access hidden states, KV cache, attention
+weights, or embeddings.  The "trajectory" is a sealed tuple of bytes
+sealed under manifest-v7; the EWMA update is the same first-order
+``(1-alpha) * prev + alpha * obs`` recurrence used in W32 and W33.
+
+Permitted phrasing: *"W37 hardens W36 by allowing a single-host
+recovery cell to be safely rerouted iff its (host, oracle, top_set)
+trajectory has been cross-host anchored above threshold across
+historical cells with at least ``min_trajectory_anchored_hosts``
+distinct anchor hosts; without anchored trajectory, W37 preserves W36
+abstention."*
+
+Forbidden phrasing: *"W37 closes W37-C-NATIVE-LATENT"*, *"W37 gives
+true three-host evidence"*, *"W37 makes the repo release-ready by
+itself"*, *"W37 solves context for multi-agent teams"*, *"W37 closes
+W37-L-MULTI-HOST-COLLUSION-CAP"*.
+
+The honest reading is narrower: on R-84-SINGLE-HOST-TRAJECTORY-RECOVER,
+W37 improves over W36 by +0.500 correctness while preserving trust
+precision at 1.000.  On the four named falsifiers (no history,
+poisoned trajectory, disagreement, trivial), W37 preserves W36
+behavior.  Mac 2 still times out (30th milestone), so the live
+trajectory probe is two-reachable-host evidence only.  Two registered
+hosts emitting a coordinated wrong top_set across enough cells can
+defeat W37 at the capsule layer (W37-L-MULTI-HOST-COLLUSION-CAP).
 
 ### "Beats" without a baseline
 
