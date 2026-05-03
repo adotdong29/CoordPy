@@ -41,7 +41,7 @@ from vision_mvp.experiments.phase71_session_compaction import (
     run_phase71_seed_stability_sweep,
     run_cross_regime_synthetic_p71,
 )
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     SchemaCapsule, build_incident_triage_schema_capsule,
     SessionCompactEnvelope, verify_session_compact,
     _compute_window_cid,

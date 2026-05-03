@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "wevra"
+name = "coordpy"
 version = "0.5.16"
-description = "Wevra — bounded-context orchestration and evaluation SDK (first shipped product from the Context Zero research programme)."
+description = "CoordPy — bounded-context orchestration and evaluation SDK (first shipped product from the Context Zero research programme)."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -63,7 +63,7 @@ heavy = [
     "RestrictedPython>=7.0",
 ]
 # Docker-first sandbox backend (Slice 2 target — declared here so
-# `pip install wevra[docker]` resolves once the backend lands).
+# `pip install coordpy[docker]` resolves once the backend lands).
 docker = [
     "docker>=6.0",
 ]
@@ -84,16 +84,16 @@ Issues = "https://github.com/adotdong29/context-zero/issues"
 Changelog = "https://github.com/adotdong29/context-zero/blob/main/CHANGELOG.md"
 
 [project.scripts]
-# Wevra SDK surface — these are the stable, contract-tested entry points.
-wevra = "vision_mvp.wevra._cli:main_run"
-wevra-import = "vision_mvp.wevra._cli:main_import"
-wevra-ci = "vision_mvp.wevra._cli:main_ci"
+# CoordPy SDK surface — these are the stable, contract-tested entry points.
+coordpy = "vision_mvp.coordpy._cli:main_run"
+coordpy-import = "vision_mvp.coordpy._cli:main_import"
+coordpy-ci = "vision_mvp.coordpy._cli:main_ci"
 # Inspect / audit the capsule graph of a finished report (SDK v3).
-wevra-capsule = "vision_mvp.wevra._cli:main_capsule"
+coordpy-capsule = "vision_mvp.coordpy._cli:main_capsule"
 # Research-programme legacy entry point — runs CASR research demos
 # (scale/phase/test/info). Retained for continuity with Phase-1..44
-# scripts and kept out of the Wevra SDK contract on purpose. The
-# public product CLI is `wevra`.
+# scripts and kept out of the CoordPy SDK contract on purpose. The
+# public product CLI is `coordpy`.
 casr = "vision_mvp.__main__:main"
 
 [tool.setuptools.packages.find]

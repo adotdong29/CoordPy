@@ -1,4 +1,4 @@
-# Success criterion - Wevra SDK v3.41 / W40
+# Success criterion - CoordPy SDK v3.41 / W40
 # Cross-host response-signature heterogeneity ratification +
 # manifest-v10 CID + cross-host response-text Jaccard divergence
 # guard

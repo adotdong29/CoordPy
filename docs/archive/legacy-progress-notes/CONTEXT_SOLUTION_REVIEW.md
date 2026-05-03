@@ -1,4 +1,4 @@
-# What We Actually Solve: Context in Wevra
+# What We Actually Solve: Context in CoordPy
 
 ## The Core Problem
 
@@ -10,7 +10,7 @@
 - ❌ No provenance (what caused this context to exist?)
 - ❌ No audit (did someone tamper with it?)
 
-**Wevra's solution**: Context-as-capsule (typed, content-addressed, bounded, immutable, auditable objects).
+**CoordPy's solution**: Context-as-capsule (typed, content-addressed, bounded, immutable, auditable objects).
 
 ---
 
@@ -181,7 +181,7 @@
 **Current state**: Tested on SWE-bench-Lite (code tasks only)
 
 **Research frontier**: Prove it generalizes
-- **Problem**: Validate Wevra on 5+ diverse task domains (not just code)
+- **Problem**: Validate CoordPy on 5+ diverse task domains (not just code)
 - **Math**: Empirical evaluation, statistical significance testing
   - Domain 1: Code understanding (SWE-bench-Lite) ✓ already done
   - Domain 2: Natural language reasoning (QASC, DROP)
@@ -192,7 +192,7 @@
   1. Implement domain adapters (task-specific schema)
   2. Run full evaluation pipeline on each domain
   3. Report: accuracy, context efficiency, compression ratio
-  4. Hypothesis: "Wevra generalizes: achieves >80% of single-domain-optimized baseline while using 50% less context"
+  4. Hypothesis: "CoordPy generalizes: achieves >80% of single-domain-optimized baseline while using 50% less context"
 - **Why it matters**: Proves it's not a code-specific hack
 
 **How it advances the score**:
@@ -245,7 +245,7 @@
    - Learned routing, information-theoretic analysis, cross-domain benchmarks
    - Timeline: 2 months writing + 3 months review
 
-**Why it matters**: Establishes Wevra as a research contribution, not just engineering
+**Why it matters**: Establishes CoordPy as a research contribution, not just engineering
 
 **How it advances the score**:
 - Research: 3 papers → +2 points

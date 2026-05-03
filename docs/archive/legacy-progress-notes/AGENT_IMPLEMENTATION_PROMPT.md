@@ -1,7 +1,7 @@
 # Implementation Prompt for Agent: 1-Day Sprint to 10/10
 
 ## Context
-You are continuing work on **Wevra: Context-Capsule Runtime** (Context Zero research programme). The codebase currently scores **8.2/10 average** across 10 dimensions. Your mission is to implement **quick-win improvements** to reach **9.5+/10** in a single 8-hour working day.
+You are continuing work on **CoordPy: Context-Capsule Runtime** (Context Zero research programme). The codebase currently scores **8.2/10 average** across 10 dimensions. Your mission is to implement **quick-win improvements** to reach **9.5+/10** in a single 8-hour working day.
 
 **Reference document**: `ADVANCEMENT_TO_10_10.md` (in same repo). Read it first for full context.
 
@@ -37,24 +37,24 @@ pip install hypothesis pytest
 ---
 
 ### **Priority 2: Layered API Design** (Usability +1, ~2 hours)
-**File**: `vision_mvp/wevra/api_layers.py` (NEW)
-**What it does**: Create 3-tier API (high/mid/low level) so users at different skill levels can use Wevra.
+**File**: `vision_mvp/coordpy/api_layers.py` (NEW)
+**What it does**: Create 3-tier API (high/mid/low level) so users at different skill levels can use CoordPy.
 **Success criteria**:
-- [ ] File created with 3 classes: `WevraSimpleAPI`, `WevraBuilderAPI`, `WevraAdvancedAPI`
+- [ ] File created with 3 classes: `CoordPySimpleAPI`, `CoordPyBuilderAPI`, `CoordPyAdvancedAPI`
 - [ ] Each class has docstrings explaining intended audience
-- [ ] Imports check: `from vision_mvp.wevra.api_layers import WevraSimpleAPI`
+- [ ] Imports check: `from vision_mvp.coordpy.api_layers import CoordPySimpleAPI`
 - [ ] Example usage works: can instantiate each class without errors
 
 **High-level (for end users)**:
 ```python
-from wevra import run_profile
+from coordpy import run_profile
 result = run_profile("bundled_57", team_size=10)
 ```
 
 **Mid-level (for developers)**:
 ```python
-from wevra.api_layers import WevraBuilderAPI
-config = (WevraBuilderAPI()
+from coordpy.api_layers import CoordPyBuilderAPI
+config = (CoordPyBuilderAPI()
     .with_team_size(10)
     .with_role("code_writer", budget=4096)
     .with_compression("medium")
@@ -63,7 +63,7 @@ config = (WevraBuilderAPI()
 
 **Low-level (for researchers)**:
 ```python
-from wevra.core import CapsuleLedger, HandoffRouter
+from coordpy.core import CapsuleLedger, HandoffRouter
 ledger = CapsuleLedger()
 router = HandoffRouter(subscription_table={...})
 ```
@@ -169,18 +169,18 @@ pytest vision_mvp/tests/test_capsule_properties.py -v
 
 **Step 2.1**: Create file
 ```bash
-touch vision_mvp/wevra/api_layers.py
+touch vision_mvp/coordpy/api_layers.py
 ```
 
 **Step 2.2**: Implement 3 classes
 ```python
-class WevraSimpleAPI:
+class CoordPySimpleAPI:
     """High-level: for end users who just want to run profiles."""
     def run_profile(self, profile_name: str, team_size: int):
         """Simple entry point."""
         pass
 
-class WevraBuilderAPI:
+class CoordPyBuilderAPI:
     """Mid-level: for developers building custom configs."""
     def __init__(self):
         self.config = {}
@@ -191,10 +191,10 @@ class WevraBuilderAPI:
         # Store role config
         return self
     def build(self):
-        """Return WevraConfig."""
+        """Return CoordPyConfig."""
         pass
 
-class WevraAdvancedAPI:
+class CoordPyAdvancedAPI:
     """Low-level: for researchers accessing substrate."""
     def __init__(self):
         from vision_mvp.core import CapsuleLedger, HandoffRouter
@@ -202,22 +202,22 @@ class WevraAdvancedAPI:
         self.router = HandoffRouter()
 ```
 
-**Step 2.3**: Add to `vision_mvp/wevra/__init__.py`
+**Step 2.3**: Add to `vision_mvp/coordpy/__init__.py`
 ```python
-from vision_mvp.wevra.api_layers import (
-    WevraSimpleAPI,
-    WevraBuilderAPI,
-    WevraAdvancedAPI
+from vision_mvp.coordpy.api_layers import (
+    CoordPySimpleAPI,
+    CoordPyBuilderAPI,
+    CoordPyAdvancedAPI
 )
-__all__ = [..., 'WevraSimpleAPI', 'WevraBuilderAPI', 'WevraAdvancedAPI']
+__all__ = [..., 'CoordPySimpleAPI', 'CoordPyBuilderAPI', 'CoordPyAdvancedAPI']
 ```
 
 **Step 2.4**: Test imports
 ```python
-from vision_mvp.wevra import WevraSimpleAPI, WevraBuilderAPI, WevraAdvancedAPI
-api_simple = WevraSimpleAPI()
-api_builder = WevraBuilderAPI().with_team_size(10).build()
-api_advanced = WevraAdvancedAPI()
+from vision_mvp.coordpy import CoordPySimpleAPI, CoordPyBuilderAPI, CoordPyAdvancedAPI
+api_simple = CoordPySimpleAPI()
+api_builder = CoordPyBuilderAPI().with_team_size(10).build()
+api_advanced = CoordPyAdvancedAPI()
 print("✓ All 3 API tiers import successfully")
 ```
 
@@ -298,7 +298,7 @@ After all 4 tasks, verify everything works together:
 pytest vision_mvp/tests/test_capsule_properties.py -v
 
 # 2. API imports work
-python -c "from vision_mvp.wevra import WevraSimpleAPI; print('✓')"
+python -c "from vision_mvp.coordpy import CoordPySimpleAPI; print('✓')"
 
 # 3. TLA+ file exists and is valid
 test -f vision_mvp/formal/CapsuleContract.tla && echo "✓"
@@ -307,7 +307,7 @@ test -f vision_mvp/formal/CapsuleContract.tla && echo "✓"
 test -f docs/THEOREMS_AUTO.md && echo "✓"
 
 # 5. No import errors in main package
-python -c "import vision_mvp.wevra; print('✓')"
+python -c "import vision_mvp.coordpy; print('✓')"
 ```
 
 All should pass ✓.
@@ -328,11 +328,11 @@ All should pass ✓.
 **Deliverables to commit**:
 ```
 + vision_mvp/tests/test_capsule_properties.py
-+ vision_mvp/wevra/api_layers.py
++ vision_mvp/coordpy/api_layers.py
 + vision_mvp/formal/CapsuleContract.tla
 + vision_mvp/scripts/generate_theorem_docs.py
 + docs/THEOREMS_AUTO.md (auto-generated)
-- vision_mvp/wevra/__init__.py (modified: add API tiers to exports)
+- vision_mvp/coordpy/__init__.py (modified: add API tiers to exports)
 ```
 
 ---
@@ -345,7 +345,7 @@ All should pass ✓.
 
 3. **Testing as you go**: After each task, run the quick test:
    ```bash
-   python -c "from vision_mvp.wevra.api_layers import WevraSimpleAPI; print('✓')"
+   python -c "from vision_mvp.coordpy.api_layers import CoordPySimpleAPI; print('✓')"
    ```
 
 4. **Commit per task**: After each of 4 tasks, create a git commit:
@@ -370,7 +370,7 @@ All should pass ✓.
 Agent has succeeded if:
 
 - [ ] `vision_mvp/tests/test_capsule_properties.py` exists and pytest passes
-- [ ] `vision_mvp/wevra/api_layers.py` exists with 3 working classes
+- [ ] `vision_mvp/coordpy/api_layers.py` exists with 3 working classes
 - [ ] `vision_mvp/formal/CapsuleContract.tla` exists with all 6 invariants
 - [ ] `vision_mvp/scripts/generate_theorem_docs.py` runs and generates `docs/THEOREMS_AUTO.md`
 - [ ] All 4 files committed to git with clear commit messages
@@ -403,7 +403,7 @@ If anything is unclear:
 1. Check `ADVANCEMENT_TO_10_10.md` for full context
 2. Read the relevant section (cited above)
 3. Copy the code template
-4. Adapt to Wevra codebase (file paths, imports)
+4. Adapt to CoordPy codebase (file paths, imports)
 5. Test it
 
 You have a 1-day sprint. Go! 🚀

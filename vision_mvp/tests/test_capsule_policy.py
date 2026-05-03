@@ -25,10 +25,10 @@ import unittest
 class CapsulePolicyContractTests(unittest.TestCase):
 
     def test_featurise_is_deterministic(self):
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget,
         )
-        from vision_mvp.wevra.capsule_policy import featurise_capsule
+        from vision_mvp.coordpy.capsule_policy import featurise_capsule
 
         c1 = ContextCapsule.new(
             kind=CapsuleKind.HANDOFF,
@@ -53,7 +53,7 @@ class CapsulePolicyContractTests(unittest.TestCase):
         self.assertEqual(f1["claim:ERROR_RATE_SPIKE"], 1.0)
 
     def test_feature_index_is_closed_vocab(self):
-        from vision_mvp.wevra.capsule_policy import (
+        from vision_mvp.coordpy.capsule_policy import (
             feature_index, _KIND_FEATURES,
         )
         idx = feature_index()
@@ -64,10 +64,10 @@ class CapsulePolicyContractTests(unittest.TestCase):
             self.assertIn(f"kind:{k}", idx)
 
     def test_budgeted_ledger_enforces_token_budget(self):
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget,
         )
-        from vision_mvp.wevra.capsule_policy import (
+        from vision_mvp.coordpy.capsule_policy import (
             BudgetedAdmissionLedger, FIFOPolicy, ADMIT, REJECT,
         )
 
@@ -93,10 +93,10 @@ class CapsulePolicyContractTests(unittest.TestCase):
         self.assertEqual(bal.remaining, 2)
 
     def test_kind_priority_admits_high_priority_only(self):
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget,
         )
-        from vision_mvp.wevra.capsule_policy import (
+        from vision_mvp.coordpy.capsule_policy import (
             BudgetedAdmissionLedger, KindPriorityPolicy, ADMIT,
         )
 
@@ -119,10 +119,10 @@ class CapsulePolicyContractTests(unittest.TestCase):
         self.assertEqual(bal.offer(c2), "REJECT")
 
     def test_train_admission_policy_is_deterministic_in_seed(self):
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget,
         )
-        from vision_mvp.wevra.capsule_policy import (
+        from vision_mvp.coordpy.capsule_policy import (
             train_admission_policy,
         )
 
@@ -161,10 +161,10 @@ class CapsulePolicyContractTests(unittest.TestCase):
         """Regression test: on a synthetic train/test split where
         the hypothesis class is realisable, the learned policy's
         admit-precision strictly beats FIFO on the test set."""
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget,
         )
-        from vision_mvp.wevra.capsule_policy import (
+        from vision_mvp.coordpy.capsule_policy import (
             BudgetedAdmissionLedger, FIFOPolicy,
             train_admission_policy, ADMIT,
         )

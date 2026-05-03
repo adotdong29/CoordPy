@@ -24,11 +24,11 @@ from __future__ import annotations
 
 import numpy as np
 
-from vision_mvp.wevra.capsule import CapsuleKind, ContextCapsule
-from vision_mvp.wevra.capsule_decoder_v2 import (
+from vision_mvp.coordpy.capsule import CapsuleKind, ContextCapsule
+from vision_mvp.coordpy.capsule_decoder_v2 import (
     _phi_sum, DEEPSET_PHI_FEATURES,
 )
-from vision_mvp.wevra.capsule_decoder_relational import (
+from vision_mvp.coordpy.capsule_decoder_relational import (
     COHORT_PSI_FEATURES, COHORT_RHO_FEATURES,
     COHORT_RELATIONAL_FEATURES,
     CohortRelationalDecoder, train_cohort_relational_decoder,

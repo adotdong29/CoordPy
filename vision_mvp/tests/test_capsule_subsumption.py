@@ -54,7 +54,7 @@ class HandleSubsumptionTests(unittest.TestCase):
 
     def _mk_handle_capsule(self, n_tokens: int, distinct_idx: int,
                            parents=()):
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget,
         )
         # Each capsule needs a distinct payload or the CID will
@@ -73,7 +73,7 @@ class HandleSubsumptionTests(unittest.TestCase):
     def test_l2_worker_view_under_budget_admits(self):
         """A worker view assembling 4 handles of 16 tokens each
         under a budget of 64 admits all four."""
-        from vision_mvp.wevra import CapsuleLedger
+        from vision_mvp.coordpy import CapsuleLedger
         worker_view = CapsuleLedger()
         for i in range(4):
             c = self._mk_handle_capsule(n_tokens=16, distinct_idx=i)
@@ -88,7 +88,7 @@ class HandleSubsumptionTests(unittest.TestCase):
         """A single handle whose token count exceeds its declared
         ``max_tokens`` is rejected at admission (the per-handle
         analogue of the worker-budget check)."""
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget,
             CapsuleLedger, CapsuleAdmissionError,
         )
@@ -140,7 +140,7 @@ class HandoffSubsumptionTests(unittest.TestCase):
         ``CapsuleBudget(max_tokens=16)`` → all admitted because
         each handoff's n_tokens (8) ≤ τ (16). Sum is 24 — but
         P31-3 sums *over admitted handoffs*, not per-handoff."""
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             CapsuleLedger, CapsuleBudget, capsule_from_handoff,
         )
         import dataclasses
@@ -162,7 +162,7 @@ class HandoffSubsumptionTests(unittest.TestCase):
         self.assertLessEqual(total, r_star * tau)
 
     def test_p31_3_oversized_handoff_rejected(self):
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             CapsuleLedger, CapsuleBudget, capsule_from_handoff,
             CapsuleAdmissionError,
         )
@@ -195,7 +195,7 @@ class ThreadResolutionSubsumptionTests(unittest.TestCase):
     """
 
     def test_p35_2_resolution_under_witness_cap_admits(self):
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget,
             CapsuleLedger,
         )
@@ -224,7 +224,7 @@ class ThreadResolutionSubsumptionTests(unittest.TestCase):
         T·R_max·W bound). A budget without `max_witnesses` is
         legal but elides that axis — verifying it is *available*
         is the contract test."""
-        from vision_mvp.wevra import CapsuleBudget
+        from vision_mvp.coordpy import CapsuleBudget
         b = CapsuleBudget(
             max_tokens=128, max_rounds=8, max_witnesses=64,
             max_parents=32)
@@ -248,7 +248,7 @@ class SweepCellSubsumptionTests(unittest.TestCase):
     """
 
     def test_p41_1_in_budget_sweep_cell_admits(self):
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             CapsuleLedger, capsule_from_sweep_cell,
         )
         ledger = CapsuleLedger()
@@ -265,7 +265,7 @@ class SweepCellSubsumptionTests(unittest.TestCase):
         self.assertLessEqual(cap.n_bytes, cap.budget.max_bytes)
 
     def test_p41_1_oversized_cell_rejected_at_construction(self):
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget,
         )
         # A SWEEP_CELL with a 100-KB payload but a 32-KB budget
@@ -299,7 +299,7 @@ class FailureModeSubsumptionTests(unittest.TestCase):
         axis. P31-5's separation depends on the subscription
         graph, not on any budget — therefore P31-5 is
         intentionally *not* a Theorem W3-11 reduction."""
-        from vision_mvp.wevra import CapsuleBudget
+        from vision_mvp.coordpy import CapsuleBudget
         legal_axes = set(CapsuleBudget().__dataclass_fields__.keys()) \
             if False else {
             "max_tokens", "max_bytes", "max_rounds",
@@ -315,7 +315,7 @@ class FailureModeSubsumptionTests(unittest.TestCase):
         a budget on the produced capsule. The capsule lifecycle
         does not carry an `extractor_sound` flag.
         """
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget,
         )
         cap = ContextCapsule.new(

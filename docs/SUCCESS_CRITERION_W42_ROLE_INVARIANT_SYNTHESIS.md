@@ -1,4 +1,4 @@
-# Success criterion - Wevra SDK v3.43 / W42
+# Success criterion - CoordPy SDK v3.43 / W42
 # Cross-role-invariant synthesis + manifest-v12 CID +
 # role-handoff-signature axis + composite-collusion bounding
 

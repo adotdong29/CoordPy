@@ -1,4 +1,4 @@
-# Success criterion - Wevra SDK v3.38 / W37
+# Success criterion - CoordPy SDK v3.38 / W37
 # Anchor-cross-host basis-trajectory ratification + manifest-v7 CID
 
 **Pre-committed before final W37 verdict/release decision**:

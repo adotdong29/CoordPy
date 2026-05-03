@@ -1,12 +1,12 @@
-# `wevra-markdown-sink` — minimal out-of-tree Wevra plugin
+# `coordpy-markdown-sink` — minimal out-of-tree CoordPy plugin
 
 This directory is a **standalone, pip-installable Python package** that
-adds a new `ReportSink` to Wevra without editing any file in the main
-repo. It exists as a worked exemplar of the Wevra extension surface: if
-this package installs alongside `wevra` and works via `entry_points`,
+adds a new `ReportSink` to CoordPy without editing any file in the main
+repo. It exists as a worked exemplar of the CoordPy extension surface: if
+this package installs alongside `coordpy` and works via `entry_points`,
 the plugin contract is real.
 
-The sink itself is deliberately tiny: it renders the Wevra product
+The sink itself is deliberately tiny: it renders the CoordPy product
 report as a short Markdown digest and writes it to a configurable path.
 The *point* is not the sink — it's the packaging.
 
@@ -15,25 +15,25 @@ The *point* is not the sink — it's the packaging.
 ```
 out_of_tree_plugin/
 ├── README.md              — this file
-├── pyproject.toml         — declares the `wevra.report_sinks` entry_point
-└── wevra_markdown_sink/
+├── pyproject.toml         — declares the `coordpy.report_sinks` entry_point
+└── coordpy_markdown_sink/
     ├── __init__.py
     └── sink.py            — the ReportSink implementation
 ```
 
-## Install against a real Wevra checkout
+## Install against a real CoordPy checkout
 
 ```bash
-# from a venv that already has wevra installed:
+# from a venv that already has coordpy installed:
 pip install -e ./examples/out_of_tree_plugin
 
 # verify registration:
-python -c "from vision_mvp.wevra.extensions import list_report_sinks; \
+python -c "from vision_mvp.coordpy.extensions import list_report_sinks; \
            print(list_report_sinks())"
 # -> ['jsonfile', 'markdown', 'stdout']
 
 # use it from the CLI:
-wevra --profile local_smoke --out-dir /tmp/wevra-smoke \
+coordpy --profile local_smoke --out-dir /tmp/coordpy-smoke \
       --report-sink markdown
 ```
 
@@ -44,14 +44,14 @@ The `markdown` sink will write `report.md` into the run's `out_dir`.
 `pyproject.toml` in this package declares:
 
 ```toml
-[project.entry-points."wevra.report_sinks"]
-markdown = "wevra_markdown_sink.sink:register"
+[project.entry-points."coordpy.report_sinks"]
+markdown = "coordpy_markdown_sink.sink:register"
 ```
 
-When Wevra first needs a report sink, `wevra.extensions.registry`
+When CoordPy first needs a report sink, `coordpy.extensions.registry`
 discovers this entry point via `importlib.metadata.entry_points`, calls
 `register()`, and the sink becomes resolvable by name. No in-tree edit
-to the Wevra repo is required.
+to the CoordPy repo is required.
 
 ## What this closes
 

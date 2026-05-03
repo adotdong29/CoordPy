@@ -61,7 +61,7 @@ Output shape.
 A nested dict::
 
     {
-      "schema": "wevra.parser_boundary.v1",
+      "schema": "coordpy.parser_boundary.v1",
       "n_instances": <int>,
       "model_tags": [...],
       "parser_modes": [...],
@@ -99,12 +99,12 @@ from vision_mvp.tasks.swe_patch_parser import (
 from vision_mvp.tasks.swe_bench_bridge import (
     load_jsonl_bank, build_synthetic_event_log, parse_unified_diff,
 )
-from vision_mvp.wevra.synthetic_llm import (
+from vision_mvp.coordpy.synthetic_llm import (
     SYNTHETIC_MODEL_PROFILES, make_synthetic_response_fn,
 )
 
 
-SCHEMA = "wevra.parser_boundary.v1"
+SCHEMA = "coordpy.parser_boundary.v1"
 
 # The bundled bank used by ``local_smoke`` / ``bundled_57`` profiles.
 DEFAULT_JSONL = ("vision_mvp/tasks/data/swe_lite_style_bank.jsonl")

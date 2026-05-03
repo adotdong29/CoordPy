@@ -199,7 +199,7 @@ def run_profile(profile_name: str, *,
                  capsule_native: bool = True,
                  deterministic: bool = False,
                  ) -> dict:
-    """Execute one Wevra run.
+    """Execute one CoordPy run.
 
     ``capsule_native`` (default True): drive the run through a
     ``CapsuleNativeRunContext`` so each boundary-crossing artefact
@@ -400,9 +400,9 @@ def _run_profile_capsule_native(profile_name: str, *,
     sealed *after* the RUN_REPORT capsule and recorded as a
     separate post-RUN_REPORT artefact slice.
     """
-    from vision_mvp.wevra.capsule_runtime import CapsuleNativeRunContext
-    from vision_mvp.wevra.provenance import build_manifest
-    from vision_mvp.wevra.runtime import (
+    from vision_mvp.coordpy.capsule_runtime import CapsuleNativeRunContext
+    from vision_mvp.coordpy.provenance import build_manifest
+    from vision_mvp.coordpy.runtime import (
         sweep_spec_from_profile, run_sweep,
     )
 
@@ -468,7 +468,7 @@ def _run_profile_capsule_native(profile_name: str, *,
                     sweep_result = run_sweep(spec, ctx=ctx)
                 except Exception as ex:
                     sweep_result = {
-                        "schema": "wevra.sweep.v2",
+                        "schema": "coordpy.sweep.v2",
                         "mode": sweep_cfg["mode"],
                         "executed_in_process": False,
                         "requires_acknowledgement": False,
@@ -592,7 +592,7 @@ def _run_profile_capsule_native(profile_name: str, *,
     # embedded report["capsules"] and the on-disk capsule_view.json
     # are this exact same render — no chicken-and-egg, no
     # render-twice drift. The view's chain_head is stable from
-    # this moment forward; ``wevra-capsule verify`` cross-checks it.
+    # this moment forward; ``coordpy-capsule verify`` cross-checks it.
     view = ctx.render(include_payload=False)
     product_report["capsules"] = view
 
@@ -702,7 +702,7 @@ def _run_profile_post_hoc(profile_name: str, *,
                 "blockers": readiness_verdict["blockers"],
             }
         else:
-            from vision_mvp.wevra.runtime import (
+            from vision_mvp.coordpy.runtime import (
                 sweep_spec_from_profile, run_sweep,
             )
             spec = sweep_spec_from_profile(
@@ -714,7 +714,7 @@ def _run_profile_post_hoc(profile_name: str, *,
                     sweep_result = run_sweep(spec)
                 except Exception as ex:
                     sweep_result = {
-                        "schema": "wevra.sweep.v2",
+                        "schema": "coordpy.sweep.v2",
                         "mode": sweep_cfg["mode"],
                         "executed_in_process": False,
                         "requires_acknowledgement": False,
@@ -742,7 +742,7 @@ def _run_profile_post_hoc(profile_name: str, *,
         "out_dir": os.path.abspath(out_dir),
     }
 
-    from vision_mvp.wevra.provenance import build_manifest
+    from vision_mvp.coordpy.provenance import build_manifest
     rd_cfg = prof.get("readiness") or {}
     sw_cfg = prof.get("sweep") or {}
     jsonl_path = (
@@ -784,7 +784,7 @@ def _run_profile_post_hoc(profile_name: str, *,
     product_report["artifacts"] = artifacts
     manifest["output"]["artifacts"] = artifacts
 
-    from vision_mvp.wevra.capsule import (
+    from vision_mvp.coordpy.capsule import (
         build_report_ledger, render_view,
     )
     if deterministic:

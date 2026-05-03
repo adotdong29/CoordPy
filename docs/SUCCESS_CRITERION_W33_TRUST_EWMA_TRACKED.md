@@ -29,7 +29,7 @@
 >     - **W32-C-NATIVE-LATENT** (architecture-dependent; out of scope)
 >     - **W32-C-MULTI-HOST** (hardware-bounded; Mac 2 ARP)
 >
-> * `docs/RESULTS_WEVRA_W32_LONG_WINDOW_CONVERGENT.md` — measured W32 result.
+> * `docs/RESULTS_COORDPY_W32_LONG_WINDOW_CONVERGENT.md` — measured W32 result.
 > * `docs/THEOREM_REGISTRY.md` — registry where W33 named claims will
 >   be added on success.
 > * `docs/HOW_NOT_TO_OVERSTATE.md` — soundness guardrails; W33 is
@@ -237,7 +237,7 @@ tampers per ratified cell × 5 seeds.
 
 ### H9 — Release-readiness clause
 
-* SDK_VERSION bumped to ``wevra.sdk.v3.34``.
+* SDK_VERSION bumped to ``coordpy.sdk.v3.34``.
 * ``__experimental__`` tuple updated with W33 symbols.
 * pyproject.toml ``0.5.7``.
 * CHANGELOG entry added.
@@ -249,7 +249,7 @@ tampers per ratified cell × 5 seeds.
 * All W33 unit tests pass.
 * phase69-79 regression suite passes.
 * phase80 unit tests pass (the W33 family bench).
-* Wider wevra suite passes.
+* Wider coordpy suite passes.
 
 ---
 

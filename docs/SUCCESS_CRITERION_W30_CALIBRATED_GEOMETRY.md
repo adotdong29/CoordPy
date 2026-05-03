@@ -16,7 +16,7 @@
 >   routing) AND discharge the still-open W29-C-CRAM-AMPLIFICATION
 >   and W29-C-PARTITION-CALIBRATION conjectures on a regime where the
 >   prior best (W29) misses by construction.
-> * `docs/RESULTS_WEVRA_W29_GEOMETRY_PARTITIONED.md` — measured W29 result
+> * `docs/RESULTS_COORDPY_W29_GEOMETRY_PARTITIONED.md` — measured W29 result
 >   (8/10 hard PASS, 2/10 PARTIAL — H6 absolute 0.75 < 0.95, H7 cram
 >   2.30× < 8×).  Both PARTIALs become named follow-up conjectures the
 >   W30 bar must address head-on.
@@ -310,7 +310,7 @@ disagreement at temperature 0).
 
 ### H9 — Release-readiness clause
 
-* SDK_VERSION bumped to ``wevra.sdk.v3.31``.
+* SDK_VERSION bumped to ``coordpy.sdk.v3.31``.
 * ``__experimental__`` tuple updated to include every W30 symbol.
 * ``pyproject.toml`` version bumped to ``0.5.4``.
 * CHANGELOG entry added.
@@ -325,7 +325,7 @@ disagreement at temperature 0).
 
 * All W22..W29 regression (``test_phase69`` through ``test_phase76``)
   remains passing byte-for-byte.
-* All wider regression ``test_wevra_*`` remains green.
+* All wider regression ``test_coordpy_*`` remains green.
 * New ``test_phase77_calibrated_dense_control.py`` MUST cover every
   enumerated H1 failure mode + H2 byte-equivalence + H3 tamper-rejection
   + H5 falsifiers + H6 cram-factor + H7 calibration prior + H8

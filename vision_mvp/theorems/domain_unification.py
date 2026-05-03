@@ -42,7 +42,7 @@ With capsules, you just add an adapter (linear).
 from vision_mvp.core.cross_domain import (
     DomainAdapter, RoboticsDomainAdapter, NLPDomainAdapter, PlanningDomainAdapter,
 )
-from vision_mvp.wevra.capsule import CapsuleKind
+from vision_mvp.coordpy.capsule import CapsuleKind
 
 
 def get_capsule_vocabulary() -> set[str]:
@@ -128,7 +128,7 @@ def demonstrate_domain_adapter_pattern():
 def measure_files_to_change_for_new_domain(new_domain_name: str) -> dict:
     """Measure: how many files must change to add a new domain?
 
-    WITH CAPSULES (Wevra approach):
+    WITH CAPSULES (CoordPy approach):
       - Add one adapter class to cross_domain.py (1 file modified)
       - Add tests to test_cross_domain.py (1 file modified)
       Total: ~2 files

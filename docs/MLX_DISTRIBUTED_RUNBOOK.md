@@ -2,13 +2,13 @@
 
 > Operator-facing bring-up runbook for a single sharded model
 > spanning two Apple Silicon Macs via MLX distributed inference,
-> targeted at use as a Wevra LLM backend
+> targeted at use as a CoordPy LLM backend
 > (`MLXDistributedBackend`). Last touched: 2026-04-26 (SDK v3.6).
 >
-> Wevra **does not** auto-bring-up the cluster; this runbook is
-> the documented out-of-band procedure. The Wevra-side
+> CoordPy **does not** auto-bring-up the cluster; this runbook is
+> the documented out-of-band procedure. The CoordPy-side
 > integration boundary is one HTTP-client class — see
-> `vision_mvp/wevra/llm_backend.py` and `docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md`.
+> `vision_mvp/coordpy/llm_backend.py` and `docs/archive/coordpy-milestones/RESULTS_COORDPY_DISTRIBUTED.md`.
 
 ## 0. Preconditions
 
@@ -131,10 +131,10 @@ curl -s http://192.168.12.191:8080/v1/chat/completions \
 # expect: {"choices":[{"message":{"content":"OK"...
 ```
 
-## 4. Point Wevra at it
+## 4. Point CoordPy at it
 
 ```python
-from vision_mvp.wevra import (
+from vision_mvp.coordpy import (
     SweepSpec, run_sweep, MLXDistributedBackend,
     CapsuleNativeRunContext,
 )
@@ -178,7 +178,7 @@ L-1..L-11 holds, root_cid is reproducible across runs (with
 python3 -m vision_mvp.experiments.parser_boundary_real_llm \
   --endpoint http://192.168.12.191:8080 \
   --n-instances 10 \
-  --out /tmp/wevra-distributed/real_cross_model_70b.json
+  --out /tmp/coordpy-distributed/real_cross_model_70b.json
 ```
 
 (Modify the experiment's `DEFAULT_MODELS` list to include the
@@ -202,7 +202,7 @@ pkill -f mlx_lm.server
 | Worker rank OOMs                                | shard size > worker memory                                           | bump `--q-bits` to 4; pick a smaller model                             |
 | `mx.distributed.init` hangs                     | TCP interface mismatch                                               | set `--mca btl_tcp_if_include 192.168.12.0/24` to your subnet         |
 | HTTP 500 from `/v1/chat/completions`            | model loaded only on rank 0                                          | each rank must have the converted MLX model on disk locally           |
-| Wevra hangs at first call                       | cold model load > Wevra `timeout`                                    | bump `MLXDistributedBackend(timeout=900.0)` for first call             |
+| CoordPy hangs at first call                       | cold model load > CoordPy `timeout`                                    | bump `MLXDistributedBackend(timeout=900.0)` for first call             |
 
 ## 8. What this runbook does NOT do
 
@@ -211,14 +211,14 @@ pkill -f mlx_lm.server
 * Auto-detect the right model size for your hardware — pick by
   hand based on (per-Mac memory) × (number of Macs) × 0.6.
 * Cryptographically sign the model weights or the manifest;
-  Wevra's `META_MANIFEST` (Theorem W3-36) is content-addressed,
+  CoordPy's `META_MANIFEST` (Theorem W3-36) is content-addressed,
   not signed.
 
 ---
 
-*This runbook is the operator boundary. The Wevra-side
+*This runbook is the operator boundary. The CoordPy-side
 integration is one class
 (`MLXDistributedBackend`) and one optional kwarg on
-`run_sweep`. Wevra deliberately does not absorb cluster
-bring-up; the Wevra contract is product, the cluster is
+`run_sweep`. CoordPy deliberately does not absorb cluster
+bring-up; the CoordPy contract is product, the cluster is
 infrastructure.*

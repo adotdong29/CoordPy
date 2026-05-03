@@ -26,7 +26,7 @@ The new method
 ==============
 
 The bundle-aware team decoder
-:class:`vision_mvp.wevra.team_coord.BundleAwareTeamDecoder` filters
+:class:`vision_mvp.coordpy.team_coord.BundleAwareTeamDecoder` filters
 admitted services by the *causal claim-kind set* of the chosen
 ``root_cause`` (CCK). When the chosen root_cause is a specific-tier
 incident (deadlock / pool_exhaustion / disk_fill / etc.), generic-
@@ -71,7 +71,7 @@ Why this is fair, not benchmark-shopping
 * **Pre-committed bench property + falsifier.** The
   *corroborated-decoy-via-non-causal-kinds* property is mechanically
   tested in
-  ``test_wevra_bundle_decoder.Phase57BankShapeTests``. A *decoy-
+  ``test_coordpy_bundle_decoder.Phase57BankShapeTests``. A *decoy-
   causal-promotion* falsifier regime
   (``build_phase57_falsifier_bank``) shows the W10 win does *not*
   hold when the decoy is ALSO mentioned via at least one
@@ -186,8 +186,8 @@ from vision_mvp.tasks.incident_triage import (
     build_role_subscriptions, grade_answer,
     _decoder_from_handoffs as _phase31_decoder_from_handoffs,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, BundleAwareTeamDecoder,
     ClaimPriorityAdmissionPolicy,
     CohortCoherenceAdmissionPolicy,
@@ -763,7 +763,7 @@ def _candidate_stats(
         has ≥ 1 mention via a CCK-eligible claim_kind, on ≥ 2 distinct
         producer roles)
     """
-    from vision_mvp.wevra.team_coord import (
+    from vision_mvp.coordpy.team_coord import (
         CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE)
     cck = CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE.get(gold_root_cause, frozenset())
     cands_aud = [c for c in candidates if c[1] == ROLE_AUDITOR]

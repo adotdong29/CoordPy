@@ -1,6 +1,6 @@
 # Success Criterion — W28 (Ensemble-Verified Cross-Model Multi-Chain Pivot Ratification)
 
-**SDK target**: wevra.sdk.v3.29
+**SDK target**: coordpy.sdk.v3.29
 **Pre-commit date**: 2026-04-30
 **Status**: pre-committed (the bar is fixed BEFORE the headline numbers are
 collected — falsifiable in either direction).
@@ -30,7 +30,7 @@ multi-agent-coordination result the programme has shipped:
   `enabled=False` reduces W27 to W26 byte-for-byte.
 
 W27's explicit remaining gaps (named in
-`docs/RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md` and reaffirmed by the
+`docs/RESULTS_COORDPY_W27_MULTI_CHAIN_PIVOT.md` and reaffirmed by the
 master plan's post-W27 next-steps section):
 
 * G1. **Live cross-model robustness of the W27 line** — the W27
@@ -137,8 +137,8 @@ soft set (must report honestly, but partial pass is acceptable).
   0.5.2.
 
 * **H8 — Focused regression green**
-  Tests `test_phase70..test_phase74 + test_phase75 + test_wevra_capsules
-  + test_wevra_team_coord + test_wevra_public_api` must all pass
+  Tests `test_phase70..test_phase74 + test_phase75 + test_coordpy_capsules
+  + test_coordpy_team_coord + test_coordpy_public_api` must all pass
   (≥ 508 from before W28 + the new W28 tests). No test must be skipped
   or marked xfail without explicit justification in the results note.
 
@@ -295,5 +295,5 @@ W28 introduces:
 ---
 
 End of pre-commit. Headline numbers will be appended to
-`RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md`; gate-by-gate
+`RESULTS_COORDPY_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md`; gate-by-gate
 verdicts will be appended to this file as a "Verdict" section.

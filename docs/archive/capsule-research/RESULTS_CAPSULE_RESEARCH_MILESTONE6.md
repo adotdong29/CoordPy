@@ -184,7 +184,7 @@ feature vector differs in `rho:distinct_roles_supporting_rc`
 ### 2.2 Status
 
 Proved (constructive).  Code anchor:
-`vision_mvp/wevra/capsule_decoder_relational.py::CohortRelationalDecoder`.
+`vision_mvp/coordpy/capsule_decoder_relational.py::CohortRelationalDecoder`.
 Contract test witnessing the strict separation:
 `vision_mvp/tests/test_phase51_relational_decoder.py::test_w3_30_strict_separation_from_deep_set`.
 
@@ -225,7 +225,7 @@ $n_{\rm test}$: 80 per domain (Gate 1 and zero-shot).
 
 Reproduce: ``python -m vision_mvp.experiments.phase51_relational_decoder``
 (≈ 50 s on a 2024 M-class MacBook).  Artefact:
-`/tmp/wevra_phase51/results_phase51_relational_decoder.json`.
+`/tmp/coordpy_phase51/results_phase51_relational_decoder.json`.
 
 ### 3.2 Gate 1 on Phase-31 noisy bench ($n_{\rm test}=80$)
 
@@ -469,7 +469,7 @@ Phase-51 research question itself.
 ### New files
 
 * `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE6.md` — this note.
-* `vision_mvp/wevra/capsule_decoder_relational.py` —
+* `vision_mvp/coordpy/capsule_decoder_relational.py` —
   ``CohortRelationalDecoder`` + ``train_cohort_relational_decoder``;
   ``COHORT_PSI_FEATURES`` (6) + ``COHORT_RHO_FEATURES`` (6)
   vocabulary; internal helpers.
@@ -495,19 +495,19 @@ Phase-51 research question itself.
 
 ### Not modified (deliberate)
 
-* `vision_mvp/wevra/capsule.py` — capsule contract C1..C6
+* `vision_mvp/coordpy/capsule.py` — capsule contract C1..C6
   byte-for-byte unchanged.
-* `vision_mvp/wevra/capsule_policy.py`,
-  `vision_mvp/wevra/capsule_policy_bundle.py` — admission
+* `vision_mvp/coordpy/capsule_policy.py`,
+  `vision_mvp/coordpy/capsule_policy_bundle.py` — admission
   layer unchanged.
-* `vision_mvp/wevra/capsule_decoder.py`,
-  `vision_mvp/wevra/capsule_decoder_v2.py` — Phase-48 and
+* `vision_mvp/coordpy/capsule_decoder.py`,
+  `vision_mvp/coordpy/capsule_decoder_v2.py` — Phase-48 and
   Phase-49 decoder modules unchanged.  Phase-51's decoder
   lives in the additively-new
-  `vision_mvp/wevra/capsule_decoder_relational.py`.
-* `vision_mvp/wevra/run.py`, `runtime.py`, `provenance.py` —
+  `vision_mvp/coordpy/capsule_decoder_relational.py`.
+* `vision_mvp/coordpy/run.py`, `runtime.py`, `provenance.py` —
   no runtime contract change.
-* `SDK_VERSION` — still `wevra.sdk.v3`.  Phase-51 is a
+* `SDK_VERSION` — still `coordpy.sdk.v3`.  Phase-51 is a
   research-centre milestone, not a public SDK contract change.
 
 ### Tests
@@ -524,7 +524,7 @@ Phase-51 research question itself.
 ```bash
 # Full Phase-51 study — Gate-1 + zero-shot.
 python -m vision_mvp.experiments.phase51_relational_decoder \
-    --out-dir /tmp/wevra_phase51
+    --out-dir /tmp/coordpy_phase51
 # Expect:
 #   [phase51-G1] cohort_relational_decoder  acc=0.362 @ pre-committed cell
 #   [phase51-G1] cohort_relational_decoder  best 0.388 @ learned(p46) B=96
@@ -540,7 +540,7 @@ python -m pytest \
     vision_mvp/tests/test_phase47_cohort_subsumption.py \
     vision_mvp/tests/test_capsule_policy.py \
     vision_mvp/tests/test_capsule_subsumption.py \
-    vision_mvp/tests/test_wevra_capsules.py -q
+    vision_mvp/tests/test_coordpy_capsules.py -q
 # Expect: 96 passed.
 ```
 

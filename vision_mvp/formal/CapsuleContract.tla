@@ -1,9 +1,9 @@
 ------------------------ MODULE CapsuleContract ------------------------
 (***************************************************************************)
-(* Formal specification of the Wevra Capsule Contract (C1..C6).            *)
+(* Formal specification of the CoordPy Capsule Contract (C1..C6).            *)
 (*                                                                         *)
 (* This module is a machine-readable restatement of the invariants stated  *)
-(* informally in `vision_mvp/wevra/capsule.py`. A capsule is modelled as a *)
+(* informally in `vision_mvp/coordpy/capsule.py`. A capsule is modelled as a *)
 (* record; the ledger is a sequence of sealed capsules; a hash chain is a  *)
 (* function from position to chain-hash. The next-state relation is the    *)
 (* three lifecycle transitions (admit, seal, retire).                      *)

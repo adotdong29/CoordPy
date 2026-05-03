@@ -88,7 +88,7 @@ CLI
         --endpoint http://192.168.12.191:11434 \\
         --models synthetic,qwen2.5:14b-32k,qwen3.5:35b \\
         --n-eval 6 \\
-        --out /tmp/wevra-distributed/phase53_scale_vs_structure.json
+        --out /tmp/coordpy-distributed/phase53_scale_vs_structure.json
 
 The synthetic regime falls back to ``extract_claims_for_role`` and
 makes zero LLM calls; it is the SDK v3.5 baseline for cross-check.
@@ -116,15 +116,15 @@ from vision_mvp.tasks.incident_triage import (
     build_scenario_bank, build_role_subscriptions,
     extract_claims_for_role, grade_answer,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.llm_backend import LLMBackend, OllamaBackend
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.llm_backend import LLMBackend, OllamaBackend
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, ClaimPriorityAdmissionPolicy,
     CoverageGuidedAdmissionPolicy, FifoAdmissionPolicy,
     RoleBudget, TeamCoordinator, audit_team_lifecycle,
     capsule_team_handoff,
 )
-from vision_mvp.wevra.team_policy import (
+from vision_mvp.coordpy.team_policy import (
     LearnedTeamAdmissionPolicy, TrainSample,
     train_team_admission_policy,
 )

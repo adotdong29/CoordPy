@@ -2,7 +2,7 @@
 
 This is the reference benchmark for SDK v3.5 (the multi-agent
 capsule coordination research slice). It instantiates the
-``TeamCoordinator`` from ``vision_mvp.wevra.team_coord`` on the
+``TeamCoordinator`` from ``vision_mvp.coordpy.team_coord`` on the
 Phase-31 incident-triage bank under a controlled noise wrapper
 (``vision_mvp.core.extractor_noise``) and compares four admission
 policies head-to-head against the substrate typed-handoff baseline.
@@ -91,16 +91,16 @@ from vision_mvp.tasks.incident_triage import (
     grade_answer, attribute_failure,
     naive_event_stream,
 )
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     CapsuleKind, CapsuleLedger,
 )
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, ClaimPriorityAdmissionPolicy,
     CoverageGuidedAdmissionPolicy, FifoAdmissionPolicy,
     RoleBudget, TeamCoordinator, audit_team_lifecycle,
     capsule_team_handoff,
 )
-from vision_mvp.wevra.team_policy import (
+from vision_mvp.coordpy.team_policy import (
     LearnedTeamAdmissionPolicy, TrainSample,
     train_team_admission_policy,
 )

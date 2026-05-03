@@ -1,15 +1,15 @@
-# Advancing Wevra to 10/10: Comprehensive Academic & Development Roadmap
+# Advancing CoordPy to 10/10: Comprehensive Academic & Development Roadmap
 
 **Version**: 1.0  
 **Date**: April 2026  
 **Target Audience**: AI researchers, ML engineers, software architects  
-**Goal**: Transform Context Zero/Wevra from 8.2/10 average to 9.8+/10 across all evaluation dimensions
+**Goal**: Transform Context Zero/CoordPy from 8.2/10 average to 9.8+/10 across all evaluation dimensions
 
 ---
 
 ## Executive Summary
 
-Wevra is a mature context-capsule runtime with solid fundamentals (23,862 lines of test code, 6-invariant contract, 46 research phases). To reach 10/10 on all dimensions, this document provides:
+CoordPy is a mature context-capsule runtime with solid fundamentals (23,862 lines of test code, 6-invariant contract, 46 research phases). To reach 10/10 on all dimensions, this document provides:
 
 1. **Mathematics & Formal Methods** advances from academic literature
 2. **ML/DL** techniques for context compression and routing
@@ -1290,7 +1290,7 @@ jobs:
 # vision_mvp/tests/fuzz_ledger.py (NEW FILE)
 
 import atheris
-from vision_mvp.wevra.capsule import CapsuleLedger, ContextCapsule
+from vision_mvp.coordpy.capsule import CapsuleLedger, ContextCapsule
 
 @atheris.instrument_func
 def fuzz_ledger_operations(data):
@@ -1491,7 +1491,7 @@ Do these immediately for highest ROI:
 | **Learned routing** | vision_mvp/core/learned_router.py | 3 weeks | Implementation +1.5 | LSTM-based context selection |
 | **Hierarchical context** | vision_mvp/core/hierarchical_compression.py | 2 weeks | Problem-Fit +1.5 | 3-level compression hierarchy |
 | **Capsule embeddings** | vision_mvp/core/capsule_embeddings.py | 2 weeks | Architecture +1 | Dense representations, semantic search |
-| **Layered API** | vision_mvp/wevra/api_layers.py | 1 week | Usability +1 | High/mid/low-level interfaces |
+| **Layered API** | vision_mvp/coordpy/api_layers.py | 1 week | Usability +1 | High/mid/low-level interfaces |
 | **Theorem auto-doc** | vision_mvp/scripts/generate_documentation.py | 1 week | Documentation +0.5 | Auto-generate proof docs |
 
 **Total effort**: 14 weeks with one engineer, 7 weeks with two in parallel.
@@ -1589,7 +1589,7 @@ This roadmap is implementable. Key insights:
 3. **Publish aggressively** (3 conference papers) → establishes novelty and theoretical depth
 
 **Critical success factors:**
-- Keep Wevra's scope narrow (SWE-bench-Lite) but validate beyond it
+- Keep CoordPy's scope narrow (SWE-bench-Lite) but validate beyond it
 - Ground every claim in academic literature (cite papers)
 - Machine-check proofs where possible (TLA+, property tests)
 - Publish early and often (arxiv first, then venues)

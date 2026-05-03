@@ -90,7 +90,7 @@ sharper in adversary cost).
 
 * **Final release declared.**  H1..H12 + S3 + S7 of the W42
   success criterion pass.  The SDK v3.43 line ships as a
-  **final release** of the Wevra SDK v3.4x research line.  This
+  **final release** of the CoordPy SDK v3.4x research line.  This
   is the **end-of-line for the capsule-layer-only research
   programme** in the Context Zero project: the strongest
   capsule-layer audited proxy this repo can support has been
@@ -177,7 +177,7 @@ analog of all previous capsule-layer limitation theorems).
 
 * **RC2 declared.**  H1..H12 + S3 of the W41 success criterion
   pass.  The SDK v3.42 line is the second release-candidate of
-  the Wevra SDK v3.4x line, strictly additive on top of RC1
+  the CoordPy SDK v3.4x line, strictly additive on top of RC1
   (every W22..W41 symbol is exported under
   ``__experimental__``; the stable RunSpec -> run report
   runtime contract is byte-for-byte unchanged).
@@ -259,7 +259,7 @@ is the new proved-conditional
 
 * **RC1 declared.**  H1..H12 + S3 of the W40 success criterion
   pass.  The SDK v3.41 line is the first official release-
-  candidate of the Wevra SDK v3.4x line.
+  candidate of the CoordPy SDK v3.4x line.
 
 ## Earlier TL;DR — SDK v3.40
 
@@ -374,7 +374,7 @@ and
 
 **Stable-vs-experimental boundary**: W39 is exported only under
 `__experimental__`; stable runtime contract remains unchanged.
-SDK_VERSION `wevra.sdk.v3.40`; package version `0.5.13`.  Both
+SDK_VERSION `coordpy.sdk.v3.40`; package version `0.5.13`.  Both
 ``vision_mvp.__version__`` and ``pyproject.toml`` are now
 ``0.5.13`` (alignment maintained).
 
@@ -396,7 +396,7 @@ mutual-disjointness CID); the cross-source × cross-cell × K-of-N
 mutually-disjoint × per-cell audit boundary is now structurally
 explicit in the envelope hierarchy.
 
-See `docs/RESULTS_WEVRA_W39_MULTI_HOST_DISJOINT_QUORUM.md` for
+See `docs/RESULTS_COORDPY_W39_MULTI_HOST_DISJOINT_QUORUM.md` for
 the full note and
 `docs/SUCCESS_CRITERION_W39_MULTI_HOST_DISJOINT_QUORUM.md` for
 the success bar.
@@ -480,7 +480,7 @@ defensible weak proxy for capsule-layer disjointness, not a true
 
 **Stable-vs-experimental boundary**: W38 is exported only under
 `__experimental__`; stable runtime contract remains unchanged.
-SDK_VERSION `wevra.sdk.v3.39`; package version `0.5.12`.  The
+SDK_VERSION `coordpy.sdk.v3.39`; package version `0.5.12`.  The
 lingering ``vision_mvp.__version__ == "0.5.9"`` vs
 ``pyproject.toml == "0.5.11"`` misalignment from earlier milestones
 is closed: both are now ``0.5.12``.
@@ -498,7 +498,7 @@ per-cell live-aware multi-anchor audit remains in manifest-v4; the
 cross-source × cross-cell × per-cell audit boundary is now
 structurally explicit in the envelope hierarchy.
 
-See `docs/RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md` for the
+See `docs/RESULTS_COORDPY_W38_DISJOINT_CONSENSUS_REFERENCE.md` for the
 full note and
 `docs/SUCCESS_CRITERION_W38_DISJOINT_CONSENSUS_REFERENCE.md` for the
 success bar.
@@ -577,7 +577,7 @@ infrastructure currently supports; it does not close W37-C-MULTI-HOST.
 
 **Stable-vs-experimental boundary**: W37 is exported only under
 `__experimental__`; stable runtime contract remains unchanged.
-SDK_VERSION `wevra.sdk.v3.38`; package version `0.5.11`.
+SDK_VERSION `coordpy.sdk.v3.38`; package version `0.5.11`.
 
 **Open walls after W37**: W37-L-MULTI-HOST-COLLUSION-CAP is a new
 proved-conditional limitation theorem at the capsule layer (two
@@ -590,7 +590,7 @@ remains in manifest-v6; per-cell live-aware multi-anchor audit remains
 in manifest-v4; the cross-cell × per-cell audit boundary is now
 structurally explicit in the envelope hierarchy.
 
-See `docs/RESULTS_WEVRA_W37_CROSS_HOST_BASIS_TRAJECTORY.md` for the
+See `docs/RESULTS_COORDPY_W37_CROSS_HOST_BASIS_TRAJECTORY.md` for the
 full note and
 `docs/SUCCESS_CRITERION_W37_CROSS_HOST_BASIS_TRAJECTORY.md` for the
 success bar.
@@ -658,7 +658,7 @@ three-host evidence.
 
 **Stable-vs-experimental boundary**: W36 is exported only under
 `__experimental__`; stable runtime contract remains unchanged.
-SDK_VERSION `wevra.sdk.v3.37`; package version `0.5.10`.
+SDK_VERSION `coordpy.sdk.v3.37`; package version `0.5.10`.
 
 **Open walls after W36**: W33-C-NATIVE-LATENT remains open.  W36 is
 not transformer-internal hidden-state projection, not a KV transplant,
@@ -668,7 +668,7 @@ W36-C-MULTI-HOST remains hardware-bounded until Mac 2 joins the
 topology.  W36 also adds a new operational wall: host-diverse dense
 control is unsafe without real live attestations.
 
-See `docs/RESULTS_WEVRA_W36_HOST_DIVERSE_TRUST_SUBSPACE.md` for the
+See `docs/RESULTS_COORDPY_W36_HOST_DIVERSE_TRUST_SUBSPACE.md` for the
 full note and `docs/SUCCESS_CRITERION_W36_HOST_DIVERSE_TRUST_SUBSPACE.md`
 for the success bar.
 
@@ -738,7 +738,7 @@ true multi-host blocker.
 
 **Stable-vs-experimental boundary**: W35 is exported only under
 `__experimental__`; stable runtime contract remains unchanged.
-SDK_VERSION `wevra.sdk.v3.36`; package version `0.5.9`.
+SDK_VERSION `coordpy.sdk.v3.36`; package version `0.5.9`.
 
 **Open walls after W35**: W33-C-NATIVE-LATENT remains open.  W35 is
 not transformer-internal hidden-state projection, not a KV transplant,
@@ -746,7 +746,7 @@ and not a learned latent controller.  W33-C-CROSS-HOST-LIVE-TRUST-
 MAGNITUDE remains open on the systematic magnitude axis.  W34-C-
 MULTI-HOST remains hardware-bounded until Mac 2 joins the topology.
 
-See `docs/RESULTS_WEVRA_W35_TRUST_SUBSPACE_DENSE_CONTROL.md` for the
+See `docs/RESULTS_COORDPY_W35_TRUST_SUBSPACE_DENSE_CONTROL.md` for the
 full note and `docs/SUCCESS_CRITERION_W35_TRUST_SUBSPACE_DENSE_CONTROL.md`
 for the success bar.
 
@@ -877,7 +877,7 @@ Trust precision = 1.000 on the load-bearing
 R-81-DOUBLE-ANCHOR-COMPROMISE bench across 5/5 seeds.  Backward-
 compat preserved byte-for-byte on the trivial path:
 **48/48 W34 unit tests + 494/494 phase69-81 regression + 211/211
-wider wevra suite = 753 tests pass**.
+wider coordpy suite = 753 tests pass**.
 
 **Trust boundary**: 14 enumerated W34 failure modes in
 ``verify_live_aware_multi_anchor_ratification`` disjoint from
@@ -901,7 +901,7 @@ verify_live_aware_multi_anchor_ratification,
 derive_multi_anchor_consensus_reference,
 compute_response_feature_signature, apply_host_decay,
 build_trivial_live_aware_registry, build_live_aware_registry);
-SDK_VERSION ``wevra.sdk.v3.35``; pyproject.toml ``0.5.8``.  Stable
+SDK_VERSION ``coordpy.sdk.v3.35``; pyproject.toml ``0.5.8``.  Stable
 runtime contract byte-for-byte unchanged from v3.34.
 
 **Conjectures inheriting forward (with W34 sharpening)**:
@@ -932,7 +932,7 @@ on the wrong direction).  Native-latent is required to break this.
 * **W33-INFRA-2** (closed): chat-template + ``num_predict=4`` +
   stop tokens.
 
-See ``docs/RESULTS_WEVRA_W34_LIVE_AWARE_MULTI_ANCHOR.md`` for the
+See ``docs/RESULTS_COORDPY_W34_LIVE_AWARE_MULTI_ANCHOR.md`` for the
 full milestone note + pre-committed bar.
 
 ---
@@ -1045,14 +1045,14 @@ is more robust than predicted).
 Trust precision = 1.000 across every R-80 sub-bank where W33
 ratifies. Backward-compat preserved byte-for-byte on the
 trivial-trust-ewma anchor: **31/31 W33 unit tests + 446/446
-phase69-80 regression + 133/133 wider wevra suite = 610 tests pass**.
+phase69-80 regression + 133/133 wider coordpy suite = 610 tests pass**.
 Mac 2 (192.168.12.248) **still unreachable** (28th milestone in a
 row, ping 100% packet loss); the other reachable host
 (192.168.12.191) was used for the live R-80-XLLM-LIVE-TRUST probe
 with mixtral:8x7b + qwen3.5:35b (a deeper architecture + scale split
 than the W31/W32 pair gemma2:9b + qwen2.5:14b).
 Stable-vs-experimental boundary tightened: ``__experimental__``
-tuple extended with W33 symbols; SDK_VERSION ``wevra.sdk.v3.34``;
+tuple extended with W33 symbols; SDK_VERSION ``coordpy.sdk.v3.34``;
 pyproject.toml ``0.5.7``.
 
 **Three named conjectures jointly discharged in one milestone**:
@@ -1063,7 +1063,7 @@ axis; W33-C-NATIVE-LATENT remains the next true wall (architecture-
 dependent); W33-C-MULTI-HOST remains hardware-bounded;
 W33-C-LATENT-CROSS-AGENT-TRUST is the new architecture-dependent
 deep wall (cross-agent trust at the model's hidden-state level).
-See ``docs/RESULTS_WEVRA_W33_TRUST_EWMA_TRACKED.md`` for the full
+See ``docs/RESULTS_COORDPY_W33_TRUST_EWMA_TRACKED.md`` for the full
 milestone note + pre-committed bar.
 
 ---
@@ -1181,12 +1181,12 @@ synthetic regimes — by mathematical bound, not by mechanism failure.
 Trust precision = 1.000 across every R-79 sub-bank where W32
 ratifies. Backward-compat preserved byte-for-byte on the
 trivial-long-window anchor: **45/45 W32 unit tests + 414/414
-phase69-79 regression + 77/77 wider wevra suite = 536 tests pass**.
+phase69-79 regression + 77/77 wider coordpy suite = 536 tests pass**.
 Mac 2 (192.168.12.248) **still unreachable** (27th milestone in a
 row, ping 100% packet loss); the other reachable host
 (192.168.12.191) was used for the live R-79-XLLM-LIVE-GOLD probe.
 Stable-vs-experimental boundary tightened: ``__experimental__``
-tuple extended with W32 symbols; SDK_VERSION ``wevra.sdk.v3.33``;
+tuple extended with W32 symbols; SDK_VERSION ``coordpy.sdk.v3.33``;
 pyproject.toml ``0.5.6``.
 
 W31-C-LONG-WINDOW-CONVERGENCE discharged on the scaling-stability
@@ -1198,7 +1198,7 @@ remains the next true wall (architecture-dependent); W32-C-MULTI-HOST
 remains hardware-bounded; W32-C-OLD-LINE-EWMA-TRUST is the new
 old-line-strengthening conjecture (W21 EWMA-tracked-trust
 integration via W32 primitives).  See
-``docs/RESULTS_WEVRA_W32_LONG_WINDOW_CONVERGENT.md`` for the
+``docs/RESULTS_COORDPY_W32_LONG_WINDOW_CONVERGENT.md`` for the
 full milestone note + pre-committed bar.
 
 ---
@@ -1287,12 +1287,12 @@ Trust precision = 1.000 across every R-78 sub-bank where W31
 ratifies. Backward-compat preserved byte-for-byte on the trivial-
 online anchor: **437/437 focused regression pass** (was 357 in
 v3.31; now +41 W31 unit tests + 39 unchanged + 1 unchanged).
-68/68 wider wevra suite passes.  Mac 2 (192.168.12.248) **still
+68/68 wider coordpy suite passes.  Mac 2 (192.168.12.248) **still
 unreachable** (26th milestone in a row, ping 100% packet loss);
 the other reachable host (192.168.12.191) was used for the live
 R-78-XLLM-LIVE probe.  Stable-vs-experimental boundary tightened:
 ``__experimental__`` tuple extended with W31 symbols; SDK_VERSION
-``wevra.sdk.v3.32``; pyproject.toml ``0.5.5``.
+``coordpy.sdk.v3.32``; pyproject.toml ``0.5.5``.
 
 W30-C-PRIOR-LEARNING discharged at the magnitude axis;
 W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE sharpened on the
@@ -1300,7 +1300,7 @@ infrastructure-discharge axis (live cross-architecture
 disagreement signal exists at temp 0); W30-C-NATIVE-LATENT remains
 the next true wall (architecture-dependent); W30-C-MULTI-HOST
 remains hardware-bounded.  See
-``docs/RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md`` for the
+``docs/RESULTS_COORDPY_W31_ONLINE_CALIBRATED_GEOMETRY.md`` for the
 full milestone note + pre-committed bar.
 
 ## TL;DR — SDK v3.31 (previous frontier)
@@ -1409,12 +1409,12 @@ in basis history ⇒ no cram amplification).
 Trust precision = 1.000 across every R-77 sub-bank where W30
 ratifies. Backward-compat preserved byte-for-byte on the trivial-
 calibration anchor: **357/357 focused regression pass** (273/273
-phase69-77 + 84/84 wider wevra suite). Mac 2 (192.168.12.248)
+phase69-77 + 84/84 wider coordpy suite). Mac 2 (192.168.12.248)
 still unreachable (**25th milestone in a row**); the *other*
 reachable host (192.168.12.191) was used for the live
 R-77-CROSS-HOST-LIVE bench. Stable-vs-experimental boundary
 tightened: ``__experimental__`` tuple extended with W30 symbols;
-SDK_VERSION ``wevra.sdk.v3.31``; pyproject.toml ``0.5.4``.
+SDK_VERSION ``coordpy.sdk.v3.31``; pyproject.toml ``0.5.4``.
 
 The pre-committed cram-factor bar (H6 ≥ 8.0×) was achieved at
 **8.74× across 5/5 seeds** (vs W29's 2.30× miss), but only at
@@ -1518,7 +1518,7 @@ runtime / LLM backend. Mac 2 (192.168.12.248) still unreachable
 (**24th milestone in a row**); the *other* reachable host
 (192.168.12.191) is the second host of the live topology. Stable-
 vs-experimental boundary tightened: ``__experimental__`` tuple
-extended with W29 symbols; SDK_VERSION ``wevra.sdk.v3.30``;
+extended with W29 symbols; SDK_VERSION ``coordpy.sdk.v3.30``;
 pyproject.toml ``0.5.3``.
 
 ## TL;DR — SDK v3.29
@@ -1583,8 +1583,8 @@ runtime / LLM backend. Mac 2 (192.168.12.248) still unreachable
 (**23rd milestone in a row**); the *other* reachable host
 (192.168.12.191) has been recharacterised as the second host of
 the topology. Stable-vs-experimental boundary tightened: explicit
-``vision_mvp.wevra.__experimental__`` tuple (41 symbols);
-SDK_VERSION ``wevra.sdk.v3.29``; pyproject.toml 0.5.2.
+``vision_mvp.coordpy.__experimental__`` tuple (41 symbols);
+SDK_VERSION ``coordpy.sdk.v3.29``; pyproject.toml 0.5.2.
 
 ## TL;DR — SDK v3.28
 
@@ -1855,7 +1855,7 @@ W22-C-CACHE-AMPLIFICATION** at +0.125 strict gain over W22 (the W22
 baseline reproduces ``acc_full = 0.875``; W23 quorum-keyed cache
 achieves ``acc_full = 1.000``) — names W23-2.
 Backward-compat (W23-3-A / W23-3-B / W23-3-C) preserved
-byte-for-byte: 703 prior wevra-anchor + capsule + recent-phase
+byte-for-byte: 703 prior coordpy-anchor + capsule + recent-phase
 tests pass + 39 new W23 tests = **742 / 742**.
 
 **Live LLM transfer (W23-Λ-real, empirical n=4 × 1 model,
@@ -1927,7 +1927,7 @@ wire-side savings (W22-Λ-no-cache); tampered envelope →
 → ``schema_cid_mismatch`` → fall through (W22-3); inner W21
 abstains → W22 reduces to W21 byte-for-byte (W22-3-A). Backward-
 compat (W22-3-A / W22-3-B) preserved byte-for-byte: 633 / 633
-prior wevra tests pass + 32 new W22 tests + 10 misc = **675 /
+prior coordpy tests pass + 32 new W22 tests + 10 misc = **675 /
 675**.
 
 **Live LLM transfer (W22-Λ-real, empirical n=4 × 2 models,
@@ -2001,7 +2001,7 @@ Bounded-context honesty: the W21 layer issues *exactly N*
 outside queries per cell, each bounded by ``max_response_tokens``;
 the W15 ``tokens_kept`` is byte-for-byte identical between W19,
 W20 AND W21. Backward-compat (W21-3-A / W21-3-B) preserved
-byte-for-byte: 585 / 585 prior wevra tests pass + 48 new W21
+byte-for-byte: 585 / 585 prior coordpy tests pass + 48 new W21
 tests pass = **633 / 633**.
 
 **Live LLM transfer (W21-Λ-real / W21-C-LIVE-WITH-REGISTRY,
@@ -2064,7 +2064,7 @@ compromised → tie W19 at 0.000. Bounded-context honesty: the W20
 layer adds *exactly one* outside query per cell, bounded by
 ``max_response_tokens = 24``; the W15 ``tokens_kept`` is
 byte-for-byte identical between W19 and W20. Backward-compat
-(W20-3) preserved byte-for-byte: 545 / 545 prior wevra tests
+(W20-3) preserved byte-for-byte: 545 / 545 prior coordpy tests
 pass + 40 new W20 tests pass = 585 / 585. A *partial* live-LLM
 W20-Λ-real probe on Mac-1 shows ``mixtral:8x7b`` (47B-MoE) free-
 form replies achieving ``acc_full = 0.750`` (+0.750 over W19);
@@ -2124,9 +2124,9 @@ to W18's on R-66-DECEIVE-NAIVE-TIGHT (188 / 226 tokens kept across
 (W19-3) preserved byte-for-byte: on R-58 default and on every
 R-65 default bank (compat / no_compat / confound / deceive), W19
 ties W18 byte-for-byte; with ``enabled = False`` the W19 method
-reduces to W18 byte-for-byte. **All prior wevra tests pass**
-(450 / 450 in the targeted wevra suites; 555 / 555 across the
-full ``test_wevra_*.py`` set with 45 new W19 tests).
+reduces to W18 byte-for-byte. **All prior coordpy tests pass**
+(450 / 450 in the targeted coordpy suites; 555 / 555 across the
+full ``test_coordpy_*.py`` set with 45 new W19 tests).
 
 **Honest scope.** R-66 is a *synthetic* regime — the producer
 is :class:`IdentityExtractor`. Real-LLM transfer of the W19
@@ -2306,9 +2306,9 @@ The **prior-conjecture discharge ledger** for SDK v3.18:
 Backward-compat (W17-3) preserved byte-for-byte: 442/442 prior
 tests pass; with ``mode = 'naive'`` or ``mode = 'structured'``
 AND ``magnitude_hinted_schema = False``, the W17 surface
-reduces to the SDK v3.15 W14 anchor byte-for-byte. The Wevra
+reduces to the SDK v3.15 W14 anchor byte-for-byte. The CoordPy
 single-run product runtime contract is byte-for-byte unchanged.
-See `docs/RESULTS_WEVRA_LIVE_COMPOSITION.md` for the milestone
+See `docs/RESULTS_COORDPY_LIVE_COMPOSITION.md` for the milestone
 note.
 
 ---
@@ -2353,13 +2353,13 @@ Backward-compat (W16-3) preserved byte-for-byte: 442/442 prior
 tests pass; with ``T_decoder = None`` and identity producer, the
 composed pipeline ties the W13 layered decoder; with structured
 prompt + ``T_decoder = None`` it ties the W14-1 anchor on R-61.
-The Wevra single-run product runtime contract is byte-for-byte
-unchanged. See `docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md` for the
+The CoordPy single-run product runtime contract is byte-for-byte
+unchanged. See `docs/RESULTS_COORDPY_COMPOSED_REAL_LLM.md` for the
 milestone note.
 
 1. **Capsule contract / runtime** — *active, advancing*. The
    contract (C1..C6) is settled. SDK v3.4 pushes capsule-native
-   execution to the LLM byte boundary inside one Wevra run
+   execution to the LLM byte boundary inside one CoordPy run
    (W3-42..W3-45). The lifecycle audit covers L-1..L-11.
 2. **Multi-agent capsule coordination** — *active, new (SDK
    v3.5)*. Capsule-native team coordination via TEAM_HANDOFF /
@@ -2391,7 +2391,7 @@ milestone note.
 5. **Two-Mac distributed inference + real cross-LLM measurement**
    — *active, settled (SDK v3.6)*. The chosen path for one-larger-
    model inference across two Apple Silicon Macs is **MLX
-   distributed** (under `mpirun mlx_lm.server`); the Wevra-side
+   distributed** (under `mpirun mlx_lm.server`); the CoordPy-side
    integration boundary is one duck-typed `LLMBackend` Protocol
    plus an `MLXDistributedBackend` adapter that talks
    OpenAI-compatible HTTP. Real cross-LLM measurement on the
@@ -2403,7 +2403,7 @@ milestone note.
    confirmation** that the capsule-native runtime survives a
    2.4× model-class jump and a dense → MoE architecture swap
    without spine modification. The two-Mac MLX-distributed path
-   is **experimental infrastructure**, not product; the Wevra
+   is **experimental infrastructure**, not product; the CoordPy
    single-run product runtime contract is byte-for-byte
    unchanged. Mac 2 remains offline at the time of SDK v3.7
    (192.168.12.248 ARP "incomplete"); the runbook is the
@@ -2420,7 +2420,7 @@ milestone note.
    surplus candidates above ``K_auditor=4`` (``5 ≤ |candidates| ≤ 7``).
    The new admission policy
    ``CohortCoherenceAdmissionPolicy`` (in
-   ``vision_mvp.wevra.team_coord``) provides two sub-modes:
+   ``vision_mvp.coordpy.team_coord``) provides two sub-modes:
    *streaming* (running cohort over admitted) and *buffered*
    (pre-fitted plurality from candidate stream's payloads via
    ``from_candidate_payloads``). Headline: at the pre-committed
@@ -2570,7 +2570,7 @@ milestone note.
   rule; ``n_outside_tokens`` recorded as strict additional cost;
   W15 ``tokens_kept`` byte-for-byte unchanged from W19.
 - **W20-3** (proved-empirical full programme regression; 585/585
-  wevra tests pass, 545 pre-existing + 40 new W20 tests) —
+  coordpy tests pass, 545 pre-existing + 40 new W20 tests) —
   Backward-compat with R-54..R-66 default banks; W20 reduces to
   W19 byte-for-byte either via no-trigger or outside-abstained.
   With ``enabled = False`` it reduces to W19 byte-for-byte.
@@ -2664,7 +2664,7 @@ milestone note.
   benchmark families with a canonical-role-for-kind mapping).
 
 - **Bundle-contradiction-aware trust-weighted disambiguator** (new
-  SDK surface, purely additive). ``vision_mvp/wevra/team_coord.py``
+  SDK surface, purely additive). ``vision_mvp/coordpy/team_coord.py``
   ships:
   * :class:`BundleContradictionDisambiguator` — the W19 four-stage
     pipeline (inner W18 decode + canonical primary identification +
@@ -2713,7 +2713,7 @@ milestone note.
   :class:`IdentityExtractor`. Real-LLM transfer (W19-Λ-real) is
   conditional on closed-vocabulary secondary-witness emission;
   free-form natural-language witnesses fall outside the W19
-  exact-match closure. The Wevra single-run product runtime
+  exact-match closure. The CoordPy single-run product runtime
   contract is byte-for-byte unchanged.
 
 ### Active observations (SDK v3.20)
@@ -2815,7 +2815,7 @@ milestone note.
   to non-incident-triage benchmark families).
 
 - **Bundle-relational compatibility disambiguator** (new SDK
-  surface, purely additive). ``vision_mvp/wevra/team_coord.py``
+  surface, purely additive). ``vision_mvp/coordpy/team_coord.py``
   ships:
   * :class:`RelationalCompatibilityDisambiguator` — the W18 four-
     stage pipeline (inner W15 decode + disambiguator selection +
@@ -2853,7 +2853,7 @@ milestone note.
   service tag, AND (c) the relational-mention convention being
   closed-vocabulary (the synthetic bench's exact-match closure).
   Real-LLM transfer (W18-Λ-real) is conditional on the LLM
-  emitting closed-vocabulary relational compounds. The Wevra
+  emitting closed-vocabulary relational compounds. The CoordPy
   single-run product runtime contract is byte-for-byte unchanged.
 
 ### Active observations (SDK v3.19)
@@ -2974,7 +2974,7 @@ milestone note.
   frontier explicit.
 
 - **Magnitude-hinted producer protocol** (new SDK surface, purely
-  additive). ``vision_mvp/wevra/team_coord.py`` ships:
+  additive). ``vision_mvp/coordpy/team_coord.py`` ships:
   * ``PRODUCER_PROMPT_MAGNITUDE_HINTED`` — third producer-prompt
     mode; the W17-1 anchor.
   * :class:`OperationalThreshold` — closed-vocabulary record
@@ -3023,7 +3023,7 @@ milestone note.
   proved-conditional on bench-property + strict-gain transfer; the
   saturated full-correctness clause remains conjectural and is
   bounded by a 35B-specific specific-tier judgment artifact (not
-  a producer-protocol failure). The Wevra single-run product
+  a producer-protocol failure). The CoordPy single-run product
   runtime contract is byte-for-byte unchanged.
 
 ### Active observations (SDK v3.18)
@@ -3123,7 +3123,7 @@ milestone note.
 
 ### Active moves (SDK v3.17 — end-to-end W14 + W15 composition + W16 family — *first end-to-end real-LLM strict advance over the strongest non-composed baseline*)
 
-(See `docs/RESULTS_WEVRA_COMPOSED_REAL_LLM.md` for the SDK
+(See `docs/RESULTS_COORDPY_COMPOSED_REAL_LLM.md` for the SDK
 v3.17 milestone note. SDK v3.18 supersedes this frontier on the
 fresh-live and symmetric-wall axes; the W16 anchors are
 preserved as historical evidence.)
@@ -3153,7 +3153,7 @@ preserved as historical evidence.)
   budget pressure; this regime makes the conditionality sharp.
 - **``AttentionAwareBundleDecoder`` + ``CapsuleContextPacker`` +
   ``FifoContextPacker`` (new).**
-  ``vision_mvp/wevra/team_coord.py``. A two-stage decoder: (1)
+  ``vision_mvp/coordpy/team_coord.py``. A two-stage decoder: (1)
   first-pass priority decode over the normalised union elects a
   tentative ``root_cause``; (2) salience-aware repack reorders +
   truncates the union under ``T_decoder`` (using closed-form weights
@@ -3209,7 +3209,7 @@ preserved as historical evidence.)
   bench property holding, (b) ``T_decoder`` below the union token
   sum, AND (c) round-2 carrying a specific-tier disambiguator with
   no ``service=`` token; W15-Λ-degenerate makes the conditionality
-  sharp. The Wevra single-run product runtime contract is byte-for-
+  sharp. The CoordPy single-run product runtime contract is byte-for-
   byte unchanged.
 
 ### Prior moves (SDK v3.15 — structured producer protocol + W14 family — *first producer-protocol move + first real-LLM strict gain ≥ 0.50 over substrate FIFO*)
@@ -3245,7 +3245,7 @@ preserved as historical evidence.)
   T-1..T-7 preserved on every cell. Anchor:
   ``docs/data/phase61_real_ollama_structured_qwen2_5_14b_n8.json``.
 - **``StructuredProducerProtocol`` + ``RoleExtractionSchema`` (new).**
-  ``vision_mvp/wevra/team_coord.py``. A prompt-rendering surface
+  ``vision_mvp/coordpy/team_coord.py``. A prompt-rendering surface
   with two modes: ``naive`` (legacy Phase-58/59/60 byte-for-byte)
   and ``structured`` (W14: tier banner observation/diagnosis split +
   per-tier kind whitelist + per-event mandate). The protocol
@@ -3392,7 +3392,7 @@ preserved as historical evidence.)
   the bench property holds in 0/4 scenarios; W13 has nothing to
   rescue and ties W12.
 - **``LayeredClaimNormalizer`` + ``LayeredRobustMultiRoundBundleDecoder``
-  (new).** ``vision_mvp/wevra/team_coord.py``. Two-layer normaliser:
+  (new).** ``vision_mvp/coordpy/team_coord.py``. Two-layer normaliser:
   (a) exact :data:`CLAIM_KIND_SYNONYMS` lookup (the W12 path); (b)
   ordered :data:`_HEURISTIC_KIND_RULES` regex-predicate abstraction
   rules whose union strictly widens the W12 closure; (c) optional
@@ -3546,7 +3546,7 @@ preserved as historical evidence.)
   cross-bench / real-Ollama / learned-normaliser extensions
   falsifiable.
 - **``RobustMultiRoundBundleDecoder`` (new).**
-  ``vision_mvp/wevra/team_coord.py``. Wraps
+  ``vision_mvp/coordpy/team_coord.py``. Wraps
   :class:`MultiRoundBundleDecoder` with a closed-vocabulary
   normalisation layer: :func:`normalize_claim_kind` rewrites
   drifted ``claim_kind`` strings into canonical kinds via
@@ -3658,7 +3658,7 @@ preserved as historical evidence.)
   family (W11-C1/C2/C3) makes the cross-bench / real-LLM /
   multi-step extensions falsifiable.
 - **``MultiRoundBundleDecoder`` (new).**
-  ``vision_mvp/wevra/team_coord.py``. Decodes the *union* of
+  ``vision_mvp/coordpy/team_coord.py``. Decodes the *union* of
   admitted handoffs across multiple ROLE_VIEW capsules; if the
   elected root_cause is specific-tier, drops every service tag
   whose admitted mentions are exclusively generic-noise kinds AND
@@ -3756,7 +3756,7 @@ preserved as historical evidence.)
   makes the cross-bench / real-LLM / multi-round extensions
   falsifiable.
 - **``BundleAwareTeamDecoder`` (new).**
-  ``vision_mvp/wevra/team_coord.py``. Three knobs (``cck_filter``,
+  ``vision_mvp/coordpy/team_coord.py``. Three knobs (``cck_filter``,
   ``role_corroboration_floor``,
   ``fallback_admitted_size_threshold``). Closed-vocabulary CCK table
   ``CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE`` maps each root_cause label
@@ -3836,7 +3836,7 @@ preserved as historical evidence.)
   multi-service top-K corroboration and single-tag corroboration**
   in the programme.
 - **``MultiServiceCorroborationAdmissionPolicy`` (new).**
-  ``vision_mvp/wevra/team_coord.py``. Two sub-modes (streaming /
+  ``vision_mvp/coordpy/team_coord.py``. Two sub-modes (streaming /
   buffered). Buffered factory ``from_candidate_stream`` is the W9-1
   anchor — pre-fits a top-K dominant tag set via the
   argmax-by-role-count tier of the corroboration score function.
@@ -3901,7 +3901,7 @@ preserved as historical evidence.)
   alternate bank seeds. The first strict separation between W8
   and W7-2 in the programme.
 - **``CrossRoleCorroborationAdmissionPolicy`` (new).**
-  ``vision_mvp/wevra/team_coord.py``. Two sub-modes (streaming /
+  ``vision_mvp/coordpy/team_coord.py``. Two sub-modes (streaming /
   buffered). Buffered factory ``from_candidate_stream`` is the
   W8-1 anchor — pre-fits a (role, tag)-aggregated dominant tag
   via score function ``W_role · |distinct_roles| + |raw_mentions|``.
@@ -3952,7 +3952,7 @@ preserved as historical evidence.)
   accuracy_full = +1.000``, stable across 5/5 alternate bank
   seeds.
 - **``CohortCoherenceAdmissionPolicy`` (new).**
-  ``vision_mvp/wevra/team_coord.py``. Two sub-modes:
+  ``vision_mvp/coordpy/team_coord.py``. Two sub-modes:
   *streaming* (arrival-order-sensitive baseline) and *buffered*
   (arrival-order-stable, pre-fitted plurality via
   ``from_candidate_payloads``). Deterministic, training-free,
@@ -4007,7 +4007,7 @@ preserved as historical evidence.)
   (capsule_learned − capsule_fifo): -0.4 (synthetic) / -0.4
   (qwen2.5:14b-32k) / 0.0 (qwen3.5:35b). The W4-C1 row in the
   registry is now conditional (see § 4.4 of
-  `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`).
+  `docs/RESULTS_COORDPY_SCALE_VS_STRUCTURE.md`).
 - **Honest scope.** Mac 2 is still offline; no two-Mac sharded
   inference run happened in SDK v3.7. The strongest model class
   exercised is single-Mac qwen3.5:35b (36 B-MoE). The
@@ -4048,7 +4048,7 @@ preserved as historical evidence.)
   (≈ 40 GB weights; fits across two Macs with KV-cache headroom).
   35B-class in Q4 fits on a single Mac; sharding buys
   context-length / KV headroom only.
-- **Wevra integration boundary** (`vision_mvp.wevra.llm_backend`):
+- **CoordPy integration boundary** (`vision_mvp.coordpy.llm_backend`):
   a duck-typed `LLMBackend` Protocol with two concrete
   implementations (`OllamaBackend`, `MLXDistributedBackend`).
   The runtime's inner-loop seal-PROMPT / seal-LLM_RESPONSE chain
@@ -4260,7 +4260,7 @@ preserved as historical evidence.)
   LLM_RESPONSE bytes ARE now capsule-tracked under SDK v3.4 (the
   prior "not capsule-native: LLM prompt bytes, raw LLM response
   bytes" line is **superseded** by Theorems W3-42 / W3-43).
-- **Not** "Wevra is a universal multi-agent platform."
+- **Not** "CoordPy is a universal multi-agent platform."
 - **Not** "the decoder beat the Phase-31 ceiling by 22.5 pp."
   The sharper reading is W3-19 ($+15$pp at $n=80$, FIFO admission).
 - **Not** "deterministic mode means the entire run is
@@ -4293,23 +4293,23 @@ preserved as historical evidence.)
 - Theorem registry: `docs/THEOREM_REGISTRY.md`
 - How-not-to-overstate rules: `docs/HOW_NOT_TO_OVERSTATE.md`
 - Master plan: `docs/context_zero_master_plan.md`
-- Milestone notes: `docs/archive/wevra-milestones/RESULTS_WEVRA_*.md`,
+- Milestone notes: `docs/archive/coordpy-milestones/RESULTS_COORDPY_*.md`,
   `docs/archive/capsule-research/RESULTS_CAPSULE_*.md` (historical),
-  `docs/archive/wevra-milestones/RESULTS_WEVRA_DEEP_INTRA_CELL.md` (SDK v3.3),
-  `docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md` (SDK v3.4),
-  `docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md` (SDK v3.5),
-  `docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md` (SDK v3.6),
-  `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md` (SDK v3.7),
-  `docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md` (SDK v3.8),
-  `docs/RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md` (SDK v3.9 — this milestone),
+  `docs/archive/coordpy-milestones/RESULTS_COORDPY_DEEP_INTRA_CELL.md` (SDK v3.3),
+  `docs/archive/coordpy-milestones/RESULTS_COORDPY_INNER_LOOP.md` (SDK v3.4),
+  `docs/archive/coordpy-milestones/RESULTS_COORDPY_TEAM_COORD.md` (SDK v3.5),
+  `docs/archive/coordpy-milestones/RESULTS_COORDPY_DISTRIBUTED.md` (SDK v3.6),
+  `docs/RESULTS_COORDPY_SCALE_VS_STRUCTURE.md` (SDK v3.7),
+  `docs/RESULTS_COORDPY_CROSS_ROLE_COHERENCE.md` (SDK v3.8),
+  `docs/RESULTS_COORDPY_CROSS_ROLE_CORROBORATION.md` (SDK v3.9 — this milestone),
   `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` (SDK v3.9 — pre-committed bar)
-- Paper draft: `papers/wevra_capsule_native_runtime.md`
-- Tests: `vision_mvp/tests/test_wevra_capsule_native*.py`,
-  `test_wevra_capsule_native_deeper.py`,
-  `test_wevra_capsule_native_inner_loop.py` (SDK v3.4),
-  `test_wevra_team_coord.py` (SDK v3.5 — multi-agent slice),
-  `test_wevra_scale_vs_structure.py` (SDK v3.7 — Phase-53),
-  `test_wevra_cross_role_coherence.py` (SDK v3.8 — Phase-54 + W7),
+- Paper draft: `papers/coordpy_capsule_native_runtime.md`
+- Tests: `vision_mvp/tests/test_coordpy_capsule_native*.py`,
+  `test_coordpy_capsule_native_deeper.py`,
+  `test_coordpy_capsule_native_inner_loop.py` (SDK v3.4),
+  `test_coordpy_team_coord.py` (SDK v3.5 — multi-agent slice),
+  `test_coordpy_scale_vs_structure.py` (SDK v3.7 — Phase-53),
+  `test_coordpy_cross_role_coherence.py` (SDK v3.8 — Phase-54 + W7),
   `test_capsule_*.py`
 - Cross-model parser-boundary experiment:
   `vision_mvp/experiments/parser_boundary_cross_model.py`

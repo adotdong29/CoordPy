@@ -11,7 +11,7 @@ import json
 import math
 import unittest
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     SchemaCapsule, build_incident_triage_schema_capsule,
     LatentVerificationOutcome,
     # W31 surface (parents)

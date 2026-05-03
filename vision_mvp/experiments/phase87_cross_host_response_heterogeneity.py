@@ -38,7 +38,7 @@ import json
 import os
 from typing import Any, Sequence
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     AttentionAwareBundleDecoder,
     BundleContradictionDisambiguator,
     OracleRegistration,
@@ -154,7 +154,7 @@ _PHASE87_K1_FRACTION = 1.0 / 2.0
 
 
 def _stable_schema_capsule():
-    from vision_mvp.wevra.team_coord import (
+    from vision_mvp.coordpy.team_coord import (
         build_incident_triage_schema_capsule)
     return build_incident_triage_schema_capsule()
 

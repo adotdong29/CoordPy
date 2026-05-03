@@ -55,7 +55,7 @@
     "honest_implication": "The W39 capsule-layer mechanism + bench results are fully validated and pre-registered as a STRICT improvement over W38 along the capsule-layer adversary-bar axis. The live-evidence axis remains bounded: one of the two W39 quorum members is a same-host disjoint reference (mac_consensus) whose disjointness is weaker than a true off-cluster physical host. Stronger live evidence requires a stable third physical host, which is hardware-bounded."
   },
   "honest_release_boundary_after_w39": {
-    "stable": "Wevra runtime contract (RunSpec -> run report, capsule primitives, lifecycle audit) is byte-for-byte unchanged.",
+    "stable": "CoordPy runtime contract (RunSpec -> run report, capsule primitives, lifecycle audit) is byte-for-byte unchanged.",
     "release_candidate": "SDK v3.40 / W39 is RC1-eligible: 31/31 W39 unit tests pass, 5/5 R-86 seeds at the load-bearing bank with measured Delta_trust_precision_w39_w38 = +0.500, all falsifiers pass, manifest-v9 CID + mutual-disjointness-CID enumerated, stale Mac-2 pin discharged.",
     "experimental": "W22..W39 remain under __experimental__.",
     "open_walls": [

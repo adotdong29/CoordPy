@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-This document summarizes the delivery of the PARADIGM_SHIFT_10_10 initiative: transforming Wevra from a 9.8/10 excellent system to a 10/10 paradigm shift that changes how the field thinks about context in multi-agent systems.
+This document summarizes the delivery of the PARADIGM_SHIFT_10_10 initiative: transforming CoordPy from a 9.8/10 excellent system to a 10/10 paradigm shift that changes how the field thinks about context in multi-agent systems.
 
 **Deliverables Completed:**
 - ✅ Phase A: 3 Impossibility Theorems (IS-1, IS-2, IS-3) with proofs + runtime demonstrations + tests
@@ -174,37 +174,37 @@ def test_domain_zero_violations(adapter, seed):
 
 ### Plugin Template & Implementation Guide
 
-Three ecosystem plugins are planned following the pattern of `examples/wevra-markdown-sink`:
+Three ecosystem plugins are planned following the pattern of `examples/coordpy-markdown-sink`:
 
-#### 1. Docker Sandbox Plugin (`examples/wevra-docker-sandbox/`)
+#### 1. Docker Sandbox Plugin (`examples/coordpy-docker-sandbox/`)
 - **Purpose:** Run untrusted code in ephemeral containers
-- **Extension Point:** `wevra.extensions.Sandbox`
+- **Extension Point:** `coordpy.extensions.Sandbox`
 - **Implementation:** Use `docker` Python SDK to create/run/destroy containers
-- **Entry Point:** `entry_points.wevra_extensions = { "docker_sandbox": "wevra_docker_sandbox:DockerSandboxBackend" }`
+- **Entry Point:** `entry_points.coordpy_extensions = { "docker_sandbox": "coordpy_docker_sandbox:DockerSandboxBackend" }`
 - **Status:** 🟡 Template ready, implementation pending
 
-#### 2. Redis Ledger Plugin (`examples/wevra-redis-ledger/`)
+#### 2. Redis Ledger Plugin (`examples/coordpy-redis-ledger/`)
 - **Purpose:** Distributed ledger backend using Redis
-- **Extension Point:** `wevra.extensions.LedgerBackend`
+- **Extension Point:** `coordpy.extensions.LedgerBackend`
 - **Implementation:** Redis RPUSH for append-only, SHA256 for chain integrity
-- **Entry Point:** `entry_points.wevra_extensions = { "redis_ledger": "wevra_redis_ledger:RedisLedgerBackend" }`
+- **Entry Point:** `entry_points.coordpy_extensions = { "redis_ledger": "coordpy_redis_ledger:RedisLedgerBackend" }`
 - **Status:** 🟡 Template ready, implementation pending
 
-#### 3. Prometheus Exporter Plugin (`examples/wevra-prometheus-exporter/`)
+#### 3. Prometheus Exporter Plugin (`examples/coordpy-prometheus-exporter/`)
 - **Purpose:** Export ledger metrics (admission latency, seal latency, violations)
-- **Extension Point:** `wevra.extensions.MetricsExporter`
+- **Extension Point:** `coordpy.extensions.MetricsExporter`
 - **Implementation:** `prometheus_client` counters/histograms on ledger events
-- **Entry Point:** `entry_points.wevra_extensions = { "prometheus_exporter": "wevra_prometheus_exporter:PrometheusExporter" }`
+- **Entry Point:** `entry_points.coordpy_extensions = { "prometheus_exporter": "coordpy_prometheus_exporter:PrometheusExporter" }`
 - **Status:** 🟡 Template ready, implementation pending
 
 ### Plugin Development Pattern
 
-Each plugin follows the structure of `examples/wevra-markdown-sink/`:
+Each plugin follows the structure of `examples/coordpy-markdown-sink/`:
 ```
-examples/wevra-docker-sandbox/
+examples/coordpy-docker-sandbox/
 ├── pyproject.toml          (entry_points registration)
 ├── README.md               (how to use)
-├── wevra_docker_sandbox/
+├── coordpy_docker_sandbox/
 │   ├── __init__.py         (DockerSandboxBackend class)
 │   └── requirements.txt     (docker)
 └── tests/
@@ -217,11 +217,11 @@ examples/wevra-docker-sandbox/
 
 ### 1. ADOPTION_GUIDE.md
 
-**Purpose:** Step-by-step integration recipe for teams adopting Wevra
+**Purpose:** Step-by-step integration recipe for teams adopting CoordPy
 
 **Sections:**
 1. Prerequisites: Python 3.9+, pip, familiarity with multi-agent patterns
-2. Install: `pip install wevra`
+2. Install: `pip install coordpy`
 3. Define domain: map your domain events to CapsuleKind vocabulary
 4. Create adapter: write a `DomainAdapter` subclass
 5. Wrap agents: replace dict-passing with capsule-passing
@@ -237,7 +237,7 @@ examples/wevra-docker-sandbox/
 **Sections:**
 1. Team profile: team name, domain, team size, initial problem
 2. Baseline metrics: context size (KB), latency (ms), error rate (%)
-3. Integration: how we integrated Wevra (3-4 week effort estimate)
+3. Integration: how we integrated CoordPy (3-4 week effort estimate)
 4. Post-integration metrics: context reduction, latency improvement, bugs prevented
 5. Developer experience: ease of integration, adoption blockers
 6. Lessons learned: recommendations for future adopters
@@ -249,9 +249,9 @@ examples/wevra-docker-sandbox/
 **Purpose:** Email templates for reaching out to potential adopter teams
 
 **Templates:**
-1. **Anthropic Claude teams**: "Use Wevra for auditable context in LLM agent teams"
-2. **OpenAI assistants teams**: "Adopt Wevra for composable multi-agent systems"
-3. **OSS AI projects**: "Integrate Wevra for formal verification of agent coordination"
+1. **Anthropic Claude teams**: "Use CoordPy for auditable context in LLM agent teams"
+2. **OpenAI assistants teams**: "Adopt CoordPy for composable multi-agent systems"
+3. **OSS AI projects**: "Integrate CoordPy for formal verification of agent coordination"
 
 **Status:** 🟡 Outlines ready
 
@@ -264,7 +264,7 @@ examples/wevra-docker-sandbox/
 - [ ] Submit "Cross-Domain Generalization" paper to FoMLAS/ICFEM (Week 5)
 - [ ] Revise "Categorical Routing" with impossibility framing, submit to ICLR (Week 4)
 - [ ] Email 5-10 target teams (Anthropic, OpenAI, OSS projects) with adoption offer (Week 5)
-- [ ] Help 2 external teams integrate Wevra, collect metrics (Week 6-7)
+- [ ] Help 2 external teams integrate CoordPy, collect metrics (Week 6-7)
 - [ ] Write joint case study with external teams (Week 7)
 - [ ] Release 3 ecosystem plugins on PyPI (Week 8)
 - [ ] Tag as "ecosystem-ready" on GitHub (Week 8)
@@ -333,9 +333,9 @@ papers/categorical_routing.md                            (+80 lines: §3 impossi
 
 ### Pending Files
 ```
-examples/wevra-docker-sandbox/                           (pending)
-examples/wevra-redis-ledger/                             (pending)
-examples/wevra-prometheus-exporter/                      (pending)
+examples/coordpy-docker-sandbox/                           (pending)
+examples/coordpy-redis-ledger/                             (pending)
+examples/coordpy-prometheus-exporter/                      (pending)
 docs/ADOPTION_GUIDE.md                                   (pending)
 docs/CASE_STUDY_TEMPLATE.md                              (pending)
 docs/OUTREACH_DRAFTS.md                                  (pending)
@@ -361,7 +361,7 @@ docs/TODO_HUMAN.md                                       (pending)
    - Files: `docs/ADOPTION_GUIDE.md`, etc.
 
 5. `"Ecosystem plugins: docker-sandbox, redis-ledger, prometheus-exporter"`
-   - Files: `examples/wevra-*/`
+   - Files: `examples/coordpy-*/`
 
 ---
 
@@ -406,7 +406,7 @@ docs/TODO_HUMAN.md                                       (pending)
 
 1. **Mathematical proof** that untyped mutable context cannot satisfy causality + audit + composability.
 2. **Evidence** that one formal specification (Capsule Contract) works across 8 fundamentally different domains.
-3. **Published research** positioning Wevra's capsule-based context model as the necessary solution.
+3. **Published research** positioning CoordPy's capsule-based context model as the necessary solution.
 
 **Phase D–E: Ready for human action.** Ecosystem plugins and adoption documentation are templated and ready for implementation. External team partnerships and field recognition depend on human outreach and engagement.
 
@@ -415,5 +415,5 @@ docs/TODO_HUMAN.md                                       (pending)
 ---
 
 **Generated with Claude Code**  
-**Wevra Research Team**  
+**CoordPy Research Team**
 **April 23, 2026**

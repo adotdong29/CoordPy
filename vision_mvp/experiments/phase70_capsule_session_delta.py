@@ -196,8 +196,8 @@ from vision_mvp.tasks.incident_triage import (
     ALL_ROLES, ROLE_AUDITOR,
     grade_answer,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.team_coord import (
     AbstainingOracle,
     AdmissionPolicy, AttentionAwareBundleDecoder,
     BundleAwareTeamDecoder,
@@ -1382,10 +1382,10 @@ def _make_llm_adjudicator(model: str, *, base_url: str | None = None,
                            timeout: float = 120.0):
     """Build an :class:`LLMAdjudicatorOracle` against a live Ollama
     backend (Mac-1 default). Used for the W23-Λ-real probe."""
-    from vision_mvp.wevra.team_coord import LLMAdjudicatorOracle
-    from vision_mvp.wevra.llm_backend import OllamaBackend
+    from vision_mvp.coordpy.team_coord import LLMAdjudicatorOracle
+    from vision_mvp.coordpy.llm_backend import OllamaBackend
     backend_url = base_url or os.environ.get(
-        "WEVRA_OLLAMA_URL", "http://127.0.0.1:11434")
+        "COORDPY_OLLAMA_URL", "http://127.0.0.1:11434")
     backend = OllamaBackend(model=model, base_url=backend_url,
                               timeout=timeout)
     return LLMAdjudicatorOracle(

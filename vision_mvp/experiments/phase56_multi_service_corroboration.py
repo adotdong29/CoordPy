@@ -46,7 +46,7 @@ Why this is fair, not benchmark-shopping
   axis along which W8 becomes inadequate.
 * **Pre-committed bench property + falsifier.** The
   *multi-service-gold-corroborated* property is mechanically tested
-  in ``test_wevra_multi_service_corroboration.Phase56BankShapeTests``.
+  in ``test_coordpy_multi_service_corroboration.Phase56BankShapeTests``.
   A *decoy-corroborated decoy* falsifier regime
   (``build_phase56_falsifier_bank``) shows the W9-1 win does *not*
   hold when a decoy is also corroborated above the min-role
@@ -154,8 +154,8 @@ from vision_mvp.tasks.incident_triage import (
     build_role_subscriptions, grade_answer,
     _decoder_from_handoffs as _phase31_decoder_from_handoffs,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, ClaimPriorityAdmissionPolicy,
     CohortCoherenceAdmissionPolicy,
     CoverageGuidedAdmissionPolicy,

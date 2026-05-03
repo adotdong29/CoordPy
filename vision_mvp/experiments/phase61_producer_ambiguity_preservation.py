@@ -1,7 +1,7 @@
 """Phase 61 — producer-side ambiguity preservation + structured prompt.
 
 SDK v3.15, W14 family anchor. **First producer-protocol move** in
-the Wevra programme — the direct response to the W13-Λ-real
+the CoordPy programme — the direct response to the W13-Λ-real
 honest negative observed on real Ollama 14B at SDK v3.14.
 
 Recap of the W13-Λ-real diagnosis
@@ -31,7 +31,7 @@ Phase-61 attacks both root causes
    R-61-structured banks all use these events.)
 
 2. **Structured producer protocol.** SDK v3.15's W14 contribution.
-   The :class:`vision_mvp.wevra.team_coord.StructuredProducerProtocol`
+   The :class:`vision_mvp.coordpy.team_coord.StructuredProducerProtocol`
    renders a prompt that splits round 1 (operational *observation*)
    from round 2 (specific *diagnosis*) and instructs the LLM to emit
    one claim per listed event with no compression. Phase-61's drivers
@@ -163,9 +163,9 @@ from vision_mvp.tasks.incident_triage import (
     build_role_subscriptions, grade_answer,
     _decoder_from_handoffs as _phase31_decoder_from_handoffs,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.llm_backend import LLMBackend, OllamaBackend
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.llm_backend import LLMBackend, OllamaBackend
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, BundleAwareTeamDecoder,
     CLAIM_KIND_SYNONYMS,
     ClaimPriorityAdmissionPolicy,

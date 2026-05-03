@@ -17,7 +17,7 @@
 >   sharpened W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE at +0.250
 >   trust-precision 1.000.  Three new W30-named open conjectures
 >   inherit forward to W31.
-> * `docs/RESULTS_WEVRA_W30_CALIBRATED_GEOMETRY.md` — measured W30
+> * `docs/RESULTS_COORDPY_W30_CALIBRATED_GEOMETRY.md` — measured W30
 >   result.
 > * `docs/THEOREM_REGISTRY.md` — registry where W31 named claims will
 >   be added on success.
@@ -300,7 +300,7 @@ detection beyond the union of per-component CIDs.
 
 ### H9 — Release-readiness clause
 
-* SDK_VERSION bumped to ``wevra.sdk.v3.32``.
+* SDK_VERSION bumped to ``coordpy.sdk.v3.32``.
 * ``__experimental__`` tuple updated to include every W31 symbol.
 * ``pyproject.toml`` version bumped to ``0.5.5``.
 * CHANGELOG entry added.
@@ -315,7 +315,7 @@ detection beyond the union of per-component CIDs.
 
 * All W22..W30 regression (``test_phase69`` through ``test_phase77``)
   remains passing byte-for-byte.
-* All wider regression ``test_wevra_*`` remains green.
+* All wider regression ``test_coordpy_*`` remains green.
 * New ``test_phase78_online_calibrated.py`` MUST cover every
   enumerated H1 failure mode + H2 byte-equivalence + H3 tamper-rejection
   + H5 falsifiers + H6 drift discharge + H7 adaptive threshold +

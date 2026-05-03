@@ -84,7 +84,7 @@ import os
 import sys
 from typing import Any
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     OracleRegistration, SchemaCapsule,
     build_incident_triage_schema_capsule,
     SharedFanoutRegistry,
@@ -505,7 +505,7 @@ def _build_single_partition_drift_recover_bench(
     starts on which cell index (we use a fixed deterministic
     pattern: even cells get tuple A, odd cells get tuple B).
     """
-    from vision_mvp.wevra.team_coord import _DecodedHandoff
+    from vision_mvp.coordpy.team_coord import _DecodedHandoff
     n_total = int(n_cells)
     n_shift = max(1, int(n_total) // 4)
     n_prefix = n_total - n_shift
@@ -926,7 +926,7 @@ def run_phase79(
                         # Replace cur cell's convergence_state_cid
                         # with prev cell's; recompute manifest-v2 to
                         # be self-consistent against the swapped CID.
-                        from vision_mvp.wevra.team_coord import (
+                        from vision_mvp.coordpy.team_coord import (
                             _compute_w32_manifest_v2_cid,
                             _compute_w32_outer_cid,
                         )

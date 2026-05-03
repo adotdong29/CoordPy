@@ -28,8 +28,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from vision_mvp.wevra.capsule import CapsuleKind, ContextCapsule
-from vision_mvp.wevra.capsule_decoder_v2 import (
+from vision_mvp.coordpy.capsule import CapsuleKind, ContextCapsule
+from vision_mvp.coordpy.capsule_decoder_v2 import (
     BUNDLE_DECODER_FEATURES_V2, DEEPSET_PHI_FEATURES,
     INTERACTION_FEATURES,
     LearnedBundleDecoderV2, train_learned_bundle_decoder_v2,
@@ -442,7 +442,7 @@ def test_multitask_decode_with_zero_domain_head_equals_shared():
                     for dom, w in d.w_domain.items()})
     # Now compute score on one bundle both ways.
     b = disk_fill_bundle()
-    from vision_mvp.wevra.capsule_decoder_v2 import (
+    from vision_mvp.coordpy.capsule_decoder_v2 import (
         _featurise_bundle_for_rc_v2, _bundle_vote_summary,
     )
     rc = "disk_fill"

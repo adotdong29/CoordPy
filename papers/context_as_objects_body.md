@@ -59,10 +59,10 @@ Each of these axes can be isolated, attacked, and bounded. The paper's
 real contribution is this decomposition plus the evidence that it is
 load-bearing.
 
-### 1.2 Why Wevra matters
+### 1.2 Why CoordPy matters
 
-The codebase contribution is **Wevra**, the first product produced by
-the Context Zero programme. Wevra is not the whole programme and it is
+The codebase contribution is **CoordPy**, the first product produced by
+the Context Zero programme. CoordPy is not the whole programme and it is
 not claimed to be a universal agent platform. Its scientific value is
 that it makes the thesis executable:
 
@@ -265,7 +265,7 @@ systematic explorations of that tradeoff.
 ## 4. Capsule-Native Execution
 
 The first stage of the programme made capsules load-bearing inside one
-Wevra run. The execution spine includes:
+CoordPy run. The execution spine includes:
 
 `PROFILE -> READINESS_CHECK -> SWEEP_SPEC -> SWEEP_CELL -> PROVENANCE -> ARTIFACT -> RUN_REPORT`
 
@@ -989,7 +989,7 @@ This gives the team results a trustworthy substrate.
 Without this runtime, many later failures would remain hard to
 classify. In a conventional agent stack, the difference between
 "producer never emitted decoy" and "downstream decoder dropped decoy"
-can be surprisingly difficult to pin down. In Wevra, those are
+can be surprisingly difficult to pin down. In CoordPy, those are
 different object-level states.
 
 ### 10.2 Admission layer
@@ -1360,7 +1360,7 @@ The programme sits at the intersection of several literatures:
 - prompt/protocol design for structured extraction,
 - and evaluation/runtime harnesses for LLM systems.
 
-The distinct contribution here is not merely that Wevra has a ledger
+The distinct contribution here is not merely that CoordPy has a ledger
 or that it uses typed objects. It is that the paper uses one object
 model to unify:
 
@@ -1415,7 +1415,7 @@ paper, and not only an agent paper.
 
 ### 16.4 How this paper differs from a runtime paper
 
-A systems reader may initially see Wevra as a runtime paper with
+A systems reader may initially see CoordPy as a runtime paper with
 benchmark appendices. That is not the right reading. The runtime is
 necessary, but the main scientific object is the decomposition of
 context across the benchmark ladder. The runtime is what makes the
@@ -1472,7 +1472,7 @@ This paper has one central message:
 > **Context in multi-agent LLM systems is not primarily a prompt-size**
 > **problem. It is an object-level coordination problem.**
 
-Capsules provide the object model. Wevra provides the executable
+Capsules provide the object model. CoordPy provides the executable
 runtime. The benchmark ladder R-53 through R-64 turns the context
 problem into a sequence of explicit, falsifiable subproblems.
 

@@ -84,7 +84,7 @@ import random
 import sys
 from typing import Any
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     OracleRegistration, SchemaCapsule,
     build_incident_triage_schema_capsule,
     CrossCellDeltaDisambiguator, MultiCellSessionCompactor,
@@ -257,7 +257,7 @@ def _build_w25_stack(
         consumer_agent_ids: tuple[str, ...],
         registry: SharedFanoutRegistry,
 ) -> SharedFanoutDisambiguator:
-    from vision_mvp.wevra.team_coord import (
+    from vision_mvp.coordpy.team_coord import (
         AttentionAwareBundleDecoder,
         RelationalCompatibilityDisambiguator,
         BundleContradictionDisambiguator,

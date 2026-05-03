@@ -27,7 +27,7 @@ from vision_mvp.experiments.phase74_multi_chain_pivot import (
     run_phase74,
     run_phase74_seed_stability_sweep,
 )
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     SalienceSignatureEnvelope, ChainPivotEnvelope,
     SharedMultiChainPool,
     MultiChainPersistedFanoutOrchestrator,
@@ -121,7 +121,7 @@ class VerifySalienceSignatureTests(unittest.TestCase):
 
     def test_schema_version_unknown(self) -> None:
         bad = SalienceSignatureEnvelope(
-            schema_version="wevra.bad.v1",
+            schema_version="coordpy.bad.v1",
             schema_cid=self.schema.cid,
             producer_agent_id="p",
             consumer_agent_ids=("c0",),
@@ -233,7 +233,7 @@ class W27BranchVocabularyTests(unittest.TestCase):
 
 class InputSignatureCidTests(unittest.TestCase):
     def test_byte_stable_across_handoff_order(self) -> None:
-        from vision_mvp.wevra.team_coord import _DecodedHandoff
+        from vision_mvp.coordpy.team_coord import _DecodedHandoff
         h_a = _DecodedHandoff("r0", "K", "p0")
         h_b = _DecodedHandoff("r1", "K", "p1")
         s1 = compute_input_signature_cid(

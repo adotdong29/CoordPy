@@ -1,5 +1,5 @@
 {
-  "schema": "wevra.parser_boundary_real.v1",
+  "schema": "coordpy.parser_boundary_real.v1",
   "n_instances": 10,
   "endpoint": "http://192.168.12.191:11434",
   "model_tags": [

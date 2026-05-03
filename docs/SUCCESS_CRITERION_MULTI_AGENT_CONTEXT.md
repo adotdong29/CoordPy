@@ -1,7 +1,7 @@
 # Success criterion — solving multi-agent context (SDK v3.21 bar)
 
 > Pre-committed, falsifiable bar for what counts as a *real* advance
-> on "solving multi-agent context" in the Context Zero / Wevra
+> on "solving multi-agent context" in the Context Zero / CoordPy
 > programme. This document is the **referee** for SDK v3.9 / v3.10 /
 > v3.11 / v3.12 / v3.13 / v3.14 / v3.15 / v3.16 / v3.17 / v3.18 /
 > v3.19 / v3.20 / v3.21 (and later milestones). Any milestone note
@@ -786,9 +786,9 @@ The **named regimes** the bar refers to (anchored in code):
 A milestone *strongly advances* the thesis iff **all eighteen** hold (bars 1–6 always; bar 7 from SDK v3.11; bar 8 from SDK v3.12; bar 9 from SDK v3.13; bar 10 from SDK v3.14; bar 11 from SDK v3.15; bar 12 from SDK v3.16; bar 13 from SDK v3.17; bar 14 from SDK v3.18; bar 15 from SDK v3.19; bar 16 from SDK v3.20; bar 17 from SDK v3.21; bar 18 from SDK v3.22):
 
 1. **Code anchor.** A new admission/decoder/coordination method
-   ships in `vision_mvp/wevra/team_coord.py` (or sibling SDK
+   ships in `vision_mvp/coordpy/team_coord.py` (or sibling SDK
    module), exported from the SDK's public surface
-   (`vision_mvp.wevra.__init__`), with a docstring that names its
+   (`vision_mvp.coordpy.__init__`), with a docstring that names its
    theorem family and falsifier.
 2. **Strict gain on the named harder regime.** The new method
    strictly improves `accuracy_full` over substrate FIFO **and**
@@ -808,7 +808,7 @@ A milestone *strongly advances* the thesis iff **all eighteen** hold (bars 1–6
    strategies on R-53 / R-54 / R-55 / R-56 / R-57.
 6. **Named bench property + falsifier regime.** The harder regime's
    structural property is named in code (mechanically verified by a
-   test in `test_wevra_*.py`) and at least **one** *falsifier regime*
+   test in `test_coordpy_*.py`) and at least **one** *falsifier regime*
    is explicitly identified — a regime where the bench property does
    not hold and the new method does *not* beat FIFO (i.e. the
    conditionality is sharp).
@@ -1670,7 +1670,7 @@ R-61-OLLAMA-A clears bar 11 *and* clears the historical bar 9 (W12-
 C2) end-to-end and is the strongest possible empirical anchor for
 the producer-protocol axis. **The honest current reading** for SDK
 v3.15 is reported in
-``docs/RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`` § 4 — see that file for
+``docs/RESULTS_COORDPY_PRODUCER_AMBIGUITY.md`` § 4 — see that file for
 the per-tier outcome.
 
 ### 1.4 R-60-ollama 4-tier grading (SDK v3.14 only)
@@ -1714,7 +1714,7 @@ the W13 advance is structurally invisible because there is no
 drift for either layer to rescue. SDK v3.14 documents this as a
 **partial success** at the milestone level (the W13 wide-OOV win
 is the strong-success anchor; R-60-ollama is the partial-real
-anchor). See `docs/RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md`
+anchor). See `docs/RESULTS_COORDPY_OPEN_WORLD_NORMALIZATION.md`
 § 4 and § 6 for the honest scope statement.
 
 ### 1.3 Falsifying failure bar (the milestone is null)
@@ -2334,7 +2334,7 @@ walls in the *bundle-resolvable* case — must combine:
   green; on R-58 default and on every R-65 default bank
   (compat / no_compat / confound / deceive), W19 ties W18
   byte-for-byte (mechanically verified by
-  ``Phase66BackwardCompatTests``). 405/405 wevra-suite tests
+  ``Phase66BackwardCompatTests``). 405/405 coordpy-suite tests
   + the 45 new W19 tests = 450/450 pass.
 
 A regime missing any of these is *not* R-66 — it does not test
@@ -2426,7 +2426,7 @@ hybrid axis** — must combine:
 * **No regression on R-54..R-68.** Every prior anchor remains
   green; with ``enabled = False`` OR ``schema = None`` OR no
   triggering W21 branch, the W22 layer reduces to W21
-  byte-for-byte; 633 prior wevra tests pass, 32 new W22 tests
+  byte-for-byte; 633 prior coordpy tests pass, 32 new W22 tests
   pass, plus 10 misc = 675 / 675 total.
 
 A regime missing any of these is *not* R-69 — it does not test

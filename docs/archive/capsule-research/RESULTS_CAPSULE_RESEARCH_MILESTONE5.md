@@ -663,19 +663,19 @@ aspirational under the standing Conjecture W3-C7.
 
 ### Not modified (deliberate)
 
-* `vision_mvp/wevra/capsule.py`,
-  `vision_mvp/wevra/capsule_policy.py`,
-  `vision_mvp/wevra/capsule_policy_bundle.py`,
-  `vision_mvp/wevra/capsule_decoder.py`,
-  `vision_mvp/wevra/capsule_decoder_v2.py` — runtime
+* `vision_mvp/coordpy/capsule.py`,
+  `vision_mvp/coordpy/capsule_policy.py`,
+  `vision_mvp/coordpy/capsule_policy_bundle.py`,
+  `vision_mvp/coordpy/capsule_decoder.py`,
+  `vision_mvp/coordpy/capsule_decoder_v2.py` — runtime
   contract and Phase-49 decoder modules unchanged.
   Phase-50 decoders live in the additively-new
   `vision_mvp/experiments/phase50_*` drivers (not the
   research centre's published modules).
-* `vision_mvp/wevra/run.py`, `runtime.py`, `provenance.py`
+* `vision_mvp/coordpy/run.py`, `runtime.py`, `provenance.py`
   — no runtime contract change.
 * `vision_mvp/core/*.py` — no substrate primitive modified.
-* `SDK_VERSION` — still `wevra.sdk.v3`.  Phase-50 is a
+* `SDK_VERSION` — still `coordpy.sdk.v3`.  Phase-50 is a
   research milestone, not a public SDK contract change.
 
 ### Tests
@@ -692,7 +692,7 @@ aspirational under the standing Conjecture W3-C7.
 ```bash
 # Part A — Gate 1 strict CI at n_test = 160.
 python -m vision_mvp.experiments.phase50_gate1_ci \
-    --out-dir /tmp/wevra_phase50
+    --out-dir /tmp/coordpy_phase50
 # Expect:
 #   "n_test_instances = 160"
 #   DeepSet best post-search: p̂ = 0.400, Wilson [0.327, 0.477]
@@ -700,7 +700,7 @@ python -m vision_mvp.experiments.phase50_gate1_ci \
 
 # Part A — Gate 1 at n_test = 320 (≈ 4 minutes).
 python -m vision_mvp.experiments.phase50_gate1_ci \
-    --out-dir /tmp/wevra_phase50_big \
+    --out-dir /tmp/coordpy_phase50_big \
     --seeds $(python3 -c "print(*range(31,111))")
 # Expect:
 #   "n_test_instances = 320"
@@ -709,7 +709,7 @@ python -m vision_mvp.experiments.phase50_gate1_ci \
 
 # Part B — 6-family strict zero-shot Gate 2 study.
 python -m vision_mvp.experiments.phase50_zero_shot_transfer \
-    --out-dir /tmp/wevra_phase50
+    --out-dir /tmp/coordpy_phase50
 # Expect:
 #   "STRICT ZERO-SHOT GATE-2: NOT MET (all families fail)"
 #   sign-stable DeepSet gap = 0.000
@@ -723,7 +723,7 @@ python -m pytest \
     vision_mvp/tests/test_phase47_cohort_subsumption.py \
     vision_mvp/tests/test_capsule_policy.py \
     vision_mvp/tests/test_capsule_subsumption.py \
-    vision_mvp/tests/test_wevra_capsules.py -q
+    vision_mvp/tests/test_coordpy_capsules.py -q
 # Expect: 86 passed.
 ```
 

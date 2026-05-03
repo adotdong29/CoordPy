@@ -2,7 +2,7 @@
 
 Uses Hypothesis to auto-generate 100s of test cases per property.
 Covers the six contract invariants stated in
-``vision_mvp/wevra/capsule.py``:
+``vision_mvp/coordpy/capsule.py``:
 
   C1  Identity      — cid = SHA256(canonical(kind, payload, budget,
                       sorted(parents))). Deterministic.
@@ -21,7 +21,7 @@ from __future__ import annotations
 import pytest
 from hypothesis import given, settings, HealthCheck, strategies as st
 
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     CapsuleAdmissionError,
     CapsuleBudget,
     CapsuleKind,
@@ -287,7 +287,7 @@ def test_metamorphic_removal_shrinks_view(caps) -> None:
     """Dropping one capsule from the input set never grows the resulting
     ledger's serialised view. A sanity check on monotonicity of the
     capsule-graph projection."""
-    from vision_mvp.wevra.capsule import render_view
+    from vision_mvp.coordpy.capsule import render_view
     import json
 
     full = CapsuleLedger()

@@ -83,7 +83,7 @@ from vision_mvp.experiments.phase87_cross_host_response_heterogeneity import (
 from vision_mvp.experiments.phase67_outside_information import (
     build_phase67_bank,
 )
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     AttentionAwareBundleDecoder,
     W36_DEFAULT_MIN_DISTINCT_HOSTS,
     W37_DEFAULT_TRAJECTORY_THRESHOLD,
@@ -103,7 +103,7 @@ from vision_mvp.wevra.team_coord import (
     W40_BRANCH_RESPONSE_SIGNATURE_NO_TRIGGER,
     W40_BRANCH_RESPONSE_SIGNATURE_INSUFFICIENT,
 )
-from vision_mvp.wevra.integrated_synthesis import (
+from vision_mvp.coordpy.integrated_synthesis import (
     IntegratedSynthesisOrchestrator,
     build_integrated_synthesis_registry,
     build_trivial_integrated_synthesis_registry,

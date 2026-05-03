@@ -35,7 +35,7 @@ Setup
        budget; uninformed about kind).
      * ``LearnedAdmissionPolicy`` — logistic regression over the
        closed feature vocabulary in
-       ``vision_mvp/wevra/capsule_policy.py``; trained on the
+       ``vision_mvp/coordpy/capsule_policy.py``; trained on the
        train split using ``train_admission_policy``.
 
 4. **Metric.** For a budget ``B`` (in tokens), each policy
@@ -66,7 +66,7 @@ Writes ``results_phase46_capsule_learning.json`` to the working
 directory by default. Run with::
 
     python -m vision_mvp.experiments.phase46_capsule_learning \\
-        --out-dir /tmp/wevra_phase46
+        --out-dir /tmp/coordpy_phase46
 
 Reproducible — uses only stdlib + numpy-free Python (``random``,
 ``math``, ``json``).
@@ -91,10 +91,10 @@ from vision_mvp.tasks.incident_triage import (
 from vision_mvp.core.extractor_noise import (
     NoiseConfig, noisy_extractor, incident_triage_known_kinds,
 )
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     capsule_from_handoff, ContextCapsule,
 )
-from vision_mvp.wevra.capsule_policy import (
+from vision_mvp.coordpy.capsule_policy import (
     BudgetedAdmissionLedger, FIFOPolicy, KindPriorityPolicy,
     LearnedAdmissionPolicy, SmallestFirstPolicy,
     train_admission_policy, ADMIT,
@@ -372,7 +372,7 @@ def run_phase46(out_dir: str = ".",
                 train_results.append(row_tr)
 
     out = {
-        "schema": "wevra.phase46.capsule_learning.v1",
+        "schema": "coordpy.phase46.capsule_learning.v1",
         "n_records": n_total,
         "n_causal_records": n_causal,
         "train_scenarios": sorted(train_ids),

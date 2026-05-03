@@ -39,7 +39,7 @@ import time
 import itertools
 from typing import Tuple, List, Dict, Any
 
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     CapsuleBudget, CapsuleKind, CapsuleLedger, ContextCapsule,
 )
 

@@ -103,7 +103,7 @@ import sys
 import urllib.request
 from typing import Any
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     OracleRegistration, SchemaCapsule,
     build_incident_triage_schema_capsule,
     SharedFanoutRegistry,

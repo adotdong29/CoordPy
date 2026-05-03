@@ -45,7 +45,7 @@ def _require_cryptography() -> None:
     if not _CRYPTOGRAPHY_AVAILABLE:
         raise RuntimeError(
             "vrf_committee requires the 'cryptography' extra. "
-            "Install with: pip install 'wevra[crypto]'")
+            "Install with: pip install 'coordpy[crypto]'")
 
 
 @dataclass

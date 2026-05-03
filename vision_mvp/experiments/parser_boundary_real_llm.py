@@ -9,10 +9,10 @@ The synthetic cross-model parser-boundary study
 PARSE_OUTCOME failure-kind closed vocabulary has resolving power
 TVD up to 1.000 across a calibrated synthetic distribution
 library. The "Future work" section of
-``papers/wevra_capsule_native_runtime.md § 9`` flagged a
+``papers/coordpy_capsule_native_runtime.md § 9`` flagged a
 *real* cross-LLM study (e.g. ``gemma2:9b`` vs ``qwen2.5:7b``) as
 the natural next move. SDK v3.6 ships the integration boundary
-(LLM backend abstraction; see ``vision_mvp.wevra.llm_backend``)
+(LLM backend abstraction; see ``vision_mvp.coordpy.llm_backend``)
 that makes this trivial to layer on, and this experiment ships
 the first real cross-LLM measurement on the *available* hardware
 (two 36 GB Apple Silicon Macs running Ollama under the existing
@@ -62,7 +62,7 @@ A JSON-serialisable dict with the same shape as
 can switch between synthetic and real with one flag::
 
     {
-      "schema": "wevra.parser_boundary_real.v1",
+      "schema": "coordpy.parser_boundary_real.v1",
       "n_instances": <int>,
       "endpoint": <str>,
       "model_tags": [...],
@@ -100,7 +100,7 @@ from vision_mvp.tasks.swe_bench_bridge import (
 )
 
 
-SCHEMA = "wevra.parser_boundary_real.v1"
+SCHEMA = "coordpy.parser_boundary_real.v1"
 
 # The bundled bank used by ``local_smoke`` / ``bundled_57`` profiles.
 DEFAULT_JSONL = "vision_mvp/tasks/data/swe_lite_style_bank.jsonl"

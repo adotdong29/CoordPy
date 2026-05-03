@@ -108,7 +108,7 @@ import sys
 import urllib.request
 from typing import Any
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     OracleRegistration, SchemaCapsule,
     build_incident_triage_schema_capsule,
     SharedFanoutRegistry,
@@ -406,7 +406,7 @@ def _build_cross_host_w28_registry(
             {**meta, "n_probes": 1,
               "topology_fallback": "deterministic_single"},
         )
-    from vision_mvp.wevra.llm_backend import OllamaBackend
+    from vision_mvp.coordpy.llm_backend import OllamaBackend
     backends_with_hosts: list[tuple[Any, str, str, float]] = []
     for h in topo["hosts"]:
         if not h.get("selected_model"):

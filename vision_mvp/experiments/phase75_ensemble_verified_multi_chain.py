@@ -89,7 +89,7 @@ import urllib.error
 import urllib.request
 from typing import Any
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     OracleRegistration, SchemaCapsule,
     build_incident_triage_schema_capsule,
     SharedFanoutRegistry,
@@ -145,11 +145,11 @@ from vision_mvp.experiments.phase74_multi_chain_pivot import (
 )
 
 OLLAMA_LOCALHOST = os.environ.get(
-    "WEVRA_OLLAMA_URL_LOCALHOST", "http://localhost:11434")
+    "COORDPY_OLLAMA_URL_LOCALHOST", "http://localhost:11434")
 OLLAMA_MAC1 = os.environ.get(
-    "WEVRA_OLLAMA_URL_MAC1", "http://192.168.12.191:11434")
+    "COORDPY_OLLAMA_URL_MAC1", "http://192.168.12.191:11434")
 OLLAMA_MAC2 = os.environ.get(
-    "WEVRA_OLLAMA_URL_MAC2", "http://192.168.12.248:11434")
+    "COORDPY_OLLAMA_URL_MAC2", "http://192.168.12.248:11434")
 
 LOCAL_HOST_ID = socket.gethostname()
 
@@ -539,7 +539,7 @@ def build_ensemble_registry_for_bank(
                   "topology_fallback": "deterministic_single"},
             )
         # Build LLM probes for every reachable host with a selected model.
-        from vision_mvp.wevra.llm_backend import OllamaBackend
+        from vision_mvp.coordpy.llm_backend import OllamaBackend
         backends_with_hosts: list[tuple[Any, str, str, float]] = []
         for h in topo["hosts"]:
             if not h.get("selected_model"):
@@ -560,7 +560,7 @@ def build_ensemble_registry_for_bank(
         # Always add a deterministic local probe so the quorum can be
         # met even if both LLM probes abstain (guarantees at least one
         # ratifying vote on byte-identical inputs).
-        from vision_mvp.wevra.team_coord import (
+        from vision_mvp.coordpy.team_coord import (
             DeterministicSignatureProbe as _D)
         registry = EnsembleRatificationRegistry(
             schema=schema,

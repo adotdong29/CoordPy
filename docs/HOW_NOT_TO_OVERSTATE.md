@@ -1,6 +1,6 @@
 # How not to overstate this
 
-> Canonical do-not-overstate rules for the Context Zero / Wevra
+> Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
 > README-of-README must satisfy these rules. Last touched: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03. Earlier: SDK v3.42 (W41 family) 2026-05-03. Earlier: SDK v3.38 (W37 family) 2026-05-02. Earlier: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
 > v3.33 (W32 family) 2026-05-01.
@@ -17,7 +17,7 @@ this repo. Unlabelled claims are forbidden.
 
 - **proved** — Mathematical proof, or proof-by-inspection of code
   that a reviewer can read in under 30 lines. The proof is in
-  `docs/CAPSULE_FORMALISM.md` or `docs/archive/pre-wevra-theory/PROOFS.md` or in the
+  `docs/CAPSULE_FORMALISM.md` or `docs/archive/pre-coordpy-theory/PROOFS.md` or in the
   docstring of the relevant code. No simulation, no
   "experiments-show", no implicit cryptographic hardness.
 - **proved-conditional** — Proof depends on a stated assumption.
@@ -57,7 +57,7 @@ Last touched: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05
 
 ### "Solves" without a defining gate
 
-> *"Wevra solves context."*
+> *"CoordPy solves context."*
 
 If you write "solves" or "closes" about any open problem, you
 must name the *defining gate* and state which side of the gate
@@ -261,7 +261,7 @@ in this network.
 
 The earlier "third physical host candidate" framing was a
 network-layer mis-identification.  Recorded as **W41-INFRA-1** in
-``docs/RESULTS_WEVRA_W41_INTEGRATED_SYNTHESIS.md §4.1``.  The
+``docs/RESULTS_COORDPY_W41_INTEGRATED_SYNTHESIS.md §4.1``.  The
 honest live multi-host topology going forward is the two-Mac
 pair (``localhost`` + ``192.168.12.191``).
 ``192.168.12.248`` is recorded as gone (per user instruction).
@@ -764,7 +764,7 @@ dormant on this regime, not refuted.
 
 ### Labelling the runtime "fully capsule-native"
 
-> *"The Wevra runtime is fully capsule-native."*
+> *"The CoordPy runtime is fully capsule-native."*
 
 Forbidden until sandbox stdout/stderr, parser-internal regex /
 recovery state, and on-the-wire LLM streaming chunks are
@@ -787,7 +787,7 @@ against an adversary, which we do not provide.
 
 ### "Fully reproducible" without scope
 
-> *"Wevra runs are fully reproducible."*
+> *"CoordPy runs are fully reproducible."*
 
 Forbidden without scope. The accurate statement is:
 "Under `RunSpec(deterministic=True)` with a frozen JSONL and a
@@ -831,7 +831,7 @@ believed and why we stopped.
 
 If a theorem is referenced in `CAPSULE_FORMALISM.md`,
 `THEOREM_REGISTRY.md`, `RESEARCH_STATUS.md`,
-`papers/wevra_capsule_native_runtime.md`, and a milestone note,
+`papers/coordpy_capsule_native_runtime.md`, and a milestone note,
 the *name and number* must be byte-identical across files.
 "Theorem W3-32" never becomes "the lifecycle correspondence
 result" without its number.
@@ -853,7 +853,7 @@ result" without its number.
 
 ### Labelling the team-coordination layer "solves multi-agent context"
 
-> *"Wevra solves context for multi-agent teams."*
+> *"CoordPy solves context for multi-agent teams."*
 
 Forbidden. SDK v3.5 ships *one* capsule-native team-coordination
 slice over *one* synthetic benchmark family (Phase-52 incident-
@@ -882,7 +882,7 @@ unqualified is forbidden.
 > coverage-guided on every seed."*
 
 Forbidden. The honest reading is the cross-seed table in
-`docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md` § "Cross-seed result":
+`docs/archive/coordpy-milestones/RESULTS_COORDPY_TEAM_COORD.md` § "Cross-seed result":
 
 * The learned policy admits *strictly fewer* handoffs than
   coverage-guided on every train seed (12/12) — this is the
@@ -912,16 +912,16 @@ distribution is forbidden.
 
 ### Labelling team-level capsules as "production-grade"
 
-> *"Wevra ships capsule-native multi-agent coordination in production."*
+> *"CoordPy ships capsule-native multi-agent coordination in production."*
 
 Forbidden. The TEAM_HANDOFF / ROLE_VIEW / TEAM_DECISION capsule
-kinds ship in the SDK's closed vocabulary, but the **Wevra product
-runtime** (the ``RunSpec`` → ``RUN_REPORT`` path, ``wevra-ci``,
-``wevra-capsule verify``) does not seal any of them. They are
+kinds ship in the SDK's closed vocabulary, but the **CoordPy product
+runtime** (the ``RunSpec`` → ``RUN_REPORT`` path, ``coordpy-ci``,
+``coordpy-capsule verify``) does not seal any of them. They are
 emitted only by ``TeamCoordinator`` — the multi-agent coordination
-*research slice* (``vision_mvp/wevra/team_coord.py``). The honest
+*research slice* (``vision_mvp/coordpy/team_coord.py``). The honest
 phrasing is: "SDK v3.5 ships a multi-agent capsule coordination
-research slice that runs side-by-side with the Wevra single-run
+research slice that runs side-by-side with the CoordPy single-run
 runtime; the run-boundary product contract is unchanged."
 
 ### Conflating substrate typed handoffs with TEAM_HANDOFF capsules
@@ -936,7 +936,7 @@ Forbidden. They are *adjacent* but distinct:
   does not see it natively; the ``capsule_from_handoff`` adapter
   produces a HANDOFF capsule (``CapsuleKind.HANDOFF``) from one.
 * ``TEAM_HANDOFF`` (``CapsuleKind.TEAM_HANDOFF``,
-  ``vision_mvp.wevra.team_coord``) is born as a capsule and has
+  ``vision_mvp.coordpy.team_coord``) is born as a capsule and has
   no substrate twin. Identity is content-addressed by the
   capsule's hash, not by a substrate ``handoff_id``.
 
@@ -1053,7 +1053,7 @@ is the W12-C2 next data point.)
 
 ### Labelling the synthetic-noisy-LLM extractor a "real LLM"
 
-> *"Phase-59 evaluates Wevra on a real LLM."*
+> *"Phase-59 evaluates CoordPy on a real LLM."*
 
 Forbidden without the mode disclosure. The Phase-59 default mode
 ``synthetic_noisy_llm`` is a *deterministic in-process synthetic
@@ -1146,7 +1146,7 @@ discipline, not normalisation.)
 
 ### Labelling the heuristic abstraction layer "open-world generalisation"
 
-> *"Wevra now generalises to open-world LLM drift."*
+> *"CoordPy now generalises to open-world LLM drift."*
 
 Forbidden without the closure boundary disclosure. The W13-1 result
 is *closure widening*, not *closure elimination*:
@@ -1347,7 +1347,7 @@ family as shipped does **not** make that claim.
   not a refutation.
 - **2026-04-26 (SDK v3.14).** Adds W13 rules: forbidden phrases
   "layered open-world normalisation solves real-LLM multi-agent
-  context" without the closure-membership conditions; "Wevra now
+  context" without the closure-membership conditions; "CoordPy now
   generalises to open-world LLM drift" without the W13-4 closure
   boundary disclosure; "SDK v3.14 wins on real Ollama 14B" without
   the R-60-OLLAMA-C honest-null tier disclosure; "we solved
@@ -1363,7 +1363,7 @@ family as shipped does **not** make that claim.
 - **2026-04-26 (SDK v3.13).** Adds W12 rules: forbidden phrases
   "robust multi-round bundle decoding solves real-LLM multi-agent
   context" without the bench-shape + closure-property conditions;
-  "Phase-59 evaluates Wevra on a real LLM" without naming the
+  "Phase-59 evaluates CoordPy on a real LLM" without naming the
   LLM mode (synthetic_noisy_llm vs ollama); "SDK v3.13 closes the
   synthetic→real-LLM transfer gap" without the bounded-producer-
   noise-channel disclosure; "we solved multi-agent context" still

@@ -24,10 +24,10 @@ Locks in:
 
 from __future__ import annotations
 
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     CapsuleKind, ContextCapsule,
 )
-from vision_mvp.wevra.capsule_decoder import (
+from vision_mvp.coordpy.capsule_decoder import (
     BUNDLE_DECODER_FEATURES, LearnedBundleDecoder,
     PluralityDecoder, PriorityDecoder,
     SourceCorroboratedPriorityDecoder, UNKNOWN,

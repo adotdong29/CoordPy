@@ -39,7 +39,7 @@ from vision_mvp.experiments.phase69_capsule_latent_hybrid import (
     run_phase69, run_phase69_seed_stability_sweep,
     run_cross_regime_synthetic_p69,
 )
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     SchemaCapsule, LatentDigestEnvelope, LatentVerificationOutcome,
     verify_latent_digest, build_incident_triage_schema_capsule,
     SharedReadCache, CachingOracleAdapter, EnvelopeTamperer,
@@ -209,7 +209,7 @@ class LatentDigestVerificationTests(unittest.TestCase):
 
     def test_verify_rejects_unknown_schema_version(self) -> None:
         wrong_version = dataclasses.replace(
-            self.env, schema_version="wevra.latent_digest.v999")
+            self.env, schema_version="coordpy.latent_digest.v999")
         out = verify_latent_digest(
             wrong_version, registered_schema=self.schema)
         self.assertFalse(out.ok)

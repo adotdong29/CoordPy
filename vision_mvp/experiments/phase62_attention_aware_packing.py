@@ -2,7 +2,7 @@
 budget pressure.
 
 SDK v3.16, W15 family anchor. **First decoder-side context-packing move**
-in the Wevra programme — the direct response to a structural gap that
+in the CoordPy programme — the direct response to a structural gap that
 SDK v3.15 left unaddressed: even when the bench property holds and the
 cross-round decoder is in scope, a tight *decoder-side* token budget
 ``T_decoder`` can drop the round-2 specific-tier disambiguator under
@@ -151,8 +151,8 @@ from vision_mvp.tasks.incident_triage import (
     build_role_subscriptions, grade_answer,
     _decoder_from_handoffs as _phase31_decoder_from_handoffs,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, BundleAwareTeamDecoder,
     AttentionAwareBundleDecoder, CapsuleContextPacker,
     ClaimPriorityAdmissionPolicy,

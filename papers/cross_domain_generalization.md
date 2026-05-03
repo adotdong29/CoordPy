@@ -1,6 +1,6 @@
 # Cross-Domain Generalization of Formal Verification: The Capsule Pattern
 
-**Authors:** Wevra Research Team
+**Authors:** CoordPy Research Team
 
 **Abstract:**
 
@@ -374,9 +374,9 @@ The paradigm shift is complete: context is not "just data." Context is a **typed
 2. Lamport, L. (2002). "Specifying Systems: The TLA+ Language and Tools for Hardware and Software Engineers."
 3. Leino, K. R. M. (2010). "Dafny: An Automated Program Verifier for Functional Correctness."
 4. Nakamoto, S. (2008). "Bitcoin: A Peer-to-Peer Electronic Cash System."
-5. Wevra Capsule Contract. `docs/CAPSULE_FORMALISM.md`.
+5. CoordPy Capsule Contract. `docs/CAPSULE_FORMALISM.md`.
 
 ---
 
 **Generated with Claude Code**  
-**Wevra Research Team**
+**CoordPy Research Team**

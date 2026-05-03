@@ -41,7 +41,7 @@ WITH CAPSULES (all three hold):
   - Composability: inserting agent₃ creates new capsule; agent₂ still sees same parent capsule
 """
 
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     CapsuleBudget, CapsuleKind, CapsuleLedger, ContextCapsule,
     CapsuleLifecycle,
 )

@@ -3,9 +3,9 @@
 One-pass orientation for this repository. If you read only one doc, read
 this one. Everything else in the repo should make sense after this page.
 
-## I just want to use Wevra
+## I just want to use CoordPy
 
-Wevra is a Python-first SDK and CLI for building auditable AI agent
+CoordPy is a Python-first SDK and CLI for building auditable AI agent
 teams with structured, content-addressed context. The first public
 release is **SDK v3.43** (May 2026, final release of the v3.4x
 line).
@@ -14,14 +14,14 @@ line).
 git clone https://github.com/adotdong29/context-zero.git
 cd context-zero
 pip install -e .
-wevra --profile local_smoke --out-dir /tmp/wevra-smoke
-wevra-capsule verify --report /tmp/wevra-smoke/product_report.json
+coordpy --profile local_smoke --out-dir /tmp/coordpy-smoke
+coordpy-capsule verify --report /tmp/coordpy-smoke/product_report.json
 ```
 
 ```python
-from vision_mvp.wevra import RunSpec, run
+from vision_mvp.coordpy import RunSpec, run
 
-report = run(RunSpec(profile="local_smoke", out_dir="/tmp/wevra-smoke"))
+report = run(RunSpec(profile="local_smoke", out_dir="/tmp/coordpy-smoke"))
 assert report["readiness"]["ready"]
 print(report["summary_text"])
 ```
@@ -50,7 +50,7 @@ axis).
 
 To go deeper:
 
-* [`docs/RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md`](RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md) — full results note.
+* [`docs/RESULTS_COORDPY_W42_ROLE_INVARIANT_SYNTHESIS.md`](RESULTS_COORDPY_W42_ROLE_INVARIANT_SYNTHESIS.md) — full results note.
 * [`docs/SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md`](SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md) — pre-committed success bar.
 * [`docs/RESEARCH_STATUS.md`](RESEARCH_STATUS.md) — what is true now.
 * [`docs/THEOREM_REGISTRY.md`](THEOREM_REGISTRY.md) — theorem-by-theorem status.
@@ -82,71 +82,71 @@ Everything below this line is the per-milestone audit trail.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.43 final)   | [`RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md`](RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md) |
+> | Latest milestone (SDK v3.43 final)   | [`RESULTS_COORDPY_W42_ROLE_INVARIANT_SYNTHESIS.md`](RESULTS_COORDPY_W42_ROLE_INVARIANT_SYNTHESIS.md) |
 > | Pre-committed success bar (SDK v3.43)| [`SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md`](SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md) |
-> | Previous milestone (SDK v3.42 RC2)   | [`RESULTS_WEVRA_W41_INTEGRATED_SYNTHESIS.md`](RESULTS_WEVRA_W41_INTEGRATED_SYNTHESIS.md) |
+> | Previous milestone (SDK v3.42 RC2)   | [`RESULTS_COORDPY_W41_INTEGRATED_SYNTHESIS.md`](RESULTS_COORDPY_W41_INTEGRATED_SYNTHESIS.md) |
 > | Pre-committed success bar (SDK v3.42)| [`SUCCESS_CRITERION_W41_INTEGRATED_SYNTHESIS.md`](SUCCESS_CRITERION_W41_INTEGRATED_SYNTHESIS.md) |
-> | Previous milestone (SDK v3.41 RC1)   | [`RESULTS_WEVRA_W40_RESPONSE_HETEROGENEITY.md`](RESULTS_WEVRA_W40_RESPONSE_HETEROGENEITY.md) |
+> | Previous milestone (SDK v3.41 RC1)   | [`RESULTS_COORDPY_W40_RESPONSE_HETEROGENEITY.md`](RESULTS_COORDPY_W40_RESPONSE_HETEROGENEITY.md) |
 > | Pre-committed success bar (SDK v3.41)| [`SUCCESS_CRITERION_W40_RESPONSE_HETEROGENEITY.md`](SUCCESS_CRITERION_W40_RESPONSE_HETEROGENEITY.md) |
-> | Previous milestone (SDK v3.40)       | [`RESULTS_WEVRA_W39_MULTI_HOST_DISJOINT_QUORUM.md`](RESULTS_WEVRA_W39_MULTI_HOST_DISJOINT_QUORUM.md) |
+> | Previous milestone (SDK v3.40)       | [`RESULTS_COORDPY_W39_MULTI_HOST_DISJOINT_QUORUM.md`](RESULTS_COORDPY_W39_MULTI_HOST_DISJOINT_QUORUM.md) |
 > | Pre-committed success bar (SDK v3.40)| [`SUCCESS_CRITERION_W39_MULTI_HOST_DISJOINT_QUORUM.md`](SUCCESS_CRITERION_W39_MULTI_HOST_DISJOINT_QUORUM.md) |
-> | Previous milestone (SDK v3.39)       | [`RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md`](RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md) |
+> | Previous milestone (SDK v3.39)       | [`RESULTS_COORDPY_W38_DISJOINT_CONSENSUS_REFERENCE.md`](RESULTS_COORDPY_W38_DISJOINT_CONSENSUS_REFERENCE.md) |
 > | Pre-committed success bar (SDK v3.39)| [`SUCCESS_CRITERION_W38_DISJOINT_CONSENSUS_REFERENCE.md`](SUCCESS_CRITERION_W38_DISJOINT_CONSENSUS_REFERENCE.md) |
-> | Previous milestone (SDK v3.38)       | [`RESULTS_WEVRA_W37_CROSS_HOST_BASIS_TRAJECTORY.md`](RESULTS_WEVRA_W37_CROSS_HOST_BASIS_TRAJECTORY.md) |
+> | Previous milestone (SDK v3.38)       | [`RESULTS_COORDPY_W37_CROSS_HOST_BASIS_TRAJECTORY.md`](RESULTS_COORDPY_W37_CROSS_HOST_BASIS_TRAJECTORY.md) |
 > | Pre-committed success bar (SDK v3.38)| [`SUCCESS_CRITERION_W37_CROSS_HOST_BASIS_TRAJECTORY.md`](SUCCESS_CRITERION_W37_CROSS_HOST_BASIS_TRAJECTORY.md) |
-> | Previous milestone (SDK v3.37)       | [`RESULTS_WEVRA_W36_HOST_DIVERSE_TRUST_SUBSPACE.md`](RESULTS_WEVRA_W36_HOST_DIVERSE_TRUST_SUBSPACE.md) |
+> | Previous milestone (SDK v3.37)       | [`RESULTS_COORDPY_W36_HOST_DIVERSE_TRUST_SUBSPACE.md`](RESULTS_COORDPY_W36_HOST_DIVERSE_TRUST_SUBSPACE.md) |
 > | Pre-committed success bar (SDK v3.37)| [`SUCCESS_CRITERION_W36_HOST_DIVERSE_TRUST_SUBSPACE.md`](SUCCESS_CRITERION_W36_HOST_DIVERSE_TRUST_SUBSPACE.md) |
-> | Previous milestone (SDK v3.36)       | [`RESULTS_WEVRA_W35_TRUST_SUBSPACE_DENSE_CONTROL.md`](RESULTS_WEVRA_W35_TRUST_SUBSPACE_DENSE_CONTROL.md) |
+> | Previous milestone (SDK v3.36)       | [`RESULTS_COORDPY_W35_TRUST_SUBSPACE_DENSE_CONTROL.md`](RESULTS_COORDPY_W35_TRUST_SUBSPACE_DENSE_CONTROL.md) |
 > | Pre-committed success bar (SDK v3.36)| [`SUCCESS_CRITERION_W35_TRUST_SUBSPACE_DENSE_CONTROL.md`](SUCCESS_CRITERION_W35_TRUST_SUBSPACE_DENSE_CONTROL.md) |
-> | Previous milestone (SDK v3.35)       | [`RESULTS_WEVRA_W34_LIVE_AWARE_MULTI_ANCHOR.md`](RESULTS_WEVRA_W34_LIVE_AWARE_MULTI_ANCHOR.md) |
+> | Previous milestone (SDK v3.35)       | [`RESULTS_COORDPY_W34_LIVE_AWARE_MULTI_ANCHOR.md`](RESULTS_COORDPY_W34_LIVE_AWARE_MULTI_ANCHOR.md) |
 > | Pre-committed success bar (SDK v3.35)| [`SUCCESS_CRITERION_W34_LIVE_AWARE_MULTI_ANCHOR.md`](SUCCESS_CRITERION_W34_LIVE_AWARE_MULTI_ANCHOR.md) |
-> | Previous milestone (SDK v3.34)       | [`RESULTS_WEVRA_W33_TRUST_EWMA_TRACKED.md`](RESULTS_WEVRA_W33_TRUST_EWMA_TRACKED.md) |
+> | Previous milestone (SDK v3.34)       | [`RESULTS_COORDPY_W33_TRUST_EWMA_TRACKED.md`](RESULTS_COORDPY_W33_TRUST_EWMA_TRACKED.md) |
 > | Pre-committed success bar (SDK v3.34)| [`SUCCESS_CRITERION_W33_TRUST_EWMA_TRACKED.md`](SUCCESS_CRITERION_W33_TRUST_EWMA_TRACKED.md) |
-> | Previous milestone (SDK v3.33)       | [`RESULTS_WEVRA_W32_LONG_WINDOW_CONVERGENT.md`](RESULTS_WEVRA_W32_LONG_WINDOW_CONVERGENT.md) |
+> | Previous milestone (SDK v3.33)       | [`RESULTS_COORDPY_W32_LONG_WINDOW_CONVERGENT.md`](RESULTS_COORDPY_W32_LONG_WINDOW_CONVERGENT.md) |
 > | Pre-committed success bar (SDK v3.33)| [`SUCCESS_CRITERION_W32_LONG_WINDOW_CONVERGENT.md`](SUCCESS_CRITERION_W32_LONG_WINDOW_CONVERGENT.md) |
-> | Previous milestone (SDK v3.32)       | [`RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md`](RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md) |
+> | Previous milestone (SDK v3.32)       | [`RESULTS_COORDPY_W31_ONLINE_CALIBRATED_GEOMETRY.md`](RESULTS_COORDPY_W31_ONLINE_CALIBRATED_GEOMETRY.md) |
 > | Pre-committed success bar (SDK v3.32)| [`SUCCESS_CRITERION_W31_ONLINE_CALIBRATED_GEOMETRY.md`](SUCCESS_CRITERION_W31_ONLINE_CALIBRATED_GEOMETRY.md) |
-> | Previous milestone (SDK v3.31)       | [`RESULTS_WEVRA_W30_CALIBRATED_GEOMETRY.md`](RESULTS_WEVRA_W30_CALIBRATED_GEOMETRY.md) |
+> | Previous milestone (SDK v3.31)       | [`RESULTS_COORDPY_W30_CALIBRATED_GEOMETRY.md`](RESULTS_COORDPY_W30_CALIBRATED_GEOMETRY.md) |
 > | Pre-committed success bar (SDK v3.31)| [`SUCCESS_CRITERION_W30_CALIBRATED_GEOMETRY.md`](SUCCESS_CRITERION_W30_CALIBRATED_GEOMETRY.md) |
-> | Previous milestone (SDK v3.30)       | [`RESULTS_WEVRA_W29_GEOMETRY_PARTITIONED.md`](RESULTS_WEVRA_W29_GEOMETRY_PARTITIONED.md) |
+> | Previous milestone (SDK v3.30)       | [`RESULTS_COORDPY_W29_GEOMETRY_PARTITIONED.md`](RESULTS_COORDPY_W29_GEOMETRY_PARTITIONED.md) |
 > | Pre-committed success bar (SDK v3.30)| [`SUCCESS_CRITERION_W29_GEOMETRY_PARTITIONED.md`](SUCCESS_CRITERION_W29_GEOMETRY_PARTITIONED.md) |
-> | Previous milestone (SDK v3.29)       | [`RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md`](RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md) |
-> | Previous milestone (SDK v3.28)       | [`RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md`](RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md) |
-> | Previous milestone (SDK v3.27)       | [`RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md`](RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md) |
-> | Previous milestone (SDK v3.26)       | [`RESULTS_WEVRA_W25_SHARED_FANOUT.md`](RESULTS_WEVRA_W25_SHARED_FANOUT.md) |
-> | Previous milestone (SDK v3.25)       | [`RESULTS_WEVRA_W24_SESSION_COMPACTION.md`](RESULTS_WEVRA_W24_SESSION_COMPACTION.md) |
-> | Previous milestone (SDK v3.24)       | [`RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md`](RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md) |
-> | Previous milestone (SDK v3.23)       | [`RESULTS_WEVRA_CAPSULE_LATENT_HYBRID.md`](RESULTS_WEVRA_CAPSULE_LATENT_HYBRID.md) |
-> | Previous milestone (SDK v3.22)       | [`RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md`](RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md) |
-> | Previous milestone (SDK v3.21)       | [`RESULTS_WEVRA_OUTSIDE_INFORMATION.md`](RESULTS_WEVRA_OUTSIDE_INFORMATION.md) |
-> | Previous milestone (SDK v3.20)       | [`RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md`](RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md) |
-> | Previous milestone (SDK v3.19)       | [`RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md`](RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md) |
-> | Previous milestone (SDK v3.18)       | [`RESULTS_WEVRA_LIVE_COMPOSITION.md`](RESULTS_WEVRA_LIVE_COMPOSITION.md) |
-> | Previous milestone (SDK v3.17)       | [`RESULTS_WEVRA_COMPOSED_REAL_LLM.md`](RESULTS_WEVRA_COMPOSED_REAL_LLM.md) |
-> | Previous milestone (SDK v3.16)       | [`RESULTS_WEVRA_ATTENTION_AWARE.md`](RESULTS_WEVRA_ATTENTION_AWARE.md) |
-> | Previous milestone (SDK v3.15)       | [`RESULTS_WEVRA_PRODUCER_AMBIGUITY.md`](RESULTS_WEVRA_PRODUCER_AMBIGUITY.md) |
-> | Previous milestone (SDK v3.14)       | [`RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md`](RESULTS_WEVRA_OPEN_WORLD_NORMALIZATION.md) |
-> | Previous milestone (SDK v3.13)       | [`RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md`](RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md) |
-> | Previous milestone (SDK v3.12)       | [`RESULTS_WEVRA_MULTI_ROUND_DECODER.md`](RESULTS_WEVRA_MULTI_ROUND_DECODER.md) |
-> | Previous milestone (SDK v3.11)       | [`RESULTS_WEVRA_BUNDLE_DECODER.md`](RESULTS_WEVRA_BUNDLE_DECODER.md) |
+> | Previous milestone (SDK v3.29)       | [`RESULTS_COORDPY_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md`](RESULTS_COORDPY_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md) |
+> | Previous milestone (SDK v3.28)       | [`RESULTS_COORDPY_W27_MULTI_CHAIN_PIVOT.md`](RESULTS_COORDPY_W27_MULTI_CHAIN_PIVOT.md) |
+> | Previous milestone (SDK v3.27)       | [`RESULTS_COORDPY_W26_CHAIN_PERSISTED_FANOUT.md`](RESULTS_COORDPY_W26_CHAIN_PERSISTED_FANOUT.md) |
+> | Previous milestone (SDK v3.26)       | [`RESULTS_COORDPY_W25_SHARED_FANOUT.md`](RESULTS_COORDPY_W25_SHARED_FANOUT.md) |
+> | Previous milestone (SDK v3.25)       | [`RESULTS_COORDPY_W24_SESSION_COMPACTION.md`](RESULTS_COORDPY_W24_SESSION_COMPACTION.md) |
+> | Previous milestone (SDK v3.24)       | [`RESULTS_COORDPY_W23_CROSS_CELL_DELTA.md`](RESULTS_COORDPY_W23_CROSS_CELL_DELTA.md) |
+> | Previous milestone (SDK v3.23)       | [`RESULTS_COORDPY_CAPSULE_LATENT_HYBRID.md`](RESULTS_COORDPY_CAPSULE_LATENT_HYBRID.md) |
+> | Previous milestone (SDK v3.22)       | [`RESULTS_COORDPY_MULTI_ORACLE_ADJUDICATION.md`](RESULTS_COORDPY_MULTI_ORACLE_ADJUDICATION.md) |
+> | Previous milestone (SDK v3.21)       | [`RESULTS_COORDPY_OUTSIDE_INFORMATION.md`](RESULTS_COORDPY_OUTSIDE_INFORMATION.md) |
+> | Previous milestone (SDK v3.20)       | [`RESULTS_COORDPY_DECEPTIVE_AMBIGUITY.md`](RESULTS_COORDPY_DECEPTIVE_AMBIGUITY.md) |
+> | Previous milestone (SDK v3.19)       | [`RESULTS_COORDPY_RELATIONAL_DISAMBIGUATOR.md`](RESULTS_COORDPY_RELATIONAL_DISAMBIGUATOR.md) |
+> | Previous milestone (SDK v3.18)       | [`RESULTS_COORDPY_LIVE_COMPOSITION.md`](RESULTS_COORDPY_LIVE_COMPOSITION.md) |
+> | Previous milestone (SDK v3.17)       | [`RESULTS_COORDPY_COMPOSED_REAL_LLM.md`](RESULTS_COORDPY_COMPOSED_REAL_LLM.md) |
+> | Previous milestone (SDK v3.16)       | [`RESULTS_COORDPY_ATTENTION_AWARE.md`](RESULTS_COORDPY_ATTENTION_AWARE.md) |
+> | Previous milestone (SDK v3.15)       | [`RESULTS_COORDPY_PRODUCER_AMBIGUITY.md`](RESULTS_COORDPY_PRODUCER_AMBIGUITY.md) |
+> | Previous milestone (SDK v3.14)       | [`RESULTS_COORDPY_OPEN_WORLD_NORMALIZATION.md`](RESULTS_COORDPY_OPEN_WORLD_NORMALIZATION.md) |
+> | Previous milestone (SDK v3.13)       | [`RESULTS_COORDPY_REAL_LLM_MULTI_ROUND.md`](RESULTS_COORDPY_REAL_LLM_MULTI_ROUND.md) |
+> | Previous milestone (SDK v3.12)       | [`RESULTS_COORDPY_MULTI_ROUND_DECODER.md`](RESULTS_COORDPY_MULTI_ROUND_DECODER.md) |
+> | Previous milestone (SDK v3.11)       | [`RESULTS_COORDPY_BUNDLE_DECODER.md`](RESULTS_COORDPY_BUNDLE_DECODER.md) |
 > | Pre-committed success bar (SDK v3.13)| [`SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`](SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md) |
-> | Previous milestone (SDK v3.10)       | [`RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md`](RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md) |
-> | Previous milestone (SDK v3.9)        | [`RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md`](RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md) |
-> | Previous milestone (SDK v3.8)        | [`RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md`](RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md) |
-> | Previous milestone (SDK v3.7)        | [`RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](RESULTS_WEVRA_SCALE_VS_STRUCTURE.md) |
+> | Previous milestone (SDK v3.10)       | [`RESULTS_COORDPY_MULTI_SERVICE_CORROBORATION.md`](RESULTS_COORDPY_MULTI_SERVICE_CORROBORATION.md) |
+> | Previous milestone (SDK v3.9)        | [`RESULTS_COORDPY_CROSS_ROLE_CORROBORATION.md`](RESULTS_COORDPY_CROSS_ROLE_CORROBORATION.md) |
+> | Previous milestone (SDK v3.8)        | [`RESULTS_COORDPY_CROSS_ROLE_COHERENCE.md`](RESULTS_COORDPY_CROSS_ROLE_COHERENCE.md) |
+> | Previous milestone (SDK v3.7)        | [`RESULTS_COORDPY_SCALE_VS_STRUCTURE.md`](RESULTS_COORDPY_SCALE_VS_STRUCTURE.md) |
 > | Repo top-level                       | [`../README.md`](../README.md), [`../ARCHITECTURE.md`](../ARCHITECTURE.md), [`../CHANGELOG.md`](../CHANGELOG.md) |
-> | Historical record (read-only)        | [`archive/`](archive/) — pre-Wevra theory, older Wevra milestones, sprint prompts |
+> | Historical record (read-only)        | [`archive/`](archive/) — pre-CoordPy theory, older CoordPy milestones, sprint prompts |
 
 ---
 
 ## What this repo is — in one line
 
-**Wevra is a context-capsule runtime.** Every piece of context that
+**CoordPy is a context-capsule runtime.** Every piece of context that
 crosses a role boundary, a layer boundary, or a run boundary is a
 typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. As of
 **SDK v3.28 (April 2026)**, capsules are load-bearing **inside one
-Wevra run** (W3 family, run-boundary → cell → parser axis → LLM
+CoordPy run** (W3 family, run-boundary → cell → parser axis → LLM
 byte boundary), **between agents in a team** (W4 family,
 multi-agent coordination *research slice*: TEAM_HANDOFF /
 ROLE_VIEW / TEAM_DECISION + T-1..T-7 lifecycle audit + learned
@@ -203,7 +203,7 @@ W27-Λ-pivot-tampered, W27-Λ-signature-drift) make the W27-1
 conditionality sharp. Discharges **W26-C-DIVERGENCE-RECOVERY**
 in the per-signature scoping direction. Backward-compat preserved
 byte-for-byte: 508/508 focused regression. See
-`docs/RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md` for the milestone note.
+`docs/RESULTS_COORDPY_W27_MULTI_CHAIN_PIVOT.md` for the milestone note.
 
 SDK v3.27's prior headline result was the **first capsule-native
 multi-agent-coordination method that amortises the producer's
@@ -257,7 +257,7 @@ surface is purely additive on top of the W20 surface (one new
 ``W21OracleProbe`` + one ``W21MultiOracleResult`` + one
 ``TrustWeightedMultiOracleDisambiguator``); the SDK v3.21 runtime
 contract is byte-for-byte unchanged. See
-`docs/RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md` for the milestone
+`docs/RESULTS_COORDPY_MULTI_ORACLE_ADJUDICATION.md` for the milestone
 note.
 SDK v3.21's prior headline result is the **first capsule-native
 multi-agent-coordination method that crosses the W19-Λ-outside
@@ -295,7 +295,7 @@ W18 method reduces to W15 byte-for-byte. The W18 surface is purely
 additive on top of the W15 surface (one new dataclass + one
 tokeniser + one closed-form scorer + one wrapping decoder); the
 SDK v3.18 runtime contract is byte-for-byte unchanged. See
-`docs/RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md` for the milestone
+`docs/RESULTS_COORDPY_RELATIONAL_DISAMBIGUATOR.md` for the milestone
 note. SDK v3.18's prior headline result is the **first fresh-live end-to-end
 real-LLM strict +1.000 advance** in the programme over the
 strongest non-composed baseline AND **the first explicit
@@ -359,7 +359,7 @@ code* (no new SDK class) and *multiplicative in effect*
 byte-for-byte: 442/442 tests pass.
 SDK v3.16's headline result was the **first decoder-side capsule-
 context-packing move** in the programme. The
-:class:`vision_mvp.wevra.team_coord.AttentionAwareBundleDecoder`
+:class:`vision_mvp.coordpy.team_coord.AttentionAwareBundleDecoder`
 salience-packs the cross-round union (CCK + tier + corroboration
 + magnitude + round) with hypothesis preservation under
 ``T_decoder`` and defeats the FIFO-packed baseline by +1.000 on
@@ -371,7 +371,7 @@ jointly necessary on the regime where both fire.
 
 SDK v3.15's headline result was the **first producer-protocol move**
 in the programme — and the **first real-Ollama benchmark in which a
-Wevra cross-round capsule decoder produced a strict +0.50 gain over
+CoordPy cross-round capsule decoder produced a strict +0.50 gain over
 substrate FIFO under a real LLM**. SDK v3.14 closed the synthetic
 open-world normalisation axis (W13-1) but produced an honest
 negative on real Ollama 14B (W13-Λ-real): the bench property was
@@ -396,7 +396,7 @@ named, each with a structurally-distinct failure mode and a sharp
 limit theorem; the W14 layer is the **first** layer to materially
 advance the programme on a real-LLM stream. Backward-compat
 preserved: R-58 / R-59 / R-60 default + falsifier banks, R-54..R-57
-anchors, and 393/393 prior tests pass byte-for-byte. Wevra's
+anchors, and 393/393 prior tests pass byte-for-byte. CoordPy's
 single-run product runtime contract is unchanged.
 
 SDK v3.14's headline result is the **first open-world
@@ -528,7 +528,7 @@ MLX-distributed integration boundary (chosen path: **MLX
 distributed** under `mpirun mlx_lm.server`; **not** Hyperspace,
 which is distributed-agent infrastructure rather than
 single-model sharding) is byte-for-byte unchanged — experimental
-infrastructure, not product; the Wevra single-run product
+infrastructure, not product; the CoordPy single-run product
 runtime contract is byte-for-byte unchanged. Up through SDK v3.4, capsules drove execution **one
 further structural layer past v3.3** by extending the discipline
 into the LLM byte boundary itself. The end-to-end inner-loop chain is
@@ -544,7 +544,7 @@ same logical input (Theorem W3-41). Meta-artefacts (the report
 itself) are authenticated by a *detached* META_MANIFEST in a
 secondary ledger — the rendering circularity (impossible to seal
 a report whose bytes encode the seal) is a sharp theorem
-(W3-36) with a constructive boundary witness. ``wevra-capsule
+(W3-36) with a constructive boundary witness. ``coordpy-capsule
 verify`` recomputes the chain from on-disk header bytes and
 re-hashes every artefact. SDK v3.4 also ships a
 **synthetic-LLM mode** (``SweepSpec(mode="synthetic", ...)``)
@@ -573,20 +573,20 @@ A **`ContextCapsule`** is an immutable object with:
   * **`parents`**    — tuple of parent CIDs (the capsule DAG).
 
 Capsules live in a **`CapsuleLedger`** — append-only, hash-chained,
-budget-enforcing, provenance-auditing. Every Wevra run emits a sealed
+budget-enforcing, provenance-auditing. Every CoordPy run emits a sealed
 capsule DAG rooted at a `RUN_REPORT` capsule; the root CID is the
 durable identifier for the run.
 
-This abstraction *subsumes and re-centers* everything Wevra already
+This abstraction *subsumes and re-centers* everything CoordPy already
 did. Handles (Phase 19), typed handoffs (Phase 31), thread resolutions
 (Phase 35), sweep cells, and the provenance manifest were already
 capsules — they just weren't named. SDK v3 names them.
 
-See [`archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md`](archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md) for the
+See [`archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE.md`](archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE.md) for the
 theorem-style statement of the Capsule Contract (invariants C1..C6)
 and why it is a better top-level description of the product than
 "bounded-context orchestration." See
-[`archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md`](archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md)
+[`archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE_NATIVE.md`](archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE_NATIVE.md)
 for the SDK v3.1 milestone in which capsules become the runtime's
 typed execution contract (W3-32 / W3-33 / W3-34 / W3-35).
 
@@ -594,7 +594,7 @@ typed execution contract (W3-32 / W3-33 / W3-34 / W3-35).
 
 ## What capsules do at runtime now (SDK v3.2)
 
-As of April 2026, when you run Wevra with the default
+As of April 2026, when you run CoordPy with the default
 ``RunSpec(capsule_native=True)``, capsules **drive** the run, not
 just describe it. Specifically:
 
@@ -661,8 +661,8 @@ SDK v3.10 mints the **W9 theorem family**:
 The new admission policy
 (``MultiServiceCorroborationAdmissionPolicy``) is exported under
 the canonical alias
-``vision_mvp.wevra.TeamMultiServiceCorroborationAdmissionPolicy``.
-The Wevra single-run product runtime contract is **byte-for-byte
+``vision_mvp.coordpy.TeamMultiServiceCorroborationAdmissionPolicy``.
+The CoordPy single-run product runtime contract is **byte-for-byte
 unchanged from SDK v3.9**; the new surface is purely additive
 (multi-agent coordination research slice). The lifecycle audit
 (T-1..T-7) holds on every cell of every regime.
@@ -691,7 +691,7 @@ Two new structural moves were made:
     primary — the rendering circularity (Theorem W3-36) makes
     it impossible to seal an ARTIFACT for a report whose bytes
     encode the seal. The manifest is the one-hop trust unit
-    beyond the primary view; ``wevra-capsule verify`` now
+    beyond the primary view; ``coordpy-capsule verify`` now
     re-hashes every meta-artefact and primary artefact at
     audit time (W3-37 / W3-38).
 
@@ -731,7 +731,7 @@ Three additive moves:
 
 ## What changed in SDK v3.6 (two-Mac distributed-inference integration boundary + real cross-LLM parser-boundary)
 
-Three additive moves. The Wevra single-run product runtime
+Three additive moves. The CoordPy single-run product runtime
 contract is *byte-for-byte unchanged*; the new surface is one
 duck-typed Protocol + two backend adapters + one new research
 experiment. The chosen two-Mac path is **MLX distributed
@@ -742,7 +742,7 @@ this use case (it is distributed-agent infrastructure, not
 single-model sharding).
 
   * **`LLMBackend` Protocol + two concrete backends.**
-    `vision_mvp/wevra/llm_backend.py` ships a runtime-checkable
+    `vision_mvp/coordpy/llm_backend.py` ships a runtime-checkable
     Protocol (`model`, `base_url`, `generate`) and two
     implementations: `OllamaBackend` (wraps the existing client
     byte-for-byte) and `MLXDistributedBackend` (talks
@@ -767,18 +767,18 @@ single-model sharding).
     parser-boundary instability.
   * **Experimental infrastructure, not product.** The two-Mac
     MLX-distributed path is opt-in research infrastructure;
-    Wevra does **not** ship `mlx`, `mlx-lm`, or `mpirun` as
+    CoordPy does **not** ship `mlx`, `mlx-lm`, or `mpirun` as
     dependencies. There is deliberately no
-    `pip install wevra[mlx_distributed]` extra. The integration
+    `pip install coordpy[mlx_distributed]` extra. The integration
     is one HTTP-client class. See
     `docs/MLX_DISTRIBUTED_RUNBOOK.md` for operator bring-up.
 
 ## What changed in SDK v3.5 (multi-agent capsule coordination — research slice)
 
-Three additive moves. The Wevra single-run product runtime
+Three additive moves. The CoordPy single-run product runtime
 contract is *byte-for-byte unchanged*; the new surface is a
-research slice (`vision_mvp.wevra.team_coord` +
-`vision_mvp.wevra.team_policy`).
+research slice (`vision_mvp.coordpy.team_coord` +
+`vision_mvp.coordpy.team_policy`).
 
   * **Three new closed-vocabulary capsule kinds.**
     `TEAM_HANDOFF` (capsule-native multi-agent handoff;
@@ -842,7 +842,7 @@ Four additive moves:
   * **In-process synthetic-LLM mode**
     (``SweepSpec(mode="synthetic", synthetic_model_tag=<tag>)``).
     Uses a deterministic synthetic LLM client
-    (``vision_mvp.wevra.synthetic_llm.SyntheticLLMClient``) that
+    (``vision_mvp.coordpy.synthetic_llm.SyntheticLLMClient``) that
     returns canned strings keyed by model tag. The full
     PROMPT / LLM_RESPONSE / PARSE_OUTCOME / PATCH_PROPOSAL /
     TEST_VERDICT chain runs end-to-end without an Ollama
@@ -898,7 +898,7 @@ now, but a few axes are still post-hoc / not capsule-tracked:
 ## Quick check: which path is my run on?
 
 ```python
-from vision_mvp.wevra import RunSpec, run, CONSTRUCTION_IN_FLIGHT
+from vision_mvp.coordpy import RunSpec, run, CONSTRUCTION_IN_FLIGHT
 report = run(RunSpec(profile="local_smoke", out_dir="/tmp/x"))
 assert report["capsules"]["construction"] == CONSTRUCTION_IN_FLIGHT
 # in_flight_stats: every proposed capsule sealed.
@@ -914,27 +914,27 @@ This repository is the home of two coupled things:
 1. **Context Zero** — a research programme on *per-agent minimum-sufficient
    context* in multi-agent LLM systems. Theorems, phase shards, an
    EXTENDED_MATH survey, and ~1500 tests of substrate behaviour.
-2. **Wevra** — the first shipped product from that programme. A
+2. **CoordPy** — the first shipped product from that programme. A
    **context-capsule runtime**: one `RunSpec` in, one reproducible,
    provenance-stamped, sealed-capsule-DAG report out.
 
 Neither identity subsumes the other. Context Zero is the body of work;
-Wevra is the load-bearing product slice of it that a third party can
-install, run, and rely on. The capsule abstraction is Wevra's centre
+CoordPy is the load-bearing product slice of it that a third party can
+install, run, and rely on. The capsule abstraction is CoordPy's centre
 of gravity; the substrate primitives (CASR router, typed handoffs,
-escalation threads, adaptive subscriptions) are Wevra's *instances*
+escalation threads, adaptive subscriptions) are CoordPy's *instances*
 of capsule-shaped objects, not its identity.
 
-If you came here because you want to **use** something, you want Wevra.
+If you came here because you want to **use** something, you want CoordPy.
 If you came here because you want to **extend the theory**, the active
 canonical entry points are
 [`docs/CAPSULE_FORMALISM.md`](CAPSULE_FORMALISM.md) (run-boundary,
 W3 family), [`docs/CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)
 (team-boundary, W4 family), and
-[`docs/THEOREM_REGISTRY.md`](THEOREM_REGISTRY.md). The pre-Wevra theory
+[`docs/THEOREM_REGISTRY.md`](THEOREM_REGISTRY.md). The pre-CoordPy theory
 volumes (`PROOFS.md`, `EXTENDED_MATH_[1-7].md`, `OPEN_QUESTIONS.md`,
 `FRAMEWORK.md`, the original 12 theorems and 72-framework survey) are
-preserved under [`docs/archive/pre-wevra-theory/`](archive/pre-wevra-theory/);
+preserved under [`docs/archive/pre-coordpy-theory/`](archive/pre-coordpy-theory/);
 they are historical record, not the active position. The phase-by-phase
 research diary lives in `vision_mvp/RESULTS_PHASE*.md`. The long-running
 master plan is [`docs/context_zero_master_plan.md`](context_zero_master_plan.md).
@@ -945,17 +945,17 @@ master plan is [`docs/context_zero_master_plan.md`](context_zero_master_plan.md)
 
 | Layer | One sentence | Stability |
 |---|---|---|
-| **Context Capsule primitives** (`wevra.capsule`) | `ContextCapsule` + `CapsuleLedger` + `CapsuleView`: the load-bearing SDK abstraction. Every cross-boundary artefact is a typed, content-addressed, lifecycle-bounded, budget-bounded, provenance-carrying capsule. | **Stable v1** (contract C1..C6). |
-| **Capsule-native runtime** (`wevra.capsule_runtime`) | `CapsuleNativeRunContext` + `seal_and_write_artifact` + intra-cell `seal_patch_proposal` / `seal_test_verdict` + sub-intra-cell `seal_parse_outcome` (SDK v3.3) + detached `seal_meta_manifest`: capsules drive runtime stage transitions at run boundaries AND inside the inner sweep loop AND on the parser axis; substantive artefacts are content-addressed at write time and re-verifiable at audit time. The capsule layer is the runtime's typed execution contract on the spine and now extends two structural layers past the cell boundary. | **Stable v3** (theorems W3-32 / W3-33 / W3-34 / W3-35 / W3-32-extended / W3-36 / W3-37 / W3-38 / W3-39 / W3-40 / W3-41). |
-| **Lifecycle audit** (`wevra.lifecycle_audit`) | `CapsuleLifecycleAudit` + `audit_capsule_lifecycle_from_view`: mechanically verifies eight lifecycle invariants L-1..L-8 over a finished run (Theorem W3-40). Returns OK / BAD / EMPTY plus typed counterexamples. Runnable from runtime ctx OR from on-disk `capsule_view.json` alone. | **Stable v1** (SDK v3.3). |
-| **Wevra SDK** (`vision_mvp.wevra`) | Profile-driven context-capsule runtime for SWE-bench-Lite-shape banks; `RunSpec` → provenance-stamped report whose root is a sealed `RUN_REPORT` capsule + a detached `meta_manifest.json` witness. ``RunSpec.deterministic=True`` opt-in collapses CIDs across runs (Theorem W3-41). | **Stable v3.3** — public contract. |
-| **Wevra console scripts** | `wevra`, `wevra-import`, `wevra-ci`, `wevra-capsule` — installed by `pip install wevra`. | **Stable v3**. |
-| **Wevra extension protocols** (`wevra.extensions`) | `SandboxBackend`, `TaskBankLoader`, `ReportSink` — runtime-checkable Protocols, discovered via `importlib.metadata.entry_points`. | **Stable v1**. |
-| **Unified runtime** (`wevra.runtime`) | `SweepSpec` + `run_sweep`: one code path for mock and real-LLM runs, with an explicit `acknowledge_heavy` cost gate. Every sweep cell becomes a `SWEEP_CELL` capsule. | **Stable v1**. |
-| **Legacy product path** (`vision_mvp.product`) | Pre-Wevra import path. Still works; re-exported by `wevra`. | **Deprecated-compat** — do not import in new code. |
-| **Core substrate** (`vision_mvp.core`) | CASR routing, hierarchical router, context ledger, exact_ops, typed role-handoff, dynamic_comm, adaptive_sub. Research primitives Wevra rests on; each is adapter-able into the capsule surface (`capsule_from_handle`, `capsule_from_handoff`, …). | **Settled, but research API** — no SDK guarantees. |
-| **Research shards** (`vision_mvp.experiments`, `vision_mvp.tasks`, `vision_mvp/RESULTS_PHASE*.md`, archived `EXTENDED_MATH_*.md`) | 53+ phases of falsifiability experiments, 72-framework theory survey (archived under `docs/archive/pre-wevra-theory/`), proofs. | **Research-grade** — empirical/proved per shard; no product-API guarantee. |
-| **Multi-agent capsule coordination** (`wevra.team_coord` + `wevra.team_policy`) | SDK v3.5 (research slice). `TEAM_HANDOFF` / `ROLE_VIEW` / `TEAM_DECISION` capsules + `TeamCoordinator` + `audit_team_lifecycle` (T-1..T-7) + learned per-role admission policy. Theorems W4-1 (proved + mechanically-checked) / W4-2 (proved-conditional) / W4-3 (proved-negative); Conjecture W4-C1 (empirical-positive on default config). | **Research-grade v1** — additive on top of the Wevra product surface; not part of the run-boundary product contract. |
+| **Context Capsule primitives** (`coordpy.capsule`) | `ContextCapsule` + `CapsuleLedger` + `CapsuleView`: the load-bearing SDK abstraction. Every cross-boundary artefact is a typed, content-addressed, lifecycle-bounded, budget-bounded, provenance-carrying capsule. | **Stable v1** (contract C1..C6). |
+| **Capsule-native runtime** (`coordpy.capsule_runtime`) | `CapsuleNativeRunContext` + `seal_and_write_artifact` + intra-cell `seal_patch_proposal` / `seal_test_verdict` + sub-intra-cell `seal_parse_outcome` (SDK v3.3) + detached `seal_meta_manifest`: capsules drive runtime stage transitions at run boundaries AND inside the inner sweep loop AND on the parser axis; substantive artefacts are content-addressed at write time and re-verifiable at audit time. The capsule layer is the runtime's typed execution contract on the spine and now extends two structural layers past the cell boundary. | **Stable v3** (theorems W3-32 / W3-33 / W3-34 / W3-35 / W3-32-extended / W3-36 / W3-37 / W3-38 / W3-39 / W3-40 / W3-41). |
+| **Lifecycle audit** (`coordpy.lifecycle_audit`) | `CapsuleLifecycleAudit` + `audit_capsule_lifecycle_from_view`: mechanically verifies eight lifecycle invariants L-1..L-8 over a finished run (Theorem W3-40). Returns OK / BAD / EMPTY plus typed counterexamples. Runnable from runtime ctx OR from on-disk `capsule_view.json` alone. | **Stable v1** (SDK v3.3). |
+| **CoordPy SDK** (`vision_mvp.coordpy`) | Profile-driven context-capsule runtime for SWE-bench-Lite-shape banks; `RunSpec` → provenance-stamped report whose root is a sealed `RUN_REPORT` capsule + a detached `meta_manifest.json` witness. ``RunSpec.deterministic=True`` opt-in collapses CIDs across runs (Theorem W3-41). | **Stable v3.3** — public contract. |
+| **CoordPy console scripts** | `coordpy`, `coordpy-import`, `coordpy-ci`, `coordpy-capsule` — installed by `pip install coordpy`. | **Stable v3**. |
+| **CoordPy extension protocols** (`coordpy.extensions`) | `SandboxBackend`, `TaskBankLoader`, `ReportSink` — runtime-checkable Protocols, discovered via `importlib.metadata.entry_points`. | **Stable v1**. |
+| **Unified runtime** (`coordpy.runtime`) | `SweepSpec` + `run_sweep`: one code path for mock and real-LLM runs, with an explicit `acknowledge_heavy` cost gate. Every sweep cell becomes a `SWEEP_CELL` capsule. | **Stable v1**. |
+| **Legacy product path** (`vision_mvp.product`) | Pre-CoordPy import path. Still works; re-exported by `coordpy`. | **Deprecated-compat** — do not import in new code. |
+| **Core substrate** (`vision_mvp.core`) | CASR routing, hierarchical router, context ledger, exact_ops, typed role-handoff, dynamic_comm, adaptive_sub. Research primitives CoordPy rests on; each is adapter-able into the capsule surface (`capsule_from_handle`, `capsule_from_handoff`, …). | **Settled, but research API** — no SDK guarantees. |
+| **Research shards** (`vision_mvp.experiments`, `vision_mvp.tasks`, `vision_mvp/RESULTS_PHASE*.md`, archived `EXTENDED_MATH_*.md`) | 53+ phases of falsifiability experiments, 72-framework theory survey (archived under `docs/archive/pre-coordpy-theory/`), proofs. | **Research-grade** — empirical/proved per shard; no product-API guarantee. |
+| **Multi-agent capsule coordination** (`coordpy.team_coord` + `coordpy.team_policy`) | SDK v3.5 (research slice). `TEAM_HANDOFF` / `ROLE_VIEW` / `TEAM_DECISION` capsules + `TeamCoordinator` + `audit_team_lifecycle` (T-1..T-7) + learned per-role admission policy. Theorems W4-1 (proved + mechanically-checked) / W4-2 (proved-conditional) / W4-3 (proved-negative); Conjecture W4-C1 (empirical-positive on default config). | **Research-grade v1** — additive on top of the CoordPy product surface; not part of the run-boundary product contract. |
 | **Boundary / next-slice** | Docker-first-by-default for public/untrusted JSONLs; first real out-of-tree plugin exemplar; release-on-tag firing. | **Declared, not fired** — see master plan § 10.5. |
 
 For the full living stability matrix, see
@@ -970,43 +970,43 @@ For the full living stability matrix, see
     ├── Theory (active):   docs/CAPSULE_FORMALISM.md (W3 family),
     │                      docs/CAPSULE_TEAM_FORMALISM.md (W4 family),
     │                      docs/THEOREM_REGISTRY.md
-    ├── Theory (archived): docs/archive/pre-wevra-theory/
+    ├── Theory (archived): docs/archive/pre-coordpy-theory/
     │                      (PROOFS.md, EXTENDED_MATH_[1-7].md, OPEN_QUESTIONS.md, …)
     ├── Substrate: vision_mvp/core/*  (CASR router, exact memory,
     │                                   typed handoff, runtime calibration)
     ├── Research shards: vision_mvp/experiments/*, vision_mvp/tasks/*,
     │                    vision_mvp/RESULTS_PHASE*.md (empirical diary, per phase)
     │
-    └── Wevra (shipped product slice)
-        ├── SDK:       vision_mvp/wevra/          (stable contract)
-        ├── CLI:       wevra / wevra-import / wevra-ci / wevra-capsule
-        ├── Runtime:   wevra.runtime.run_sweep    (mock + real, one path)
-        ├── Plugins:   wevra.extensions           (3 Protocols + registry)
-        ├── Schemas:   phase45.product_report.v2, wevra.provenance.v1, …
-        ├── Latest milestone: docs/RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md (SDK v3.24)
-        ├── Older milestones: docs/archive/wevra-milestones/ (SDK v3.0 → v3.6)
+    └── CoordPy (shipped product slice)
+        ├── SDK:       vision_mvp/coordpy/          (stable contract)
+        ├── CLI:       coordpy / coordpy-import / coordpy-ci / coordpy-capsule
+        ├── Runtime:   coordpy.runtime.run_sweep    (mock + real, one path)
+        ├── Plugins:   coordpy.extensions           (3 Protocols + registry)
+        ├── Schemas:   phase45.product_report.v2, coordpy.provenance.v1, …
+        ├── Latest milestone: docs/RESULTS_COORDPY_W23_CROSS_CELL_DELTA.md (SDK v3.24)
+        ├── Older milestones: docs/archive/coordpy-milestones/ (SDK v3.0 → v3.6)
         └── Legacy:    vision_mvp/product/*       (deprecated-compat)
 ```
 
-The rule of thumb: **anything imported from `vision_mvp.wevra` is
+The rule of thumb: **anything imported from `vision_mvp.coordpy` is
 product; anything else is research substrate or research shard.**
 
 ---
 
-## What Wevra is — and what it is not
+## What CoordPy is — and what it is not
 
-**Wevra IS:** a drop-in SDK for profile-driven evaluation runs on
+**CoordPy IS:** a drop-in SDK for profile-driven evaluation runs on
 SWE-bench-Lite-shape task banks, with a stable report schema, a CI
 gate, a provenance manifest on every run, and a plugin surface for
 sandboxes / task banks / report sinks.
 
-**Wevra is NOT:**
+**CoordPy is NOT:**
 - The whole Context Zero research programme.
 - A universal multi-agent platform.
 - A replacement for SWE-bench harnesses on arbitrary-shape tasks.
 - An orchestrator for training runs or long-lived agent services.
 
-The distinction matters: Wevra is deliberately narrow so that what it
+The distinction matters: CoordPy is deliberately narrow so that what it
 does, it does with proofs and provenance. Scope creep is resisted on
 purpose.
 
@@ -1018,18 +1018,18 @@ purpose.
 git clone <this-repo>
 cd context-zero
 pip install -e .[docker]            # Docker extra optional, recommended for public JSONLs
-wevra --profile local_smoke --out-dir /tmp/wevra-smoke
-wevra-ci       --report /tmp/wevra-smoke/product_report.json --min-pass-at-1 1.0
-wevra-capsule  view   --report /tmp/wevra-smoke/product_report.json
-wevra-capsule  verify --report /tmp/wevra-smoke/product_report.json
+coordpy --profile local_smoke --out-dir /tmp/coordpy-smoke
+coordpy-ci       --report /tmp/coordpy-smoke/product_report.json --min-pass-at-1 1.0
+coordpy-capsule  view   --report /tmp/coordpy-smoke/product_report.json
+coordpy-capsule  verify --report /tmp/coordpy-smoke/product_report.json
 ```
 
-Four files of interest land in `/tmp/wevra-smoke/`:
+Four files of interest land in `/tmp/coordpy-smoke/`:
 
 - `product_report.json`   — machine-readable report (`phase45.product_report.v2`),
-  includes a `capsules` block (`wevra.capsule_view.v1`).
+  includes a `capsules` block (`coordpy.capsule_view.v1`).
 - `capsule_view.json`     — the sealed capsule DAG on disk.
-- `provenance.json`       — reproducibility manifest (`wevra.provenance.v1`).
+- `provenance.json`       — reproducibility manifest (`coordpy.provenance.v1`).
 - `product_summary.txt`   — human summary with a capsule-kind histogram,
   `chain_ok` flag, and the RUN_REPORT capsule's root CID.
 
@@ -1037,16 +1037,16 @@ Send someone the `root_cid` plus the JSONL SHA-256 (already recorded
 in `provenance.json`) and they have everything needed to reproduce,
 audit, and verify the run — no out-of-band trust required.
 
-For a real-LLM sweep, set `WEVRA_OLLAMA_URL` and add `--acknowledge-heavy`.
+For a real-LLM sweep, set `COORDPY_OLLAMA_URL` and add `--acknowledge-heavy`.
 
 ---
 
 ## Where to go from here
 
-- **I want to use Wevra** → [`README.md § Wevra SDK quick start`](../README.md) and
-  [`vision_mvp/wevra/__init__.py`](../vision_mvp/wevra/__init__.py) (module docstring
+- **I want to use CoordPy** → [`README.md § CoordPy SDK quick start`](../README.md) and
+  [`vision_mvp/coordpy/__init__.py`](../vision_mvp/coordpy/__init__.py) (module docstring
   lists the full public surface).
-- **I want to extend Wevra** → [`vision_mvp/wevra/extensions/`](../vision_mvp/wevra/extensions/)
+- **I want to extend CoordPy** → [`vision_mvp/coordpy/extensions/`](../vision_mvp/coordpy/extensions/)
   and the `examples/out_of_tree_plugin/` folder (minimal standalone package
   demonstrating the `entry_points` path).
 - **I want to understand the substrate** → [`ARCHITECTURE.md`](../ARCHITECTURE.md)
@@ -1057,16 +1057,16 @@ For a real-LLM sweep, set `WEVRA_OLLAMA_URL` and add `--acknowledge-heavy`.
   [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md) (W4 family),
   [`THEOREM_REGISTRY.md`](THEOREM_REGISTRY.md), and
   [`context_zero_master_plan.md` § 1–2](context_zero_master_plan.md).
-- **I want the historical theory** → pre-Wevra theory volumes are
-  preserved under [`archive/pre-wevra-theory/`](archive/pre-wevra-theory/)
+- **I want the historical theory** → pre-CoordPy theory volumes are
+  preserved under [`archive/pre-coordpy-theory/`](archive/pre-coordpy-theory/)
   (`PROOFS.md`, `EXTENDED_MATH_[1-7].md`, `OPEN_QUESTIONS.md`,
   `FRAMEWORK.md`, `MVP.md`, `EVALUATION.md`, `ROADMAP.md`,
   `VISION_MILLIONS.md`, `MATH_AUDIT.md`).
 - **I want the research diary** → `vision_mvp/RESULTS_PHASE*.md` in
   order; the latest milestone is
-  [`RESULTS_WEVRA_COMPOSED_REAL_LLM.md`](RESULTS_WEVRA_COMPOSED_REAL_LLM.md)
-  (SDK v3.17); older Wevra milestone notes are under
-  [`archive/wevra-milestones/`](archive/wevra-milestones/).
+  [`RESULTS_COORDPY_COMPOSED_REAL_LLM.md`](RESULTS_COORDPY_COMPOSED_REAL_LLM.md)
+  (SDK v3.17); older CoordPy milestone notes are under
+  [`archive/coordpy-milestones/`](archive/coordpy-milestones/).
 
 ---
 

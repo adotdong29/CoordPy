@@ -262,7 +262,7 @@ Four decoders under test:
 4. **`LearnedBundleDecoder`** — multinomial-logistic over the
    10 class-agnostic bundle-shape features
    (see `BUNDLE_DECODER_FEATURES` in
-   `vision_mvp/wevra/capsule_decoder.py`), trained by
+   `vision_mvp/coordpy/capsule_decoder.py`), trained by
    full-batch gradient descent (300 epochs, $lr = 0.5$,
    $l_2 = 10^{-3}$, deterministic in seed).
 
@@ -583,7 +583,7 @@ but less than "paradigm shift."
 ### New files
 
 * `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE3.md` — this note.
-* `vision_mvp/wevra/capsule_decoder.py` — `BundleDecoder`
+* `vision_mvp/coordpy/capsule_decoder.py` — `BundleDecoder`
   interface, `PriorityDecoder`, `PluralityDecoder`,
   `SourceCorroboratedPriorityDecoder`,
   `LearnedBundleDecoder` + `train_learned_bundle_decoder`,
@@ -602,7 +602,7 @@ but less than "paradigm shift."
 
 ### Modified files (additive only)
 
-* `vision_mvp/wevra/__init__.py` — re-exports the Phase-48
+* `vision_mvp/coordpy/__init__.py` — re-exports the Phase-48
   decoder symbols (additive; no existing export altered).
 * `docs/CAPSULE_FORMALISM.md` — adds § 4.C with Theorems
   W3-17 / W3-18 / Claim W3-19, Conjectures W3-C6 / W3-C7;
@@ -614,16 +614,16 @@ but less than "paradigm shift."
 
 ### Not modified (deliberate)
 
-* `vision_mvp/wevra/capsule.py` — capsule contract C1..C6
+* `vision_mvp/coordpy/capsule.py` — capsule contract C1..C6
   byte-for-byte unchanged.
-* `vision_mvp/wevra/capsule_policy.py`,
-  `vision_mvp/wevra/capsule_policy_bundle.py` — admission
+* `vision_mvp/coordpy/capsule_policy.py`,
+  `vision_mvp/coordpy/capsule_policy_bundle.py` — admission
   layer unchanged. The decoder is a *reader* of the
   admitted ledger, not a mutator.
-* `vision_mvp/wevra/run.py`, `runtime.py`, `provenance.py` —
+* `vision_mvp/coordpy/run.py`, `runtime.py`, `provenance.py` —
   no runtime contract change.
 * `vision_mvp/core/*.py` — no substrate primitive modified.
-* `SDK_VERSION` — still `wevra.sdk.v3`. The decoder is
+* `SDK_VERSION` — still `coordpy.sdk.v3`. The decoder is
   additive on the research centre, not part of the public
   SDK contract.
 
@@ -639,14 +639,14 @@ but less than "paradigm shift."
 ```bash
 # Part A+B — bundle decoding (P47-C1 anchor, W3-17/W3-18/W3-19).
 python -m vision_mvp.experiments.phase48_bundle_decoding \
-    --out-dir /tmp/wevra_phase48
+    --out-dir /tmp/coordpy_phase48
 # Expect:
 #   CEILING BROKEN (one or more cells > 0.200).
 #   learned_bundle_decoder best cell ≈ 0.35–0.37 on test.
 
 # Part C — cross-domain decoder transfer (W3-C6).
 python -m vision_mvp.experiments.phase48_decoder_transfer \
-    --out-dir /tmp/wevra_phase48
+    --out-dir /tmp/coordpy_phase48
 # Expect:
 #   incident → security cross ≈ 0.300 (within-security).
 #   security → incident cross ≈ 0.125 (below priority).
@@ -657,7 +657,7 @@ python -m pytest vision_mvp/tests/test_phase48_bundle_decoding.py \
     vision_mvp/tests/test_phase47_cohort_subsumption.py \
     vision_mvp/tests/test_capsule_policy.py \
     vision_mvp/tests/test_capsule_subsumption.py \
-    vision_mvp/tests/test_wevra_capsules.py -q
+    vision_mvp/tests/test_coordpy_capsules.py -q
 # Expect: 55 passed.
 ```
 

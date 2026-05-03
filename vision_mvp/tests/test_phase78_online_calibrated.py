@@ -12,7 +12,7 @@ from __future__ import annotations
 import dataclasses
 import unittest
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     build_incident_triage_schema_capsule,
     SchemaCapsule,
     W29_PARTITION_LINEAR, W29_PARTITION_HIERARCHICAL,
@@ -126,7 +126,7 @@ def _make_simple_envelope(
         thresholds: tuple[float, ...] = (),
         wire_required: bool = True,
 ) -> OnlineCalibratedRatificationEnvelope:
-    from vision_mvp.wevra.team_coord import (
+    from vision_mvp.coordpy.team_coord import (
         _compute_prior_trajectory_cid,
         _compute_threshold_trajectory_cid,
     )

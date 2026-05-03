@@ -20,13 +20,13 @@ from __future__ import annotations
 import dataclasses
 import unittest
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     SchemaCapsule,
     LatentVerificationOutcome,
     build_incident_triage_schema_capsule,
     _DecodedHandoff,
 )
-from vision_mvp.wevra.role_invariant_synthesis import (
+from vision_mvp.coordpy.role_invariant_synthesis import (
     W42_ROLE_INVARIANT_SCHEMA_VERSION,
     W42_BRANCH_TRIVIAL_INVARIANCE_PASSTHROUGH,
     W42_BRANCH_INVARIANCE_DISABLED,

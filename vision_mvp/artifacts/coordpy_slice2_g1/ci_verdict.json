@@ -1,0 +1,66 @@
+{
+  "schema": "phase46.ci_verdict.v1.aggregate",
+  "n_reports": 1,
+  "ok": true,
+  "verdicts": [
+    {
+      "schema": "phase46.ci_verdict.v1",
+      "report_path": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/artifacts/coordpy_slice2_g1/product_report.json",
+      "product_report_profile": "aspen_mac1_coder",
+      "ok": true,
+      "blockers": [],
+      "checks": {
+        "schema": {
+          "ok": true,
+          "expected": [
+            "phase45.product_report.v1",
+            "phase45.product_report.v2"
+          ],
+          "got": "phase45.product_report.v2"
+        },
+        "profile": {
+          "ok": true,
+          "profile": "aspen_mac1_coder",
+          "allowed": [
+            "aspen_mac1_coder",
+            "aspen_mac1_coder_70b",
+            "aspen_mac2_frontier",
+            "bundled_57",
+            "bundled_57_mock_sweep",
+            "local_smoke",
+            "public_jsonl"
+          ]
+        },
+        "readiness": {
+          "ok": true,
+          "ready": true,
+          "n": 4,
+          "n_passed_all": 4,
+          "pass_fraction": 1.0,
+          "min_pass_fraction": 1.0,
+          "blockers": []
+        },
+        "sweep": {
+          "ok": true,
+          "present": true,
+          "mode": "real",
+          "executed_in_process": true,
+          "n_cells": 2,
+          "min_pass_at_1": 0.0,
+          "required_min_pass_at_1": 0.0,
+          "bad_cells": []
+        },
+        "artifacts": {
+          "ok": true,
+          "required": [
+            "product_report.json",
+            "product_summary.txt",
+            "readiness_verdict.json"
+          ],
+          "missing": []
+        }
+      }
+    }
+  ],
+  "aggregate_blockers": []
+}

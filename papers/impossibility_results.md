@@ -1,6 +1,6 @@
 # Impossibility Results in Multi-Agent Context Management
 
-**Authors:** Wevra Research Team
+**Authors:** CoordPy Research Team
 
 **Abstract:**
 
@@ -35,7 +35,7 @@ We provide:
 
 ### Implications
 
-The field must shift from treating context as "just data" to recognizing it as a **typed, immutable, auditable object**. Systems that satisfy this property (e.g., Wevra's Capsule Contract) become necessary, not optional.
+The field must shift from treating context as "just data" to recognizing it as a **typed, immutable, auditable object**. Systems that satisfy this property (e.g., CoordPy's Capsule Contract) become necessary, not optional.
 
 ---
 
@@ -296,7 +296,7 @@ We validate this across 8 domains, proving the universality of the result. The p
 2. Nakamoto, S. "Bitcoin: A Peer-to-Peer Electronic Cash System." (2008).
 3. Lamport, L., et al. "The Safety and Liveness Guarantees of Databases." (Specifying Systems).
 4. Pfenning, F., & Wong, L. "Substructural Type Systems." (POPL 1999).
-5. Wevra Capsule Contract Formalism. `docs/CAPSULE_FORMALISM.md`.
+5. CoordPy Capsule Contract Formalism. `docs/CAPSULE_FORMALISM.md`.
 
 ---
 
@@ -340,4 +340,4 @@ Composability preserved:
 ---
 
 **Generated with Claude Code**  
-**Wevra Research Team**
+**CoordPy Research Team**

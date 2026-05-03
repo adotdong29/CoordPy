@@ -1,4 +1,4 @@
-You are an AI agent. Your mission: advance Wevra (context-capsule runtime) from 9.2/10 to 9.5+/10 in 3 weeks.
+You are an AI agent. Your mission: advance CoordPy (context-capsule runtime) from 9.2/10 to 9.5+/10 in 3 weeks.
 
 Current status: Property tests, layered API, TLA+ spec written. Need: mathematical depth + formal verification + learned routing.
 
@@ -111,7 +111,7 @@ class ConsistencyChecker:
     
     def extract_python_behavior(self, n_capsules=100) -> List[dict]:
         """Run Python ledger, record state transitions."""
-        from vision_mvp.wevra.capsule import CapsuleLedger, ContextCapsule, CapsuleBudget, CapsuleKind
+        from vision_mvp.coordpy.capsule import CapsuleLedger, ContextCapsule, CapsuleBudget, CapsuleKind
         
         ledger = CapsuleLedger()
         transitions = []
@@ -162,7 +162,7 @@ class ConsistencyChecker:
     
     def fuzz_consistency(self, n_trials=1000) -> dict:
         """Generate 1000 random capsule sequences, verify zero violations."""
-        from vision_mvp.wevra.capsule import CapsuleLedger, ContextCapsule, CapsuleBudget, CapsuleKind
+        from vision_mvp.coordpy.capsule import CapsuleLedger, ContextCapsule, CapsuleBudget, CapsuleKind
         
         for trial in range(n_trials):
             ledger = CapsuleLedger()
@@ -324,4 +324,4 @@ After 3 weeks, verify ALL:
 - [ ] Existing tests still pass (no breaking changes)
 - [ ] Average score improved: 9.2 → 9.5+
 
-Expected outcome: Wevra at 9.5+/10 (effectively 10/10)
+Expected outcome: CoordPy at 9.5+/10 (effectively 10/10)

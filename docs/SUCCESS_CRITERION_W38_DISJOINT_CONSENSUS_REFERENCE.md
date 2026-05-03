@@ -1,4 +1,4 @@
-# Success criterion - Wevra SDK v3.39 / W38
+# Success criterion - CoordPy SDK v3.39 / W38
 # Disjoint cross-source consensus-reference trajectory-divergence
 # adjudication + manifest-v8 CID
 

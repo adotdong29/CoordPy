@@ -11,7 +11,7 @@ from __future__ import annotations
 import dataclasses
 import unittest
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     build_incident_triage_schema_capsule,
     SchemaCapsule,
     GeometryPartitionedRatificationEnvelope,
@@ -682,7 +682,7 @@ class SchemaSanityTests(unittest.TestCase):
 
     def test_schema_version_is_v1(self) -> None:
         self.assertEqual(W30_CALIBRATED_SCHEMA_VERSION,
-                          "wevra.calibrated_geometry_ratification.v1")
+                          "coordpy.calibrated_geometry_ratification.v1")
 
     def test_default_calibration_threshold(self) -> None:
         self.assertAlmostEqual(

@@ -51,7 +51,7 @@ generalisation across distractor draws of the same scenario
 family, not memorisation of one scenario.
 
 **Policies compared.** All implemented in
-`vision_mvp/wevra/capsule_policy.py`:
+`vision_mvp/coordpy/capsule_policy.py`:
 
   * `FIFOPolicy` — accept until budget exhausted (the SDK-v3
     default).
@@ -309,11 +309,11 @@ Phase 47.
 # Default: 10 seeds × 4 distractor densities × 5 scenarios =
 # 200 instances, 5K capsules; ~9 s wall on a 2024 M-class macbook.
 python -m vision_mvp.experiments.phase46_capsule_learning \
-    --out-dir /tmp/wevra_phase46
+    --out-dir /tmp/coordpy_phase46
 
 # Larger sweep:
 python -m vision_mvp.experiments.phase46_capsule_learning \
-    --out-dir /tmp/wevra_phase46 \
+    --out-dir /tmp/coordpy_phase46 \
     --seeds 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 \
     --budgets 16 24 32 48 64 96 128 256 \
     --spurious-prob 0.30 --mislabel-prob 0.10
@@ -326,7 +326,7 @@ with `jq`:
 ```bash
 jq '.test_results[] | select(.budget == 32) |
     {policy, decoder_accuracy, policy_precision, policy_recall}' \
-    /tmp/wevra_phase46/results_phase46_capsule_learning.json
+    /tmp/coordpy_phase46/results_phase46_capsule_learning.json
 ```
 
 ---
@@ -335,10 +335,10 @@ jq '.test_results[] | select(.budget == 32) |
 
 | Object                                | Anchor                                                              |
 |---                                    |---                                                                  |
-| Featuriser + closed vocab             | `vision_mvp/wevra/capsule_policy.py::featurise_capsule`             |
-| Learned policy + training             | `vision_mvp/wevra/capsule_policy.py::train_admission_policy`        |
+| Featuriser + closed vocab             | `vision_mvp/coordpy/capsule_policy.py::featurise_capsule`             |
+| Learned policy + training             | `vision_mvp/coordpy/capsule_policy.py::train_admission_policy`        |
 | Heuristic policies                    | `FIFOPolicy / SmallestFirstPolicy / KindPriorityPolicy`             |
-| Budgeted admission ledger             | `vision_mvp/wevra/capsule_policy.py::BudgetedAdmissionLedger`       |
+| Budgeted admission ledger             | `vision_mvp/coordpy/capsule_policy.py::BudgetedAdmissionLedger`       |
 | Driver                                | `vision_mvp/experiments/phase46_capsule_learning.py`                |
 | Contract tests                        | `vision_mvp/tests/test_capsule_policy.py` (Phase 46)                |
 | Theoretical anchor                    | `docs/CAPSULE_FORMALISM.md` § 5 (Conjecture W3-C4)                  |

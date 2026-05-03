@@ -24,7 +24,7 @@
 >     - **W31-C-MULTI-HOST** (hardware-bounded; Mac 2 ARP)
 >     - **W31-C-LONG-WINDOW-CONVERGENCE** (trajectory_window scaling)
 >
-> * `docs/RESULTS_WEVRA_W31_ONLINE_CALIBRATED_GEOMETRY.md` — measured W31 result.
+> * `docs/RESULTS_COORDPY_W31_ONLINE_CALIBRATED_GEOMETRY.md` — measured W31 result.
 > * `docs/THEOREM_REGISTRY.md` — registry where W32 named claims will be added on success.
 > * `docs/HOW_NOT_TO_OVERSTATE.md` — soundness guardrails; W32 is
 >   capsule-layer audited proxy (EWMA + CUSUM + gold-correlation
@@ -331,7 +331,7 @@ tamper detection beyond the union of W31's per-component CIDs.
 
 ### H9 — Release-readiness clause
 
-* SDK_VERSION bumped to ``wevra.sdk.v3.33``.
+* SDK_VERSION bumped to ``coordpy.sdk.v3.33``.
 * ``__experimental__`` tuple updated to include every W32 symbol.
 * ``pyproject.toml`` version bumped to ``0.5.6``.
 * CHANGELOG entry added.
@@ -353,7 +353,7 @@ tamper detection beyond the union of W31's per-component CIDs.
 
 * All W22..W31 regression (``test_phase69`` through ``test_phase78``)
   remains passing byte-for-byte.
-* All wider regression ``test_wevra_*`` remains green.
+* All wider regression ``test_coordpy_*`` remains green.
 * New ``test_phase79_long_window_convergent.py`` MUST cover every
   enumerated H1 failure mode + H2 byte-equivalence + H3 tamper-rejection
   + H5 falsifiers + H6 long-window discharge + H7 scaling sweep +

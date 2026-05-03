@@ -1,4 +1,4 @@
-# Wevra: A Formally Verified Context Capsule Runtime for AI Agents
+# CoordPy: A Formally Verified Context Capsule Runtime for AI Agents
 
 **Authors:** Anonymous  
 **Venue:** PLDI 2025 or OOPSLA 2025  
@@ -8,7 +8,7 @@
 
 ## Abstract
 
-We present Wevra, the first formally verified context-passing runtime for multi-agent AI systems. The **Capsule Contract** — a set of six invariants (C1–C6) — ensures that every unit of context crossing a role boundary is typed, budgeted, provenance-traced, and cryptographically sealed. We specify the contract in TLA+ and verify the Python runtime implementation by fuzz-testing: 1000 trials × 10 operations = 10,000 state transitions, **zero invariant violations**. The capsule ledger is hash-chained, making all context passing tamper-evident and auditable. We show the contract generalizes across application domains: robotics, NLP, and planning each instantiate the capsule type system with domain-specific claim kinds, yet all inherit the six invariants with zero modifications. The runtime achieves microsecond latency on admission/sealing and scales to 1000+ concurrent capsules. This work closes the gap between formal methods (TLA+ theorems) and operational reality (Python production code), making formal guarantees actionable in AI systems.
+We present CoordPy, the first formally verified context-passing runtime for multi-agent AI systems. The **Capsule Contract** — a set of six invariants (C1–C6) — ensures that every unit of context crossing a role boundary is typed, budgeted, provenance-traced, and cryptographically sealed. We specify the contract in TLA+ and verify the Python runtime implementation by fuzz-testing: 1000 trials × 10 operations = 10,000 state transitions, **zero invariant violations**. The capsule ledger is hash-chained, making all context passing tamper-evident and auditable. We show the contract generalizes across application domains: robotics, NLP, and planning each instantiate the capsule type system with domain-specific claim kinds, yet all inherit the six invariants with zero modifications. The runtime achieves microsecond latency on admission/sealing and scales to 1000+ concurrent capsules. This work closes the gap between formal methods (TLA+ theorems) and operational reality (Python production code), making formal guarantees actionable in AI systems.
 
 **Keywords:** formal verification, TLA+, runtime verification, context management, AI agents, tamper-evident logs.
 
@@ -21,14 +21,14 @@ We present Wevra, the first formally verified context-passing runtime for multi-
 In AI agent systems — including LLM orchestration, hierarchical RL, and multi-agent simulations — context is passed untyped:
 
 ```python
-# Before Wevra:
+# Before CoordPy:
 def agent(role, context):
     # What is context? A dict? A string? Do all its fields apply to this role?
     # Is it safe to modify context in-place?
     # Can we audit which context was used if the agent's decision is questioned?
     return action
 
-# After Wevra:
+# After CoordPy:
 def agent(role, handoffs: list[TypedHandoff]):
     capsules = [ledger.get(h.payload_cid) for h in handoffs]
     # Each capsule is immutable (C6), budgeted (C4), typed (C2),
@@ -55,7 +55,7 @@ We propose six invariants that any context-passing runtime should satisfy:
 ### 1.3 Contribution
 
 1. **Formalization**: The Capsule Contract in TLA+ with full state machine semantics.
-2. **Implementation**: Wevra, a Python runtime implementing the contract.
+2. **Implementation**: CoordPy, a Python runtime implementing the contract.
 3. **Verification**: Fuzz-testing the runtime against the TLA+ spec; 10,000 transitions, 0 violations.
 4. **Generalization**: Cross-domain validation (robotics, NLP, planning) showing the contract is universal.
 5. **Audit trail**: Every sealed capsule is immutable and traceable, enabling end-to-end audits of agent decisions.
@@ -481,7 +481,7 @@ A sealed capsule ledger is a complete, tamper-evident audit trail:
 
 ### 6.1 Run report
 
-At the end of an agent run, Wevra constructs a **RUN_REPORT capsule** whose payload includes:
+At the end of an agent run, CoordPy constructs a **RUN_REPORT capsule** whose payload includes:
 - Metadata: agent name, role, timestamp.
 - Results: agent output, status (SUCCESS / ERROR / TIMEOUT).
 - Parents: CIDs of all HANDOFF, HANDLE, ARTIFACT capsules used during the run.

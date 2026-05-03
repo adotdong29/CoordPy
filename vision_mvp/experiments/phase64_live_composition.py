@@ -175,9 +175,9 @@ from vision_mvp.tasks.incident_triage import (
     build_role_subscriptions, grade_answer,
     _decoder_from_handoffs as _phase31_decoder_from_handoffs,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.llm_backend import LLMBackend, OllamaBackend
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.llm_backend import LLMBackend, OllamaBackend
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, AttentionAwareBundleDecoder,
     BundleAwareTeamDecoder,
     CapsuleContextPacker,

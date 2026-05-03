@@ -88,7 +88,7 @@ _HOSTS: dict[str, dict[str, str]] = {
 
 
 def _mac2_candidates() -> tuple[str, ...]:
-    env = os.environ.get("WEVRA_OLLAMA_URL_MAC2")
+    env = os.environ.get("COORDPY_OLLAMA_URL_MAC2")
     candidates = [
         env,
         "http://192.168.12.248:11434",

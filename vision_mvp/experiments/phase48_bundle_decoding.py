@@ -71,20 +71,20 @@ from vision_mvp.tasks.incident_triage import (
 from vision_mvp.core.extractor_noise import (
     NoiseConfig, noisy_extractor, incident_triage_known_kinds,
 )
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     ContextCapsule, capsule_from_handoff,
 )
-from vision_mvp.wevra.capsule_policy import (
+from vision_mvp.coordpy.capsule_policy import (
     BudgetedAdmissionLedger, FIFOPolicy, KindPriorityPolicy,
     LearnedAdmissionPolicy, train_admission_policy, ADMIT,
 )
-from vision_mvp.wevra.capsule_policy_bundle import (
+from vision_mvp.coordpy.capsule_policy_bundle import (
     BundleLearnedPolicy, CorroboratedAdmissionPolicy,
     PluralityBundlePolicy, train_bundle_policy,
     DEFAULT_CLAIM_TO_ROOT_CAUSE, DEFAULT_PRIORITY_ORDER,
     DEFAULT_HIGH_PRIORITY_CUTOFF,
 )
-from vision_mvp.wevra.capsule_decoder import (
+from vision_mvp.coordpy.capsule_decoder import (
     PriorityDecoder, PluralityDecoder,
     SourceCorroboratedPriorityDecoder,
     LearnedBundleDecoder, train_learned_bundle_decoder,
@@ -405,7 +405,7 @@ def run_phase48(
         })
 
     out = {
-        "schema": "wevra.phase48.bundle_decoding.v1",
+        "schema": "coordpy.phase48.bundle_decoding.v1",
         "n_records": n_total,
         "n_causal_records": n_causal,
         "n_train_instances": len(train_inst),

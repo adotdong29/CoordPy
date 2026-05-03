@@ -10,7 +10,7 @@
 > synthesis guard ladder summarised in § 14.2 and § 17).
 >
 > **Latest milestone marker (SDK v3.43 / W42, 2026-05-03 — FINAL
-> RELEASE of the Wevra SDK v3.4x line).**  The programme now has
+> RELEASE of the CoordPy SDK v3.4x line).**  The programme now has
 > **thirty-nine** coupled research axes.  W42 is explicitly framed
 > as a **third-axis bounding** milestone *and* a **release-closure**
 > milestone -- not "W42: one more local mechanism."  W42 wraps W41's
@@ -64,7 +64,7 @@
 > not load-bearing for the W42 closed-form mechanism.
 > **Final release declared**: H1..H12 + S3 + S7 of the W42 success
 > criterion pass.  The SDK v3.43 line ships as the **final release**
-> of the Wevra SDK v3.4x research line — the **end-of-line for the
+> of the CoordPy SDK v3.4x research line — the **end-of-line for the
 > capsule-layer-only research programme** in the Context Zero
 > project.  The remaining open frontiers (``W42-C-NATIVE-LATENT``
 > for transformer-internal trust-state projection;
@@ -76,8 +76,8 @@
 > stable ``RunSpec → run report`` runtime contract is byte-for-byte
 > unchanged.  Versioning: ``vision_mvp.__version__`` and
 > ``pyproject.toml`` ``project.version`` are now both ``0.5.16``
-> (alignment maintained); ``SDK_VERSION = wevra.sdk.v3.43``.  See
-> ``docs/RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md`` and
+> (alignment maintained); ``SDK_VERSION = coordpy.sdk.v3.43``.  See
+> ``docs/RESULTS_COORDPY_W42_ROLE_INVARIANT_SYNTHESIS.md`` and
 > ``docs/SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md``.
 
 > **Earlier milestone marker (SDK v3.42 RC2 / W41, 2026-05-03 —
@@ -146,14 +146,14 @@
 > live LLM inference is required to evaluate the W41 success
 > criterion.  **RC2 declared**: H1..H12 + S3 of the W41 success
 > criterion pass.  The SDK v3.42 line is the second release-
-> candidate of the Wevra SDK v3.4x line, strictly additive on top
+> candidate of the CoordPy SDK v3.4x line, strictly additive on top
 > of RC1 (every W22..W41 symbol is exported under
 > ``__experimental__``; the stable ``RunSpec → run report``
 > runtime contract is byte-for-byte unchanged).  Versioning:
 > ``vision_mvp.__version__`` and ``pyproject.toml``
 > ``project.version`` are now both ``0.5.15`` (alignment
-> maintained); ``SDK_VERSION = wevra.sdk.v3.42``.  See
-> ``docs/RESULTS_WEVRA_W41_INTEGRATED_SYNTHESIS.md`` and
+> maintained); ``SDK_VERSION = coordpy.sdk.v3.42``.  See
+> ``docs/RESULTS_COORDPY_W41_INTEGRATED_SYNTHESIS.md`` and
 > ``docs/SUCCESS_CRITERION_W41_INTEGRATED_SYNTHESIS.md``.
 
 > **Earlier milestone marker (SDK v3.41 RC1 / W40, 2026-05-03).** The
@@ -226,14 +226,14 @@
 > requires SSH credentials.  ``192.168.12.248`` remains
 > ARP-incomplete (32nd milestone in a row).  **RC1 declared**:
 > H1..H12 + S3 of the W40 success criterion pass.  The SDK v3.41
-> line is the **first official release-candidate** of the Wevra
+> line is the **first official release-candidate** of the CoordPy
 > SDK v3.4x line.  Stable-vs-experimental boundary final for RC1:
 > every W22..W40 symbol is exported under ``__experimental__``;
 > the stable ``RunSpec → run report`` runtime contract is byte-for-
 > byte unchanged.  Versioning: ``vision_mvp.__version__`` and
 > ``pyproject.toml`` ``project.version`` are now both ``0.5.14``
 > (alignment maintained).  See
-> ``docs/RESULTS_WEVRA_W40_RESPONSE_HETEROGENEITY.md`` and
+> ``docs/RESULTS_COORDPY_W40_RESPONSE_HETEROGENEITY.md`` and
 > ``docs/SUCCESS_CRITERION_W40_RESPONSE_HETEROGENEITY.md``.
 
 > **Previous milestone marker (SDK v3.40 / W39, 2026-05-02).** The
@@ -314,7 +314,7 @@
 > truncation-recovery bench).  Versioning: ``vision_mvp.__version__``
 > and ``pyproject.toml`` ``project.version`` are now both ``0.5.13``
 > (alignment maintained).  See
-> ``docs/RESULTS_WEVRA_W39_MULTI_HOST_DISJOINT_QUORUM.md`` and
+> ``docs/RESULTS_COORDPY_W39_MULTI_HOST_DISJOINT_QUORUM.md`` and
 > ``docs/SUCCESS_CRITERION_W39_MULTI_HOST_DISJOINT_QUORUM.md``.
 
 > **Previous milestone marker (SDK v3.39 / W38, 2026-05-02).** The
@@ -365,7 +365,7 @@
 > ``pyproject.toml`` ``project.version`` are now both ``0.5.12`` (the
 > lingering 0.5.9 vs 0.5.11 misalignment from earlier milestones is
 > closed).  See
-> ``docs/RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md`` and
+> ``docs/RESULTS_COORDPY_W38_DISJOINT_CONSENSUS_REFERENCE.md`` and
 > ``docs/SUCCESS_CRITERION_W38_DISJOINT_CONSENSUS_REFERENCE.md``.
 
 > **Previous milestone marker (SDK v3.38 / W37, 2026-05-02).** The
@@ -402,7 +402,7 @@
 > and remote `qwen2.5:14b` produced **8/8 responsive probes, 8/8
 > cross-host anchored agreements, and 8/8 gold-correlated agreements**
 > at temperature 0.  See
-> ``docs/RESULTS_WEVRA_W37_CROSS_HOST_BASIS_TRAJECTORY.md`` and
+> ``docs/RESULTS_COORDPY_W37_CROSS_HOST_BASIS_TRAJECTORY.md`` and
 > ``docs/SUCCESS_CRITERION_W37_CROSS_HOST_BASIS_TRAJECTORY.md``.
 
 > **Previous milestone marker (SDK v3.37 / W36, 2026-05-02).** W36
@@ -457,9 +457,9 @@
 > at the capsule layer, no multi-anchor mechanism (including W34)
 > can recover; native-latent (architecture-dependent) is required
 > to break this.  Mac 2 still ARP-incomplete (29th milestone).
-> SDK_VERSION ``wevra.sdk.v3.35``; pyproject ``0.5.8``; 753/753
-> tests pass (48 W34 unit + 494 phase69-81 + 211 wider wevra).
-> See ``docs/RESULTS_WEVRA_W34_LIVE_AWARE_MULTI_ANCHOR.md`` and
+> SDK_VERSION ``coordpy.sdk.v3.35``; pyproject ``0.5.8``; 753/753
+> tests pass (48 W34 unit + 494 phase69-81 + 211 wider coordpy).
+> See ``docs/RESULTS_COORDPY_W34_LIVE_AWARE_MULTI_ANCHOR.md`` and
 > ``docs/SUCCESS_CRITERION_W34_LIVE_AWARE_MULTI_ANCHOR.md``.
 >
 > **Position in the research arc**: W35 changes the synthesis from
@@ -502,7 +502,7 @@ its limited context window on. We argue that this is the wrong
 abstraction. The unit of context should be a typed, immutable,
 lifecycle-bounded object with explicit budget and provenance.
 
-We implement this view in **Wevra**, a capsule-native runtime and
+We implement this view in **CoordPy**, a capsule-native runtime and
 research harness produced by the **Context Zero** programme. A
 capsule is a content-addressed object satisfying six invariants:
 identity, type, lifecycle, budget, provenance, and immutability. The
@@ -601,7 +601,7 @@ knowledge matter for the live W21-Λ-real escape.
 
 This paper documents the strongest released **capsule-layer
 audited** multi-agent context system from the Context Zero
-programme. The shipped product surface is the **Wevra SDK**, first
+programme. The shipped product surface is the **CoordPy SDK**, first
 publicly released as **SDK v3.43** in May 2026. The released
 result is the W42 family's measured strict trust-precision
 recovery on `R-89-ROLE-INVARIANT-RECOVER` (1.000 vs the prior best
@@ -683,10 +683,10 @@ Each of these axes can be isolated, attacked, and bounded. The paper's
 real contribution is this decomposition plus the evidence that it is
 load-bearing.
 
-### 1.2 Why Wevra matters
+### 1.2 Why CoordPy matters
 
-The codebase contribution is **Wevra**, the first product produced by
-the Context Zero programme. Wevra is not the whole programme and it is
+The codebase contribution is **CoordPy**, the first product produced by
+the Context Zero programme. CoordPy is not the whole programme and it is
 not claimed to be a universal agent platform. Its scientific value is
 that it makes the thesis executable:
 
@@ -889,7 +889,7 @@ systematic explorations of that tradeoff.
 ## 4. Capsule-Native Execution
 
 The first stage of the programme made capsules load-bearing inside one
-Wevra run. The execution spine includes:
+CoordPy run. The execution spine includes:
 
 `PROFILE -> READINESS_CHECK -> SWEEP_SPEC -> SWEEP_CELL -> PROVENANCE -> ARTIFACT -> RUN_REPORT`
 
@@ -1683,7 +1683,7 @@ This gives the team results a trustworthy substrate.
 Without this runtime, many later failures would remain hard to
 classify. In a conventional agent stack, the difference between
 "producer never emitted decoy" and "downstream decoder dropped decoy"
-can be surprisingly difficult to pin down. In Wevra, those are
+can be surprisingly difficult to pin down. In CoordPy, those are
 different object-level states.
 
 ### 10.2 Admission layer
@@ -1971,7 +1971,7 @@ layers along exactly the axis named above. Each layer is documented
 in its own milestone results note; the canonical references are:
 
 - **W18 — Bundle-relational compatibility disambiguator (SDK v3.19,
-  *RESULTS_WEVRA_RELATIONAL_DISAMBIGUATOR.md*).** The first capsule-
+  *RESULTS_COORDPY_RELATIONAL_DISAMBIGUATOR.md*).** The first capsule-
   native method that crosses the **W17-Λ-symmetric** wall on a
   regime where it actually applies (R-65-COMPAT). A closed-form
   scorer reads the round-2 disambiguator's payload text — the
@@ -1980,7 +1980,7 @@ in its own milestone results note; the canonical references are:
   (R-65-NO-COMPAT, R-65-CONFOUND, R-65-DECEIVE) make the W18-1
   conditionality sharp.
 - **W19 — Bundle-contradiction-aware trust-weighted disambiguator
-  (SDK v3.20, *RESULTS_WEVRA_DECEPTIVE_AMBIGUITY.md*).** The first
+  (SDK v3.20, *RESULTS_COORDPY_DECEPTIVE_AMBIGUITY.md*).** The first
   capsule-native method that crosses the **W18-Λ-deceive** wall on
   the bundle-resolvable case (R-66-DECEIVE-NAIVE,
   R-66-CONFOUND-RESOLVABLE). A closed-form scorer counts independent
@@ -1992,7 +1992,7 @@ in its own milestone results note; the canonical references are:
   natural escape from both walls — *outside information* — is named
   W19-C-OUTSIDE.
 - **W20 — Outside-witness acquisition disambiguator (SDK v3.21,
-  *RESULTS_WEVRA_OUTSIDE_INFORMATION.md*).** The first capsule-
+  *RESULTS_COORDPY_OUTSIDE_INFORMATION.md*).** The first capsule-
   native method that crosses the **W19-Λ-outside** wall on a regime
   where it actually applies (R-67-OUTSIDE-RESOLVES). A typed
   ``OutsideWitnessOracle`` Protocol + a deterministic
@@ -2008,7 +2008,7 @@ in its own milestone results note; the canonical references are:
   from W20-Λ-compromised — *multi-oracle aggregation* — is named
   W20-C-MULTI-ORACLE.
 - **W21 — Trust-weighted multi-oracle adjudicator (SDK v3.22,
-  *RESULTS_WEVRA_MULTI_ORACLE_ADJUDICATION.md*).** The first
+  *RESULTS_COORDPY_MULTI_ORACLE_ADJUDICATION.md*).** The first
   capsule-native method that crosses the **W20-Λ-compromised**
   wall on a regime where it actually applies (R-68-MULTI-MAJORITY).
   A registered set of N typed oracles with prior trust weights;
@@ -2043,7 +2043,7 @@ already-working capsule-native pipeline across cells, agents, and
 salience signatures":
 
 - **W22 — Capsule + audited latent-state-sharing hybrid (SDK v3.23,
-  *RESULTS_WEVRA_CAPSULE_LATENT_HYBRID.md*).** A typed
+  *RESULTS_COORDPY_CAPSULE_LATENT_HYBRID.md*).** A typed
   ``LatentDigestEnvelope`` per cell carrying the W21 quorum result
   + projected subset, signed at construction; a
   ``SharedReadCache`` reuses identical-query oracle replies across
@@ -2051,7 +2051,7 @@ salience signatures":
   capsule passing with audited proxies for the LatentMAS
   latent-state-sharing direction.
 - **W23 — Cross-cell delta + super-token reference (SDK v3.24,
-  *RESULTS_WEVRA_W23_CROSS_CELL_DELTA.md*).** A
+  *RESULTS_COORDPY_W23_CROSS_CELL_DELTA.md*).** A
   ``SessionDigestEnvelope`` (hash-chained running cross-cell state)
   + ``SessionDeltaEnvelope`` (per-cell delta) +
   ``SuperTokenReferenceEnvelope`` (single-token CID dense-control
@@ -2059,7 +2059,7 @@ salience signatures":
   state via O(1) visible-token references per cell.
 - **W24 — Bounded-window session compaction + intra-cell
   resample-quorum + cross-process wire (SDK v3.25,
-  *RESULTS_WEVRA_W24_SESSION_COMPACTION.md*).** A
+  *RESULTS_COORDPY_W24_SESSION_COMPACTION.md*).** A
   ``MultiCellSessionCompactor`` folds the last
   ``compact_window - 1`` cell digests into one fixed-size
   ``SessionCompactEnvelope``; a ``ResampleQuorumCachingOracleAdapter``
@@ -2068,13 +2068,13 @@ salience signatures":
   through a real Python subprocess (real cross-*process*, not
   cross-*host*). −18 % over W23 on R-71-LONG-SESSION.
 - **W25 — Shared-fanout dense-control + cross-agent state reuse
-  (SDK v3.26, *RESULTS_WEVRA_W25_SHARED_FANOUT.md*).** One producer
+  (SDK v3.26, *RESULTS_COORDPY_W25_SHARED_FANOUT.md*).** One producer
   computes one ``FanoutEnvelope`` for K named consumers, each
   consumer resolves via 1 ``<fanout_ref:DDDD>`` token. −69.87 %
   over W24 on R-72-FANOUT-SHARED at K=3.
 - **W26 — Chain-persisted dense-control fanout + per-consumer
   projections (SDK v3.27,
-  *RESULTS_WEVRA_W26_CHAIN_PERSISTED_FANOUT.md*).** A two-tier
+  *RESULTS_COORDPY_W26_CHAIN_PERSISTED_FANOUT.md*).** A two-tier
   envelope hierarchy (``ChainAnchorEnvelope`` +
   ``ChainAdvanceEnvelope``) amortises the producer's per-cell
   salience-token cost across cells via 1-token chain-advance
@@ -2084,7 +2084,7 @@ salience signatures":
   K=10. W25-C-K-SCALING discharged at K∈{3,5,8,10}.
 - **W27 — Multi-chain salience-keyed dense-control fanout +
   per-signature scoping (SDK v3.28,
-  *RESULTS_WEVRA_W27_MULTI_CHAIN_PIVOT.md*).** The first capsule-
+  *RESULTS_COORDPY_W27_MULTI_CHAIN_PIVOT.md*).** The first capsule-
   native method that *simultaneously* improves both efficiency AND
   correctness over the prior best (W26) on a regime where the
   prior best architecturally limits correctness. A bounded pool
@@ -2220,7 +2220,7 @@ The programme sits at the intersection of several literatures:
 - prompt/protocol design for structured extraction,
 - and evaluation/runtime harnesses for LLM systems.
 
-The distinct contribution here is not merely that Wevra has a ledger
+The distinct contribution here is not merely that CoordPy has a ledger
 or that it uses typed objects. It is that the paper uses one object
 model to unify:
 
@@ -2275,7 +2275,7 @@ paper, and not only an agent paper.
 
 ### 16.4 How this paper differs from a runtime paper
 
-A systems reader may initially see Wevra as a runtime paper with
+A systems reader may initially see CoordPy as a runtime paper with
 benchmark appendices. That is not the right reading. The runtime is
 necessary, but the main scientific object is the decomposition of
 context across the benchmark ladder. The runtime is what makes the
@@ -2332,7 +2332,7 @@ This paper has one central message:
 > **Context in multi-agent LLM systems is not primarily a prompt-size**
 > **problem. It is an object-level coordination problem.**
 
-Capsules provide the object model. Wevra provides the executable
+Capsules provide the object model. CoordPy provides the executable
 runtime. The benchmark ladder R-53 through R-64 turns the context
 problem into a sequence of explicit, falsifiable subproblems.
 
@@ -2642,7 +2642,7 @@ The current paper incorporates the following layers:
   **W31-C-MULTI-HOST** (3+ host topology, hardware-bounded),
   **W31-C-LONG-WINDOW-CONVERGENCE** (longer trajectory windows).
   41/41 W31 unit tests + 437/437 phase69-78 regression + 68/68
-  wider wevra suite pass. Mac 2 (192.168.12.248) still ARP-
+  wider coordpy suite pass. Mac 2 (192.168.12.248) still ARP-
   incomplete (26th milestone). (R-78, SDK v3.32)
 - **W32 family:** long-window convergent online geometry-aware
   dense control + EWMA-tracked per-partition prior + Page two-
@@ -2706,7 +2706,7 @@ The current paper incorporates the following layers:
   **W32-C-OLD-LINE-EWMA-TRUST** (W21 EWMA-tracked-trust
   integration; primitives ship in W32 but the W21 integration
   is not yet built). 45/45 W32 unit tests + 414/414 phase69-79
-  regression + 77/77 wider wevra suite = 536 tests pass. Mac 2
+  regression + 77/77 wider coordpy suite = 536 tests pass. Mac 2
   (192.168.12.248) still ARP-incomplete (27th milestone).
   (R-79, SDK v3.33)
 

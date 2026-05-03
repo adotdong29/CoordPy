@@ -1,4 +1,4 @@
-# Success criterion - Wevra SDK v3.37 / W36
+# Success criterion - CoordPy SDK v3.37 / W36
 # Host-diverse trust-subspace guard + manifest-v6
 
 **Pre-committed before final W36 verdict/release decision**:

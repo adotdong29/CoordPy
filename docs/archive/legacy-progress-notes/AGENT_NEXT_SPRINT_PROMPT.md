@@ -2,14 +2,14 @@
 
 ## Context
 
-You are continuing work on Wevra. **Status after 1-day sprint**: 9.2/10 average (up from 8.2).
+You are continuing work on CoordPy. **Status after 1-day sprint**: 9.2/10 average (up from 8.2).
 
 **Reference documents**:
 - `ADVANCEMENT_TO_10_10.md` — full research roadmap
 - `CONTEXT_SOLUTION_REVIEW.md` — what we've solved and what's missing
 - `AGENT_IMPLEMENTATION_PROMPT.md` — how previous agent worked
 
-**Your mission**: Implement the **three hardest problems** that will push Wevra to 9.8+/10 (effectively 10/10 in practice).
+**Your mission**: Implement the **three hardest problems** that will push CoordPy to 9.8+/10 (effectively 10/10 in practice).
 
 **Timeline**: 3 weeks (intensive, focused work)
 
@@ -161,7 +161,7 @@ print('✓ Category theory module loads')
 ```
 
 **Why this matters**:
-- Establishes Wevra as mathematically grounded (not just engineering)
+- Establishes CoordPy as mathematically grounded (not just engineering)
 - Opens path to optimization (can compute Kan extensions more efficiently)
 - Enables paper submission to ICLR/ICML
 - Adds +2 originality points (novel theoretical contribution)
@@ -625,7 +625,7 @@ Agent has succeeded if:
   - AUC ≥ 0.82 (baseline 0.72)
   - Context reduction ≥ 30%
   - Integrates into Phase-31
-  - All tests pass: `pytest vision_mvp/tests/test_wevra_routing.py -v`
+  - All tests pass: `pytest vision_mvp/tests/test_coordpy_routing.py -v`
 
 - [ ] All 4 commits made with clear messages
 - [ ] No breaking changes (existing tests still pass)
@@ -661,4 +661,4 @@ If you get stuck:
 3. Read cited papers (they have the math)
 4. Try a simpler version first (prototype before production)
 
-You have 3 weeks to take Wevra from 9.2 → 9.5+/10. Go deep. 🚀
+You have 3 weeks to take CoordPy from 9.2 → 9.5+/10. Go deep. 🚀

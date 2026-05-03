@@ -69,23 +69,23 @@ from vision_mvp.tasks.incident_triage import (
 from vision_mvp.core.extractor_noise import (
     NoiseConfig, noisy_extractor, incident_triage_known_kinds,
 )
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     ContextCapsule, capsule_from_handoff,
 )
-from vision_mvp.wevra.capsule_policy import (
+from vision_mvp.coordpy.capsule_policy import (
     BudgetedAdmissionLedger, FIFOPolicy,
     LearnedAdmissionPolicy, train_admission_policy, ADMIT,
 )
-from vision_mvp.wevra.capsule_policy_bundle import (
+from vision_mvp.coordpy.capsule_policy_bundle import (
     BundleLearnedPolicy, train_bundle_policy,
     DEFAULT_CLAIM_TO_ROOT_CAUSE, DEFAULT_PRIORITY_ORDER,
     DEFAULT_HIGH_PRIORITY_CUTOFF,
 )
-from vision_mvp.wevra.capsule_decoder import (
+from vision_mvp.coordpy.capsule_decoder import (
     PriorityDecoder, LearnedBundleDecoder,
     train_learned_bundle_decoder, evaluate_decoder,
 )
-from vision_mvp.wevra.capsule_decoder_v2 import (
+from vision_mvp.coordpy.capsule_decoder_v2 import (
     BUNDLE_DECODER_FEATURES_V2,
     LearnedBundleDecoderV2, train_learned_bundle_decoder_v2,
     InteractionBundleDecoder, train_interaction_bundle_decoder,
@@ -439,7 +439,7 @@ def run_phase49(
         return {"name": getattr(dec, "name", "?")}
 
     out = {
-        "schema": "wevra.phase49.stronger_decoder.v1",
+        "schema": "coordpy.phase49.stronger_decoder.v1",
         "n_records": n_total,
         "n_causal_records": n_causal,
         "n_train_instances": len(train_inst),

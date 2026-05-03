@@ -95,7 +95,7 @@ table-level bound $|active\_edges| \le E_{\max}$ admits a
 cohort reduction with $b_p = E_{\max}$. $\square$
 
 **Status.** Proved (constructive). Code anchor:
-`vision_mvp/wevra/capsule.py::CapsuleKind.COHORT` /
+`vision_mvp/coordpy/capsule.py::CapsuleKind.COHORT` /
 `capsule_from_cohort` / `capsule_from_adaptive_sub_table`.
 Empirical anchor:
 `vision_mvp/experiments/phase46_unification_audit.py::audit_adaptive_edge_cohort`
@@ -366,7 +366,7 @@ For each domain: collect capsules under the same Phase-32
 noisy extractor settings (`spurious=0.30, mislabel=0.10`);
 split by seed (train = {31, …, 38}, test = {39, 40}); train
 a per-domain `LearnedAdmissionPolicy` on the closed feature
-vocabulary in `vision_mvp/wevra/capsule_policy.py`.
+vocabulary in `vision_mvp/coordpy/capsule_policy.py`.
 
 Four evaluation axes:
 
@@ -460,7 +460,7 @@ features are domain-specific" pattern.
    three domains learn to be more conservative than FIFO.
 3. **Claim-kind features are native-domain-only** because
    the closed feature vocab in
-   `vision_mvp/wevra/capsule_policy.py::_CLAIM_KIND_FEATURES`
+   `vision_mvp/coordpy/capsule_policy.py::_CLAIM_KIND_FEATURES`
    mostly doesn't cover compliance/security kinds — a feature-
    engineering limitation, not a fundamental one.
 
@@ -571,7 +571,7 @@ unification" but strictly less than "paradigm shift."
 ### New files
 
 * `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE2.md` — this note.
-* `vision_mvp/wevra/capsule_policy_bundle.py` — bundle-aware
+* `vision_mvp/coordpy/capsule_policy_bundle.py` — bundle-aware
   admission policies (CorroboratedAdmissionPolicy,
   PluralityBundlePolicy, BundleLearnedPolicy, trainer,
   BundleStats, featurise_capsule_with_bundle).
@@ -585,16 +585,16 @@ unification" but strictly less than "paradigm shift."
 
 ### Modified files (additive)
 
-* `vision_mvp/wevra/capsule.py` — added `CapsuleKind.COHORT`
+* `vision_mvp/coordpy/capsule.py` — added `CapsuleKind.COHORT`
   (12th kind), `_default_budget_for(COHORT)`,
   `capsule_from_cohort` and `capsule_from_adaptive_sub_table`
   adapters. Every pre-P47 capsule still constructs and
   admits byte-for-byte unchanged.
-* `vision_mvp/wevra/capsule_policy.py` —
+* `vision_mvp/coordpy/capsule_policy.py` —
   `BudgetedAdmissionLedger.offer_all_batched` now honours
   an optional `reject_set(capsules)` method on the policy
   for bundle-level vetoes. Pre-P47 policies unchanged.
-* `vision_mvp/wevra/__init__.py` — re-exports the new
+* `vision_mvp/coordpy/__init__.py` — re-exports the new
   symbols.
 * `vision_mvp/experiments/phase46_unification_audit.py` —
   added `audit_adaptive_edge_cohort`; updated
@@ -608,12 +608,12 @@ unification" but strictly less than "paradigm shift."
 
 ### Not modified
 
-* `vision_mvp/wevra/run.py`, `runtime.py`, `provenance.py` —
+* `vision_mvp/coordpy/run.py`, `runtime.py`, `provenance.py` —
   no runtime contract change.
 * `vision_mvp/core/*.py` — no substrate primitive modified.
 * Phase-31/32/33 task modules — no change to the scenario
   banks, extractors, or decoders.
-* SDK_VERSION remains `wevra.sdk.v3` (the alphabet extension
+* SDK_VERSION remains `coordpy.sdk.v3` (the alphabet extension
   is additive; existing capsule types still construct
   byte-for-byte).
 
@@ -633,19 +633,19 @@ capsule test suite passing.
 ```bash
 # Part A — formal frontier (cohort subsumption audit).
 python -m vision_mvp.experiments.phase46_unification_audit \
-    --out-dir /tmp/wevra_phase47
+    --out-dir /tmp/coordpy_phase47
 # Expect: 6/6 FULL, 0/6 PARTIAL, 0/6 FAIL.
 
 # Part B — bundle-aware learning (deterministic; re-execs
 # under PYTHONHASHSEED=0 on launch).
 python -m vision_mvp.experiments.phase47_bundle_learning \
-    --out-dir /tmp/wevra_phase47
+    --out-dir /tmp/coordpy_phase47
 # Expect: bundle_learned(dec) saturates test decoder_acc at
 # B = 16; learned (P46) needs B >= 96 to saturate.
 
 # Part C — cross-domain transfer.
 python -m vision_mvp.experiments.phase47_cross_domain \
-    --out-dir /tmp/wevra_phase47
+    --out-dir /tmp/coordpy_phase47
 # Expect: diagonal ~0.28 / 0.72 / 0.53; incident->security
 # ~ 0.50 (+21 pp above base rate); security->incident < base.
 
@@ -653,7 +653,7 @@ python -m vision_mvp.experiments.phase47_cross_domain \
 python -m pytest vision_mvp/tests/test_phase47_cohort_subsumption.py \
                   vision_mvp/tests/test_capsule_policy.py \
                   vision_mvp/tests/test_capsule_subsumption.py \
-                  vision_mvp/tests/test_wevra_capsules.py -q
+                  vision_mvp/tests/test_coordpy_capsules.py -q
 # Expect: 41 passed.
 ```
 

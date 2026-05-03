@@ -27,7 +27,7 @@ from vision_mvp.experiments.phase75_ensemble_verified_multi_chain import (
     CoordinatedDriftProbe,
     build_ensemble_registry_for_bank,
 )
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     SchemaCapsule, build_incident_triage_schema_capsule,
     SalienceSignatureEnvelope, W27_SALIENCE_SIGNATURE_SCHEMA_VERSION,
     EnsemblePivotRatificationEnvelope, W28_RATIFICATION_SCHEMA_VERSION,

@@ -1,14 +1,14 @@
 # Capsule team-level formalism
 
 > Formal model of the SDK v3.5 multi-agent capsule coordination
-> layer (``vision_mvp.wevra.team_coord``). Last touched:
+> layer (``vision_mvp.coordpy.team_coord``). Last touched:
 > 2026-04-26.
 
 This document specifies the **team-level** capsule contract — the
 W4 family of theorems — that complements the run-boundary,
 intra-cell, parser-axis, and LLM-byte-boundary contracts (the W3
 family in [`docs/CAPSULE_FORMALISM.md`](CAPSULE_FORMALISM.md)).
-Where the W3 family makes capsules load-bearing inside *one* Wevra
+Where the W3 family makes capsules load-bearing inside *one* CoordPy
 run, the W4 family makes capsules load-bearing **between agents in
 a team**.
 
@@ -77,7 +77,7 @@ satisfies all of T-1..T-7:
 
 **Proof.** By inspection of
 ``audit_team_lifecycle`` in
-[`vision_mvp/wevra/team_coord.py`](../vision_mvp/wevra/team_coord.py).
+[`vision_mvp/coordpy/team_coord.py`](../vision_mvp/coordpy/team_coord.py).
 Each invariant's failure is enumerated with a concrete
 counterexample record. The audit code is short (≈ 100 lines) and
 the failure modes are closed-vocabulary; soundness holds by
@@ -85,7 +85,7 @@ construction.
 
 **Status.** *Proved + mechanically-checked* — runs on every
 ``TeamCoordinator`` round and is unit-tested in
-``test_wevra_team_coord.py::TeamLifecycleAuditTests``.
+``test_coordpy_team_coord.py::TeamLifecycleAuditTests``.
 
 ### 2.2 W4-2 — Coverage-implies-correctness (proved-conditional)
 

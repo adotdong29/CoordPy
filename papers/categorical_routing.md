@@ -8,7 +8,7 @@
 
 ## Abstract
 
-We propose a categorical framework for optimal routing of typed context in multi-agent systems. A capsule is a typed, content-addressed, budget-bounded unit of context; routing a set of capsules to a role amounts to selecting the minimal set that covers the role's semantic requirements. We show this selection is the **right Kan extension** of an available-claims functor along the role-semantics embedding, making routing *provably optimal*. We prove team composition is **associative** up to capsule-DAG equality (Theorem OPERAD-1), enabling order-independent hierarchical agent coordination. When role semantics are unknown, we approximate the Kan extension with **LearnedRouter**, an LSTM-based relevance scorer that achieves **AUC > 0.80** on synthetic separable tasks and **AUC > 0.8** cross-domain (robotics, NLP, planning). The framework is implemented in Wevra, a formally verified context-passing runtime; 10,000 concurrent transactions verified against a 6-invariant TLA+ contract with **zero violations**. We show that categorical routing reduces context bloat, improves latency, and scales to 1000+ agents.
+We propose a categorical framework for optimal routing of typed context in multi-agent systems. A capsule is a typed, content-addressed, budget-bounded unit of context; routing a set of capsules to a role amounts to selecting the minimal set that covers the role's semantic requirements. We show this selection is the **right Kan extension** of an available-claims functor along the role-semantics embedding, making routing *provably optimal*. We prove team composition is **associative** up to capsule-DAG equality (Theorem OPERAD-1), enabling order-independent hierarchical agent coordination. When role semantics are unknown, we approximate the Kan extension with **LearnedRouter**, an LSTM-based relevance scorer that achieves **AUC > 0.80** on synthetic separable tasks and **AUC > 0.8** cross-domain (robotics, NLP, planning). The framework is implemented in CoordPy, a formally verified context-passing runtime; 10,000 concurrent transactions verified against a 6-invariant TLA+ contract with **zero violations**. We show that categorical routing reduces context bloat, improves latency, and scales to 1000+ agents.
 
 **Keywords:** categorical semantics, Kan extensions, multi-agent coordination, context compression, formal verification.
 
@@ -320,7 +320,7 @@ Times are wall-clock on CPU (M3 MacBook Pro). Kan extension is O(k log k) (sorti
 
 ## 6 Formal verification
 
-The Wevra runtime implements the capsule contract (6 invariants) in a TLA+ specification. We verify the Python implementation by fuzz-testing:
+The CoordPy runtime implements the capsule contract (6 invariants) in a TLA+ specification. We verify the Python implementation by fuzz-testing:
 
 **ConsistencyChecker**: Generates randomised capsule sequences and checks all 6 invariants (C1 Identity, C2 TypedClaim, C3 Lifecycle, C4 Budget, C5 Provenance, C6 Frozen) on every state transition.
 

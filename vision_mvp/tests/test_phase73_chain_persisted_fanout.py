@@ -49,7 +49,7 @@ from vision_mvp.experiments.phase73_chain_persisted_fanout import (
     run_phase73, run_phase73_seed_stability_sweep,
     run_cross_regime_p73, run_k_scaling_sweep,
 )
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     ChainAnchorEnvelope, ChainAdvanceEnvelope,
     ChainPersistedFanoutRegistry,
     ChainPersistedFanoutDisambiguator,

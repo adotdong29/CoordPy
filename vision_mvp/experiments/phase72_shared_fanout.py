@@ -52,7 +52,7 @@ import random
 import sys
 from typing import Any
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     # W22 stack
     OracleRegistration, SchemaCapsule,
     build_incident_triage_schema_capsule,
@@ -158,7 +158,7 @@ def _build_w24_compactor(
         wrapped in a fresh ``QuorumKeyedCachingOracleAdapter`` sharing a
         per-agent ``QuorumKeyedSharedReadCache``.
     """
-    from vision_mvp.wevra.team_coord import (
+    from vision_mvp.coordpy.team_coord import (
         AttentionAwareBundleDecoder,
         RelationalCompatibilityDisambiguator,
         BundleContradictionDisambiguator,

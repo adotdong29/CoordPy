@@ -202,8 +202,8 @@ from vision_mvp.tasks.incident_triage import (
     grade_answer,
     _decoder_from_handoffs as _phase31_decoder_from_handoffs,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.team_coord import (
     AbstainingOracle,
     AdmissionPolicy, AttentionAwareBundleDecoder,
     BundleAwareTeamDecoder,
@@ -963,7 +963,7 @@ def run_phase69(*,
             "n_outside_tokens_total", 0)) for r in rows)
         # Verbose audit cost — what the W21 audit dict is when
         # whitespace-tokenised at the same convention.
-        from vision_mvp.wevra.team_coord import _whitespace_token_count
+        from vision_mvp.coordpy.team_coord import _whitespace_token_count
         s_w21_audit = 0
         for r in rows:
             mo = r.get("multi_oracle") or {}
@@ -1207,10 +1207,10 @@ def _make_llm_adjudicator(model: str, *, base_url: str | None = None,
                            timeout: float = 120.0):
     """Build an :class:`LLMAdjudicatorOracle` against a live Ollama
     backend (Mac-1 default). Used for the W22-Λ-real probe."""
-    from vision_mvp.wevra.team_coord import LLMAdjudicatorOracle
-    from vision_mvp.wevra.llm_backend import OllamaBackend
+    from vision_mvp.coordpy.team_coord import LLMAdjudicatorOracle
+    from vision_mvp.coordpy.llm_backend import OllamaBackend
     backend_url = base_url or os.environ.get(
-        "WEVRA_OLLAMA_URL", "http://127.0.0.1:11434")
+        "COORDPY_OLLAMA_URL", "http://127.0.0.1:11434")
     backend = OllamaBackend(model=model, base_url=backend_url,
                               timeout=timeout)
     return LLMAdjudicatorOracle(

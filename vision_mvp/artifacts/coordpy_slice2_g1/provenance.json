@@ -1,0 +1,57 @@
+{
+  "schema": "coordpy.provenance.v1",
+  "timestamp_utc": "2026-04-22T20:00:43.118863+00:00",
+  "code": {
+    "git_sha": "85f03f73bb0e69b3e1e4468b0ca34686dcf8ba4d",
+    "git_dirty": true,
+    "package": "vision_mvp",
+    "package_version": "0.5.0",
+    "repo_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero"
+  },
+  "runtime": {
+    "python_version": "3.14.4",
+    "python_implementation": "CPython",
+    "platform": "macOS-14.8.2-x86_64-i386-64bit-Mach-O",
+    "machine": "x86_64",
+    "system": "Darwin"
+  },
+  "profile": {
+    "name": "aspen_mac1_coder",
+    "schema": "phase45.profile.v1"
+  },
+  "model": {
+    "tag": "qwen2.5-coder:14b",
+    "endpoint": "http://192.168.12.191:11434"
+  },
+  "sandbox": "subprocess",
+  "input": {
+    "jsonl_path": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/tasks/data/swe_lite_style_bank.jsonl",
+    "jsonl_sha256": "82723d0bb6bd8ca6414d56d4b3202f76cf9a9d3e605e3d5aa0435108b09e5b31",
+    "jsonl_bytes": 53849
+  },
+  "invocation": {
+    "argv": [
+      "-c"
+    ],
+    "cwd": "/Users/qdong/Desktop/Desktop1/Andy/context-zero",
+    "user": "qdong",
+    "hostname": "Qunfengs-MBP.lan"
+  },
+  "output": {
+    "out_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/vision_mvp/artifacts/coordpy_slice2_g1",
+    "artifacts": [
+      "product_report.json",
+      "product_summary.txt",
+      "provenance.json",
+      "readiness_verdict.json",
+      "sweep_result.json"
+    ]
+  },
+  "extra": {
+    "invocation_kwargs": {
+      "skip_sweep": false,
+      "force_sweep": false,
+      "jsonl_override": null
+    }
+  }
+}

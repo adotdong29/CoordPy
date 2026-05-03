@@ -1,7 +1,7 @@
 """Phase 63 — composed end-to-end W14 + W15 benchmark.
 
 SDK v3.17, W16 family anchor. **First end-to-end composition move** in
-the Wevra programme — W14 (producer-side ambiguity preservation) and
+the CoordPy programme — W14 (producer-side ambiguity preservation) and
 W15 (decoder-side capsule context packing) on a *single* regime where
 both layers are independently load-bearing.
 
@@ -198,8 +198,8 @@ from vision_mvp.tasks.incident_triage import (
     build_role_subscriptions, grade_answer,
     _decoder_from_handoffs as _phase31_decoder_from_handoffs,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, AttentionAwareBundleDecoder,
     BundleAwareTeamDecoder,
     CapsuleContextPacker,

@@ -94,14 +94,14 @@ if os.environ.get("PYTHONHASHSEED") != "0":
     os.execvpe(sys.executable, [sys.executable, *sys.argv],
                 os.environ)
 
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     ContextCapsule, capsule_from_handoff,
 )
-from vision_mvp.wevra.capsule_decoder import (
+from vision_mvp.coordpy.capsule_decoder import (
     LearnedBundleDecoder, PriorityDecoder,
     evaluate_decoder, train_learned_bundle_decoder,
 )
-from vision_mvp.wevra.capsule_decoder_v2 import (
+from vision_mvp.coordpy.capsule_decoder_v2 import (
     BUNDLE_DECODER_FEATURES_V2, DEEPSET_PHI_FEATURES,
     _bundle_vote_summary, _featurise_bundle_for_rc_v2,
     _feature_vector_v2, _phi_capsule, _phi_sum,
@@ -142,7 +142,7 @@ def _incident_spec() -> DomainSpec:
     from vision_mvp.core.extractor_noise import (
         incident_triage_known_kinds,
     )
-    from vision_mvp.wevra.capsule_policy_bundle import (
+    from vision_mvp.coordpy.capsule_policy_bundle import (
         DEFAULT_CLAIM_TO_ROOT_CAUSE, DEFAULT_PRIORITY_ORDER,
     )
     return DomainSpec(
@@ -821,7 +821,7 @@ def run_phase50_zero_shot(
                     / max(1, len(stable_rows)))
 
     out = {
-        "schema": "wevra.phase50.zero_shot.v1",
+        "schema": "coordpy.phase50.zero_shot.v1",
         "train_seeds": list(train_seeds),
         "test_seeds": list(test_seeds),
         "distractor_grid": list(distractor_grid),

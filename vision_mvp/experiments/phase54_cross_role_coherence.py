@@ -105,7 +105,7 @@ CLI
 
     python3 -m vision_mvp.experiments.phase54_cross_role_coherence \
         --K-auditor 4 --n-eval 10 \
-        --out /tmp/wevra-distributed/phase54_cross_role_coherence_K4.json
+        --out /tmp/coordpy-distributed/phase54_cross_role_coherence_K4.json
 
 The default configuration is the **pre-committed** evaluation
 setting; do not retroactively widen it after seeing the result.
@@ -129,8 +129,8 @@ from vision_mvp.tasks.incident_triage import (
     build_role_subscriptions, grade_answer,
     _decoder_from_handoffs as _phase31_decoder_from_handoffs,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, ClaimPriorityAdmissionPolicy,
     CohortCoherenceAdmissionPolicy,
     CoverageGuidedAdmissionPolicy, FifoAdmissionPolicy,

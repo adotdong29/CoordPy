@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 # ``cryptography`` is declared as an optional extra (``pip install
-# wevra[crypto]``). Guarded so the bare Wevra install (which transitively
+# coordpy[crypto]``). Guarded so the bare CoordPy install (which transitively
 # imports this module via ``vision_mvp/__init__.py`` →
 # ``composed_routers``) does not fail when the extra is absent; the
 # signing surface raises a clear error at use time instead.
@@ -41,7 +41,7 @@ def _require_cryptography() -> None:
     if not _CRYPTOGRAPHY_AVAILABLE:
         raise RuntimeError(
             "peer_review signing requires the 'cryptography' extra. "
-            "Install with: pip install 'wevra[crypto]'")
+            "Install with: pip install 'coordpy[crypto]'")
 
 
 def _canonical(obj: Any) -> bytes:

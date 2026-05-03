@@ -16,7 +16,7 @@ from __future__ import annotations
 import dataclasses
 import unittest
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     SchemaCapsule,
     LatentVerificationOutcome,
     build_incident_triage_schema_capsule,
@@ -25,7 +25,7 @@ from vision_mvp.wevra.team_coord import (
     W40_BRANCH_RESPONSE_SIGNATURE_NO_TRIGGER,
     W40_BRANCH_RESPONSE_SIGNATURE_INSUFFICIENT,
 )
-from vision_mvp.wevra.integrated_synthesis import (
+from vision_mvp.coordpy.integrated_synthesis import (
     W41_INTEGRATED_SYNTHESIS_SCHEMA_VERSION,
     W41_PRODUCER_AXIS_FIRED,
     W41_PRODUCER_AXIS_NO_TRIGGER,
@@ -640,7 +640,7 @@ class W41OrchestratorTests(unittest.TestCase):
         # Easiest path: trivial bank routes through PASSTHROUGH;
         # to test DISABLED specifically, set enabled=False on the
         # orchestrator directly.
-        from vision_mvp.wevra.team_coord import (
+        from vision_mvp.coordpy.team_coord import (
             build_incident_triage_schema_capsule)
         schema = build_incident_triage_schema_capsule()
         # We construct a stub W40 inner with no probe activity by

@@ -67,7 +67,7 @@ import random
 import sys
 from typing import Any, Sequence
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     AttentionAwareBundleDecoder,
     BundleContradictionDisambiguator,
     OracleRegistration,
@@ -125,7 +125,7 @@ def _stable_schema_capsule() -> SchemaCapsule:
     """
     from vision_mvp.experiments.phase76_geometry_partitioned_product_manifold import (
         INCIDENT_TRIAGE_AMBIENT_VOCABULARY)
-    from vision_mvp.wevra.team_coord import (
+    from vision_mvp.coordpy.team_coord import (
         build_incident_triage_schema_capsule)
     return build_incident_triage_schema_capsule()
 

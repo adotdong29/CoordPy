@@ -1,4 +1,4 @@
-# Success criterion — Wevra SDK v3.36 / W35
+# Success criterion — CoordPy SDK v3.36 / W35
 # Trust-subspace dense-control proxy + basis-history projection + manifest-v5
 
 **Pre-committed before final W35 verdict/release decision**:

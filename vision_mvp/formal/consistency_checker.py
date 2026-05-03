@@ -21,7 +21,7 @@ import random
 from dataclasses import dataclass, field
 from typing import Any
 
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     CapsuleBudget,
     CapsuleKind,
     CapsuleLedger,

@@ -1,4 +1,4 @@
-# Success criterion - Wevra SDK v3.40 / W39
+# Success criterion - CoordPy SDK v3.40 / W39
 # Multi-host disjoint quorum consensus-reference ratification +
 # manifest-v9 CID + mutually-disjoint physical-host topology
 

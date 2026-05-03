@@ -105,9 +105,9 @@ what the programme has *not* claimed:
 
 ## 0. Why a separate formalisation document
 
-`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md` states the Capsule Contract in prose
+`docs/archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE.md` states the Capsule Contract in prose
 and lists six theorems (W3-1 .. W3-6). That note is a milestone
-write-up; it is not a formalisation. The Wevra v3 milestone added
+write-up; it is not a formalisation. The CoordPy v3 milestone added
 nothing to the substrate's mathematical content beyond the
 contract — the unification was claimed but not derived.
 
@@ -123,7 +123,7 @@ This document is the formal complement. It does three things:
    are *special cases* of one capsule-level invariant — and is
    honest about which subsumption claims remain conjectural.
 
-The formalisation is faithful to `vision_mvp/wevra/capsule.py` —
+The formalisation is faithful to `vision_mvp/coordpy/capsule.py` —
 every object below has a code anchor.
 
 ---
@@ -400,7 +400,7 @@ $$
 
 **Code anchor.** Implicit in `CapsuleLedger.admit` and
 `ContextCapsule.new`. *Empirical* anchor: the ablation in
-`tests/test_wevra_capsules.py::test_c4_budget_rejects_over_tokens`
+`tests/test_coordpy_capsules.py::test_c4_budget_rejects_over_tokens`
 verifies tightening rejects.
 
 ### Theorem W3-9 (Ledger DAG is acyclic and topologically equal to
@@ -514,7 +514,7 @@ $b_b$, which is the operational form of the bound.
 $\square$ (For the sub-class.)
 
 **Code anchor.** `capsule_from_handle`, `capsule_from_handoff`,
-adapters in `vision_mvp/wevra/capsule.py`. The four reductions are
+adapters in `vision_mvp/coordpy/capsule.py`. The four reductions are
 *additive* — the substrate primitive's own enforcement is unchanged.
 
 **What is NOT subsumed.** The expressivity-separation theorems
@@ -561,7 +561,7 @@ fields. Topology is by definition $\pi$. $\square$
 ### Theorem W3-13 (Capsule DAG height is bounded by $|\mathbb{K}|$
 on the canonical run pattern)
 
-For a single Wevra run, the capsule DAG produced by
+For a single CoordPy run, the capsule DAG produced by
 `build_report_ledger` has height $\le 4$ (chain
 `PROFILE → {READINESS_CHECK, SWEEP_SPEC, PROVENANCE,
 ARTIFACT}_*; SWEEP_SPEC → SWEEP_CELL_*; everything → RUN_REPORT`).
@@ -676,7 +676,7 @@ failure of the *alphabet* — specifically, the absence of a
 kind whose admit step checks its own parent-set cardinality
 against a cohort-cap budget. Adding `COHORT` closes the gap.
 
-**Code anchor.** `vision_mvp/wevra/capsule.py::CapsuleKind.COHORT`
+**Code anchor.** `vision_mvp/coordpy/capsule.py::CapsuleKind.COHORT`
 (12th kind), `capsule_from_cohort`,
 `capsule_from_adaptive_sub_table`;
 `vision_mvp/experiments/phase46_unification_audit.py::audit_adaptive_edge_cohort`;
@@ -696,7 +696,7 @@ $$
 \Psi(c_1, c_2) = 1.
 $$
 
-Examples of relational invariants that matter in the Wevra
+Examples of relational invariants that matter in the CoordPy
 substrate: "no two admitted `HANDOFF` capsules share a
 `source_event_id`"; "no two sealed `HANDLE` capsules have
 spans that overlap"; "the subscription graph implied by the
@@ -1011,7 +1011,7 @@ expressivity. $\square$
 
 **Status.** Proved (constructive — the strict-separator
 embedding is implemented in `DEEPSET_PHI_FEATURES`, see
-`vision_mvp/wevra/capsule_decoder_v2.py::_phi_capsule`).
+`vision_mvp/coordpy/capsule_decoder_v2.py::_phi_capsule`).
 
 **Empirical anchor.** On the Phase-31 noisy bench at
 $n_{\rm test} = 80$ with augmented training:
@@ -1684,7 +1684,7 @@ $\square$
 
 **Status.** Proved (constructive; the distinguishing predicate
 is witnessed by the Phase-51 empirical bundle examples).
-Code anchor: `vision_mvp/wevra/capsule_decoder_relational.py::CohortRelationalDecoder`.
+Code anchor: `vision_mvp/coordpy/capsule_decoder_relational.py::CohortRelationalDecoder`.
 
 **Caveat.**  W3-30 is a **capacity** statement.  Whether the
 strict-containment margin buys empirical lift on
@@ -1790,7 +1790,7 @@ downstream consumer can prove offline that
 `product_report.json` bytes are equal up to canonical key reorder,
 using only the capsule view and SHA-256.
 
-**Status.** Stated in `docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md`. Empirically
+**Status.** Stated in `docs/archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE.md`. Empirically
 exercised by `test_capsule_view_on_disk_matches_embedded`. The
 adversarial collision attack is ruled out by SHA-256 second
 preimage hardness.
@@ -1799,8 +1799,8 @@ preimage hardness.
 for inter-role artefacts) — **FALSIFIED (Phase 47)**
 
 **Original statement.** The closed alphabet $\mathbb{K}$ of 11
-kinds is *complete* for the Wevra runtime in the sense that
-every artifact ever crossing a Wevra inter-role / inter-layer /
+kinds is *complete* for the CoordPy runtime in the sense that
+every artifact ever crossing a CoordPy inter-role / inter-layer /
 inter-run boundary has, after the v3 milestone, a canonical
 `CapsuleKind` mapping.
 
@@ -1819,7 +1819,7 @@ algebra)
 With $\mathbb{K}' = \mathbb{K} \cup \{\mathtt{COHORT}\}$ and the
 current budget axes
 $(\mathtt{max\_tokens}, \mathtt{max\_bytes}, \mathtt{max\_rounds},$
-$\mathtt{max\_witnesses}, \mathtt{max\_parents})$, every Wevra
+$\mathtt{max\_witnesses}, \mathtt{max\_parents})$, every CoordPy
 runtime artifact whose canonical bounded-context invariant is
 expressible as a conjunction of **magnitude** predicates
 (per-capsule or per-cohort) admits a canonical kind mapping
@@ -2046,7 +2046,7 @@ conservative.
 
 ### Theorem W3-32 (Lifecycle ↔ execution-state correspondence)
 
-Let $\mathcal{S}$ be the canonical Wevra-run stage set
+Let $\mathcal{S}$ be the canonical CoordPy-run stage set
 $\{\mathrm{profile}, \mathrm{readiness}, \mathrm{sweep\_spec},
 \mathrm{sweep\_cell}_1, \dots, \mathrm{sweep\_cell}_n,
 \mathrm{provenance}, \mathrm{artifact}_1, \dots, \mathrm{artifact}_k,
@@ -2071,9 +2071,9 @@ is total exactly on $\mathcal{A}_\mathcal{L}$ (§ 2.3). The three
 conditions are mutually exclusive and exhaustive on the runtime's
 finite stage transitions. $\square$
 
-**Code anchor.** ``vision_mvp/wevra/capsule_runtime.py``;
+**Code anchor.** ``vision_mvp/coordpy/capsule_runtime.py``;
 contract tests in
-``vision_mvp/tests/test_wevra_capsule_native.py``
+``vision_mvp/tests/test_coordpy_capsule_native.py``
 (``test_w3_32_lifecycle_correspondence_clean_run``,
 ``test_failed_admission_leaves_in_flight_entry``).
 
@@ -2101,10 +2101,10 @@ $h' = h$, which is the claim. $\square$
 **Failure mode.** ``ContentAddressMismatch`` (a subtype of
 ``CapsuleAdmissionError``) detects honest-writer / racing-writer
 TOCTOU drift; it is not a defence against adversarial concurrent
-writes (the trust unit is the same as Wevra's sandbox boundary).
+writes (the trust unit is the same as CoordPy's sandbox boundary).
 
 **Code anchor.**
-``vision_mvp/wevra/capsule_runtime.py::seal_and_write_artifact``;
+``vision_mvp/coordpy/capsule_runtime.py::seal_and_write_artifact``;
 contract tests
 ``test_w3_33_seal_then_write_then_verify`` and
 ``test_w3_33_mismatch_detector``.
@@ -2128,7 +2128,7 @@ $$
 $$
 
 **Proof.** Both paths invoke the same adapter for each kind
-(``capsule_from_*`` in ``vision_mvp/wevra/capsule.py``) on the
+(``capsule_from_*`` in ``vision_mvp/coordpy/capsule.py``) on the
 same canonical payload (the in-flight runner stores the payload
 into $r$ before the adapter call; the post-hoc fold reads the
 same payload back from $r$). C1 makes $\mathit{cid}(c)$ a pure
@@ -2183,7 +2183,7 @@ caller is observable as a typed failure at the offending method,
 not as an obscure downstream KeyError or assertion.
 
 **Code anchor.**
-``vision_mvp/wevra/capsule_runtime.py``;
+``vision_mvp/coordpy/capsule_runtime.py``;
 contract tests
 ``test_w3_35_cell_refuses_without_spec``,
 ``test_w3_35_readiness_refuses_without_profile``.
@@ -2238,7 +2238,7 @@ verdict sealed`` is an instance of W3-35 with intra-cell
 parents. $\square$
 
 **Code anchor.**
-``vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_patch_proposal``,
+``vision_mvp/coordpy/capsule_runtime.py::CapsuleNativeRunContext.seal_patch_proposal``,
 ``seal_test_verdict``;
 hooks plumbed through
 ``vision_mvp/tasks/swe_sandbox.py::run_swe_loop_sandboxed``
@@ -2246,7 +2246,7 @@ hooks plumbed through
 default None preserves byte-for-byte Phase-40 behaviour).
 
 **Empirical anchor.**
-``vision_mvp/tests/test_wevra_capsule_native_intra_cell.py``:
+``vision_mvp/tests/test_coordpy_capsule_native_intra_cell.py``:
 ``test_patch_proposal_seals_under_spec``,
 ``test_patch_proposal_refuses_without_spec``,
 ``test_test_verdict_seals_under_patch_proposal``,
@@ -2256,7 +2256,7 @@ and 48 TEST_VERDICT capsules sealed in flight on local_smoke).
 
 ### Theorem W3-36 (Meta-artefact circularity is sharp; detached-witness corollary)
 
-Let $R \in \mathcal{L}$ be the RUN_REPORT capsule of a Wevra
+Let $R \in \mathcal{L}$ be the RUN_REPORT capsule of a CoordPy
 run, $V$ be the rendered view of $\mathcal{L}$ at $R$'s seal
 time, $M = \{m_1, \dots, m_k\}$ the meta-artefact set whose
 bytes are a structural function of $V$
@@ -2294,9 +2294,9 @@ $R.\mathrm{cid}$; a self-witnessing solution is impossible
 (W3-36 negative).
 
 **Code anchor.**
-``vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_meta_manifest``
+``vision_mvp/coordpy/capsule_runtime.py::CapsuleNativeRunContext.seal_meta_manifest``
 and ``render_meta_manifest_view``;
-``vision_mvp/wevra/capsule.py::capsule_from_meta_manifest``;
+``vision_mvp/coordpy/capsule.py::capsule_from_meta_manifest``;
 ``vision_mvp/product/runner.py`` Stage 8 writes
 ``meta_manifest.json``.
 
@@ -2333,7 +2333,7 @@ header — flips the verdict to False. Witnessed by
 ``test_w3_37_tamper_capsule_order_detected``.
 
 **Code anchor.**
-``vision_mvp/wevra/capsule.py::verify_chain_from_view_dict``.
+``vision_mvp/coordpy/capsule.py::verify_chain_from_view_dict``.
 
 ### Theorem W3-38 (ARTIFACT audit-time on-disk re-hash)
 
@@ -2357,7 +2357,7 @@ a mismatch entry naming the path, the sealed SHA, and the
 on-disk SHA. Witnessed by ``test_w3_38_artifact_drift_detected``.
 
 **Code anchor.**
-``vision_mvp/wevra/capsule_runtime.py::verify_artifacts_on_disk``.
+``vision_mvp/coordpy/capsule_runtime.py::verify_artifacts_on_disk``.
 
 ---
 
@@ -2371,7 +2371,7 @@ For a reader who wants the *proof obligations*:
 4. § 5, W3-C1 — what is still open in subsumption.
 
 For a reader who wants the *runtime contract*: the original
-`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md` is still the right entry; this
+`docs/archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE.md` is still the right entry; this
 document complements it.
 
 For a reader who wants to *learn capsule policies*: see
@@ -2384,33 +2384,33 @@ research milestone).
 
 | Object / theorem        | File / symbol                                                  |
 |---                      |---                                                             |
-| $\mathcal{C}$           | `vision_mvp/wevra/capsule.py::ContextCapsule`                  |
-| $\mathit{cid}$          | `vision_mvp/wevra/capsule.py::_capsule_cid`                    |
-| Lifecycle automaton     | `vision_mvp/wevra/capsule.py::CapsuleLifecycle._EDGES`         |
-| $\mathcal{A}_b$         | `vision_mvp/wevra/capsule.py::CapsuleLedger.admit`             |
-| Chain step              | `vision_mvp/wevra/capsule.py::_chain_step`                     |
+| $\mathcal{C}$           | `vision_mvp/coordpy/capsule.py::ContextCapsule`                  |
+| $\mathit{cid}$          | `vision_mvp/coordpy/capsule.py::_capsule_cid`                    |
+| Lifecycle automaton     | `vision_mvp/coordpy/capsule.py::CapsuleLifecycle._EDGES`         |
+| $\mathcal{A}_b$         | `vision_mvp/coordpy/capsule.py::CapsuleLedger.admit`             |
+| Chain step              | `vision_mvp/coordpy/capsule.py::_chain_step`                     |
 | Adapter $\alpha_T$ for HANDLE | `capsule_from_handle`                                    |
 | Adapter $\alpha_T$ for HANDOFF | `capsule_from_handoff`                                  |
 | Adapter $\alpha_T$ for SWEEP_CELL | `capsule_from_sweep_cell`                            |
 | W3-11 reduction tests   | `vision_mvp/tests/test_capsule_subsumption.py` (Phase-46)      |
-| W3-7, W3-9, W3-10 tests | `vision_mvp/tests/test_wevra_capsules.py`                      |
-| Capsule learning policy | `vision_mvp/wevra/capsule_policy.py` (Phase-46)                |
+| W3-7, W3-9, W3-10 tests | `vision_mvp/tests/test_coordpy_capsules.py`                      |
+| Capsule learning policy | `vision_mvp/coordpy/capsule_policy.py` (Phase-46)                |
 | W3-14 negative test     | `vision_mvp/tests/test_phase47_cohort_subsumption.py::W3_14_*` |
-| W3-15 cohort lift       | `vision_mvp/wevra/capsule.py::CapsuleKind.COHORT` / `capsule_from_cohort` / `capsule_from_adaptive_sub_table` |
+| W3-15 cohort lift       | `vision_mvp/coordpy/capsule.py::CapsuleKind.COHORT` / `capsule_from_cohort` / `capsule_from_adaptive_sub_table` |
 | W3-15 cohort audit      | `vision_mvp/experiments/phase46_unification_audit.py::audit_adaptive_edge_cohort` |
 | W3-16 relational limit  | `vision_mvp/tests/test_phase47_cohort_subsumption.py::W3_16_*` |
 | W3-17 admission locality | `vision_mvp/experiments/phase47_bundle_learning.py` (0.200 saturation) |
 | W3-18 plurality sufficiency | `vision_mvp/tests/test_phase48_bundle_decoding.py::test_w3_18_*` |
 | W3-19 empirical break    | `vision_mvp/experiments/phase48_bundle_decoding.py` (0.350–0.375 @ n_test=80) |
-| LearnedBundleDecoder    | `vision_mvp/wevra/capsule_decoder.py::LearnedBundleDecoder` |
+| LearnedBundleDecoder    | `vision_mvp/coordpy/capsule_decoder.py::LearnedBundleDecoder` |
 | Decoder transfer study  | `vision_mvp/experiments/phase48_decoder_transfer.py` |
 | W3-C6 transfer evidence | `vision_mvp/experiments/phase48_decoder_transfer.py` (sign-flip on lone_top_priority_flag) |
-| DeepSetBundleDecoder    | `vision_mvp/wevra/capsule_decoder_v2.py::DeepSetBundleDecoder` |
-| MLPBundleDecoder        | `vision_mvp/wevra/capsule_decoder_v2.py::MLPBundleDecoder` |
-| LearnedBundleDecoderV2  | `vision_mvp/wevra/capsule_decoder_v2.py::LearnedBundleDecoderV2` |
-| InteractionBundleDecoder| `vision_mvp/wevra/capsule_decoder_v2.py::InteractionBundleDecoder` |
-| MultitaskBundleDecoder  | `vision_mvp/wevra/capsule_decoder_v2.py::MultitaskBundleDecoder` |
-| W3-20 strict separator  | `vision_mvp/wevra/capsule_decoder_v2.py::_phi_capsule` (per-capsule conjunctive features) |
+| DeepSetBundleDecoder    | `vision_mvp/coordpy/capsule_decoder_v2.py::DeepSetBundleDecoder` |
+| MLPBundleDecoder        | `vision_mvp/coordpy/capsule_decoder_v2.py::MLPBundleDecoder` |
+| LearnedBundleDecoderV2  | `vision_mvp/coordpy/capsule_decoder_v2.py::LearnedBundleDecoderV2` |
+| InteractionBundleDecoder| `vision_mvp/coordpy/capsule_decoder_v2.py::InteractionBundleDecoder` |
+| MultitaskBundleDecoder  | `vision_mvp/coordpy/capsule_decoder_v2.py::MultitaskBundleDecoder` |
+| W3-20 strict separator  | `vision_mvp/coordpy/capsule_decoder_v2.py::_phi_capsule` (per-capsule conjunctive features) |
 | W3-21 sign-flip anchor  | `vision_mvp/experiments/phase49_symmetric_transfer.py` (feature_comparison_v2) |
 | W3-22 multitask anchor  | `vision_mvp/experiments/phase49_symmetric_transfer.py` (multitask_cells) |
 | W3-23 Gate-1 anchor     | `vision_mvp/experiments/phase49_stronger_decoder.py` (DeepSet @ bundle_learned_admit/B=64) |
@@ -2425,16 +2425,16 @@ research milestone).
 | `StandardisedBundleDecoderV2` | `vision_mvp/experiments/phase50_zero_shot_transfer.py` |
 | `SignStableDeepSetDecoder`    | `vision_mvp/experiments/phase50_zero_shot_transfer.py` |
 | Phase 50 contract tests  | `vision_mvp/tests/test_phase50_ci_and_zero_shot.py` (14 tests) |
-| W3-32 lifecycle correspondence | `vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext` |
-| W3-33 content-addressing at write | `vision_mvp/wevra/capsule_runtime.py::seal_and_write_artifact` |
-| W3-34 in-flight ↔ post-hoc CID equivalence | `vision_mvp/tests/test_wevra_capsule_native.py::InFlightVsPostHocEquivalenceTests` |
-| W3-35 parent-CID gating | `vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext` (precondition checks in each `seal_*` method) |
-| Capsule-native runtime tests | `vision_mvp/tests/test_wevra_capsule_native.py` (16 tests) |
-| W3-39 PARSE_OUTCOME lifecycle gate | `vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_parse_outcome` |
-| W3-39 parse → patch DAG chain | `vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_patch_proposal(parse_outcome_cid=...)` |
-| W3-40 lifecycle-audit soundness | `vision_mvp/wevra/lifecycle_audit.py::CapsuleLifecycleAudit` |
+| W3-32 lifecycle correspondence | `vision_mvp/coordpy/capsule_runtime.py::CapsuleNativeRunContext` |
+| W3-33 content-addressing at write | `vision_mvp/coordpy/capsule_runtime.py::seal_and_write_artifact` |
+| W3-34 in-flight ↔ post-hoc CID equivalence | `vision_mvp/tests/test_coordpy_capsule_native.py::InFlightVsPostHocEquivalenceTests` |
+| W3-35 parent-CID gating | `vision_mvp/coordpy/capsule_runtime.py::CapsuleNativeRunContext` (precondition checks in each `seal_*` method) |
+| Capsule-native runtime tests | `vision_mvp/tests/test_coordpy_capsule_native.py` (16 tests) |
+| W3-39 PARSE_OUTCOME lifecycle gate | `vision_mvp/coordpy/capsule_runtime.py::CapsuleNativeRunContext.seal_parse_outcome` |
+| W3-39 parse → patch DAG chain | `vision_mvp/coordpy/capsule_runtime.py::CapsuleNativeRunContext.seal_patch_proposal(parse_outcome_cid=...)` |
+| W3-40 lifecycle-audit soundness | `vision_mvp/coordpy/lifecycle_audit.py::CapsuleLifecycleAudit` |
 | W3-41 deterministic-mode CID determinism | `vision_mvp/product/runner.py::_canonicalise_for_determinism`, `_canonicalise_run_report_headers`, `_canonicalise_readiness_verdict`, `_canonicalise_sweep_result` |
-| Deeper-slice contract tests | `vision_mvp/tests/test_wevra_capsule_native_deeper.py` (18 tests) |
+| Deeper-slice contract tests | `vision_mvp/tests/test_coordpy_capsule_native_deeper.py` (18 tests) |
 
 ---
 
@@ -2465,9 +2465,9 @@ alphabet.
 $\square$
 
 **Code anchor.**
-`vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_parse_outcome`,
+`vision_mvp/coordpy/capsule_runtime.py::CapsuleNativeRunContext.seal_parse_outcome`,
 `seal_patch_proposal`. Tests:
-`vision_mvp/tests/test_wevra_capsule_native_deeper.py
+`vision_mvp/tests/test_coordpy_capsule_native_deeper.py
 ::ParseOutcomeLifecycleTests`.
 
 ### Theorem W3-40 (Lifecycle-audit soundness)
@@ -2478,7 +2478,7 @@ Let $\mathcal{L}$ be a finished `CapsuleLedger` produced by a
 
 **Claim.** $A(\mathcal{L}).\mathrm{verdict} = \mathtt{OK}$ iff
 $\mathcal{L}$ satisfies the eight lifecycle invariants L-1..L-8
-defined in `vision_mvp/wevra/lifecycle_audit.py`.
+defined in `vision_mvp/coordpy/lifecycle_audit.py`.
 
 **Proof.** By construction. The audit's `run()` method calls
 the eight `_check_l*` methods in sequence, accumulates every
@@ -2500,9 +2500,9 @@ L-2..L-8 check is recoverable. L-1 is vacuous on a forensic view
 (failed in-flight entries do not appear there).
 
 **Code anchor.**
-`vision_mvp/wevra/lifecycle_audit.py::CapsuleLifecycleAudit.run`.
+`vision_mvp/coordpy/lifecycle_audit.py::CapsuleLifecycleAudit.run`.
 Tests:
-`vision_mvp/tests/test_wevra_capsule_native_deeper.py
+`vision_mvp/tests/test_coordpy_capsule_native_deeper.py
 ::LifecycleAuditTests`.
 
 ### Theorem W3-41 (Deterministic-mode CID determinism on full DAG)
@@ -2577,7 +2577,7 @@ not on wall clock.
 `_canonicalise_readiness_verdict`,
 `_canonicalise_sweep_result`,
 `_canonicalise_run_report_headers`. Tests:
-`vision_mvp/tests/test_wevra_capsule_native_deeper.py
+`vision_mvp/tests/test_coordpy_capsule_native_deeper.py
 ::DeterministicModeTests::test_w3_41_two_runs_collapse_to_identical_cids`.
 
 ## 4.J SDK v3.4 extension — sub-sub-intra-cell PROMPT / LLM_RESPONSE slice
@@ -2625,9 +2625,9 @@ shape is the literal output of ``capsule_from_prompt`` whose
 shape is enforced by inspection. $\square$
 
 **Code anchor.**
-``vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_prompt``,
-``vision_mvp/wevra/capsule.py::capsule_from_prompt``. Tests:
-``vision_mvp/tests/test_wevra_capsule_native_inner_loop.py::PromptCapsuleLifecycleTests``.
+``vision_mvp/coordpy/capsule_runtime.py::CapsuleNativeRunContext.seal_prompt``,
+``vision_mvp/coordpy/capsule.py::capsule_from_prompt``. Tests:
+``vision_mvp/tests/test_coordpy_capsule_native_inner_loop.py::PromptCapsuleLifecycleTests``.
 
 ### Theorem W3-43 (Prompt → response parent gate)
 
@@ -2654,10 +2654,10 @@ tests ``cap.cid in self.ledger`` before re-admitting
 (idempotence). $\square$
 
 **Code anchor.**
-``vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_llm_response``,
-``vision_mvp/wevra/capsule.py::capsule_from_llm_response``.
+``vision_mvp/coordpy/capsule_runtime.py::CapsuleNativeRunContext.seal_llm_response``,
+``vision_mvp/coordpy/capsule.py::capsule_from_llm_response``.
 Tests:
-``vision_mvp/tests/test_wevra_capsule_native_inner_loop.py::LLMResponseCapsuleLifecycleTests``.
+``vision_mvp/tests/test_coordpy_capsule_native_inner_loop.py::LLMResponseCapsuleLifecycleTests``.
 
 ### Theorem W3-44 (PARSE_OUTCOME → LLM_RESPONSE chain consistency)
 
@@ -2687,7 +2687,7 @@ in ``CapsuleLifecycleAudit`` hold:
 ``[self.spec_cap.cid, llm_response_cid]`` and raises if
 ``llm_response_cid not in self.ledger``. Coordinate equality
 follows from the runtime's
-``vision_mvp/wevra/runtime.py::_seal_prompt_response_pair`` and
+``vision_mvp/coordpy/runtime.py::_seal_prompt_response_pair`` and
 ``_make_intra_cell_hooks``: the LLM_RESPONSE coordinates are
 captured at ``_gen`` invocation; the PARSE_OUTCOME coordinates
 are captured at ``on_patch`` invocation; the four non-strategy
@@ -2701,12 +2701,12 @@ $(\mathit{cid}(s),)$ alone (single-parent shape). The
 lifecycle audit's L-4 rule accepts both shapes.
 
 **Code anchor.**
-``vision_mvp/wevra/capsule_runtime.py::CapsuleNativeRunContext.seal_parse_outcome``
+``vision_mvp/coordpy/capsule_runtime.py::CapsuleNativeRunContext.seal_parse_outcome``
 (``llm_response_cid`` parameter); hook plumbing in
-``vision_mvp/wevra/runtime.py::_make_intra_cell_hooks``,
+``vision_mvp/coordpy/runtime.py::_make_intra_cell_hooks``,
 ``_seal_prompt_response_pair``,
 ``_real_cells._gen``. Tests:
-``vision_mvp/tests/test_wevra_capsule_native_inner_loop.py::LifecycleAuditExtendedTests::test_audit_detects_l11_coord_drift``,
+``vision_mvp/tests/test_coordpy_capsule_native_inner_loop.py::LifecycleAuditExtendedTests::test_audit_detects_l11_coord_drift``,
 ``SyntheticLLMSweepTests::test_synthetic_clean_full_chain``.
 
 ### Theorem W3-45 (Lifecycle-audit soundness extends to L-9..L-11)
@@ -2730,19 +2730,19 @@ synthetic ledger from a forensic ``capsule_view.json`` and
 runs the eleven checks. Soundness is preserved because
 ``render_view``'s ``payload_kinds_always`` invariant now
 includes PROMPT and LLM_RESPONSE (SDK v3.4
-``vision_mvp/wevra/capsule.py::render_view``); every L-9..L-11
+``vision_mvp/coordpy/capsule.py::render_view``); every L-9..L-11
 check is recoverable from the on-disk view alone.
 
 **Code anchor.**
-``vision_mvp/wevra/lifecycle_audit.py::CapsuleLifecycleAudit.run``,
+``vision_mvp/coordpy/lifecycle_audit.py::CapsuleLifecycleAudit.run``,
 ``_check_l9``, ``_check_l10``, ``_check_l11``. Tests:
-``vision_mvp/tests/test_wevra_capsule_native_inner_loop.py::LifecycleAuditExtendedTests``.
+``vision_mvp/tests/test_coordpy_capsule_native_inner_loop.py::LifecycleAuditExtendedTests``.
 
 ### Conjecture W3-C6 (synthetic-LLM cross-distribution PARSE_OUTCOME variance — empirical)
 
 **Claim (sharper, empirical reading of the SDK v3.3 W3-C4 conjecture).**
 Conditional on the synthetic distribution library
-``vision_mvp.wevra.synthetic_llm.SYNTHETIC_MODEL_PROFILES``
+``vision_mvp.coordpy.synthetic_llm.SYNTHETIC_MODEL_PROFILES``
 (seven calibrated distributions covering the parser's failure
 taxonomy), the cross-distribution PARSE_OUTCOME failure-kind
 multinomial Total Variation Distance reaches ≥ 0.5 on at least

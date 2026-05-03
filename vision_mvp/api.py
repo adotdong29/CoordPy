@@ -2,8 +2,8 @@
 
 ``CASRRouter`` is the original routing-layer primitive from the
 Context Zero research programme. It is research code, not part of
-the Wevra SDK contract — for the shipped product surface use
-``from vision_mvp import wevra``.
+the CoordPy SDK contract — for the shipped product surface use
+``from vision_mvp import coordpy``.
 
 Usage
 -----

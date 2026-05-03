@@ -5,7 +5,7 @@ from __future__ import annotations
 import dataclasses
 import unittest
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     HostDiverseBasisEntry,
     HostDiverseRatificationEnvelope,
     HostRegistration,

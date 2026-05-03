@@ -1,7 +1,7 @@
 # Context-Zero — Master Plan
 
 > **Latest milestone marker (SDK v3.43 / W42, 2026-05-03 — FINAL
-> RELEASE of the Wevra SDK v3.4x line).**  *Cross-role-invariant
+> RELEASE of the CoordPy SDK v3.4x line).**  *Cross-role-invariant
 > synthesis + manifest-v12 CID + role-handoff-signature axis +
 > composite-collusion bounding + final-release declaration*.  W42
 > wraps W41's producer-axis × trust-axis integrated synthesis with
@@ -42,7 +42,7 @@
 > all three axes are coordinated by the adversary, W42 cannot
 > recover).  **Final release declared**: H1..H12 + S3 + S7 of the
 > W42 success criterion pass.  The SDK v3.43 line ships as the
-> **final release** of the Wevra SDK v3.4x research line — the
+> **final release** of the CoordPy SDK v3.4x research line — the
 > **end-of-line for the capsule-layer-only research programme** in
 > the Context Zero project.  The remaining open frontiers
 > (``W42-C-NATIVE-LATENT``, ``W42-C-MULTI-HOST``) are explicitly
@@ -53,7 +53,7 @@
 > ``RunSpec → run report`` runtime contract is byte-for-byte
 > unchanged.  Versioning: ``vision_mvp.__version__`` and
 > ``pyproject.toml`` are now both ``0.5.16``;
-> ``SDK_VERSION = wevra.sdk.v3.43``.
+> ``SDK_VERSION = coordpy.sdk.v3.43``.
 > **Net effect on the original thesis**: materially stronger than
 > W41 along the cross-role-invariance axis; the deeper
 > trust/semantics wall is now strictly *bounded* (not closed) at
@@ -63,7 +63,7 @@
 > meaningfully tightened along the audited capsule-layer line and
 > released honestly as the strongest capsule-layer audited proxy
 > this repo can support.
-> See ``docs/RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md`` and
+> See ``docs/RESULTS_COORDPY_W42_ROLE_INVARIANT_SYNTHESIS.md`` and
 > ``docs/SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md``; the
 > appended SDK v3.43 (W42 family) section at the end of this file
 > answers the eight forced master-plan synthesis questions for W42.
@@ -138,7 +138,7 @@
 > at the capsule layer.  Release readiness improves materially:
 > **RC1 declared.**  H1..H12 + S3 of the W40 success criterion
 > pass.  The SDK v3.41 line is the **first official release-
-> candidate** of the Wevra SDK v3.4x line.  Stable-vs-experimental
+> candidate** of the CoordPy SDK v3.4x line.  Stable-vs-experimental
 > boundary final for RC1: every W22..W40 symbol is exported
 > under ``__experimental__``; the stable ``RunSpec → run report``
 > runtime contract is byte-for-byte unchanged.  Versioning:
@@ -152,7 +152,7 @@
 > observation on ``.101``.  Original goal (solving context for
 > multi-agent teams): not solved in general; meaningfully
 > tightened along the audited capsule-layer line.
-> See ``docs/RESULTS_WEVRA_W40_RESPONSE_HETEROGENEITY.md`` and
+> See ``docs/RESULTS_COORDPY_W40_RESPONSE_HETEROGENEITY.md`` and
 > ``docs/SUCCESS_CRITERION_W40_RESPONSE_HETEROGENEITY.md``.
 
 > **Earlier milestone marker (SDK v3.40 / W39, 2026-05-02).**
@@ -232,7 +232,7 @@
 > simultaneous full-quorum-collusion at the capsule layer, and by
 > the live-inference-layer ``W39-INFRA-1`` infrastructure
 > observation on ``.101``.
-> See ``docs/RESULTS_WEVRA_W39_MULTI_HOST_DISJOINT_QUORUM.md`` and
+> See ``docs/RESULTS_COORDPY_W39_MULTI_HOST_DISJOINT_QUORUM.md`` and
 > ``docs/SUCCESS_CRITERION_W39_MULTI_HOST_DISJOINT_QUORUM.md``.
 
 > **Earlier milestone marker (SDK v3.39 / W38, 2026-05-02).**
@@ -283,7 +283,7 @@
 > trust/semantics wall for true native latent, by simultaneous
 > consensus-collusion at the capsule layer, and by Mac 2
 > unavailability.
-> See ``docs/RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md`` and
+> See ``docs/RESULTS_COORDPY_W38_DISJOINT_CONSENSUS_REFERENCE.md`` and
 > ``docs/SUCCESS_CRITERION_W38_DISJOINT_CONSENSUS_REFERENCE.md``.
 
 > **Earlier milestone marker (SDK v3.38 / W37, 2026-05-02).**
@@ -320,7 +320,7 @@
 > at the cross-cell × cross-host audited proxy boundary, still blocked
 > by a deeper trust/semantics wall for true native latent, by two-host
 > collusion at the capsule layer, and by Mac 2 unavailability.
-> See ``docs/RESULTS_WEVRA_W37_CROSS_HOST_BASIS_TRAJECTORY.md`` and
+> See ``docs/RESULTS_COORDPY_W37_CROSS_HOST_BASIS_TRAJECTORY.md`` and
 > ``docs/SUCCESS_CRITERION_W37_CROSS_HOST_BASIS_TRAJECTORY.md``.
 
 > **Earlier milestone marker (SDK v3.37 / W36, 2026-05-02).**
@@ -347,7 +347,7 @@
 > real cross-LLM parser-boundary measurement (chosen path: **MLX
 > distributed** — Apple-official, supports Apple Silicon
 > sharded inference; not Hyperspace, which is distributed-agent
-> infra rather than single-model sharding). The Wevra-side
+> infra rather than single-model sharding). The CoordPy-side
 > integration ships as a duck-typed ``LLMBackend`` Protocol with
 > two concrete implementations (``OllamaBackend``,
 > ``MLXDistributedBackend``); the inner-loop seal-PROMPT /
@@ -361,7 +361,7 @@
 > jump and a dense → MoE architecture swap without spine
 > modification (Theorem W5-1 proved-empirical; W5-2 / W5-3
 > proved on the integration boundary). The two-Mac MLX-distributed
-> path is **experimental infrastructure**, not product; Wevra's
+> path is **experimental infrastructure**, not product; CoordPy's
 > single-run product runtime contract is byte-for-byte
 > unchanged. SDK v3.5 capsule-native multi-agent team
 > coordination slice still in force (TEAM_HANDOFF / ROLE_VIEW /
@@ -380,7 +380,7 @@
 > code is evidence for the research, and the research is what makes
 > the tool principled. Neither identity subsumes the other.
 >
-> **Naming.** `Context Zero` is the research programme. `Wevra` is the
+> **Naming.** `Context Zero` is the research programme. `CoordPy` is the
 > first usable product produced by the programme: the operator-facing
 > surface that wraps the already-settled substrate, parser/matcher/sandbox
 > stack, readiness gate, reporting, and deployment boundary.
@@ -401,7 +401,7 @@
 > **Execution contract (SDK v3.1, 2026-04-26).** Capsules have
 > stopped being purely a post-hoc audit fold and (partially) become
 > the runtime's typed execution contract. The
-> ``CapsuleNativeRunContext`` runtime context drives a Wevra run
+> ``CapsuleNativeRunContext`` runtime context drives a CoordPy run
 > through capsule lifecycle transitions: each stage seals a typed
 > capsule before the next stage can read its result. Substantive
 > on-disk artifacts are content-addressed at write time
@@ -410,7 +410,7 @@
 > CID-equivalent on non-ARTIFACT kinds (Theorem W3-34). The
 > capsule layer has therefore moved from *"capsules as audit
 > graph"* toward *"capsules as execution contract"*. See § 4.18
-> for the v3.1 runtime extension and `docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md`
+> for the v3.1 runtime extension and `docs/archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE_NATIVE.md`
 > for the milestone note.
 >
 > **Intra-cell + detached witness (SDK v3.2, 2026-04-26).**
@@ -426,11 +426,11 @@
 > the primary ledger) with a positive corollary: a detached
 > META_MANIFEST in a secondary ledger is the strongest
 > authentication achievable, one trust hop beyond the primary
-> view. ``wevra-capsule verify`` now recomputes the chain from
+> view. ``coordpy-capsule verify`` now recomputes the chain from
 > on-disk header bytes (Theorem W3-37) and re-hashes every
 > ARTIFACT against the on-disk file at audit time
 > (Theorem W3-38). See § 4.19 for the v3.2 runtime extension and
-> `docs/archive/wevra-milestones/RESULTS_WEVRA_INTRA_CELL.md` for the milestone note.
+> `docs/archive/coordpy-milestones/RESULTS_COORDPY_INTRA_CELL.md` for the milestone note.
 >
 > **PROMPT / LLM_RESPONSE slice (SDK v3.4, 2026-04-26).**
 > The capsule-native slice has been extended one further
@@ -454,10 +454,10 @@
 > research (W3-C6, empirical) reports cross-distribution
 > PARSE_OUTCOME failure-kind Total Variation Distance up to
 > 1.000 across the calibrated synthetic distribution library
-> (`vision_mvp/wevra/synthetic_llm.py`) and parser-mode
+> (`vision_mvp/coordpy/synthetic_llm.py`) and parser-mode
 > shift up to 1.000 on `synthetic.unclosed`. See § 4.21 for
 > the v3.4 runtime extension and
-> `docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md` for the milestone note.
+> `docs/archive/coordpy-milestones/RESULTS_COORDPY_INNER_LOOP.md` for the milestone note.
 >
 > **Multi-agent team coordination slice (SDK v3.5,
 > 2026-04-26).** The capsule-native abstraction has been
@@ -491,22 +491,22 @@
 > reverses at higher noise (W4-C1, empirical; see
 > `docs/HOW_NOT_TO_OVERSTATE.md` for cross-seed reading
 > rules).
-> The Wevra single-run product runtime contract is unchanged;
-> the team layer is research-grade (`vision_mvp.wevra
+> The CoordPy single-run product runtime contract is unchanged;
+> the team layer is research-grade (`vision_mvp.coordpy
 > .team_coord`). See § 4.22 for the v3.5 extension and
-> `docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md` for the milestone note;
+> `docs/archive/coordpy-milestones/RESULTS_COORDPY_TEAM_COORD.md` for the milestone note;
 > the formal model lives in `docs/CAPSULE_TEAM_FORMALISM.md`.
 >
 > **Programme vs Product — read this first.** The programme ships
 > theorems, phase shards, and an EXTENDED_MATH survey (§§ 1–9). The
-> product ships one SDK — **Wevra** — with a bounded public surface:
+> product ships one SDK — **CoordPy** — with a bounded public surface:
 > `RunSpec` → provenance-stamped report, profile-driven evaluation on
 > SWE-bench-Lite-shape banks, plugin protocols, unified mock/real
-> runtime, CI gate (§ 10). Wevra is **not** the whole programme and
+> runtime, CI gate (§ 10). CoordPy is **not** the whole programme and
 > **not** a universal agent platform. CASR (Causal-Abstraction Scale-
 > Renormalized Routing) is the *original substrate* — it lives in
-> `vision_mvp.core.*` as settled research code and grounds Wevra's
-> bounded-context claim (Theorem 3 in `docs/archive/pre-wevra-theory/PROOFS.md`); it is not itself
+> `vision_mvp.core.*` as settled research code and grounds CoordPy's
+> bounded-context claim (Theorem 3 in `docs/archive/pre-coordpy-theory/PROOFS.md`); it is not itself
 > the product identity. The canonical one-pass orientation for a new
 > reader is [`docs/START_HERE.md`](START_HERE.md).
 
@@ -528,7 +528,7 @@ Three pieces of discipline this plan imposes on itself:
    framework, a library, or a product. It is a set of claims about
    information flow in systems of LLM agents and about the shape of
    the contract between symbolic machinery and a model. The current
-   product surface (`Wevra`) is an output of the programme, not the
+   product surface (`CoordPy`) is an output of the programme, not the
    programme's boundary.
 2. **No hype.** Every empirical number in this document is traceable
    to a result note and to a test or experiment. Any claim that is
@@ -595,7 +595,7 @@ It means the following, in order of strength:
    per-agent context can be kept at O(log N) tokens per round
    without loss of accuracy, with the bound matching the
    information-theoretic lower bound up to a ceiling (Theorem 3
-   in `docs/archive/pre-wevra-theory/PROOFS.md`). This is settled, for the class of tasks it
+   in `docs/archive/pre-coordpy-theory/PROOFS.md`). This is settled, for the class of tasks it
    covers (Phases 1–10, 94+ tests).
 2. **A losslessly recoverable external memory.** Every artifact the
    system has ever taken in is addressable by content hash,
@@ -679,7 +679,7 @@ downstream writeups:
 - **We do not claim arbitrary-task universality.** O(log N) requires
   low intrinsic rank (`r ≤ O(log N)`); general d-dimensional tasks
   at small tolerance ε have an Ω(d·log 1/ε) communication floor
-  (Theorem 11, `docs/archive/pre-wevra-theory/PROOFS.md`). When this condition fails, routing does
+  (Theorem 11, `docs/archive/pre-coordpy-theory/PROOFS.md`). When this condition fails, routing does
   not save us.
 - **We do not claim soundness over adversarial code.** Phase-26 and
   Phase-27 sandboxes neuter common side-effectful APIs but are not
@@ -811,10 +811,10 @@ constraint.
 Two anchors:
 
 - **Rate-distortion theory** provides a lower bound on the size of
-  the representation that preserves answer quality (`docs/archive/pre-wevra-theory/FRAMEWORK.md`
+  the representation that preserves answer quality (`docs/archive/pre-coordpy-theory/FRAMEWORK.md`
   §A.2). CASR is designed to approach but not violate it.
 - **Shannon-style channel capacity / broadcast lower bounds**
-  (Theorems 3, 11 in `docs/archive/pre-wevra-theory/PROOFS.md`) say that any protocol in which
+  (Theorems 3, 11 in `docs/archive/pre-coordpy-theory/PROOFS.md`) say that any protocol in which
   every agent must learn one bit has `B · R ≥ log N`; a protocol
   achieving ⌈log₂ N⌉ peak context is optimal up to the ceiling.
 
@@ -837,7 +837,7 @@ unless you change the problem.
 - **Content-addressed storage** (Merkle DAGs, Git-style provenance)
   is the exact-memory layer (Phase 19).
 - **Rank-based / log-rank communication bounds** sit under the
-  workspace capacity O(log N) result (V2.14 in `docs/archive/pre-wevra-theory/MATH_AUDIT.md`).
+  workspace capacity O(log N) result (V2.14 in `docs/archive/pre-coordpy-theory/MATH_AUDIT.md`).
 
 ### 2.3 Machine learning
 
@@ -883,7 +883,7 @@ content, not as decoration:
   router (Theorem 13).
 
 The `EXTENDED_MATH_[1-7].md` documents survey 72 such frameworks;
-`docs/archive/pre-wevra-theory/MATH_AUDIT.md` records which are `USED`, `STRUCTURAL`, `BUILT`, or
+`docs/archive/pre-coordpy-theory/MATH_AUDIT.md` records which are `USED`, `STRUCTURAL`, `BUILT`, or
 `THEORY`. As of Phase 27, about 30 % of the survey is in the code,
 which is the honest number.
 
@@ -1046,7 +1046,7 @@ distributed async variants; rigorous fixed-point convergence for
 `T_i*`; trainable world models for the surprise filter at scale.
 The falsifiability test against the "most context is necessary"
 hypothesis has not been run on SWE-bench end-to-end yet
-(`docs/archive/pre-wevra-theory/ROADMAP.md`).
+(`docs/archive/pre-coordpy-theory/ROADMAP.md`).
 
 **Why it matters.** The O(log N) bound is, if it holds up under
 peer review, a channel-capacity-level statement about a class of
@@ -4727,8 +4727,8 @@ heavy. The programme rotates between the two.
 
 ### 4.12 The Context Capsule as a research center (Phase 46 — post-SDK-v3 milestone)
 
-The SDK v3 milestone (`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md`,
-2026-04-22) named the **Context Capsule** as Wevra's
+The SDK v3 milestone (`docs/archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE.md`,
+2026-04-22) named the **Context Capsule** as CoordPy's
 load-bearing abstraction: every piece of context that
 crosses a role / layer / run boundary is a typed, content-
 addressed, lifecycle-bounded, budget-bounded, provenance-
@@ -4756,7 +4756,7 @@ $\le 4$). Section 5 names sharp-falsifier conjectures
 W3-C1..W3-C4.
 
 **2. Capsule learning problem
-(`vision_mvp/wevra/capsule_policy.py`,
+(`vision_mvp/coordpy/capsule_policy.py`,
 `vision_mvp/experiments/phase46_capsule_learning.py`,
 `docs/archive/capsule-research/RESULTS_CAPSULE_LEARNING.md`).** Capsule admission —
 "should this proposed capsule be admitted under the ledger's
@@ -4859,7 +4859,7 @@ identity. After Phase 46:
 * The substrate primitives themselves are byte-for-byte
   unchanged. The `CapsuleLedger.admit_and_seal` runtime
   contract is unchanged; `BudgetedAdmissionLedger` is
-  *additive*. SDK_VERSION remains "wevra.sdk.v3".
+  *additive*. SDK_VERSION remains "coordpy.sdk.v3".
 * The expressivity-separation theorems (P31-5, P35-1) and
   correctness-preservation theorems (P31-4, P35-3) are
   *NOT* subsumed by the capsule contract — by design. The
@@ -5518,7 +5518,7 @@ richer than DeepSet: it distinguishes two bundles with
 identical (claim_kind, rc) multisets but different role
 assignments — a distinction DeepSet's per-capsule φ-sum
 cannot make.  Code anchor:
-`vision_mvp/wevra/capsule_decoder_relational.py::CohortRelationalDecoder`.
+`vision_mvp/coordpy/capsule_decoder_relational.py::CohortRelationalDecoder`.
 
 **2. Claim W3-31 (empirical, code-backed — matched pipeline).**
 
@@ -5621,7 +5621,7 @@ The Phase-46..51 work above is on the *decoder* / research-center
 axis: capsules as the substrate over which admission, bundling,
 and zero-shot decoding are studied. The SDK v3.1 milestone is on a
 **different axis entirely** — the **runtime** axis. Up to v3.0 the
-capsule layer was a post-hoc fold: a Wevra run executed end-to-end
+capsule layer was a post-hoc fold: a CoordPy run executed end-to-end
 as ordinary Python and a sealed capsule DAG was synthesised from
 the finished ``product_report`` dict afterwards. Capsules
 *described* the run; they did not gate it. SDK v3.1 makes capsules
@@ -5629,7 +5629,7 @@ the finished ``product_report`` dict afterwards. Capsules
 
 **1. The new contract.** ``CapsuleNativeRunContext`` is a runtime
 context that owns a ``CapsuleLedger`` and exposes one ``seal_*``
-method per Wevra-run stage (profile / readiness / sweep_spec /
+method per CoordPy-run stage (profile / readiness / sweep_spec /
 sweep_cell / provenance / artifact / run_report). Each stage
 seals a typed capsule before the next stage can read its result;
 parent-CID gating (Capsule Contract C5) refuses to admit a
@@ -5679,13 +5679,13 @@ hashing its own bytes (circular), so they remain renderings.
   downstream KeyError. The capsule layer enforces ordering at the
   type level.
 
-**4. What this changes about Wevra's originality claim.** The
+**4. What this changes about CoordPy's originality claim.** The
 older positioning — *"every cross-boundary artefact is a typed,
 content-addressed, lifecycle-bounded capsule"* — was true at the
 Capsule Contract level (C1..C6) but operationally was a post-hoc
 description of a run that had already happened. SDK v3.1 makes
 the operational claim *"capsules drive execution"* honest on a
-real slice: the entire Wevra run lifecycle (profile → readiness →
+real slice: the entire CoordPy run lifecycle (profile → readiness →
 sweep → provenance → artifacts → run-report) is now a sequence of
 capsule lifecycle transitions enforced at the type level, not a
 sequence of Python calls audited post hoc. This is the move from
@@ -5712,24 +5712,24 @@ sequence of Python calls audited post hoc. This is the move from
 
 * New: ``CapsuleNativeRunContext``, ``ContentAddressMismatch``,
   ``seal_and_write_artifact``, ``CONSTRUCTION_IN_FLIGHT`` /
-  ``CONSTRUCTION_POST_HOC`` (re-exported from ``vision_mvp.wevra``).
+  ``CONSTRUCTION_POST_HOC`` (re-exported from ``vision_mvp.coordpy``).
 * New: ``RunSpec.capsule_native: bool = True`` (default flips
   onto the new path).
-* Bumped: ``SDK_VERSION = "wevra.sdk.v3.1"``.
+* Bumped: ``SDK_VERSION = "coordpy.sdk.v3.1"``.
 * Unchanged: ``ContextCapsule``, ``CapsuleLedger``,
   ``CapsuleView``, ``CAPSULE_VIEW_SCHEMA``, ``build_report_ledger``,
   every ``capsule_from_*`` adapter, every v3.0 contract test.
 
-**7. Empirical anchor.** ``vision_mvp/tests/test_wevra_capsule_native.py``
+**7. Empirical anchor.** ``vision_mvp/tests/test_coordpy_capsule_native.py``
 ships 16 contract tests that lock the four theorems plus the
 substantive-artifact content-addressing claim. The full
 ``vision_mvp.tests`` suite is **1406 / 1406 green** under the
 new path; the legacy ``capsule_native=False`` path remains
 green (back-compat guarantee).
 
-Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE_NATIVE.md` (milestone note);
+Anchor: `docs/archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE_NATIVE.md` (milestone note);
 `docs/CAPSULE_FORMALISM.md` § 4.G (theorems); test suite
-`vision_mvp/tests/test_wevra_capsule_native.py`.
+`vision_mvp/tests/test_coordpy_capsule_native.py`.
 
 ### 4.19 SDK v3.2 — intra-cell capsule-native + detached META_MANIFEST + strong on-disk verification
 
@@ -5775,7 +5775,7 @@ beyond the primary view; cryptographic signing is orthogonal
 and out of scope.
 
 **3. Strong on-disk verification.**
-``wevra-capsule verify`` now runs four independent checks:
+``coordpy-capsule verify`` now runs four independent checks:
 (i) chain-from-headers recompute on the embedded view
 (Theorem W3-37); (ii) chain-from-headers recompute on the
 on-disk ``capsule_view.json`` (W3-37 again, against the
@@ -5815,14 +5815,14 @@ are recoverable from disk alone.
   PROFILE / READINESS_CHECK / SWEEP_SPEC / SWEEP_CELL /
   PROVENANCE.
 
-**5. What this changes about Wevra's originality claim.** The v3.1
+**5. What this changes about CoordPy's originality claim.** The v3.1
 positioning was *"capsules drive execution at the run boundary"*.
 With v3.2, capsules also drive execution **past the cell boundary**:
 inside every sweep cell the inner parse→apply→test transition is
 two sealed capsules with parent-CID gating, not a function-call
 sequence. The meta-artefact circularity is no longer a vague TODO
 or an asymmetric apology in the milestone note — it is a sharp
-limitation theorem with a constructive boundary witness. ``wevra-capsule
+limitation theorem with a constructive boundary witness. ``coordpy-capsule
 verify`` is no longer a header-trust check — it recomputes from
 disk bytes and re-hashes. Three classes of "operational claim that
 was ahead of code" have become "operational claim that the code
@@ -5838,7 +5838,7 @@ honestly earns."
   Theorem W3-36 establishes this is *impossible* without
   cryptographic signing; it is a sharp limitation, not a TODO.
 * Adversarial concurrent writers remain out of scope (the trust
-  boundary is the same as Wevra's sandbox boundary).
+  boundary is the same as CoordPy's sandbox boundary).
 * Cross-run determinism on the full DAG remains open.
 
 **7. SDK surface delta.** Strictly additive on v3.1:
@@ -5848,35 +5848,35 @@ honestly earns."
   ``verify_chain_from_view_dict``,
   ``verify_artifacts_on_disk``,
   ``verify_meta_manifest_on_disk`` (re-exported from
-  ``vision_mvp.wevra``).
+  ``vision_mvp.coordpy``).
 * New: ``CapsuleNativeRunContext.seal_patch_proposal``,
   ``.seal_test_verdict``, ``.seal_meta_manifest``,
   ``.render_meta_manifest_view``.
 * New: ``CapsuleKind.PATCH_PROPOSAL``, ``.TEST_VERDICT``,
   ``.META_MANIFEST`` (closed-vocabulary additions).
 * New: ``meta_manifest.json`` artefact written on every run.
-* Bumped: ``SDK_VERSION = "wevra.sdk.v3.2"``.
+* Bumped: ``SDK_VERSION = "coordpy.sdk.v3.2"``.
 * Unchanged: ``RunSpec`` fields; ``CAPSULE_VIEW_SCHEMA``
-  (``wevra.capsule_view.v1`` — the new payloads are additive
+  (``coordpy.capsule_view.v1`` — the new payloads are additive
   on the same schema); the entire v3.1 surface; the post-hoc
   ``build_report_ledger`` adapter; every existing
   ``capsule_from_*`` adapter.
 
 **8. Empirical anchor.**
-``vision_mvp/tests/test_wevra_capsule_native_intra_cell.py`` ships
+``vision_mvp/tests/test_coordpy_capsule_native_intra_cell.py`` ships
 16 contract tests that lock the four new theorems plus the
 W3-34 spine-equivalence preservation. Combined with v3.1's
-``test_wevra_capsule_native.py`` (16 tests still green) and the
-public-surface lock (``test_wevra_public_api.py`` 10 tests),
+``test_coordpy_capsule_native.py`` (16 tests still green) and the
+public-surface lock (``test_coordpy_public_api.py`` 10 tests),
 the capsule-native runtime contract is now witnessed by 42
-contract tests. Full ``vision_mvp.tests/test_wevra_*`` suite
+contract tests. Full ``vision_mvp.tests/test_coordpy_*`` suite
 **101 / 101 green**; the substrate's ``run_swe_loop_sandboxed``
 hook addition does not regress any phase-40, phase-42, phase-45,
 or phase-47 substrate tests (98 / 98 green on the targeted run).
 
-Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_INTRA_CELL.md` (milestone note);
+Anchor: `docs/archive/coordpy-milestones/RESULTS_COORDPY_INTRA_CELL.md` (milestone note);
 `docs/CAPSULE_FORMALISM.md` § 4.H (theorems); test suite
-`vision_mvp/tests/test_wevra_capsule_native_intra_cell.py`.
+`vision_mvp/tests/test_coordpy_capsule_native_intra_cell.py`.
 
 ### 4.20 SDK v3.3 — sub-intra-cell parser-axis + lifecycle audit + deterministic-mode replay
 
@@ -5966,7 +5966,7 @@ on wall clock.
   profile under `deterministic=True` produce byte-identical CIDs
   on every kind, identical chain head, identical root CID.
 
-**5. What this changes about Wevra's originality claim.** The v3.2
+**5. What this changes about CoordPy's originality claim.** The v3.2
 positioning was *"capsules drive execution at the run boundary
 and the inner sweep loop pair (patch, verdict)"*. The v3.3
 positioning is sharper:
@@ -5997,7 +5997,7 @@ been promoted to "operational claim the code honestly earns":
   `LLM_RESPONSE` capsules (Conjecture W3-C5).
 * Sandbox stdout / stderr / test trace remain plain bytes.
 * Adversarial concurrent writers remain out of scope (the trust
-  boundary is the same as Wevra's sandbox boundary).
+  boundary is the same as CoordPy's sandbox boundary).
 * Real-LLM mode is non-deterministic by construction; the
   determinism flag does not change that.
 * Cryptographic signing of META_MANIFEST remains orthogonal and
@@ -6012,33 +6012,33 @@ been promoted to "operational claim the code honestly earns":
   `seal_and_write_artifact(recorded_path=...)` argument.
 * New: `CapsuleLifecycleAudit`, `LifecycleAuditReport`,
   `audit_capsule_lifecycle`, `audit_capsule_lifecycle_from_view`
-  (re-exported from `vision_mvp.wevra`).
+  (re-exported from `vision_mvp.coordpy`).
 * New: `RunSpec.deterministic: bool = False`.
 * New: `--deterministic` CLI flag on `vision_mvp.product`.
-* Bumped: `SDK_VERSION = "wevra.sdk.v3.3"`.
+* Bumped: `SDK_VERSION = "coordpy.sdk.v3.3"`.
 * Unchanged: every v3.2 contract test (101) still passes
-  byte-for-byte; capsule view schema name `wevra.capsule_view.v1`;
+  byte-for-byte; capsule view schema name `coordpy.capsule_view.v1`;
   the post-hoc `build_report_ledger` adapter; the META_MANIFEST
   detached-witness boundary.
 
 **8. Empirical anchor.**
-`vision_mvp/tests/test_wevra_capsule_native_deeper.py` ships 18
+`vision_mvp/tests/test_coordpy_capsule_native_deeper.py` ships 18
 contract tests covering the W3-39 / W3-40 / W3-41 claims plus the
 PARSE_OUTCOME ↔ PATCH_PROPOSAL coordinate-matching invariant and
 the rationale-to-failure-kind mapping. Combined with v3.1's
-`test_wevra_capsule_native.py` (16 tests) and v3.2's
-`test_wevra_capsule_native_intra_cell.py` (16 tests), the
+`test_coordpy_capsule_native.py` (16 tests) and v3.2's
+`test_coordpy_capsule_native_intra_cell.py` (16 tests), the
 capsule-native runtime contract is now witnessed by 50 contract
-tests. Full `vision_mvp.tests.test_wevra_*` + `test_capsule_*`
+tests. Full `vision_mvp.tests.test_coordpy_*` + `test_capsule_*`
 suite **165 / 165 green**; the substrate's
 `run_swe_loop_sandboxed` hook addition does not regress any
 phase-40, phase-42, phase-45, phase-47, or phase-50 substrate
 tests.
 
-Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_DEEP_INTRA_CELL.md` (this milestone
+Anchor: `docs/archive/coordpy-milestones/RESULTS_COORDPY_DEEP_INTRA_CELL.md` (this milestone
 note); `docs/THEOREM_REGISTRY.md` (canonical theorem registry);
 `docs/RESEARCH_STATUS.md` (canonical research-status); paper
-draft: `papers/wevra_capsule_native_runtime.md` (claim taxonomy +
+draft: `papers/coordpy_capsule_native_runtime.md` (claim taxonomy +
 flagship write-up).
 
 ### 4.21 SDK v3.4 — sub-sub-intra-cell PROMPT / LLM_RESPONSE slice + synthetic mode + parser-boundary research
@@ -6109,7 +6109,7 @@ satisfies L-1..L-11 (Theorem W3-45 — proved by inspection).
 `SweepSpec(mode="synthetic", synthetic_model_tag=<tag>)`
 mode replaces the real `LLMClient` with a deterministic
 in-process `SyntheticLLMClient`
-(`vision_mvp/wevra/synthetic_llm.py`) that returns canned
+(`vision_mvp/coordpy/synthetic_llm.py`) that returns canned
 strings keyed by `(instance_id, model_tag)`. The full
 PROMPT / LLM_RESPONSE / PARSE_OUTCOME / PATCH_PROPOSAL /
 TEST_VERDICT chain seals end-to-end without an Ollama
@@ -6146,7 +6146,7 @@ A real cross-LLM extension is straightforward to layer on by
 substituting `mode="real"` with a real `LLMClient`; this
 experiment is the necessary in-CI-runnable preliminary.
 
-**6. What this changes about Wevra's originality claim.** The
+**6. What this changes about CoordPy's originality claim.** The
 v3.3 positioning was *"capsules drive execution at the run
 boundary, the inner sweep loop pair, AND the parser axis"*.
 The v3.4 positioning is sharper:
@@ -6197,43 +6197,43 @@ been promoted to "operational claims the code honestly earns":
   * New: lifecycle audit invariants L-9 / L-10 / L-11
     (`_check_l9` / `_check_l10` / `_check_l11`).
   * New: `SweepSpec(mode="synthetic", synthetic_model_tag=...)`
-    + `_synthetic_cells` dispatcher in `wevra.runtime`.
-  * New: `vision_mvp/wevra/synthetic_llm.py`
+    + `_synthetic_cells` dispatcher in `coordpy.runtime`.
+  * New: `vision_mvp/coordpy/synthetic_llm.py`
     (`SyntheticLLMClient`, `SYNTHETIC_MODEL_PROFILES`,
     `make_synthetic_response_fn`).
   * New: `vision_mvp/experiments/parser_boundary_cross_model.py`
     (CLI entry point + programmable function).
-  * Bumped: `SDK_VERSION = "wevra.sdk.v3.4"`.
+  * Bumped: `SDK_VERSION = "coordpy.sdk.v3.4"`.
   * Unchanged: every v3.3 contract test (18) still passes
     byte-for-byte; capsule view schema name
-    `wevra.capsule_view.v1` (PROMPT / LLM_RESPONSE payloads
+    `coordpy.capsule_view.v1` (PROMPT / LLM_RESPONSE payloads
     are additive); the post-hoc `build_report_ledger` adapter;
     deterministic-mode replay; the META_MANIFEST detached-witness
     boundary.
 
 **9. Empirical anchor.**
-`vision_mvp/tests/test_wevra_capsule_native_inner_loop.py`
+`vision_mvp/tests/test_coordpy_capsule_native_inner_loop.py`
 ships 16 contract tests covering the W3-42 / W3-43 / W3-44 /
 W3-45 / W3-C6 claims plus PROMPT idempotence, the synthetic-mode
 end-to-end chain, and synthetic-mode determinism. Combined
-with v3.1's `test_wevra_capsule_native.py` (16 tests), v3.2's
-`test_wevra_capsule_native_intra_cell.py` (16 tests), and
-v3.3's `test_wevra_capsule_native_deeper.py` (18 tests), the
+with v3.1's `test_coordpy_capsule_native.py` (16 tests), v3.2's
+`test_coordpy_capsule_native_intra_cell.py` (16 tests), and
+v3.3's `test_coordpy_capsule_native_deeper.py` (18 tests), the
 capsule-native runtime contract is now witnessed by **66
-contract tests**. Full `vision_mvp.tests.test_wevra_*` +
+contract tests**. Full `vision_mvp.tests.test_coordpy_*` +
 `test_capsule_*` suite green.
 
-Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_INNER_LOOP.md` (this milestone
+Anchor: `docs/archive/coordpy-milestones/RESULTS_COORDPY_INNER_LOOP.md` (this milestone
 note); `docs/CAPSULE_FORMALISM.md` § 4.J (theorems);
 `docs/THEOREM_REGISTRY.md` (canonical registry);
 `docs/RESEARCH_STATUS.md` (canonical research-status); paper
-draft: `papers/wevra_capsule_native_runtime.md` (claim taxonomy
+draft: `papers/coordpy_capsule_native_runtime.md` (claim taxonomy
 + flagship write-up).
 
 ### 4.22 SDK v3.5 — capsule-native multi-agent team coordination (the team-layer slice)
 
 The v3.4 milestone (§ 4.21) closed the LLM byte boundary inside
-*one* Wevra run. The strongest remaining frontier — and the one
+*one* CoordPy run. The strongest remaining frontier — and the one
 that actually maps onto the original Context-Zero "solve context
 for multi-agent teams" thesis — was the **team boundary**: what
 crosses between agents in a coordination round. SDK v3.5 makes
@@ -6317,14 +6317,14 @@ training scales (the 14-scenario sweep eval shows fixed baselines
 match or exceed the learned policy when training-data scale is
 small).
 
-**4. Strict programme/product split is preserved.** The Wevra
+**4. Strict programme/product split is preserved.** The CoordPy
 **product** runtime contract — `RunSpec` → sealed RUN_REPORT
 capsule + detached META_MANIFEST + lifecycle audit L-1..L-11 + CI
 gate — is **byte-for-byte unchanged**. The team-layer capsule
 kinds are emitted *only* by `TeamCoordinator`; the run-boundary
-sweep path does not seal them. The `wevra` console script's
+sweep path does not seal them. The `coordpy` console script's
 output is unchanged. The team layer is research-grade
-(`vision_mvp.wevra.team_coord`), additive on top of v3.4.
+(`vision_mvp.coordpy.team_coord`), additive on top of v3.4.
 
 **5. The team-layer slice is what reconnects capsule-native
 execution to the original "solve context for multi-agent teams"
@@ -6347,7 +6347,7 @@ coordination round." The unbounded "we solved multi-agent
 context" read is **forbidden** by
 `docs/HOW_NOT_TO_OVERSTATE.md`.
 
-**6. Tests + audit.** `vision_mvp/tests/test_wevra_team_coord.py`
+**6. Tests + audit.** `vision_mvp/tests/test_coordpy_team_coord.py`
 ships 22 contract tests covering capsule constructors, the
 coordinator's emit/seal flow, idempotency under byte-identical
 handoffs, K_role / T_role budget enforcement, T-1..T-7 audit
@@ -6355,19 +6355,19 @@ verdicts (including a positive T-7 violation construction),
 admission-policy semantics for FIFO / priority / coverage-guided,
 the learned-policy training-loop convergence on a separable
 pattern, and the W4-2 / W4-3 theorem anchors. Full
-`test_wevra_*` + `test_capsule_*` + `test_role_handoff` suite
+`test_coordpy_*` + `test_capsule_*` + `test_role_handoff` suite
 green. Combined with v3.4's 66 capsule-native run-boundary
 contract tests, the capsule-native layer (run-boundary +
 team-boundary) is now witnessed by **88 contract tests**.
 
-Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_TEAM_COORD.md` (this milestone note);
+Anchor: `docs/archive/coordpy-milestones/RESULTS_COORDPY_TEAM_COORD.md` (this milestone note);
 `docs/CAPSULE_TEAM_FORMALISM.md` (formal model);
 `docs/THEOREM_REGISTRY.md` (canonical registry — W4 rows added);
 `docs/RESEARCH_STATUS.md` (canonical research-status — multi-
 agent axis added);
 `vision_mvp/experiments/phase52_team_coord.py` (benchmark
-driver); `vision_mvp/wevra/team_coord.py` and
-`vision_mvp/wevra/team_policy.py` (the new module pair).
+driver); `vision_mvp/coordpy/team_coord.py` and
+`vision_mvp/coordpy/team_policy.py` (the new module pair).
 
 ### 4.23 SDK v3.6 — two-Mac distributed-inference integration boundary + real cross-LLM parser-boundary measurement
 
@@ -6378,7 +6378,7 @@ Up through v3.5 the capsule-native runtime was load-bearing in
 its inner-loop spine but pinned to a single-host Ollama HTTP
 client; the **stronger-model regime** that two combined Apple
 Silicon Macs unlock (a single sharded model spanning
-`mac1.local + mac2.local`) was an operator concern, not a Wevra
+`mac1.local + mac2.local`) was an operator concern, not a CoordPy
 concern. SDK v3.6 ships the smallest honest integration boundary
 plus the first **real** (non-synthetic) cross-LLM measurement
 on the parser-boundary axis.
@@ -6411,8 +6411,8 @@ The realistic model class on 2 × 36 GB Macs is **70B in 4-bit**
 Sub-70B models run on a single Mac in 4-bit; sharding gives
 context-length / KV headroom only.
 
-**2. Wevra integration boundary
-(`vision_mvp/wevra/llm_backend.py`).**
+**2. CoordPy integration boundary
+(`vision_mvp/coordpy/llm_backend.py`).**
 
 A duck-typed `LLMBackend` Protocol with three pieces:
 
@@ -6425,7 +6425,7 @@ A duck-typed `LLMBackend` Protocol with three pieces:
   `POST /v1/chat/completions` endpoint. Designed for an
   `mlx_lm.server` launched under `mpirun --hostfile <hosts>`
   so the same HTTP surface fronts a single-host run *or* a
-  sharded multi-host run. Wevra is **neutral on the sharding
+  sharded multi-host run. CoordPy is **neutral on the sharding
   strategy**: one HTTP client, one Protocol, one adapter class.
 * `make_backend(name, **kwargs)` — factory dispatch by name.
 
@@ -6451,12 +6451,12 @@ equivalently regardless of backend (W5-2 proved).
        `recovery=closed_at_eos`.
   Anchor:
   `vision_mvp/experiments/parser_boundary_real_llm.py`;
-  result JSON in `/tmp/wevra-distributed/`.
+  result JSON in `/tmp/coordpy-distributed/`.
 * **W5-2 (proved)** — Backend integration: any duck-typed
   `LLMBackend` substitutes for `LLMClient` in `_real_cells`;
   the capsule chain seals end-to-end byte-for-byte.
   Anchor:
-  `test_wevra_llm_backend.py::RunSweepBackendIntegrationTests`.
+  `test_coordpy_llm_backend.py::RunSweepBackendIntegrationTests`.
 * **W5-3 (proved)** — `MLXDistributedBackend` wire shape:
   OpenAI-compatible `POST /v1/chat/completions` with
   `{model, messages, max_tokens, temperature, stream:false}`,
@@ -6484,10 +6484,10 @@ equivalently regardless of backend (W5-2 proved).
 **5. Honest scope.**
 
 The MLX-distributed two-Mac path is **experimental
-infrastructure**, not product. Wevra does **not** ship `mlx`,
+infrastructure**, not product. CoordPy does **not** ship `mlx`,
 `mlx-lm`, or `mpirun` as dependencies; it does not auto-bring-up
 the cluster. There is deliberately no
-`pip install wevra[mlx_distributed]` extra. The integration is
+`pip install coordpy[mlx_distributed]` extra. The integration is
 one HTTP-client class.
 
 W5-1 was measured on a *single* Mac (Mac 1 alive at measurement
@@ -6519,26 +6519,26 @@ you see it without hand-diffing N responses.
 
 **7. Files / tests / artefacts.**
 
-* `vision_mvp/wevra/llm_backend.py` (new) — Protocol +
+* `vision_mvp/coordpy/llm_backend.py` (new) — Protocol +
   `OllamaBackend` + `MLXDistributedBackend` + `make_backend`.
-* `vision_mvp/wevra/runtime.py` — `run_sweep` accepts optional
+* `vision_mvp/coordpy/runtime.py` — `run_sweep` accepts optional
   `llm_backend`; sweep block records `"backend"` field.
-* `vision_mvp/wevra/__init__.py` — re-exports + `SDK_VERSION =
-  "wevra.sdk.v3.6"`.
+* `vision_mvp/coordpy/__init__.py` — re-exports + `SDK_VERSION =
+  "coordpy.sdk.v3.6"`.
 * `vision_mvp/experiments/parser_boundary_real_llm.py` (new) —
   real-LLM cross-model parser-boundary harness.
-* `vision_mvp/tests/test_wevra_llm_backend.py` (new) — 9
+* `vision_mvp/tests/test_coordpy_llm_backend.py` (new) — 9
   contract / wire-shape / integration tests.
-* `docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md` (this milestone note).
+* `docs/archive/coordpy-milestones/RESULTS_COORDPY_DISTRIBUTED.md` (this milestone note).
 * `docs/MLX_DISTRIBUTED_RUNBOOK.md` (operator runbook).
 * `docs/THEOREM_REGISTRY.md` — W5-1 / W5-2 / W5-3 / W5-C1 /
   W5-C2 / W5-C3 rows added.
 * `docs/RESEARCH_STATUS.md` — fifth research axis added.
 
-Anchor: `docs/archive/wevra-milestones/RESULTS_WEVRA_DISTRIBUTED.md` (this milestone
+Anchor: `docs/archive/coordpy-milestones/RESULTS_COORDPY_DISTRIBUTED.md` (this milestone
 note); `docs/MLX_DISTRIBUTED_RUNBOOK.md` (operator runbook);
 `vision_mvp/experiments/parser_boundary_real_llm.py`
-(benchmark driver); `vision_mvp/wevra/llm_backend.py` (the new
+(benchmark driver); `vision_mvp/coordpy/llm_backend.py` (the new
 adapter module).
 
 ### 4.24 SDK v3.7 — model-scale vs capsule-structure on multi-agent coordination (real-LLM Phase-53 benchmark + W6 family)
@@ -6564,7 +6564,7 @@ the original multi-agent-context thesis?**
 * The integration boundary (`MLXDistributedBackend`,
   `LLMBackend` Protocol, `run_sweep(..., llm_backend=...)`) is
   byte-for-byte unchanged from SDK v3.6 and remains correct
-  against the in-process OpenAI-compat stub. The Wevra side has
+  against the in-process OpenAI-compat stub. The CoordPy side has
   nothing additional to do until the cluster lights up; the
   runbook (`docs/MLX_DISTRIBUTED_RUNBOOK.md`) is the operator
   path.
@@ -6701,18 +6701,18 @@ right claim to hold at this benchmark size.
 * `vision_mvp/experiments/phase53_scale_vs_structure.py` (new)
   — 770-line driver: real-LLM extractor, candidate stream
   builder, decomposition, cross-regime TVD.
-* `vision_mvp/tests/test_wevra_scale_vs_structure.py` (new) —
+* `vision_mvp/tests/test_coordpy_scale_vs_structure.py` (new) —
   19 contract tests (parser robustness, backend duck-typing,
   audit_ok grid, schema lock).
-* `vision_mvp/wevra/__init__.py` — `SDK_VERSION = "wevra.sdk.v3.7"`.
-* `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md` (this milestone note).
+* `vision_mvp/coordpy/__init__.py` — `SDK_VERSION = "coordpy.sdk.v3.7"`.
+* `docs/RESULTS_COORDPY_SCALE_VS_STRUCTURE.md` (this milestone note).
 * `docs/data/phase53_scale_vs_structure_K4_n5.json` (frozen
   benchmark output).
 * `docs/THEOREM_REGISTRY.md` — W6-1 / W6-2 / W6-3 / W6-4 /
   W6-C1 / W6-C2 / W6-C3 / W6-C4 / W6-C5 added; W4-C1 amended.
 * `docs/RESEARCH_STATUS.md` — sixth research axis added.
 
-Anchor: `docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`;
+Anchor: `docs/RESULTS_COORDPY_SCALE_VS_STRUCTURE.md`;
 `docs/data/phase53_scale_vs_structure_K4_n5.json`;
 `vision_mvp/experiments/phase53_scale_vs_structure.py`.
 
@@ -6765,10 +6765,10 @@ coordination axis from the producer-extraction-quality axis that
 dominated Phase-53. Bench properties (gold-plurality, cross-role,
 budget-bound) are *named and mechanically verified* by the
 contract tests
-(``test_wevra_cross_role_coherence.Phase54BankShapeTests``).
+(``test_coordpy_cross_role_coherence.Phase54BankShapeTests``).
 
 **3. ``CohortCoherenceAdmissionPolicy`` (new, SDK v3.8).**
-``vision_mvp/wevra/team_coord.py``. A deterministic, training-
+``vision_mvp/coordpy/team_coord.py``. A deterministic, training-
 free, interpretable cross-role admission rule that filters
 foreign-service decoys via a ``service=<tag>`` cohort signature.
 Two sub-modes:
@@ -6844,17 +6844,17 @@ and falsifiable.
 
 **7. What changed.**
 
-* `vision_mvp/wevra/team_coord.py` (extended) —
+* `vision_mvp/coordpy/team_coord.py` (extended) —
   ``CohortCoherenceAdmissionPolicy``;
   ``_candidate_service_tag``; updated ``ALL_FIXED_POLICY_NAMES``.
-* `vision_mvp/wevra/__init__.py` — re-exports
+* `vision_mvp/coordpy/__init__.py` — re-exports
   ``TeamCohortCoherenceAdmissionPolicy``;
-  ``SDK_VERSION = "wevra.sdk.v3.8"``.
+  ``SDK_VERSION = "coordpy.sdk.v3.8"``.
 * `vision_mvp/experiments/phase54_cross_role_coherence.py` (new).
-* `vision_mvp/tests/test_wevra_cross_role_coherence.py` (new) —
+* `vision_mvp/tests/test_coordpy_cross_role_coherence.py` (new) —
   21 contract tests including default-config win, K-sweep, audit
   invariance, bank-seed stability.
-* `docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md` (new — milestone
+* `docs/RESULTS_COORDPY_CROSS_ROLE_COHERENCE.md` (new — milestone
   results note).
 * `docs/data/phase54_cross_role_coherence_K4_n10.json` (frozen
   default-config result).
@@ -6865,7 +6865,7 @@ and falsifiable.
 * `docs/RESEARCH_STATUS.md` — seventh research axis added.
 * `docs/HOW_NOT_TO_OVERSTATE.md` — W7 overstatement guards added.
 
-Anchor: `docs/RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md`;
+Anchor: `docs/RESULTS_COORDPY_CROSS_ROLE_COHERENCE.md`;
 `docs/data/phase54_cross_role_coherence_K4_n10.json`;
 `vision_mvp/experiments/phase54_cross_role_coherence.py`.
 
@@ -6921,7 +6921,7 @@ flips the corroboration signal so 0/10 falsifier scenarios satisfy
 it; on the falsifier the new policy correctly ties FIFO at 0.000.
 
 **3. `CrossRoleCorroborationAdmissionPolicy` (new, SDK v3.9 — PART C).**
-`vision_mvp/wevra/team_coord.py`. A deterministic, training-free,
+`vision_mvp/coordpy/team_coord.py`. A deterministic, training-free,
 interpretable cross-role admission rule that aggregates over
 **(role, tag) bipartite multisets** rather than over raw tag
 counts. Default score function:
@@ -7032,28 +7032,28 @@ a claim that "we solved multi-agent context" — see
 
 **8. What changed.**
 
-* `vision_mvp/wevra/team_coord.py` (extended) —
+* `vision_mvp/coordpy/team_coord.py` (extended) —
   `CrossRoleCorroborationAdmissionPolicy`; `_candidate_source_role`;
   updated `ALL_FIXED_POLICY_NAMES`.
-* `vision_mvp/wevra/__init__.py` — re-exports
+* `vision_mvp/coordpy/__init__.py` — re-exports
   `TeamCrossRoleCorroborationAdmissionPolicy`;
-  `SDK_VERSION = "wevra.sdk.v3.9"`.
+  `SDK_VERSION = "coordpy.sdk.v3.9"`.
 * `vision_mvp/experiments/phase55_decoy_plurality.py` (new) —
   Phase-55 driver, 5 base scenario builders, default + falsifier
   bank constructors, `run_phase55`, `run_phase55_budget_sweep`,
   `run_seed_stability_sweep`, `run_cross_regime_summary`.
-* `vision_mvp/tests/test_wevra_cross_role_corroboration.py` (new)
+* `vision_mvp/tests/test_coordpy_cross_role_corroboration.py` (new)
   — 34 contract tests including W8-1 default-config win, W8-2
   structural ordering, W8-3 backward-compat, W8-4 falsifier,
   K-sweep, seed stability, audit invariance, no-regression on
   Phase 53 synthetic.
-* `vision_mvp/tests/test_wevra_public_api.py` (updated) —
+* `vision_mvp/tests/test_coordpy_public_api.py` (updated) —
   `test_sdk_version_is_v3_9` and corroboration-policy export
   test.
 * `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` (new) —
   pre-committed strong / partial / null success bars; named
   regime taxonomy.
-* `docs/RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md` (new —
+* `docs/RESULTS_COORDPY_CROSS_ROLE_CORROBORATION.md` (new —
   milestone results note).
 * `docs/data/phase55_decoy_plurality_K4_n10.json` (frozen
   default).
@@ -7074,11 +7074,11 @@ a claim that "we solved multi-agent context" — see
 * `docs/START_HERE.md` — SDK v3.9 paragraph + canonical-reading
   pointer to the success-criterion doc.
 
-Anchor: `docs/RESULTS_WEVRA_CROSS_ROLE_CORROBORATION.md`;
+Anchor: `docs/RESULTS_COORDPY_CROSS_ROLE_CORROBORATION.md`;
 `docs/data/phase55_decoy_plurality_K4_n10.json`;
 `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`;
 `vision_mvp/experiments/phase55_decoy_plurality.py`;
-`vision_mvp/wevra/team_coord.py`
+`vision_mvp/coordpy/team_coord.py`
 (`CrossRoleCorroborationAdmissionPolicy`).
 
 ### 4.27 SDK v3.10 — multi-service top-K cross-role corroboration multi-agent coordination (deterministic Phase-56 benchmark + W9 family)
@@ -7137,7 +7137,7 @@ distinct producer roles so 10/10 falsifier scenarios satisfy
 correctly ties FIFO at 0.000.
 
 **3. `MultiServiceCorroborationAdmissionPolicy` (new, SDK v3.10 — PART C).**
-`vision_mvp/wevra/team_coord.py`. A deterministic, training-free,
+`vision_mvp/coordpy/team_coord.py`. A deterministic, training-free,
 interpretable cross-role admission rule that admits the **top-K
 cross-role-corroborated tier** rather than the single highest-
 scoring tag. Selection rule:
@@ -7207,37 +7207,37 @@ real-LLM extensions falsifiable. SDK v3.9's W8-C1 conjecture
 (top-K corroboration improves multi-service scenarios) is now
 **discharged-empirical** by W9-1.
 
-**6. PART F (product/runtime honesty).** The Wevra single-run
+**6. PART F (product/runtime honesty).** The CoordPy single-run
 product runtime contract is **byte-for-byte unchanged from SDK
 v3.9**. The new admission policy is a research-slice addition to
-`vision_mvp.wevra.team_coord` (additive surface). The lifecycle
+`vision_mvp.coordpy.team_coord` (additive surface). The lifecycle
 audit (T-1..T-7) holds on every cell of every regime, including
 Phase 56 default and falsifier.
 
 **7. Files / tests / artefacts (this milestone).**
 
-* `vision_mvp/wevra/team_coord.py` (extended) —
+* `vision_mvp/coordpy/team_coord.py` (extended) —
   `MultiServiceCorroborationAdmissionPolicy` added; streaming +
   `from_candidate_stream` buffered factory; `_dominant_tag_set`
   helper; `ALL_FIXED_POLICY_NAMES` updated.
-* `vision_mvp/wevra/__init__.py` — re-exports
+* `vision_mvp/coordpy/__init__.py` — re-exports
   `TeamMultiServiceCorroborationAdmissionPolicy`; `SDK_VERSION`
-  bumped to `wevra.sdk.v3.10`.
+  bumped to `coordpy.sdk.v3.10`.
 * `vision_mvp/experiments/phase56_multi_service_corroboration.py`
   (new) — driver; 5 base scenario builders; default + falsifier
   bank constructors; `run_phase56`,
   `run_phase56_seed_stability_sweep`, `run_cross_regime_summary`.
-* `vision_mvp/tests/test_wevra_multi_service_corroboration.py`
+* `vision_mvp/tests/test_coordpy_multi_service_corroboration.py`
   (new) — 36 contract tests covering policy unit tests, bank
   shape, default config win, seed stability, falsifier behaviour,
   W9-3 backward-compat with Phase 55, audit-grid invariance,
   cross-regime contract, public-API contract.
-* `vision_mvp/tests/test_wevra_public_api.py` (updated) —
+* `vision_mvp/tests/test_coordpy_public_api.py` (updated) —
   `test_sdk_version_is_v3_10` (renamed from v3_9).
 * `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md` (updated) —
   R-56 named regime added; bar anchor advanced to R-56;
   falsifying-failure list extended to gate W8-1 contract test.
-* `docs/RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md` (new —
+* `docs/RESULTS_COORDPY_MULTI_SERVICE_CORROBORATION.md` (new —
   milestone results note).
 * `docs/data/phase56_multi_service_K4_n10.json` (frozen default).
 * `docs/data/phase56_falsifier_K4_n10.json` (frozen falsifier).
@@ -7252,11 +7252,11 @@ Phase 56 default and falsifier.
   v3.10 frontier section.
 * `docs/START_HERE.md` — SDK v3.10 paragraph + W9 family summary.
 
-Anchor: `docs/RESULTS_WEVRA_MULTI_SERVICE_CORROBORATION.md`;
+Anchor: `docs/RESULTS_COORDPY_MULTI_SERVICE_CORROBORATION.md`;
 `docs/data/phase56_multi_service_K4_n10.json`;
 `docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`;
 `vision_mvp/experiments/phase56_multi_service_corroboration.py`;
-`vision_mvp/wevra/team_coord.py`
+`vision_mvp/coordpy/team_coord.py`
 (`MultiServiceCorroborationAdmissionPolicy`).
 
 **Master-plan post-v3.10 reading.** After SDK v3.10:
@@ -7328,12 +7328,12 @@ claim_kinds AND a decoy corroborated via non-causal kinds.
 * W10-Λ admission limit witness: ``max_admission_only_accuracy_full
   = 0.000`` on R-57.
 
-**Anchor:** ``docs/RESULTS_WEVRA_BUNDLE_DECODER.md``;
+**Anchor:** ``docs/RESULTS_COORDPY_BUNDLE_DECODER.md``;
 ``docs/data/phase57_decoder_K8_n10.json``;
 ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-57 anchor +
 bar 7 — admission/decoding split);
 ``vision_mvp/experiments/phase57_decoder_forcing.py``;
-``vision_mvp/wevra/team_coord.py`` (``BundleAwareTeamDecoder``,
+``vision_mvp/coordpy/team_coord.py`` (``BundleAwareTeamDecoder``,
 ``CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE``).
 
 **Master-plan post-v3.11 reading.** After SDK v3.11:
@@ -7411,7 +7411,7 @@ cannot win.
 * Named falsifier W11-4 (round-1 noise floods K_auditor=4 budget):
   multi_round ties FIFO at 0.000.
 
-**Anchor:** ``docs/RESULTS_WEVRA_MULTI_ROUND_DECODER.md``;
+**Anchor:** ``docs/RESULTS_COORDPY_MULTI_ROUND_DECODER.md``;
 ``docs/data/phase58_default_K8_n8.json``;
 ``docs/data/phase58_seed_sweep_K8_n8.json``;
 ``docs/data/phase58_falsifier_K4_n8.json``;
@@ -7419,7 +7419,7 @@ cannot win.
 ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-58 anchor +
 bar 8 — temporal/structural split);
 ``vision_mvp/experiments/phase58_multi_round_decoder.py``;
-``vision_mvp/wevra/team_coord.py`` (``MultiRoundBundleDecoder``,
+``vision_mvp/coordpy/team_coord.py`` (``MultiRoundBundleDecoder``,
 ``collect_admitted_handoffs``, ``_GENERIC_NOISE_CLAIM_KINDS``).
 
 **Master-plan post-v3.12 reading.** After SDK v3.12:
@@ -7528,7 +7528,7 @@ llm_synonym_prob=0.50, llm_svc_alt_prob=0.30):**
 * Named falsifier W12-4 (``oov_prob=0.50`` activates kinds outside
   :data:`CLAIM_KIND_SYNONYMS`): robust ties FIFO at 0.000.
 
-**Anchor:** ``docs/RESULTS_WEVRA_REAL_LLM_MULTI_ROUND.md``;
+**Anchor:** ``docs/RESULTS_COORDPY_REAL_LLM_MULTI_ROUND.md``;
 ``docs/data/phase59_default_K8_n12.json``;
 ``docs/data/phase59_seed_sweep_K8_n12.json``;
 ``docs/data/phase59_falsifier_K8_n8.json``;
@@ -7537,7 +7537,7 @@ llm_synonym_prob=0.50, llm_svc_alt_prob=0.30):**
 ``docs/SUCCESS_CRITERION_MULTI_AGENT_CONTEXT.md`` (R-59 anchor +
 bar 9 — synthetic→real-LLM transfer split);
 ``vision_mvp/experiments/phase59_real_llm_multi_round.py``;
-``vision_mvp/wevra/team_coord.py`` (``RobustMultiRoundBundleDecoder``,
+``vision_mvp/coordpy/team_coord.py`` (``RobustMultiRoundBundleDecoder``,
 ``CLAIM_KIND_SYNONYMS``, ``normalize_claim_kind``,
 ``normalize_payload``, ``normalize_handoff``).
 
@@ -7852,7 +7852,7 @@ by the milestone:
    produced an honest negative.** The W14-1 win clears
    the R-61-OLLAMA-A tier (+0.500 strict gain over substrate FIFO
    on real Mac-1 ``qwen2.5:14b-32k`` at n=8); SDK v3.14 only
-   reached the R-60-OLLAMA-C tier (honest null). The Wevra
+   reached the R-60-OLLAMA-C tier (honest null). The CoordPy
    programme now has **six** coupled structural axes with named
    limit theorems on each, and the **W14 layer is the first to
    materially advance the programme on a real-LLM stream**.
@@ -8019,7 +8019,7 @@ by the milestone:
    **Yes — it adds a structurally-orthogonal seventh axis.**
    The W14 layer is a *producer-side* intervention; the W15 layer
    is a *decoder-side* intervention. They compose additively. The
-   Wevra programme now has seven coupled structural axes with
+   CoordPy programme now has seven coupled structural axes with
    named limit theorems on each, and the W15 layer is the first
    to make *joint correctness AND decoder-side context efficiency*
    the strict-gain anchor.
@@ -8196,7 +8196,7 @@ by the milestone:
    intervention; the W15 layer is a *decoder-side* intervention.
    They compose additively in code (no new SDK class) AND
    multiplicatively in effect (each layer is necessary on the
-   regime where the other layer's limit fires). The Wevra
+   regime where the other layer's limit fires). The CoordPy
    programme now has eight coupled structural moves with named
    limit theorems on each, and the W16 layer is the **first** to
    make *joint upstream-and-downstream necessity* the strict-gain
@@ -8453,7 +8453,7 @@ axis and a systems axis; they are not the same.
 **Scientific goals.**
 
 - Run the falsifiability check for the core thesis end-to-end on
-  SWE-bench (`docs/archive/pre-wevra-theory/ROADMAP.md`). If fewer than 50 % of events are
+  SWE-bench (`docs/archive/pre-coordpy-theory/ROADMAP.md`). If fewer than 50 % of events are
   causally relevant in a naive-context run, the routing thesis is
   confirmed empirically at task scale; if more than 80 %, the
   thesis is wrong and the programme pivots to compression-first.
@@ -8592,7 +8592,7 @@ approximation.
   `vision-tests`. Pattern extension is additive — keeps
   `may_raise_explicit` FN at 0.
 - **Cross-encoder re-ranking on retrieval.** Closes the narrow
-  residual gap on adversarial / synonym queries (`docs/archive/pre-wevra-theory/MATH_AUDIT.md`
+  residual gap on adversarial / synonym queries (`docs/archive/pre-coordpy-theory/MATH_AUDIT.md`
   §Phase-20 candidates).
 - **LLM wrap-path on the Phase-29 open-vocabulary residual.** The
   Phase-29 substrate falls to a deterministic content-match on
@@ -8773,12 +8773,12 @@ are the near-term frontier. §6.1 is where the hard theory lives.
 | `docs/context_zero_master_plan.md`   | This doc. Long-running strategy + arcs + open problems.                 | Thesis, research strategy, durable framing        |
 | `README.md`                          | Entry point; current status + quickstart + headline table             | First impression, reproducibility instructions    |
 | `ARCHITECTURE.md`                    | Reference architecture of the substrate + CASR                         | Layer semantics + contract between layers         |
-| `docs/archive/pre-wevra-theory/FRAMEWORK.md`                       | Original problem formulation; routing-as-causal-inference              | Theoretical origin of CASR                        |
-| `docs/archive/pre-wevra-theory/PROOFS.md`                          | Formal theorems with proofs                                           | Mathematical claims                                |
-| `docs/archive/pre-wevra-theory/MATH_AUDIT.md`                      | Which of the 72 frameworks are actually in the code                   | Honest accounting of theory-to-code               |
-| `docs/archive/pre-wevra-theory/OPEN_QUESTIONS.md`                  | Seven foundational open questions + resolution status                 | Which hard problems the programme owns            |
-| `docs/archive/pre-wevra-theory/ROADMAP.md`                         | Phase 1–4 plan + risk register + falsifiability check                 | Empirical plan, SWE-bench framing                 |
-| `docs/archive/pre-wevra-theory/VISION_MILLIONS.md`                 | Forward-looking vision past CASR (10^6+ agents)                        | Speculative / post-CASR architectures             |
+| `docs/archive/pre-coordpy-theory/FRAMEWORK.md`                       | Original problem formulation; routing-as-causal-inference              | Theoretical origin of CASR                        |
+| `docs/archive/pre-coordpy-theory/PROOFS.md`                          | Formal theorems with proofs                                           | Mathematical claims                                |
+| `docs/archive/pre-coordpy-theory/MATH_AUDIT.md`                      | Which of the 72 frameworks are actually in the code                   | Honest accounting of theory-to-code               |
+| `docs/archive/pre-coordpy-theory/OPEN_QUESTIONS.md`                  | Seven foundational open questions + resolution status                 | Which hard problems the programme owns            |
+| `docs/archive/pre-coordpy-theory/ROADMAP.md`                         | Phase 1–4 plan + risk register + falsifiability check                 | Empirical plan, SWE-bench framing                 |
+| `docs/archive/pre-coordpy-theory/VISION_MILLIONS.md`                 | Forward-looking vision past CASR (10^6+ agents)                        | Speculative / post-CASR architectures             |
 | `vision_mvp/RESULTS_PHASE*.md`       | Per-phase empirical record                                            | What happened in each phase, with archived JSON   |
 
 This document refers to the others; the others should refer back
@@ -8807,7 +8807,7 @@ Legend: **✅** done, **◐** partial, **🧱** blocked externally,
 
 | Item | Status | Anchor |
 |---|---|---|
-| Bounded-context router (typed handoff, per-role inbox) | ✅ | Phases 1–10, Theorem 3 in `docs/archive/pre-wevra-theory/PROOFS.md` |
+| Bounded-context router (typed handoff, per-role inbox) | ✅ | Phases 1–10, Theorem 3 in `docs/archive/pre-coordpy-theory/PROOFS.md` |
 | Byte-for-byte lossless external memory (content-hash) | ✅ | Phase 19 |
 | Routing + substrate gap validated on SWE-style tasks | ✅ | Phase 29, 40, 42 |
 | Strategy-invariance under parser / matcher / semantic refinement | ✅ | Theorem P43-3, P44 § D.4 |
@@ -8878,7 +8878,7 @@ Legend: **✅** done, **◐** partial, **🧱** blocked externally,
 | Master plan §9 Finished-Product Checklist (this section) | ✅ | here |
 | README thread for the product runner | ✅ | `README.md` |
 | ARCHITECTURE pointer to product surface | ✅ | `ARCHITECTURE.md` |
-| MATH_AUDIT refresh with P44 / P45 claims | ✅ | `docs/archive/pre-wevra-theory/MATH_AUDIT.md` |
+| MATH_AUDIT refresh with P44 / P45 claims | ✅ | `docs/archive/pre-coordpy-theory/MATH_AUDIT.md` |
 | CI gate using `product_report.json` in upstream repo | ☐ | consumer concern, not programme concern |
 | Public announcement / paper | ☐ | explicitly deferred — §7.5 still stands |
 
@@ -8940,21 +8940,21 @@ editing `vision_mvp/core/`, `vision_mvp/tasks/`, or
 
 ---
 
-## 10. Wevra SDK / Production-Readiness (Slice 1 + Slice 2 + Slice 3)
+## 10. CoordPy SDK / Production-Readiness (Slice 1 + Slice 2 + Slice 3)
 
 § 9 is the *research* finished-product checklist — the programme's
 substrate, pipeline, and reporting are at finished-product state as
 of Phase 45/46. § 10 is the parallel **product** checklist for
-**Wevra**, the first shipped system/product from Context Zero.
+**CoordPy**, the first shipped system/product from Context Zero.
 
 **Framing contract.**
   * Context Zero = the research programme (§§ 1–9).
-  * **Wevra = a context-capsule runtime.** Every inter-role,
+  * **CoordPy = a context-capsule runtime.** Every inter-role,
     inter-layer, and inter-run artefact is a **`ContextCapsule`** —
     a typed, content-addressed, lifecycle-bounded, budget-bounded,
-    provenance-carrying object. Wevra is **not** the whole research
+    provenance-carrying object. CoordPy is **not** the whole research
     programme and **not** a universal agent platform.
-  * Wevra's scope: profile-driven evaluation on SWE-bench-Lite-shape
+  * CoordPy's scope: profile-driven evaluation on SWE-bench-Lite-shape
     banks, with a stable report schema, provenance manifest, CI
     gate, unified mock/real runtime, extension system, import
     audit, and — the SDK-v3 centre of gravity — a sealed capsule
@@ -8966,21 +8966,21 @@ of Phase 45/46. § 10 is the parallel **product** checklist for
 
 ### 10.0 The Capsule Contract (SDK v3 centre of gravity)
 
-Wevra's one-line identity has sharpened across slices. Slice 1
+CoordPy's one-line identity has sharpened across slices. Slice 1
 framed it as "profile-driven evaluation SDK"; Slice 2 as
 "bounded-context orchestration and evaluation SDK with a unified
 mock/real runtime and a plugin surface." Both were outcome-shaped.
 Slice 3 recognises the mechanism that was always there and names
 it as the product's load-bearing abstraction:
 
-> **Wevra is a context-capsule runtime.** Every piece of context
+> **CoordPy is a context-capsule runtime.** Every piece of context
 > that crosses a role boundary, a layer boundary, or a run
 > boundary is a typed, content-addressed, lifecycle-bounded,
 > budget-bounded, provenance-stamped **capsule** — never a raw
 > prompt string.
 
 A **`ContextCapsule`** satisfies six invariants (C1..C6, stated
-and tested in `vision_mvp/tests/test_wevra_capsules.py`):
+and tested in `vision_mvp/tests/test_coordpy_capsules.py`):
 
   * **C1 Identity.**   SHA-256 content-address over
     `(kind, payload, budget, parents)`.
@@ -9005,24 +9005,24 @@ The abstraction unifies what was already there:
 | `dynamic_comm.ThreadResolution`         | 35    | `THREAD_RESOLUTION`          |
 | `adaptive_sub.AdaptiveEdge`             | 36    | `ADAPTIVE_EDGE`              |
 | `SweepSpec`                              | S2    | `SWEEP_SPEC`                 |
-| per-cell sweep report (`wevra.sweep.v2`) | S2    | `SWEEP_CELL`                 |
+| per-cell sweep report (`coordpy.sweep.v2`) | S2    | `SWEEP_CELL`                 |
 | `phase44_public_readiness` verdict      | 44    | `READINESS_CHECK`            |
-| `wevra.provenance.v1` manifest          | S1    | `PROVENANCE`                 |
+| `coordpy.provenance.v1` manifest          | S1    | `PROVENANCE`                 |
 | on-disk `product_report.json` etc.       | 45    | `ARTIFACT`                   |
 | resolved profile dict                    | 45    | `PROFILE`                    |
 | the run itself                           | S3    | `RUN_REPORT`                 |
 
-The reference implementation is `vision_mvp/wevra/capsule.py`
+The reference implementation is `vision_mvp/coordpy/capsule.py`
 (~700 LOC). Every run folds its finished artefacts into a
 `CapsuleLedger` via `build_report_ledger`; the resulting
 `CapsuleView` lands in `report["capsules"]` and in
-`capsule_view.json`. A new CLI `wevra-capsule view / verify / cid`
+`capsule_view.json`. A new CLI `coordpy-capsule view / verify / cid`
 inspects / audits the graph. The `RUN_REPORT` capsule's CID is
-the durable identifier for a Wevra run — it is what downstream
+the durable identifier for a CoordPy run — it is what downstream
 consumers pin to prove they read the same bytes.
 
 **Why this is the right centre.** "Bounded-context orchestration"
-is an outcome-shaped name — it describes what Wevra *does*. The
+is an outcome-shaped name — it describes what CoordPy *does*. The
 capsule contract is mechanism-shaped — it describes *why* the
 bounded-context guarantees hold across role boundaries, layer
 boundaries, and run boundaries uniformly. Specifically: the
@@ -9050,64 +9050,64 @@ contract, not parallel ad-hoc mechanisms.
     the contract; it claims to have picked the right top-level
     shape and implemented it.
 
-See [`docs/archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md`](archive/wevra-milestones/RESULTS_WEVRA_CAPSULE.md)
+See [`docs/archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE.md`](archive/coordpy-milestones/RESULTS_COORDPY_CAPSULE.md)
 for theorems W3-1..W3-6 and conjectures W3-C1..W3-C3.
 
 ### 10.1 Stability matrix (living)
 
 | Layer | Scope | Stability | Import path |
 |---|---|---|---|
-| **Context Capsule primitives** — `ContextCapsule`, `CapsuleKind`, `CapsuleLifecycle`, `CapsuleBudget`, `CapsuleLedger`, `CapsuleView`, `render_view`, `build_report_ledger`, `capsule_from_*` adapters | **SDK-v3 load-bearing abstraction.** Every cross-boundary artefact is a capsule. | **Stable v1** (contract C1..C6 tested in `test_wevra_capsules.py`) | `vision_mvp.wevra.capsule`, re-exported from `vision_mvp.wevra` |
-| **Capsule view artifact** — `wevra.capsule_view.v1` | Sealed capsule graph on disk | **Stable v1** (written next to every report) | `capsule_view.json` in `out_dir` |
-| **Wevra SDK** — `RunSpec`, `run`, `SweepSpec`, `run_sweep`, `HeavyRunNotAcknowledged`, `WevraConfig`, `profiles`, `report`, `ci_gate`, `import_data`, `extensions`, capsule primitives, `build_manifest`, schema constants | Public product contract | **Stable v3** (contract-tested: `test_wevra_public_api.py`, `test_wevra_runtime.py`, `test_wevra_capsules.py`) | `vision_mvp.wevra` |
-| **Wevra console scripts** — `wevra`, `wevra-import`, `wevra-ci`, `wevra-capsule` | CLI surface | **Stable v3** (Slice 3: `wevra-capsule view / verify / cid`) | `[project.scripts]` |
-| **Provenance manifest** — `wevra.provenance.v1` | Reproducibility artifact; also a `PROVENANCE` capsule in the run's DAG | **Stable v1** (tested on every run) | `vision_mvp.wevra.provenance` |
-| **Extension Protocols** — `SandboxBackend`, `TaskBankLoader`, `ReportSink` | Plugin surface | **Stable v1** (runtime-checkable Protocols, contract-tested: `test_wevra_extensions.py`) | `vision_mvp.wevra.extensions` |
-| **Unified runtime** — `SweepSpec`, `run_sweep`, `wevra.sweep.v2` | One coherent execution path; emits `SWEEP_SPEC` + `SWEEP_CELL` capsules | **Stable v1** (covers mock + real-executed + real-staged) | `vision_mvp.wevra.runtime` |
-| **Report / CI / import schemas** — `phase45.product_report.v2` (and v1 compat), `phase46.ci_verdict.v1`, `phase46.import_audit.v1`, `wevra.capsule_view.v1` | On-disk contract | **Stable** (v1 and v2 both accepted by `wevra-ci`) | — |
-| **Core substrate** — CASR router, hierarchical router, ledger, exact_ops, role_handoff, dynamic_comm, adaptive_sub | Research substrate used *by* Wevra; adapter-able into capsules (`capsule_from_handle`, `capsule_from_handoff`, …) | **Settled** (proofs + tests) but **research API** | `vision_mvp.core.*` |
-| **Legacy product path** — `vision_mvp.product.*` | Pre-Slice-1 import path | **Deprecated-compat** (still works; re-exported by `wevra`) | `vision_mvp.product` |
-| **Docker sandbox** — `DockerSandbox` (backend) | Untrusted-input isolation | **Available** (backend exists, contract-tested); **not yet the default** for public JSONLs | `vision_mvp.wevra.extensions.get_sandbox("docker")` |
+| **Context Capsule primitives** — `ContextCapsule`, `CapsuleKind`, `CapsuleLifecycle`, `CapsuleBudget`, `CapsuleLedger`, `CapsuleView`, `render_view`, `build_report_ledger`, `capsule_from_*` adapters | **SDK-v3 load-bearing abstraction.** Every cross-boundary artefact is a capsule. | **Stable v1** (contract C1..C6 tested in `test_coordpy_capsules.py`) | `vision_mvp.coordpy.capsule`, re-exported from `vision_mvp.coordpy` |
+| **Capsule view artifact** — `coordpy.capsule_view.v1` | Sealed capsule graph on disk | **Stable v1** (written next to every report) | `capsule_view.json` in `out_dir` |
+| **CoordPy SDK** — `RunSpec`, `run`, `SweepSpec`, `run_sweep`, `HeavyRunNotAcknowledged`, `CoordPyConfig`, `profiles`, `report`, `ci_gate`, `import_data`, `extensions`, capsule primitives, `build_manifest`, schema constants | Public product contract | **Stable v3** (contract-tested: `test_coordpy_public_api.py`, `test_coordpy_runtime.py`, `test_coordpy_capsules.py`) | `vision_mvp.coordpy` |
+| **CoordPy console scripts** — `coordpy`, `coordpy-import`, `coordpy-ci`, `coordpy-capsule` | CLI surface | **Stable v3** (Slice 3: `coordpy-capsule view / verify / cid`) | `[project.scripts]` |
+| **Provenance manifest** — `coordpy.provenance.v1` | Reproducibility artifact; also a `PROVENANCE` capsule in the run's DAG | **Stable v1** (tested on every run) | `vision_mvp.coordpy.provenance` |
+| **Extension Protocols** — `SandboxBackend`, `TaskBankLoader`, `ReportSink` | Plugin surface | **Stable v1** (runtime-checkable Protocols, contract-tested: `test_coordpy_extensions.py`) | `vision_mvp.coordpy.extensions` |
+| **Unified runtime** — `SweepSpec`, `run_sweep`, `coordpy.sweep.v2` | One coherent execution path; emits `SWEEP_SPEC` + `SWEEP_CELL` capsules | **Stable v1** (covers mock + real-executed + real-staged) | `vision_mvp.coordpy.runtime` |
+| **Report / CI / import schemas** — `phase45.product_report.v2` (and v1 compat), `phase46.ci_verdict.v1`, `phase46.import_audit.v1`, `coordpy.capsule_view.v1` | On-disk contract | **Stable** (v1 and v2 both accepted by `coordpy-ci`) | — |
+| **Core substrate** — CASR router, hierarchical router, ledger, exact_ops, role_handoff, dynamic_comm, adaptive_sub | Research substrate used *by* CoordPy; adapter-able into capsules (`capsule_from_handle`, `capsule_from_handoff`, …) | **Settled** (proofs + tests) but **research API** | `vision_mvp.core.*` |
+| **Legacy product path** — `vision_mvp.product.*` | Pre-Slice-1 import path | **Deprecated-compat** (still works; re-exported by `coordpy`) | `vision_mvp.product` |
+| **Docker sandbox** — `DockerSandbox` (backend) | Untrusted-input isolation | **Available** (backend exists, contract-tested); **not yet the default** for public JSONLs | `vision_mvp.coordpy.extensions.get_sandbox("docker")` |
 | **Docker-first-by-default** for public JSONLs | Slice 3 target | **Boundary / next-slice** (default-flip when caller declares untrusted input) | n/a yet |
-| **First real out-of-tree plugin** | Slice 3 community target | **Exemplar landed** (`examples/out_of_tree_plugin/wevra-markdown-sink`); a full third-party-owned sink package remains future | `examples/out_of_tree_plugin/` |
-| **GitHub Actions release on tag** | Slice 3 ops target | **Declared** (workflow file checked in); **not yet fired on a real tag** | `.github/workflows/wevra-ci.yml` |
+| **First real out-of-tree plugin** | Slice 3 community target | **Exemplar landed** (`examples/out_of_tree_plugin/coordpy-markdown-sink`); a full third-party-owned sink package remains future | `examples/out_of_tree_plugin/` |
+| **GitHub Actions release on tag** | Slice 3 ops target | **Declared** (workflow file checked in); **not yet fired on a real tag** | `.github/workflows/coordpy-ci.yml` |
 | **Research shards** — Phases 1–44 RESULTS_*, EXTENDED_MATH_*, per-phase scripts, 72-framework survey | Research programme | **Research-grade** (empirical/proved per shard; no product-API guarantee) | `vision_mvp.experiments.*`, `vision_mvp.tasks.*`, docs |
 
 ### 10.2 Slice 1 (this milestone) — completed
 
 | Item | Status | Anchor |
 |---|---|---|
-| Canonical SDK package boundary `vision_mvp/wevra/` | ✅ | `vision_mvp/wevra/__init__.py` |
-| `RunSpec` / `run` unified programmatic entry point | ✅ | `vision_mvp/wevra/run.py` |
-| `WevraConfig` (env-driven, frozen, validated) | ✅ | `vision_mvp/wevra/config.py` |
-| Provenance manifest (`wevra.provenance.v1`) on every run | ✅ | `vision_mvp/wevra/provenance.py`, wired in `product/runner.py` |
-| Console scripts `wevra`, `wevra-import`, `wevra-ci` | ✅ | `pyproject.toml` `[project.scripts]`, `wevra/_cli.py` |
-| Package rename → `wevra` 0.4.0, extras slots (dev/docker/cluster) | ✅ | `pyproject.toml` |
+| Canonical SDK package boundary `vision_mvp/coordpy/` | ✅ | `vision_mvp/coordpy/__init__.py` |
+| `RunSpec` / `run` unified programmatic entry point | ✅ | `vision_mvp/coordpy/run.py` |
+| `CoordPyConfig` (env-driven, frozen, validated) | ✅ | `vision_mvp/coordpy/config.py` |
+| Provenance manifest (`coordpy.provenance.v1`) on every run | ✅ | `vision_mvp/coordpy/provenance.py`, wired in `product/runner.py` |
+| Console scripts `coordpy`, `coordpy-import`, `coordpy-ci` | ✅ | `pyproject.toml` `[project.scripts]`, `coordpy/_cli.py` |
+| Package rename → `coordpy` 0.4.0, extras slots (dev/docker/cluster) | ✅ | `pyproject.toml` |
 | `sys.path.insert` hacks removed from product modules | ✅ | `product/runner.py`, `product/ci_gate.py`, `product/import_data.py` |
-| Contract tests locking the public SDK surface | ✅ | `tests/test_wevra_public_api.py` |
-| Provenance + CLI smoke tests | ✅ | `tests/test_wevra_provenance.py` |
+| Contract tests locking the public SDK surface | ✅ | `tests/test_coordpy_public_api.py` |
+| Provenance + CLI smoke tests | ✅ | `tests/test_coordpy_provenance.py` |
 | Backwards-compat: `vision_mvp.product.*` still works | ✅ | confirmed by `test_phase45_product.py` |
-| README: Wevra-vs-Context-Zero framing, SDK quickstart, stability matrix, "Who Wevra is for", "How to extend Wevra" | ✅ | `README.md` |
-| ARCHITECTURE: Wevra SDK boundary note | ✅ | `ARCHITECTURE.md` |
+| README: CoordPy-vs-Context-Zero framing, SDK quickstart, stability matrix, "Who CoordPy is for", "How to extend CoordPy" | ✅ | `README.md` |
+| ARCHITECTURE: CoordPy SDK boundary note | ✅ | `ARCHITECTURE.md` |
 | Master plan § 10 (this section) | ✅ | here |
 
 **Theorem-style claims / conjectures for Slice 1:**
 
   * **Claim W1-1 (SDK boundary is a projection of settled layers).**
-    The Wevra SDK re-exports only modules whose tests have held
+    The CoordPy SDK re-exports only modules whose tests have held
     unchanged across the last three phases (profiles, report,
     ci_gate, import_data, runner). No research-grade module is on
     the SDK surface.
   * **Claim W1-2 (every run is reproducible).** Every invocation
-    of `wevra.run(spec)` — and every `python -m vision_mvp.product`
+    of `coordpy.run(spec)` — and every `python -m vision_mvp.product`
     — emits a `provenance.json` pinning git SHA, package version,
     Python, platform, profile, model, endpoint, sandbox, input
     JSONL + SHA-256, argv, and the final artifact list. Tested on
     every run (`test_runner_emits_provenance_on_every_run`).
   * **Conjecture W1-3 (drop-in without a plugin system).** For the
     current scope (profile-driven SWE-bench-Lite-shape evaluation
-    + CI gate + public-JSONL import), Wevra is a true drop-in SDK:
-    `pip install wevra` + one console script yields a
+    + CI gate + public-JSONL import), CoordPy is a true drop-in SDK:
+    `pip install coordpy` + one console script yields a
     provenance-stamped report. Falsifiable by any external
     operator who needs a new sandbox backend, a new task-bank
     shape, or a new reporting sink without editing `vision_mvp/`.
@@ -9117,29 +9117,29 @@ for theorems W3-1..W3-6 and conjectures W3-C1..W3-C3.
     API is not yet settled. Falsifiable by any SDK consumer who
     has to import from `vision_mvp.core.*`,
     `vision_mvp.experiments.*`, or `vision_mvp.tasks.*` to use
-    Wevra.
+    CoordPy.
 
 ### 10.2-bis Slice 2 (2026-04-22) — completed
 
-Full detail in `vision_mvp/RESULTS_WEVRA_SLICE2.md`.
+Full detail in `vision_mvp/RESULTS_COORDPY_SLICE2.md`.
 
 | Item | Status | Anchor |
 |---|---|---|
-| Extension system (3 Protocols, registry, `entry_points` discovery) | ✅ | `vision_mvp/wevra/extensions/` |
+| Extension system (3 Protocols, registry, `entry_points` discovery) | ✅ | `vision_mvp/coordpy/extensions/` |
 | Worked in-tree `ReportSink` example, exercised end-to-end | ✅ | `examples/jsonl_report_sink.py` |
-| Unified mock/real runtime (`SweepSpec`, `run_sweep`, `HeavyRunNotAcknowledged`) | ✅ | `vision_mvp/wevra/runtime.py` |
-| `RunSpec.acknowledge_heavy` first-class cost gate | ✅ | `vision_mvp/wevra/run.py` |
-| `RunSpec.report_sinks` hook | ✅ | `vision_mvp/wevra/run.py` |
+| Unified mock/real runtime (`SweepSpec`, `run_sweep`, `HeavyRunNotAcknowledged`) | ✅ | `vision_mvp/coordpy/runtime.py` |
+| `RunSpec.acknowledge_heavy` first-class cost gate | ✅ | `vision_mvp/coordpy/run.py` |
+| `RunSpec.report_sinks` hook | ✅ | `vision_mvp/coordpy/run.py` |
 | Report schema bumped to `phase45.product_report.v2` (v1 still accepted by CI gate) | ✅ | `vision_mvp/product/runner.py`, `ci_gate.py` |
-| Env-driven endpoints (`WEVRA_OLLAMA_URL_MAC{1,2}`, `WEVRA_OLLAMA_URL`) | ✅ | `wevra.runtime._resolve_endpoint` |
-| Operator-grade failure messages on the run path | ✅ | `wevra.runtime` + `product/report.py` |
-| `--acknowledge-heavy` / `--report-sink` on `wevra` CLI | ✅ | `vision_mvp/wevra/_cli.py` |
-| GitHub Actions workflow (SDK contract tests + build + release-on-tag) | ✅ (declared) | `.github/workflows/wevra-ci.yml` |
-| `CHANGELOG.md` tracks Wevra SDK releases | ✅ | `CHANGELOG.md` |
-| **Real ASPEN mac1 run launched via `wevra.run(...)`** | ✅ | `vision_mvp/artifacts/wevra_slice2_g1/` — `sweep.executed_in_process=true`, 4 instances × 2 parser modes × 3 strategies, 114 s wall |
-| `wevra-ci` verdict on the ASPEN run (canonical release artifact) | ✅ | `vision_mvp/artifacts/wevra_slice2_g1/ci_verdict.json` — `ok=true` |
-| Contract tests for extensions (10) + runtime (10) | ✅ | `tests/test_wevra_extensions.py`, `tests/test_wevra_runtime.py` |
-| `SDK_VERSION` bump to `wevra.sdk.v2` (additive, backwards-compat) | ✅ | `vision_mvp/wevra/__init__.py` |
+| Env-driven endpoints (`COORDPY_OLLAMA_URL_MAC{1,2}`, `COORDPY_OLLAMA_URL`) | ✅ | `coordpy.runtime._resolve_endpoint` |
+| Operator-grade failure messages on the run path | ✅ | `coordpy.runtime` + `product/report.py` |
+| `--acknowledge-heavy` / `--report-sink` on `coordpy` CLI | ✅ | `vision_mvp/coordpy/_cli.py` |
+| GitHub Actions workflow (SDK contract tests + build + release-on-tag) | ✅ (declared) | `.github/workflows/coordpy-ci.yml` |
+| `CHANGELOG.md` tracks CoordPy SDK releases | ✅ | `CHANGELOG.md` |
+| **Real ASPEN mac1 run launched via `coordpy.run(...)`** | ✅ | `vision_mvp/artifacts/coordpy_slice2_g1/` — `sweep.executed_in_process=true`, 4 instances × 2 parser modes × 3 strategies, 114 s wall |
+| `coordpy-ci` verdict on the ASPEN run (canonical release artifact) | ✅ | `vision_mvp/artifacts/coordpy_slice2_g1/ci_verdict.json` — `ok=true` |
+| Contract tests for extensions (10) + runtime (10) | ✅ | `tests/test_coordpy_extensions.py`, `tests/test_coordpy_runtime.py` |
+| `SDK_VERSION` bump to `coordpy.sdk.v2` (additive, backwards-compat) | ✅ | `vision_mvp/coordpy/__init__.py` |
 | Master plan § 10 refreshed (this pass) | ✅ | here |
 
 Full suite: **1349 tests pass**, up from Slice 1's 1327.
@@ -9155,16 +9155,16 @@ to new subsystems.
 
 | Follow-up | Status | Anchor |
 |---|---|---|
-| B.1 Stable `SandboxBackend` Protocol (runtime-checkable) | ✅ | `vision_mvp/wevra/extensions/sandbox.py` |
-| B.2 Stable `TaskBankLoader` Protocol + `TaskBankBundle` | ✅ | `vision_mvp/wevra/extensions/taskbank.py` |
-| B.3 Stable `ReportSink` Protocol | ✅ | `vision_mvp/wevra/extensions/report_sink.py` |
-| B.4 Registry discovery via `importlib.metadata.entry_points` | ✅ | `vision_mvp/wevra/extensions/registry.py` (groups `wevra.sandboxes` / `wevra.task_banks` / `wevra.report_sinks`) |
-| B.5 One worked extension landed end-to-end | ✅ (in-tree) | `vision_mvp/wevra/extensions/examples/jsonl_report_sink.py`; exercised end-to-end by `test_wevra_extensions.py::test_worked_example_sink_end_to_end` |
-| B.6 Contract tests for the extension protocols | ✅ | `vision_mvp/tests/test_wevra_extensions.py` (10 tests) |
+| B.1 Stable `SandboxBackend` Protocol (runtime-checkable) | ✅ | `vision_mvp/coordpy/extensions/sandbox.py` |
+| B.2 Stable `TaskBankLoader` Protocol + `TaskBankBundle` | ✅ | `vision_mvp/coordpy/extensions/taskbank.py` |
+| B.3 Stable `ReportSink` Protocol | ✅ | `vision_mvp/coordpy/extensions/report_sink.py` |
+| B.4 Registry discovery via `importlib.metadata.entry_points` | ✅ | `vision_mvp/coordpy/extensions/registry.py` (groups `coordpy.sandboxes` / `coordpy.task_banks` / `coordpy.report_sinks`) |
+| B.5 One worked extension landed end-to-end | ✅ (in-tree) | `vision_mvp/coordpy/extensions/examples/jsonl_report_sink.py`; exercised end-to-end by `test_coordpy_extensions.py::test_worked_example_sink_end_to_end` |
+| B.6 Contract tests for the extension protocols | ✅ | `vision_mvp/tests/test_coordpy_extensions.py` (10 tests) |
 
 **Remaining in Slice 3:** a community-owned out-of-tree plugin
 shipped by a third party. An *in-repo* exemplar landed in the
-post-Slice-2 identity pass (`examples/out_of_tree_plugin/wevra-
+post-Slice-2 identity pass (`examples/out_of_tree_plugin/coordpy-
 markdown-sink/`) — a standalone pip-installable package that
 registers a new `ReportSink` purely via `entry_points` and
 requires no edit under `vision_mvp/`. The machinery is closed and
@@ -9175,36 +9175,36 @@ is future.
 
 | Follow-up | Status | Anchor |
 |---|---|---|
-| C.1 `SweepSpec` dataclass (frozen, validated) | ✅ | `vision_mvp/wevra/runtime.py` |
-| C.2 Dispatcher: mock → in-process; real → in-process | ✅ | `wevra.runtime.run_sweep` |
+| C.1 `SweepSpec` dataclass (frozen, validated) | ✅ | `vision_mvp/coordpy/runtime.py` |
+| C.2 Dispatcher: mock → in-process; real → in-process | ✅ | `coordpy.runtime.run_sweep` |
 | C.3 `executed_in_process=True` path for real runs | ✅ | validated end-to-end on ASPEN mac1 |
 | C.4 Explicit operator-boundary cost gate | ✅ | `RunSpec.acknowledge_heavy=True`; `HeavyRunNotAcknowledged` raised under `strict_cost_gate=True` |
-| C.5 One coherent artifact/report model | ✅ | schema bumped to `phase45.product_report.v2`, sweep sub-block schema `wevra.sweep.v2`; CI gate accepts v1 and v2 |
+| C.5 One coherent artifact/report model | ✅ | schema bumped to `phase45.product_report.v2`, sweep sub-block schema `coordpy.sweep.v2`; CI gate accepts v1 and v2 |
 
 #### Remaining D (production hardening) — ✅ **mostly done (Slice 2)**
 
 | Follow-up | Status | Anchor |
 |---|---|---|
-| D.1 Docker-first sandbox as default for untrusted JSONLs | ◐ | `DockerSandbox` backend exists and is registered under `wevra.extensions.get_sandbox("docker")`; the *default-flip* for public/untrusted inputs is Slice 3 |
-| D.2 Env-validated cluster endpoints | ✅ | `WEVRA_OLLAMA_URL_MAC1`, `WEVRA_OLLAMA_URL_MAC2`, `WEVRA_OLLAMA_URL` resolved in `wevra.runtime._resolve_endpoint`; tested in `test_wevra_runtime.EnvEndpointOverrideTests` |
+| D.1 Docker-first sandbox as default for untrusted JSONLs | ◐ | `DockerSandbox` backend exists and is registered under `coordpy.extensions.get_sandbox("docker")`; the *default-flip* for public/untrusted inputs is Slice 3 |
+| D.2 Env-validated cluster endpoints | ✅ | `COORDPY_OLLAMA_URL_MAC1`, `COORDPY_OLLAMA_URL_MAC2`, `COORDPY_OLLAMA_URL` resolved in `coordpy.runtime._resolve_endpoint`; tested in `test_coordpy_runtime.EnvEndpointOverrideTests` |
 | D.3 Operator-grade failure messages | ✅ | unified runtime wraps sweep errors into `sweep_result.error_kind` / `sweep_result.error_detail`; renderer surfaces `sweep : ERROR <kind>: <detail>` instead of a stack trace |
-| D.4 Release workflow | ◐ | `.github/workflows/wevra-ci.yml` checked in (SDK contract tests on 3.10/3.11/3.12 + `python -m build` sdist+wheel + release on tag); not yet fired on a real tag (Slice 3 ops) |
-| D.5 CHANGELOG.md curated per Wevra release | ✅ | `CHANGELOG.md` now tracks Wevra SDK versions (0.4.0 Slice 1, 0.5.0 Slice 2); phase-numbered narrative stays in RESULTS notes |
+| D.4 Release workflow | ◐ | `.github/workflows/coordpy-ci.yml` checked in (SDK contract tests on 3.10/3.11/3.12 + `python -m build` sdist+wheel + release on tag); not yet fired on a real tag (Slice 3 ops) |
+| D.5 CHANGELOG.md curated per CoordPy release | ✅ | `CHANGELOG.md` now tracks CoordPy SDK versions (0.4.0 Slice 1, 0.5.0 Slice 2); phase-numbered narrative stays in RESULTS notes |
 
 #### G. Cluster-backed validation — ✅ **done (Slice 2)**
 
 | Follow-up | Status | Anchor |
 |---|---|---|
-| G.1 One `aspen_mac1_coder` real run launched via `wevra` | ✅ | `vision_mvp/artifacts/wevra_slice2_g1/product_report.json`; `sweep.executed_in_process=true`, `sweep.model=qwen2.5-coder:14b`, 4 instances × 2 parser modes × 3 strategies, 114 s wall |
-| G.2 Provenance manifest stored with the artifact | ✅ | `vision_mvp/artifacts/wevra_slice2_g1/provenance.json` (`wevra.provenance.v1`) |
-| G.3 `wevra-ci` verdict checked in | ✅ | `vision_mvp/artifacts/wevra_slice2_g1/ci_verdict.json` — `ok=true, blockers=0, executed_in_process=true` |
+| G.1 One `aspen_mac1_coder` real run launched via `coordpy` | ✅ | `vision_mvp/artifacts/coordpy_slice2_g1/product_report.json`; `sweep.executed_in_process=true`, `sweep.model=qwen2.5-coder:14b`, 4 instances × 2 parser modes × 3 strategies, 114 s wall |
+| G.2 Provenance manifest stored with the artifact | ✅ | `vision_mvp/artifacts/coordpy_slice2_g1/provenance.json` (`coordpy.provenance.v1`) |
+| G.3 `coordpy-ci` verdict checked in | ✅ | `vision_mvp/artifacts/coordpy_slice2_g1/ci_verdict.json` — `ok=true, blockers=0, executed_in_process=true` |
 
 **Empirical finding reproduced.** Strict parser fails
 (pass@1 = 0.000) on `qwen2.5-coder:14b`, robust parser recovers
 (pass@1 = 1.000) across all three strategies — a Phase-42 result
-re-obtained via the Wevra surface.
+re-obtained via the CoordPy surface.
 
-### 10.4 Slice 2 theorem-style claims (detail in `vision_mvp/RESULTS_WEVRA_SLICE2.md`)
+### 10.4 Slice 2 theorem-style claims (detail in `vision_mvp/RESULTS_COORDPY_SLICE2.md`)
 
   * **W2-1 (proved, constructive).** Stable extension surface
     preserves bounded-context guarantees: any registered
@@ -9215,14 +9215,14 @@ re-obtained via the Wevra surface.
   * **W2-2 (empirical).** Unified-runtime identity under mock
     oracle: every mock profile's pooled summary is unchanged
     between Slice 1's `_mock_sweep` and Slice 2's
-    `wevra.runtime.run_sweep` (1349/1349 tests pass).
+    `coordpy.runtime.run_sweep` (1349/1349 tests pass).
   * **W2-3 (proved, constructive).** External-run safety as
-    product contract: every `wevra.run` emits a provenance
+    product contract: every `coordpy.run` emits a provenance
     manifest sufficient to reproduce the run on a different
     machine, modulo declared external state (model residency,
     endpoint availability) and `temperature=0.0`-bounded LLM
     nondeterminism.
-  * **W2-4 (testable conjecture).** Wevra is a true drop-in SDK
+  * **W2-4 (testable conjecture).** CoordPy is a true drop-in SDK
     iff E1–E6 hold (pip-install works, provenance is sufficient,
     real runs execute in-process, plugins don't require in-tree
     edits, release automation emits artifacts on tag, Docker is
@@ -9252,26 +9252,26 @@ Honest ledger, today:
    report schema (Slice 2+). `ci_gate.EXPECTED_REPORT_SCHEMAS`
    accepts both v1 and v2 — v1 remains valid input to the CI gate
    for backwards-compat but is no longer emitted. Test locked:
-   `test_report_schema_stable` asserts v2; `test_wevra_runtime`
+   `test_report_schema_stable` asserts v2; `test_coordpy_runtime`
    re-asserts v2 via the SDK surface.
 3. **Bare-install wheel sanity.** — ✅ **done (Slice 3B).** Release
-   rehearsal (`python -m build` → `pip install wevra-0.5.1-py3-
+   rehearsal (`python -m build` → `pip install coordpy-0.5.1-py3-
    none-any.whl` in a fresh venv) exposed two real release
    blockers that are now fixed: (a) `core/peer_review.py` and
    `core/vrf_committee.py` imported `cryptography` unconditionally
    at module top-level — now guarded behind `_require_cryptography()`
    at constructor time, matching the optional `[crypto]` extra;
-   (b) `wevra --version` crashed because `argparse` required
+   (b) `coordpy --version` crashed because `argparse` required
    `--profile`/`--out-dir` — now short-circuits pre-parse.
 4. **First real out-of-tree plugin** — in-repo exemplar landed
-   (`examples/out_of_tree_plugin/wevra-markdown-sink/`), proving
+   (`examples/out_of_tree_plugin/coordpy-markdown-sink/`), proving
    the `entry_points` contract works without any edit under
    `vision_mvp/`. A community-owned third-party-published plugin
    package remains future.
 5. **GitHub Actions release on a real tag.** The workflow is
    checked in, the local `python -m build` → fresh-venv install
-   path is exercised (both `wevra --profile local_smoke` and
-   `wevra-ci` run cleanly from the wheel), but the tag-triggered
+   path is exercised (both `coordpy --profile local_smoke` and
+   `coordpy-ci` run cleanly from the wheel), but the tag-triggered
    `release` job has not been fired on a real `vX.Y.Z` tag. This
    remains the single residual operational step that requires a
    GitHub tag event to exercise honestly.
@@ -9390,7 +9390,7 @@ The W17 family closes all three on one driver. The SDK v3.18 mint:
   downstream answer. R-58 / R-59 / R-60 / R-61 / R-62 / R-63
   default + falsifier banks all preserved; **442/442 prior
   tests pass byte-for-byte**; 20 new tests cover the W17
-  surface (462/462 wevra suite; +103 cross-cutting tests pass).
+  surface (462/462 coordpy suite; +103 cross-cutting tests pass).
 
 The W17 layer is *additive in code*: one new prompt-mode
 constant (``PRODUCER_PROMPT_MAGNITUDE_HINTED``), one new
@@ -9403,7 +9403,7 @@ threshold-table data structure
 exported via the SDK ``__init__``. **The runtime contract is
 byte-for-byte unchanged.**
 
-The Wevra programme now has **nine** structurally-distinct
+The CoordPy programme now has **nine** structurally-distinct
 moves named one-by-one over SDK v3.7..v3.18, with W17 adding
 two: a *positive* live-strict-gain anchor (W17-1) AND a
 *negative* symmetric-corroboration limit theorem
@@ -9631,14 +9631,14 @@ The SDK v3.20 mint:
 The W19 layer is *additive in code*: one new dataclass + two
 closed-form helpers + one canonical-role-for-kind table + one
 wrapping decoder. The SDK v3.19 runtime contract is byte-for-
-byte unchanged; **all prior wevra tests pass byte-for-byte**;
+byte unchanged; **all prior coordpy tests pass byte-for-byte**;
 new tests cover the W19 unit semantics, the Phase-66 bench-
 property witnesses, the W19-1 strict-win anchor, the 5-seed
 stability, the two named falsifiers, the backward-compat smoke,
 the token-budget honesty, and the cross-regime synthetic summary.
-Total: 405 pre-existing wevra tests + 45 new W19 tests =
-450 / 450 in the targeted wevra suites; 555 / 555 across the
-full ``test_wevra_*.py`` set.
+Total: 405 pre-existing coordpy tests + 45 new W19 tests =
+450 / 450 in the targeted coordpy suites; 555 / 555 across the
+full ``test_coordpy_*.py`` set.
 
 The defensible "thesis-after-SDK-v3.20" is that the
 synthetic→real-LLM-and-bounded-context transfer story now has
@@ -9817,8 +9817,8 @@ The SDK v3.22 mint:
   W21-Λ-real (proved-conditional + empirical-research n=4 × 2
   models), W21-C-CALIBRATED-TRUST + W21-C-LIVE-WITH-REGISTRY
   (the second partially discharged at n=4 × mixtral 8x7b).
-* **48 new tests** (``test_wevra_multi_oracle_adjudication.py``);
-  full SDK regression: 633 / 633 wevra tests pass.
+* **48 new tests** (``test_coordpy_multi_oracle_adjudication.py``);
+  full SDK regression: 633 / 633 coordpy tests pass.
 
 Headline reading:
 
@@ -10066,7 +10066,7 @@ tie at ``acc_full = 0.750`` — the synthetic mitigation advantage
 does not cleanly transfer at n=4 (newly named conjecture
 **W23-C-MITIGATION-LIVE-VARIANCE**: positive expected
 improvement, not strict per-probe). Full programme regression:
-703 prior + 39 new W23 = **742/742** wevra-anchor + capsule +
+703 prior + 39 new W23 = **742/742** coordpy-anchor + capsule +
 recent-phase tests pass. Mac 2 still unreachable (**17th
 milestone in a row**); the W23 :class:`CrossHostProducerDecoderProxy`
 mechanically validates the wire-encoding contract via a
@@ -10206,7 +10206,7 @@ fall through to W23. Live W24-2 transfer on Mac-1 Ollama:
 = 0.750``) — the synthetic +0.500 does not fully transfer; names
 **W24-C-LIVE-VARIANCE-COMPLETE** as the follow-up. Full programme
 regression: 121/121 phase-69/70/71 + capsule + 33/33 new W24
-tests + 619/619 wevra-anchor + capsule + recent-phase tests
+tests + 619/619 coordpy-anchor + capsule + recent-phase tests
 pass. Mac 2 still unreachable (**18th milestone in a row**); the
 W24 :class:`CrossProcessProducerDecoderWire` upgrades the W23
 within-process proxy to a real OS-level subprocess pipe.
@@ -10314,7 +10314,7 @@ shared registry → W25 = W24 byte-for-byte) and W25-3 trust
 soundness (R-72-FANOUT-POISONED: unauthorised consumer rejected on
 every cell) — make the conditionality sharp. **Empirically
 discharges the multi-agent extension of the W24 single-agent
-compaction direction.** See `docs/RESULTS_WEVRA_W25_SHARED_FANOUT.md`.
+compaction direction.** See `docs/RESULTS_COORDPY_W25_SHARED_FANOUT.md`.
 
 ### 4.44 SDK v3.27 — chain-persisted dense-control fanout + per-consumer projections + Phase-73 R-73 benchmark family + W26 family (R-73-CHAIN-SHARED + R-73-CHAIN-WINDOWED + R-73-NO-CHAIN named falsifier + R-73-CHAIN-TAMPERED + R-73-PROJECTION-MISMATCH trust falsifiers + R-73-DIVERGENT regime + W25-C-K-SCALING discharge at K∈{3,5,8,10})
 
@@ -10606,7 +10606,7 @@ cross-process honesty validated on this repo.
 
 ## Post-W27 next steps → discharged in SDK v3.29 (W28)
 
-**SDK v3.29 / W28** (`docs/RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md`)
+**SDK v3.29 / W28** (`docs/RESULTS_COORDPY_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md`)
 ships the **first capsule-native synthesis between the explicit-
 capsule trust line (W21 trust-weighted multi-oracle adjudication)
 and the dense-control line (W27 multi-chain salience-keyed
@@ -10647,9 +10647,9 @@ pool)**, behind a controller-verified ratification envelope with
   *variance-reduction magnitude* axis becomes the new named open
   conjecture **W28-C-CROSS-HOST-VARIANCE**.
 * **Stable-vs-experimental boundary tightened.** New explicit
-  ``vision_mvp.wevra.__experimental__`` tuple lists every
+  ``vision_mvp.coordpy.__experimental__`` tuple lists every
   dense-control symbol (W22..W28); SDK_VERSION bumped to
-  ``wevra.sdk.v3.29``; pyproject.toml 0.5.2; ARCHITECTURE.md
+  ``coordpy.sdk.v3.29``; pyproject.toml 0.5.2; ARCHITECTURE.md
   gains a "Stable-vs-Experimental Boundary" section.
 
 **Master-plan-level questions (the post-W27 audit board, refreshed
@@ -10882,7 +10882,7 @@ Three named falsifiers all empirically confirmed
 (W30-Λ-trivial-calibration, W30-Λ-non-calibratable,
 W30-Λ-degenerate-history). 14 enumerated trust-boundary failure
 modes (vs W29's 14, disjoint from W29's). **357/357 focused
-regression pass** (273/273 phase69-77 + 84/84 wider wevra
+regression pass** (273/273 phase69-77 + 84/84 wider coordpy
 suite).
 
 Mac 2 (192.168.12.248) still ARP-incomplete (25th milestone in a
@@ -10948,7 +10948,7 @@ honestly null (not failure).
    added under ``__experimental__`` (36 unit tests + verifier
    + 12 W30 primitives). (b) SDK version bumped to v3.31 /
    0.5.4. (c) Focused regression W3..W30 phase suite + wider
-   wevra = 357/357 in ~15s, fast + reproducible. (d) The
+   coordpy = 357/357 in ~15s, fast + reproducible. (d) The
    calibration prior + disagreement-routing vocabulary is
    honestly framed as capsule-layer audited proxy in the module
    docstring AND in the results note's §9.*
@@ -11044,7 +11044,7 @@ Three named falsifiers all empirically confirmed
 14; cumulative 42-mode trust boundary across W29 + W30 + W31).
 **437/437 focused regression pass** (was 357 in v3.31; +41 W31
 unit tests + 39 unchanged from v3.31 + 1 unchanged).  68/68 wider
-wevra suite passes.
+coordpy suite passes.
 
 Mac 2 (192.168.12.248) **still ARP-incomplete (26th milestone)**;
 ping 100% packet loss; port 11434 unreachable.  The two reachable
@@ -11104,7 +11104,7 @@ probe.
    ``__experimental__`` / pyproject.toml axis.  (a) W31 surface
    added under ``__experimental__`` (41 unit tests + verifier +
    10 W31 primitives).  (b) SDK version bumped to v3.32 / 0.5.5.
-   (c) Focused regression W3..W31 phase suite + wider wevra =
+   (c) Focused regression W3..W31 phase suite + wider coordpy =
    505/505 in ~115s, reproducible.  (d) The online running-mean /
    adaptive threshold / sealed trajectory / manifest CID
    vocabulary is honestly framed as capsule-layer audited proxy
@@ -11220,7 +11220,7 @@ correlated-gold gate-bounded).  14 enumerated trust-boundary
 failure modes (vs W31's 14, vs W30's 14, vs W29's 14; cumulative
 56-mode trust boundary across W29 + W30 + W31 + W32).
 **45/45 W32 unit tests + 414/414 phase69-79 regression + 77/77
-wider wevra suite = 536 tests pass**.
+wider coordpy suite = 536 tests pass**.
 
 Mac 2 (192.168.12.248) **still ARP-incomplete (27th milestone)**;
 ping 100% packet loss; port 11434 unreachable.  The two reachable
@@ -11286,7 +11286,7 @@ gold-verifiable probe.
    ``__experimental__`` / pyproject.toml axis.  (a) W32 surface
    added under ``__experimental__`` (45 unit tests + verifier +
    13 W32 primitives).  (b) SDK version bumped to v3.33 / 0.5.6.
-   (c) Focused regression W3..W32 phase suite + wider wevra =
+   (c) Focused regression W3..W32 phase suite + wider coordpy =
    536/536, reproducible.  (d) The long-window convergent / EWMA /
    Page CUSUM / gold-correlation lookup / manifest-v2 CID
    vocabulary is honestly framed as capsule-layer audited proxy
@@ -11445,7 +11445,7 @@ Eight self-questions (post-W33):
    W33-Λ-mis-trust-shift ⇒ honest empirical correction
    (anchor-oracle design is more robust than predicted).*
 7. **Is release-readiness improved?** *YES — SDK_VERSION bumped
-   to wevra.sdk.v3.34, pyproject.toml 0.5.7, CHANGELOG entry
+   to coordpy.sdk.v3.34, pyproject.toml 0.5.7, CHANGELOG entry
    added, ``__experimental__`` updated with W33 symbols (98
    entries, ``__all__`` 440 entries), stable runtime contract
    byte-for-byte unchanged.*
@@ -11577,7 +11577,7 @@ can support without transformer-internal evidence, and is
 strictly additive on top of W40 RC1: every W22..W41 symbol is
 exported under ``__experimental__``; the stable RunSpec -> run
 report runtime contract is byte-for-byte unchanged;
-``SDK_VERSION = wevra.sdk.v3.42``;
+``SDK_VERSION = coordpy.sdk.v3.42``;
 ``vision_mvp.__version__ = pyproject.toml = 0.5.15``;
 698/698 phase69-88 focused W22..W41 stack regression (was
 661/661 at W40 RC1; W41 added 37 cleanly) + 364/364 phase11-39
@@ -11650,7 +11650,7 @@ format):
    hung Ollama HTTP listener (TCP-up + HTTP-broken)" is
    **retracted** at the W41 milestone.  ``.101`` is an Apple TV
    / AirPlay receiver, not a Mac.  The retraction is recorded
-   honestly in HOW_NOT_TO_OVERSTATE.md, RESULTS_WEVRA_W41
+   honestly in HOW_NOT_TO_OVERSTATE.md, RESULTS_COORDPY_W41
    _INTEGRATED_SYNTHESIS.md §4.1, and THEOREM_REGISTRY.md
    (W41-INFRA-1).  The previous "two-reachable-host evidence"
    anchors remain valid (those used ``localhost`` + ``.191``
@@ -11689,7 +11689,7 @@ policy registry, not just the per-cell oracle responses.
 
 Headline forced-verdict result: **release v3.43 is earned.**
 The SDK v3.43 line ships as a **final release** (NOT just RC3)
-of the Wevra SDK v3.4x research line.  Every hard gate
+of the CoordPy SDK v3.4x research line.  Every hard gate
 (H1..H12) and every load-bearing soft gate (S3, S5, S6, S7) of
 the W42 success criterion passes; the strict +0.500 gain on
 R-89-ROLE-INVARIANT-RECOVER is reproducible across 5/5 seeds;
@@ -11744,7 +11744,7 @@ capsule-layer scope:
   evidence available; ``.248`` is gone, ``.101`` is Apple TV /
   AirPlay (W41-INFRA-1).
 
-The Wevra SDK v3.43 final release is the **end-of-line for the
+The CoordPy SDK v3.43 final release is the **end-of-line for the
 capsule-layer-only research programme** in the Context Zero
 project.  Future work addressing the remaining frontiers will
 require new architectural substrate (transformer-internal

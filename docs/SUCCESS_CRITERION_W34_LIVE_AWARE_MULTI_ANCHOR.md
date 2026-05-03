@@ -1,4 +1,4 @@
-# Success criterion — Wevra SDK v3.35 / W34
+# Success criterion — CoordPy SDK v3.35 / W34
 # Live-aware multi-anchor adjudication + native-latent audited
 # response-feature proxy + W34 manifest-v4 CID + live cross-host
 # pre-flight discipline
@@ -125,8 +125,8 @@ multi-anchor adjudication.
 | **H6** | **Multi-anchor strict trust-precision gain** on R-81-DOUBLE-ANCHOR-COMPROMISE — a regime where the W33 single-anchor itself becomes compromised mid-session: ``Δ_trust_precision_w34_w33 ≥ +0.10`` AND no correctness regression AND ≤ 2 token/cell overhead AND trust precision = 1.000 across 5/5 seeds × ≥ 16 cells | Δ_trust_prec ≥ 0.10; min trust prec = 1.000 |
 | **H7** | **Pre-flight infra discipline closes W33-INFRA-1 + W33-INFRA-2** on R-81-XLLM-PREFLIGHT: when the W34 preflight fails for a host, that host's oracles are explicitly skipped (not silently timed out); when ``/api/tags`` confirms availability and the chat-template is used with ``num_predict=4`` + stop tokens, at least 1 host returns valid one-word responses on ≥ 80 % of one-word probes | Pre-flight check fires; valid-response rate ≥ 80 % on at least one host |
 | **H8** | **Native-latent audited proxy is byte-stable** on R-81-RESPONSE-FEATURE-SIGNATURE: closed-form deterministic ``response_feature_signature`` reproducible byte-for-byte across 2/2 runs of the same prompt at temp 0; signature length = 16 hex chars (64 bits) | byte-equal across 2 runs |
-| **H9** | Release-readiness clause | SDK_VERSION bumped to wevra.sdk.v3.35; pyproject.toml 0.5.8; ``__experimental__`` extended with W34 symbols; CHANGELOG entry; stable runtime contract byte-for-byte unchanged |
-| **H10** | Focused regression green | ≥ 25 W34 unit tests + all phase69-81 + wider wevra suite all PASS |
+| **H9** | Release-readiness clause | SDK_VERSION bumped to coordpy.sdk.v3.35; pyproject.toml 0.5.8; ``__experimental__`` extended with W34 symbols; CHANGELOG entry; stable runtime contract byte-for-byte unchanged |
+| **H10** | Focused regression green | ≥ 25 W34 unit tests + all phase69-81 + wider coordpy suite all PASS |
 
 **Hard-gate aggregate**: 10/10 PASS = STRONG SUCCESS; 8-9/10 PASS = PARTIAL SUCCESS; ≤ 7/10 PASS = FAILURE.
 

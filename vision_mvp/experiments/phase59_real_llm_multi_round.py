@@ -1,7 +1,7 @@
 """Phase 59 — real-LLM-driven multi-round delayed-disambiguation.
 
 SDK v3.13, W12 family anchor. **First cross-round real-LLM transfer
-benchmark** in the Wevra programme.
+benchmark** in the CoordPy programme.
 
 This phase is the *real-LLM transfer* slice of the SDK v3.12 W11
 synthetic win on R-58. Where Phase-58 hand-built canonical
@@ -124,9 +124,9 @@ from vision_mvp.tasks.incident_triage import (
     build_role_subscriptions, grade_answer,
     _decoder_from_handoffs as _phase31_decoder_from_handoffs,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.llm_backend import LLMBackend, OllamaBackend
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.llm_backend import LLMBackend, OllamaBackend
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, BundleAwareTeamDecoder,
     CLAIM_KIND_SYNONYMS,
     ClaimPriorityAdmissionPolicy,

@@ -1,16 +1,16 @@
 """vision_mvp — Context Zero research programme top-level package.
 
-**If you are looking for the shipped product**, you want Wevra:
+**If you are looking for the shipped product**, you want CoordPy:
 
-    from vision_mvp import wevra
-    report = wevra.run(wevra.RunSpec(profile="local_smoke",
-                                     out_dir="/tmp/wevra"))
+    from vision_mvp import coordpy
+    report = coordpy.run(coordpy.RunSpec(profile="local_smoke",
+                                     out_dir="/tmp/coordpy"))
 
 **If you are looking at research substrate**, the original routing-layer
 primitive is ``CASRRouter`` (Causal-Abstraction Scale-Renormalized
 Routing), kept here as research-grade code. It is the substrate that
-grounds Wevra's bounded-context guarantees; it is not itself part of
-the Wevra SDK contract.
+grounds CoordPy's bounded-context guarantees; it is not itself part of
+the CoordPy SDK contract.
 
     >>> from vision_mvp import CASRRouter
     >>> import numpy as np
@@ -22,7 +22,7 @@ the Wevra SDK contract.
 Orientation
 -----------
 - ``docs/START_HERE.md``   — one-pass orientation for new readers.
-- ``vision_mvp.wevra``     — stable product SDK surface.
+- ``vision_mvp.coordpy``     — stable product SDK surface.
 - ``PROOFS.md``            — formal theorems.
 - ``FINAL_RESULTS.md``     — measured scaling (N = 10 … 100 000).
 - ``EXTENDED_MATH_[1-7]``  — 72-framework theoretical survey.

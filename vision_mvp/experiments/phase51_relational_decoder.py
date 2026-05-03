@@ -83,26 +83,26 @@ if os.environ.get("PYTHONHASHSEED") != "0":
     os.execvpe(sys.executable, [sys.executable, *sys.argv],
                 os.environ)
 
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     ContextCapsule, capsule_from_handoff,
 )
-from vision_mvp.wevra.capsule_policy import (
+from vision_mvp.coordpy.capsule_policy import (
     BudgetedAdmissionLedger, FIFOPolicy,
     LearnedAdmissionPolicy, train_admission_policy, ADMIT,
 )
-from vision_mvp.wevra.capsule_policy_bundle import (
+from vision_mvp.coordpy.capsule_policy_bundle import (
     BundleLearnedPolicy, train_bundle_policy,
     DEFAULT_CLAIM_TO_ROOT_CAUSE, DEFAULT_PRIORITY_ORDER,
     DEFAULT_HIGH_PRIORITY_CUTOFF,
 )
-from vision_mvp.wevra.capsule_decoder import (
+from vision_mvp.coordpy.capsule_decoder import (
     PriorityDecoder, LearnedBundleDecoder,
     train_learned_bundle_decoder, evaluate_decoder,
 )
-from vision_mvp.wevra.capsule_decoder_v2 import (
+from vision_mvp.coordpy.capsule_decoder_v2 import (
     DeepSetBundleDecoder, train_deep_set_bundle_decoder,
 )
-from vision_mvp.wevra.capsule_decoder_relational import (
+from vision_mvp.coordpy.capsule_decoder_relational import (
     CohortRelationalDecoder, train_cohort_relational_decoder,
     COHORT_RELATIONAL_FEATURES,
 )
@@ -369,7 +369,7 @@ def run_gate1_on_incident(
 
     threshold = 0.400
     out = {
-        "schema": "wevra.phase51.gate1_incident.v1",
+        "schema": "coordpy.phase51.gate1_incident.v1",
         "n_seeds": len(seeds),
         "n_train_instances": len(train_inst),
         "n_test_instances": len(test_inst),
@@ -648,7 +648,7 @@ def run_zero_shot_transfer(
     }
 
     out = {
-        "schema": "wevra.phase51.zero_shot.v1",
+        "schema": "coordpy.phase51.zero_shot.v1",
         "train_seeds": list(train_seeds),
         "test_seeds": list(test_seeds),
         "distractor_grid": list(distractor_grid),
@@ -740,7 +740,7 @@ def run_phase51(out_dir: str = ".",
     _print_zero_shot_summary(zs_out)
 
     full = {
-        "schema": "wevra.phase51.v1",
+        "schema": "coordpy.phase51.v1",
         "gate1": g1_out,
         "zero_shot": zs_out,
     }

@@ -1,4 +1,4 @@
-# Success criterion - Wevra SDK v3.42 / W41
+# Success criterion - CoordPy SDK v3.42 / W41
 # Integrated multi-agent context synthesis + manifest-v11 CID +
 # cross-axis witness CID + producer-axis x trust-axis decision
 # selector

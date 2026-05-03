@@ -71,7 +71,7 @@ from vision_mvp.experiments.phase87_cross_host_response_heterogeneity import (
     _interleave_by_family,
     _PHASE87_K1_FRACTION,
 )
-from vision_mvp.wevra.team_coord import _DecodedHandoff
+from vision_mvp.coordpy.team_coord import _DecodedHandoff
 
 
 # W42 incident-marker handoff vocabulary.  Used by the R-89 driver
@@ -117,7 +117,7 @@ from vision_mvp.experiments.phase88_integrated_synthesis import (
 from vision_mvp.experiments.phase67_outside_information import (
     build_phase67_bank,
 )
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     AttentionAwareBundleDecoder,
     W36_DEFAULT_MIN_DISTINCT_HOSTS,
     W37_DEFAULT_TRAJECTORY_THRESHOLD,
@@ -133,7 +133,7 @@ from vision_mvp.wevra.team_coord import (
     W40_DEFAULT_RESPONSE_TEXT_DIVERSITY_MIN,
     W40_DEFAULT_MIN_RESPONSE_SIGNATURE_PROBES,
 )
-from vision_mvp.wevra.role_invariant_synthesis import (
+from vision_mvp.coordpy.role_invariant_synthesis import (
     RoleInvariancePolicyEntry,
     RoleInvariantSynthesisOrchestrator,
     build_role_invariant_registry,

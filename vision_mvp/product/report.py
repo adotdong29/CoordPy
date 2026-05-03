@@ -74,7 +74,7 @@ def render_summary(report: dict[str, Any]) -> str:
         lines.append(f"  launch_cmd: {' '.join(sw.get('launch_cmd') or [])}")
     lines.append("")
     cv = report.get("capsules")
-    if isinstance(cv, dict) and cv.get("schema") == "wevra.capsule_view.v1":
+    if isinstance(cv, dict) and cv.get("schema") == "coordpy.capsule_view.v1":
         stats = cv.get("stats", {})
         by_kind = stats.get("by_kind", {})
         chain_ok = bool(cv.get("chain_ok"))

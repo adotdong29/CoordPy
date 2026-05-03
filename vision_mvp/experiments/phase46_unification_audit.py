@@ -19,7 +19,7 @@ sub-class table in ``docs/CAPSULE_FORMALISM.md`` § 4.
 Run::
 
     python -m vision_mvp.experiments.phase46_unification_audit \\
-        --out-dir /tmp/wevra_phase46
+        --out-dir /tmp/coordpy_phase46
 
 Writes ``results_phase46_unification_audit.json``. ~3 s wall.
 """
@@ -48,7 +48,7 @@ def audit_handle() -> dict[str, Any]:
     """
     import numpy as np
     from vision_mvp.core.context_ledger import ContextLedger
-    from vision_mvp.wevra import (
+    from vision_mvp.coordpy import (
         capsule_from_handle, CapsuleLedger,
     )
 
@@ -92,7 +92,7 @@ def audit_handoff() -> dict[str, Any]:
     from vision_mvp.core.role_handoff import (
         HandoffRouter, RoleSubscriptionTable, RoleInbox, TypedHandoff,
     )
-    from vision_mvp.wevra import (
+    from vision_mvp.coordpy import (
         capsule_from_handoff, CapsuleLedger,
     )
 
@@ -144,7 +144,7 @@ def audit_thread_resolution() -> dict[str, Any]:
     <-> CapsuleBudget(max_tokens=tau, max_witnesses=W,
                        max_rounds=R_max).
     """
-    from vision_mvp.wevra import (
+    from vision_mvp.coordpy import (
         ContextCapsule, CapsuleKind, CapsuleBudget, CapsuleLedger,
     )
     # ThreadResolution is a frozen dataclass produced by
@@ -216,7 +216,7 @@ def audit_adaptive_edge() -> dict[str, Any]:
     Phase-47 COHORT kind. This audit reports the per-edge lift
     only; the cohort-lift is a separate audit row.
     """
-    from vision_mvp.wevra import (
+    from vision_mvp.coordpy import (
         ContextCapsule, CapsuleKind, CapsuleBudget, CapsuleLedger,
     )
     payload = {
@@ -280,7 +280,7 @@ def audit_adaptive_edge_cohort() -> dict[str, Any]:
     from vision_mvp.core.adaptive_sub import (
         AdaptiveSubscriptionTable,
     )
-    from vision_mvp.wevra import (
+    from vision_mvp.coordpy import (
         ContextCapsule, CapsuleKind, CapsuleBudget, CapsuleLedger,
         capsule_from_adaptive_sub_table, capsule_from_cohort,
     )
@@ -351,14 +351,14 @@ def audit_adaptive_edge_cohort() -> dict[str, Any]:
 
 
 def audit_run_report() -> dict[str, Any]:
-    """End-to-end: a full Wevra mock run produces a sealed
+    """End-to-end: a full CoordPy mock run produces a sealed
     capsule DAG with a ``RUN_REPORT`` root whose CID is a
     durable run identifier.
 
     Reduction: P41-1 / P43-1 (substrate-prompt flatness)
     <-> CapsuleBudget on SWEEP_CELL kinds inside the DAG.
     """
-    from vision_mvp.wevra import build_report_ledger
+    from vision_mvp.coordpy import build_report_ledger
 
     # Synthesise a minimal product_report dict mirroring the
     # ``phase45.product_report.v2`` shape with a sweep block.
@@ -370,7 +370,7 @@ def audit_run_report() -> dict[str, Any]:
             "ready": True, "n": 1, "n_passed_all": 1,
             "schema": "phase45.readiness_verdict.v1"},
         "sweep": {
-            "schema": "wevra.sweep.v2",
+            "schema": "coordpy.sweep.v2",
             "mode": "mock", "executed_in_process": True,
             "sandbox": "in_process",
             "jsonl": "/tmp/test.jsonl",
@@ -385,7 +385,7 @@ def audit_run_report() -> dict[str, Any]:
                  "n_instances": 1},
             ]},
         "provenance": {
-            "schema": "wevra.provenance.v1",
+            "schema": "coordpy.provenance.v1",
             "version": "0.5.1", "git_sha": "abc"},
         "artifacts": ["product_report.json"],
     }
@@ -442,7 +442,7 @@ def run_audit(out_dir: str = ".") -> dict[str, Any]:
     n_partial = sum(1 for a in audits if a["verdict"] == "PARTIAL")
     n_fail = sum(1 for a in audits if a["verdict"] == "FAIL")
     out = {
-        "schema": "wevra.phase46.unification_audit.v1",
+        "schema": "coordpy.phase46.unification_audit.v1",
         "n_primitives": len(audits),
         "n_full_reduction": n_full,
         "n_partial_reduction": n_partial,

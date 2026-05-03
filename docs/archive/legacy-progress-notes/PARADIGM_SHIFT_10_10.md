@@ -2,7 +2,7 @@
 
 ## Mission
 
-Transform Wevra from an excellent engineering system (9.8/10) into a **paradigm shift** (10/10) that changes how the entire field thinks about context in multi-agent systems.
+Transform CoordPy from an excellent engineering system (9.8/10) into a **paradigm shift** (10/10) that changes how the entire field thinks about context in multi-agent systems.
 
 **Timeline**: 6-8 weeks  
 **Outcome**: Impossibility theorems + 7-domain validation + 3 published papers + 2 external teams adopting
@@ -95,12 +95,12 @@ achieve both (A) and (C) simultaneously.
 **Code artifact**:
 - File: `vision_mvp/theorems/domain_unification.py` (NEW)
 - Contains: formal statement of IS-2, cross-domain adapter theory
-- Test: `test_is2_dynamic_types_fail_at_scale()` — show that adding 8th domain requires code changes without capsules, but not with Wevra
+- Test: `test_is2_dynamic_types_fail_at_scale()` — show that adding 8th domain requires code changes without capsules, but not with CoordPy
 
 **Data to collect**:
 - For 7 domains, measure: "How many files must change when adding a new domain?"
   - Without capsules (hypothetical): ~5-10 files (type checking, serialization, routing)
-  - With Wevra: ~1 file (domain adapter, follows template)
+  - With CoordPy: ~1 file (domain adapter, follows template)
 
 ---
 
@@ -206,11 +206,11 @@ is computationally intractable.
 1. Introduction: State of multi-agent context (all current systems fail one of three)
 2. Theorem IS-1: Proof + runtime demonstration
 3. Theorem IS-2: Proof + cross-domain evidence (7 domains)
-4. Theorem IS-3: Proof + complexity analysis (Wevra linear vs hypothetical mutable exponential)
+4. Theorem IS-3: Proof + complexity analysis (CoordPy linear vs hypothetical mutable exponential)
 5. Related work: RAG, attention, message passing, blockchain, TLA+
 6. Conclusion: Capsules are NECESSARY, not just sufficient
 
-**Novel angle**: Not "Wevra is good" but "WITHOUT immutable typed context, three fundamental properties are IMPOSSIBLE."
+**Novel angle**: Not "CoordPy is good" but "WITHOUT immutable typed context, three fundamental properties are IMPOSSIBLE."
 
 **Page count**: 14-16 pages
 
@@ -263,11 +263,11 @@ is computationally intractable.
 ## Part 4: Industry Adoption Pathway (2 weeks, parallel to papers)
 
 ### Milestone 1: Proof of Concept (Week 5)
-**Goal**: Get 1 external team to use Wevra in a real project
+**Goal**: Get 1 external team to use CoordPy in a real project
 
-- Create **adoption template**: step-by-step guide for integrating Wevra into existing system
+- Create **adoption template**: step-by-step guide for integrating CoordPy into existing system
 - Target: teams already using LLM agents (e.g., Anthropic Claude teams, OpenAI assistants)
-- Offer: "Use Wevra, we'll provide support, and we'll co-author a case study paper"
+- Offer: "Use CoordPy, we'll provide support, and we'll co-author a case study paper"
 - Success: 1 team commits to 4-week trial
 
 ### Milestone 2: Case Study (Week 6-7)
@@ -278,17 +278,17 @@ is computationally intractable.
   - Latency improvement (admission/sealing time)
   - Bug discovery (did immutable context prevent bugs?)
   - Developer experience (ease of integration)
-- Output: "Case Study: [Team Name]'s Adoption of Wevra" (4-6 page report)
+- Output: "Case Study: [Team Name]'s Adoption of CoordPy" (4-6 page report)
 
 ### Milestone 3: Ecosystem Signal (Week 8)
-**Goal**: Show Wevra is becoming a platform, not just a system
+**Goal**: Show CoordPy is becoming a platform, not just a system
 
 - Release 3 minimal plugins:
   1. **Docker sandbox backend** (for untrusted code execution)
-  2. **Redis ledger backend** (for distributed Wevra instances)
+  2. **Redis ledger backend** (for distributed CoordPy instances)
   3. **Prometheus metrics exporter** (for production monitoring)
 - GitHub releases: tag as "ecosystem-ready"
-- Documentation: "How to build a Wevra plugin" (with template)
+- Documentation: "How to build a CoordPy plugin" (with template)
 
 ---
 
@@ -298,10 +298,10 @@ is computationally intractable.
 
 - [ ] **IS-1 theorem proved** and demonstrated with runtime code
 - [ ] **IS-2 theorem proved** with 8-domain case study (all tests pass)
-- [ ] **IS-3 theorem proved** with complexity analysis (Wevra linear, hypothetical mutable exponential)
+- [ ] **IS-3 theorem proved** with complexity analysis (CoordPy linear, hypothetical mutable exponential)
 - [ ] **7-domain validation**: robotics, NLP, planning, biology, supply chain, finance, science, consensus — all with tests, all passing
 - [ ] **3 papers submitted** to top venues (PLDI, FoMLAS, ICLR)
-- [ ] **2 external teams** adopted Wevra in production (with metrics)
+- [ ] **2 external teams** adopted CoordPy in production (with metrics)
 - [ ] **Ecosystem**: 3 plugins released, ecosystem template documented
 - [ ] **Field recognition**: Papers cited, GitHub stars trending, Hacker News discussion
 
@@ -310,7 +310,7 @@ is computationally intractable.
 **Paradigm shift achieved when**:
 - Papers are published (acceptances = peer validation of impossibility theorems)
 - Field acknowledges: "Without immutable typed context, you CANNOT guarantee causality + audit + composability"
-- Wevra becomes the reference implementation
+- CoordPy becomes the reference implementation
 - New systems are designed around the capsule pattern (industry adoption)
 - Citations accumulate (field-wide impact)
 
@@ -342,7 +342,7 @@ is computationally intractable.
 ### Week 5-8: Adoption
 - [ ] Create adoption template + documentation
 - [ ] Contact 5-10 potential teams, offer proof-of-concept partnership
-- [ ] Help 2 teams integrate Wevra (Week 6-7)
+- [ ] Help 2 teams integrate CoordPy (Week 6-7)
 - [ ] Collect metrics, write case study (Week 7)
 - [ ] Release 3 ecosystem plugins (Week 8)
 - [ ] GitHub release: "ecosystem-ready"
@@ -362,7 +362,7 @@ is computationally intractable.
 2. **Cross-domain validation** (8 domains) shows this isn't a niche solution
 3. **Published papers** in top venues establish peer-validated novelty
 4. **External adoption** signals market readiness and field acceptance
-5. **Ecosystem** shows Wevra is a platform, not just a system
+5. **Ecosystem** shows CoordPy is a platform, not just a system
 
 **Result**: The field shifts from "context is just data" to "context is a typed, immutable, auditable object." This is a paradigm shift.
 
@@ -380,7 +380,7 @@ is computationally intractable.
 
 ## Success Signal
 
-When Wevra papers are published and cited, and the community says:
+When CoordPy papers are published and cited, and the community says:
 **"We can't build multi-agent systems without thinking about context as immutable, typed, auditable objects"**
 
 Then it's a paradigm shift. Then it's 10/10.

@@ -1,4 +1,4 @@
-"""Categorical semantics for Wevra routing and team composition.
+"""Categorical semantics for CoordPy routing and team composition.
 
 Two constructions are formalised here:
 
@@ -23,7 +23,7 @@ Two constructions are formalised here:
       the sealed capsule-graph is independent of the bracketing.
 
 Both classes are small, deterministic, and standalone — they operate on
-dataclasses from ``vision_mvp.wevra.capsule`` and
+dataclasses from ``vision_mvp.coordpy.capsule`` and
 ``vision_mvp.core.role_handoff`` without any heavy dependency.  The aim
 is that ``verify_naturality`` and ``verify_associativity`` are concrete,
 runnable, machine-checkable witnesses of the two theorems rather than
@@ -36,7 +36,7 @@ import dataclasses
 import itertools
 from typing import Callable, Iterable, Sequence
 
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     CapsuleBudget,
     CapsuleKind,
     CapsuleLedger,
@@ -54,7 +54,7 @@ class _RoleObject:
     """An object of ``CapsuleCategory`` — a role together with the set of
     claim kinds it semantically accepts.  Two role objects are equal iff
     their name *and* support set coincide, which matches the structural
-    notion of role equality used throughout Wevra."""
+    notion of role equality used throughout CoordPy."""
 
     role: str
     support: frozenset[str]

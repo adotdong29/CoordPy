@@ -1,7 +1,7 @@
 """Phase 60 — open-world normalisation + real-Ollama transfer.
 
 SDK v3.14, W13 family anchor. **First open-world normalisation move**
-in the Wevra programme, and the **first real-Ollama benchmark with
+in the CoordPy programme, and the **first real-Ollama benchmark with
 honest raw-response capture**.
 
 This phase has three pre-committed contributions:
@@ -116,9 +116,9 @@ from vision_mvp.tasks.incident_triage import (
     build_role_subscriptions, grade_answer,
     _decoder_from_handoffs as _phase31_decoder_from_handoffs,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.llm_backend import LLMBackend, OllamaBackend
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.llm_backend import LLMBackend, OllamaBackend
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, BundleAwareTeamDecoder,
     CLAIM_KIND_SYNONYMS,
     ClaimPriorityAdmissionPolicy,
@@ -700,7 +700,7 @@ def _drift_metrics(round1_cands, round2_cands) -> dict[str, Any]:
       * ``n_oov`` — outside both closures (W13-4 falsifier territory).
     """
     canonical = {kind for (kind, _l, _r) in
-                  __import__("vision_mvp.wevra.team_coord",
+                  __import__("vision_mvp.coordpy.team_coord",
                               fromlist=["_DECODER_PRIORITY"])
                                 ._DECODER_PRIORITY}
     layered = LayeredClaimNormalizer()

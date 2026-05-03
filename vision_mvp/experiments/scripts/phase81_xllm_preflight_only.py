@@ -22,7 +22,7 @@ import urllib.request
 
 
 def _mac2_candidates() -> tuple[tuple[str, str, str], ...]:
-    env = os.environ.get("WEVRA_OLLAMA_URL_MAC2")
+    env = os.environ.get("COORDPY_OLLAMA_URL_MAC2")
     candidates = [
         (env, env, "any") if env else None,
         ("http://192.168.12.248:11434", "192.168.12.248", "any"),

@@ -43,7 +43,7 @@ Why this is "fair", not benchmark-shopping
   SDK v3.9 brief asks for.
 * **Pre-committed bench property + falsifier.** The
   *cross-role-corroborated gold* property is mechanically tested in
-  ``test_wevra_cross_role_corroboration.Phase55BankShapeTests``. A
+  ``test_coordpy_cross_role_corroboration.Phase55BankShapeTests``. A
   *decoy-corroborated decoy* falsifier regime is also defined in
   this file (see ``build_phase55_falsifier_bank``) and shows the
   W8-1 win does *not* hold when the decoy is the corroborated tag
@@ -146,8 +146,8 @@ from vision_mvp.tasks.incident_triage import (
     build_role_subscriptions, grade_answer,
     _decoder_from_handoffs as _phase31_decoder_from_handoffs,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, CapsuleLedger
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.capsule import CapsuleKind, CapsuleLedger
+from vision_mvp.coordpy.team_coord import (
     AdmissionPolicy, ClaimPriorityAdmissionPolicy,
     CohortCoherenceAdmissionPolicy,
     CoverageGuidedAdmissionPolicy,

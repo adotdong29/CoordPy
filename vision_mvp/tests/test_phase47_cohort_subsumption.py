@@ -37,7 +37,7 @@ class W3_14_PerCapsuleLocalityTests(unittest.TestCase):
     succeeds — the cardinality bound is not enforced."""
 
     def test_per_capsule_budget_cannot_bound_total_count(self):
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget, CapsuleLedger,
         )
         ledger = CapsuleLedger()
@@ -64,7 +64,7 @@ class W3_14_PerCapsuleLocalityTests(unittest.TestCase):
         """Check that ``CapsuleBudget`` does not silently gain a
         ``max_total_ledger_size`` or ``max_total_members`` axis — a
         regression of W3-14 would be a new axis of that shape."""
-        from vision_mvp.wevra import CapsuleBudget
+        from vision_mvp.coordpy import CapsuleBudget
         axes = set(CapsuleBudget().__dataclass_fields__.keys()) \
             if False else set()
         import dataclasses
@@ -86,7 +86,7 @@ class W3_15_CohortLiftTests(unittest.TestCase):
     *at admission time*, not just inside the substrate."""
 
     def test_cohort_admits_within_cap(self):
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget, CapsuleLedger,
             capsule_from_cohort,
         )
@@ -118,7 +118,7 @@ class W3_15_CohortLiftTests(unittest.TestCase):
     def test_cohort_over_cap_rejected_at_construction(self):
         """If membership exceeds ``max_members``, the cohort's
         own construction fails via the ``max_parents`` axis."""
-        from vision_mvp.wevra import capsule_from_cohort
+        from vision_mvp.coordpy import capsule_from_cohort
         # 5 members, cap = 4 — rejected at construction.
         with self.assertRaises(ValueError):
             capsule_from_cohort(
@@ -137,7 +137,7 @@ class W3_15_CohortLiftTests(unittest.TestCase):
         from vision_mvp.core.adaptive_sub import (
             AdaptiveSubscriptionTable,
         )
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget, CapsuleLedger,
             capsule_from_adaptive_sub_table,
         )
@@ -172,7 +172,7 @@ class W3_15_CohortLiftTests(unittest.TestCase):
         # Now synthesise a fourth edge CID that would exceed the
         # cap. Re-lift the cohort with 4 members → construction
         # fails (max_parents = max_active_edges = 3).
-        from vision_mvp.wevra import capsule_from_cohort
+        from vision_mvp.coordpy import capsule_from_cohort
         with self.assertRaises(ValueError):
             capsule_from_cohort(
                 cohort_tag="adaptive_edge_table",
@@ -197,7 +197,7 @@ class W3_16_RelationalLimitationTests(unittest.TestCase):
         ``source_event_ids=(1,)`` is still admitted by the
         cardinality-only cohort rule. The relational invariant
         'no two members share an event_id' is NOT enforced."""
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget, CapsuleLedger,
             capsule_from_cohort,
         )
@@ -238,7 +238,7 @@ class W3_16_RelationalLimitationTests(unittest.TestCase):
         relational enforcement. A cohort whose member list
         contains duplicates collapses to the deduplicated set
         automatically via the CID canonicalisation."""
-        from vision_mvp.wevra import (
+        from vision_mvp.coordpy import (
             ContextCapsule, CapsuleKind, CapsuleBudget, CapsuleLedger,
             capsule_from_cohort,
         )

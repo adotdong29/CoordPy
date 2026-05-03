@@ -25,7 +25,7 @@ Threat model on this probe:
 
 The probe records:
 
-* Mac-2 address resolution (``WEVRA_OLLAMA_URL_MAC2`` env var,
+* Mac-2 address resolution (``COORDPY_OLLAMA_URL_MAC2`` env var,
   followed by a candidate list including ``.101`` and ``.248``).
 * Per-host preflight via ``/api/tags``.
 * Per-prompt cross-host responses at temperature 0 + ``num_predict=4``
@@ -136,7 +136,7 @@ def _mac2_candidates() -> tuple[str, ...]:
     (recorded for honesty so the milestone can document the stale
     pin).
     """
-    env = os.environ.get("WEVRA_OLLAMA_URL_MAC2")
+    env = os.environ.get("COORDPY_OLLAMA_URL_MAC2")
     candidates = [
         env,
         "http://192.168.12.101:11434",

@@ -13,7 +13,7 @@
 >   it must include W28's bar AND add new geometry-aware machinery AND
 >   discharge the **W28-C-CROSS-HOST-VARIANCE** open conjecture on a
 >   regime where W27 alone makes correctness mistakes.
-> * `docs/RESULTS_WEVRA_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md` — the
+> * `docs/RESULTS_COORDPY_W28_ENSEMBLE_VERIFIED_MULTI_CHAIN.md` — the
 >   measured W28 milestone result (8/8 hard, 3/4 soft, 1 honestly null;
 >   the null becomes W28-C-CROSS-HOST-VARIANCE which W29 must discharge).
 > * `docs/THEOREM_REGISTRY.md` — registry where W29 named claims will be
@@ -282,7 +282,7 @@ The discharge MUST cite the specific empirical anchor.
 
 ### H9 — Release-readiness clause
 
-* SDK_VERSION bumped to ``wevra.sdk.v3.30``.
+* SDK_VERSION bumped to ``coordpy.sdk.v3.30``.
 * ``__experimental__`` tuple updated to include every W29 symbol.
 * ``pyproject.toml`` version bumped to ``0.5.3``.
 * CHANGELOG entry added.
@@ -298,7 +298,7 @@ The discharge MUST cite the specific empirical anchor.
 
 * All W22..W28 regression (``test_phase69`` through ``test_phase75``)
   remains 254/254 passing byte-for-byte.
-* All wider regression ``test_wevra_*`` remains green.
+* All wider regression ``test_coordpy_*`` remains green.
 * New ``test_phase76_geometry_partitioned.py`` MUST cover every
   enumerated H1 failure mode + H2 byte-equivalence + H3 tamper-rejection
   + H5 falsifiers + H7 cram-factor + the disabled / no-trigger paths.

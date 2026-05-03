@@ -34,8 +34,8 @@ from vision_mvp.experiments.phase50_zero_shot_transfer import (
     make_cross_standardised, make_cross_stable_deepset,
     _incident_spec, _security_spec,
 )
-from vision_mvp.wevra.capsule import CapsuleKind, ContextCapsule
-from vision_mvp.wevra.capsule_decoder_v2 import (
+from vision_mvp.coordpy.capsule import CapsuleKind, ContextCapsule
+from vision_mvp.coordpy.capsule_decoder_v2 import (
     BUNDLE_DECODER_FEATURES_V2, DEEPSET_PHI_FEATURES,
     _bundle_vote_summary, _feature_vector_v2,
 )

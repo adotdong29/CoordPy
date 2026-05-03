@@ -26,7 +26,7 @@ For each domain we:
 2. Split by seed — 80 % train, 20 % test.
 3. Train a per-domain ``LearnedAdmissionPolicy`` with the
    closed feature vocabulary in
-   ``vision_mvp/wevra/capsule_policy.py``.
+   ``vision_mvp/coordpy/capsule_policy.py``.
 
 Transfer cells
 --------------
@@ -87,8 +87,8 @@ if os.environ.get("PYTHONHASHSEED") != "0":
                 os.environ)
 
 
-from vision_mvp.wevra.capsule import capsule_from_handoff
-from vision_mvp.wevra.capsule_policy import (
+from vision_mvp.coordpy.capsule import capsule_from_handoff
+from vision_mvp.coordpy.capsule_policy import (
     BudgetedAdmissionLedger, FIFOPolicy, KindPriorityPolicy,
     LearnedAdmissionPolicy, train_admission_policy,
     ADMIT,
@@ -404,7 +404,7 @@ def run_phase47_transfer(
         attribution.append(row)
 
     out = {
-        "schema": "wevra.phase47.cross_domain_transfer.v1",
+        "schema": "coordpy.phase47.cross_domain_transfer.v1",
         "train_seeds": list(train_seeds),
         "test_seeds": list(test_seeds),
         "distractor_grid": list(distractor_grid),

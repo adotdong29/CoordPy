@@ -15,8 +15,8 @@
 
 ## Why this archive exists
 
-The Context Zero / Wevra programme has produced a long sequence of
-milestone notes, theory volumes, sprint prompts, and pre-Wevra design
+The Context Zero / CoordPy programme has produced a long sequence of
+milestone notes, theory volumes, sprint prompts, and pre-CoordPy design
 documents. Aggregated at the repo root they made the *active* position
 hard to see quickly. The consolidation moves the historical record
 here so that:
@@ -39,7 +39,7 @@ here so that:
 | Team-boundary capsule formalism (W4) | [`docs/CAPSULE_TEAM_FORMALISM.md`](../CAPSULE_TEAM_FORMALISM.md)             |
 | Long-running master plan             | [`docs/context_zero_master_plan.md`](../context_zero_master_plan.md)         |
 | Two-Mac MLX distributed runbook      | [`docs/MLX_DISTRIBUTED_RUNBOOK.md`](../MLX_DISTRIBUTED_RUNBOOK.md)           |
-| Latest milestone (SDK v3.7)          | [`docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](../RESULTS_WEVRA_SCALE_VS_STRUCTURE.md) |
+| Latest milestone (SDK v3.7)          | [`docs/RESULTS_COORDPY_SCALE_VS_STRUCTURE.md`](../RESULTS_COORDPY_SCALE_VS_STRUCTURE.md) |
 | Repo entrypoint / quick start        | [`README.md`](../../README.md)                                               |
 | SDK release history                  | [`CHANGELOG.md`](../../CHANGELOG.md)                                         |
 | Substrate architecture               | [`ARCHITECTURE.md`](../../ARCHITECTURE.md)                                   |
@@ -63,7 +63,7 @@ SDK-v3.x runtime contracts; the canonical statement now lives in
   * `RESULTS_CAPSULE_RESEARCH_MILESTONE5.md`
   * `RESULTS_CAPSULE_RESEARCH_MILESTONE6.md`
 
-### `wevra-milestones/` — older Wevra SDK milestone notes
+### `coordpy-milestones/` — older CoordPy SDK milestone notes
 
 Per-milestone narrative for SDK v3.0 → v3.6. Useful for tracing
 *why* a contract was sharpened the way it was. The current state of
@@ -71,17 +71,17 @@ each contract lives in
 [`docs/RESEARCH_STATUS.md`](../RESEARCH_STATUS.md) and
 [`docs/THEOREM_REGISTRY.md`](../THEOREM_REGISTRY.md); the latest
 milestone (SDK v3.7) is kept live at
-[`docs/RESULTS_WEVRA_SCALE_VS_STRUCTURE.md`](../RESULTS_WEVRA_SCALE_VS_STRUCTURE.md).
+[`docs/RESULTS_COORDPY_SCALE_VS_STRUCTURE.md`](../RESULTS_COORDPY_SCALE_VS_STRUCTURE.md).
 
-  * `RESULTS_WEVRA_CAPSULE.md` (SDK v3 — Capsule Contract C1..C6)
-  * `RESULTS_WEVRA_CAPSULE_NATIVE.md` (SDK v3.1 — capsule-native runtime)
-  * `RESULTS_WEVRA_INTRA_CELL.md` (SDK v3.2 — intra-cell + detached witness)
-  * `RESULTS_WEVRA_DEEP_INTRA_CELL.md` (SDK v3.3 — sub-intra-cell + audit + determinism)
-  * `RESULTS_WEVRA_INNER_LOOP.md` (SDK v3.4 — LLM byte boundary)
-  * `RESULTS_WEVRA_TEAM_COORD.md` (SDK v3.5 — multi-agent team coordination)
-  * `RESULTS_WEVRA_DISTRIBUTED.md` (SDK v3.6 — two-Mac distributed-inference + cross-LLM)
+  * `RESULTS_COORDPY_CAPSULE.md` (SDK v3 — Capsule Contract C1..C6)
+  * `RESULTS_COORDPY_CAPSULE_NATIVE.md` (SDK v3.1 — capsule-native runtime)
+  * `RESULTS_COORDPY_INTRA_CELL.md` (SDK v3.2 — intra-cell + detached witness)
+  * `RESULTS_COORDPY_DEEP_INTRA_CELL.md` (SDK v3.3 — sub-intra-cell + audit + determinism)
+  * `RESULTS_COORDPY_INNER_LOOP.md` (SDK v3.4 — LLM byte boundary)
+  * `RESULTS_COORDPY_TEAM_COORD.md` (SDK v3.5 — multi-agent team coordination)
+  * `RESULTS_COORDPY_DISTRIBUTED.md` (SDK v3.6 — two-Mac distributed-inference + cross-LLM)
 
-### `pre-wevra-theory/` — pre-Wevra Context Zero research volumes
+### `pre-coordpy-theory/` — pre-CoordPy Context Zero research volumes
 
 The original Context Zero research programme: 12 formal theorems, the
 72-framework theoretical survey, the Phase-1 MVP spec, the four-phase
@@ -95,7 +95,7 @@ and the W3/W4/W5/W6 theorem families in
   * `EXTENDED_MATH.md`, `EXTENDED_MATH_[2-7].md` — 7 volumes of mathematical grounding (the 72-framework survey).
   * `OPEN_QUESTIONS.md` — seven foundational open questions.
   * `FRAMEWORK.md` — original problem formulation; routing-as-causal-inference.
-  * `EVALUATION.md` — pre-Wevra metrics + benchmarks + falsifiability.
+  * `EVALUATION.md` — pre-CoordPy metrics + benchmarks + falsifiability.
   * `MVP.md` — Phase-1 spec.
   * `ROADMAP.md` — original four-phase research plan.
   * `VISION_MILLIONS.md` — million-agent forward-looking vision.
@@ -106,7 +106,7 @@ and the W3/W4/W5/W6 theorem families in
 ### `legacy-progress-notes/` — sprint prompts, agent prompts, old summaries
 
 Prompts written for past coding-sprint agents, paradigm-shift summary
-notes, the pre-Wevra benchmark-reproduction guide, and historical
+notes, the pre-CoordPy benchmark-reproduction guide, and historical
 delivery summaries. These were never canonical — they were artefacts
 of one-shot sprints. Kept for traceability only.
 
@@ -115,7 +115,7 @@ of one-shot sprints. Kept for traceability only.
   * `AGENT_NETWORK_DESIGN.md`
   * `AGENT_NEXT_SPRINT_PROMPT.md`
   * `AGENT_SPRINT_3WEEK.md`
-  * `BENCHMARK.md` — pre-Wevra reproduction guide; superseded by the *Fastest path from zero to a real report* section in [`docs/START_HERE.md`](../START_HERE.md).
+  * `BENCHMARK.md` — pre-CoordPy reproduction guide; superseded by the *Fastest path from zero to a real report* section in [`docs/START_HERE.md`](../START_HERE.md).
   * `CONTEXT_SOLUTION_REVIEW.md`
   * `FINAL_VALIDATION.md`
   * `PARADIGM_SHIFT_10_10.md`
@@ -137,7 +137,7 @@ of one-shot sprints. Kept for traceability only.
      [`docs/HOW_NOT_TO_OVERSTATE.md`](../HOW_NOT_TO_OVERSTATE.md)
      names what is *proved / proved-conditional / mechanically-checked
      / empirical / conjectural / retracted* now.
-  4. If an archived doc cites a path like ``docs/RESULTS_WEVRA_X.md``
+  4. If an archived doc cites a path like ``docs/RESULTS_COORDPY_X.md``
      or a top-level ``PROOFS.md``, the current location is
      ``docs/archive/<theme>/<filename>.md`` — see the layout above.
 

@@ -67,7 +67,7 @@ import random
 import sys
 from typing import Any
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     # W22 stack
     OracleRegistration, SchemaCapsule,
     build_incident_triage_schema_capsule,
@@ -178,7 +178,7 @@ def _build_w25_stack(
         registry: SharedFanoutRegistry,
 ) -> SharedFanoutDisambiguator:
     """Build a W25 SharedFanoutDisambiguator (W22→W23→W24→W25)."""
-    from vision_mvp.wevra.team_coord import (
+    from vision_mvp.coordpy.team_coord import (
         AttentionAwareBundleDecoder,
         RelationalCompatibilityDisambiguator,
         BundleContradictionDisambiguator,

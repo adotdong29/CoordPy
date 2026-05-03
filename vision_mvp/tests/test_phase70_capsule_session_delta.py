@@ -36,7 +36,7 @@ from vision_mvp.experiments.phase70_capsule_session_delta import (
     run_cross_regime_synthetic_p70,
     FlippingProbabilisticOracle,
 )
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     SchemaCapsule, build_incident_triage_schema_capsule,
     SessionDigestEnvelope, SessionDeltaEnvelope,
     verify_session_digest_chain, verify_session_delta,

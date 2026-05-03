@@ -78,10 +78,10 @@ if os.environ.get("PYTHONHASHSEED") != "0":
     os.execvpe(sys.executable, [sys.executable, *sys.argv],
                 os.environ)
 
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     ContextCapsule, capsule_from_handoff,
 )
-from vision_mvp.wevra.capsule_decoder import (
+from vision_mvp.coordpy.capsule_decoder import (
     BUNDLE_DECODER_FEATURES, LearnedBundleDecoder,
     PluralityDecoder, PriorityDecoder,
     SourceCorroboratedPriorityDecoder,
@@ -121,7 +121,7 @@ def _incident_spec() -> DomainSpec:
     from vision_mvp.core.extractor_noise import (
         incident_triage_known_kinds,
     )
-    from vision_mvp.wevra.capsule_policy_bundle import (
+    from vision_mvp.coordpy.capsule_policy_bundle import (
         DEFAULT_CLAIM_TO_ROOT_CAUSE, DEFAULT_PRIORITY_ORDER,
     )
     return DomainSpec(
@@ -423,7 +423,7 @@ def run_phase48_transfer(
         feature_comparison.append(row)
 
     out = {
-        "schema": "wevra.phase48.decoder_transfer.v1",
+        "schema": "coordpy.phase48.decoder_transfer.v1",
         "train_seeds": list(train_seeds),
         "test_seeds": list(test_seeds),
         "distractor_grid": list(distractor_grid),

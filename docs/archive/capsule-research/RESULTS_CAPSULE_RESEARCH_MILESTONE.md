@@ -1,7 +1,7 @@
 # RESULTS — Capsule research milestone (post-SDK-v3)
 
 > *Theory-forward results note. The SDK-v3 milestone
-> (`docs/RESULTS_WEVRA_CAPSULE.md`, 2026-04-22) named the
+> (`docs/RESULTS_COORDPY_CAPSULE.md`, 2026-04-22) named the
 > capsule abstraction. This note moves it from a product label
 > to a **research center** by adding (a) a formal mathematical
 > model, (b) an ML problem with a real held-out result, (c) an
@@ -145,7 +145,7 @@ Source: `docs/CAPSULE_FORMALISM.md` (~580 lines, ~10 KB).
 
 ### PART B — Capsule learning problem
 
-Source: `vision_mvp/wevra/capsule_policy.py` (~430 lines),
+Source: `vision_mvp/coordpy/capsule_policy.py` (~430 lines),
 `vision_mvp/experiments/phase46_capsule_learning.py` (~340
 lines), `docs/RESULTS_CAPSULE_LEARNING.md` (~330 lines),
 `vision_mvp/tests/test_capsule_policy.py` (~190 lines).
@@ -193,13 +193,13 @@ This document.
 
 ### PART E — Minimal product/runtime adjustments
 
-Source: `vision_mvp/wevra/__init__.py` (3 lines added).
+Source: `vision_mvp/coordpy/__init__.py` (3 lines added).
 
 * Re-exported `BudgetedAdmissionLedger` and the four policy
   classes as part of the public SDK surface, so external
   callers can drop in a capsule policy without crossing
   internal module boundaries. SDK_VERSION unchanged
-  ("wevra.sdk.v3"); the public surface is *additive*.
+  ("coordpy.sdk.v3"); the public surface is *additive*.
 * No runtime contract change. The unbudgeted
   `CapsuleLedger.admit_and_seal` path is byte-for-byte
   unchanged.
@@ -290,7 +290,7 @@ result.
 * `docs/CAPSULE_FORMALISM.md` — formal mathematical model.
 * `docs/RESULTS_CAPSULE_LEARNING.md` — Phase-46 ML result.
 * `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE.md` — this note.
-* `vision_mvp/wevra/capsule_policy.py` — `AdmissionPolicy`
+* `vision_mvp/coordpy/capsule_policy.py` — `AdmissionPolicy`
   framework, three heuristics, one learned policy,
   budgeted-admission ledger, training routine.
 * `vision_mvp/experiments/phase46_capsule_learning.py` —
@@ -305,7 +305,7 @@ result.
 
 ### Modified files (additive only)
 
-* `vision_mvp/wevra/__init__.py` — re-export
+* `vision_mvp/coordpy/__init__.py` — re-export
   `capsule_policy.*` symbols.
 * `docs/context_zero_master_plan.md` — § 4.10 + § 4.11 + § 5
   add capsule-research-center section, ML/research agenda,
@@ -313,20 +313,20 @@ result.
 
 ### NOT modified (deliberate)
 
-* `vision_mvp/wevra/capsule.py` — *byte-for-byte unchanged*.
+* `vision_mvp/coordpy/capsule.py` — *byte-for-byte unchanged*.
   The capsule contract C1..C6 is the precondition of this
   milestone, not its product.
 * All Phase-19..44 substrate primitives. The unification is
   *additive on top of* every Phase-N guarantee; no
   substrate primitive is modified.
-* `vision_mvp/wevra/run.py`, `runtime.py`, `provenance.py`.
+* `vision_mvp/coordpy/run.py`, `runtime.py`, `provenance.py`.
   No runtime contract change.
 
 ### Tests
 
 * New: 16 (6 capsule-policy + 10 subsumption-stress).
-* Pre-existing capsule tests (`test_wevra_capsules.py`,
-  `test_wevra_public_api.py`): unchanged, all pass.
+* Pre-existing capsule tests (`test_coordpy_capsules.py`,
+  `test_coordpy_public_api.py`): unchanged, all pass.
 * Total new test code: ~480 lines.
 
 ---
@@ -336,11 +336,11 @@ result.
 ```bash
 # Run the ML benchmark.
 python -m vision_mvp.experiments.phase46_capsule_learning \
-    --out-dir /tmp/wevra_phase46
+    --out-dir /tmp/coordpy_phase46
 
 # Run the unification audit.
 python -m vision_mvp.experiments.phase46_unification_audit \
-    --out-dir /tmp/wevra_phase46
+    --out-dir /tmp/coordpy_phase46
 
 # Run the new contract tests.
 python -m pytest vision_mvp/tests/test_capsule_policy.py \

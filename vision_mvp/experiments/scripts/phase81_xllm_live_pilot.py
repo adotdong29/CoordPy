@@ -39,7 +39,7 @@ import time
 import urllib.error
 import urllib.request
 
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     LiveOracleAttestation,
     compute_response_feature_signature,
     HostRegistration,

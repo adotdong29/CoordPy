@@ -1,4 +1,4 @@
-"""Cross-domain validation adapters for the Wevra capsule system.
+"""Cross-domain validation adapters for the CoordPy capsule system.
 
 Each adapter maps domain event types to existing CapsuleKind values
 (HANDLE, SWEEP_CELL, READINESS_CHECK, PROFILE) so that CapsuleCategory
@@ -10,7 +10,7 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass
 
-from vision_mvp.wevra.capsule import (
+from vision_mvp.coordpy.capsule import (
     CapsuleBudget, CapsuleKind, CapsuleLedger, ContextCapsule,
 )
 

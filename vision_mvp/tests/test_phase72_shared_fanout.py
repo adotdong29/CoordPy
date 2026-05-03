@@ -36,7 +36,7 @@ from vision_mvp.experiments.phase72_shared_fanout import (
     run_phase72_seed_stability_sweep,
     run_cross_regime_p72,
 )
-from vision_mvp.wevra.team_coord import (
+from vision_mvp.coordpy.team_coord import (
     FanoutEnvelope,
     SharedFanoutRegistry,
     SharedFanoutDisambiguator,
@@ -181,7 +181,7 @@ class VerifyFanoutUnitTests(unittest.TestCase):
 
     def test_unknown_schema_version_rejected(self) -> None:
         env_bad = FanoutEnvelope(
-            schema_version="wevra.shared_fanout.UNKNOWN",
+            schema_version="coordpy.shared_fanout.UNKNOWN",
             producer_agent_id=self.env.producer_agent_id,
             consumer_agent_ids=self.env.consumer_agent_ids,
             compact_per_tag_votes=self.env.compact_per_tag_votes,

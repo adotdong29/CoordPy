@@ -28,7 +28,7 @@ from vision_mvp.core.cross_domain import (
 )
 from vision_mvp.core.learned_routing import LearnedRouter, RoutingTrainer
 from vision_mvp.formal.consistency_checker import ConsistencyChecker
-from vision_mvp.wevra.capsule import CapsuleKind
+from vision_mvp.coordpy.capsule import CapsuleKind
 
 
 # ---------------------------------------------------------------------------

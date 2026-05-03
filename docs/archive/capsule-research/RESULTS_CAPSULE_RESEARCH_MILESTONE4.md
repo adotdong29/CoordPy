@@ -128,7 +128,7 @@ The crux of W3-20's strict-separation argument is that the
 per-capsule embedding $\varphi(c, rc)$ can express
 *conjunctive* shapes that aggregated features cannot. The
 8-dim ``DEEPSET_PHI_FEATURES`` in
-`vision_mvp/wevra/capsule_decoder_v2.py::_phi_capsule`:
+`vision_mvp/coordpy/capsule_decoder_v2.py::_phi_capsule`:
 
 * `phi:implies_rc` — 1 iff $c$'s `claim_kind` implies `rc`.
 * `phi:implies_rc_and_top_priority` — conjunctive top-
@@ -426,7 +426,7 @@ combination of $G(E, y)$.
 $\square$
 
 **Status.** Proved (constructive). Code anchor:
-`vision_mvp/wevra/capsule_decoder_v2.py::_phi_capsule`.
+`vision_mvp/coordpy/capsule_decoder_v2.py::_phi_capsule`.
 
 **Empirical anchor.** DeepSet's 0.425 vs V1 linear's 0.375
 on the same evaluation (Claim W3-23).
@@ -564,7 +564,7 @@ milestone away.**
 ### New files
 
 * `docs/RESULTS_CAPSULE_RESEARCH_MILESTONE4.md` — this note.
-* `vision_mvp/wevra/capsule_decoder_v2.py` — V2 feature
+* `vision_mvp/coordpy/capsule_decoder_v2.py` — V2 feature
   vocabulary, ``LearnedBundleDecoderV2``,
   ``InteractionBundleDecoder``, ``MLPBundleDecoder``,
   ``DeepSetBundleDecoder``, ``MultitaskBundleDecoder``, all
@@ -593,18 +593,18 @@ milestone away.**
 
 ### Not modified (deliberate)
 
-* `vision_mvp/wevra/capsule.py` — capsule contract C1..C6
+* `vision_mvp/coordpy/capsule.py` — capsule contract C1..C6
   byte-for-byte unchanged.
-* `vision_mvp/wevra/capsule_policy.py`,
-  `vision_mvp/wevra/capsule_policy_bundle.py` — admission
+* `vision_mvp/coordpy/capsule_policy.py`,
+  `vision_mvp/coordpy/capsule_policy_bundle.py` — admission
   layer unchanged.
-* `vision_mvp/wevra/capsule_decoder.py` — Phase-48 decoder
+* `vision_mvp/coordpy/capsule_decoder.py` — Phase-48 decoder
   module unchanged; Phase-49 decoders live in the
   additively-new `capsule_decoder_v2.py`.
-* `vision_mvp/wevra/run.py`, `runtime.py`, `provenance.py` —
+* `vision_mvp/coordpy/run.py`, `runtime.py`, `provenance.py` —
   no runtime contract change.
 * `vision_mvp/core/*.py` — no substrate primitive modified.
-* `SDK_VERSION` — still `wevra.sdk.v3`. The Phase-49
+* `SDK_VERSION` — still `coordpy.sdk.v3`. The Phase-49
   decoders are additive on the research centre, not part
   of the public SDK contract.
 
@@ -621,14 +621,14 @@ milestone away.**
 ```bash
 # Part A — stronger decoder (Gate 1 anchor, W3-20 / W3-23).
 python -m vision_mvp.experiments.phase49_stronger_decoder \
-    --out-dir /tmp/wevra_phase49
+    --out-dir /tmp/coordpy_phase49
 # Expect:
 #   DeepSet best cell ≈ 0.400-0.425 on test.
 #   "PARADIGM-SHIFT GATE-1: at least one cell crosses 0.400".
 
 # Part B — symmetric transfer (Gate 2 anchor, W3-21 / W3-22).
 python -m vision_mvp.experiments.phase49_symmetric_transfer \
-    --out-dir /tmp/wevra_phase49
+    --out-dir /tmp/coordpy_phase49
 # Expect:
 #   multitask shared-head-only on incident ≈ 0.350.
 #   multitask shared-head-only on security ≈ 0.350.
@@ -641,7 +641,7 @@ python -m pytest \
     vision_mvp/tests/test_phase47_cohort_subsumption.py \
     vision_mvp/tests/test_capsule_policy.py \
     vision_mvp/tests/test_capsule_subsumption.py \
-    vision_mvp/tests/test_wevra_capsules.py -q
+    vision_mvp/tests/test_coordpy_capsules.py -q
 # Expect: 72 passed.
 ```
 
