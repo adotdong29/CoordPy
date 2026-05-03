@@ -14,7 +14,7 @@
 > - **conjectural** — stated, falsifiable; not yet proved or systematically tested.
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
-> Last touched: SDK v3.38, 2026-05-02.
+> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03.
 
 ## Capsule algebra (W3-7 .. W3-16)
 

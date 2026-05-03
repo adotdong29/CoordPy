@@ -1,17 +1,90 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
-> Updated through SDK v3.42 RC2, 2026-05-03 (W22 → W41 cumulative
-> trust + dense-control + live-aware multi-anchor / trust-subspace /
-> host-diverse / cross-host trajectory / disjoint-consensus-reference /
+> Updated through **SDK v3.43 (final release of the v3.4x line)**,
+> 2026-05-03 (W22 → W42 cumulative trust + dense-control +
+> live-aware multi-anchor / trust-subspace / host-diverse /
+> cross-host trajectory / disjoint-consensus-reference /
 > multi-host-disjoint-quorum / cross-host-response-heterogeneity /
-> integrated-multi-agent-context-synthesis guard ladder summarised in
-> § 14.2 and § 17).
+> integrated-multi-agent-context-synthesis / cross-role-invariant-
+> synthesis guard ladder summarised in § 14.2 and § 17).
 >
-> **Latest milestone marker (SDK v3.42 RC2 / W41, 2026-05-03).** The
-> programme now has **thirty-eight** coupled research axes.  W41 is
-> explicitly framed as a **synthesis** milestone, not "W41: one more
-> local mechanism."  W41 jointly binds the strongest old-line
+> **Latest milestone marker (SDK v3.43 / W42, 2026-05-03 — FINAL
+> RELEASE of the Wevra SDK v3.4x line).**  The programme now has
+> **thirty-nine** coupled research axes.  W42 is explicitly framed
+> as a **third-axis bounding** milestone *and* a **release-closure**
+> milestone -- not "W42: one more local mechanism."  W42 wraps W41's
+> producer-axis × trust-axis integrated synthesis with a third
+> orthogonal evidence axis: the **role-handoff invariance axis**,
+> computed deterministically from the canonical sorted ``(role,
+> kind, payload)`` tuples in the cell's input handoffs and
+> namespaced as ``w42_role_handoff_signature``.  An honest
+> controller pre-registers a ``RoleInvariancePolicyRegistry``
+> mapping signature CIDs to expected service sets; W42 ratifies on
+> agreement, abstains on disagreement, and falls through on unknown
+> signatures.  W42 is closed-form, zero-parameter, and capsule-
+> layer; it does NOT add a transformer-internal mechanism, does NOT
+> close ``W41-L-COMPOSITE-COLLUSION-CAP`` in general, and does NOT
+> close its own new ``W42-L-FULL-COMPOSITE-COLLUSION-CAP``
+> limitation theorem (the W42 analog of all previous capsule-layer
+> limitation theorems, sharper in adversary cost).  The role-
+> invariance decision is a deterministic 7-branch classifier
+> ``select_role_invariance_decision`` over ``(integrated_services,
+> expected_services, policy_match_found)``.  Manifest-v12 binds six
+> component CIDs (``parent_w41_cid``, ``invariance_state_cid``,
+> ``invariance_decision_cid``, ``invariance_audit_cid``,
+> ``invariance_witness_cid``, ``role_handoff_signature_cid``); the
+> audit / witness / signature CIDs are namespaced
+> (``w42_invariance_audit`` / ``w42_invariance_witness`` /
+> ``w42_role_handoff_signature``) so substituting a W22..W41 audit /
+> witness / signature for them is mechanically rejected.
+> ``verify_role_invariant_synthesis_ratification`` enumerates 14
+> disjoint W42 failure modes (cumulative 196 across W22..W42).
+> R-89 is the first multi-agent context benchmark family in the
+> programme that records the cross-role invariance branch
+> distribution per cell across five banks (``trivial_w42`` /
+> ``role_invariant_agrees`` / ``role_invariant_recover`` /
+> ``full_composite_collusion`` / ``insufficient_invariance_policy``).
+> The load-bearing change is the **first measured strict
+> trust-precision recovery on a regime where W41 tied at 0.500**:
+> on R-89-ROLE-INVARIANT-RECOVER, W42 raises trust precision from
+> 0.500 to **1.000 across 5/5 seeds**
+> (``Δ_trust_precision_w42_w41 = +0.500``, min = max).  W42 carries
+> roughly **17.5k structured bits per visible W42 token** at one
+> visible token overhead/cell (in the W38..W40 density range).
+> **Live cross-host paraphrase-invariance probe (2026-05-03).**  At
+> temperature 0 on the two-Mac topology (``localhost`` gemma2:9b +
+> ``192.168.12.191`` qwen2.5:14b), K=4 paraphrases of one
+> closed-vocabulary arithmetic prompt produce **4/4 paraphrase-
+> invariant cross-host gold-correlated agreement**: both hosts emit
+> "Four" on every paraphrase; cross-host normalised agreement =
+> 1.000; within-host paraphrase-invariance count = 1 distinct answer
+> per host.  This is the first measured cross-host paraphrase-
+> invariance result in the programme; it is a realism anchor only,
+> not load-bearing for the W42 closed-form mechanism.
+> **Final release declared**: H1..H12 + S3 + S7 of the W42 success
+> criterion pass.  The SDK v3.43 line ships as the **final release**
+> of the Wevra SDK v3.4x research line — the **end-of-line for the
+> capsule-layer-only research programme** in the Context Zero
+> project.  The remaining open frontiers (``W42-C-NATIVE-LATENT``
+> for transformer-internal trust-state projection;
+> ``W42-C-MULTI-HOST`` for K+1-host disjoint topology) are
+> explicitly out of capsule-layer scope and require new
+> architectural substrate (transformer-internal access, K+1-host
+> topology, or both).  Stable-vs-experimental boundary final: every
+> W22..W42 symbol is exported under ``__experimental__``; the
+> stable ``RunSpec → run report`` runtime contract is byte-for-byte
+> unchanged.  Versioning: ``vision_mvp.__version__`` and
+> ``pyproject.toml`` ``project.version`` are now both ``0.5.16``
+> (alignment maintained); ``SDK_VERSION = wevra.sdk.v3.43``.  See
+> ``docs/RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md`` and
+> ``docs/SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md``.
+
+> **Earlier milestone marker (SDK v3.42 RC2 / W41, 2026-05-03 —
+> superseded by v3.43 final).** The programme had **thirty-eight**
+> coupled research axes at this milestone.  W41 is explicitly
+> framed as a **synthesis** milestone, not "W41: one more local
+> mechanism."  W41 jointly binds the strongest old-line
 > explicit-capsule trust-adjudication chain (W21..W40) AND the
 > strongest cross-role / multi-round bundle decoder family (W7..W11)
 > into a single auditable end-to-end path with one **manifest-v11**

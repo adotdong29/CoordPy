@@ -1,9 +1,90 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (SDK v3.41 RC1 / W40, 2026-05-03).**
-> *Cross-host response-signature heterogeneity ratification +
-> manifest-v10 CID + cross-host response-text Jaccard divergence
-> guard + RC1 declaration*.  W40 wraps W39's K-of-N mutually-
+> **Latest milestone marker (SDK v3.43 / W42, 2026-05-03 — FINAL
+> RELEASE of the Wevra SDK v3.4x line).**  *Cross-role-invariant
+> synthesis + manifest-v12 CID + role-handoff-signature axis +
+> composite-collusion bounding + final-release declaration*.  W42
+> wraps W41's producer-axis × trust-axis integrated synthesis with
+> a **third orthogonal evidence axis**: the role-handoff invariance
+> axis, computed deterministically from the canonical sorted
+> ``(role, kind, payload)`` tuples in the cell's input handoffs and
+> namespaced as ``w42_role_handoff_signature``.  An honest
+> controller pre-registers a ``RoleInvariancePolicyRegistry``
+> mapping signature CIDs to expected service sets; W42 ratifies on
+> agreement, abstains on disagreement, and falls through on unknown
+> signatures.  This *bounds* (does not close)
+> ``W41-L-COMPOSITE-COLLUSION-CAP`` at the capsule layer by raising
+> the adversary bar from "compromise W21 producer-side admission
+> AND inject diverse W40 response bytes for the same wrong
+> top_set" to "compromise W21 + inject W40 diverse responses AND
+> poison the controller-side role-invariance policy registry."  On
+> R-89-ROLE-INVARIANT-RECOVER, W42 raises trust precision over W41
+> from 0.500 (``W41-L-COMPOSITE-COLLUSION-CAP`` fires) to **1.000**
+> (**Δ_trust_precision_w42_w41 = +0.500**, min and max equal across
+> 5/5 seeds).  This is the **first measured strict trust-precision
+> recovery on a regime where W41 tied at 0.500**.  Trust/audit
+> survived: W42 adds 14 mechanically tested verifier failure modes
+> and manifest-v12 CID binding (over six component CIDs), bringing
+> the cumulative W22..W42 trust boundary to **196 enumerated
+> failure modes**.  Bounded-context efficiency improved in the
+> audited cross-role sense: about **17.5k structured bits per
+> visible W42 token** on the load-bearing regime at one visible
+> token overhead/cell.  **Live cross-host evidence**: the W42
+> cross-host paraphrase-invariance probe at temperature 0 on the
+> two-Mac topology (``localhost`` gemma2:9b + ``192.168.12.191``
+> qwen2.5:14b) records **4/4 paraphrase-invariant cross-host
+> gold-correlated agreement** on K=4 paraphrases of one
+> closed-vocabulary arithmetic prompt; both hosts emit "Four" on
+> every paraphrase; cross-host normalised agreement = 1.000.  The
+> first measured cross-host paraphrase-invariance result in the
+> programme.  W42 also proves a new ``W42-L-FULL-COMPOSITE-
+> COLLUSION-CAP`` limitation theorem at the capsule layer (when
+> all three axes are coordinated by the adversary, W42 cannot
+> recover).  **Final release declared**: H1..H12 + S3 + S7 of the
+> W42 success criterion pass.  The SDK v3.43 line ships as the
+> **final release** of the Wevra SDK v3.4x research line — the
+> **end-of-line for the capsule-layer-only research programme** in
+> the Context Zero project.  The remaining open frontiers
+> (``W42-C-NATIVE-LATENT``, ``W42-C-MULTI-HOST``) are explicitly
+> out of capsule-layer scope and require new architectural
+> substrate (transformer-internal access, K+1-host topology, or
+> both).  Stable-vs-experimental boundary final: every W22..W42
+> symbol is exported under ``__experimental__``; the stable
+> ``RunSpec → run report`` runtime contract is byte-for-byte
+> unchanged.  Versioning: ``vision_mvp.__version__`` and
+> ``pyproject.toml`` are now both ``0.5.16``;
+> ``SDK_VERSION = wevra.sdk.v3.43``.
+> **Net effect on the original thesis**: materially stronger than
+> W41 along the cross-role-invariance axis; the deeper
+> trust/semantics wall is now strictly *bounded* (not closed) at
+> the capsule layer; the remaining wall is explicitly architecture-
+> bound and out of capsule-layer scope.  Original goal (solving
+> context for multi-agent teams): not solved in general;
+> meaningfully tightened along the audited capsule-layer line and
+> released honestly as the strongest capsule-layer audited proxy
+> this repo can support.
+> See ``docs/RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md`` and
+> ``docs/SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md``; the
+> appended SDK v3.43 (W42 family) section at the end of this file
+> answers the eight forced master-plan synthesis questions for W42.
+
+> **Earlier milestone marker (SDK v3.42 RC2 / W41, 2026-05-03 —
+> superseded by v3.43 final).** *Integrated multi-agent context
+> synthesis + manifest-v11 CID + cross-axis witness CID +
+> producer-axis x trust-axis decision selector + RC2 declaration*.
+> W41 jointly binds the strongest old-line explicit-capsule
+> trust-adjudication chain (W21..W40) AND the strongest cross-role
+> / multi-round bundle decoder family (W7..W11) into a single
+> auditable end-to-end path with one ``manifest-v11`` envelope.
+> ``W41-L-COMPOSITE-COLLUSION-CAP`` names the open wall: when both
+> axes are compromised on the same wrong top_set, W41 cannot
+> recover.  W42 (above) materially BOUNDS this wall via a third
+> orthogonal evidence axis and is the released final.
+
+> **Earlier milestone marker (SDK v3.41 RC1 / W40, 2026-05-03 —
+> superseded by v3.43 final).** *Cross-host response-signature
+> heterogeneity ratification + manifest-v10 CID + cross-host
+> response-text Jaccard divergence guard + RC1 declaration*.  W40 wraps W39's K-of-N mutually-
 > disjoint quorum consensus-reference adjudication with a
 > **cross-host response-heterogeneity** layer that operates on
 > an evidence axis ORTHOGONAL to top_set: the per-member response

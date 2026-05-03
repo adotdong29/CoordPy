@@ -2,7 +2,7 @@
 
 > Canonical do-not-overstate rules for the Context Zero / Wevra
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: SDK v3.38 (W37 family) 2026-05-02. Earlier: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
+> README-of-README must satisfy these rules. Last touched: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03. Earlier: SDK v3.42 (W41 family) 2026-05-03. Earlier: SDK v3.38 (W37 family) 2026-05-02. Earlier: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
 > v3.33 (W32 family) 2026-05-01.
 
 The programme has a long history of moves where a candidate result
@@ -53,7 +53,7 @@ quantitative bar, on which bench, at which $n$. The phrase
 "under W3-Cn" where W3-Cn is a named conjecture in
 `THEOREM_REGISTRY.md`. The strict reading W3-C7 is **retracted**.
 
-Last touched: SDK v3.42 (W41 family) 2026-05-03.
+Last touched: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03.
 
 ### "Solves" without a defining gate
 

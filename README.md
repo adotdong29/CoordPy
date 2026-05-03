@@ -23,7 +23,7 @@ disagreement, and falls through on unknown signatures.  This
 the capsule layer by raising the adversary bar from "compromise
 the W21 producer-side admission AND inject diverse W40 response
 bytes for the same wrong top_set" to "compromise W21 + inject W40
-diverse responses + poison the controller-side role-invariance
+diverse responses AND poison the controller-side role-invariance
 policy registry."  On **R-89-ROLE-INVARIANT-RECOVER** (the
 W41-L-COMPOSITE-COLLUSION-CAP regime), W42 strictly improves
 trust precision over W41 from 0.500 to **1.000**
@@ -75,7 +75,119 @@ byte-for-byte unchanged.  Versioning: ``vision_mvp.__version__``
 and ``pyproject.toml`` are now both ``0.5.16``;
 ``SDK_VERSION = wevra.sdk.v3.43``.
 
-**Previous milestone: SDK v3.42 RC2 (May 2026).** Integrated
+## Final release scope (v3.43)
+
+The SDK v3.43 line is the **final release of the Wevra SDK v3.4x
+research line** -- the **end-of-line for the capsule-layer-only
+research programme** in the Context Zero project.  The boundary
+between what is stable, what is experimental but included, and
+what is explicitly out of scope is now final and frozen for this
+release.
+
+### Stable and shipped
+
+* The product/runtime contract: one ``wevra.RunSpec`` in, one
+  reproducible ``RunReport`` out, where the report is the root of
+  a sealed capsule graph that can be audited and replayed.  This
+  contract is byte-for-byte unchanged from earlier v3.x releases
+  and is what users and downstream tools should depend on.
+* Public CLIs: ``wevra``, ``wevra-import``, ``wevra-ci``,
+  ``wevra-capsule`` (see ``[project.scripts]`` in
+  ``pyproject.toml``).
+* Capsule contract types and ``wevra.run`` /
+  ``wevra.RunReport`` orchestration (W3-7..W3-31 and W3-32..W3-41).
+* Public package version: ``vision_mvp.__version__ = 0.5.16`` ==
+  ``pyproject.toml`` ``project.version = 0.5.16``;
+  ``SDK_VERSION = "wevra.sdk.v3.43"``.
+
+### Experimental but included
+
+Everything under ``vision_mvp.wevra.__experimental__`` is
+**experimental research surface** included in the release for
+audit, reproduction, and downstream research.  This covers the
+entire capsule-layer trust-adjudication / multi-agent-coordination
+research ladder:
+
+* The W22..W42 capsule-layer research surface (every symbol in
+  the cumulative ``__experimental__`` tuple — orchestrators,
+  registries, envelopes, verifiers, signature CIDs, manifest
+  versions v6 through v12, decision selectors, named decision
+  branches, and the 196 cumulative enumerated trust-boundary
+  failure modes).
+* The R-69..R-89 benchmark family drivers
+  (``vision_mvp.experiments.phase69_*`` through
+  ``phase89_role_invariant_synthesis``) and the matching unit
+  tests under ``vision_mvp/tests/``.
+* The bounded live cross-host probes
+  (``phase8x_xllm_*`` and ``phase89_xllm_role_invariance_probe``).
+
+These symbols may move, rename, or get withdrawn as the next
+research programme starts.  Downstream code that depends on them
+should pin against the experimental tuple, not assume API
+stability.
+
+### Out of scope for this release
+
+Two open frontiers are explicitly **out of capsule-layer scope**
+and are not addressed by the Wevra SDK v3.4x line.  They are
+preserved as named conjectures in
+``docs/THEOREM_REGISTRY.md`` so future work has a clean handle on
+them, but they are not blockers to the v3.43 final release:
+
+* **``W42-C-NATIVE-LATENT``** — true transformer-internal
+  trust-state projection.  Architecture-bound: requires
+  hidden-state, KV-cache, attention-weight, or embedding-table
+  access.  No mechanism in this repo touches transformer
+  internals; the W22..W42 chain is closed-form, deterministic,
+  zero-parameter, and capsule-layer.  Closing
+  ``W42-C-NATIVE-LATENT`` requires a new architectural substrate
+  that is not in this repo.
+* **``W42-C-MULTI-HOST``** — K+1-host disjoint topology beyond
+  the two-Mac pair (``localhost`` + ``192.168.12.191``).
+  Hardware-bound: would let the role-invariance policy registry
+  be sourced from a true off-cluster oracle, defeating the
+  ``W42-L-FULL-COMPOSITE-COLLUSION-CAP`` attack at the capsule
+  layer.  The lab's two-Mac topology is the strongest live
+  evidence available in this environment; ``.248`` is gone,
+  ``.101`` is Apple TV / AirPlay (``W41-INFRA-1`` carry-forward).
+
+These are next-programme architecture questions, not release
+blockers.  Future work addressing them will require new
+substrate (transformer-internal access, K+1-host topology, or
+both) and is explicitly outside the scope of this repo's v3.43
+final release.
+
+### Reproducing the headline result
+
+The forced-verdict result is a strict **+0.500
+trust-precision recovery** on R-89-ROLE-INVARIANT-RECOVER across
+5/5 seeds (``min = max = +0.500``).  To reproduce:
+
+```
+# W42 unit suite (40 tests; ~2 s).
+python3 -m pytest vision_mvp/tests/test_phase89_role_invariant_synthesis.py -q
+
+# Focused W22..W42 stack regression (738 tests; ~80 s).
+python3 -m pytest vision_mvp/tests/test_phase{69..89}_*.py -q
+
+# R-89 5-seed sweep driver (writes seed-sweep JSON artifacts under
+# vision_mvp/experiments/artifacts/phase89/).
+python3 -m vision_mvp.experiments.phase89_role_invariant_synthesis
+```
+
+The success bar (every hard gate, every named falsifier, the
+forced verdict structure) is pre-committed in
+``docs/SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md``.  The
+results note (every empirical headline + theoretical claim +
+hard-gate / soft-gate aggregate + end-of-line declaration) is in
+``docs/RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md``.  The
+canonical theorem-by-theorem status is in
+``docs/THEOREM_REGISTRY.md``; the do-not-overstate rules are in
+``docs/HOW_NOT_TO_OVERSTATE.md``.
+
+---
+
+**Previous milestone: SDK v3.42 RC2 (May 2026, superseded by v3.43 final).** Integrated
 multi-agent context synthesis + manifest-v11 CID + cross-axis
 witness CID + producer-axis x trust-axis decision selector (W41
 family).  W41 jointly binds the strongest old-line explicit-
@@ -87,7 +199,7 @@ the adversary controls both axes on the same wrong top_set, W41
 cannot recover.  W42 (above) materially BOUNDS this wall via a
 third orthogonal evidence axis.
 
-**Previous milestone: SDK v3.41 RC1 (May 2026).** Cross-host
+**Previous milestone: SDK v3.41 RC1 (May 2026, superseded by v3.43 final).** Cross-host
 response-signature heterogeneity ratification + manifest-v10 CID +
 cross-host response-text Jaccard divergence guard (W40 family).
 W40 wraps W39's K-of-N mutually-disjoint quorum consensus-reference
