@@ -67,6 +67,12 @@
 > ``docs/SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md``; the
 > appended SDK v3.43 (W42 family) section at the end of this file
 > answers the eight forced master-plan synthesis questions for W42.
+>
+> **Reader note.** Earlier milestone markers below are preserved as
+> historical records, not current release guidance.  In particular,
+> any W39/W40 wording that treated ``192.168.12.101`` as a third-host
+> Mac candidate is superseded by the W41 retraction: ``.101`` is an
+> Apple TV / AirPlay receiver, not a Mac.
 
 > **Earlier milestone marker (SDK v3.42 RC2 / W41, 2026-05-03 —
 > superseded by v3.43 final).** *Integrated multi-agent context
@@ -155,7 +161,8 @@
 > See ``docs/RESULTS_COORDPY_W40_RESPONSE_HETEROGENEITY.md`` and
 > ``docs/SUCCESS_CRITERION_W40_RESPONSE_HETEROGENEITY.md``.
 
-> **Earlier milestone marker (SDK v3.40 / W39, 2026-05-02).**
+> **Earlier milestone marker (SDK v3.40 / W39, 2026-05-02 —
+> historical `.101` interpretation later retracted at W41).**
 > *Multi-host disjoint quorum consensus-reference ratification +
 > manifest-v9 CID + mutually-disjoint physical-host topology*.  W39
 > wraps W38's disjoint cross-source consensus-reference adjudication

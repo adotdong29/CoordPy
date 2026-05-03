@@ -42,6 +42,30 @@ this repo. Unlabelled claims are forbidden.
 
 ## Forbidden moves
 
+### "Public install is live everywhere" or "all CoordPy APIs are stable"
+
+> *"Just `pip install coordpy`; everything in the repo is stable."*
+
+Forbidden unless it is true at the time of writing.  Public-facing
+release text must distinguish:
+
+* the **stable released surface** (`vision_mvp.coordpy`, the public
+  CLIs, and the named on-disk schema contracts),
+* the **experimental included surface**
+  (`vision_mvp.coordpy.__experimental__`), and
+* the **out-of-scope next-programme work**
+  (`W42-C-NATIVE-LATENT`, `W42-C-MULTI-HOST`).
+
+Permitted phrasing: *"Install from a clone with `pip install -e .`
+today; use `pip install coordpy` / `pipx install coordpy` once the
+package is published.  Treat `vision_mvp.coordpy` as the stable SDK
+surface and `vision_mvp.coordpy.__experimental__` as non-stable
+research API."*
+
+Forbidden phrasing: *"Everything in CoordPy is stable"*, *"`pip
+install coordpy` is available now"* (unless it is), *"the W22..W42
+ladder is part of the stable SDK contract"*.
+
 ### "Paradigm shift" without a stated reading
 
 > *"This is a paradigm shift."*

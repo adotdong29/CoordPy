@@ -40,6 +40,17 @@ together:
   consumes the report, and a `coordpy-capsule verify` CLI that
   re-hashes the on-disk capsule chain end-to-end.
 
+## Who it is for
+
+CoordPy is for developers and researchers building **AI agent teams**
+rather than a single prompt loop. It is a good fit when you need one or
+more of these:
+
+* a stable Python SDK and CLI for multi-agent runs;
+* structured handoffs between agents instead of ad hoc prompt strings;
+* auditable run artifacts that can be re-verified from disk;
+* a clean stable core plus an opt-in experimental research surface.
+
 ## Why CoordPy
 
 Most multi-agent stacks treat context as text — prompts, JSON
@@ -66,11 +77,16 @@ end-to-end in a runnable SDK.
 
 ## Install
 
+Today, the supported install path is from a clone:
+
 ```bash
-pip install -e .                 # editable install from a clone
-# or, once published to PyPI:
+git clone https://github.com/adotdong29/context-zero.git
+cd context-zero
+pip install -e .
+
+# once published to PyPI:
 # pip install coordpy
-# pipx install coordpy              # if you only want the CLIs
+# pipx install coordpy            # if you only want the CLIs
 ```
 
 Only required dependency is NumPy. The optional LLM-agent demo
@@ -115,6 +131,10 @@ COORDPY_OLLAMA_URL=http://localhost:11434 \
 
 See [`docs/START_HERE.md`](docs/START_HERE.md) for the onboarding
 path and [`examples/`](examples/) for short standalone programs.
+
+If you only want the product surface, you can stop after this section
+plus [Stable vs experimental — at a glance](#stable-vs-experimental--at-a-glance).
+Everything below is deeper release-scope detail and historical research context.
 
 ## Stable vs experimental — at a glance
 
@@ -295,7 +315,7 @@ the adversary controls both axes on the same wrong top_set, W41
 cannot recover.  W42 (above) materially BOUNDS this wall via a
 third orthogonal evidence axis.
 
-**Previous milestone: SDK v3.41 RC1 (May 2026, superseded by v3.43 final).** Cross-host
+**Previous milestone: SDK v3.41 RC1 (May 2026, superseded by v3.43 final; historical `.101` reading retracted at W41).** Cross-host
 response-signature heterogeneity ratification + manifest-v10 CID +
 cross-host response-text Jaccard divergence guard (W40 family).
 W40 wraps W39's K-of-N mutually-disjoint quorum consensus-reference
@@ -358,7 +378,7 @@ byte-for-byte unchanged.  Versioning: ``vision_mvp.__version__``
 and ``pyproject.toml`` are now both ``0.5.14`` (alignment
 maintained).
 
-**Previous milestone: SDK v3.40 (May 2026).** Multi-host disjoint quorum
+**Previous milestone: SDK v3.40 (May 2026; historical `.101` reading later retracted at W41).** Multi-host disjoint quorum
 consensus-reference ratification + manifest-v9 CID + mutually-disjoint
 physical-host topology (W39 family).  W39 wraps W38's disjoint
 cross-source consensus-reference adjudication with a **K-of-N

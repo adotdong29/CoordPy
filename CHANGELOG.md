@@ -28,6 +28,13 @@ remaining open frontiers (`W42-C-NATIVE-LATENT`,
 `W42-C-MULTI-HOST`) are explicitly out of capsule-layer scope and
 are next-programme work, not v3.43 blockers.*
 
+**Install/use today:** install from a clone with `pip install -e .`,
+then use the stable import surface `vision_mvp.coordpy` and the public
+CLIs `coordpy`, `coordpy-import`, `coordpy-ci`, and
+`coordpy-capsule`.  `pip install coordpy` / `pipx install coordpy`
+remain the intended published install paths once the package is on
+PyPI.
+
 ### Added — W42 family (cross-role-invariant synthesis + composite-collusion bounding)
 
 * **`vision_mvp/coordpy/role_invariant_synthesis.py`** — new module
@@ -452,7 +459,7 @@ candidate (RC1)** of the SDK v3.4x line.*
   has a pre-existing collection-time hang independent of W40 —
   carried forward unchanged from W39).
 
-## [0.5.13 / 3.40] — 2026-05-02 — SDK v3.40 — multi-host disjoint quorum consensus-reference ratification + manifest-v9 CID + mutually-disjoint physical-host topology + R-86 Phase-86 benchmark family + W39 multi-host quorum-bounding limitation theorem + bounded 5-host live disjoint quorum probe + 192.168.12.101 Mac-2 stale-pin discharge
+## [0.5.13 / 3.40] — 2026-05-02 — SDK v3.40 — multi-host disjoint quorum consensus-reference ratification + manifest-v9 CID + mutually-disjoint physical-host topology + R-86 Phase-86 benchmark family + W39 multi-host quorum-bounding limitation theorem + bounded 5-host live disjoint quorum probe + historical `.101` third-host candidate reading (later retracted at W41)
 
 *Strictly additive on SDK v3.39.  The stable CoordPy product/runtime
 (`RunSpec → run report`) is byte-for-byte unchanged.  W39 surface lives
@@ -534,12 +541,15 @@ under `__experimental__`.*
 
 ### Added — Lab topology resolution + live evidence
 
-* **`192.168.12.248` Mac-2 stale-pin DISCHARGED**.  ARP-incomplete
-  for the 31st milestone in a row.  ``192.168.12.101`` identified
-  as the reachable third physical host candidate, **partially
-  discharging W38-C-MULTI-HOST at the topology layer**: preflight-OK
-  on cold contact with `qwen3.5:35b` and `qwen2.5:14b-32k` model
-  files visible.
+* **Historical W39 topology reading (superseded at W41).**
+  ``192.168.12.248`` remained ARP-incomplete for the 31st milestone
+  in a row.  At W39 time, ``192.168.12.101`` was treated as the
+  reachable third physical host candidate, **partially discharging
+  W38-C-MULTI-HOST at the topology layer**: preflight-OK on cold
+  contact with `qwen3.5:35b` and `qwen2.5:14b-32k` model files
+  visible.  This specific `.101` interpretation was later retracted
+  at W41, which identified `.101` as an Apple TV / AirPlay receiver,
+  not a Mac.
 
 * **`W39-INFRA-1`** named: ``.101`` Ollama inference path is
   bounded under capsule-layer one-word probe budget after first

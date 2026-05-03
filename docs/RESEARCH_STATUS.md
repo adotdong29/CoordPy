@@ -102,6 +102,27 @@ sharper in adversary cost).
 * **Cumulative trust boundary**: 196 enumerated capsule-layer
   failure modes mechanically audited across W22..W42.
 
+**Release-use summary (current truth).**
+
+* **Install today**: from a clone, `pip install -e .`, then import
+  `vision_mvp.coordpy` or use the `coordpy` / `coordpy-import` /
+  `coordpy-ci` / `coordpy-capsule` CLIs.  `pip install coordpy` and
+  `pipx install coordpy` are the intended published install paths once
+  the package is on PyPI.
+* **Stable and released**: the `RunSpec -> run -> RunReport` runtime,
+  the public CLIs, capsule primitives, and the on-disk schema
+  contracts named in the README.
+* **Experimental but included**: every W22..W42 symbol under
+  `vision_mvp.coordpy.__experimental__`, the R-69..R-89 benchmark
+  drivers, and the bounded live cross-host probes.
+* **Out of scope for this release**: `W42-C-NATIVE-LATENT` and
+  `W42-C-MULTI-HOST`.
+
+Historical note: older sections below are preserved as milestone
+records.  Where they mention `.101` as a third-host Mac candidate,
+that reading is superseded by the W41 retraction: `.101` is an Apple
+TV / AirPlay receiver, not a Mac.
+
 ## Earlier TL;DR — SDK v3.42 RC2
 
 The programme now has **thirty-eight** coupled research axes.  SDK
