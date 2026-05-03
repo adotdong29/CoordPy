@@ -788,20 +788,36 @@ def _spec_payload(spec: SweepSpec) -> dict[str, Any]:
 def sweep_spec_from_profile(profile_name: str,
                               *, acknowledge_heavy: bool = False,
                               jsonl_override: str | None = None,
+                              config: "Any | None" = None,
                               ) -> SweepSpec | None:
     """Build a ``SweepSpec`` from a profile's ``sweep`` block.
 
     Returns None if the profile has no sweep block. Endpoint is
     resolved via ``COORDPY_OLLAMA_URL_*`` env overrides when the
-    profile's declared endpoint matches a known cluster node.
+    profile's declared endpoint matches a known cluster node. When a
+    ``CoordPyConfig``-shaped ``config`` is supplied, its model /
+    backend / base-url overrides are applied additively on top.
     """
     from vision_mvp.product import profiles as _profiles
     prof = _profiles.get_profile(profile_name)
     sw = prof.get("sweep")
     if sw is None:
         return None
-    jsonl = jsonl_override or sw["jsonl"]
+    jsonl = jsonl_override or getattr(config, "jsonl", None) or sw["jsonl"]
+    model = getattr(config, "model", None) or sw.get("model")
+    backend_name = None
+    resolver = getattr(config, "resolved_backend_name", None)
+    if callable(resolver):
+        backend_name = resolver()
     endpoint = _resolve_endpoint(sw.get("ollama_url"))
+    if backend_name in {"openai", "openai_compatible", "provider", "mlx_distributed"}:
+        endpoint = (
+            getattr(config, "llm_base_url", None)
+            or getattr(config, "ollama_url", None)
+            or endpoint
+        )
+    elif getattr(config, "ollama_url", None):
+        endpoint = getattr(config, "ollama_url")
     return SweepSpec(
         mode=sw["mode"],
         jsonl=jsonl,
@@ -810,7 +826,7 @@ def sweep_spec_from_profile(profile_name: str,
         apply_modes=tuple(sw["apply_modes"]),
         n_distractors=tuple(sw["n_distractors"]),
         n_instances=sw.get("n_instances"),
-        model=sw.get("model"),
+        model=model,
         endpoint=endpoint,
         acknowledge_heavy=acknowledge_heavy,
         enable_raw_capture=bool(sw.get("enable_raw_capture", False)),

@@ -17,6 +17,7 @@ import json
 import os
 import sys
 
+from .config import CoordPyConfig
 from .run import RunSpec, run as coordpy_run
 
 
@@ -40,12 +41,32 @@ def _cmd_run(argv: list[str] | None = None) -> int:
             "(e.g. public_jsonl) execute inside Docker by default "
             "(--network=none, read-only rootfs). Pass "
             "--allow-unsafe-sandbox only for JSONL you have audited "
-            "yourself."))
+            "yourself.\n\n"
+            "Provider config: prefer COORDPY_BACKEND, "
+            "COORDPY_API_BASE_URL, COORDPY_API_KEY "
+            "(legacy COORDPY_LLM_* names and OPENAI_* fallbacks "
+            "are also supported for OpenAI-compatible providers)."))
     ap.add_argument("--profile", required=True,
                      choices=_profiles.list_profiles())
     ap.add_argument("--out-dir", required=True)
     ap.add_argument("--jsonl", default=None,
                      help="override profile JSONL")
+    ap.add_argument("--model", default=None,
+                     help="override the profile's model tag for real sweeps")
+    ap.add_argument("--backend", default=None,
+                     choices=("ollama", "openai", "openai_compatible",
+                              "provider",
+                              "mlx_distributed"),
+                     help=("LLM backend for real sweeps. Defaults to "
+                           "CoordPy env/config resolution."))
+    ap.add_argument("--base-url", default=None,
+                     help=("override the backend base URL. For OpenAI-"
+                           "compatible providers this should be the "
+                           "root URL hosting /v1/chat/completions."))
+    ap.add_argument("--api-key-env", default=None,
+                     help=("read the provider API key from this "
+                           "environment variable instead of "
+                           "COORDPY_API_KEY / OPENAI_API_KEY"))
     ap.add_argument("--skip-sweep", action="store_true")
     ap.add_argument("--force-sweep", action="store_true")
     ap.add_argument("--acknowledge-heavy", action="store_true",
@@ -69,6 +90,18 @@ def _cmd_run(argv: list[str] | None = None) -> int:
         from . import __version__, SDK_VERSION
         print(f"coordpy {__version__} ({SDK_VERSION})")
         return 0
+    api_key = None
+    if args.api_key_env:
+        api_key = os.environ.get(args.api_key_env)
+        if api_key is None:
+            ap.error(
+                f"--api-key-env {args.api_key_env!r} is not set in the environment")
+    config = CoordPyConfig.from_env(
+        model=args.model,
+        llm_backend=args.backend,
+        llm_base_url=args.base_url,
+        llm_api_key=api_key,
+    )
     spec = RunSpec(
         profile=args.profile,
         out_dir=args.out_dir,
@@ -78,6 +111,7 @@ def _cmd_run(argv: list[str] | None = None) -> int:
         acknowledge_heavy=args.acknowledge_heavy,
         allow_unsafe_sandbox=args.allow_unsafe_sandbox,
         report_sinks=tuple(args.report_sink),
+        config=config,
     )
     report = coordpy_run(spec)
     print(report.get("summary_text", ""))

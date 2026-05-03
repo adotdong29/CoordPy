@@ -110,6 +110,27 @@ class RunnerV2ReportTests(unittest.TestCase):
         # Staged launch_cmd lives inside the v2 block.
         self.assertIn("phase42_parser_sweep", " ".join(sw["launch_cmd"]))
 
+    def test_runspec_config_flows_into_real_profile(self):
+        from vision_mvp.coordpy import CoordPyConfig, RunSpec, run
+        cfg = CoordPyConfig(
+            model="gpt-4o-mini",
+            llm_backend="openai",
+            llm_base_url="https://api.example.test",
+            llm_api_key="secret",
+        )
+        with tempfile.TemporaryDirectory() as td:
+            rep = run(RunSpec(
+                profile="aspen_mac1_coder",
+                out_dir=td,
+                acknowledge_heavy=False,
+                config=cfg,
+            ))
+        sw = rep["sweep"]
+        self.assertEqual(sw["schema"], "coordpy.sweep.v2")
+        self.assertFalse(sw["executed_in_process"])
+        self.assertIn("gpt-4o-mini", " ".join(sw["launch_cmd"]))
+        self.assertIn("https://api.example.test", " ".join(sw["launch_cmd"]))
+
 
 class EnvEndpointOverrideTests(unittest.TestCase):
 
@@ -130,6 +151,21 @@ class EnvEndpointOverrideTests(unittest.TestCase):
             self.assertEqual(spec.endpoint, "http://example.internal:11434")
         finally:
             del os.environ["COORDPY_OLLAMA_URL"]
+
+    def test_openai_config_override_applies(self):
+        from vision_mvp.coordpy import CoordPyConfig
+        from vision_mvp.coordpy.runtime import sweep_spec_from_profile
+        cfg = CoordPyConfig(
+            model="gpt-4o-mini",
+            llm_backend="openai_compatible",
+            llm_base_url="https://api.example.test",
+        )
+        spec = sweep_spec_from_profile(
+            "aspen_mac1_coder",
+            config=cfg,
+        )
+        self.assertEqual(spec.model, "gpt-4o-mini")
+        self.assertEqual(spec.endpoint, "https://api.example.test")
 
 
 if __name__ == "__main__":

@@ -36,6 +36,10 @@ class CoordPySurfaceTests(unittest.TestCase):
         "CoordPyConfig",
         "PROVENANCE_SCHEMA", "build_manifest",
         "profiles", "report", "ci_gate", "import_data", "extensions",
+        "Agent", "AgentTurn", "TeamResult", "AgentTeam", "agent",
+        "create_team",
+        "OpenAICompatibleBackend", "backend_from_env",
+        "backend_from_config",
         "__version__", "SDK_VERSION",
         "PRODUCT_REPORT_SCHEMA", "PRODUCT_REPORT_SCHEMA_V1",
         "CI_VERDICT_SCHEMA", "IMPORT_AUDIT_SCHEMA",
@@ -116,16 +120,45 @@ class CoordPySurfaceTests(unittest.TestCase):
         # re-export). The integration boundary is one HTTP-client
         # class — CoordPy deliberately does not own cluster bring-up.
         from vision_mvp.coordpy import (
-            LLMBackend, OllamaBackend, MLXDistributedBackend,
-            make_backend,
+            LLMBackend, OllamaBackend, OpenAICompatibleBackend,
+            MLXDistributedBackend, make_backend, backend_from_env,
+            backend_from_config, CoordPyConfig,
         )
         self.assertIsNotNone(LLMBackend)
         # Factory dispatch by name.
         b1 = make_backend("ollama", model="m", base_url=None)
         self.assertIsInstance(b1, OllamaBackend)
+        b_openai = make_backend(
+            "openai_compatible", model="m",
+            base_url="https://api.openai.com")
+        self.assertIsInstance(b_openai, OpenAICompatibleBackend)
         b2 = make_backend("mlx_distributed", model="m",
                            base_url="http://x:8080")
         self.assertIsInstance(b2, MLXDistributedBackend)
+        with tempfile.TemporaryDirectory():
+            os.environ["COORDPY_BACKEND"] = "openai"
+            os.environ["COORDPY_MODEL"] = "gpt-4o-mini"
+            os.environ["COORDPY_API_KEY"] = "secret"
+            try:
+                b3 = backend_from_env()
+                self.assertIsInstance(b3, OpenAICompatibleBackend)
+                cfg = CoordPyConfig.from_env()
+                b4 = backend_from_config(
+                    cfg, model="gpt-4o-mini",
+                    endpoint="https://api.openai.com")
+                self.assertIsInstance(b4, OpenAICompatibleBackend)
+            finally:
+                del os.environ["COORDPY_BACKEND"]
+                del os.environ["COORDPY_MODEL"]
+                del os.environ["COORDPY_API_KEY"]
+
+    def test_agent_team_surface_is_exported(self):
+        from vision_mvp.coordpy import Agent, AgentTeam, agent, create_team
+        planner = agent("planner", "Plan the work.")
+        writer = Agent(name="writer", instructions="Write the answer.")
+        team = create_team([planner, writer], capture_capsules=False)
+        self.assertIsInstance(planner, Agent)
+        self.assertIsInstance(team, AgentTeam)
 
     def test_team_coord_surface_is_exported(self):
         # The SDK v3.5 multi-agent coordination research slice must
@@ -173,16 +206,25 @@ class CoordPySurfaceTests(unittest.TestCase):
         from vision_mvp.coordpy import CoordPyConfig
         os.environ["COORDPY_MODEL"] = "test-model:1b"
         os.environ["COORDPY_SANDBOX"] = "in_process"
+        os.environ["COORDPY_BACKEND"] = "openai"
+        os.environ["COORDPY_API_BASE_URL"] = "https://api.example.test"
+        os.environ["COORDPY_API_KEY"] = "secret"
         try:
             cfg = CoordPyConfig.from_env()
             self.assertEqual(cfg.model, "test-model:1b")
             self.assertEqual(cfg.sandbox, "in_process")
+            self.assertEqual(cfg.llm_backend, "openai")
+            self.assertEqual(cfg.llm_base_url, "https://api.example.test")
+            self.assertEqual(cfg.llm_api_key, "secret")
             # kwargs override env.
             cfg2 = CoordPyConfig.from_env(model="override:7b")
             self.assertEqual(cfg2.model, "override:7b")
         finally:
             del os.environ["COORDPY_MODEL"]
             del os.environ["COORDPY_SANDBOX"]
+            del os.environ["COORDPY_BACKEND"]
+            del os.environ["COORDPY_API_BASE_URL"]
+            del os.environ["COORDPY_API_KEY"]
 
     def test_profiles_are_re_exported(self):
         from vision_mvp.coordpy import profiles

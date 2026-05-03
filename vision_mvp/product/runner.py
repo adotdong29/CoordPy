@@ -196,6 +196,7 @@ def run_profile(profile_name: str, *,
                  skip_sweep: bool = False,
                  acknowledge_heavy: bool = False,
                  allow_unsafe_sandbox: bool = False,
+                 config: "Any | None" = None,
                  capsule_native: bool = True,
                  deterministic: bool = False,
                  ) -> dict:
@@ -237,6 +238,7 @@ def run_profile(profile_name: str, *,
             skip_sweep=skip_sweep,
             acknowledge_heavy=acknowledge_heavy,
             allow_unsafe_sandbox=allow_unsafe_sandbox,
+            config=config,
             deterministic=deterministic,
         )
     return _run_profile_post_hoc(
@@ -247,6 +249,7 @@ def run_profile(profile_name: str, *,
         skip_sweep=skip_sweep,
         acknowledge_heavy=acknowledge_heavy,
         allow_unsafe_sandbox=allow_unsafe_sandbox,
+        config=config,
         deterministic=deterministic,
     )
 
@@ -388,6 +391,7 @@ def _run_profile_capsule_native(profile_name: str, *,
                                  skip_sweep: bool,
                                  acknowledge_heavy: bool,
                                  allow_unsafe_sandbox: bool,
+                                 config: "Any | None" = None,
                                  deterministic: bool = False,
                                  ) -> dict:
     """Capsule-native run path.
@@ -401,6 +405,7 @@ def _run_profile_capsule_native(profile_name: str, *,
     separate post-RUN_REPORT artefact slice.
     """
     from vision_mvp.coordpy.capsule_runtime import CapsuleNativeRunContext
+    from vision_mvp.coordpy.llm_backend import backend_from_config
     from vision_mvp.coordpy.provenance import build_manifest
     from vision_mvp.coordpy.runtime import (
         sweep_spec_from_profile, run_sweep,
@@ -451,6 +456,7 @@ def _run_profile_capsule_native(profile_name: str, *,
     # seals each cell in flight via ctx.
     sweep_result: dict[str, Any] | None = None
     sweep_cfg = prof.get("sweep")
+    resolved_spec = None
     if sweep_cfg and not skip_sweep:
         if not readiness_verdict["ready"] and not force_sweep:
             sweep_result = {
@@ -462,10 +468,19 @@ def _run_profile_capsule_native(profile_name: str, *,
             spec = sweep_spec_from_profile(
                 profile_name,
                 acknowledge_heavy=acknowledge_heavy,
-                jsonl_override=jsonl_override)
+                jsonl_override=jsonl_override,
+                config=config)
+            resolved_spec = spec
             if spec is not None:
                 try:
-                    sweep_result = run_sweep(spec, ctx=ctx)
+                    llm_backend = backend_from_config(
+                        config,
+                        model=spec.model or "",
+                        endpoint=spec.endpoint,
+                        timeout=spec.llm_timeout,
+                    ) if spec.mode == "real" and spec.model else None
+                    sweep_result = run_sweep(
+                        spec, ctx=ctx, llm_backend=llm_backend)
                 except Exception as ex:
                     sweep_result = {
                         "schema": "coordpy.sweep.v2",
@@ -476,8 +491,7 @@ def _run_profile_capsule_native(profile_name: str, *,
                         "error_detail": str(ex)[:400],
                     }
                 sweep_result.update({
-                    "model_metadata": _profiles.model_availability(
-                        sweep_cfg.get("model")),
+                    "model_metadata": _profiles.model_availability(spec.model),
                 })
                 # Substantive artefact: sweep_result.json /
                 # sweep_launch.json. Parent: the SWEEP_SPEC capsule
@@ -521,8 +535,10 @@ def _run_profile_capsule_native(profile_name: str, *,
         profile_name=profile_name,
         profile_schema=_profiles.SCHEMA_VERSION,
         jsonl_path=jsonl_path,
-        model=sw_cfg.get("model"),
-        endpoint=sw_cfg.get("ollama_url"),
+        model=(resolved_spec.model if resolved_spec is not None
+               else sw_cfg.get("model")),
+        endpoint=(resolved_spec.endpoint if resolved_spec is not None
+                  else sw_cfg.get("ollama_url")),
         sandbox=(sw_cfg.get("sandbox") or rd_cfg.get("sandbox_name")),
         out_dir=out_dir,
         artifacts=artifact_list,
@@ -533,6 +549,8 @@ def _run_profile_capsule_native(profile_name: str, *,
                 "force_sweep": force_sweep,
                 "jsonl_override": jsonl_override,
             },
+            "runtime_config": (
+                config.as_dict() if config is not None else None),
         },
     )
     if deterministic:
@@ -668,6 +686,7 @@ def _run_profile_post_hoc(profile_name: str, *,
                            skip_sweep: bool,
                            acknowledge_heavy: bool,
                            allow_unsafe_sandbox: bool,
+                           config: "Any | None" = None,
                            deterministic: bool = False,
                            ) -> dict:
     """Legacy post-hoc fold path. Retained so the SDK can still
@@ -694,6 +713,7 @@ def _run_profile_post_hoc(profile_name: str, *,
 
     sweep_result: dict[str, Any] | None = None
     sweep_cfg = prof.get("sweep")
+    resolved_spec = None
     if sweep_cfg and not skip_sweep:
         if not readiness_verdict["ready"] and not force_sweep:
             sweep_result = {
@@ -705,13 +725,22 @@ def _run_profile_post_hoc(profile_name: str, *,
             from vision_mvp.coordpy.runtime import (
                 sweep_spec_from_profile, run_sweep,
             )
+            from vision_mvp.coordpy.llm_backend import backend_from_config
             spec = sweep_spec_from_profile(
                 profile_name,
                 acknowledge_heavy=acknowledge_heavy,
-                jsonl_override=jsonl_override)
+                jsonl_override=jsonl_override,
+                config=config)
+            resolved_spec = spec
             if spec is not None:
                 try:
-                    sweep_result = run_sweep(spec)
+                    llm_backend = backend_from_config(
+                        config,
+                        model=spec.model or "",
+                        endpoint=spec.endpoint,
+                        timeout=spec.llm_timeout,
+                    ) if spec.mode == "real" and spec.model else None
+                    sweep_result = run_sweep(spec, llm_backend=llm_backend)
                 except Exception as ex:
                     sweep_result = {
                         "schema": "coordpy.sweep.v2",
@@ -722,8 +751,7 @@ def _run_profile_post_hoc(profile_name: str, *,
                         "error_detail": str(ex)[:400],
                     }
                 sweep_result.update({
-                    "model_metadata": _profiles.model_availability(
-                        sweep_cfg.get("model")),
+                    "model_metadata": _profiles.model_availability(spec.model),
                 })
                 artifact_name = (
                     "sweep_result.json" if sweep_result.get(
@@ -751,8 +779,10 @@ def _run_profile_post_hoc(profile_name: str, *,
         profile_name=profile_name,
         profile_schema=_profiles.SCHEMA_VERSION,
         jsonl_path=jsonl_path,
-        model=sw_cfg.get("model"),
-        endpoint=sw_cfg.get("ollama_url"),
+        model=(resolved_spec.model if resolved_spec is not None
+               else sw_cfg.get("model")),
+        endpoint=(resolved_spec.endpoint if resolved_spec is not None
+                  else sw_cfg.get("ollama_url")),
         sandbox=(sw_cfg.get("sandbox") or rd_cfg.get("sandbox_name")),
         out_dir=out_dir,
         artifacts=None,
@@ -763,6 +793,8 @@ def _run_profile_post_hoc(profile_name: str, *,
                 "force_sweep": force_sweep,
                 "jsonl_override": jsonl_override,
             },
+            "runtime_config": (
+                config.as_dict() if config is not None else None),
         },
     )
     if deterministic:

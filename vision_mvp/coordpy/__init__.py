@@ -76,14 +76,17 @@ from .runtime import SweepSpec, run_sweep, HeavyRunNotAcknowledged
 # SDK v3.6 — LLM backend abstraction. Strictly additive: when no
 # backend is supplied, the runtime instantiates ``LLMClient``
 # byte-for-byte unchanged. When a backend is supplied (e.g. an
-# ``MLXDistributedBackend`` whose ``base_url`` points at an
-# ``mlx_lm.server`` launched under ``mpirun`` across two Apple
-# Silicon hosts), the inner-loop calls dispatch through the
-# backend without any other change to the spine. The PROMPT /
+# ``OpenAICompatibleBackend`` pointed at any OpenAI-compatible
+# provider, or an ``MLXDistributedBackend`` whose ``base_url``
+# points at an ``mlx_lm.server`` launched under ``mpirun`` across
+# two Apple Silicon hosts), the inner-loop calls dispatch through
+# the backend without any other change to the spine. The PROMPT /
 # LLM_RESPONSE capsules' shape (SHA-256 + length + snippet) is
 # preserved regardless of backend.
 from .llm_backend import (
-    LLMBackend, OllamaBackend, MLXDistributedBackend, make_backend,
+    LLMBackend, OllamaBackend, OpenAICompatibleBackend,
+    MLXDistributedBackend, make_backend, backend_from_env,
+    backend_from_config,
 )
 
 # Capsule runtime (Slice 3 — SDK v3). The load-bearing abstraction
@@ -137,6 +140,13 @@ from .lifecycle_audit import (
 # (end-user / developer / researcher). Purely additive.
 from .api_layers import (
     CoordPySimpleAPI, CoordPyBuilderAPI, CoordPyAdvancedAPI, BuilderSpec,
+)
+
+# Stable lightweight agent-team surface. This is the product-facing
+# "create a few agents and run them" path; it stays above the
+# research-grade team ladder while still sealing a capsule trail.
+from .agents import (
+    Agent, AgentTurn, TeamResult, AgentTeam, agent, create_team,
 )
 
 # Capsule admission policies (Phase 46 research milestone). The
@@ -983,8 +993,9 @@ __all__ = [
     "SweepSpec", "run_sweep", "HeavyRunNotAcknowledged",
     # SDK v3.6 — LLM backend abstraction (additive integration
     # boundary for two-Mac MLX-distributed inference).
-    "LLMBackend", "OllamaBackend", "MLXDistributedBackend",
-    "make_backend",
+    "LLMBackend", "OllamaBackend", "OpenAICompatibleBackend",
+    "MLXDistributedBackend", "make_backend", "backend_from_env",
+    "backend_from_config",
     # Capsule runtime (Slice 3 — SDK v3)
     "ContextCapsule", "CapsuleKind", "CapsuleLifecycle",
     "CapsuleBudget", "CapsuleLedger", "CapsuleView",
@@ -1540,6 +1551,9 @@ __all__ = [
     "TEAM_FEATURE_DIM", "TEAM_FEATURE_NAMES",
     # Layered API (end-user / developer / researcher ergonomics)
     "CoordPySimpleAPI", "CoordPyBuilderAPI", "CoordPyAdvancedAPI", "BuilderSpec",
+    # Stable lightweight agent/team surface
+    "Agent", "AgentTurn", "TeamResult", "AgentTeam", "agent",
+    "create_team",
     # Config
     "CoordPyConfig",
     # Provenance

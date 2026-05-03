@@ -8,6 +8,12 @@
 > `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.43 (final
 > release), 2026-05-03.
 
+> New reader note. If you are here to install or use CoordPy, start
+> with [`README.md`](../README.md) and
+> [`docs/START_HERE.md`](START_HERE.md). This file is the canonical
+> statement of what is true now plus preserved historical milestone
+> summaries below.
+
 ## TL;DR — SDK v3.43 (final release)
 
 The programme now has **thirty-nine** coupled research axes.  SDK
@@ -104,14 +110,22 @@ sharper in adversary cost).
 
 **Release-use summary (current truth).**
 
-* **Install today**: from a clone, `pip install -e .`, then import
-  `vision_mvp.coordpy` or use the `coordpy` / `coordpy-import` /
-  `coordpy-ci` / `coordpy-capsule` CLIs.  `pip install coordpy` and
-  `pipx install coordpy` are the intended published install paths once
-  the package is on PyPI.
+* **Install today**: CoordPy is not on PyPI yet. Install from a clone
+  with `pip install -e .`, then import `vision_mvp.coordpy` or use the
+  `coordpy` / `coordpy-import` / `coordpy-ci` / `coordpy-capsule`
+  CLIs. `pip install coordpy` and `pipx install coordpy` are the
+  intended published install paths once the package is on PyPI.
+* **Simple agent path**: use `Agent`, `AgentTeam`, `agent`, and
+  `create_team` from `vision_mvp.coordpy` for the smallest stable
+  “define a few agents and run them” surface. For real providers, use
+  `backend_from_env()` or `AgentTeam.from_env(...)` with
+  `COORDPY_BACKEND`, `COORDPY_MODEL`, and either
+  `COORDPY_OLLAMA_URL` or `COORDPY_API_KEY` /
+  `COORDPY_API_BASE_URL`.
 * **Stable and released**: the `RunSpec -> run -> RunReport` runtime,
-  the public CLIs, capsule primitives, and the on-disk schema
-  contracts named in the README.
+  the simple `AgentTeam` API, the public CLIs, capsule primitives, the
+  provider-backed `OpenAICompatibleBackend` path, and the on-disk
+  schema contracts named in the README.
 * **Experimental but included**: every W22..W42 symbol under
   `vision_mvp.coordpy.__experimental__`, the R-69..R-89 benchmark
   drivers, and the bounded live cross-host probes.
@@ -122,6 +136,12 @@ Historical note: older sections below are preserved as milestone
 records.  Where they mention `.101` as a third-host Mac candidate,
 that reading is superseded by the W41 retraction: `.101` is an Apple
 TV / AirPlay receiver, not a Mac.
+
+## Historical milestone summaries begin below
+
+Everything after this heading is preserved for research continuity and
+auditability. The current product/release truth is the v3.43 section
+above.
 
 ## Earlier TL;DR — SDK v3.42 RC2
 

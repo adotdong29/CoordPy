@@ -3,17 +3,17 @@
 Lifts the runtime's LLM-call surface above the Ollama-only HTTP path
 that ``vision_mvp.core.llm_client.LLMClient`` historically represented.
 Adds a small duck-typed Protocol matching what the runtime's inner
-loop already expects (``generate``) and two concrete backends:
+loop already expects (``generate``) and three concrete backend names:
 
   * ``OllamaBackend``         — wraps the existing Ollama client
                                  byte-for-byte unchanged.
-  * ``MLXDistributedBackend`` — talks an OpenAI-compatible
-                                 ``/v1/chat/completions`` endpoint.
-                                 Designed for an ``mlx_lm.server``
-                                 launched under ``mx.distributed`` /
-                                 ``mpirun`` across multiple Apple
-                                 Silicon hosts so a *single* sharded
-                                 model spans the cluster.
+  * ``OpenAICompatibleBackend`` — talks an OpenAI-compatible
+                                  ``/v1/chat/completions`` endpoint.
+  * ``MLXDistributedBackend`` — backwards-compatible alias for the
+                                 same OpenAI-compatible transport,
+                                 historically named for
+                                 ``mlx_lm.server`` under
+                                 ``mx.distributed`` / ``mpirun``.
 
 Strict additivity. The new surface is layered *under* the existing
 inner-loop call site (``_real_cells`` already accepts a duck-typed
@@ -64,6 +64,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import os
 import time
 import urllib.error
 import urllib.request
@@ -131,7 +132,7 @@ class OllamaBackend:
 
 
 @dataclasses.dataclass
-class MLXDistributedBackend:
+class OpenAICompatibleBackend:
     """``LLMBackend`` adapter for an OpenAI-compatible HTTP endpoint.
 
     Wire shape: ``POST <base_url>/v1/chat/completions`` with the
@@ -158,6 +159,11 @@ class MLXDistributedBackend:
     ``urllib.error.URLError`` like any other HTTP unavailability;
     the runtime handles that with the same error path as a
     misconfigured Ollama endpoint.
+    This backend is provider-neutral as long as the provider exposes an
+    OpenAI-compatible chat-completions endpoint. By default,
+    ``from_env()`` targets the public OpenAI API; point
+    ``COORDPY_API_BASE_URL`` or ``OPENAI_BASE_URL`` at any compatible
+    endpoint to reuse the same surface with other providers.
     """
 
     model: str
@@ -199,6 +205,61 @@ class MLXDistributedBackend:
         msg = choices[0].get("message") or {}
         return (msg.get("content") or "").strip()
 
+    @classmethod
+    def from_env(
+        cls,
+        *,
+        model: str | None = None,
+        base_url: str | None = None,
+        api_key: str | None = None,
+        timeout: float = 600.0,
+    ) -> "OpenAICompatibleBackend":
+        """Build an OpenAI-compatible backend from common env vars.
+
+        Resolution order:
+
+        1. explicit kwargs
+        2. ``COORDPY_MODEL`` / ``COORDPY_API_BASE_URL`` /
+           ``COORDPY_API_KEY``
+        3. legacy ``COORDPY_LLM_BASE_URL`` / ``COORDPY_LLM_API_KEY``
+        4. ``OPENAI_API_KEY`` / ``OPENAI_BASE_URL``
+        5. OpenAI default base URL
+        """
+        resolved_model = model or os.environ.get("COORDPY_MODEL")
+        if not resolved_model:
+            raise ValueError(
+                "model is required; pass model=... or set COORDPY_MODEL")
+        resolved_base = (
+            base_url
+            or os.environ.get("COORDPY_API_BASE_URL")
+            or os.environ.get("COORDPY_LLM_BASE_URL")
+            or os.environ.get("OPENAI_BASE_URL")
+            or "https://api.openai.com"
+        )
+        resolved_key = (
+            api_key
+            or os.environ.get("COORDPY_API_KEY")
+            or os.environ.get("COORDPY_LLM_API_KEY")
+            or os.environ.get("OPENAI_API_KEY")
+        )
+        return cls(
+            model=resolved_model,
+            base_url=resolved_base,
+            api_key=resolved_key,
+            timeout=timeout,
+        )
+
+
+@dataclasses.dataclass
+class MLXDistributedBackend(OpenAICompatibleBackend):
+    """Backward-compatible alias for the MLX/OpenAI-compatible path.
+
+    Historically the OpenAI-compatible backend entered the SDK as the
+    MLX distributed integration boundary. It remains exported under
+    this name for compatibility, but the general product-facing name is
+    :class:`OpenAICompatibleBackend`.
+    """
+
 
 def make_backend(name: str, **kwargs: Any) -> LLMBackend:
     """Factory dispatch by string name.
@@ -206,20 +267,172 @@ def make_backend(name: str, **kwargs: Any) -> LLMBackend:
     Valid names:
 
       * ``"ollama"``           — :class:`OllamaBackend`
+      * ``"openai"``           — :class:`OpenAICompatibleBackend`
+      * ``"openai_compatible"`` — :class:`OpenAICompatibleBackend`
       * ``"mlx_distributed"``  — :class:`MLXDistributedBackend`
     """
     if name == "ollama":
         return OllamaBackend(**kwargs)
+    if name in ("openai", "openai_compatible", "provider"):
+        return OpenAICompatibleBackend(**kwargs)
     if name == "mlx_distributed":
         return MLXDistributedBackend(**kwargs)
     raise ValueError(
         f"unknown LLM backend {name!r}; "
-        f"valid: 'ollama', 'mlx_distributed'")
+        f"valid: 'ollama', 'openai', 'openai_compatible', "
+        f"'mlx_distributed'")
+
+
+def backend_from_env(
+    name: str | None = None,
+    *,
+    model: str | None = None,
+    base_url: str | None = None,
+    api_key: str | None = None,
+    timeout: float | None = None,
+    think: bool | None = None,
+) -> LLMBackend:
+    """Build a backend from explicit args plus ``COORDPY_*`` env vars.
+
+    This is the easiest path for end users who want to supply a model
+    provider API key without learning the lower-level backend classes.
+    """
+    backend_name = (
+        name
+        or os.environ.get("COORDPY_BACKEND")
+        or os.environ.get("COORDPY_LLM_BACKEND")
+    )
+    if backend_name is None:
+        if (
+            os.environ.get("COORDPY_API_BASE_URL")
+            or os.environ.get("COORDPY_LLM_BASE_URL")
+            or os.environ.get("OPENAI_BASE_URL")
+            or os.environ.get("COORDPY_API_KEY")
+            or os.environ.get("COORDPY_LLM_API_KEY")
+            or os.environ.get("OPENAI_API_KEY")
+        ):
+            backend_name = "openai_compatible"
+        else:
+            backend_name = "ollama"
+    if backend_name == "ollama":
+        resolved_model = model or os.environ.get("COORDPY_MODEL") or "qwen2.5:0.5b"
+        resolved_base = (
+            base_url
+            or os.environ.get("COORDPY_OLLAMA_URL")
+        )
+        return OllamaBackend(
+            model=resolved_model,
+            base_url=resolved_base,
+            timeout=300.0 if timeout is None else float(timeout),
+            think=think,
+        )
+    if backend_name in ("openai", "openai_compatible", "provider"):
+        return OpenAICompatibleBackend.from_env(
+            model=model,
+            base_url=base_url,
+            api_key=api_key,
+            timeout=600.0 if timeout is None else float(timeout),
+        )
+    if backend_name == "mlx_distributed":
+        resolved_model = model or os.environ.get("COORDPY_MODEL")
+        resolved_base = (
+            base_url
+            or os.environ.get("COORDPY_API_BASE_URL")
+            or os.environ.get("COORDPY_LLM_BASE_URL")
+        )
+        if not resolved_model or not resolved_base:
+            raise ValueError(
+                "mlx_distributed backend requires model and base_url; "
+                "pass them explicitly or set COORDPY_MODEL and "
+                "COORDPY_LLM_BASE_URL")
+        resolved_key = (
+            api_key
+            or os.environ.get("COORDPY_API_KEY")
+            or os.environ.get("COORDPY_LLM_API_KEY")
+        )
+        return MLXDistributedBackend(
+            model=resolved_model,
+            base_url=resolved_base,
+            api_key=resolved_key,
+            timeout=600.0 if timeout is None else float(timeout),
+        )
+    raise ValueError(
+        f"unknown backend {backend_name!r}; valid: 'ollama', 'openai', "
+        f"'openai_compatible', 'provider', 'mlx_distributed'")
+
+
+def backend_from_config(
+    config: Any | None,
+    *,
+    model: str,
+    endpoint: str | None = None,
+    timeout: float = 600.0,
+) -> LLMBackend | None:
+    """Build a backend from a ``CoordPyConfig``-shaped object.
+
+    Resolution order:
+      1. explicit backend on the config
+      2. inferred OpenAI-compatible backend when a base URL or API key exists
+      3. inferred Ollama backend when only an Ollama URL exists
+      4. ``None`` to preserve the legacy runtime path
+    """
+    if config is None:
+        return None
+    backend_name = None
+    resolver = getattr(config, "resolved_backend_name", None)
+    if callable(resolver):
+        backend_name = resolver()
+    else:
+        backend_name = getattr(config, "llm_backend", None)
+    if backend_name is None:
+        return None
+    if backend_name == "ollama":
+        return OllamaBackend(
+            model=model,
+            base_url=(getattr(config, "ollama_url", None) or endpoint),
+            timeout=timeout,
+        )
+    if backend_name in {"openai", "openai_compatible", "provider"}:
+        base_url = (
+            getattr(config, "llm_base_url", None)
+            or "https://api.openai.com"
+        )
+        if not base_url:
+            raise ValueError(
+                "OpenAI-compatible backend requires llm_base_url/base_url")
+        return make_backend(
+            backend_name,
+            model=model,
+            base_url=base_url,
+            api_key=getattr(config, "llm_api_key", None),
+            timeout=timeout,
+        )
+    if backend_name == "mlx_distributed":
+        base_url = (
+            getattr(config, "llm_base_url", None)
+            or getattr(config, "ollama_url", None)
+            or endpoint
+        )
+        if not base_url:
+            raise ValueError(
+                "MLX backend requires llm_base_url/base_url")
+        return make_backend(
+            backend_name,
+            model=model,
+            base_url=base_url,
+            api_key=getattr(config, "llm_api_key", None),
+            timeout=timeout,
+        )
+    raise ValueError(
+        f"unsupported backend resolved from config: {backend_name!r}")
 
 
 __all__ = [
     "LLMBackend",
     "OllamaBackend",
+    "OpenAICompatibleBackend",
     "MLXDistributedBackend",
     "make_backend",
+    "backend_from_env",
+    "backend_from_config",
 ]

@@ -10,10 +10,11 @@ A single runtime can serve very different users:
     admission policies, decoders, or audit passes.
 
 This module exposes three thin classes — ``CoordPySimpleAPI``,
-``CoordPyBuilderAPI``, ``CoordPyAdvancedAPI`` — that route to the same
-underlying primitives but present them at different cognitive cost.
-No new runtime logic lives here; these are just ergonomic surfaces
-over modules that already exist.
+``CoordPyBuilderAPI``, ``CoordPyAdvancedAPI`` — plus a tiny stable
+team/agent-spec layer that routes to the same underlying primitives
+but presents them at different cognitive cost. No new runtime logic
+lives here; these are just ergonomic surfaces over modules that
+already exist.
 
 See ``ADVANCEMENT_TO_10_10.md`` Part III §4 for the design note.
 """
@@ -30,6 +31,83 @@ from .capsule import (
     render_view,
 )
 from .run import RunSpec, run
+
+
+@dataclasses.dataclass(frozen=True)
+class AgentRoleSpec:
+    """Human-readable definition of one agent in a CoordPy team."""
+
+    name: str
+    role: str | None = None
+    instructions: str = ""
+    budget: int = 2048
+    model: str | None = None
+
+
+@dataclasses.dataclass(frozen=True)
+class AgentTeamSpec:
+    """Small stable team definition for developer-facing code.
+
+    This is intentionally additive. It gives downstream code a clear,
+    typed way to talk about "my team" and "my agent roles" without
+    changing the existing run-boundary contract. ``to_run_spec()``
+    still returns an ordinary ``RunSpec``.
+    """
+
+    name: str
+    mission: str = ""
+    roles: tuple[AgentRoleSpec, ...] = ()
+
+    def to_run_spec(
+            self,
+            *,
+            profile: str,
+            out_dir: str,
+            acknowledge_heavy: bool = False,
+            config: "Any | None" = None,
+            ) -> RunSpec:
+        return RunSpec(
+            profile=profile,
+            out_dir=out_dir,
+            acknowledge_heavy=acknowledge_heavy,
+            config=config,
+        )
+
+
+class AgentTeamBuilder:
+    """Small fluent builder for "create agents / teams" use cases."""
+
+    def __init__(self, name: str, *, mission: str = "") -> None:
+        self._name = name
+        self._mission = mission
+        self._roles: list[AgentRoleSpec] = []
+
+    def add_agent(
+            self,
+            name: str,
+            *,
+            role: str | None = None,
+            instructions: str = "",
+            budget: int = 2048,
+            model: str | None = None,
+            ) -> "AgentTeamBuilder":
+        if budget <= 0:
+            raise ValueError(f"agent budget must be > 0, got {budget}")
+        self._roles.append(AgentRoleSpec(
+            name=name,
+            role=role,
+            instructions=instructions,
+            budget=int(budget),
+            model=model,
+        ))
+        return self
+
+    def build(self) -> AgentTeamSpec:
+        return AgentTeamSpec(
+            name=self._name,
+            mission=self._mission,
+            roles=tuple(self._roles),
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -61,6 +139,26 @@ class CoordPySimpleAPI:
                        acknowledge_heavy=acknowledge_heavy)
         return run(spec)
 
+    def team(self, name: str, *, mission: str = "") -> AgentTeamBuilder:
+        """Create a small stable team-builder for developer code."""
+        return AgentTeamBuilder(name, mission=mission)
+
+    def run_team(self,
+                 team: AgentTeamSpec,
+                 *,
+                 profile: str,
+                 out_dir: str,
+                 acknowledge_heavy: bool = False,
+                 config: "Any | None" = None) -> dict[str, Any]:
+        """Execute a team through the same stable run boundary."""
+        spec = team.to_run_spec(
+            profile=profile,
+            out_dir=out_dir,
+            acknowledge_heavy=acknowledge_heavy,
+            config=config,
+        )
+        return run(spec)
+
 
 # ---------------------------------------------------------------------------
 # Tier 2 — CoordPyBuilderAPI: fluent configuration for developers.
@@ -79,13 +177,26 @@ class BuilderSpec:
     profile: str
     out_dir: str
     roles: tuple[tuple[str, int], ...] = ()  # (role_name, token_budget)
+    team: AgentTeamSpec | None = None
     compression: str = "medium"  # "low" | "medium" | "high"
     acknowledge_heavy: bool = False
+    model: str | None = None
+    backend: str | None = None
+    base_url: str | None = None
 
     def to_run_spec(self) -> RunSpec:
+        config = None
+        if self.model or self.backend or self.base_url:
+            from .config import CoordPyConfig
+            config = CoordPyConfig(
+                model=self.model,
+                llm_backend=self.backend,
+                llm_base_url=self.base_url,
+            )
         return RunSpec(
             profile=self.profile, out_dir=self.out_dir,
-            acknowledge_heavy=self.acknowledge_heavy)
+            acknowledge_heavy=self.acknowledge_heavy,
+            config=config)
 
 
 class CoordPyBuilderAPI:
@@ -113,8 +224,14 @@ class CoordPyBuilderAPI:
         self._profile: str | None = None
         self._out_dir: str | None = None
         self._roles: list[tuple[str, int]] = []
+        self._team_name: str | None = None
+        self._team_mission: str = ""
+        self._agents: list[AgentRoleSpec] = []
         self._compression: str = "medium"
         self._ack_heavy: bool = False
+        self._model: str | None = None
+        self._backend: str | None = None
+        self._base_url: str | None = None
 
     def with_profile(self, profile: str) -> "CoordPyBuilderAPI":
         self._profile = profile
@@ -130,6 +247,29 @@ class CoordPyBuilderAPI:
         self._roles.append((role, int(budget)))
         return self
 
+    def with_team(self, name: str, *, mission: str = "") -> "CoordPyBuilderAPI":
+        self._team_name = name
+        self._team_mission = mission
+        return self
+
+    def with_agent(self,
+                   name: str,
+                   *,
+                   role: str | None = None,
+                   instructions: str = "",
+                   budget: int = 2048,
+                   model: str | None = None) -> "CoordPyBuilderAPI":
+        if budget <= 0:
+            raise ValueError(f"agent budget must be > 0, got {budget}")
+        self._agents.append(AgentRoleSpec(
+            name=name,
+            role=role,
+            instructions=instructions,
+            budget=int(budget),
+            model=model,
+        ))
+        return self
+
     def with_compression(self, level: str) -> "CoordPyBuilderAPI":
         if level not in self._ALLOWED_COMPRESSION:
             raise ValueError(
@@ -141,17 +281,41 @@ class CoordPyBuilderAPI:
         self._ack_heavy = bool(ack)
         return self
 
+    def with_model(self, model: str) -> "CoordPyBuilderAPI":
+        self._model = model
+        return self
+
+    def with_backend(self,
+                     backend: str,
+                     *,
+                     base_url: str | None = None) -> "CoordPyBuilderAPI":
+        self._backend = backend
+        if base_url is not None:
+            self._base_url = base_url
+        return self
+
     def build(self) -> BuilderSpec:
         if self._profile is None:
             raise ValueError("profile is required; call with_profile(...)")
         if self._out_dir is None:
             raise ValueError("out_dir is required; call with_out_dir(...)")
+        team = None
+        if self._team_name is not None:
+            team = AgentTeamSpec(
+                name=self._team_name,
+                mission=self._team_mission,
+                roles=tuple(self._agents),
+            )
         return BuilderSpec(
             profile=self._profile,
             out_dir=self._out_dir,
             roles=tuple(self._roles),
+            team=team,
             compression=self._compression,
             acknowledge_heavy=self._ack_heavy,
+            model=self._model,
+            backend=self._backend,
+            base_url=self._base_url,
         )
 
 
@@ -202,6 +366,9 @@ class CoordPyAdvancedAPI:
 
 
 __all__ = [
+    "AgentRoleSpec",
+    "AgentTeamSpec",
+    "AgentTeamBuilder",
     "CoordPySimpleAPI",
     "CoordPyBuilderAPI",
     "CoordPyAdvancedAPI",

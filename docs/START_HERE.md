@@ -9,7 +9,7 @@ use it, read this page first.
 
 CoordPy gives you a stable runtime contract for AI agent teamwork:
 
-* **Typed capsules instead of raw prompt strings.** Prompts,
+* **Bounded-context capsules instead of token cramming.** Prompts,
   responses, handoffs, and reports are stored as structured,
   content-addressed objects with provenance and budget metadata.
 * **A reproducible runtime.** One `RunSpec` in, one `RunReport` out,
@@ -39,7 +39,8 @@ results links in [Where to read next](#where-to-read-next).
 
 ## Install
 
-Today, the exact install path is from a clone:
+CoordPy is not on PyPI yet. Today, the exact install path is from a
+clone:
 
 ```bash
 git clone https://github.com/adotdong29/context-zero.git
@@ -94,13 +95,50 @@ COORDPY_OLLAMA_URL=http://localhost:11434 \
   coordpy --profile local_smoke --acknowledge-heavy --out-dir /tmp/coordpy-smoke
 ```
 
+If you want the simplest stable agent-team API instead of `RunSpec`,
+use the lightweight team surface:
+
+```python
+from vision_mvp.coordpy import AgentTeam, agent
+
+team = AgentTeam.from_env(
+    [
+        agent("planner", "Break the task into steps."),
+        agent("researcher", "Gather the facts."),
+        agent("writer", "Write the final answer."),
+    ],
+    model="gpt-4o-mini",   # or qwen2.5:0.5b with COORDPY_BACKEND=ollama
+    backend_name="openai", # or "ollama"
+)
+result = team.run("Explain what CoordPy does.")
+print(result.final_output)
+```
+
+Common environment variables:
+
+```bash
+# Local Ollama
+export COORDPY_BACKEND=ollama
+export COORDPY_MODEL=qwen2.5:0.5b
+export COORDPY_OLLAMA_URL=http://localhost:11434
+
+# OpenAI-compatible provider
+export COORDPY_BACKEND=openai
+export COORDPY_MODEL=gpt-4o-mini
+export COORDPY_API_KEY=...
+# Optional for compatible non-default providers:
+# export COORDPY_API_BASE_URL=https://your-provider.example/v1
+```
+
 ## Stable vs experimental
 
 **Stable and released in SDK v3.43**
 
 * `vision_mvp.coordpy` SDK surface: `RunSpec`, `run`, `RunReport`,
-  `SweepSpec`, `run_sweep`, `CoordPyConfig`, `profiles`, `ci_gate`,
-  `import_data`, `extensions`, capsule primitives, schema constants
+  `SweepSpec`, `run_sweep`, `CoordPyConfig`, `Agent`, `AgentTeam`,
+  `agent`, `create_team`, `profiles`, `ci_gate`, `import_data`,
+  `extensions`, capsule primitives, schema constants,
+  `OpenAICompatibleBackend`, `backend_from_env`
 * CLI surface: `coordpy`, `coordpy-import`, `coordpy-ci`,
   `coordpy-capsule`
 * On-disk schemas: `coordpy.capsule_view.v1`,
@@ -128,7 +166,16 @@ If you want to use CoordPy:
 
 * [`README.md`](../README.md) — product landing page, install, CLI,
   stable surface
-* [`examples/`](../examples/) — short runnable examples
+* [`examples/06_agent_team_api.py`](../examples/06_agent_team_api.py) —
+  simplest stable provider-backed agent-team example
+* [`examples/04_local_llm.py`](../examples/04_local_llm.py) — smallest
+  local-LLM multi-agent example
+* [`examples/05_real_code_review.py`](../examples/05_real_code_review.py) —
+  richer end-to-end team workflow example
+* [`examples/`](../examples/) — all short runnable examples, including
+  the older substrate demos
+* [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md) — direct
+  capsule-level team coordination model for the experimental surface
 * [`ARCHITECTURE.md`](../ARCHITECTURE.md) — architectural overview
 
 If you want to understand the released result:

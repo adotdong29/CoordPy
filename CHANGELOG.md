@@ -4,6 +4,11 @@ The Changelog tracks **CoordPy SDK** releases. The research programme's
 phase-by-phase narrative lives in `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+If you are trying to understand what CoordPy does or how to install and
+use it, start with [`README.md`](README.md) and
+[`docs/START_HERE.md`](docs/START_HERE.md). The changelog is release
+history, not the primary onboarding path.
+
 > **Current release: SDK v3.43 (May 2026) — first public release of
 > CoordPy and final release of the SDK v3.4x line.** See the v3.43
 > entry below for the exact scope; see the

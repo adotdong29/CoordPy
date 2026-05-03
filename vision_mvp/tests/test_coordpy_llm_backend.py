@@ -11,7 +11,7 @@ Locks the following claims:
           arbitrary backend (provided ``model`` is a valid string
           and ``generate`` returns a string).
 
-  W5-2   ``MLXDistributedBackend.generate`` formats an OpenAI-
+  W5-2   ``OpenAICompatibleBackend.generate`` formats an OpenAI-
           compatible ``/v1/chat/completions`` request body and
           parses the response shape correctly. Locked against a
           stub HTTP server (``http.server.BaseHTTPRequestHandler``).
@@ -24,7 +24,7 @@ Locks the following claims:
           TEST_VERDICT CID would surface here).
 
   W5-4   ``LLMBackend`` is ``runtime_checkable``; ``isinstance``
-          accepts ``OllamaBackend`` and ``MLXDistributedBackend``
+          accepts ``OllamaBackend`` and ``OpenAICompatibleBackend``
           and rejects an object missing ``generate``.
 
 The tests use the public surface only
@@ -35,6 +35,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import os
 import threading
 import time
 import unittest
@@ -44,7 +45,7 @@ from typing import Any
 
 # ---------------------------------------------------------------------------
 # Helpers — a tiny stub HTTP server speaking OpenAI-compatible
-# ``/v1/chat/completions``. Used only by the MLXDistributedBackend
+# ``/v1/chat/completions``. Used only by the OpenAI-compatible backend
 # wire-shape test so we don't need an actual mlx_lm.server running.
 # ---------------------------------------------------------------------------
 
@@ -138,17 +139,22 @@ class LLMBackendProtocolTests(unittest.TestCase):
 
     def test_runtime_checkable_accepts_concrete_backends(self):
         from vision_mvp.coordpy import (
-            LLMBackend, OllamaBackend, MLXDistributedBackend,
+            LLMBackend, OllamaBackend, OpenAICompatibleBackend,
+            MLXDistributedBackend,
         )
         # OllamaBackend constructs an actual LLMClient internally
         # but does not call out — instantiation is local-only.
         ob = OllamaBackend(model="qwen2.5:14b-32k",
                            base_url="http://example.invalid:11434")
         self.assertIsInstance(ob, LLMBackend)
-        mb = MLXDistributedBackend(
+        mb = OpenAICompatibleBackend(
             model="mlx-community/Llama-3.3-70B-Instruct-4bit",
             base_url="http://example.invalid:8080")
         self.assertIsInstance(mb, LLMBackend)
+        compat = MLXDistributedBackend(
+            model="mlx-community/Llama-3.3-70B-Instruct-4bit",
+            base_url="http://example.invalid:8080")
+        self.assertIsInstance(compat, LLMBackend)
 
     def test_runtime_checkable_rejects_object_missing_generate(self):
         from vision_mvp.coordpy import LLMBackend
@@ -177,20 +183,43 @@ class MakeBackendFactoryTests(unittest.TestCase):
         self.assertEqual(b.model, "m")
         self.assertEqual(b.base_url, "http://x:8080")
 
+    def test_make_openai_compatible(self):
+        from vision_mvp.coordpy import make_backend, OpenAICompatibleBackend
+        b = make_backend(
+            "openai", model="gpt-4o-mini",
+            base_url="https://api.openai.com")
+        self.assertIsInstance(b, OpenAICompatibleBackend)
+        self.assertEqual(b.model, "gpt-4o-mini")
+
     def test_make_unknown_raises(self):
         from vision_mvp.coordpy import make_backend
         with self.assertRaises(ValueError):
             make_backend("not_a_backend", model="m")
 
+    def test_backend_from_config_prefers_openai_compatible_surface(self):
+        from vision_mvp.coordpy import (
+            CoordPyConfig, OpenAICompatibleBackend, backend_from_config,
+        )
+        cfg = CoordPyConfig(
+            llm_backend="openai_compatible",
+            llm_base_url="https://api.example.test",
+            llm_api_key="secret",
+        )
+        backend = backend_from_config(
+            cfg, model="gpt-4o-mini",
+            endpoint="https://ignored.example.test")
+        self.assertIsInstance(backend, OpenAICompatibleBackend)
+        self.assertEqual(backend.base_url, "https://api.example.test")
 
-class MLXDistributedBackendWireShapeTests(unittest.TestCase):
+
+class OpenAICompatibleBackendWireShapeTests(unittest.TestCase):
     """W5-2 — wire-shape lock against an OpenAI-compatible stub."""
 
     def test_request_body_matches_openai_chat_completions(self):
-        from vision_mvp.coordpy import MLXDistributedBackend
+        from vision_mvp.coordpy import OpenAICompatibleBackend
         server, _t, base_url = _start_stub()
         try:
-            b = MLXDistributedBackend(
+            b = OpenAICompatibleBackend(
                 model="mlx-community/Llama-3.3-70B-Instruct-4bit",
                 base_url=base_url, timeout=5.0,
             )
@@ -217,10 +246,10 @@ class MLXDistributedBackendWireShapeTests(unittest.TestCase):
         # The stub doesn't validate auth; we just check the call
         # completes when an API key is supplied — locks the
         # branch that adds the Authorization header.
-        from vision_mvp.coordpy import MLXDistributedBackend
+        from vision_mvp.coordpy import OpenAICompatibleBackend
         server, _t, base_url = _start_stub()
         try:
-            b = MLXDistributedBackend(
+            b = OpenAICompatibleBackend(
                 model="m", base_url=base_url,
                 api_key="secret", timeout=5.0,
             )
@@ -229,6 +258,19 @@ class MLXDistributedBackendWireShapeTests(unittest.TestCase):
         finally:
             server.shutdown()
             server.server_close()
+
+    def test_from_env_uses_common_provider_env_vars(self):
+        from vision_mvp.coordpy import OpenAICompatibleBackend
+        os.environ["COORDPY_MODEL"] = "gpt-4o-mini"
+        os.environ["COORDPY_API_KEY"] = "secret"
+        try:
+            b = OpenAICompatibleBackend.from_env()
+            self.assertEqual(b.model, "gpt-4o-mini")
+            self.assertEqual(b.base_url, "https://api.openai.com")
+            self.assertEqual(b.api_key, "secret")
+        finally:
+            del os.environ["COORDPY_MODEL"]
+            del os.environ["COORDPY_API_KEY"]
 
 
 class RunSweepBackendIntegrationTests(unittest.TestCase):

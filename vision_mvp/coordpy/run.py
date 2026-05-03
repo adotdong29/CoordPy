@@ -90,15 +90,22 @@ def run(spec: RunSpec) -> dict[str, Any]:
     ``report["sink_emissions"]``.
     """
     from vision_mvp.product.runner import run_profile
+    from .config import CoordPyConfig
+
+    if spec.config is None:
+        resolved_config = CoordPyConfig.from_env()
+    else:
+        resolved_config = CoordPyConfig.from_env(**spec.config.as_dict())
 
     report = run_profile(
         spec.profile,
         out_dir=spec.out_dir,
-        jsonl_override=spec.jsonl_override,
+        jsonl_override=spec.jsonl_override or resolved_config.jsonl,
         force_sweep=spec.force_sweep,
         skip_sweep=spec.skip_sweep,
         acknowledge_heavy=spec.acknowledge_heavy,
         allow_unsafe_sandbox=spec.allow_unsafe_sandbox,
+        config=resolved_config,
         capsule_native=spec.capsule_native,
         deterministic=spec.deterministic,
     )
