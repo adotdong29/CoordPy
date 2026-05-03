@@ -597,6 +597,31 @@ where the LLM's vote is required for quorum, cross-model split is
 sharp (mixtral 8x7b: +0.750; gemma2:9b: +0.000)** — scale + general
 knowledge matter for the live W21-Λ-real escape.
 
+### Release framing (SDK v3.43, final release of the v3.4x line)
+
+This paper documents the strongest released **capsule-layer
+audited** multi-agent context system from the Context Zero
+programme. The shipped product surface is the **Wevra SDK**, first
+publicly released as **SDK v3.43** in May 2026. The released
+result is the W42 family's measured strict trust-precision
+recovery on `R-89-ROLE-INVARIANT-RECOVER` (1.000 vs the prior best
+W41 at 0.500; `Δ = +0.500` across 5/5 seeds, min = max), bounding
+the `W41-L-COMPOSITE-COLLUSION-CAP` limitation theorem at the
+capsule layer via a third orthogonal evidence axis (the
+role-handoff invariance axis). The paper and the repo describe
+this result with the same framing on **scope** (capsule-layer
+audited proxy; closed-form, deterministic, zero-parameter; not
+transformer-internal), **limitations** (the newly proved
+`W42-L-FULL-COMPOSITE-COLLUSION-CAP` is not closed; it bounds
+adversary cost), and **next work** (`W42-C-NATIVE-LATENT` for
+transformer-internal trust transfer; `W42-C-MULTI-HOST` for
+K+1-host disjoint topology — both are explicitly out of capsule-
+layer scope and require new architectural substrate). The stable
+SDK contract (`RunSpec → run report`) is byte-for-byte unchanged
+across the v3.4x line; every W22..W42 symbol is exported under
+`__experimental__`. The paper does not claim universal solution
+of multi-agent context.
+
 ## 1. Introduction
 
 Context is the central systems problem in multi-agent LLM workflows.

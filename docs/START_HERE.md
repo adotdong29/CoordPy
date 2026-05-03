@@ -3,6 +3,71 @@
 One-pass orientation for this repository. If you read only one doc, read
 this one. Everything else in the repo should make sense after this page.
 
+## I just want to use Wevra
+
+Wevra is a Python-first SDK and CLI for building auditable AI agent
+teams with structured, content-addressed context. The first public
+release is **SDK v3.43** (May 2026, final release of the v3.4x
+line).
+
+```bash
+git clone https://github.com/adotdong29/context-zero.git
+cd context-zero
+pip install -e .
+wevra --profile local_smoke --out-dir /tmp/wevra-smoke
+wevra-capsule verify --report /tmp/wevra-smoke/product_report.json
+```
+
+```python
+from vision_mvp.wevra import RunSpec, run
+
+report = run(RunSpec(profile="local_smoke", out_dir="/tmp/wevra-smoke"))
+assert report["readiness"]["ready"]
+print(report["summary_text"])
+```
+
+If you only need this much, jump to:
+
+* [`README.md § Install`](../README.md#install) — install + console scripts.
+* [`README.md § Quickstart`](../README.md#quickstart) — the minimal Python path.
+* [`README.md § SDK reference — full quick start`](../README.md#sdk-reference--full-quick-start) — full SDK surface.
+* [`README.md § Stable vs experimental — at a glance`](../README.md#stable-vs-experimental--at-a-glance) — what is contract-tested vs research-grade.
+* [`examples/`](../examples/) — short standalone programs.
+
+## I want to understand the released result
+
+The v3.43 line is the **final release of the capsule-layer-only
+research programme** in Context Zero. Its strongest internal result
+is a measured strict trust-precision recovery on a regime where
+the prior best (W41) tied at 0.500: on
+`R-89-ROLE-INVARIANT-RECOVER`, W42 raises trust precision from
+0.500 to **1.000 across 5/5 seeds**
+(`Δ_trust_precision = +0.500`, min = max). This is the first
+capsule-native multi-agent-coordination method that materially
+**bounds** `W41-L-COMPOSITE-COLLUSION-CAP` at the capsule layer
+via a third orthogonal evidence axis (the role-handoff invariance
+axis).
+
+To go deeper:
+
+* [`docs/RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md`](RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md) — full results note.
+* [`docs/SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md`](SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md) — pre-committed success bar.
+* [`docs/RESEARCH_STATUS.md`](RESEARCH_STATUS.md) — what is true now.
+* [`docs/THEOREM_REGISTRY.md`](THEOREM_REGISTRY.md) — theorem-by-theorem status.
+* [`docs/HOW_NOT_TO_OVERSTATE.md`](HOW_NOT_TO_OVERSTATE.md) — what may and may not be claimed.
+* [`papers/context_as_objects.md`](../papers/context_as_objects.md) — the main paper.
+
+The remaining open frontiers (`W42-C-NATIVE-LATENT` for
+transformer-internal trust transfer; `W42-C-MULTI-HOST` for
+K+1-host disjoint topology beyond the two-Mac pair) are
+explicitly **out of capsule-layer scope** and require new
+architectural substrate. They are next-programme work, not
+v3.43 release blockers.
+
+## I want the research-record table
+
+Everything below this line is the per-milestone audit trail.
+
 > **Current canonical reading.** The active scientific and product
 > position is captured by a small set of files; everything else is
 > historical record under [`archive/`](archive/).

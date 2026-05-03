@@ -1,16 +1,32 @@
 # Changelog
 
-The Changelog now tracks **Wevra SDK** releases. The research
-programme's phase-by-phase narrative lives in
-`vision_mvp/RESULTS_PHASE*.md` and
+The Changelog tracks **Wevra SDK** releases. The research programme's
+phase-by-phase narrative lives in `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
-## [0.5.16 / 3.43] — 2026-05-03 — SDK v3.43 (final release) — cross-role-invariant synthesis + manifest-v12 CID + role-handoff-signature axis + composite-collusion bounding + R-89 Phase-89 benchmark family + W42-3 strict +0.500 trust-precision recovery + W42-L-FULL-COMPOSITE-COLLUSION-CAP limitation theorem + first measured cross-host paraphrase-invariance live probe + final release declaration
+> **Current release: SDK v3.43 (May 2026) — first public release of
+> Wevra and final release of the SDK v3.4x line.** See the v3.43
+> entry below for the exact scope; see the
+> [README](README.md#final-release-scope-v343) for stable-vs-
+> experimental boundaries and out-of-scope next-programme work.
+
+## [0.5.16 / 3.43] — 2026-05-03 — SDK v3.43 — first public Wevra release; final release of the SDK v3.4x line
+
+Headline: cross-role-invariant synthesis + manifest-v12 CID +
+role-handoff-signature axis + composite-collusion bounding (W42
+family). New benchmark family R-89. The new theorem
+`W42-L-FULL-COMPOSITE-COLLUSION-CAP` records the residual capsule-
+layer wall. First measured cross-host paraphrase-invariance live
+probe in the programme.
 
 *Strictly additive on SDK v3.42 RC2.  The stable Wevra product/runtime
-(`RunSpec → run report`) is byte-for-byte unchanged.  W42 surface lives
-under `__experimental__`.  This release is the **final release** of
-the SDK v3.4x research line.*
+(`RunSpec → run report`) is byte-for-byte unchanged.  The W42 surface
+lives under `__experimental__`.  This release is the **final release**
+of the SDK v3.4x research line — the **end-of-line for the
+capsule-layer-only research programme** in Context Zero. The
+remaining open frontiers (`W42-C-NATIVE-LATENT`,
+`W42-C-MULTI-HOST`) are explicitly out of capsule-layer scope and
+are next-programme work, not v3.43 blockers.*
 
 ### Added — W42 family (cross-role-invariant synthesis + composite-collusion bounding)
 

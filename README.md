@@ -1,79 +1,163 @@
-# Context Zero — Wevra
+# Wevra
 
-**Wevra is a context-capsule runtime.** Every piece of context that
-crosses a role boundary, a layer boundary, or a run boundary is a
-typed, content-addressed, lifecycle-bounded, budget-bounded,
+**A Python-first SDK and CLI for building auditable AI agent teams
+with structured, content-addressed context.** Each piece of context
+that crosses a role boundary, a layer boundary, or a run boundary is
+a typed, content-addressed, lifecycle-bounded, budget-bounded,
 provenance-stamped **capsule** — never a raw prompt string. One
-`RunSpec` in, one reproducible report out, and that report is the
-root of a sealed capsule graph you can audit, replay, and trust.
+`RunSpec` in, one reproducible `RunReport` out, and that report is
+the root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.43 final (May 2026).** Cross-role-
-invariant synthesis + manifest-v12 CID + role-handoff-signature
-axis + composite-collusion bounding (W42 family).  W42 adds a
-**third orthogonal evidence axis** on top of W41's producer-axis
-× trust-axis integrated synthesis -- the **role-handoff
-invariance axis**, computed deterministically from the canonical
-sorted ``(role, kind, payload)`` tuples in the cell's input
-handoffs, namespaced as ``w42_role_handoff_signature``.  An
-honest controller pre-registers a
-:class:`RoleInvariancePolicyRegistry` mapping signature CIDs to
-expected service sets.  W42 ratifies on agreement, abstains on
-disagreement, and falls through on unknown signatures.  This
-**bounds** (does not close) ``W41-L-COMPOSITE-COLLUSION-CAP`` at
-the capsule layer by raising the adversary bar from "compromise
-the W21 producer-side admission AND inject diverse W40 response
-bytes for the same wrong top_set" to "compromise W21 + inject W40
-diverse responses AND poison the controller-side role-invariance
-policy registry."  On **R-89-ROLE-INVARIANT-RECOVER** (the
-W41-L-COMPOSITE-COLLUSION-CAP regime), W42 strictly improves
-trust precision over W41 from 0.500 to **1.000**
-(**Δ_trust_precision_w42_w41 = +0.500**, min and max equal across
-5/5 seeds): the **first capsule-native multi-agent coordination
-method that materially BOUNDS the W41 composite-collusion wall at
-the capsule layer**.  On **R-89-FULL-COMPOSITE-COLLUSION** the
-new proved-conditional limitation theorem
-**W42-L-FULL-COMPOSITE-COLLUSION-CAP** fires (when all three
-axes are coordinated by the adversary, W42 cannot recover at the
-capsule layer; closure requires native-latent evidence or a
-K+1-axis topology with a new uncompromised evidence axis).  On
-**R-89-TRIVIAL-W42**, **R-89-ROLE-INVARIANT-AGREES**, and
-**R-89-INSUFFICIENT-INVARIANCE-POLICY** falsifiers, W42
-preserves W41 behavior with no correctness or trust-precision
-regression.  W42 adds 14 verifier failure modes
-(``empty_w42_envelope`` / ``w42_*_cid_mismatch`` /
-``w42_invariance_score_invalid`` / ``w42_token_accounting_invalid``
-/ etc.), bringing the cumulative W22..W42 trust boundary to **196
-enumerated modes**.  manifest-v12 binds 6 component CIDs:
-parent_w41_cid + invariance_state_cid + invariance_decision_cid
-+ invariance_audit_cid + invariance_witness_cid +
-role_handoff_signature_cid (the audit / witness / signature CIDs
-are namespaced so substituting a W22..W41 audit / witness /
-signature is mechanically detected).  **W42 cross-host
-paraphrase-invariance live probe (2026-05-03)**: at temperature 0
-on the two-Mac topology (``localhost`` gemma2:9b +
-``192.168.12.191`` qwen2.5:14b), K=4 paraphrases of one
-closed-vocabulary arithmetic prompt produce **4/4 paraphrase-
-invariant cross-host gold-correlated agreement** on both hosts;
-both hosts emit "Four" on every paraphrase; cross-host
-normalised agreement = 1.000.  This is the first measured
-cross-host paraphrase-invariance result in the programme.  W42 is
-**not native latent transfer** and not transformer-internal
-hidden-state projection; it is an audited capsule-layer
-role-handoff invariance proxy with three mechanically-enforced
-preconditions (signature determinism + permutation-invariance +
-payload-canonicalisation).  **Final release declared**: H1..H12 +
-S3 + S7 of the W42 success criterion pass; the SDK v3.43 line
-ships as the **final release** of the Wevra SDK v3.4x research
-line -- the **end-of-line for the capsule-layer-only research
-programme** in the Context Zero project.  The remaining open
-frontiers (``W42-C-NATIVE-LATENT``, ``W42-C-MULTI-HOST``) are
-explicitly out of capsule-layer scope and require new
-architectural substrate.  Stable-vs-experimental boundary final:
-every W22..W42 symbol is exported under ``__experimental__``;
-the stable ``RunSpec → run report`` runtime contract is
-byte-for-byte unchanged.  Versioning: ``vision_mvp.__version__``
-and ``pyproject.toml`` are now both ``0.5.16``;
-``SDK_VERSION = wevra.sdk.v3.43``.
+> **Status — SDK v3.43, the final release of the Wevra SDK v3.4x
+> line (May 2026).** This is the first public release of Wevra.
+> See [Final release scope](#final-release-scope-v343) below for
+> what is stable, what is experimental, and what is explicitly out
+> of scope.
+
+## What Wevra is
+
+Wevra is the shipped product surface from the **Context Zero**
+research programme. It gives you four things you would otherwise
+build by hand on every project that wires multiple LLM agents
+together:
+
+* **A capsule contract.** Every cross-boundary artefact (prompt,
+  response, parse outcome, role handoff, run report) is a typed
+  object with a content-derived ID, declared parents, an explicit
+  budget, and a closed lifecycle. The contract is checked at
+  runtime; tampering is detectable.
+* **A capsule-native runtime.** `wevra.run(RunSpec(...))` produces a
+  `RunReport` whose root is a sealed capsule DAG, written to disk
+  alongside a `provenance.json` reproducibility manifest and a
+  detached `meta_manifest.json` witness.
+* **A team-coordination surface.** Agents exchange `TEAM_HANDOFF` /
+  `ROLE_VIEW` / `TEAM_DECISION` capsules with a mechanically-checked
+  T-1..T-7 lifecycle audit, so multi-agent runs are reproducible,
+  bounded-context, and audit-friendly.
+* **A research-grade evaluation harness.** Reproducible profiles
+  (`local_smoke`, `bundled_57`, `aspen_mac1_coder`,
+  `aspen_mac2_frontier`, `public_jsonl`, …), a `wevra-ci` gate that
+  consumes the report, and a `wevra-capsule verify` CLI that
+  re-hashes the on-disk capsule chain end-to-end.
+
+## Why Wevra
+
+Most multi-agent stacks treat context as text — prompts, JSON
+records, ad-hoc tool traces. That works until something breaks, and
+then the failure is a vague "the model was confused." Wevra treats
+context as **objects**: typed, content-addressed, lifecycle-bounded.
+The result is a runtime where you can ask "what evidence did the
+team actually have?", get a sealed DAG, and re-verify it from the
+bytes on disk. Reproducibility, auditability, and a clean integration
+boundary for downstream tools come along for free.
+
+## What makes it different
+
+Wevra is **not** another agent-orchestration framework. It is a
+runtime contract — small, stable, opinionated — under which
+existing agent code becomes auditable. Capsules are the load-bearing
+abstraction; everything else (CLIs, profiles, the team harness, the
+research-grade trust ladder) hangs off them. The individual
+primitives (content addressing, hash-chained logs, typed claim
+kinds, capability-style typed references) are inherited from Git /
+Merkle DAGs / IPFS / actor systems / session types. What Wevra
+contributes is the *unification* — one contract, implemented
+end-to-end in a runnable SDK.
+
+## Install
+
+```bash
+pip install -e .                 # editable install from a clone
+# or, once published to PyPI:
+# pip install wevra
+# pipx install wevra              # if you only want the CLIs
+```
+
+Only required dependency is NumPy. The optional LLM-agent demo
+talks HTTP to a local Ollama instance — no Python binding required.
+
+Optional extras: `wevra[scientific]`, `wevra[dl]`, `wevra[heavy]`,
+`wevra[crypto]`, `wevra[docker]` (Docker-first sandbox), `wevra[dev]`.
+
+Installing the package registers four console scripts:
+
+```bash
+wevra --profile local_smoke --out-dir /tmp/wevra-smoke
+wevra-import   --jsonl /path/to/swe_bench_lite.jsonl --out /tmp/audit.json
+wevra-ci       --report /tmp/wevra-smoke/product_report.json --min-pass-at-1 1.0
+wevra-capsule  view   --report /tmp/wevra-smoke/product_report.json
+wevra-capsule  verify --report /tmp/wevra-smoke/product_report.json
+```
+
+## Quickstart
+
+```python
+from vision_mvp.wevra import RunSpec, run
+
+report = run(RunSpec(profile="local_smoke", out_dir="/tmp/wevra-smoke"))
+assert report["readiness"]["ready"]
+assert report["provenance"]["schema"] == "wevra.provenance.v1"
+
+# Every run ships a sealed capsule graph.
+cv = report["capsules"]
+assert cv["schema"] == "wevra.capsule_view.v1"
+assert cv["chain_ok"]
+print(f"RUN_REPORT CID = {cv['root_cid']}")
+print(report["summary_text"])
+```
+
+A first real-LLM team is one extra line:
+
+```bash
+WEVRA_OLLAMA_URL=http://localhost:11434 \
+    wevra --profile local_smoke --acknowledge-heavy --out-dir /tmp/wevra-smoke
+```
+
+See [`docs/START_HERE.md`](docs/START_HERE.md) for the onboarding
+path and [`examples/`](examples/) for short standalone programs.
+
+## Stable vs experimental — at a glance
+
+| Surface | What you get | Stability |
+|---|---|---|
+| `vision_mvp.wevra` SDK — `RunSpec`, `run`, `RunReport`, `SweepSpec`, `run_sweep`, `WevraConfig`, `profiles`, `ci_gate`, `import_data`, `extensions`, capsule primitives, schema constants | The product / runtime contract | **Stable** (contract-tested, byte-for-byte unchanged across the v3.4x line) |
+| Console scripts — `wevra`, `wevra-import`, `wevra-ci`, `wevra-capsule` | The CLI surface | **Stable v3** |
+| Capsule view / provenance / report schemas — `wevra.capsule_view.v1`, `wevra.provenance.v1`, `phase45.product_report.v2` | On-disk contracts | **Stable** |
+| `vision_mvp.wevra.__experimental__` — W22..W42 trust-adjudication / multi-agent-coordination ladder, R-69..R-89 benchmark drivers, bounded live cross-host probes | Research surface, included for audit and reproduction | **Experimental** — may move, rename, or be withdrawn as the next programme starts |
+| Transformer-internal trust transfer (`W42-C-NATIVE-LATENT`); K+1-host disjoint topology beyond the two-Mac pair (`W42-C-MULTI-HOST`) | Architecture-bound open frontiers | **Out of scope for this release** — see [Out of scope](#out-of-scope-for-this-release) |
+
+The full stability matrix lives further down in
+[Stability matrix](#stability-matrix); the canonical, file-by-file
+status is in [`docs/RESEARCH_STATUS.md`](docs/RESEARCH_STATUS.md)
+and [`docs/THEOREM_REGISTRY.md`](docs/THEOREM_REGISTRY.md).
+
+## The released result, in one paragraph
+
+The v3.43 line closes the **capsule-layer-only research programme**
+inside Context Zero. Its strongest internal result is a measured
+strict trust-precision recovery on a regime where the prior best
+(W41) tied at 0.500: on `R-89-ROLE-INVARIANT-RECOVER`, W42 raises
+trust precision from 0.500 to **1.000 across 5/5 seeds**
+(`Δ_trust_precision = +0.500`, min = max). This is the first
+capsule-native multi-agent-coordination method in the programme
+that materially **bounds** `W41-L-COMPOSITE-COLLUSION-CAP` at the
+capsule layer via a third orthogonal evidence axis (the
+role-handoff invariance axis). W42 is closed-form, deterministic,
+zero-parameter, and capsule-layer; it does **not** add a
+transformer-internal mechanism, does **not** close
+`W42-L-FULL-COMPOSITE-COLLUSION-CAP` (a newly proved-conditional
+limitation theorem), and does **not** claim universal solution of
+multi-agent context. Live cross-host evidence at temperature 0 on
+the two-Mac topology (`localhost` gemma2:9b + `192.168.12.191`
+qwen2.5:14b) shows **4/4 paraphrase-invariant gold-correlated
+agreement** across K=4 paraphrases of one arithmetic prompt — the
+first measured cross-host paraphrase-invariance result in the
+programme. Full results note:
+[`docs/RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md`](docs/RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md);
+pre-committed success bar:
+[`docs/SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md`](docs/SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md);
+paper:
+[`papers/context_as_objects.md`](papers/context_as_objects.md).
 
 ## Final release scope (v3.43)
 
@@ -186,6 +270,18 @@ canonical theorem-by-theorem status is in
 ``docs/HOW_NOT_TO_OVERSTATE.md``.
 
 ---
+
+## Detailed milestone history
+
+The sections below preserve the per-milestone notes for the W22..W42
+research ladder, in reverse-chronological order, for audit and
+research-record purposes. Everything from this point on is
+**research surface** — useful if you want to follow exactly how the
+released result was built up, but not required reading for using
+Wevra. The active scientific position is in
+[`docs/RESEARCH_STATUS.md`](docs/RESEARCH_STATUS.md); the
+theorem-by-theorem status is in
+[`docs/THEOREM_REGISTRY.md`](docs/THEOREM_REGISTRY.md).
 
 **Previous milestone: SDK v3.42 RC2 (May 2026, superseded by v3.43 final).** Integrated
 multi-agent context synthesis + manifest-v11 CID + cross-axis
@@ -1404,31 +1500,12 @@ require.
 
 ---
 
-## Install
+## SDK reference — full quick start
 
-```bash
-git clone <this-repo>
-cd context-zero
-pip install -e .
-```
-
-Only dependency is NumPy. The optional LLM-agent demo talks HTTP to a local
-Ollama instance (no Python binding required).
-
-Installing the package also registers three console scripts:
-
-```bash
-wevra --profile local_smoke --out-dir /tmp/cz-smoke
-wevra-import --jsonl /path/to/swe_bench_lite.jsonl --out /tmp/audit.json
-wevra-ci --report /tmp/cz-smoke/product_report.json --min-pass-at-1 1.0
-```
-
-Optional extras: `wevra[scientific]`, `wevra[dl]`, `wevra[heavy]`,
-`wevra[docker]` (Docker-first sandbox — Slice 2), `wevra[dev]`.
-
----
-
-## Wevra SDK — quick start
+The landing-page [Quickstart](#quickstart) covers the minimal path.
+This section walks through the full SDK surface — capsule
+construction modes, on-disk artifact set, CLIs, who Wevra is for,
+and how to extend it.
 
 Wevra is a context-capsule runtime. One `RunSpec` in, one
 reproducible, provenance-stamped **capsule graph** out.
@@ -1611,7 +1688,12 @@ matrix and the concrete next-slice follow-ups.
 
 ---
 
-## Quick start
+## Research substrate quick start (CASR)
+
+The Wevra SDK is built on top of `CASRRouter` (Causal-Abstraction
+Scale-Renormalized Routing) — the research substrate that grounds
+Wevra's bounded-context guarantees. CASR is **not** part of the
+Wevra SDK contract; it is exposed for research use.
 
 ```python
 from vision_mvp import CASRRouter
@@ -1636,7 +1718,12 @@ independent of the state dimension d=64.
 
 ---
 
-## CLI
+## Research-substrate CLI
+
+The legacy `casr` console script (and the equivalent
+`python -m vision_mvp ...`) drives the CASR research demos and is
+retained for continuity with the Phase-1..44 scripts. The product
+CLI is `wevra` — see [Install](#install) above.
 
 ```bash
 python -m vision_mvp demo --n 500 --d 32 --rounds 20
@@ -1665,17 +1752,19 @@ context-zero/
 │   ├── CAPSULE_TEAM_FORMALISM.md        # team-boundary capsule formalism (W4 family)
 │   ├── context_zero_master_plan.md      # long-running master plan
 │   ├── MLX_DISTRIBUTED_RUNBOOK.md       # two-Mac MLX distributed-inference runbook
-│   ├── RESULTS_WEVRA_CROSS_ROLE_COHERENCE.md # latest milestone (SDK v3.8)
-│   ├── RESULTS_WEVRA_SCALE_VS_STRUCTURE.md # previous milestone (SDK v3.7)
+│   ├── RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md  # latest milestone (SDK v3.43, final)
+│   ├── SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md  # pre-committed success bar (SDK v3.43)
 │   └── archive/                         # historical milestones + pre-Wevra theory (see archive/README.md)
-├── papers/                     # paper-grade write-ups (Wevra capsule-native runtime, etc.)
+├── papers/                     # paper-grade write-ups (context_as_objects.md is the main paper)
+├── examples/                   # short standalone programs (basic consensus, drift tracking, scaling, local LLM, real code review)
 └── vision_mvp/                 # working implementation + research diary
     ├── wevra/                  # public Wevra SDK (stable contract — see § Stability matrix)
+    │   └── __experimental__/   # W22..W42 research surface (under the experimental tuple)
     ├── core/                   # CASR substrate primitives (research-grade)
     ├── tasks/                  # task banks + adapters
-    ├── experiments/            # phase 1–53 experiment harnesses
-    ├── tests/                  # ~1500 substrate + capsule tests
-    ├── RESULTS_PHASE*.md       # phase-by-phase research diary (Phase 1 → 53+)
+    ├── experiments/            # phase 1–89 experiment harnesses (incl. R-69..R-89 benchmark drivers)
+    ├── tests/                  # ~1500 substrate + capsule + W22..W42 tests
+    ├── RESULTS_PHASE*.md       # phase-by-phase research diary (Phase 1 → 89+)
     └── README.md               # implementation-level README
 ```
 

@@ -78,10 +78,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/your-org/context-zero"
-Documentation = "https://github.com/your-org/context-zero#readme"
-Issues = "https://github.com/your-org/context-zero/issues"
-Changelog = "https://github.com/your-org/context-zero/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/adotdong29/context-zero"
+Documentation = "https://github.com/adotdong29/context-zero#readme"
+Issues = "https://github.com/adotdong29/context-zero/issues"
+Changelog = "https://github.com/adotdong29/context-zero/blob/main/CHANGELOG.md"
 
 [project.scripts]
 # Wevra SDK surface — these are the stable, contract-tested entry points.
