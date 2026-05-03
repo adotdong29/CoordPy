@@ -5,6 +5,96 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.15 / 3.42] — 2026-05-03 — SDK v3.42 RC2 — integrated multi-agent context synthesis + manifest-v11 CID + cross-axis witness CID + producer-axis x trust-axis decision selector + R-88 Phase-88 benchmark family + W41-L-COMPOSITE-COLLUSION-CAP limitation theorem + W41-INFRA-1 (.101 retracted: AirPlay receiver, not Mac) + RC2 declaration
+
+*Strictly additive on SDK v3.41 RC1.  The stable Wevra product/runtime
+(`RunSpec → run report`) is byte-for-byte unchanged.  W41 surface lives
+under `__experimental__`.  This release is the **second release-
+candidate (RC2)** of the SDK v3.4x line.*
+
+### Added — W41 family (integrated multi-agent context synthesis)
+
+* **`IntegratedSynthesisOrchestrator`** wraps W40
+  (`CrossHostResponseHeterogeneityOrchestrator`) with a cross-axis
+  classification layer that jointly binds the strongest old-line
+  explicit-capsule trust-adjudication chain (W21..W40) AND the
+  strongest cross-role / multi-round bundle decoder family (W7..W11)
+  into a single auditable end-to-end path with one **manifest-v11**
+  envelope binding both axes plus a content-addressed cross-axis
+  witness.  W41 is closed-form, zero-parameter, and capsule-layer; it
+  does NOT add a transformer-internal mechanism, does NOT close
+  `W40-L-COORDINATED-DIVERSE-RESPONSE-CAP`, and does NOT close its
+  own new `W41-L-COMPOSITE-COLLUSION-CAP` limitation theorem.
+
+* **Cross-axis decision selector**
+  `select_integrated_synthesis_decision`: deterministic 8-branch
+  classifier returning one of: `trivial_integrated_passthrough`,
+  `integrated_disabled`, `integrated_rejected`,
+  `integrated_producer_only`, `integrated_trust_only`,
+  `integrated_both_axes`, `integrated_axes_diverged_abstained`,
+  `integrated_neither_axis`.
+
+* **Manifest-v11 CID** binds five component CIDs: `parent_w40_cid`,
+  `synthesis_state_cid`, `synthesis_decision_cid`,
+  `synthesis_audit_cid`, and `cross_axis_witness_cid` (an explicit
+  per-cell witness namespaced as `w41_cross_axis_witness` so
+  substituting a W22..W40 audit / witness for it is mechanically
+  rejected).
+
+* **W41 verifier** (`verify_integrated_synthesis_ratification`)
+  enumerates 14 failure modes disjoint from W22..W40 (cumulative 182
+  across W22..W41).
+
+* **R-88 Phase-88 benchmark family** (5 banks): `trivial_w41`,
+  `both_axes`, `trust_only_safety`, `composite_collusion`,
+  `insufficient_response_signature`.
+
+* **W41-L-COMPOSITE-COLLUSION-CAP** (NEW limitation theorem): when
+  the adversary coordinates BOTH the producer-side admission AND the
+  trust-side W40 ratification on the wrong set, W41 cannot recover
+  at the capsule layer.
+
+* **W41-INFRA-1** (lab topology retraction): `192.168.12.101` is an
+  Apple TV / AirPlay receiver (`AirTunes/860.7.1` banner on port
+  5000; locally-administered MAC `36:1c:eb:dc:9a:04`), NOT a Mac
+  running Ollama.  The W37..W40 "TCP-up + HTTP-broken Ollama Mac"
+  framing is retracted at this milestone.  Honest live topology:
+  two-Mac pair (`localhost` + `192.168.12.191`).  `192.168.12.248`
+  recorded as gone per user instruction.
+
+### Empirical results (R-88, 5/5 seeds × 16 cells/seed)
+
+* `trivial_w41`: W41 = W40 byte-for-byte; overhead = 0.
+* `both_axes`: correctness_w41 = correctness_w40 = 1.000;
+  trust_precision_w41 = trust_precision_w40 = 1.000; delta = 0.
+* `trust_only_safety`: trust_precision_w41 = trust_precision_w40 =
+  1.000 on the safety branch (W41 routes through the
+  INTEGRATED_TRUST_ONLY safety branch on the recovery half);
+  correctness_w41 = correctness_w40 = 0.500.
+* `composite_collusion`: trust_precision_w41 = trust_precision_w40
+  = 0.500; W41-L-COMPOSITE-COLLUSION-CAP fires; delta = 0.
+* `insufficient_response_signature`: W41 = W40 byte-for-W39 on the
+  answer; delta = 0.
+
+All five banks: `all_w41_verified_ok = True`; W41 overhead = 1
+visible token/cell (= 0 on `trivial_w41`); ~15.5k structured bits
+per cell of cross-axis state under manifest-v11.
+
+### Tests
+
+698/698 phase69-88 focused W22..W41 stack regression (was 661/661
+at W40 RC1; W41 added 37 cleanly) + 364/364 phase11-39 broad spot
+check + 205/205 phase40-51 + phase6 broad spot check (1267 tests
+pass excluding the named pre-existing
+`test_phase50_ci_and_zero_shot` collection-time hang carried
+forward unchanged from W40).
+
+### Versioning
+
+* `SDK_VERSION` = `wevra.sdk.v3.42`
+* `vision_mvp.__version__` = `0.5.15`
+* `pyproject.toml` version = `0.5.15`
+
 ## [0.5.14 / 3.41] — 2026-05-03 — SDK v3.41 RC1 — cross-host response-signature heterogeneity ratification + manifest-v10 CID + cross-host response-text Jaccard divergence guard + R-87 Phase-87 benchmark family + W40-L-COORDINATED-DIVERSE-RESPONSE-CAP limitation theorem + W40-INFRA-1 (.101 TCP-up + HTTP-broken) + RC1 declaration
 
 *Strictly additive on SDK v3.40.  The stable Wevra product/runtime

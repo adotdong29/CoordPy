@@ -1,13 +1,89 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
-> Updated through SDK v3.41 RC1, 2026-05-03 (W22 → W40 cumulative
+> Updated through SDK v3.42 RC2, 2026-05-03 (W22 → W41 cumulative
 > trust + dense-control + live-aware multi-anchor / trust-subspace /
 > host-diverse / cross-host trajectory / disjoint-consensus-reference /
-> multi-host-disjoint-quorum / cross-host-response-heterogeneity guard
-> ladder summarised in § 14.2 and § 17).
+> multi-host-disjoint-quorum / cross-host-response-heterogeneity /
+> integrated-multi-agent-context-synthesis guard ladder summarised in
+> § 14.2 and § 17).
 >
-> **Latest milestone marker (SDK v3.41 RC1 / W40, 2026-05-03).** The
+> **Latest milestone marker (SDK v3.42 RC2 / W41, 2026-05-03).** The
+> programme now has **thirty-eight** coupled research axes.  W41 is
+> explicitly framed as a **synthesis** milestone, not "W41: one more
+> local mechanism."  W41 jointly binds the strongest old-line
+> explicit-capsule trust-adjudication chain (W21..W40) AND the
+> strongest cross-role / multi-round bundle decoder family (W7..W11)
+> into a single auditable end-to-end path with one **manifest-v11**
+> envelope binding both axes plus a content-addressed cross-axis
+> witness.  W41 is closed-form, zero-parameter, and capsule-layer; it
+> does NOT add a transformer-internal mechanism, does NOT close
+> ``W40-L-COORDINATED-DIVERSE-RESPONSE-CAP``, and does NOT close its
+> own new ``W41-L-COMPOSITE-COLLUSION-CAP`` limitation theorem (the
+> W41 analog of all previous capsule-layer limitation theorems).
+> The cross-axis classification is a deterministic 8-branch decision
+> selector ``select_integrated_synthesis_decision`` over the per-axis
+> branches and per-axis service tuples.  Manifest-v11 binds five
+> component CIDs (``parent_w40_cid``, ``synthesis_state_cid``,
+> ``synthesis_decision_cid``, ``synthesis_audit_cid``,
+> ``cross_axis_witness_cid``); the audit + witness CIDs are
+> namespaced (``w41_synthesis_audit`` / ``w41_cross_axis_witness``)
+> so substituting a W22..W40 audit / witness for them is mechanically
+> rejected.  ``verify_integrated_synthesis_ratification`` enumerates
+> 14 disjoint W41 failure modes (cumulative 182 across W22..W41).
+> R-88 is the first end-to-end multi-agent context benchmark family
+> in the programme that records the cross-axis branch distribution
+> per cell, letting researchers distinguish which axis (producer vs
+> trust vs both vs neither) is load-bearing.  Across 5/5 seeds × 16
+> cells/seed, R-88 results are: ``trivial_w41`` (W41 = W40 byte-for-
+> byte; 80 trivial_integrated_passthrough); ``both_axes``
+> (correctness 1.000; trust precision 1.000; delta = 0; 40
+> producer_only + 40 both_axes); ``trust_only_safety`` (trust
+> precision 1.000 preserved; safety branch INTEGRATED_TRUST_ONLY
+> clears services on collapse; 40 producer_only + 40 trust_only);
+> ``composite_collusion`` (W41-L-COMPOSITE-COLLUSION-CAP fires;
+> trust precision 0.500; delta = 0; 40 producer_only + 40 both_axes
+> on wrong set); ``insufficient_response_signature`` (W41 = W40
+> byte-for-W39; 80 producer_only).  W41 carries roughly **15.5k
+> structured bits per visible W41 token** at one visible token
+> overhead/cell (in the W38..W40 density range).  **Lab topology
+> retraction -- W41-INFRA-1**: re-probing ``192.168.12.101`` at the
+> W41 milestone identifies it as an Apple TV / AirPlay receiver
+> (``HTTP/1.1 403 Forbidden`` with header ``Server:
+> AirTunes/860.7.1`` on port 5000; locally-administered MAC
+> ``36:1c:eb:dc:9a:04``; no Mac mDNS hostname), NOT a Mac running
+> Ollama.  The W37..W40 "TCP-up + HTTP-broken Ollama Mac" framing
+> for ``.101`` is **retracted** at this milestone.  No Ollama
+> instance has ever been running on ``.101`` in this network; port
+> 11434 returning "Empty reply from server" was the device closing
+> the connection on an unrecognised port, NOT a hung Ollama
+> listener.  The honest live multi-host topology going forward is
+> the two-Mac pair ``localhost`` (``Qunfengs-MBP.lan``,
+> ``192.168.12.157``) + ``192.168.12.191``
+> (``HSC136047-MAC.lan``).  ``192.168.12.248`` is recorded as gone
+> (per user instruction).  A bounded W41 sanity probe at
+> temperature 0 + ``num_predict = 4`` on the two-Mac topology
+> produced byte-agreed answers across architectures: ``localhost
+> gemma2:9b`` and ``192.168.12.191 qwen2.5:14b`` both answered
+> "Four" to "What is 2+2? Answer with one word."  This sharpens
+> the closed-vocabulary one-word-prompt
+> ``W37-C-LIVE-TRUNCATION-RECOVERY`` /
+> ``W40-C-LIVE-RESPONSE-HETEROGENEITY`` anchors at the synthetic
+> layer; the W41 mechanism is closed-form and capsule-layer, so no
+> live LLM inference is required to evaluate the W41 success
+> criterion.  **RC2 declared**: H1..H12 + S3 of the W41 success
+> criterion pass.  The SDK v3.42 line is the second release-
+> candidate of the Wevra SDK v3.4x line, strictly additive on top
+> of RC1 (every W22..W41 symbol is exported under
+> ``__experimental__``; the stable ``RunSpec → run report``
+> runtime contract is byte-for-byte unchanged).  Versioning:
+> ``vision_mvp.__version__`` and ``pyproject.toml``
+> ``project.version`` are now both ``0.5.15`` (alignment
+> maintained); ``SDK_VERSION = wevra.sdk.v3.42``.  See
+> ``docs/RESULTS_WEVRA_W41_INTEGRATED_SYNTHESIS.md`` and
+> ``docs/SUCCESS_CRITERION_W41_INTEGRATED_SYNTHESIS.md``.
+
+> **Earlier milestone marker (SDK v3.41 RC1 / W40, 2026-05-03).** The
 > programme now has **thirty-seven** coupled research axes.  W40
 > wraps W39's K-of-N mutually-disjoint quorum consensus-reference
 > adjudication with a **cross-host response-signature heterogeneity**

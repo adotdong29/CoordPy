@@ -672,6 +672,41 @@ from .team_coord import (
     W40_BRANCH_RESPONSE_SIGNATURE_INCOMPLETE,
     W40_ALL_BRANCHES,
 )
+# W41 family - integrated multi-agent context synthesis (SDK v3.42).
+# Strict superset of W40: composes the strongest old-line explicit-
+# capsule trust adjudication chain (W21..W40) and the strongest
+# cross-role / multi-round bundle decoder family (W7..W11) into a
+# single auditable end-to-end path with one manifest-v11 envelope
+# binding both axes plus a content-addressed cross-axis witness.
+from .integrated_synthesis import (
+    IntegratedSynthesisRatificationEnvelope,
+    IntegratedSynthesisRegistry,
+    W41IntegratedSynthesisResult,
+    IntegratedSynthesisOrchestrator,
+    verify_integrated_synthesis_ratification,
+    select_integrated_synthesis_decision,
+    classify_producer_axis_branch,
+    classify_trust_axis_branch,
+    build_integrated_synthesis_registry,
+    build_trivial_integrated_synthesis_registry,
+    W41_INTEGRATED_SYNTHESIS_SCHEMA_VERSION,
+    W41_PRODUCER_AXIS_FIRED,
+    W41_PRODUCER_AXIS_NO_TRIGGER,
+    W41_TRUST_AXIS_RATIFIED,
+    W41_TRUST_AXIS_ABSTAINED,
+    W41_TRUST_AXIS_NO_TRIGGER,
+    W41_BRANCH_TRIVIAL_INTEGRATED_PASSTHROUGH,
+    W41_BRANCH_INTEGRATED_DISABLED,
+    W41_BRANCH_INTEGRATED_REJECTED,
+    W41_BRANCH_INTEGRATED_PRODUCER_ONLY,
+    W41_BRANCH_INTEGRATED_TRUST_ONLY,
+    W41_BRANCH_INTEGRATED_BOTH_AXES,
+    W41_BRANCH_INTEGRATED_AXES_DIVERGED_ABSTAINED,
+    W41_BRANCH_INTEGRATED_NEITHER_AXIS,
+    W41_ALL_BRANCHES,
+    W41_PRODUCER_BRANCHES,
+    W41_TRUST_BRANCHES,
+)
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
     TrainSample as TeamTrainSample,
@@ -684,7 +719,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.41"
+SDK_VERSION = "wevra.sdk.v3.42"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -883,6 +918,19 @@ __experimental__: tuple[str, ...] = (
     "select_cross_host_response_heterogeneity_decision",
     "build_trivial_cross_host_response_heterogeneity_registry",
     "build_cross_host_response_heterogeneity_registry",
+    # W41 family — integrated multi-agent context synthesis +
+    # manifest-v11 CID + cross-axis witness CID +
+    # producer-axis x trust-axis decision selector.
+    "IntegratedSynthesisRatificationEnvelope",
+    "IntegratedSynthesisRegistry",
+    "W41IntegratedSynthesisResult",
+    "IntegratedSynthesisOrchestrator",
+    "verify_integrated_synthesis_ratification",
+    "select_integrated_synthesis_decision",
+    "classify_producer_axis_branch",
+    "classify_trust_axis_branch",
+    "build_integrated_synthesis_registry",
+    "build_trivial_integrated_synthesis_registry",
 )
 
 __all__ = [
@@ -1416,6 +1464,33 @@ __all__ = [
     "W40_BRANCH_RESPONSE_SIGNATURE_INSUFFICIENT",
     "W40_BRANCH_RESPONSE_SIGNATURE_INCOMPLETE",
     "W40_ALL_BRANCHES",
+    # W41 family - integrated multi-agent context synthesis +
+    # manifest-v11 CID + cross-axis witness + producer/trust
+    # decision selector.
+    "IntegratedSynthesisRatificationEnvelope",
+    "IntegratedSynthesisRegistry",
+    "W41IntegratedSynthesisResult",
+    "IntegratedSynthesisOrchestrator",
+    "verify_integrated_synthesis_ratification",
+    "select_integrated_synthesis_decision",
+    "classify_producer_axis_branch",
+    "classify_trust_axis_branch",
+    "build_integrated_synthesis_registry",
+    "build_trivial_integrated_synthesis_registry",
+    "W41_INTEGRATED_SYNTHESIS_SCHEMA_VERSION",
+    "W41_PRODUCER_AXIS_FIRED",
+    "W41_PRODUCER_AXIS_NO_TRIGGER",
+    "W41_TRUST_AXIS_RATIFIED",
+    "W41_TRUST_AXIS_ABSTAINED",
+    "W41_TRUST_AXIS_NO_TRIGGER",
+    "W41_BRANCH_TRIVIAL_INTEGRATED_PASSTHROUGH",
+    "W41_BRANCH_INTEGRATED_DISABLED",
+    "W41_BRANCH_INTEGRATED_REJECTED",
+    "W41_BRANCH_INTEGRATED_PRODUCER_ONLY",
+    "W41_BRANCH_INTEGRATED_TRUST_ONLY",
+    "W41_BRANCH_INTEGRATED_BOTH_AXES",
+    "W41_BRANCH_INTEGRATED_AXES_DIVERGED_ABSTAINED",
+    "W41_BRANCH_INTEGRATED_NEITHER_AXIS",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

@@ -5,10 +5,100 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.41 RC1,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.42 RC2,
 > 2026-05-03.
 
-## TL;DR — SDK v3.41 RC1
+## TL;DR — SDK v3.42 RC2
+
+The programme now has **thirty-eight** coupled research axes.  SDK
+v3.42 RC2 mints axis 38: **integrated multi-agent context
+synthesis + manifest-v11 CID + cross-axis witness CID +
+producer-axis x trust-axis decision selector** (W41).  W41 is
+explicitly framed as a **synthesis** milestone -- "using
+everything already built in this repo, what is the strongest
+honest full-system attempt we can make to solve context for
+multi-agent teams?" -- not "W41: one more local mechanism."  W41
+jointly binds the strongest old-line explicit-capsule trust-
+adjudication chain (W21..W40) AND the strongest cross-role /
+multi-round bundle decoder family (W7..W11) into a single
+auditable end-to-end path with one ``manifest-v11`` envelope.
+
+The load-bearing change is from *trust-only adjudication*
+(W21..W40) to *integrated cross-axis classification* (producer-
+side W7..W11 x trust-side W21..W40) under one manifest-v11
+envelope.  W41 raises the capsule-layer adversary bar from
+"compromise the W22..W40 trust-adjudication chain" to "compromise
+the W22..W40 trust-adjudication chain AND coordinate the W7..W11
+producer-side admission so the cross-axis classification cannot
+use one axis to overrule the other."  When both are coordinated,
+W41 cannot recover; this is the new proved-conditional
+``W41-L-COMPOSITE-COLLUSION-CAP`` limitation theorem (the W41
+analog of all previous capsule-layer limitation theorems).
+
+**Headline SDK v3.42 RC2 results.**
+
+* **R-88-TRIVIAL-W41.**  With synthesis disabled, manifest-v11
+  disabled, and abstain-on-axes-diverged disabled, W41 reduces
+  to W40 byte-for-byte across 5/5 seeds; ``all_byte_equivalent
+  _w41_w40 = True``.  Aggregate branch distribution: 80 cells
+  (5 seeds × 16 cells/seed) on ``trivial_integrated_passthrough``.
+
+* **R-88-BOTH-AXES (no-regression).**  W41 ratifies via
+  ``integrated_both_axes`` on the recovery half + via
+  ``integrated_producer_only`` on the prefix half.  Across 5/5
+  seeds: ``correctness_w41 = correctness_w40 = 1.000``;
+  ``trust_precision_w41 = trust_precision_w40 = 1.000``;
+  ``Δ_correctness_w41_w40 = 0.000``;
+  ``Δ_trust_precision_w41_w40 = 0.000``.
+
+* **R-88-TRUST-ONLY-SAFETY (load-bearing safety).**  When the
+  W21 producer set is colluded AND W40 detects collapse and
+  abstains, W41 routes through the ``integrated_trust_only``
+  safety branch with empty integrated services on the recovery
+  half.  Across 5/5 seeds: ``trust_precision_w41 =
+  trust_precision_w40 = 1.000`` (W41 preserves the W40 safety
+  abstention exactly).
+
+* **R-88-COMPOSITE-COLLUSION (W41-L-COMPOSITE-COLLUSION-CAP).**
+  When both the producer-side admission AND the trust-side W40
+  ratification are coordinated by the adversary, W41 cannot
+  recover; ``Δ_trust_precision_w41_w40 = 0.000`` across 5/5
+  seeds; W41 ratifies ``integrated_both_axes`` on the wrong
+  set.
+
+* **R-88-INSUFFICIENT-RESPONSE-SIGNATURE.**  When W40 returns
+  insufficient probes, W41 routes through
+  ``integrated_producer_only`` and preserves W40 byte-for-W39
+  on the answer; delta = 0 across 5/5 seeds.
+
+* **W41-INFRA-1.**  ``192.168.12.101`` is identified as an
+  Apple TV / AirPlay receiver (``HTTP/1.1 403 Forbidden`` with
+  ``Server: AirTunes/860.7.1`` on port 5000; locally-administered
+  MAC ``36:1c:eb:dc:9a:04``), NOT a Mac running Ollama.  The
+  W37..W40 "TCP-up + HTTP-broken Ollama Mac" framing for
+  ``.101`` is **retracted** at the W41 milestone.  The honest
+  live multi-host topology is the two-Mac pair (``localhost`` +
+  ``192.168.12.191``).  ``192.168.12.248`` is recorded as gone
+  (per user instruction).
+
+* **RC2 declared.**  H1..H12 + S3 of the W41 success criterion
+  pass.  The SDK v3.42 line is the second release-candidate of
+  the Wevra SDK v3.4x line, strictly additive on top of RC1
+  (every W22..W41 symbol is exported under
+  ``__experimental__``; the stable RunSpec -> run report
+  runtime contract is byte-for-byte unchanged).
+
+* **Cross-axis branch distribution (R-88).**  R-88 is the first
+  end-to-end multi-agent context benchmark family that records
+  the cross-axis branch distribution per cell.  At
+  ``n_eval = 16`` × 5 seeds = 80 cells per bank:
+  - ``trivial_w41``: 80 trivial_integrated_passthrough.
+  - ``both_axes``: 40 integrated_producer_only + 40 integrated_both_axes.
+  - ``trust_only_safety``: 40 integrated_producer_only + 40 integrated_trust_only.
+  - ``composite_collusion``: 40 integrated_producer_only + 40 integrated_both_axes (on wrong set).
+  - ``insufficient_response_signature``: 80 integrated_producer_only.
+
+## Earlier TL;DR — SDK v3.41 RC1
 
 The programme now has **thirty-seven** coupled research axes.  SDK
 v3.41 RC1 mints axis 37: **cross-host response-signature

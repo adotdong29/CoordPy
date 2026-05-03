@@ -53,7 +53,7 @@ quantitative bar, on which bench, at which $n$. The phrase
 "under W3-Cn" where W3-Cn is a named conjecture in
 `THEOREM_REGISTRY.md`. The strict reading W3-C7 is **retracted**.
 
-Last touched: SDK v3.39 (W38 family) 2026-05-02.
+Last touched: SDK v3.42 (W41 family) 2026-05-03.
 
 ### "Solves" without a defining gate
 
@@ -197,6 +197,78 @@ W38 preserves W37 behavior or honestly fails.  Mac 2 still times out
 consensus host from a different model class on the same physical
 host as one trajectory host -- a defensible weak proxy for capsule-
 layer disjointness, NOT a true 3-physical-host disjoint topology.
+
+### "W41 solves context for multi-agent teams" or "W41 closes W41-L-COMPOSITE-COLLUSION-CAP"
+
+> *"W41 finally solves context for multi-agent teams."*
+
+Forbidden.  W41 is an **integration** milestone, not a "solving"
+milestone.  W41 jointly binds the W21..W40 trust-adjudication
+chain and the W7..W11 cross-role / multi-round bundle decoder
+family into a single auditable end-to-end path under a manifest-
+v11 envelope, but does NOT close native-latent transfer, does
+NOT close ``W40-L-COORDINATED-DIVERSE-RESPONSE-CAP``, and does
+NOT close its own ``W41-L-COMPOSITE-COLLUSION-CAP`` limitation
+theorem.
+
+W41 also does not access hidden states, KV cache, attention
+weights, or embeddings.  The cross-axis classification is a
+closed-form, zero-parameter, deterministic mechanical decision
+over the W40 projection branch + the inner answer's services
+field; the eight named integrated branches are mechanically
+classifiable from per-axis branches alone.
+
+Permitted phrasing: *"W41 is the first capsule-native end-to-end
+integrated synthesis of the W21..W40 trust-adjudication chain
+and the W7..W11 cross-role / multi-round bundle decoder family,
+with one manifest-v11 envelope binding both axes plus a cross-
+axis witness, and a measured cross-axis branch distribution that
+lets researchers distinguish which axis is load-bearing on each
+cell."*
+
+Forbidden phrasing: *"W41 solves context for multi-agent teams"*,
+*"W41 closes W41-L-COMPOSITE-COLLUSION-CAP"*, *"W41 closes
+W41-C-NATIVE-LATENT"*, *"W41 gives true 3-host evidence"*, *"W41
+makes the repo release-ready by itself"*.
+
+The honest reading is narrower: on R-88-BOTH-AXES, R-88-TRUST-
+ONLY-SAFETY, and R-88-INSUFFICIENT-RESPONSE-SIGNATURE, W41
+preserves W40 byte-for-byte on the answer field while adding 1
+visible token/cell of cross-axis classification overhead and
+~15.5k structured bits/cell of cross-axis state under manifest-
+v11.  On R-88-COMPOSITE-COLLUSION (the new W41-L-COMPOSITE-
+COLLUSION-CAP regime), W41 cannot recover when the adversary
+coordinates BOTH the producer-side admission AND the trust-side
+W40 ratification on the wrong set; this is the new proved-
+conditional limitation theorem.
+
+### "192.168.12.101 is a Mac with a hung Ollama listener" (RETRACTED at W41)
+
+> *"`.101` is a Mac running Ollama with a hung HTTP listener (TCP-up + HTTP-broken)."*
+
+**Retracted at the W41 milestone (2026-05-03).** The W37 / W38 /
+W39 / W40 milestones described ``192.168.12.101`` as a third Mac
+with a hung Ollama HTTP listener.  Re-probing at the W41
+milestone shows that ``.101`` is an **Apple TV / AirPlay
+receiver**: ``HTTP/1.1 403 Forbidden`` with header ``Server:
+AirTunes/860.7.1`` on port 5000; locally-administered MAC
+``36:1c:eb:dc:9a:04`` (the second nibble of the first byte is
+``6`` => locally administered); no Mac mDNS hostname.  Port
+11434 returning "Empty reply from server" is the device closing
+the connection on an unrecognised port, NOT a hung Ollama
+listener.  No Ollama instance has ever been running on ``.101``
+in this network.
+
+The earlier "third physical host candidate" framing was a
+network-layer mis-identification.  Recorded as **W41-INFRA-1** in
+``docs/RESULTS_WEVRA_W41_INTEGRATED_SYNTHESIS.md §4.1``.  The
+honest live multi-host topology going forward is the two-Mac
+pair (``localhost`` + ``192.168.12.191``).
+``192.168.12.248`` is recorded as gone (per user instruction).
+
+The previous milestone's "two-reachable-host evidence" anchors
+remain valid (those used ``localhost`` + ``.191`` directly via
+the W39-INFRA-1 fallback path, which correctly avoided ``.101``).
 
 ### "Beats" without a baseline
 

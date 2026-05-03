@@ -11393,6 +11393,205 @@ Eight self-questions (post-W33):
 
 ---
 
+## SDK v3.42 RC2 (W41 family) — integrated multi-agent context synthesis + manifest-v11 CID + cross-axis witness CID + producer-axis x trust-axis decision selector + W41-INFRA-1 lab topology retraction — 2026-05-03
+
+W41 is explicitly framed as a **synthesis** milestone, not "W41:
+one more local mechanism."  The instruction was: "using
+everything already built in this repo, what is the strongest
+honest full-system attempt we can make to solve context for
+multi-agent teams?"  W41 attempts to answer that by jointly
+binding the strongest old-line explicit-capsule trust-
+adjudication chain (W21..W40) AND the strongest cross-role /
+multi-round bundle decoder family (W7..W11) into a single
+auditable end-to-end path with one ``manifest-v11`` envelope
+binding both axes plus a content-addressed cross-axis witness.
+
+The load-bearing change is from *trust-only adjudication*
+(W21..W40) to *integrated cross-axis classification* (producer-
+side W7..W11 x trust-side W21..W40) under one manifest-v11
+envelope.  W41 raises the capsule-layer adversary bar from
+"compromise the W22..W40 trust-adjudication chain" to
+"compromise the W22..W40 trust-adjudication chain AND
+coordinate the W7..W11 producer-side admission so the cross-
+axis classification cannot use one axis to overrule the other."
+When both are coordinated, W41 cannot recover; this is the new
+proved-conditional **W41-L-COMPOSITE-COLLUSION-CAP** limitation
+theorem.
+
+W41 does NOT add a new transformer-internal mechanism.  The
+cross-axis classification is closed-form, zero-parameter, and
+capsule-layer.  The ``IntegratedSynthesisOrchestrator`` wraps a
+``CrossHostResponseHeterogeneityOrchestrator`` (W40) and adds a
+deterministic 8-branch decision selector
+``select_integrated_synthesis_decision`` that classifies each
+cell into one of: ``trivial_integrated_passthrough``,
+``integrated_disabled``, ``integrated_rejected``,
+``integrated_producer_only``, ``integrated_trust_only``,
+``integrated_both_axes``,
+``integrated_axes_diverged_abstained``,
+``integrated_neither_axis``.  The selector is mechanical: given
+the same per-axis branches and service tuples, two calls
+produce byte-identical (branch, services) outputs.
+
+Manifest-v11 binds five component CIDs: ``parent_w40_cid``,
+``synthesis_state_cid``, ``synthesis_decision_cid``,
+``synthesis_audit_cid``, ``cross_axis_witness_cid``.  The
+synthesis_audit and cross_axis_witness CIDs are namespaced as
+``w41_synthesis_audit`` / ``w41_cross_axis_witness`` so
+substituting a W22..W40 audit / witness for them is mechanically
+detected.  ``verify_integrated_synthesis_ratification``
+enumerates **14 disjoint failure modes** (cumulative 182 across
+W22..W41).
+
+R-88 is the first end-to-end multi-agent context benchmark
+family in the programme that records the cross-axis branch
+distribution per cell, letting researchers distinguish which
+axis (producer-side vs trust-side vs both vs neither) is
+load-bearing on each cell.  R-88 has five banks: ``trivial_w41``
+(W41 reduces to W40 byte-for-byte; 80 cells trivial_integrated
+_passthrough across 5/5 seeds × 16 cells); ``both_axes``
+(producer fires + trust ratifies => W41 ratifies via INTEGRATED
+_BOTH_AXES on the recovery half + INTEGRATED_PRODUCER_ONLY on
+the prefix half; correctness 1.000, trust precision 1.000;
+delta = 0 vs W40); ``trust_only_safety`` (W21 produces wrong
+colluded set + W40 detects collapse + abstains; W41 routes
+through the safety branch INTEGRATED_TRUST_ONLY with empty
+integrated services on the recovery half; trust precision
+1.000); ``composite_collusion`` (adversary coordinates BOTH
+axes; W41-L-COMPOSITE-COLLUSION-CAP fires; W41 ratifies
+INTEGRATED_BOTH_AXES on the wrong set; delta = 0);
+``insufficient_response_signature`` (W40 returns NO_TRIGGER on
+insufficient probes; W41 routes through INTEGRATED_PRODUCER
+_ONLY; W41 = W40 on the answer).
+
+**Lab topology retraction (W41-INFRA-1)**.  The W37 / W38 / W39
+/ W40 milestones described ``192.168.12.101`` as a third Mac
+with a hung Ollama HTTP listener ("TCP-up + HTTP-broken").
+Re-probing at the W41 milestone shows that ``.101`` is an Apple
+TV / AirPlay receiver (``HTTP/1.1 403 Forbidden`` with header
+``Server: AirTunes/860.7.1`` on port 5000; locally-administered
+MAC ``36:1c:eb:dc:9a:04``; no Mac mDNS hostname), NOT a Mac
+running Ollama.  Port 11434 returning "Empty reply from server"
+is the device closing the connection on an unrecognised port,
+NOT a hung Ollama listener.  The framing is **retracted** at
+this milestone.  The honest live multi-host topology is the
+two-Mac pair ``localhost`` (``Qunfengs-MBP.lan``,
+``192.168.12.157``) + ``192.168.12.191`` (``HSC136047-MAC.lan``).
+``192.168.12.248`` is recorded as gone (per user instruction).
+A bounded W41 sanity probe at temperature 0 + num_predict = 4
+on the two-Mac topology produced byte-agreed answers across
+architectures: ``localhost gemma2:9b`` and ``192.168.12.191
+qwen2.5:14b`` both answered "Four" to "What is 2+2? Answer with
+one word."  This sharpens the closed-vocabulary one-word-prompt
+W37-C-LIVE-TRUNCATION-RECOVERY / W40-C-LIVE-RESPONSE-
+HETEROGENEITY anchors.  The W41 mechanism is closed-form and
+capsule-layer; no live LLM inference is required to evaluate
+the W41 success criterion -- the live two-Mac probe is a bonus
+realism anchor, not load-bearing.
+
+Verdict against pre-committed success criterion: **12/12 hard
+gates + S3 PASS = STRONG SUCCESS, RC2 declared**.  W41 is the
+strongest honest capsule-layer integrated synthesis the repo
+can support without transformer-internal evidence, and is
+strictly additive on top of W40 RC1: every W22..W41 symbol is
+exported under ``__experimental__``; the stable RunSpec -> run
+report runtime contract is byte-for-byte unchanged;
+``SDK_VERSION = wevra.sdk.v3.42``;
+``vision_mvp.__version__ = pyproject.toml = 0.5.15``;
+698/698 phase69-88 focused W22..W41 stack regression (was
+661/661 at W40 RC1; W41 added 37 cleanly) + 364/364 phase11-39
+broad spot check + 205/205 phase40-51 + phase6 broad spot
+check (1267 tests pass excluding the named pre-existing
+test_phase50_ci_and_zero_shot collection-time hang carried
+forward unchanged from W40).
+
+The 8-step audit answers (matching the user's milestone-prompt
+format):
+
+1. **Did the integrated system materially help?** *YES on the
+   integration / measurement axes.  R-88 is the first benchmark
+   family that records the cross-axis branch distribution per
+   cell.  W41 carries one manifest-v11 envelope binding both
+   axes plus a cross-axis witness, with 14 enumerated failure
+   modes.  W41 does NOT improve correctness or trust precision
+   over W40 on any R-88 bank: by construction, the integration
+   layer preserves W40's output byte-for-byte on the answer
+   field (the safety branch INTEGRATED_TRUST_ONLY clears
+   services on collapse; INTEGRATED_BOTH_AXES uses the
+   intersection of producer + trust sets when they overlap).
+   The integration's contribution is measurement + binding +
+   safety-branch routing -- not per-cell correctness gain.*
+2. **Did trust/audit survive?** *YES.  W41 is strictly
+   additive: every W22..W40 verifier check still applies; the
+   W41 verifier adds 14 new disjoint failure modes; cumulative
+   trust boundary is 182 enumerated failure modes; the cross-
+   axis witness CID is namespaced so a W22..W40 witness cannot
+   be substituted for a W41 witness.*
+3. **Did bounded-context efficiency improve in a real way?**
+   *No correctness or trust precision change vs W40 (delta = 0
+   on every bank); 1 visible token/cell of W41 overhead added
+   on active banks; ~15.5k structured bits/cell of cross-axis
+   state under manifest-v11.  W41 is in the W38..W40 density
+   range; not the highest-density milestone but in the top
+   tier.*
+4. **Did multi-host evidence materially broaden?** *NO; in fact
+   it narrowed honestly.  The W37..W40 framing of ``.101`` as a
+   third Mac is retracted (W41-INFRA-1: ``.101`` is an Apple
+   TV).  ``.248`` is gone.  The honest two-Mac topology
+   (``localhost`` + ``.191``) is now the live anchor.  The W41
+   mechanism is closed-form and capsule-layer; no live LLM
+   inference is required to evaluate it.*
+5. **Which caveats were closed vs only sharpened?** *None
+   closed; one new caveat sharpened (W41-L-COMPOSITE-COLLUSION-
+   CAP is a NEW proved-conditional limitation theorem); one
+   infrastructure caveat retracted (W41-INFRA-1: the ``.101``
+   mis-identification from W37..W40).*
+6. **Did release readiness truly improve?** *YES on the
+   integration / synthesis axis: RC2 declared (the second
+   release-candidate of the SDK v3.4x line).  But: the walking-
+   back of the ``.101`` framing means the live multi-host
+   evidence is now narrower than the W37..W40 narrative
+   (two-Mac instead of "three-Mac with one HTTP-broken").
+   Release-readiness is unchanged on the stable runtime
+   contract (still byte-for-byte unchanged).*
+7. **Is the original thesis materially stronger or still
+   blocked by a deeper trust/semantics wall?** *MATERIALLY
+   STRONGER on the integration / measurement axis (W41 is the
+   first capsule-native end-to-end integrated synthesis with
+   measured cross-axis branch distribution and one manifest-v11
+   envelope binding both axes).  But the deeper trust/semantics
+   wall remains: W41-L-COMPOSITE-COLLUSION-CAP is the new
+   proved-conditional limitation theorem; native-latent
+   transfer is still architecture-dependent; a third genuine
+   Mac with Ollama is not available in this environment.*
+8. **Did anything previously claimed get retracted?** *YES.
+   The W37..W40 framing of ``192.168.12.101`` as "a Mac with a
+   hung Ollama HTTP listener (TCP-up + HTTP-broken)" is
+   **retracted** at the W41 milestone.  ``.101`` is an Apple TV
+   / AirPlay receiver, not a Mac.  The retraction is recorded
+   honestly in HOW_NOT_TO_OVERSTATE.md, RESULTS_WEVRA_W41
+   _INTEGRATED_SYNTHESIS.md §4.1, and THEOREM_REGISTRY.md
+   (W41-INFRA-1).  The previous "two-reachable-host evidence"
+   anchors remain valid (those used ``localhost`` + ``.191``
+   directly via the W39-INFRA-1 fallback path, which correctly
+   avoided ``.101``).*
+
+Named open frontier for SDK v3.43 (if the programme continues
+beyond RC2): **W41-C-NATIVE-LATENT** (architecture-dependent;
+the next move would be a transformer-internal projection probe
+on a model where hidden states are observable, which is out of
+scope at the capsule layer); **W41-C-MULTI-HOST** (a third
+genuine Mac with Ollama would let the W40 quorum size be raised
+beyond ``quorum_min``, defeating the W41-L-COMPOSITE-COLLUSION-
+CAP attack at the capsule layer; hardware-bounded; not in this
+environment); **the release path itself** (RC2 -> stable v1.0
+if the W41 integration holds across additional adversarial
+regimes that have not yet been probed; RC2 -> RC3 if a new
+local mechanism extends the capsule-layer adversary bar
+further).
+
+---
+
 *End of master plan. Changelog lives in the results notes, not
 here. If this document ever becomes a changelog, delete the
 changelog and restore the plan.*
