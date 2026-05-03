@@ -5,10 +5,104 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.42 RC2,
-> 2026-05-03.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.43 (final
+> release), 2026-05-03.
 
-## TL;DR — SDK v3.42 RC2
+## TL;DR — SDK v3.43 (final release)
+
+The programme now has **thirty-nine** coupled research axes.  SDK
+v3.43 mints axis 39: **cross-role-invariant synthesis +
+manifest-v12 CID + role-handoff-signature axis +
+composite-collusion bounding** (W42).  W42 is explicitly framed as
+a **third-axis bounding** milestone *and* a **release-closure**
+milestone -- "using everything already built in this repo, plus
+any honest infra/model improvements, can this repo now actually
+earn release?"  W42 answers that by adding a third orthogonal
+evidence axis on top of W41's producer-axis x trust-axis
+integrated synthesis, mechanically raising the adversary bar from
+"compromise the W21 producer-side admission AND the W40 trust-
+side ratification" (the W41 adversary) to "compromise the W21
+producer-side admission AND the W40 trust-side ratification AND
+poison the controller-side role-invariance policy registry that
+maps role-handoff signatures to expected service sets" (the W42
+adversary).
+
+The load-bearing change is the **first measured strict
+trust-precision recovery on a regime where W41 tied at 0.500**.
+On R-89-ROLE-INVARIANT-RECOVER, W42 improves trust precision from
+0.500 to **1.000 across 5/5 seeds**
+(``Δ_trust_precision_w42_w41 = +0.500``, min = max).  When the
+adversary also poisons the policy registry, W42 cannot recover;
+this is the new proved-conditional
+``W42-L-FULL-COMPOSITE-COLLUSION-CAP`` limitation theorem (the
+W42 analog of all previous capsule-layer limitation theorems,
+sharper in adversary cost).
+
+**Headline SDK v3.43 final-release results.**
+
+* **R-89-TRIVIAL-W42.**  With invariance disabled, manifest-v12
+  disabled, and abstain-on-invariance-diverged disabled, W42
+  reduces to W41 byte-for-byte across 5/5 seeds;
+  ``w42_w41_byte_equivalent = True``.  Aggregate branch
+  distribution: 80 cells (5 seeds × 16 cells/seed) on
+  ``trivial_invariance_passthrough``.
+
+* **R-89-ROLE-INVARIANT-AGREES (no-regression).**  W42 ratifies
+  via ``invariance_ratified`` on every cell.  Across 5/5 seeds:
+  ``trust_precision_w42 = trust_precision_w41 = 1.000``;
+  ``Δ_trust_precision_w42_w41 = 0.000``.
+
+* **R-89-ROLE-INVARIANT-RECOVER (load-bearing strict gain).**
+  When W41 ratifies the wrong colluded set (R-88-COMPOSITE-
+  COLLUSION) AND the controller-side policy entry registers the
+  true gold for the cell's role-handoff signature, W42 abstains
+  via ``invariance_diverged_abstained`` on every recovery-half
+  cell.  Across 5/5 seeds: ``trust_precision_w42 = 1.000``;
+  ``trust_precision_w41 = 0.500``;
+  **Δ_trust_precision_w42_w41 = +0.500** (min = max).  This is
+  the first capsule-native multi-agent coordination method that
+  materially BOUNDS ``W41-L-COMPOSITE-COLLUSION-CAP`` at the
+  capsule layer.
+
+* **R-89-FULL-COMPOSITE-COLLUSION (W42-L-FULL-COMPOSITE-
+  COLLUSION-CAP).**  When the adversary ALSO poisons the policy
+  registry to register the wrong colluded set as expected
+  services, W42 ratifies on the wrong set; W42 cannot recover at
+  the capsule layer.  Across 5/5 seeds: ``Δ_trust_precision_w42
+  _w41 = 0.000``.  Closure requires native-latent evidence
+  outside the capsule layer (``W42-C-NATIVE-LATENT``).
+
+* **R-89-INSUFFICIENT-INVARIANCE-POLICY.**  When no policy entry
+  is registered, W42 routes through ``invariance_no_policy`` and
+  preserves W41 byte-for-W40 on the answer; delta = 0 across
+  5/5 seeds.
+
+* **W42 cross-host paraphrase-invariance live probe (2026-05-03).**
+  At temperature 0 on the two-Mac topology (localhost gemma2:9b
+  + 192.168.12.191 qwen2.5:14b), K=4 paraphrases of one
+  closed-vocabulary arithmetic prompt produce 4/4 paraphrase-
+  invariant cross-host gold-correlated agreement on both hosts;
+  cross-host normalised agreement = 1.000; within-host
+  paraphrase-invariance count = 1 distinct answer per host.  The
+  first measured cross-host paraphrase-invariance result in the
+  programme.  Realism anchor only; not load-bearing for the W42
+  closed-form mechanism.
+
+* **Final release declared.**  H1..H12 + S3 + S7 of the W42
+  success criterion pass.  The SDK v3.43 line ships as a
+  **final release** of the Wevra SDK v3.4x research line.  This
+  is the **end-of-line for the capsule-layer-only research
+  programme** in the Context Zero project: the strongest
+  capsule-layer audited proxy this repo can support has been
+  built; the remaining open frontiers
+  (``W42-C-NATIVE-LATENT``, ``W42-C-MULTI-HOST``) are explicitly
+  out of capsule-layer scope and require new architectural
+  substrate.
+
+* **Cumulative trust boundary**: 196 enumerated capsule-layer
+  failure modes mechanically audited across W22..W42.
+
+## Earlier TL;DR — SDK v3.42 RC2
 
 The programme now has **thirty-eight** coupled research axes.  SDK
 v3.42 RC2 mints axis 38: **integrated multi-agent context

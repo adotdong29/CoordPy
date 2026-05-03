@@ -47,4 +47,4 @@ __all__ = [
     "AdversarialCASRRouter",
     "DynamicCASRRouter",
 ]
-__version__ = "0.5.15"
+__version__ = "0.5.16"

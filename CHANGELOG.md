@@ -5,6 +5,170 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.16 / 3.43] — 2026-05-03 — SDK v3.43 (final release) — cross-role-invariant synthesis + manifest-v12 CID + role-handoff-signature axis + composite-collusion bounding + R-89 Phase-89 benchmark family + W42-3 strict +0.500 trust-precision recovery + W42-L-FULL-COMPOSITE-COLLUSION-CAP limitation theorem + first measured cross-host paraphrase-invariance live probe + final release declaration
+
+*Strictly additive on SDK v3.42 RC2.  The stable Wevra product/runtime
+(`RunSpec → run report`) is byte-for-byte unchanged.  W42 surface lives
+under `__experimental__`.  This release is the **final release** of
+the SDK v3.4x research line.*
+
+### Added — W42 family (cross-role-invariant synthesis + composite-collusion bounding)
+
+* **`vision_mvp/wevra/role_invariant_synthesis.py`** — new module
+  implementing the W42 third-axis bounding mechanism on top of
+  W41 integrated synthesis.  Adds:
+  - ``RoleInvariantSynthesisRatificationEnvelope`` (sealed
+    manifest-v12 envelope binding the W41 parent CID + 4 W42
+    component CIDs + role-handoff signature CID).
+  - ``RoleInvariancePolicyEntry`` /
+    ``RoleInvariancePolicyRegistry`` (controller-side honest
+    mapping ``role_handoff_signature_cid -> expected_services``).
+  - ``RoleInvariantSynthesisRegistry`` (W42 orchestrator
+    registry with ``invariance_enabled``, ``manifest_v12_disabled``,
+    and ``abstain_on_invariance_diverged`` knobs).
+  - ``W42RoleInvariantResult`` (per-cell W42 result record).
+  - ``RoleInvariantSynthesisOrchestrator`` (closed-form,
+    deterministic, zero-parameter wrapper of
+    ``IntegratedSynthesisOrchestrator``).
+  - ``compute_role_handoff_signature_cid`` (deterministic
+    SHA-256 over canonical sorted ``(role, kind, payload)``
+    tuples; permutation-invariant; payload-canonicalised;
+    namespaced ``w42_role_handoff_signature``).
+  - ``select_role_invariance_decision`` (closed-form,
+    zero-parameter classifier returning one of seven invariance
+    branches: ``trivial_invariance_passthrough`` /
+    ``invariance_disabled`` / ``invariance_rejected`` /
+    ``invariance_no_trigger`` / ``invariance_no_policy`` /
+    ``invariance_ratified`` /
+    ``invariance_diverged_abstained``).
+  - ``verify_role_invariant_synthesis_ratification`` (pure-
+    function verifier enumerating 14 disjoint W42 failure modes
+    namespaced disjoint from the W22..W41 cumulative 182 modes;
+    cumulative trust boundary across W22..W42 = **196 enumerated
+    failure modes**).
+  - ``build_trivial_role_invariant_registry`` /
+    ``build_role_invariant_registry`` (registry builders).
+
+* **`vision_mvp/experiments/phase89_role_invariant_synthesis.py`**
+  — new R-89 driver with five banks (``trivial_w42`` /
+  ``role_invariant_agrees`` / ``role_invariant_recover`` /
+  ``full_composite_collusion`` /
+  ``insufficient_invariance_policy``) plus a 5-seed sweep entry
+  point.  Adds a synthetic per-cell incident-marker handoff
+  (``incident_dispatcher`` role, ``w42_incident_id`` claim_kind)
+  on non-trivial banks to simulate the upstream cell-schema
+  dispatcher tag a real deployment would emit; the marker uses
+  an unknown ``claim_kind`` and is ignored by the W21..W41 inner
+  chain by construction.
+
+* **`vision_mvp/experiments/phase89_xllm_role_invariance_probe.py`**
+  — bounded live cross-host paraphrase-invariance probe at
+  temperature 0 on the two-Mac topology (``localhost``
+  gemma2:9b + ``192.168.12.191`` qwen2.5:14b) across K=4
+  paraphrases of one closed-vocabulary arithmetic prompt.
+
+* **`vision_mvp/tests/test_phase89_role_invariant_synthesis.py`**
+  — 40 new W42 unit tests covering signature determinism +
+  permutation-invariance + payload canonicalisation, decision
+  selector branches, policy registry, CID determinism, all 14
+  verifier failure modes, all 5 R-89 banks, and orchestrator
+  passthrough.
+
+* **`docs/SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md`**
+  — pre-committed success criterion with H1..H12 hard gates +
+  S1..S7 soft gates + named falsifiers + final release verdict
+  structure.
+
+* **`docs/RESULTS_WEVRA_W42_ROLE_INVARIANT_SYNTHESIS.md`** —
+  results note with empirical headlines, density / efficiency
+  measurements, trust boundary enumeration, theoretical claims,
+  hard-gate / soft-gate aggregate, forced release verdict, and
+  end-of-line declaration.
+
+* **`docs/THEOREM_REGISTRY.md`** — appended W42-1..W42-4 +
+  W42-L-FULL-COMPOSITE-COLLUSION-CAP + W42-L-TRIVIAL-PASSTHROUGH
+  + W42-L-INSUFFICIENT-INVARIANCE-POLICY + W42-C-NATIVE-LATENT +
+  W42-C-MULTI-HOST + W42-LIVE-CROSS-HOST-PARAPHRASE entries.
+
+* **`docs/RESEARCH_STATUS.md`** — new TL;DR for SDK v3.43 final
+  release with the strict +0.500 gain headline + final-release
+  declaration + cumulative trust boundary update.
+
+* **`docs/START_HERE.md`** — header table updated with the W42
+  milestone as the latest milestone.
+
+* **`docs/context_zero_master_plan.md`** — appended SDK v3.43
+  W42 family section with the eight forced master-plan synthesis
+  questions answered for W42 + the end-of-line declaration.
+
+* **`README.md`** — headline updated to W42 final release.
+
+### Headline empirical results
+
+* **R-89-ROLE-INVARIANT-RECOVER (load-bearing)**:
+  ``trust_precision_w42 = 1.000`` strictly improving over
+  ``trust_precision_w41 = 0.500``;
+  ``Δ_trust_precision_w42_w41 = +0.500`` across 5/5 seeds (min =
+  max).  The first measured strict trust-precision recovery on a
+  regime where W41 tied at 0.500.  Aggregate branch
+  distribution: 40 ``invariance_ratified`` (prefix half) + 40
+  ``invariance_diverged_abstained`` (recovery half).
+
+* **R-89-TRIVIAL-W42**: byte-for-W41 across 5/5 seeds; W42
+  overhead = 0; aggregate branch distribution: 80
+  ``trivial_invariance_passthrough``;
+  ``all_byte_equivalent_w42_w41 = True``.
+
+* **R-89-ROLE-INVARIANT-AGREES**: no regression; all 80 cells
+  ``invariance_ratified``;
+  ``Δ_trust_precision_w42_w41 = 0.000``.
+
+* **R-89-FULL-COMPOSITE-COLLUSION**:
+  ``W42-L-FULL-COMPOSITE-COLLUSION-CAP`` fires; W42 ratifies on
+  the wrong colluded set on every cell;
+  ``Δ_trust_precision_w42_w41 = 0.000``.
+
+* **R-89-INSUFFICIENT-INVARIANCE-POLICY**: W42 falls through
+  ``invariance_no_policy``; preserves W41 byte-for-W40 on the
+  answer.
+
+* **W42 cross-host paraphrase-invariance live probe (2026-05-03)**:
+  4/4 paraphrases × 2 hosts × 2 model architectures (gemma2:9b
+  + qwen2.5:14b), all 4/4 gold-correct on each host;
+  cross-host normalised agreement = 1.000; both hosts paraphrase-
+  invariant (1 distinct normalised answer per host).
+
+### Regression confidence
+
+* 738/738 phase69-89 focused W22..W42 regression pass (was
+  698/698 phase69-88 at SDK v3.42 RC2; W42 added 40 cleanly).
+* 889/889 phase4-7 broad spot-check pass (excluding pre-existing
+  ``test_phase50_ci_and_zero_shot.py`` collection-time hang
+  carried forward unchanged from W41).
+
+### Versioning
+
+* ``SDK_VERSION = wevra.sdk.v3.43``.
+* ``vision_mvp.__version__ = 0.5.16``.
+* ``pyproject.toml version = 0.5.16`` (alignment maintained).
+
+### Final release verdict
+
+The SDK v3.43 line ships as the **final release** of the Wevra
+SDK v3.4x research line.  Every hard gate (H1..H12) and every
+load-bearing soft gate (S3, S5, S6, S7) of the W42 success
+criterion passes.  The strict +0.500 trust-precision gain on
+R-89-ROLE-INVARIANT-RECOVER is reproducible across 5/5 seeds
+(min = max).  The live two-Mac paraphrase-invariance probe is
+recorded honestly.
+
+This is the **end-of-line for the capsule-layer-only research
+programme** in the Context Zero project.  The remaining open
+frontiers (``W42-C-NATIVE-LATENT``, ``W42-C-MULTI-HOST``) are
+explicitly out of capsule-layer scope and require new
+architectural substrate (transformer-internal access, K+1-host
+topology, or both).
+
 ## [0.5.15 / 3.42] — 2026-05-03 — SDK v3.42 RC2 — integrated multi-agent context synthesis + manifest-v11 CID + cross-axis witness CID + producer-axis x trust-axis decision selector + R-88 Phase-88 benchmark family + W41-L-COMPOSITE-COLLUSION-CAP limitation theorem + W41-INFRA-1 (.101 retracted: AirPlay receiver, not Mac) + RC2 declaration
 
 *Strictly additive on SDK v3.41 RC1.  The stable Wevra product/runtime

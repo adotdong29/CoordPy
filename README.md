@@ -7,7 +7,87 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.41 RC1 (May 2026).** Cross-host
+**Latest milestone: SDK v3.43 final (May 2026).** Cross-role-
+invariant synthesis + manifest-v12 CID + role-handoff-signature
+axis + composite-collusion bounding (W42 family).  W42 adds a
+**third orthogonal evidence axis** on top of W41's producer-axis
+× trust-axis integrated synthesis -- the **role-handoff
+invariance axis**, computed deterministically from the canonical
+sorted ``(role, kind, payload)`` tuples in the cell's input
+handoffs, namespaced as ``w42_role_handoff_signature``.  An
+honest controller pre-registers a
+:class:`RoleInvariancePolicyRegistry` mapping signature CIDs to
+expected service sets.  W42 ratifies on agreement, abstains on
+disagreement, and falls through on unknown signatures.  This
+**bounds** (does not close) ``W41-L-COMPOSITE-COLLUSION-CAP`` at
+the capsule layer by raising the adversary bar from "compromise
+the W21 producer-side admission AND inject diverse W40 response
+bytes for the same wrong top_set" to "compromise W21 + inject W40
+diverse responses + poison the controller-side role-invariance
+policy registry."  On **R-89-ROLE-INVARIANT-RECOVER** (the
+W41-L-COMPOSITE-COLLUSION-CAP regime), W42 strictly improves
+trust precision over W41 from 0.500 to **1.000**
+(**Δ_trust_precision_w42_w41 = +0.500**, min and max equal across
+5/5 seeds): the **first capsule-native multi-agent coordination
+method that materially BOUNDS the W41 composite-collusion wall at
+the capsule layer**.  On **R-89-FULL-COMPOSITE-COLLUSION** the
+new proved-conditional limitation theorem
+**W42-L-FULL-COMPOSITE-COLLUSION-CAP** fires (when all three
+axes are coordinated by the adversary, W42 cannot recover at the
+capsule layer; closure requires native-latent evidence or a
+K+1-axis topology with a new uncompromised evidence axis).  On
+**R-89-TRIVIAL-W42**, **R-89-ROLE-INVARIANT-AGREES**, and
+**R-89-INSUFFICIENT-INVARIANCE-POLICY** falsifiers, W42
+preserves W41 behavior with no correctness or trust-precision
+regression.  W42 adds 14 verifier failure modes
+(``empty_w42_envelope`` / ``w42_*_cid_mismatch`` /
+``w42_invariance_score_invalid`` / ``w42_token_accounting_invalid``
+/ etc.), bringing the cumulative W22..W42 trust boundary to **196
+enumerated modes**.  manifest-v12 binds 6 component CIDs:
+parent_w41_cid + invariance_state_cid + invariance_decision_cid
++ invariance_audit_cid + invariance_witness_cid +
+role_handoff_signature_cid (the audit / witness / signature CIDs
+are namespaced so substituting a W22..W41 audit / witness /
+signature is mechanically detected).  **W42 cross-host
+paraphrase-invariance live probe (2026-05-03)**: at temperature 0
+on the two-Mac topology (``localhost`` gemma2:9b +
+``192.168.12.191`` qwen2.5:14b), K=4 paraphrases of one
+closed-vocabulary arithmetic prompt produce **4/4 paraphrase-
+invariant cross-host gold-correlated agreement** on both hosts;
+both hosts emit "Four" on every paraphrase; cross-host
+normalised agreement = 1.000.  This is the first measured
+cross-host paraphrase-invariance result in the programme.  W42 is
+**not native latent transfer** and not transformer-internal
+hidden-state projection; it is an audited capsule-layer
+role-handoff invariance proxy with three mechanically-enforced
+preconditions (signature determinism + permutation-invariance +
+payload-canonicalisation).  **Final release declared**: H1..H12 +
+S3 + S7 of the W42 success criterion pass; the SDK v3.43 line
+ships as the **final release** of the Wevra SDK v3.4x research
+line -- the **end-of-line for the capsule-layer-only research
+programme** in the Context Zero project.  The remaining open
+frontiers (``W42-C-NATIVE-LATENT``, ``W42-C-MULTI-HOST``) are
+explicitly out of capsule-layer scope and require new
+architectural substrate.  Stable-vs-experimental boundary final:
+every W22..W42 symbol is exported under ``__experimental__``;
+the stable ``RunSpec → run report`` runtime contract is
+byte-for-byte unchanged.  Versioning: ``vision_mvp.__version__``
+and ``pyproject.toml`` are now both ``0.5.16``;
+``SDK_VERSION = wevra.sdk.v3.43``.
+
+**Previous milestone: SDK v3.42 RC2 (May 2026).** Integrated
+multi-agent context synthesis + manifest-v11 CID + cross-axis
+witness CID + producer-axis x trust-axis decision selector (W41
+family).  W41 jointly binds the strongest old-line explicit-
+capsule trust-adjudication chain (W21..W40) AND the strongest
+cross-role / multi-round bundle decoder family (W7..W11) into a
+single auditable end-to-end path with one ``manifest-v11``
+envelope.  W41-L-COMPOSITE-COLLUSION-CAP names the open wall: when
+the adversary controls both axes on the same wrong top_set, W41
+cannot recover.  W42 (above) materially BOUNDS this wall via a
+third orthogonal evidence axis.
+
+**Previous milestone: SDK v3.41 RC1 (May 2026).** Cross-host
 response-signature heterogeneity ratification + manifest-v10 CID +
 cross-host response-text Jaccard divergence guard (W40 family).
 W40 wraps W39's K-of-N mutually-disjoint quorum consensus-reference

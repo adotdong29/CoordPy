@@ -11590,6 +11590,134 @@ regimes that have not yet been probed; RC2 -> RC3 if a new
 local mechanism extends the capsule-layer adversary bar
 further).
 
+## SDK v3.43 (W42 family) — cross-role-invariant synthesis + manifest-v12 CID + role-handoff-signature axis + composite-collusion bounding + final release of the SDK v3.4x line — 2026-05-03
+
+W42 is explicitly framed as a **third-axis bounding** milestone
+*and* a **release-closure** milestone.  The forced verdict: the
+strict +0.500 trust-precision recovery on R-89-ROLE-INVARIANT-
+RECOVER (5/5 seeds, min = max) materially BOUNDS
+``W41-L-COMPOSITE-COLLUSION-CAP`` at the capsule layer via a
+third orthogonal evidence axis -- the **role-handoff invariance
+axis**, computed deterministically from the canonical sorted
+``(role, kind, payload)`` tuples in the cell's input handoffs,
+namespaced as ``w42_role_handoff_signature``.  The third axis is
+genuinely orthogonal to the W21 oracle responses (producer axis)
+AND the W40 response signature bytes (trust axis): compromising
+it requires controlling the controller-side role-invariance
+policy registry, not just the per-cell oracle responses.
+
+Headline forced-verdict result: **release v3.43 is earned.**
+The SDK v3.43 line ships as a **final release** (NOT just RC3)
+of the Wevra SDK v3.4x research line.  Every hard gate
+(H1..H12) and every load-bearing soft gate (S3, S5, S6, S7) of
+the W42 success criterion passes; the strict +0.500 gain on
+R-89-ROLE-INVARIANT-RECOVER is reproducible across 5/5 seeds;
+and the live two-Mac paraphrase-invariance probe (4/4
+paraphrases × 2 hosts, gemma2:9b on localhost + qwen2.5:14b on
+192.168.12.191, both emit "Four" on every paraphrase) records
+the strongest live realism anchor available in this
+environment.
+
+The W42 mechanism is closed-form, deterministic, zero-parameter,
+controller-pre-registered, and audited at the capsule layer.
+W42 does **not** add a new transformer-internal mechanism.  W42
+does **not** close ``W41-L-COMPOSITE-COLLUSION-CAP`` in general
+-- it strictly BOUNDS it by raising the adversary's coordination
+cost to "compromise W21 producer-side admission AND W40
+trust-side ratification AND poison the controller-side policy
+registry."  When all three are coordinated, W42 cannot recover;
+this is the new proved-conditional
+``W42-L-FULL-COMPOSITE-COLLUSION-CAP`` limitation theorem.
+
+The cumulative arc -- old explicit-capsule trust-adjudication
+chain (W21..W34), dense-control / geometry-aware line
+(W35..W36), trust-axis multi-host line (W37..W40), W41
+integrated synthesis binding both axes, and W42 cross-role-
+invariance bounding -- is a **single coherent capsule-native
+multi-agent coordination research programme** with 196
+enumerated capsule-layer failure modes mechanically audited, 6
+manifest versions (v6..v12) sealing 5+ component CIDs per
+envelope, and 7 named limitation theorems
+(``W34-MULTI-ANCHOR-CAP``, ``W37-MULTI-HOST-COLLUSION-CAP``,
+``W38-CONSENSUS-COLLUSION-CAP``,
+``W39-FULL-DISJOINT-QUORUM-COLLUSION-CAP``,
+``W40-COORDINATED-DIVERSE-RESPONSE-CAP``,
+``W41-COMPOSITE-COLLUSION-CAP``,
+``W42-FULL-COMPOSITE-COLLUSION-CAP``).
+
+The remaining open frontiers after W42 are explicitly out of
+capsule-layer scope:
+
+- **W42-C-NATIVE-LATENT** (transformer-internal trust-state
+  projection): architecture-bound; requires hidden-state,
+  KV-cache, attention-weight, or embedding-table access; out of
+  capsule-layer scope.  This is the irreducible architectural
+  wall the trust-axis line has been bumping against since W34.
+
+- **W42-C-MULTI-HOST** (K+1-host disjoint topology beyond the
+  two-Mac pair): hardware-bound; would let the role-invariance
+  policy registry be sourced from a true off-cluster oracle,
+  defeating the W42-L-FULL-COMPOSITE-COLLUSION-CAP attack at the
+  capsule layer.  The lab's two-Mac topology
+  (``localhost`` + ``192.168.12.191``) is the strongest live
+  evidence available; ``.248`` is gone, ``.101`` is Apple TV /
+  AirPlay (W41-INFRA-1).
+
+The Wevra SDK v3.43 final release is the **end-of-line for the
+capsule-layer-only research programme** in the Context Zero
+project.  Future work addressing the remaining frontiers will
+require new architectural substrate (transformer-internal
+access, K+1-host topology, or both) and is explicitly out of
+this repo's scope.
+
+The eight forced master-plan synthesis questions, answered for
+W42:
+
+1. **Did the integrated system materially help?** *YES.  W42
+   delivers the first measured strict trust-precision recovery
+   (+0.500) on a regime where W41 tied at 0.500.  The recovery
+   is reproducible across 5/5 seeds with min = max.*
+2. **Did trust/audit survive?** *YES.  14 new W42 failure modes
+   mechanically tested; cumulative 196 enumerated capsule-layer
+   failure modes; manifest-v12 with 6 component CIDs binds the
+   parent W41 envelope + 4 W42 CIDs + the role-handoff signature
+   CID.*
+3. **Did bounded-context efficiency improve in a real way?**
+   *YES on the structured-bits density axis: W42 carries ~17.5k
+   structured bits per visible W42 token at 1 visible token
+   overhead per cell; W41 envelope structured bits + 6×256 W42
+   CIDs.*
+4. **Did multi-host evidence materially broaden?** *YES.  The
+   W42 cross-host paraphrase-invariance live probe is the first
+   measured K-paraphrase × M-host gold-correlated agreement in
+   the programme: 4/4 paraphrases × 2 hosts × 2 model
+   architectures, all gold-correct, both hosts paraphrase-
+   invariant.*
+5. **Which caveats were closed vs only sharpened?** *Sharpened:
+   W41-L-COMPOSITE-COLLUSION-CAP is now strictly BOUNDED at the
+   capsule layer (raised adversary cost to also compromising
+   the policy registry); the W42-L-FULL-COMPOSITE-COLLUSION-CAP
+   wall remains open at the capsule layer; native-latent
+   transfer remains open and architecture-bound.*
+6. **Did release readiness truly improve?** *YES.  RC2 -> final
+   release.  H5 strict +0.500 gain forces the verdict; the SDK
+   v3.43 line ships as the final release of the v3.4x line.*
+7. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on
+   the cross-role-invariance axis; the deeper trust/semantics
+   wall is now strictly BOUNDED (not closed) at the capsule
+   layer.  The remaining wall is explicitly architecture-bound
+   and out of capsule-layer scope.*
+8. **Did anything previously claimed get retracted?** *NO new
+   retractions at W42; the W41-INFRA-1 retraction (``.101`` is
+   Apple TV, not a Mac with Ollama) carries forward unchanged.*
+
+Named open frontier after W42: ``W42-C-NATIVE-LATENT``
+(transformer-internal hidden-state projection; out of capsule-
+layer scope); ``W42-C-MULTI-HOST`` (K+1-host disjoint topology;
+hardware-bounded).  Both require new architectural substrate
+beyond what this repo can support.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

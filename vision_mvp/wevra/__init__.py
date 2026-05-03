@@ -707,6 +707,32 @@ from .integrated_synthesis import (
     W41_PRODUCER_BRANCHES,
     W41_TRUST_BRANCHES,
 )
+# SDK v3.43 (W42) — cross-role-invariant synthesis +
+# manifest-v12 CID + role-handoff-signature axis +
+# composite-collusion bounding (third orthogonal evidence axis
+# on top of W41 producer x trust integration).
+from .role_invariant_synthesis import (
+    RoleInvariantSynthesisRatificationEnvelope,
+    RoleInvariancePolicyEntry,
+    RoleInvariancePolicyRegistry,
+    RoleInvariantSynthesisRegistry,
+    W42RoleInvariantResult,
+    RoleInvariantSynthesisOrchestrator,
+    verify_role_invariant_synthesis_ratification,
+    select_role_invariance_decision,
+    compute_role_handoff_signature_cid,
+    build_role_invariant_registry,
+    build_trivial_role_invariant_registry,
+    W42_ROLE_INVARIANT_SCHEMA_VERSION,
+    W42_BRANCH_TRIVIAL_INVARIANCE_PASSTHROUGH,
+    W42_BRANCH_INVARIANCE_DISABLED,
+    W42_BRANCH_INVARIANCE_REJECTED,
+    W42_BRANCH_INVARIANCE_NO_TRIGGER,
+    W42_BRANCH_INVARIANCE_RATIFIED,
+    W42_BRANCH_INVARIANCE_DIVERGED_ABSTAINED,
+    W42_BRANCH_INVARIANCE_NO_POLICY,
+    W42_ALL_BRANCHES,
+)
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
     TrainSample as TeamTrainSample,
@@ -719,7 +745,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.42"
+SDK_VERSION = "wevra.sdk.v3.43"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -931,6 +957,20 @@ __experimental__: tuple[str, ...] = (
     "classify_trust_axis_branch",
     "build_integrated_synthesis_registry",
     "build_trivial_integrated_synthesis_registry",
+    # W42 family — cross-role-invariant synthesis +
+    # manifest-v12 CID + role-handoff-signature axis +
+    # composite-collusion bounding.
+    "RoleInvariantSynthesisRatificationEnvelope",
+    "RoleInvariancePolicyEntry",
+    "RoleInvariancePolicyRegistry",
+    "RoleInvariantSynthesisRegistry",
+    "W42RoleInvariantResult",
+    "RoleInvariantSynthesisOrchestrator",
+    "verify_role_invariant_synthesis_ratification",
+    "select_role_invariance_decision",
+    "compute_role_handoff_signature_cid",
+    "build_role_invariant_registry",
+    "build_trivial_role_invariant_registry",
 )
 
 __all__ = [
