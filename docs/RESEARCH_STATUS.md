@@ -5,13 +5,82 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.40,
-> 2026-05-02.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.41 RC1,
+> 2026-05-03.
 
-## TL;DR — SDK v3.40
+## TL;DR — SDK v3.41 RC1
 
-The programme now has **thirty-six** coupled research axes.  SDK
-v3.40 mints axis 36: **multi-host disjoint quorum consensus-
+The programme now has **thirty-seven** coupled research axes.  SDK
+v3.41 RC1 mints axis 37: **cross-host response-signature
+heterogeneity ratification + manifest-v10 CID + cross-host
+response-text Jaccard divergence guard** (W40).  W40 wraps W39's
+K-of-N mutually-disjoint quorum consensus-reference adjudication
+with a **cross-host response-heterogeneity** layer that operates
+on an evidence axis ORTHOGONAL to top_set: the per-member response
+**text bytes** themselves.  Even if K colluders coordinate their
+declared top_set (the W39 full-quorum-collusion attack;
+``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP`` fires), naturally-
+independent K probes should produce heterogeneous response text
+bytes.  When the K member probes' mean pairwise Jaccard divergence
+over canonical sorted token bags falls strictly below
+``response_text_diversity_min``, W40 abstains via
+``RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED`` even when W39 would have
+RATIFIED.
+
+The load-bearing change is from *top-set-only quorum agreement*
+(W39) to *top-set agreement AND cross-host response-text Jaccard
+heterogeneity* (W40).  W39 raises the adversary bar to "compromise
+2 of N trajectory hosts AND ``quorum_min`` of the K mutually-
+disjoint registered consensus references".  W40 raises it to
+"compromise 2 of N trajectory hosts AND ``quorum_min`` of the K
+mutually-disjoint registered consensus references AND inject K
+diverse response text bytes that all encode the same wrong
+top_set".  When the adversary diversifies response bytes while
+holding the wrong top_set in lock-step, W40 cannot recover; this
+is the new proved-conditional
+``W40-L-COORDINATED-DIVERSE-RESPONSE-CAP`` limitation theorem.
+
+**Headline SDK v3.41 RC1 results.**
+
+* **R-87-RESPONSE-SIGNATURE-COLLAPSE (load-bearing).**  W40
+  improves over W39 from 0.500 to **1.000** trust precision
+  across 5/5 seeds, **Δ_trust_precision_w40_w39 = +0.500** (min
+  and max equal).  W40 ratifies 0 cells via
+  RESPONSE_SIGNATURE_DIVERSE in the recovery half, abstains via
+  RESPONSE_SIGNATURE_COLLAPSE on 8 cells/seed; overhead = 1
+  visible token/cell.
+
+* **R-87-TRIVIAL-W40.**  With response-heterogeneity disabled,
+  collapse-abstain disabled, and manifest-v10 disabled, W40
+  reduces to W39 byte-for-byte across 5/5 seeds.
+
+* **R-87-NO-REGRESSION-DIVERSE-AGREES.**  W40 ratifies via
+  RESPONSE_SIGNATURE_DIVERSE; delta = 0 across 5/5 seeds.
+
+* **R-87-COORDINATED-DIVERSE-RESPONSE.**  The smart attacker who
+  diversifies response bytes while holding the wrong top_set
+  defeats W40; ``W40-L-COORDINATED-DIVERSE-RESPONSE-CAP`` fires;
+  delta = 0 across 5/5 seeds.
+
+* **R-87-INSUFFICIENT-RESPONSE-SIGNATURE.**  When fewer than
+  ``min_response_signature_probes`` member probes carry response
+  signatures, W40 reduces to W39 byte-for-byte; delta = 0.
+
+* **W40-INFRA-1.**  ``192.168.12.101`` re-probed (2026-05-03):
+  ping 0% packet loss, TCP 11434 + 22 connect; Ollama HTTP
+  listener still returns "Empty reply / Connection reset"; SSH
+  credentials unavailable.  Honest verdict: TCP-up + HTTP-broken;
+  a strict topology-layer improvement over W39's 100% packet
+  loss end-state.
+
+* **RC1 declared.**  H1..H12 + S3 of the W40 success criterion
+  pass.  The SDK v3.41 line is the first official release-
+  candidate of the Wevra SDK v3.4x line.
+
+## Earlier TL;DR — SDK v3.40
+
+The programme had **thirty-six** coupled research axes.  SDK
+v3.40 minted axis 36: **multi-host disjoint quorum consensus-
 reference ratification + manifest-v9 CID + mutually-disjoint
 physical-host topology** (W39).  W39 wraps W38's disjoint
 cross-source consensus-reference adjudication with a *quorum* of

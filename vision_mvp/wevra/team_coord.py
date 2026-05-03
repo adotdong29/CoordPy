@@ -30470,3 +30470,1553 @@ def build_multi_host_disjoint_quorum_registry(
         registered_trajectory_host_ids=frozenset(
             str(h) for h in registered_trajectory_host_ids),
     )
+
+
+# =============================================================================
+# SDK v3.41 — W40 family
+# Cross-host response-signature heterogeneity ratification +
+# manifest-v10 CID + cross-host response-text Jaccard divergence
+# guard.
+#
+# W40 wraps W39's K-of-N mutually-disjoint quorum consensus-reference
+# adjudication with a *response-heterogeneity* layer that operates on
+# an evidence axis orthogonal to top_set: the per-member response
+# **text bytes** themselves.  Even if K colluders coordinate their
+# declared top_set (the W39 full-quorum-collusion attack), naturally-
+# independent K probes should produce heterogeneous response text
+# bytes (different paraphrases, different surface forms, different
+# tokenisations).  If the K member probes' response token bags
+# collapse to homogeneity (mean pairwise Jaccard divergence below a
+# registered threshold), W40 abstains via
+# ``RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED`` even when W39 would have
+# RATIFIED.
+#
+# W40 raises the capsule-layer adversary bar from "compromise 2 of N
+# trajectory hosts AND `quorum_min` of the K mutually-disjoint
+# registered consensus references" to "compromise 2 of N trajectory
+# hosts AND `quorum_min` of the K mutually-disjoint registered
+# consensus references AND inject K diverse response text bytes that
+# all encode the same wrong top_set".
+#
+# W40 does NOT close W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP in
+# general; it bounds the *naive* full-quorum-collusion attack (where
+# the colluder pushes K identical wrong response bytes) but cannot
+# recover when the adversary diversifies response bytes while
+# holding the wrong top_set in lock-step (the new
+# W40-L-COORDINATED-DIVERSE-RESPONSE-CAP limitation theorem, the
+# W40 analog of W34-L-MULTI-ANCHOR-CAP, W37-L-MULTI-HOST-COLLUSION-
+# CAP, W38-L-CONSENSUS-COLLUSION-CAP, and W39-L-FULL-DISJOINT-
+# QUORUM-COLLUSION-CAP).
+#
+# What W40 is NOT (do-not-overstate)
+# ----------------------------------
+#   * NOT a transformer-internal hidden-state projection.
+#   * NOT a runtime KV-cache transplant.
+#   * NOT a learned heterogeneity model (zero parameters; the
+#     heterogeneity score is a closed-form Jaccard divergence over
+#     canonical sorted token bags).
+#   * NOT proof of temporal ordering at the model layer.
+#   * NOT a runtime ground-truth oracle (each W40 member probe is a
+#     controller-pre-registered audited capsule-layer probe).
+#   * NOT closure of W37-L-MULTI-HOST-COLLUSION-CAP at the capsule
+#     layer (only further-bounded).
+#   * NOT closure of W38-L-CONSENSUS-COLLUSION-CAP at the capsule
+#     layer (only further-bounded).
+#   * NOT closure of W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP at the
+#     capsule layer (only further-bounded by raising the adversary
+#     bar from a K-of-N mutually-disjoint quorum to a K-of-N
+#     mutually-disjoint quorum WITH heterogeneous response
+#     signatures).
+#   * NOT closure of the new W40-L-COORDINATED-DIVERSE-RESPONSE-CAP
+#     limitation theorem (when the adversary diversifies response
+#     bytes while holding the wrong top_set in lock-step, W40 cannot
+#     recover; recovery requires native-latent evidence outside the
+#     capsule layer or a K+1-host disjoint topology).
+# =============================================================================
+
+
+W40_RESPONSE_HETEROGENEITY_SCHEMA_VERSION: str = (
+    "wevra.cross_host_response_heterogeneity.v1")
+
+W40_BRANCH_RESPONSE_SIGNATURE_RESOLVED = (
+    "response_signature_resolved")
+W40_BRANCH_TRIVIAL_RESPONSE_SIGNATURE_PASSTHROUGH = (
+    "trivial_response_signature_passthrough")
+W40_BRANCH_RESPONSE_SIGNATURE_REJECTED = (
+    "response_signature_rejected")
+W40_BRANCH_RESPONSE_SIGNATURE_DISABLED = (
+    "response_signature_disabled")
+W40_BRANCH_RESPONSE_SIGNATURE_NO_TRIGGER = (
+    "response_signature_no_trigger")
+W40_BRANCH_RESPONSE_SIGNATURE_DIVERSE = (
+    "response_signature_diverse")
+W40_BRANCH_RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED = (
+    "response_signature_collapse_abstained")
+W40_BRANCH_RESPONSE_SIGNATURE_NO_REFERENCES = (
+    "response_signature_no_references")
+W40_BRANCH_RESPONSE_SIGNATURE_INSUFFICIENT = (
+    "response_signature_insufficient")
+W40_BRANCH_RESPONSE_SIGNATURE_INCOMPLETE = (
+    "response_signature_incomplete")
+
+W40_ALL_BRANCHES: tuple[str, ...] = (
+    W40_BRANCH_RESPONSE_SIGNATURE_RESOLVED,
+    W40_BRANCH_TRIVIAL_RESPONSE_SIGNATURE_PASSTHROUGH,
+    W40_BRANCH_RESPONSE_SIGNATURE_REJECTED,
+    W40_BRANCH_RESPONSE_SIGNATURE_DISABLED,
+    W40_BRANCH_RESPONSE_SIGNATURE_NO_TRIGGER,
+    W40_BRANCH_RESPONSE_SIGNATURE_DIVERSE,
+    W40_BRANCH_RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED,
+    W40_BRANCH_RESPONSE_SIGNATURE_NO_REFERENCES,
+    W40_BRANCH_RESPONSE_SIGNATURE_INSUFFICIENT,
+    W40_BRANCH_RESPONSE_SIGNATURE_INCOMPLETE,
+)
+
+W40_DEFAULT_RESPONSE_TEXT_DIVERSITY_MIN: float = 0.20
+W40_DEFAULT_MIN_RESPONSE_SIGNATURE_PROBES: int = 2
+
+
+def _w40_canonical_token_bag(text: str) -> tuple[str, ...]:
+    """Closed-form canonical token bag of a response text.
+
+    Splits on ASCII whitespace, lower-cases, strips punctuation, and
+    returns the sorted distinct token tuple.  Deterministic; zero
+    parameters; permutation- and case-invariant.
+    """
+    if text is None:
+        return ()
+    tokens: list[str] = []
+    for raw in str(text).split():
+        cleaned = "".join(
+            ch for ch in raw.lower()
+            if ch.isalnum() or ch in ("-", "_", "/", "."))
+        if cleaned:
+            tokens.append(cleaned)
+    return tuple(sorted(set(tokens)))
+
+
+def _w40_compute_response_signature_cid(
+        *,
+        response_text: str,
+) -> str:
+    """SHA-256 over the canonical token-bag form of the response text.
+
+    Two responses with identical canonical token bags yield byte-
+    identical CIDs.  Two responses with disjoint token bags yield
+    distinct CIDs with overwhelming probability.
+    """
+    payload = _canonical_json_bytes({
+        "response_token_bag":
+            list(_w40_canonical_token_bag(response_text)),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _w40_pairwise_jaccard_divergence(
+        a: Sequence[str],
+        b: Sequence[str],
+) -> float:
+    """Closed-form Jaccard divergence over two token bags.
+
+    Returns 0.0 when the two token bags are byte-identical (the
+    "collapse" extreme); 1.0 when they are disjoint (the "fully
+    diverse" extreme).  Both empty -> 0.0 (collapse).
+    """
+    set_a = set(str(t) for t in a)
+    set_b = set(str(t) for t in b)
+    if not set_a and not set_b:
+        return 0.0
+    inter = len(set_a & set_b)
+    union = len(set_a | set_b)
+    if union == 0:
+        return 0.0
+    return 1.0 - (float(inter) / float(union))
+
+
+@dataclasses.dataclass(frozen=True)
+class ResponseSignatureProbe:
+    """One W40 cross-host response-signature member probe.
+
+    A W40 member probe is a controller-pre-registered audited
+    capsule-layer artefact carrying ``(member_index, host_ids,
+    oracle_ids, response_token_bag, response_signature_cid,
+    cell_idx)``.  The probe is NOT a runtime ground-truth oracle:
+    ``response_signature_cid`` is a SHA-256 over the canonical
+    normalized response text bytes (closed-form, zero parameters),
+    and ``response_token_bag`` is the canonical sorted token bag.
+    """
+
+    member_index: int
+    host_ids: tuple[str, ...]
+    oracle_ids: tuple[str, ...]
+    response_token_bag: tuple[str, ...]
+    response_signature_cid: str
+    cell_idx: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "member_index": int(self.member_index),
+            "host_ids": [str(h) for h in sorted(self.host_ids)],
+            "oracle_ids": [str(o) for o in sorted(self.oracle_ids)],
+            "response_token_bag": [
+                str(t) for t in sorted(self.response_token_bag)],
+            "response_signature_cid": str(self.response_signature_cid),
+            "cell_idx": int(self.cell_idx),
+        }
+
+
+@dataclasses.dataclass(frozen=True)
+class MultiHostResponseHeterogeneityProbe:
+    """One W40 multi-host response-heterogeneity probe.
+
+    A W40 probe is a frozen tuple of K
+    :class:`ResponseSignatureProbe` member probes whose host pools
+    are mechanically disjoint from the W37 trajectory hosts (the
+    W38/W39 precondition) AND mutually disjoint from one another
+    (the W39 precondition, inherited).  The W40 mechanism does NOT
+    instantiate any per-probe runtime ground-truth oracle: each
+    member probe is itself a controller-pre-registered audited
+    capsule-layer artefact.
+    """
+
+    member_probes: tuple[ResponseSignatureProbe, ...]
+    response_text_diversity_min: float
+    min_response_signature_probes: int
+    cell_idx: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "member_probes": [
+                p.as_dict() for p in self.member_probes],
+            "response_text_diversity_min": round(
+                float(self.response_text_diversity_min), 4),
+            "min_response_signature_probes": int(
+                self.min_response_signature_probes),
+            "cell_idx": int(self.cell_idx),
+        }
+
+
+def _compute_w40_response_signature_state_cid(
+        *,
+        probe: MultiHostResponseHeterogeneityProbe | None,
+) -> str:
+    payload = _canonical_json_bytes({
+        "response_probe": (
+            probe.as_dict() if probe is not None else None),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w40_response_signature_topology_cid(
+        *,
+        registered_member_pool_host_ids: Sequence[Iterable[str]],
+        registered_member_pool_oracle_ids: Sequence[Iterable[str]],
+        registered_trajectory_host_ids: Iterable[str],
+) -> str:
+    pools = []
+    for host_pool, oracle_pool in zip(
+            registered_member_pool_host_ids,
+            registered_member_pool_oracle_ids):
+        pools.append({
+            "host_ids": [str(h) for h in sorted(host_pool)],
+            "oracle_ids": [str(o) for o in sorted(oracle_pool)],
+        })
+    payload = _canonical_json_bytes({
+        "pools": pools,
+        "registered_trajectory_host_ids": [
+            str(h) for h in sorted(registered_trajectory_host_ids)],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w40_response_heterogeneity_witness_cid(
+        *,
+        registered_member_pool_host_ids: Sequence[Iterable[str]],
+) -> str:
+    """CID over the explicit pairwise-disjointness witness for W40.
+
+    Same defense-in-depth shape as ``_compute_w39_mutual_disjointness_cid``
+    but namespaced as the W40 heterogeneity witness so swapping a W39
+    mutual-disjointness witness for a W40 heterogeneity witness (or
+    vice-versa) is mechanically rejected.
+    """
+    pools = [sorted(set(str(h) for h in pool))
+             for pool in registered_member_pool_host_ids]
+    pairs = []
+    for i in range(len(pools)):
+        for j in range(i + 1, len(pools)):
+            inter = sorted(set(pools[i]) & set(pools[j]))
+            pairs.append({
+                "i": int(i), "j": int(j),
+                "intersection": inter,
+            })
+    payload = _canonical_json_bytes({
+        "namespace": "w40_response_heterogeneity_witness",
+        "n_pools": int(len(pools)),
+        "pairs": pairs,
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w40_response_signature_decision_cid(
+        *,
+        projection_branch: str,
+        n_diverse_pairs: int,
+        n_collapse_pairs: int,
+        n_pairs: int,
+        n_total: int,
+        mean_pairwise_jaccard: float,
+        per_pair_jaccards: Sequence[float],
+        per_pair_branches: Sequence[str],
+) -> str:
+    payload = _canonical_json_bytes({
+        "projection_branch": str(projection_branch),
+        "n_diverse_pairs": int(n_diverse_pairs),
+        "n_collapse_pairs": int(n_collapse_pairs),
+        "n_pairs": int(n_pairs),
+        "n_total": int(n_total),
+        "mean_pairwise_jaccard": round(
+            float(mean_pairwise_jaccard), 4),
+        "per_pair_jaccards": [
+            round(float(j), 4) for j in per_pair_jaccards],
+        "per_pair_branches": [str(b) for b in per_pair_branches],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w40_response_signature_audit_cid(
+        *,
+        projection_branch: str,
+        w39_decision_top_set: Sequence[str],
+        n_diverse_pairs: int,
+        n_collapse_pairs: int,
+        n_pairs: int,
+        n_total: int,
+        mean_pairwise_jaccard: float,
+        response_text_diversity_min: float,
+        min_response_signature_probes: int,
+) -> str:
+    payload = _canonical_json_bytes({
+        "projection_branch": str(projection_branch),
+        "w39_decision_top_set": [
+            str(t) for t in sorted(w39_decision_top_set)],
+        "n_diverse_pairs": int(n_diverse_pairs),
+        "n_collapse_pairs": int(n_collapse_pairs),
+        "n_pairs": int(n_pairs),
+        "n_total": int(n_total),
+        "mean_pairwise_jaccard": round(
+            float(mean_pairwise_jaccard), 4),
+        "response_text_diversity_min": round(
+            float(response_text_diversity_min), 4),
+        "min_response_signature_probes": int(
+            min_response_signature_probes),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w40_manifest_v10_cid(
+        *,
+        parent_w39_cid: str,
+        response_signature_state_cid: str,
+        response_signature_audit_cid: str,
+        response_signature_topology_cid: str,
+        response_signature_decision_cid: str,
+        response_heterogeneity_witness_cid: str,
+) -> str:
+    payload = _canonical_json_bytes({
+        "parent_w39_cid": str(parent_w39_cid),
+        "response_signature_state_cid": str(
+            response_signature_state_cid),
+        "response_signature_audit_cid": str(
+            response_signature_audit_cid),
+        "response_signature_topology_cid": str(
+            response_signature_topology_cid),
+        "response_signature_decision_cid": str(
+            response_signature_decision_cid),
+        "response_heterogeneity_witness_cid": str(
+            response_heterogeneity_witness_cid),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w40_outer_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        parent_w39_cid: str,
+        response_signature_state_cid: str,
+        response_signature_audit_cid: str,
+        response_signature_topology_cid: str,
+        response_signature_decision_cid: str,
+        response_heterogeneity_witness_cid: str,
+        manifest_v10_cid: str,
+        cell_index: int,
+) -> str:
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "parent_w39_cid": str(parent_w39_cid),
+        "response_signature_state_cid": str(
+            response_signature_state_cid),
+        "response_signature_audit_cid": str(
+            response_signature_audit_cid),
+        "response_signature_topology_cid": str(
+            response_signature_topology_cid),
+        "response_signature_decision_cid": str(
+            response_signature_decision_cid),
+        "response_heterogeneity_witness_cid": str(
+            response_heterogeneity_witness_cid),
+        "manifest_v10_cid": str(manifest_v10_cid),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def select_cross_host_response_heterogeneity_decision(
+        *,
+        response_probe: MultiHostResponseHeterogeneityProbe | None,
+        w39_ratified: bool,
+        response_text_diversity_min: float = (
+            W40_DEFAULT_RESPONSE_TEXT_DIVERSITY_MIN),
+        min_response_signature_probes: int = (
+            W40_DEFAULT_MIN_RESPONSE_SIGNATURE_PROBES),
+) -> tuple[str, int, int, int, int, float,
+           tuple[float, ...], tuple[str, ...]]:
+    """Select the W40 cross-host response-heterogeneity branch.
+
+    Deterministic, closed-form, zero-parameter.  Returns
+    ``(branch, n_diverse_pairs, n_collapse_pairs, n_pairs, n_total,
+       mean_pairwise_jaccard, per_pair_jaccards, per_pair_branches)``.
+
+    Branches:
+      * ``RESPONSE_SIGNATURE_NO_REFERENCES`` -- no W40 probe registered.
+      * ``RESPONSE_SIGNATURE_NO_TRIGGER`` -- W39 did not RATIFY.
+      * ``RESPONSE_SIGNATURE_INSUFFICIENT`` -- fewer than
+        ``min_response_signature_probes`` member probes registered.
+      * ``RESPONSE_SIGNATURE_INCOMPLETE`` -- one or more member
+        probes are missing their response_signature_cid /
+        response_token_bag (W40 falls through to W39).
+      * ``RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED`` -- W39 RATIFIED
+        but the K member probes' mean pairwise Jaccard divergence
+        is strictly below ``response_text_diversity_min``; W40
+        abstains.
+      * ``RESPONSE_SIGNATURE_DIVERSE`` -- W39 RATIFIED and the K
+        member probes' mean pairwise Jaccard divergence is at or
+        above ``response_text_diversity_min``; W40 ratifies.
+    """
+    if response_probe is None or not response_probe.member_probes:
+        return (W40_BRANCH_RESPONSE_SIGNATURE_NO_REFERENCES,
+                0, 0, 0, 0, 0.0, (), ())
+    if not w39_ratified:
+        return (W40_BRANCH_RESPONSE_SIGNATURE_NO_TRIGGER,
+                0, 0, 0, len(response_probe.member_probes),
+                0.0, (), ())
+    n_total = int(len(response_probe.member_probes))
+    if n_total < int(min_response_signature_probes):
+        return (W40_BRANCH_RESPONSE_SIGNATURE_INSUFFICIENT,
+                0, 0, 0, n_total, 0.0, (), ())
+    # Incomplete check: every member must carry a non-empty
+    # response_signature_cid AND a non-empty response_token_bag.
+    for m in response_probe.member_probes:
+        if not str(m.response_signature_cid):
+            return (W40_BRANCH_RESPONSE_SIGNATURE_INCOMPLETE,
+                    0, 0, 0, n_total, 0.0, (), ())
+    # Compute pairwise Jaccard divergence across all (i, j).
+    n_diverse = 0
+    n_collapse = 0
+    per_pair_jacs: list[float] = []
+    per_pair_brs: list[str] = []
+    for i in range(n_total):
+        for j in range(i + 1, n_total):
+            bag_i = response_probe.member_probes[i].response_token_bag
+            bag_j = response_probe.member_probes[j].response_token_bag
+            jac = _w40_pairwise_jaccard_divergence(bag_i, bag_j)
+            per_pair_jacs.append(jac)
+            if jac >= float(response_text_diversity_min):
+                n_diverse += 1
+                per_pair_brs.append(
+                    W40_BRANCH_RESPONSE_SIGNATURE_DIVERSE)
+            else:
+                n_collapse += 1
+                per_pair_brs.append(
+                    W40_BRANCH_RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED)
+    n_pairs = len(per_pair_jacs)
+    if n_pairs == 0:
+        return (W40_BRANCH_RESPONSE_SIGNATURE_INSUFFICIENT,
+                0, 0, 0, n_total, 0.0, (), ())
+    mean_jac = sum(per_pair_jacs) / float(n_pairs)
+    if mean_jac < float(response_text_diversity_min):
+        return (W40_BRANCH_RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED,
+                n_diverse, n_collapse, n_pairs, n_total,
+                mean_jac, tuple(per_pair_jacs),
+                tuple(per_pair_brs))
+    return (W40_BRANCH_RESPONSE_SIGNATURE_DIVERSE,
+            n_diverse, n_collapse, n_pairs, n_total,
+            mean_jac, tuple(per_pair_jacs),
+            tuple(per_pair_brs))
+
+
+@dataclasses.dataclass(frozen=True)
+class CrossHostResponseHeterogeneityRatificationEnvelope:
+    """Content-addressed W40 cross-host response-heterogeneity envelope."""
+
+    schema_version: str
+    schema_cid: str
+    parent_w39_cid: str
+    response_probe: MultiHostResponseHeterogeneityProbe | None
+    response_signature_state_cid: str
+    response_signature_topology_cid: str
+    response_signature_decision_cid: str
+    response_heterogeneity_witness_cid: str
+    projection_branch: str
+    w39_decision_top_set: tuple[str, ...]
+    n_diverse_pairs: int
+    n_collapse_pairs: int
+    n_pairs: int
+    n_total: int
+    mean_pairwise_jaccard: float
+    response_text_diversity_min: float
+    min_response_signature_probes: int
+    per_pair_jaccards: tuple[float, ...]
+    per_pair_branches: tuple[str, ...]
+    response_signature_audit_cid: str
+    manifest_v10_cid: str
+    cell_index: int
+    wire_required: bool = False
+    w40_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.w40_cid:
+            object.__setattr__(self, "w40_cid",
+                               self.recompute_w40_cid())
+
+    def recompute_w40_cid(self) -> str:
+        return _compute_w40_outer_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            parent_w39_cid=self.parent_w39_cid,
+            response_signature_state_cid=(
+                self.response_signature_state_cid),
+            response_signature_audit_cid=(
+                self.response_signature_audit_cid),
+            response_signature_topology_cid=(
+                self.response_signature_topology_cid),
+            response_signature_decision_cid=(
+                self.response_signature_decision_cid),
+            response_heterogeneity_witness_cid=(
+                self.response_heterogeneity_witness_cid),
+            manifest_v10_cid=self.manifest_v10_cid,
+            cell_index=int(self.cell_index),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w39_cid": self.parent_w39_cid,
+            "response_probe": (
+                self.response_probe.as_dict()
+                if self.response_probe is not None else None),
+            "response_signature_state_cid":
+                self.response_signature_state_cid,
+            "response_signature_topology_cid":
+                self.response_signature_topology_cid,
+            "response_signature_decision_cid":
+                self.response_signature_decision_cid,
+            "response_heterogeneity_witness_cid":
+                self.response_heterogeneity_witness_cid,
+            "projection_branch": self.projection_branch,
+            "w39_decision_top_set": [
+                str(t) for t in self.w39_decision_top_set],
+            "n_diverse_pairs": int(self.n_diverse_pairs),
+            "n_collapse_pairs": int(self.n_collapse_pairs),
+            "n_pairs": int(self.n_pairs),
+            "n_total": int(self.n_total),
+            "mean_pairwise_jaccard": round(
+                float(self.mean_pairwise_jaccard), 4),
+            "response_text_diversity_min": round(
+                float(self.response_text_diversity_min), 4),
+            "min_response_signature_probes": int(
+                self.min_response_signature_probes),
+            "per_pair_jaccards": [
+                round(float(j), 4) for j in self.per_pair_jaccards],
+            "per_pair_branches": [
+                str(b) for b in self.per_pair_branches],
+            "response_signature_audit_cid":
+                self.response_signature_audit_cid,
+            "manifest_v10_cid": self.manifest_v10_cid,
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<w40_ref:{self.w40_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_structured_bits(self) -> int:
+        return int(8 * self.n_envelope_bytes)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w39_cid": self.parent_w39_cid,
+            "response_probe": (
+                self.response_probe.as_dict()
+                if self.response_probe is not None else None),
+            "response_signature_state_cid":
+                self.response_signature_state_cid,
+            "response_signature_topology_cid":
+                self.response_signature_topology_cid,
+            "response_signature_decision_cid":
+                self.response_signature_decision_cid,
+            "response_heterogeneity_witness_cid":
+                self.response_heterogeneity_witness_cid,
+            "projection_branch": self.projection_branch,
+            "w39_decision_top_set": [
+                str(t) for t in self.w39_decision_top_set],
+            "n_diverse_pairs": int(self.n_diverse_pairs),
+            "n_collapse_pairs": int(self.n_collapse_pairs),
+            "n_pairs": int(self.n_pairs),
+            "n_total": int(self.n_total),
+            "mean_pairwise_jaccard": round(
+                float(self.mean_pairwise_jaccard), 4),
+            "response_text_diversity_min": round(
+                float(self.response_text_diversity_min), 4),
+            "min_response_signature_probes": int(
+                self.min_response_signature_probes),
+            "per_pair_jaccards": [
+                round(float(j), 4) for j in self.per_pair_jaccards],
+            "per_pair_branches": [
+                str(b) for b in self.per_pair_branches],
+            "response_signature_audit_cid":
+                self.response_signature_audit_cid,
+            "manifest_v10_cid": self.manifest_v10_cid,
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "w40_cid": self.w40_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_cross_host_response_heterogeneity_ratification(
+        env: CrossHostResponseHeterogeneityRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_parent_w39_cid: str,
+        registered_member_pool_host_ids: tuple[frozenset[str], ...],
+        registered_member_pool_oracle_ids: tuple[frozenset[str], ...],
+        registered_trajectory_host_ids: frozenset[str],
+        registered_response_signature_topology_cid: str,
+        registered_response_heterogeneity_witness_cid: str,
+) -> LatentVerificationOutcome:
+    """Pure-function verifier for the W40 envelope.
+
+    Enumerates 14 disjoint failure modes, disjoint from W22..W39:
+
+    1.  ``empty_w40_envelope``
+    2.  ``w40_schema_version_unknown``
+    3.  ``w40_schema_cid_mismatch``
+    4.  ``w39_parent_cid_mismatch``
+    5.  ``w40_projection_branch_unknown``
+    6.  ``w40_response_probe_unregistered_host``
+    7.  ``w40_response_probe_unregistered_oracle``
+    8.  ``w40_response_disjoint_topology_violation``
+    9.  ``w40_response_mutual_disjointness_violation``
+    10. ``w40_response_thresholds_invalid``
+    11. ``w40_response_state_cid_mismatch``
+    12. ``w40_response_decision_cid_mismatch``
+    13. ``w40_response_topology_cid_mismatch``
+    14. ``w40_manifest_v10_cid_mismatch`` (with
+        ``w40_response_heterogeneity_cid_mismatch`` and
+        ``w40_outer_cid_mismatch`` co-defined).
+    """
+    n_checks = 0
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_w40_envelope", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_version != (
+            W40_RESPONSE_HETEROGENEITY_SCHEMA_VERSION):
+        return LatentVerificationOutcome(
+            ok=False, reason="w40_schema_version_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w40_schema_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.parent_w39_cid != str(registered_parent_w39_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w39_parent_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.projection_branch not in W40_ALL_BRANCHES:
+        return LatentVerificationOutcome(
+            ok=False, reason="w40_projection_branch_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    # Per-member-probe registration check (host).
+    registered_hosts_union: set[str] = set()
+    for pool in registered_member_pool_host_ids:
+        registered_hosts_union |= set(str(h) for h in pool)
+    if env.response_probe is not None:
+        for member in env.response_probe.member_probes:
+            for host_id in member.host_ids:
+                if (str(host_id)
+                        and str(host_id)
+                        not in registered_hosts_union):
+                    return LatentVerificationOutcome(
+                        ok=False,
+                        reason=(
+                            "w40_response_probe_unregistered_host"),
+                        n_checks=n_checks)
+    n_checks += 1
+    # Per-member-probe registration check (oracle).
+    registered_oracles_union: set[str] = set()
+    for pool in registered_member_pool_oracle_ids:
+        registered_oracles_union |= set(str(o) for o in pool)
+    if env.response_probe is not None:
+        for member in env.response_probe.member_probes:
+            for oracle_id in member.oracle_ids:
+                if (str(oracle_id)
+                        and str(oracle_id)
+                        not in registered_oracles_union):
+                    return LatentVerificationOutcome(
+                        ok=False,
+                        reason=(
+                            "w40_response_probe_unregistered_oracle"),
+                        n_checks=n_checks)
+    n_checks += 1
+    # Disjoint-topology check (each pool vs trajectory hosts).
+    traj_set = set(str(h) for h in registered_trajectory_host_ids)
+    for pool in registered_member_pool_host_ids:
+        overlap = set(str(h) for h in pool) & traj_set
+        if overlap:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w40_response_disjoint_topology_violation",
+                n_checks=n_checks)
+    n_checks += 1
+    # Mutual-disjointness check (every pair of pools is disjoint).
+    pools_list = [set(str(h) for h in pool)
+                  for pool in registered_member_pool_host_ids]
+    for i in range(len(pools_list)):
+        for j in range(i + 1, len(pools_list)):
+            if pools_list[i] & pools_list[j]:
+                return LatentVerificationOutcome(
+                    ok=False,
+                    reason=(
+                        "w40_response_mutual_disjointness_violation"),
+                    n_checks=n_checks)
+    n_checks += 1
+    div_min = float(env.response_text_diversity_min)
+    mrsp = int(env.min_response_signature_probes)
+    if (math.isnan(div_min) or math.isinf(div_min)
+            or div_min < 0.0 or div_min > 1.0
+            or mrsp < 1 or mrsp > 16):
+        return LatentVerificationOutcome(
+            ok=False, reason="w40_response_thresholds_invalid",
+            n_checks=n_checks)
+    n_checks += 1
+    expected_state_cid = _compute_w40_response_signature_state_cid(
+        probe=env.response_probe)
+    if expected_state_cid != env.response_signature_state_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w40_response_state_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    expected_decision_cid = (
+        _compute_w40_response_signature_decision_cid(
+            projection_branch=env.projection_branch,
+            n_diverse_pairs=int(env.n_diverse_pairs),
+            n_collapse_pairs=int(env.n_collapse_pairs),
+            n_pairs=int(env.n_pairs),
+            n_total=int(env.n_total),
+            mean_pairwise_jaccard=float(env.mean_pairwise_jaccard),
+            per_pair_jaccards=env.per_pair_jaccards,
+            per_pair_branches=env.per_pair_branches,
+        ))
+    if expected_decision_cid != env.response_signature_decision_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w40_response_decision_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if (env.response_signature_topology_cid
+            != str(registered_response_signature_topology_cid)):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w40_response_topology_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if (env.response_heterogeneity_witness_cid
+            != str(registered_response_heterogeneity_witness_cid)):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w40_response_mutual_disjointness_violation",
+            n_checks=n_checks)
+    n_checks += 1
+    expected_audit = _compute_w40_response_signature_audit_cid(
+        projection_branch=env.projection_branch,
+        w39_decision_top_set=env.w39_decision_top_set,
+        n_diverse_pairs=int(env.n_diverse_pairs),
+        n_collapse_pairs=int(env.n_collapse_pairs),
+        n_pairs=int(env.n_pairs),
+        n_total=int(env.n_total),
+        mean_pairwise_jaccard=float(env.mean_pairwise_jaccard),
+        response_text_diversity_min=float(
+            env.response_text_diversity_min),
+        min_response_signature_probes=int(
+            env.min_response_signature_probes),
+    )
+    expected_manifest = _compute_w40_manifest_v10_cid(
+        parent_w39_cid=env.parent_w39_cid,
+        response_signature_state_cid=(
+            env.response_signature_state_cid),
+        response_signature_audit_cid=expected_audit,
+        response_signature_topology_cid=(
+            env.response_signature_topology_cid),
+        response_signature_decision_cid=(
+            env.response_signature_decision_cid),
+        response_heterogeneity_witness_cid=(
+            env.response_heterogeneity_witness_cid),
+    )
+    if (expected_audit != env.response_signature_audit_cid
+            or expected_manifest != env.manifest_v10_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w40_manifest_v10_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.recompute_w40_cid() != env.w40_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w40_outer_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+@dataclasses.dataclass
+class CrossHostResponseHeterogeneityRegistry:
+    """Controller-side registry for W40 cross-host response heterogeneity.
+
+    Mechanically enforces TWO disjointness preconditions at
+    construction time (inherited from W39):
+
+    * **Trajectory disjointness**: every registered member host pool
+      is disjoint from ``registered_trajectory_host_ids``; otherwise
+      :class:`DisjointTopologyError` is raised.
+    * **Mutual disjointness**: every pair of registered member host
+      pools has empty host-set intersection; otherwise
+      :class:`MutuallyDisjointTopologyError` is raised.
+    """
+
+    schema: SchemaCapsule | None = None
+    inner_w39_registry: (
+        MultiHostDisjointQuorumRegistry | None) = None
+    response_signature_enabled: bool = True
+    manifest_v10_disabled: bool = False
+    allow_response_signature_collapse_abstain: bool = True
+    response_text_diversity_min: float = (
+        W40_DEFAULT_RESPONSE_TEXT_DIVERSITY_MIN)
+    min_response_signature_probes: int = (
+        W40_DEFAULT_MIN_RESPONSE_SIGNATURE_PROBES)
+    registered_member_pool_host_ids: tuple[frozenset[str], ...] = ()
+    registered_member_pool_oracle_ids: tuple[
+        frozenset[str], ...] = ()
+    registered_trajectory_host_ids: frozenset[str] = frozenset()
+
+    _envelopes: dict[
+        str,
+        CrossHostResponseHeterogeneityRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_w40_registered: int = 0
+    n_w40_rejected: int = 0
+    n_response_signature_diverse: int = 0
+    n_response_signature_collapse_abstained: int = 0
+    n_response_signature_no_references: int = 0
+    n_response_signature_no_trigger: int = 0
+    n_response_signature_insufficient: int = 0
+    n_response_signature_incomplete: int = 0
+
+    def __post_init__(self) -> None:
+        # Trajectory-disjointness (inherited from W39).
+        traj_set = set(self.registered_trajectory_host_ids)
+        for i, pool in enumerate(
+                self.registered_member_pool_host_ids):
+            overlap = set(pool) & traj_set
+            if overlap:
+                raise DisjointTopologyError(
+                    "W40 trajectory disjointness violated: pool "
+                    f"{i} host_ids ∩ trajectory_host_ids = "
+                    f"{sorted(overlap)!r}")
+        # Mutual-disjointness (inherited from W39).
+        pools_list = [
+            set(pool)
+            for pool in self.registered_member_pool_host_ids]
+        for i in range(len(pools_list)):
+            for j in range(i + 1, len(pools_list)):
+                inter = pools_list[i] & pools_list[j]
+                if inter:
+                    raise MutuallyDisjointTopologyError(
+                        "W40 mutual disjointness violated: "
+                        f"pool {i} ∩ pool {j} = {sorted(inter)!r}")
+
+    @property
+    def is_trivial(self) -> bool:
+        return (not bool(self.response_signature_enabled)
+                and bool(self.manifest_v10_disabled)
+                and not bool(
+                    self.allow_response_signature_collapse_abstain))
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        return not self.is_trivial
+
+    @property
+    def response_signature_topology_cid(self) -> str:
+        return _compute_w40_response_signature_topology_cid(
+            registered_member_pool_host_ids=(
+                self.registered_member_pool_host_ids),
+            registered_member_pool_oracle_ids=(
+                self.registered_member_pool_oracle_ids),
+            registered_trajectory_host_ids=(
+                self.registered_trajectory_host_ids),
+        )
+
+    @property
+    def response_heterogeneity_witness_cid(self) -> str:
+        return _compute_w40_response_heterogeneity_witness_cid(
+            registered_member_pool_host_ids=(
+                self.registered_member_pool_host_ids),
+        )
+
+    def register_envelope(
+            self,
+            envelope: (
+                CrossHostResponseHeterogeneityRatificationEnvelope),
+            *,
+            registered_parent_w39_cid: str,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            outcome = LatentVerificationOutcome(
+                ok=False, reason="schema_unregistered", n_checks=0)
+            self.n_w40_rejected += 1
+            return outcome
+        outcome = (
+            verify_cross_host_response_heterogeneity_ratification(
+                envelope,
+                registered_schema=self.schema,
+                registered_parent_w39_cid=str(
+                    registered_parent_w39_cid),
+                registered_member_pool_host_ids=(
+                    self.registered_member_pool_host_ids),
+                registered_member_pool_oracle_ids=(
+                    self.registered_member_pool_oracle_ids),
+                registered_trajectory_host_ids=frozenset(
+                    self.registered_trajectory_host_ids),
+                registered_response_signature_topology_cid=(
+                    self.response_signature_topology_cid),
+                registered_response_heterogeneity_witness_cid=(
+                    self.response_heterogeneity_witness_cid),
+            ))
+        if outcome.ok:
+            self._envelopes[envelope.w40_cid] = envelope
+            self.n_w40_registered += 1
+            br = envelope.projection_branch
+            if br == W40_BRANCH_RESPONSE_SIGNATURE_DIVERSE:
+                self.n_response_signature_diverse += 1
+            elif br == (
+                    W40_BRANCH_RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED):
+                self.n_response_signature_collapse_abstained += 1
+            elif br == W40_BRANCH_RESPONSE_SIGNATURE_NO_REFERENCES:
+                self.n_response_signature_no_references += 1
+            elif br == W40_BRANCH_RESPONSE_SIGNATURE_NO_TRIGGER:
+                self.n_response_signature_no_trigger += 1
+            elif br == W40_BRANCH_RESPONSE_SIGNATURE_INSUFFICIENT:
+                self.n_response_signature_insufficient += 1
+            elif br == W40_BRANCH_RESPONSE_SIGNATURE_INCOMPLETE:
+                self.n_response_signature_incomplete += 1
+        else:
+            self.n_w40_rejected += 1
+        return outcome
+
+
+@dataclasses.dataclass(frozen=True)
+class W40CrossHostResponseHeterogeneityResult:
+    """Audit record for one W40 decode call."""
+
+    answer: dict[str, Any]
+    inner_w39_branch: str
+    decoder_branch: str
+    projection_branch: str
+    w39_decision_top_set: tuple[str, ...]
+    n_diverse_pairs: int
+    n_collapse_pairs: int
+    n_pairs: int
+    n_total: int
+    mean_pairwise_jaccard: float
+    parent_w39_cid: str
+    cell_index: int
+    n_w39_visible_tokens: int
+    n_w40_visible_tokens: int
+    n_w40_overhead_tokens: int
+    w40_cid: str
+    manifest_v10_cid: str
+    response_signature_state_cid: str
+    response_signature_audit_cid: str
+    response_signature_topology_cid: str
+    response_signature_decision_cid: str
+    response_heterogeneity_witness_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w40: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(
+                self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get(
+                "remediation", "investigate")),
+            "inner_w39_branch": str(self.inner_w39_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "projection_branch": str(self.projection_branch),
+            "w39_decision_top_set": [
+                str(t) for t in self.w39_decision_top_set],
+            "n_diverse_pairs": int(self.n_diverse_pairs),
+            "n_collapse_pairs": int(self.n_collapse_pairs),
+            "n_pairs": int(self.n_pairs),
+            "n_total": int(self.n_total),
+            "mean_pairwise_jaccard": round(
+                float(self.mean_pairwise_jaccard), 4),
+            "parent_w39_cid": str(self.parent_w39_cid),
+            "cell_index": int(self.cell_index),
+            "n_w39_visible_tokens": int(self.n_w39_visible_tokens),
+            "n_w40_visible_tokens": int(self.n_w40_visible_tokens),
+            "n_w40_overhead_tokens": int(self.n_w40_overhead_tokens),
+            "w40_cid": str(self.w40_cid),
+            "manifest_v10_cid": str(self.manifest_v10_cid),
+            "response_signature_state_cid": str(
+                self.response_signature_state_cid),
+            "response_signature_audit_cid": str(
+                self.response_signature_audit_cid),
+            "response_signature_topology_cid": str(
+                self.response_signature_topology_cid),
+            "response_signature_decision_cid": str(
+                self.response_signature_decision_cid),
+            "response_heterogeneity_witness_cid": str(
+                self.response_heterogeneity_witness_cid),
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": str(self.verification_reason),
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w40": float(self.cram_factor_w40),
+        }
+
+
+@dataclasses.dataclass
+class CrossHostResponseHeterogeneityOrchestrator:
+    """Cross-host response-heterogeneity guard around W39."""
+
+    inner: MultiHostDisjointQuorumOrchestrator
+    registry: CrossHostResponseHeterogeneityRegistry
+    enabled: bool = True
+    require_w40_verification: bool = True
+
+    _last_result: (
+        "W40CrossHostResponseHeterogeneityResult | None") = None
+    _last_envelope: (
+        "CrossHostResponseHeterogeneityRatificationEnvelope "
+        "| None") = None
+    _cell_index: int = 0
+    _response_provider: Any = None
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.registry.schema
+
+    def reset_session(self) -> None:
+        self.inner.reset_session()
+        self._last_result = None
+        self._last_envelope = None
+        self._cell_index = 0
+
+    def set_response_provider(self, provider: Any) -> None:
+        """Register a callable producing a W40 probe per cell.
+
+        The callable receives ``(orch, w39_result)`` and returns a
+        :class:`MultiHostResponseHeterogeneityProbe` or ``None``.
+        ``None`` triggers the ``RESPONSE_SIGNATURE_NO_REFERENCES``
+        branch.
+        """
+        self._response_provider = provider
+
+    def _build_envelope(
+            self,
+            *,
+            parent_w39_cid: str,
+            probe: MultiHostResponseHeterogeneityProbe | None,
+            projection_branch: str,
+            w39_decision_top_set: tuple[str, ...],
+            n_diverse_pairs: int,
+            n_collapse_pairs: int,
+            n_pairs: int,
+            n_total: int,
+            mean_pairwise_jaccard: float,
+            per_pair_jaccards: tuple[float, ...],
+            per_pair_branches: tuple[str, ...],
+            wire_required: bool,
+    ) -> CrossHostResponseHeterogeneityRatificationEnvelope:
+        state_cid = _compute_w40_response_signature_state_cid(
+            probe=probe)
+        topology_cid = (
+            self.registry.response_signature_topology_cid)
+        witness_cid = (
+            self.registry.response_heterogeneity_witness_cid)
+        decision_cid = (
+            _compute_w40_response_signature_decision_cid(
+                projection_branch=projection_branch,
+                n_diverse_pairs=int(n_diverse_pairs),
+                n_collapse_pairs=int(n_collapse_pairs),
+                n_pairs=int(n_pairs),
+                n_total=int(n_total),
+                mean_pairwise_jaccard=float(mean_pairwise_jaccard),
+                per_pair_jaccards=per_pair_jaccards,
+                per_pair_branches=per_pair_branches,
+            ))
+        audit_cid = _compute_w40_response_signature_audit_cid(
+            projection_branch=projection_branch,
+            w39_decision_top_set=w39_decision_top_set,
+            n_diverse_pairs=int(n_diverse_pairs),
+            n_collapse_pairs=int(n_collapse_pairs),
+            n_pairs=int(n_pairs),
+            n_total=int(n_total),
+            mean_pairwise_jaccard=float(mean_pairwise_jaccard),
+            response_text_diversity_min=float(
+                self.registry.response_text_diversity_min),
+            min_response_signature_probes=int(
+                self.registry.min_response_signature_probes),
+        )
+        manifest_cid = _compute_w40_manifest_v10_cid(
+            parent_w39_cid=parent_w39_cid,
+            response_signature_state_cid=state_cid,
+            response_signature_audit_cid=audit_cid,
+            response_signature_topology_cid=topology_cid,
+            response_signature_decision_cid=decision_cid,
+            response_heterogeneity_witness_cid=witness_cid,
+        )
+        return CrossHostResponseHeterogeneityRatificationEnvelope(
+            schema_version=W40_RESPONSE_HETEROGENEITY_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            parent_w39_cid=str(parent_w39_cid),
+            response_probe=probe,
+            response_signature_state_cid=state_cid,
+            response_signature_topology_cid=topology_cid,
+            response_signature_decision_cid=decision_cid,
+            response_heterogeneity_witness_cid=witness_cid,
+            projection_branch=str(projection_branch),
+            w39_decision_top_set=tuple(w39_decision_top_set),
+            n_diverse_pairs=int(n_diverse_pairs),
+            n_collapse_pairs=int(n_collapse_pairs),
+            n_pairs=int(n_pairs),
+            n_total=int(n_total),
+            mean_pairwise_jaccard=float(mean_pairwise_jaccard),
+            response_text_diversity_min=float(
+                self.registry.response_text_diversity_min),
+            min_response_signature_probes=int(
+                self.registry.min_response_signature_probes),
+            per_pair_jaccards=tuple(
+                float(j) for j in per_pair_jaccards),
+            per_pair_branches=tuple(
+                str(b) for b in per_pair_branches),
+            response_signature_audit_cid=audit_cid,
+            manifest_v10_cid=manifest_cid,
+            cell_index=int(self._cell_index),
+            wire_required=bool(wire_required),
+        )
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        if not self.enabled or self.schema is None:
+            out = self.inner.decode_rounds(per_round_handoffs)
+            n_w39_visible = int(
+                out.get("multi_host_disjoint_quorum", {}).get(
+                    "n_w39_visible_tokens", 0))
+            return self._pack(
+                out=out,
+                decoder_branch=W40_BRANCH_RESPONSE_SIGNATURE_DISABLED,
+                projection_branch="",
+                envelope=None,
+                n_w40_visible=n_w39_visible,
+                w40_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason="disabled",
+                w39_decision_top_set=(),
+                n_diverse_pairs=0,
+                n_collapse_pairs=0,
+                n_pairs=0,
+                n_total=0,
+                mean_pairwise_jaccard=0.0,
+                parent_w39_cid="",
+            )
+
+        out = self.inner.decode_rounds(per_round_handoffs)
+        w39_result = self.inner.last_result
+        n_w39_visible = int(
+            w39_result.n_w39_visible_tokens
+            if w39_result is not None else 0)
+        inner_w39_branch = str(
+            w39_result.decoder_branch
+            if w39_result is not None else "")
+
+        if self.registry.is_trivial:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=(
+                    W40_BRANCH_TRIVIAL_RESPONSE_SIGNATURE_PASSTHROUGH),
+                projection_branch="",
+                envelope=None,
+                n_w40_visible=n_w39_visible,
+                w40_overhead=0,
+                ratified=True,
+                verify_ok=True,
+                verify_reason="trivial_passthrough",
+                w39_decision_top_set=(),
+                n_diverse_pairs=0,
+                n_collapse_pairs=0,
+                n_pairs=0,
+                n_total=0,
+                mean_pairwise_jaccard=0.0,
+                parent_w39_cid="",
+            )
+
+        # Build the W40 cross-host response-heterogeneity probe.
+        probe: MultiHostResponseHeterogeneityProbe | None = None
+        if self._response_provider is not None:
+            try:
+                probe = self._response_provider(self, w39_result)
+            except Exception:
+                probe = None
+
+        # W39 RATIFIED iff its decoder_branch is QUORUM_RATIFIED.
+        # On any other W39 outcome (DIVERGENCE_ABSTAINED, NO_REFERENCES,
+        # NO_TRIGGER, INSUFFICIENT, SPLIT, REFERENCE_WEAK, DISABLED,
+        # REJECTED, RESOLVED, TRIVIAL), W40 fires NO_TRIGGER and falls
+        # through.  W39_decision_top_set is the W39 decision top_set.
+        w39_decision_top: tuple[str, ...] = ()
+        w39_ratified = False
+        if w39_result is not None:
+            w39_decision_top = tuple(sorted(
+                str(t) for t in w39_result.decision_top_set))
+            w39_ratified = bool(
+                w39_result.decoder_branch
+                == W39_BRANCH_QUORUM_RATIFIED)
+
+        (proj_branch, n_diverse, n_collapse, n_pairs, n_total,
+         mean_jac, per_pair_jacs, per_pair_brs) = (
+            select_cross_host_response_heterogeneity_decision(
+                response_probe=probe,
+                w39_ratified=w39_ratified,
+                response_text_diversity_min=float(
+                    self.registry.response_text_diversity_min),
+                min_response_signature_probes=int(
+                    self.registry.min_response_signature_probes),
+            ))
+
+        decoder_branch = W40_BRANCH_RESPONSE_SIGNATURE_RESOLVED
+        w40_answer = dict(out)
+        if (proj_branch
+                == W40_BRANCH_RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED
+                and self.registry.allow_response_signature_collapse_abstain
+                and w39_ratified):
+            # Drop the W39 ratified services.  The cross-host
+            # response-heterogeneity layer detected collapse.
+            w40_answer["services"] = ()
+            decoder_branch = (
+                W40_BRANCH_RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED)
+        elif proj_branch == W40_BRANCH_RESPONSE_SIGNATURE_DIVERSE:
+            decoder_branch = W40_BRANCH_RESPONSE_SIGNATURE_DIVERSE
+        elif proj_branch in (
+                W40_BRANCH_RESPONSE_SIGNATURE_NO_REFERENCES,
+                W40_BRANCH_RESPONSE_SIGNATURE_NO_TRIGGER,
+                W40_BRANCH_RESPONSE_SIGNATURE_INSUFFICIENT,
+                W40_BRANCH_RESPONSE_SIGNATURE_INCOMPLETE):
+            decoder_branch = proj_branch
+
+        parent_w39_cid = ""
+        w39_envelope = self.inner.last_envelope
+        if (w39_result is not None
+                and w39_envelope is not None):
+            parent_w39_cid = str(w39_envelope.w39_cid)
+        if not parent_w39_cid:
+            parent_payload = _canonical_json_bytes({
+                "inner_w39_branch": inner_w39_branch,
+                "n_w39_visible": int(n_w39_visible),
+                "cell_index": int(self._cell_index),
+            })
+            parent_w39_cid = hashlib.sha256(
+                parent_payload).hexdigest()
+
+        envelope = self._build_envelope(
+            parent_w39_cid=parent_w39_cid,
+            probe=probe,
+            projection_branch=proj_branch,
+            w39_decision_top_set=w39_decision_top,
+            n_diverse_pairs=int(n_diverse),
+            n_collapse_pairs=int(n_collapse),
+            n_pairs=int(n_pairs),
+            n_total=int(n_total),
+            mean_pairwise_jaccard=float(mean_jac),
+            per_pair_jaccards=per_pair_jacs,
+            per_pair_branches=per_pair_brs,
+            wire_required=self.registry.has_wire_required_layer,
+        )
+        outcome = self.registry.register_envelope(
+            envelope,
+            registered_parent_w39_cid=parent_w39_cid,
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+        if not verify_ok and self.require_w40_verification:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W40_BRANCH_RESPONSE_SIGNATURE_REJECTED,
+                projection_branch=proj_branch,
+                envelope=envelope,
+                n_w40_visible=n_w39_visible,
+                w40_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason=verify_reason,
+                w39_decision_top_set=w39_decision_top,
+                n_diverse_pairs=int(n_diverse),
+                n_collapse_pairs=int(n_collapse),
+                n_pairs=int(n_pairs),
+                n_total=int(n_total),
+                mean_pairwise_jaccard=float(mean_jac),
+                parent_w39_cid=parent_w39_cid,
+            )
+
+        w40_overhead = int(envelope.n_wire_tokens)
+        n_w40_visible = int(n_w39_visible + w40_overhead)
+        out_local = dict(out)
+        for k, v in w40_answer.items():
+            out_local[k] = v
+        if "services" not in w40_answer:
+            out_local["services"] = ()
+        self._cell_index += 1
+        return self._pack(
+            out=out_local,
+            decoder_branch=decoder_branch,
+            projection_branch=proj_branch,
+            envelope=envelope,
+            n_w40_visible=n_w40_visible,
+            w40_overhead=w40_overhead,
+            ratified=True,
+            verify_ok=verify_ok,
+            verify_reason=verify_reason,
+            w39_decision_top_set=w39_decision_top,
+            n_diverse_pairs=int(n_diverse),
+            n_collapse_pairs=int(n_collapse),
+            n_pairs=int(n_pairs),
+            n_total=int(n_total),
+            mean_pairwise_jaccard=float(mean_jac),
+            parent_w39_cid=parent_w39_cid,
+        )
+
+    def _pack(
+            self,
+            *,
+            out: dict[str, Any],
+            decoder_branch: str,
+            projection_branch: str,
+            envelope: (
+                CrossHostResponseHeterogeneityRatificationEnvelope
+                | None),
+            n_w40_visible: int,
+            w40_overhead: int,
+            ratified: bool,
+            verify_ok: bool,
+            verify_reason: str,
+            w39_decision_top_set: tuple[str, ...],
+            n_diverse_pairs: int,
+            n_collapse_pairs: int,
+            n_pairs: int,
+            n_total: int,
+            mean_pairwise_jaccard: float,
+            parent_w39_cid: str,
+    ) -> dict[str, Any]:
+        envelope_bytes = (envelope.n_envelope_bytes
+                          if envelope is not None else 0)
+        structured_bits = (envelope.n_structured_bits
+                           if envelope is not None else 0)
+        wire = max(1, int(w40_overhead))
+        cram_factor = (float(structured_bits) / float(wire)
+                       if structured_bits > 0 else 0.0)
+        w40_cid = (str(envelope.w40_cid)
+                   if envelope is not None else "")
+        manifest_cid = (str(envelope.manifest_v10_cid)
+                        if envelope is not None else "")
+        state_cid = (
+            str(envelope.response_signature_state_cid)
+            if envelope is not None else "")
+        audit_cid = (
+            str(envelope.response_signature_audit_cid)
+            if envelope is not None else "")
+        topology_cid = (
+            str(envelope.response_signature_topology_cid)
+            if envelope is not None
+            else self.registry.response_signature_topology_cid)
+        decision_cid = (
+            str(envelope.response_signature_decision_cid)
+            if envelope is not None else "")
+        witness_cid = (
+            str(envelope.response_heterogeneity_witness_cid)
+            if envelope is not None
+            else self.registry.response_heterogeneity_witness_cid)
+        n_w39_visible = int(out.get(
+            "multi_host_disjoint_quorum", {}).get(
+                "n_w39_visible_tokens", 0))
+        inner_w39_branch = str(out.get(
+            "multi_host_disjoint_quorum", {}).get(
+                "decoder_branch", ""))
+        result = W40CrossHostResponseHeterogeneityResult(
+            answer=dict(out),
+            inner_w39_branch=inner_w39_branch,
+            decoder_branch=str(decoder_branch),
+            projection_branch=str(projection_branch),
+            w39_decision_top_set=tuple(w39_decision_top_set),
+            n_diverse_pairs=int(n_diverse_pairs),
+            n_collapse_pairs=int(n_collapse_pairs),
+            n_pairs=int(n_pairs),
+            n_total=int(n_total),
+            mean_pairwise_jaccard=float(mean_pairwise_jaccard),
+            parent_w39_cid=str(parent_w39_cid),
+            cell_index=int(self._cell_index - 1
+                           if self._cell_index > 0 else 0),
+            n_w39_visible_tokens=int(n_w39_visible),
+            n_w40_visible_tokens=int(n_w40_visible),
+            n_w40_overhead_tokens=int(w40_overhead),
+            w40_cid=w40_cid,
+            manifest_v10_cid=manifest_cid,
+            response_signature_state_cid=state_cid,
+            response_signature_audit_cid=audit_cid,
+            response_signature_topology_cid=topology_cid,
+            response_signature_decision_cid=decision_cid,
+            response_heterogeneity_witness_cid=witness_cid,
+            ratified=bool(ratified),
+            verification_ok=bool(verify_ok),
+            verification_reason=str(verify_reason),
+            n_envelope_bytes=int(envelope_bytes),
+            n_structured_bits=int(structured_bits),
+            cram_factor_w40=float(cram_factor),
+        )
+        self._last_result = result
+        self._last_envelope = envelope
+        out_local = dict(out)
+        out_local["cross_host_response_heterogeneity"] = (
+            result.as_dict())
+        if envelope is not None:
+            out_local[
+                "cross_host_response_heterogeneity_envelope"] = (
+                envelope.as_dict())
+        return out_local
+
+    def decode(
+            self,
+            handoffs: Sequence[_DecodedHandoff],
+    ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> (
+            "W40CrossHostResponseHeterogeneityResult | None"):
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> (
+            "CrossHostResponseHeterogeneityRatificationEnvelope "
+            "| None"):
+        return self._last_envelope
+
+
+def build_trivial_cross_host_response_heterogeneity_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w39_registry: (
+            MultiHostDisjointQuorumRegistry | None) = None,
+) -> CrossHostResponseHeterogeneityRegistry:
+    return CrossHostResponseHeterogeneityRegistry(
+        schema=schema,
+        inner_w39_registry=inner_w39_registry,
+        response_signature_enabled=False,
+        manifest_v10_disabled=True,
+        allow_response_signature_collapse_abstain=False,
+        registered_member_pool_host_ids=(),
+        registered_member_pool_oracle_ids=(),
+        registered_trajectory_host_ids=frozenset(),
+    )
+
+
+def build_cross_host_response_heterogeneity_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w39_registry: MultiHostDisjointQuorumRegistry,
+        registered_member_pool_host_ids: Sequence[Iterable[str]] = (),
+        registered_member_pool_oracle_ids: Sequence[
+            Iterable[str]] = (),
+        registered_trajectory_host_ids: Iterable[str] = (),
+        response_signature_enabled: bool = True,
+        manifest_v10_disabled: bool = False,
+        allow_response_signature_collapse_abstain: bool = True,
+        response_text_diversity_min: float = (
+            W40_DEFAULT_RESPONSE_TEXT_DIVERSITY_MIN),
+        min_response_signature_probes: int = (
+            W40_DEFAULT_MIN_RESPONSE_SIGNATURE_PROBES),
+) -> CrossHostResponseHeterogeneityRegistry:
+    pool_hosts = tuple(
+        frozenset(str(h) for h in pool)
+        for pool in registered_member_pool_host_ids)
+    pool_oracles = tuple(
+        frozenset(str(o) for o in pool)
+        for pool in registered_member_pool_oracle_ids)
+    return CrossHostResponseHeterogeneityRegistry(
+        schema=schema,
+        inner_w39_registry=inner_w39_registry,
+        response_signature_enabled=bool(
+            response_signature_enabled),
+        manifest_v10_disabled=bool(manifest_v10_disabled),
+        allow_response_signature_collapse_abstain=bool(
+            allow_response_signature_collapse_abstain),
+        response_text_diversity_min=float(
+            response_text_diversity_min),
+        min_response_signature_probes=int(
+            min_response_signature_probes),
+        registered_member_pool_host_ids=pool_hosts,
+        registered_member_pool_oracle_ids=pool_oracles,
+        registered_trajectory_host_ids=frozenset(
+            str(h) for h in registered_trajectory_host_ids),
+    )

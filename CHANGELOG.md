@@ -5,6 +5,183 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.14 / 3.41] — 2026-05-03 — SDK v3.41 RC1 — cross-host response-signature heterogeneity ratification + manifest-v10 CID + cross-host response-text Jaccard divergence guard + R-87 Phase-87 benchmark family + W40-L-COORDINATED-DIVERSE-RESPONSE-CAP limitation theorem + W40-INFRA-1 (.101 TCP-up + HTTP-broken) + RC1 declaration
+
+*Strictly additive on SDK v3.40.  The stable Wevra product/runtime
+(`RunSpec → run report`) is byte-for-byte unchanged.  W40 surface lives
+under `__experimental__`.  This release is the **first official release-
+candidate (RC1)** of the SDK v3.4x line.*
+
+### Added — W40 family
+
+* **`CrossHostResponseHeterogeneityOrchestrator`** wraps W39
+  (`MultiHostDisjointQuorumOrchestrator`) with a cross-host
+  response-signature heterogeneity layer that operates on an evidence
+  axis ORTHOGONAL to top_set: the per-member response **text bytes**
+  themselves.  Even if K colluders coordinate their declared top_set
+  (the W39 full-quorum-collusion attack), naturally-independent K
+  probes should produce heterogeneous response text bytes.  When the
+  K member probes' mean pairwise Jaccard divergence over canonical
+  sorted token bags falls strictly below
+  `response_text_diversity_min`, W40 abstains via
+  `RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED`.
+
+* **Cross-host response-heterogeneity (Jaccard divergence) score**:
+  closed-form, zero-parameter, deterministic
+  `1 - |inter|/|union|` over canonical sorted whitespace token bags
+  (lower-cased, punctuation-stripped, deduplicated).  Permutation-
+  and case-invariant.
+
+* **Manifest-v10 CID** binds six component CIDs:
+  `parent_w39_cid`, `response_signature_state_cid`,
+  `response_signature_audit_cid`,
+  `response_signature_topology_cid`,
+  `response_signature_decision_cid`, and the new
+  `response_heterogeneity_witness_cid` (an explicit per-pair-
+  intersection witness namespaced as
+  `w40_response_heterogeneity_witness` so swapping a W39 mutual-
+  disjointness witness for a W40 heterogeneity witness or vice-versa
+  is mechanically rejected).
+
+* **W40 verifier**
+  (`verify_cross_host_response_heterogeneity_ratification`)
+  enumerates 14 failure modes disjoint from W22..W39:
+  `empty_w40_envelope`, `w40_schema_version_unknown`,
+  `w40_schema_cid_mismatch`, `w39_parent_cid_mismatch`,
+  `w40_projection_branch_unknown`,
+  `w40_response_probe_unregistered_host`,
+  `w40_response_probe_unregistered_oracle`,
+  `w40_response_disjoint_topology_violation`,
+  `w40_response_mutual_disjointness_violation`,
+  `w40_response_thresholds_invalid`,
+  `w40_response_state_cid_mismatch`,
+  `w40_response_decision_cid_mismatch`,
+  `w40_response_topology_cid_mismatch`,
+  `w40_manifest_v10_cid_mismatch` (with `w40_outer_cid_mismatch`
+  and the heterogeneity-witness swap-detection co-defined).
+  Cumulative trust boundary across W22 + W29 + W30 + W31 + W32 +
+  W33 + W34 + W35 + W36 + W37 + W38 + W39 + W40 = **168 enumerated
+  failure modes**.
+
+* **`ResponseSignatureProbe`**: one W40 member probe, carrying
+  `(member_index, host_ids, oracle_ids, response_token_bag,
+  response_signature_cid, cell_idx)`.  Closed-form, deterministic,
+  zero-parameter, audited capsule-layer artefact.
+
+* **`MultiHostResponseHeterogeneityProbe`**: a frozen tuple of K
+  `ResponseSignatureProbe` member probes plus
+  `response_text_diversity_min` and
+  `min_response_signature_probes`.  Mechanically enforces both
+  trajectory-disjointness AND mutual-disjointness preconditions
+  inherited from W39.
+
+* **`select_cross_host_response_heterogeneity_decision`**:
+  closed-form zero-parameter cross-host response-heterogeneity
+  selector.  Returns one of:
+  `RESPONSE_SIGNATURE_NO_REFERENCES`,
+  `RESPONSE_SIGNATURE_NO_TRIGGER`,
+  `RESPONSE_SIGNATURE_INSUFFICIENT`,
+  `RESPONSE_SIGNATURE_INCOMPLETE`,
+  `RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED`,
+  `RESPONSE_SIGNATURE_DIVERSE`.
+
+* **R-87 / Phase-87 benchmark family**: five regimes —
+  `trivial_w40`, `response_signature_collapse` (load-bearing),
+  `no_regression_diverse_agrees`, `coordinated_diverse_response`
+  (W40-L-COORDINATED-DIVERSE-RESPONSE-CAP),
+  `insufficient_response_signature`.
+
+* **W40 unit tests**: 36/36 passing in
+  `vision_mvp/tests/test_phase87_cross_host_response_heterogeneity.py`.
+
+### Measured
+
+* On **R-87-RESPONSE-SIGNATURE-COLLAPSE** (the load-bearing
+  regime): W40 wins **+0.500 trust precision** over W39 across
+  5/5 seeds × 16 cells/seed (W39 trust precision 0.5; W40 trust
+  precision 1.000).  W40 abstains via
+  `RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED` on 8 cells/seed in the
+  recovery half (the W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP
+  regime where W39 RATIFIES the wrong top_set), preserves W39
+  behaviour on the prefix half (W39 didn't RATIFY → W40 fires
+  RESPONSE_SIGNATURE_NO_TRIGGER).  W40 overhead: 1 visible
+  token/cell.  Structured state density: ~14.5k bits per visible
+  W40 token.
+
+* On **R-87-TRIVIAL-W40**: W40 = W39 byte-for-byte across 5/5
+  seeds; overhead = 0.
+
+* On **R-87-NO-REGRESSION-DIVERSE-AGREES**: W40 = W39 (delta = 0)
+  across 5/5 seeds; W40 ratifies via RESPONSE_SIGNATURE_DIVERSE
+  on 8 cells/seed.
+
+* On **R-87-COORDINATED-DIVERSE-RESPONSE**:
+  `W40-L-COORDINATED-DIVERSE-RESPONSE-CAP` fires; delta_trust =
+  0 across 5/5 seeds.  Closure requires native-latent evidence
+  outside the capsule layer or a K+1-host disjoint topology with
+  a new genuinely uncompromised pool.
+
+* On **R-87-INSUFFICIENT-RESPONSE-SIGNATURE**: W40 returns
+  `RESPONSE_SIGNATURE_INSUFFICIENT` on every recovery cell where
+  fewer than `min_response_signature_probes=2` member probes are
+  present; delta = 0 across 5/5 seeds.
+
+### Lab topology — W40-INFRA-1
+
+* `192.168.12.101` re-probed (2026-05-03):
+  - `ping -c 2`: **0% packet loss**, 30 ms RTT (a strict
+    improvement over the W39 end-state of 100% packet loss).
+  - `nc -zv 11434`: TCP connect succeeds.
+  - `nc -zv 22`: TCP SSH connect succeeds (auth methods
+    advertised: publickey, password, keyboard-interactive).
+  - `curl /api/version`: still "Empty reply from server" /
+    "Connection reset by peer" across 5 attempts at 60-second
+    timeout (the W39-INFRA-1 hung-listener pattern).
+  - SSH attempted via `nobody@`, `qdong@`, `root@`, `admin@`:
+    all rejected for lack of credentials.
+* Verdict: **W40-INFRA-1**.  `192.168.12.101` is now **TCP-up +
+  HTTP-broken** at the Ollama layer; the host network stack has
+  recovered (a strict improvement over W39); the Ollama listener
+  remains in the W39-INFRA-1 hung-listener state.  Restoration
+  requires SSH credentials still unavailable in this environment.
+* `192.168.12.248` remains ARP-incomplete (32nd milestone in a
+  row).
+
+### Newly named
+
+* **W40-L-COORDINATED-DIVERSE-RESPONSE-CAP**: new limitation
+  theorem (the W40 analog of W34/W37/W38/W39 collusion-CAPs).
+* **W40-L-INSUFFICIENT-RESPONSE-SIGNATURE**: new falsifier.
+* **W40-L-NATIVE-LATENT-GAP**: new native-latent gap.
+* **W40-C-NATIVE-LATENT**: open conjecture.
+* **W40-C-MULTI-HOST**: open conjecture (partially discharged at
+  the topology layer via .101 TCP-up; still open at the
+  live-inference layer via W40-INFRA-1).
+* **W40-C-LIVE-RESPONSE-HETEROGENEITY** (NEW): empirical-
+  validated at the synthetic-bench layer; conjectural at the
+  live-inference layer pending a dedicated live collusion-
+  recovery experiment.
+
+### Release readiness — RC1 declaration
+
+* **RC1 declared.**  H1..H12 + S3 of the W40 success criterion
+  pass.  The SDK v3.41 line is the **first official release-
+  candidate** of the Wevra SDK v3.4x line.
+* `wevra.sdk.v3.41`; pyproject `0.5.14`;
+  `vision_mvp.__version__ == "0.5.14"` (alignment maintained).
+* Stable runtime contract is byte-for-byte unchanged.
+* Stable-vs-experimental boundary is final for RC1: every
+  W22..W40 symbol is exported under `__experimental__`.
+* Open-conjectures + limitation-theorems cut-list pinned in
+  `THEOREM_REGISTRY.md`.
+* 36/36 W40 unit tests + 661/661 phase69-87 focused W22..W40
+  stack regression (was 625/625 phase69-86 at SDK v3.40; W40
+  added 36 cleanly) + 364/364 phase11-39 broad spot check +
+  205/205 phase40-51 + phase6 broad spot check (1230 total
+  tests pass excluding test_phase50_ci_and_zero_shot.py which
+  has a pre-existing collection-time hang independent of W40 —
+  carried forward unchanged from W39).
+
 ## [0.5.13 / 3.40] — 2026-05-02 — SDK v3.40 — multi-host disjoint quorum consensus-reference ratification + manifest-v9 CID + mutually-disjoint physical-host topology + R-86 Phase-86 benchmark family + W39 multi-host quorum-bounding limitation theorem + bounded 5-host live disjoint quorum probe + 192.168.12.101 Mac-2 stale-pin discharge
 
 *Strictly additive on SDK v3.39.  The stable Wevra product/runtime

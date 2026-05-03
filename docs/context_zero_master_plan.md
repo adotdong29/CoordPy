@@ -1,6 +1,80 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (SDK v3.40 / W39, 2026-05-02).**
+> **Latest milestone marker (SDK v3.41 RC1 / W40, 2026-05-03).**
+> *Cross-host response-signature heterogeneity ratification +
+> manifest-v10 CID + cross-host response-text Jaccard divergence
+> guard + RC1 declaration*.  W40 wraps W39's K-of-N mutually-
+> disjoint quorum consensus-reference adjudication with a
+> **cross-host response-heterogeneity** layer that operates on
+> an evidence axis ORTHOGONAL to top_set: the per-member response
+> **text bytes** themselves.  Even if K colluders coordinate their
+> declared top_set (the W39 full-quorum-collusion attack;
+> ``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP`` fires), naturally-
+> independent K probes should produce heterogeneous response text
+> bytes.  When the K member probes' mean pairwise Jaccard
+> divergence over canonical sorted token bags falls strictly
+> below ``response_text_diversity_min``, W40 abstains via
+> ``RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED`` even when W39 would
+> have RATIFIED.  This *bounds* (does not close) the
+> ``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP`` limitation theorem:
+> it raises the capsule-layer adversary bar from "compromise 2
+> of N trajectory hosts AND ``quorum_min`` of the K mutually-
+> disjoint registered consensus references" to "compromise 2 of
+> N trajectory hosts AND ``quorum_min`` of the K mutually-
+> disjoint registered consensus references AND inject K diverse
+> response text bytes".  Geometry-aware dense-control integration
+> materially helped at the cross-host response-text axis: on
+> R-87-RESPONSE-SIGNATURE-COLLAPSE, W40 raises trust precision
+> over W39 from 0.500 (W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP
+> fires against W39) to **1.000**
+> (**Δ_trust_precision_w40_w39 = +0.500**, min and max equal
+> across 5/5 seeds).  Trust/audit survived: W40 adds 14
+> mechanically tested verifier failure modes and manifest-v10 CID
+> binding (over six component CIDs including the new response-
+> heterogeneity-witness CID), bringing the cumulative W22..W40
+> trust boundary to **168 enumerated failure modes**.  Bounded-
+> context efficiency improved in the audited cross-host sense:
+> about **14.5k structured bits per visible W40 token** on the
+> load-bearing regime at one visible token overhead/cell.
+> **Multi-host evidence broadened materially at the topology
+> layer**: the historical Mac-2 stale pin (``192.168.12.248``,
+> ARP-incomplete for the 32nd milestone in a row) remains
+> discharged in favour of ``192.168.12.101``; ``.101`` re-probed
+> on 2026-05-03 -- ping 0% packet loss (a strict improvement
+> over W39's 100% packet loss end-state), TCP port 11434
+> connects, TCP port 22 connects with auth methods advertised;
+> however the Ollama HTTP listener still returns "Empty reply
+> from server" / "Connection reset by peer" (the W39-INFRA-1
+> hung-listener pattern persists; SSH credentials still
+> unavailable to restart).  Honest verdict: **W40-INFRA-1**:
+> ``192.168.12.101`` is now TCP-up + HTTP-broken at the Ollama
+> layer; restoration requires SSH credentials.  Earlier loose
+> ends closed versus sharpened: W40 *bounds* (not closes) the
+> ``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP`` and proves a new
+> ``W40-L-COORDINATED-DIVERSE-RESPONSE-CAP`` limitation theorem
+> at the capsule layer; it does not close native latent and
+> still cannot recover under coordinated diverse-response attack
+> at the capsule layer.  Release readiness improves materially:
+> **RC1 declared.**  H1..H12 + S3 of the W40 success criterion
+> pass.  The SDK v3.41 line is the **first official release-
+> candidate** of the Wevra SDK v3.4x line.  Stable-vs-experimental
+> boundary final for RC1: every W22..W40 symbol is exported
+> under ``__experimental__``; the stable ``RunSpec → run report``
+> runtime contract is byte-for-byte unchanged.  Versioning:
+> ``vision_mvp.__version__`` and ``pyproject.toml`` are now
+> both ``0.5.14`` (alignment maintained).
+> **Net effect on the original thesis**: materially stronger than
+> W39 at the cross-host response-text-bytes axis, still blocked
+> by a deeper trust/semantics wall for true native latent, by
+> coordinated-diverse-response attacks at the capsule layer, and
+> by the live-inference-layer ``W40-INFRA-1`` infrastructure
+> observation on ``.101``.  Original goal (solving context for
+> multi-agent teams): not solved in general; meaningfully
+> tightened along the audited capsule-layer line.
+> See ``docs/RESULTS_WEVRA_W40_RESPONSE_HETEROGENEITY.md`` and
+> ``docs/SUCCESS_CRITERION_W40_RESPONSE_HETEROGENEITY.md``.
+
+> **Earlier milestone marker (SDK v3.40 / W39, 2026-05-02).**
 > *Multi-host disjoint quorum consensus-reference ratification +
 > manifest-v9 CID + mutually-disjoint physical-host topology*.  W39
 > wraps W38's disjoint cross-source consensus-reference adjudication

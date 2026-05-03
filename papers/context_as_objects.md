@@ -1,14 +1,94 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
-> Updated through SDK v3.40, 2026-05-02 (W22 → W39 cumulative
+> Updated through SDK v3.41 RC1, 2026-05-03 (W22 → W40 cumulative
 > trust + dense-control + live-aware multi-anchor / trust-subspace /
 > host-diverse / cross-host trajectory / disjoint-consensus-reference /
-> multi-host-disjoint-quorum guard ladder summarised in § 14.2 and
-> § 17).
+> multi-host-disjoint-quorum / cross-host-response-heterogeneity guard
+> ladder summarised in § 14.2 and § 17).
 >
-> **Latest milestone marker (SDK v3.40 / W39, 2026-05-02).** The
-> programme now has **thirty-six** coupled research axes.  W39 wraps
+> **Latest milestone marker (SDK v3.41 RC1 / W40, 2026-05-03).** The
+> programme now has **thirty-seven** coupled research axes.  W40
+> wraps W39's K-of-N mutually-disjoint quorum consensus-reference
+> adjudication with a **cross-host response-signature heterogeneity**
+> layer that operates on an evidence axis ORTHOGONAL to top_set: the
+> per-member response **text bytes** themselves.  Even if K colluders
+> coordinate their declared top_set (the W39 full-quorum-collusion
+> attack; ``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP`` fires),
+> naturally-independent K probes should produce heterogeneous
+> response text bytes (different paraphrases, different surface
+> forms, different tokenisations).  When the K member probes' mean
+> pairwise Jaccard divergence over canonical sorted token bags falls
+> strictly below ``response_text_diversity_min``, W40 abstains via
+> ``RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED`` even when W39 would
+> have RATIFIED.  The envelope binds a manifest-v10 CID over six
+> components (``parent_w39_cid``,
+> ``response_signature_state_cid``,
+> ``response_signature_audit_cid``,
+> ``response_signature_topology_cid``,
+> ``response_signature_decision_cid``,
+> ``response_heterogeneity_witness_cid``).  This *bounds* (does not
+> close) the ``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP`` limitation
+> theorem: it raises the capsule-layer adversary bar from
+> "compromise 2 of N trajectory hosts AND ``quorum_min`` of the K
+> mutually-disjoint registered consensus references" to "compromise
+> 2 of N trajectory hosts AND ``quorum_min`` of the K mutually-
+> disjoint registered consensus references AND inject K diverse
+> response text bytes that all encode the same wrong top_set".
+> On R-87-RESPONSE-SIGNATURE-COLLAPSE, W40 raises trust precision
+> over W39 from 0.500 (``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP``
+> fires against W39) to **1.000**
+> (**Δ_trust_precision_w40_w39 = +0.500**, min and max equal across
+> 5/5 seeds), abstains via ``RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED``
+> on 8 cells/seed, and adds one visible-token overhead/cell while
+> carrying about **14.5k structured bits per visible W40 token**.
+> On the four named falsifiers (R-87-TRIVIAL-W40,
+> R-87-NO-REGRESSION-DIVERSE-AGREES,
+> R-87-COORDINATED-DIVERSE-RESPONSE,
+> R-87-INSUFFICIENT-RESPONSE-SIGNATURE) W40 preserves W39 behavior
+> and trust precision exactly.  W40 adds 14 mechanically tested
+> verifier failure modes (including the W40-specific
+> ``w40_response_mutual_disjointness_violation``), bringing the
+> cumulative W22..W40 trust boundary to **168 enumerated failure
+> modes**.  A new proved-conditional limitation theorem
+> **W40-L-COORDINATED-DIVERSE-RESPONSE-CAP** is recorded: when the
+> K registered W40 member probes' response signatures are *injected*
+> to be diverse but all encode the same wrong top_set in lock-step
+> (the "smart" attacker who diversifies response bytes while
+> holding the wrong top_set), W40 cannot recover at the capsule
+> layer (the W40 analog of W34-L-MULTI-ANCHOR-CAP,
+> W37-L-MULTI-HOST-COLLUSION-CAP, W38-L-CONSENSUS-COLLUSION-CAP,
+> and W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP); closure requires
+> native-latent evidence outside the capsule layer or a K+1-host
+> disjoint topology with a new uncompromised pool.  W40 is
+> explicitly NOT native latent transfer, NOT transformer-internal
+> hidden-state projection, and NOT a KV-cache transplant; it is an
+> audited capsule-layer cross-host response-text Jaccard divergence
+> proxy with two mechanically-enforced disjointness preconditions
+> inherited from W39.  **Lab topology resolution -- W40-INFRA-1**:
+> ``192.168.12.101`` re-probed (2026-05-03) -- ping 0% packet loss
+> (a strict improvement over W39's 100% packet loss end-state),
+> TCP port 11434 connects, TCP port 22 connects with auth methods
+> advertised; however, the Ollama HTTP listener still returns
+> "Empty reply from server" / "Connection reset by peer" (the
+> W39-INFRA-1 hung-listener pattern persists).  SSH credentials
+> still unavailable to restart.  Honest verdict: ``.101`` is now
+> **TCP-up + HTTP-broken** at the Ollama layer; restoration
+> requires SSH credentials.  ``192.168.12.248`` remains
+> ARP-incomplete (32nd milestone in a row).  **RC1 declared**:
+> H1..H12 + S3 of the W40 success criterion pass.  The SDK v3.41
+> line is the **first official release-candidate** of the Wevra
+> SDK v3.4x line.  Stable-vs-experimental boundary final for RC1:
+> every W22..W40 symbol is exported under ``__experimental__``;
+> the stable ``RunSpec → run report`` runtime contract is byte-for-
+> byte unchanged.  Versioning: ``vision_mvp.__version__`` and
+> ``pyproject.toml`` ``project.version`` are now both ``0.5.14``
+> (alignment maintained).  See
+> ``docs/RESULTS_WEVRA_W40_RESPONSE_HETEROGENEITY.md`` and
+> ``docs/SUCCESS_CRITERION_W40_RESPONSE_HETEROGENEITY.md``.
+
+> **Previous milestone marker (SDK v3.40 / W39, 2026-05-02).** The
+> programme had **thirty-six** coupled research axes.  W39 wraps
 > W38's disjoint cross-source consensus-reference adjudication with
 > a **K-of-N mutually-disjoint quorum** of disjoint probes, each
 > sourced from a physically-distinct host pool that is both

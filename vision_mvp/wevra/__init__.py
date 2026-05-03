@@ -643,6 +643,34 @@ from .team_coord import (
     W39_BRANCH_QUORUM_SPLIT,
     W39_BRANCH_QUORUM_REFERENCE_WEAK,
     W39_ALL_BRANCHES,
+    # SDK v3.41 — cross-host response-signature heterogeneity
+    # ratification + manifest-v10 CID + cross-host response-text
+    # Jaccard divergence guard (W40). EXPERIMENTAL — see
+    # __experimental__.
+    ResponseSignatureProbe,
+    MultiHostResponseHeterogeneityProbe,
+    CrossHostResponseHeterogeneityRatificationEnvelope,
+    CrossHostResponseHeterogeneityRegistry,
+    W40CrossHostResponseHeterogeneityResult,
+    CrossHostResponseHeterogeneityOrchestrator,
+    verify_cross_host_response_heterogeneity_ratification,
+    select_cross_host_response_heterogeneity_decision,
+    build_trivial_cross_host_response_heterogeneity_registry,
+    build_cross_host_response_heterogeneity_registry,
+    W40_RESPONSE_HETEROGENEITY_SCHEMA_VERSION,
+    W40_DEFAULT_RESPONSE_TEXT_DIVERSITY_MIN,
+    W40_DEFAULT_MIN_RESPONSE_SIGNATURE_PROBES,
+    W40_BRANCH_RESPONSE_SIGNATURE_RESOLVED,
+    W40_BRANCH_TRIVIAL_RESPONSE_SIGNATURE_PASSTHROUGH,
+    W40_BRANCH_RESPONSE_SIGNATURE_REJECTED,
+    W40_BRANCH_RESPONSE_SIGNATURE_DISABLED,
+    W40_BRANCH_RESPONSE_SIGNATURE_NO_TRIGGER,
+    W40_BRANCH_RESPONSE_SIGNATURE_DIVERSE,
+    W40_BRANCH_RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED,
+    W40_BRANCH_RESPONSE_SIGNATURE_NO_REFERENCES,
+    W40_BRANCH_RESPONSE_SIGNATURE_INSUFFICIENT,
+    W40_BRANCH_RESPONSE_SIGNATURE_INCOMPLETE,
+    W40_ALL_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -656,7 +684,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.40"
+SDK_VERSION = "wevra.sdk.v3.41"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -842,6 +870,19 @@ __experimental__: tuple[str, ...] = (
     "select_multi_host_disjoint_quorum_decision",
     "build_trivial_multi_host_disjoint_quorum_registry",
     "build_multi_host_disjoint_quorum_registry",
+    # W40 family — cross-host response-signature heterogeneity
+    # ratification + manifest-v10 CID + cross-host response-text
+    # Jaccard divergence guard.
+    "ResponseSignatureProbe",
+    "MultiHostResponseHeterogeneityProbe",
+    "CrossHostResponseHeterogeneityRatificationEnvelope",
+    "CrossHostResponseHeterogeneityRegistry",
+    "W40CrossHostResponseHeterogeneityResult",
+    "CrossHostResponseHeterogeneityOrchestrator",
+    "verify_cross_host_response_heterogeneity_ratification",
+    "select_cross_host_response_heterogeneity_decision",
+    "build_trivial_cross_host_response_heterogeneity_registry",
+    "build_cross_host_response_heterogeneity_registry",
 )
 
 __all__ = [
@@ -1348,6 +1389,33 @@ __all__ = [
     "W39_BRANCH_QUORUM_SPLIT",
     "W39_BRANCH_QUORUM_REFERENCE_WEAK",
     "W39_ALL_BRANCHES",
+    # W40 family — cross-host response-signature heterogeneity
+    # ratification + manifest-v10 CID + cross-host response-text
+    # Jaccard divergence guard.
+    "ResponseSignatureProbe",
+    "MultiHostResponseHeterogeneityProbe",
+    "CrossHostResponseHeterogeneityRatificationEnvelope",
+    "CrossHostResponseHeterogeneityRegistry",
+    "W40CrossHostResponseHeterogeneityResult",
+    "CrossHostResponseHeterogeneityOrchestrator",
+    "verify_cross_host_response_heterogeneity_ratification",
+    "select_cross_host_response_heterogeneity_decision",
+    "build_trivial_cross_host_response_heterogeneity_registry",
+    "build_cross_host_response_heterogeneity_registry",
+    "W40_RESPONSE_HETEROGENEITY_SCHEMA_VERSION",
+    "W40_DEFAULT_RESPONSE_TEXT_DIVERSITY_MIN",
+    "W40_DEFAULT_MIN_RESPONSE_SIGNATURE_PROBES",
+    "W40_BRANCH_RESPONSE_SIGNATURE_RESOLVED",
+    "W40_BRANCH_TRIVIAL_RESPONSE_SIGNATURE_PASSTHROUGH",
+    "W40_BRANCH_RESPONSE_SIGNATURE_REJECTED",
+    "W40_BRANCH_RESPONSE_SIGNATURE_DISABLED",
+    "W40_BRANCH_RESPONSE_SIGNATURE_NO_TRIGGER",
+    "W40_BRANCH_RESPONSE_SIGNATURE_DIVERSE",
+    "W40_BRANCH_RESPONSE_SIGNATURE_COLLAPSE_ABSTAINED",
+    "W40_BRANCH_RESPONSE_SIGNATURE_NO_REFERENCES",
+    "W40_BRANCH_RESPONSE_SIGNATURE_INSUFFICIENT",
+    "W40_BRANCH_RESPONSE_SIGNATURE_INCOMPLETE",
+    "W40_ALL_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",
