@@ -27901,3 +27901,1141 @@ def build_cross_host_trajectory_registry(
         registered_anchor_host_ids=frozenset(
             str(h) for h in registered_anchor_host_ids),
     )
+
+
+# =============================================================================
+# SDK v3.39 — W38 family
+# Disjoint cross-source consensus-reference trajectory-divergence
+# adjudication + manifest-v8 CID.
+#
+# W38 wraps W37's anchor-cross-host basis-trajectory ratification with a
+# disjoint cross-source consensus reference.  W37's deepest open wall is
+# W37-L-MULTI-HOST-COLLUSION-CAP: when two registered hosts simultaneously
+# emit a coordinated wrong top_set across enough cells, the trajectory
+# crosses the anchored thresholds and W37 can be made to reroute on the
+# wrong top_set.
+#
+# W38 maintains a controller-pre-registered ``ConsensusReferenceProbe``
+# whose host topology is mechanically *disjoint* from W37's trajectory
+# hosts (the registry refuses to construct otherwise).  At each cell, when
+# W37 chooses to reroute, W38 cross-checks the W37 candidate top_set
+# against the disjoint consensus reference top_set.  If they disagree
+# within ``divergence_margin_min``, W38 abstains via the
+# DIVERGENCE_ABSTAINED branch (the disjoint-source disagreement is itself
+# a trust signal).  If they agree, W38 ratifies the W37 reroute.
+#
+# What W38 is NOT (do-not-overstate)
+# ----------------------------------
+#   * NOT a transformer-internal hidden-state projection.
+#   * NOT a runtime KV-cache transplant.
+#   * NOT a learned consensus model (zero parameters).
+#   * NOT proof of temporal ordering at the model layer.
+#   * NOT a runtime ground-truth oracle (the consensus probe is a
+#     controller-pre-registered audited capsule-layer probe).
+#   * NOT closure of W37-L-MULTI-HOST-COLLUSION-CAP at the capsule layer
+#     (W38 only *bounds* it by a disjoint-consensus precondition).
+#   * NOT closure of the new W38-L-CONSENSUS-COLLUSION-CAP limitation
+#     theorem (when the disjoint consensus reference itself is compromised
+#     in lock-step with the colluding trajectory hosts, W38 cannot
+#     recover; recovery requires native-latent evidence architecturally
+#     outside the capsule layer).
+# =============================================================================
+
+
+W38_DISJOINT_CONSENSUS_SCHEMA_VERSION: str = (
+    "wevra.disjoint_consensus_reference.v1")
+
+W38_BRANCH_CONSENSUS_RESOLVED = "consensus_resolved"
+W38_BRANCH_TRIVIAL_CONSENSUS_PASSTHROUGH = (
+    "trivial_consensus_passthrough")
+W38_BRANCH_CONSENSUS_REJECTED = "consensus_rejected"
+W38_BRANCH_CONSENSUS_DISABLED = "consensus_disabled"
+W38_BRANCH_CONSENSUS_NO_TRIGGER = "consensus_no_trigger"
+W38_BRANCH_CONSENSUS_RATIFIED = "consensus_ratified"
+W38_BRANCH_CONSENSUS_NO_REFERENCE = "consensus_no_reference"
+W38_BRANCH_CONSENSUS_DIVERGENCE_ABSTAINED = (
+    "consensus_divergence_abstained")
+W38_BRANCH_CONSENSUS_REFERENCE_WEAK = "consensus_reference_weak"
+
+W38_ALL_BRANCHES: tuple[str, ...] = (
+    W38_BRANCH_CONSENSUS_RESOLVED,
+    W38_BRANCH_TRIVIAL_CONSENSUS_PASSTHROUGH,
+    W38_BRANCH_CONSENSUS_REJECTED,
+    W38_BRANCH_CONSENSUS_DISABLED,
+    W38_BRANCH_CONSENSUS_NO_TRIGGER,
+    W38_BRANCH_CONSENSUS_RATIFIED,
+    W38_BRANCH_CONSENSUS_NO_REFERENCE,
+    W38_BRANCH_CONSENSUS_DIVERGENCE_ABSTAINED,
+    W38_BRANCH_CONSENSUS_REFERENCE_WEAK,
+)
+
+W38_DEFAULT_CONSENSUS_STRENGTH_MIN: float = 0.66
+W38_DEFAULT_DIVERGENCE_MARGIN_MIN: float = 0.10
+
+
+class DisjointTopologyError(ValueError):
+    """Raised when a W38 registry would have overlapping host topologies.
+
+    The consensus reference must be sourced from a host topology that is
+    mechanically disjoint from the W37 trajectory host set.  Constructing
+    a registry where ``consensus_host_ids ∩ trajectory_host_ids ≠ ∅``
+    raises this error at registration time.  This is mechanically enforced
+    so a misconfigured controller cannot accidentally co-locate the
+    consensus reference with a colluding trajectory host.
+    """
+
+
+@dataclasses.dataclass(frozen=True)
+class ConsensusReferenceProbe:
+    """One W38 disjoint cross-source consensus reference probe.
+
+    The probe is a controller-pre-registered audited capsule-layer
+    artefact: ``top_set`` is the consensus reference top_set asserted by
+    the disjoint registered consensus host(s); ``consensus_strength`` is
+    a closed-form scalar in [0, 1] reflecting how strongly the disjoint
+    consensus host(s) attest the top_set (e.g. fraction of disjoint
+    consensus oracles that agreed on the top_set).  The probe is NOT a
+    runtime ground-truth oracle.
+    """
+
+    top_set: tuple[str, ...]
+    consensus_host_ids: tuple[str, ...]
+    consensus_oracle_ids: tuple[str, ...]
+    consensus_strength: float
+    cell_idx: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "top_set": [str(t) for t in sorted(self.top_set)],
+            "consensus_host_ids": [
+                str(h) for h in sorted(self.consensus_host_ids)],
+            "consensus_oracle_ids": [
+                str(o) for o in sorted(self.consensus_oracle_ids)],
+            "consensus_strength": round(
+                float(self.consensus_strength), 4),
+            "cell_idx": int(self.cell_idx),
+        }
+
+
+def _compute_w38_consensus_state_cid(
+        *,
+        probe: ConsensusReferenceProbe | None,
+) -> str:
+    payload = _canonical_json_bytes({
+        "consensus_probe": (
+            probe.as_dict() if probe is not None else None),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w38_consensus_topology_cid(
+        *,
+        registered_consensus_host_ids: Iterable[str],
+        registered_consensus_oracle_ids: Iterable[str],
+        registered_trajectory_host_ids: Iterable[str],
+) -> str:
+    payload = _canonical_json_bytes({
+        "registered_consensus_host_ids": [
+            str(h) for h in sorted(registered_consensus_host_ids)],
+        "registered_consensus_oracle_ids": [
+            str(o) for o in sorted(registered_consensus_oracle_ids)],
+        "registered_trajectory_host_ids": [
+            str(h) for h in sorted(registered_trajectory_host_ids)],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w38_divergence_audit_cid(
+        *,
+        projection_branch: str,
+        w37_top_set: Sequence[str],
+        consensus_top_set: Sequence[str],
+        divergence_score: float,
+        consensus_strength: float,
+        consensus_strength_min: float,
+        divergence_margin_min: float,
+) -> str:
+    payload = _canonical_json_bytes({
+        "projection_branch": str(projection_branch),
+        "w37_top_set": [str(t) for t in sorted(w37_top_set)],
+        "consensus_top_set": [str(t) for t in sorted(consensus_top_set)],
+        "divergence_score": round(float(divergence_score), 4),
+        "consensus_strength": round(float(consensus_strength), 4),
+        "consensus_strength_min": round(
+            float(consensus_strength_min), 4),
+        "divergence_margin_min": round(
+            float(divergence_margin_min), 4),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w38_consensus_probe_cid(
+        *,
+        probe: ConsensusReferenceProbe | None,
+) -> str:
+    payload = _canonical_json_bytes({
+        "probe": probe.as_dict() if probe is not None else None,
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w38_manifest_v8_cid(
+        *,
+        parent_w37_cid: str,
+        consensus_reference_state_cid: str,
+        divergence_audit_cid: str,
+        consensus_topology_cid: str,
+        consensus_probe_cid: str,
+) -> str:
+    payload = _canonical_json_bytes({
+        "parent_w37_cid": str(parent_w37_cid),
+        "consensus_reference_state_cid": str(
+            consensus_reference_state_cid),
+        "divergence_audit_cid": str(divergence_audit_cid),
+        "consensus_topology_cid": str(consensus_topology_cid),
+        "consensus_probe_cid": str(consensus_probe_cid),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w38_outer_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        parent_w37_cid: str,
+        consensus_reference_state_cid: str,
+        divergence_audit_cid: str,
+        consensus_topology_cid: str,
+        consensus_probe_cid: str,
+        manifest_v8_cid: str,
+        cell_index: int,
+) -> str:
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "parent_w37_cid": str(parent_w37_cid),
+        "consensus_reference_state_cid": str(
+            consensus_reference_state_cid),
+        "divergence_audit_cid": str(divergence_audit_cid),
+        "consensus_topology_cid": str(consensus_topology_cid),
+        "consensus_probe_cid": str(consensus_probe_cid),
+        "manifest_v8_cid": str(manifest_v8_cid),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _w38_top_set_divergence_score(
+        a: Sequence[str],
+        b: Sequence[str],
+) -> float:
+    """Closed-form Jaccard-divergence over two top_sets.
+
+    Returns 0.0 when the two top_sets are byte-identical; 1.0 when they
+    are disjoint or both empty when the convention says they cannot be
+    compared.  Uses the canonical sorted form so the score is permutation-
+    invariant.
+    """
+    sa = set(str(t) for t in a)
+    sb = set(str(t) for t in b)
+    if not sa and not sb:
+        return 0.0
+    inter = sa & sb
+    union = sa | sb
+    if not union:
+        return 0.0
+    return 1.0 - (len(inter) / len(union))
+
+
+def select_disjoint_consensus_divergence(
+        *,
+        consensus_probe: ConsensusReferenceProbe | None,
+        w37_candidate_top_set: Sequence[str],
+        w37_rerouted: bool,
+        consensus_strength_min: float = (
+            W38_DEFAULT_CONSENSUS_STRENGTH_MIN),
+        divergence_margin_min: float = (
+            W38_DEFAULT_DIVERGENCE_MARGIN_MIN),
+) -> tuple[str, float, tuple[str, ...]]:
+    """Select the W38 consensus-reference projection branch.
+
+    Deterministic, closed-form, zero-parameter.  Returns
+    ``(branch, divergence_score, consensus_top_set)``.
+
+    Branches:
+      * ``CONSENSUS_NO_REFERENCE`` -- no consensus probe registered.
+      * ``CONSENSUS_NO_TRIGGER`` -- W37 did not reroute, so there is
+        nothing to cross-check at the W38 layer.
+      * ``CONSENSUS_REFERENCE_WEAK`` -- the consensus probe's strength
+        is below ``consensus_strength_min``; W38 cannot rely on it and
+        falls through to the W37 decision.
+      * ``CONSENSUS_DIVERGENCE_ABSTAINED`` -- W37 reroutes but the
+        candidate top_set diverges from the consensus reference top_set
+        by >= ``divergence_margin_min``; W38 abstains.
+      * ``CONSENSUS_RATIFIED`` -- W37 reroutes and the candidate top_set
+        agrees with the consensus reference; W38 ratifies the W37
+        reroute.
+    """
+    if consensus_probe is None:
+        return (W38_BRANCH_CONSENSUS_NO_REFERENCE, 0.0, ())
+    consensus_top = tuple(sorted(str(t) for t in consensus_probe.top_set))
+    if not w37_rerouted:
+        return (W38_BRANCH_CONSENSUS_NO_TRIGGER, 0.0, consensus_top)
+    strength = float(consensus_probe.consensus_strength)
+    if (math.isnan(strength) or math.isinf(strength)
+            or strength < float(consensus_strength_min)):
+        return (W38_BRANCH_CONSENSUS_REFERENCE_WEAK,
+                0.0, consensus_top)
+    div = _w38_top_set_divergence_score(
+        w37_candidate_top_set, consensus_top)
+    if div >= float(divergence_margin_min):
+        return (W38_BRANCH_CONSENSUS_DIVERGENCE_ABSTAINED,
+                float(div), consensus_top)
+    return (W38_BRANCH_CONSENSUS_RATIFIED, float(div), consensus_top)
+
+
+@dataclasses.dataclass(frozen=True)
+class DisjointConsensusReferenceRatificationEnvelope:
+    """Content-addressed W38 disjoint-consensus envelope."""
+
+    schema_version: str
+    schema_cid: str
+    parent_w37_cid: str
+    consensus_probe: ConsensusReferenceProbe | None
+    consensus_reference_state_cid: str
+    consensus_topology_cid: str
+    consensus_probe_cid: str
+    projection_branch: str
+    w37_top_set: tuple[str, ...]
+    consensus_top_set: tuple[str, ...]
+    divergence_score: float
+    consensus_strength: float
+    consensus_strength_min: float
+    divergence_margin_min: float
+    divergence_audit_cid: str
+    manifest_v8_cid: str
+    cell_index: int
+    wire_required: bool = False
+    w38_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.w38_cid:
+            object.__setattr__(self, "w38_cid",
+                               self.recompute_w38_cid())
+
+    def recompute_w38_cid(self) -> str:
+        return _compute_w38_outer_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            parent_w37_cid=self.parent_w37_cid,
+            consensus_reference_state_cid=(
+                self.consensus_reference_state_cid),
+            divergence_audit_cid=self.divergence_audit_cid,
+            consensus_topology_cid=self.consensus_topology_cid,
+            consensus_probe_cid=self.consensus_probe_cid,
+            manifest_v8_cid=self.manifest_v8_cid,
+            cell_index=int(self.cell_index),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w37_cid": self.parent_w37_cid,
+            "consensus_probe": (
+                self.consensus_probe.as_dict()
+                if self.consensus_probe is not None else None),
+            "consensus_reference_state_cid":
+                self.consensus_reference_state_cid,
+            "consensus_topology_cid": self.consensus_topology_cid,
+            "consensus_probe_cid": self.consensus_probe_cid,
+            "projection_branch": self.projection_branch,
+            "w37_top_set": [str(t) for t in self.w37_top_set],
+            "consensus_top_set": [
+                str(t) for t in self.consensus_top_set],
+            "divergence_score": round(
+                float(self.divergence_score), 4),
+            "consensus_strength": round(
+                float(self.consensus_strength), 4),
+            "consensus_strength_min": round(
+                float(self.consensus_strength_min), 4),
+            "divergence_margin_min": round(
+                float(self.divergence_margin_min), 4),
+            "divergence_audit_cid": self.divergence_audit_cid,
+            "manifest_v8_cid": self.manifest_v8_cid,
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<w38_ref:{self.w38_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_structured_bits(self) -> int:
+        return int(8 * self.n_envelope_bytes)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w37_cid": self.parent_w37_cid,
+            "consensus_probe": (
+                self.consensus_probe.as_dict()
+                if self.consensus_probe is not None else None),
+            "consensus_reference_state_cid":
+                self.consensus_reference_state_cid,
+            "consensus_topology_cid": self.consensus_topology_cid,
+            "consensus_probe_cid": self.consensus_probe_cid,
+            "projection_branch": self.projection_branch,
+            "w37_top_set": [str(t) for t in self.w37_top_set],
+            "consensus_top_set": [
+                str(t) for t in self.consensus_top_set],
+            "divergence_score": round(
+                float(self.divergence_score), 4),
+            "consensus_strength": round(
+                float(self.consensus_strength), 4),
+            "consensus_strength_min": round(
+                float(self.consensus_strength_min), 4),
+            "divergence_margin_min": round(
+                float(self.divergence_margin_min), 4),
+            "divergence_audit_cid": self.divergence_audit_cid,
+            "manifest_v8_cid": self.manifest_v8_cid,
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "w38_cid": self.w38_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_disjoint_consensus_reference_ratification(
+        env: DisjointConsensusReferenceRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_parent_w37_cid: str,
+        registered_consensus_host_ids: frozenset[str],
+        registered_consensus_oracle_ids: frozenset[str],
+        registered_trajectory_host_ids: frozenset[str],
+        registered_consensus_topology_cid: str,
+) -> LatentVerificationOutcome:
+    """Pure-function verifier for the W38 envelope.
+
+    Enumerates 14 disjoint failure modes, disjoint from W22..W37.
+    """
+    n_checks = 0
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_w38_envelope", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_version != W38_DISJOINT_CONSENSUS_SCHEMA_VERSION:
+        return LatentVerificationOutcome(
+            ok=False, reason="w38_schema_version_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w38_schema_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.parent_w37_cid != str(registered_parent_w37_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w37_parent_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.projection_branch not in W38_ALL_BRANCHES:
+        return LatentVerificationOutcome(
+            ok=False, reason="w38_projection_branch_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.consensus_probe is not None:
+        for host_id in env.consensus_probe.consensus_host_ids:
+            if (str(host_id)
+                    and str(host_id) not in registered_consensus_host_ids):
+                return LatentVerificationOutcome(
+                    ok=False,
+                    reason="w38_consensus_host_unregistered",
+                    n_checks=n_checks)
+    n_checks += 1
+    if env.consensus_probe is not None:
+        for oracle_id in env.consensus_probe.consensus_oracle_ids:
+            if (str(oracle_id)
+                    and str(oracle_id)
+                    not in registered_consensus_oracle_ids):
+                return LatentVerificationOutcome(
+                    ok=False,
+                    reason="w38_consensus_oracle_unregistered",
+                    n_checks=n_checks)
+    n_checks += 1
+    overlap = (set(str(h) for h in registered_consensus_host_ids)
+               & set(str(h) for h in registered_trajectory_host_ids))
+    if overlap:
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w38_disjoint_topology_violation",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.consensus_probe is not None:
+        strength = float(env.consensus_probe.consensus_strength)
+        if (math.isnan(strength) or math.isinf(strength)
+                or strength < 0.0 or strength > 1.0):
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w38_consensus_strength_out_of_range",
+                n_checks=n_checks)
+    n_checks += 1
+    div = float(env.divergence_score)
+    cs_min = float(env.consensus_strength_min)
+    div_min = float(env.divergence_margin_min)
+    if (math.isnan(div) or math.isinf(div) or div < 0.0 or div > 1.0
+            or math.isnan(cs_min) or math.isinf(cs_min)
+            or cs_min < 0.0 or cs_min > 1.0
+            or math.isnan(div_min) or math.isinf(div_min)
+            or div_min < 0.0 or div_min > 1.0):
+        return LatentVerificationOutcome(
+            ok=False, reason="w38_divergence_threshold_invalid",
+            n_checks=n_checks)
+    n_checks += 1
+    expected_state_cid = _compute_w38_consensus_state_cid(
+        probe=env.consensus_probe)
+    if expected_state_cid != env.consensus_reference_state_cid:
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w38_consensus_state_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    expected_probe_cid = _compute_w38_consensus_probe_cid(
+        probe=env.consensus_probe)
+    if expected_probe_cid != env.consensus_probe_cid:
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w38_consensus_probe_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if (env.consensus_topology_cid
+            != str(registered_consensus_topology_cid)):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w38_consensus_topology_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    expected_audit_cid = _compute_w38_divergence_audit_cid(
+        projection_branch=env.projection_branch,
+        w37_top_set=env.w37_top_set,
+        consensus_top_set=env.consensus_top_set,
+        divergence_score=float(env.divergence_score),
+        consensus_strength=float(env.consensus_strength),
+        consensus_strength_min=float(env.consensus_strength_min),
+        divergence_margin_min=float(env.divergence_margin_min),
+    )
+    expected_manifest = _compute_w38_manifest_v8_cid(
+        parent_w37_cid=env.parent_w37_cid,
+        consensus_reference_state_cid=(
+            env.consensus_reference_state_cid),
+        divergence_audit_cid=expected_audit_cid,
+        consensus_topology_cid=env.consensus_topology_cid,
+        consensus_probe_cid=env.consensus_probe_cid,
+    )
+    if (expected_audit_cid != env.divergence_audit_cid
+            or expected_manifest != env.manifest_v8_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w38_manifest_v8_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.recompute_w38_cid() != env.w38_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w38_outer_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+@dataclasses.dataclass
+class DisjointConsensusReferenceRegistry:
+    """Controller-side registry for W38 disjoint cross-source consensus.
+
+    Mechanically enforces ``consensus_host_ids ∩ trajectory_host_ids =
+    ∅`` at construction time by raising ``DisjointTopologyError``.  This
+    is load-bearing: a controller cannot accidentally co-locate the
+    consensus reference with a colluding trajectory host.
+    """
+
+    schema: SchemaCapsule | None = None
+    inner_w37_registry: CrossHostBasisTrajectoryRegistry | None = None
+    consensus_enabled: bool = True
+    manifest_v8_disabled: bool = False
+    allow_consensus_reference_divergence_abstain: bool = True
+    consensus_strength_min: float = (
+        W38_DEFAULT_CONSENSUS_STRENGTH_MIN)
+    divergence_margin_min: float = W38_DEFAULT_DIVERGENCE_MARGIN_MIN
+    registered_consensus_host_ids: frozenset[str] = frozenset()
+    registered_consensus_oracle_ids: frozenset[str] = frozenset()
+    registered_trajectory_host_ids: frozenset[str] = frozenset()
+
+    _envelopes: dict[
+        str, DisjointConsensusReferenceRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_w38_registered: int = 0
+    n_w38_rejected: int = 0
+    n_consensus_ratified: int = 0
+    n_consensus_divergence_abstained: int = 0
+    n_consensus_no_reference: int = 0
+    n_consensus_no_trigger: int = 0
+    n_consensus_reference_weak: int = 0
+
+    def __post_init__(self) -> None:
+        overlap = (set(self.registered_consensus_host_ids)
+                   & set(self.registered_trajectory_host_ids))
+        if overlap:
+            raise DisjointTopologyError(
+                "W38 disjoint topology violated: "
+                f"consensus_host_ids ∩ trajectory_host_ids = "
+                f"{sorted(overlap)!r}")
+
+    @property
+    def is_trivial(self) -> bool:
+        return (not bool(self.consensus_enabled)
+                and bool(self.manifest_v8_disabled)
+                and not bool(
+                    self.allow_consensus_reference_divergence_abstain))
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        return not self.is_trivial
+
+    @property
+    def consensus_topology_cid(self) -> str:
+        return _compute_w38_consensus_topology_cid(
+            registered_consensus_host_ids=(
+                self.registered_consensus_host_ids),
+            registered_consensus_oracle_ids=(
+                self.registered_consensus_oracle_ids),
+            registered_trajectory_host_ids=(
+                self.registered_trajectory_host_ids),
+        )
+
+    def register_envelope(
+            self,
+            envelope: DisjointConsensusReferenceRatificationEnvelope,
+            *,
+            registered_parent_w37_cid: str,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            outcome = LatentVerificationOutcome(
+                ok=False, reason="schema_unregistered", n_checks=0)
+            self.n_w38_rejected += 1
+            return outcome
+        outcome = verify_disjoint_consensus_reference_ratification(
+            envelope,
+            registered_schema=self.schema,
+            registered_parent_w37_cid=str(registered_parent_w37_cid),
+            registered_consensus_host_ids=frozenset(
+                self.registered_consensus_host_ids),
+            registered_consensus_oracle_ids=frozenset(
+                self.registered_consensus_oracle_ids),
+            registered_trajectory_host_ids=frozenset(
+                self.registered_trajectory_host_ids),
+            registered_consensus_topology_cid=(
+                self.consensus_topology_cid),
+        )
+        if outcome.ok:
+            self._envelopes[envelope.w38_cid] = envelope
+            self.n_w38_registered += 1
+            br = envelope.projection_branch
+            if br == W38_BRANCH_CONSENSUS_RATIFIED:
+                self.n_consensus_ratified += 1
+            elif br == W38_BRANCH_CONSENSUS_DIVERGENCE_ABSTAINED:
+                self.n_consensus_divergence_abstained += 1
+            elif br == W38_BRANCH_CONSENSUS_NO_REFERENCE:
+                self.n_consensus_no_reference += 1
+            elif br == W38_BRANCH_CONSENSUS_NO_TRIGGER:
+                self.n_consensus_no_trigger += 1
+            elif br == W38_BRANCH_CONSENSUS_REFERENCE_WEAK:
+                self.n_consensus_reference_weak += 1
+        else:
+            self.n_w38_rejected += 1
+        return outcome
+
+
+@dataclasses.dataclass(frozen=True)
+class W38DisjointConsensusReferenceResult:
+    """Audit record for one W38 decode call."""
+
+    answer: dict[str, Any]
+    inner_w37_branch: str
+    decoder_branch: str
+    projection_branch: str
+    w37_top_set: tuple[str, ...]
+    consensus_top_set: tuple[str, ...]
+    divergence_score: float
+    consensus_strength: float
+    parent_w37_cid: str
+    cell_index: int
+    n_w37_visible_tokens: int
+    n_w38_visible_tokens: int
+    n_w38_overhead_tokens: int
+    w38_cid: str
+    manifest_v8_cid: str
+    consensus_reference_state_cid: str
+    divergence_audit_cid: str
+    consensus_topology_cid: str
+    consensus_probe_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w38: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get(
+                "remediation", "investigate")),
+            "inner_w37_branch": str(self.inner_w37_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "projection_branch": str(self.projection_branch),
+            "w37_top_set": [str(t) for t in self.w37_top_set],
+            "consensus_top_set": [
+                str(t) for t in self.consensus_top_set],
+            "divergence_score": round(
+                float(self.divergence_score), 4),
+            "consensus_strength": round(
+                float(self.consensus_strength), 4),
+            "parent_w37_cid": str(self.parent_w37_cid),
+            "cell_index": int(self.cell_index),
+            "n_w37_visible_tokens": int(self.n_w37_visible_tokens),
+            "n_w38_visible_tokens": int(self.n_w38_visible_tokens),
+            "n_w38_overhead_tokens": int(self.n_w38_overhead_tokens),
+            "w38_cid": str(self.w38_cid),
+            "manifest_v8_cid": str(self.manifest_v8_cid),
+            "consensus_reference_state_cid": str(
+                self.consensus_reference_state_cid),
+            "divergence_audit_cid": str(self.divergence_audit_cid),
+            "consensus_topology_cid": str(self.consensus_topology_cid),
+            "consensus_probe_cid": str(self.consensus_probe_cid),
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": str(self.verification_reason),
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w38": float(self.cram_factor_w38),
+        }
+
+
+@dataclasses.dataclass
+class DisjointConsensusReferenceOrchestrator:
+    """Disjoint cross-source consensus-reference guard around W37."""
+
+    inner: CrossHostBasisTrajectoryOrchestrator
+    registry: DisjointConsensusReferenceRegistry
+    enabled: bool = True
+    require_w38_verification: bool = True
+
+    _last_result: "W38DisjointConsensusReferenceResult | None" = None
+    _last_envelope: (
+        "DisjointConsensusReferenceRatificationEnvelope | None") = None
+    _cell_index: int = 0
+    _consensus_provider: Any = None
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.registry.schema
+
+    def reset_session(self) -> None:
+        self.inner.reset_session()
+        self._last_result = None
+        self._last_envelope = None
+        self._cell_index = 0
+
+    def set_consensus_reference_provider(self, provider: Any) -> None:
+        """Register a callable producing a ConsensusReferenceProbe per cell.
+
+        The callable receives ``(orch, w37_result)`` and returns a
+        ``ConsensusReferenceProbe | None``.  ``None`` triggers the
+        ``CONSENSUS_NO_REFERENCE`` branch.
+        """
+        self._consensus_provider = provider
+
+    def _build_envelope(
+            self,
+            *,
+            parent_w37_cid: str,
+            probe: ConsensusReferenceProbe | None,
+            projection_branch: str,
+            w37_top_set: tuple[str, ...],
+            consensus_top_set: tuple[str, ...],
+            divergence_score: float,
+            consensus_strength: float,
+            wire_required: bool,
+    ) -> DisjointConsensusReferenceRatificationEnvelope:
+        state_cid = _compute_w38_consensus_state_cid(probe=probe)
+        topology_cid = self.registry.consensus_topology_cid
+        probe_cid = _compute_w38_consensus_probe_cid(probe=probe)
+        audit_cid = _compute_w38_divergence_audit_cid(
+            projection_branch=projection_branch,
+            w37_top_set=w37_top_set,
+            consensus_top_set=consensus_top_set,
+            divergence_score=float(divergence_score),
+            consensus_strength=float(consensus_strength),
+            consensus_strength_min=float(
+                self.registry.consensus_strength_min),
+            divergence_margin_min=float(
+                self.registry.divergence_margin_min),
+        )
+        manifest_cid = _compute_w38_manifest_v8_cid(
+            parent_w37_cid=parent_w37_cid,
+            consensus_reference_state_cid=state_cid,
+            divergence_audit_cid=audit_cid,
+            consensus_topology_cid=topology_cid,
+            consensus_probe_cid=probe_cid,
+        )
+        return DisjointConsensusReferenceRatificationEnvelope(
+            schema_version=W38_DISJOINT_CONSENSUS_SCHEMA_VERSION,
+            schema_cid=str(self.schema.cid),
+            parent_w37_cid=str(parent_w37_cid),
+            consensus_probe=probe,
+            consensus_reference_state_cid=state_cid,
+            consensus_topology_cid=topology_cid,
+            consensus_probe_cid=probe_cid,
+            projection_branch=str(projection_branch),
+            w37_top_set=tuple(w37_top_set),
+            consensus_top_set=tuple(consensus_top_set),
+            divergence_score=float(divergence_score),
+            consensus_strength=float(consensus_strength),
+            consensus_strength_min=float(
+                self.registry.consensus_strength_min),
+            divergence_margin_min=float(
+                self.registry.divergence_margin_min),
+            divergence_audit_cid=audit_cid,
+            manifest_v8_cid=manifest_cid,
+            cell_index=int(self._cell_index),
+            wire_required=bool(wire_required),
+        )
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        if not self.enabled or self.schema is None:
+            out = self.inner.decode_rounds(per_round_handoffs)
+            n_w37_visible = int(
+                out.get("cross_host_basis_trajectory", {}).get(
+                    "n_w37_visible_tokens", 0))
+            return self._pack(
+                out=out,
+                decoder_branch=W38_BRANCH_CONSENSUS_DISABLED,
+                projection_branch="",
+                envelope=None,
+                n_w38_visible=n_w37_visible,
+                w38_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason="disabled",
+                w37_top_set=(),
+                consensus_top_set=(),
+                divergence_score=0.0,
+                consensus_strength=0.0,
+                parent_w37_cid="",
+            )
+
+        out = self.inner.decode_rounds(per_round_handoffs)
+        w37_result = self.inner.last_result
+        n_w37_visible = int(
+            w37_result.n_w37_visible_tokens
+            if w37_result is not None else 0)
+        inner_w37_branch = str(
+            w37_result.decoder_branch if w37_result is not None else "")
+
+        if self.registry.is_trivial:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W38_BRANCH_TRIVIAL_CONSENSUS_PASSTHROUGH,
+                projection_branch="",
+                envelope=None,
+                n_w38_visible=n_w37_visible,
+                w38_overhead=0,
+                ratified=True,
+                verify_ok=True,
+                verify_reason="trivial_passthrough",
+                w37_top_set=(),
+                consensus_top_set=(),
+                divergence_score=0.0,
+                consensus_strength=0.0,
+                parent_w37_cid="",
+            )
+
+        # Run consensus reference probe.
+        probe: ConsensusReferenceProbe | None = None
+        if self._consensus_provider is not None:
+            try:
+                probe = self._consensus_provider(self, w37_result)
+            except Exception:
+                probe = None
+
+        # Compute the W37 candidate top_set.  W38 only cross-checks when
+        # W37 actually rerouted; otherwise it mirrors the W37 decision.
+        w37_rerouted = (inner_w37_branch == W37_BRANCH_TRAJECTORY_REROUTED)
+        w37_top = (tuple(sorted(str(t) for t in w37_result.projection_top_set))
+                   if w37_result is not None else ())
+        (proj_branch, div_score, consensus_top) = (
+            select_disjoint_consensus_divergence(
+                consensus_probe=probe,
+                w37_candidate_top_set=w37_top,
+                w37_rerouted=w37_rerouted,
+                consensus_strength_min=float(
+                    self.registry.consensus_strength_min),
+                divergence_margin_min=float(
+                    self.registry.divergence_margin_min),
+            ))
+
+        decoder_branch = W38_BRANCH_CONSENSUS_RESOLVED
+        w38_answer = dict(out)
+        if (proj_branch == W38_BRANCH_CONSENSUS_DIVERGENCE_ABSTAINED
+                and self.registry.allow_consensus_reference_divergence_abstain
+                and w37_rerouted):
+            # Drop the W37 reroute services.  W38 abstains because the
+            # disjoint consensus reference disagrees with the W37
+            # candidate top_set.
+            w38_answer["services"] = ()
+            decoder_branch = W38_BRANCH_CONSENSUS_DIVERGENCE_ABSTAINED
+        elif proj_branch == W38_BRANCH_CONSENSUS_RATIFIED:
+            decoder_branch = W38_BRANCH_CONSENSUS_RATIFIED
+        elif proj_branch in (
+                W38_BRANCH_CONSENSUS_NO_REFERENCE,
+                W38_BRANCH_CONSENSUS_NO_TRIGGER,
+                W38_BRANCH_CONSENSUS_REFERENCE_WEAK):
+            decoder_branch = proj_branch
+
+        parent_w37_cid = ""
+        if (w37_result is not None
+                and self.inner.last_envelope is not None):
+            parent_w37_cid = str(self.inner.last_envelope.w37_cid)
+        if not parent_w37_cid:
+            parent_payload = _canonical_json_bytes({
+                "inner_w37_branch": inner_w37_branch,
+                "n_w37_visible": int(n_w37_visible),
+                "cell_index": int(self._cell_index),
+            })
+            parent_w37_cid = hashlib.sha256(parent_payload).hexdigest()
+
+        consensus_strength = (float(probe.consensus_strength)
+                              if probe is not None else 0.0)
+        envelope = self._build_envelope(
+            parent_w37_cid=parent_w37_cid,
+            probe=probe,
+            projection_branch=proj_branch,
+            w37_top_set=w37_top,
+            consensus_top_set=tuple(consensus_top),
+            divergence_score=float(div_score),
+            consensus_strength=consensus_strength,
+            wire_required=self.registry.has_wire_required_layer,
+        )
+        outcome = self.registry.register_envelope(
+            envelope,
+            registered_parent_w37_cid=parent_w37_cid,
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+        if not verify_ok and self.require_w38_verification:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W38_BRANCH_CONSENSUS_REJECTED,
+                projection_branch=proj_branch,
+                envelope=envelope,
+                n_w38_visible=n_w37_visible,
+                w38_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason=verify_reason,
+                w37_top_set=w37_top,
+                consensus_top_set=tuple(consensus_top),
+                divergence_score=float(div_score),
+                consensus_strength=consensus_strength,
+                parent_w37_cid=parent_w37_cid,
+            )
+
+        w38_overhead = int(envelope.n_wire_tokens)
+        n_w38_visible = int(n_w37_visible + w38_overhead)
+        out_local = dict(out)
+        for k, v in w38_answer.items():
+            out_local[k] = v
+        if "services" not in w38_answer:
+            out_local["services"] = ()
+        self._cell_index += 1
+        return self._pack(
+            out=out_local,
+            decoder_branch=decoder_branch,
+            projection_branch=proj_branch,
+            envelope=envelope,
+            n_w38_visible=n_w38_visible,
+            w38_overhead=w38_overhead,
+            ratified=True,
+            verify_ok=verify_ok,
+            verify_reason=verify_reason,
+            w37_top_set=w37_top,
+            consensus_top_set=tuple(consensus_top),
+            divergence_score=float(div_score),
+            consensus_strength=consensus_strength,
+            parent_w37_cid=parent_w37_cid,
+        )
+
+    def _pack(
+            self,
+            *,
+            out: dict[str, Any],
+            decoder_branch: str,
+            projection_branch: str,
+            envelope: (
+                DisjointConsensusReferenceRatificationEnvelope | None),
+            n_w38_visible: int,
+            w38_overhead: int,
+            ratified: bool,
+            verify_ok: bool,
+            verify_reason: str,
+            w37_top_set: tuple[str, ...],
+            consensus_top_set: tuple[str, ...],
+            divergence_score: float,
+            consensus_strength: float,
+            parent_w37_cid: str,
+    ) -> dict[str, Any]:
+        envelope_bytes = (envelope.n_envelope_bytes
+                          if envelope is not None else 0)
+        structured_bits = (envelope.n_structured_bits
+                           if envelope is not None else 0)
+        wire = max(1, int(w38_overhead))
+        cram_factor = (float(structured_bits) / float(wire)
+                       if structured_bits > 0 else 0.0)
+        w38_cid = str(envelope.w38_cid) if envelope is not None else ""
+        manifest_cid = (str(envelope.manifest_v8_cid)
+                        if envelope is not None else "")
+        state_cid = (str(envelope.consensus_reference_state_cid)
+                     if envelope is not None else "")
+        audit_cid = (str(envelope.divergence_audit_cid)
+                     if envelope is not None else "")
+        topology_cid = (str(envelope.consensus_topology_cid)
+                        if envelope is not None
+                        else self.registry.consensus_topology_cid)
+        probe_cid = (str(envelope.consensus_probe_cid)
+                     if envelope is not None else "")
+        n_w37_visible = int(out.get("cross_host_basis_trajectory", {}).get(
+            "n_w37_visible_tokens", 0))
+        inner_w37_branch = str(out.get(
+            "cross_host_basis_trajectory", {}).get(
+                "decoder_branch", ""))
+        result = W38DisjointConsensusReferenceResult(
+            answer=dict(out),
+            inner_w37_branch=inner_w37_branch,
+            decoder_branch=str(decoder_branch),
+            projection_branch=str(projection_branch),
+            w37_top_set=tuple(w37_top_set),
+            consensus_top_set=tuple(consensus_top_set),
+            divergence_score=float(divergence_score),
+            consensus_strength=float(consensus_strength),
+            parent_w37_cid=str(parent_w37_cid),
+            cell_index=int(self._cell_index - 1
+                           if self._cell_index > 0 else 0),
+            n_w37_visible_tokens=int(n_w37_visible),
+            n_w38_visible_tokens=int(n_w38_visible),
+            n_w38_overhead_tokens=int(w38_overhead),
+            w38_cid=w38_cid,
+            manifest_v8_cid=manifest_cid,
+            consensus_reference_state_cid=state_cid,
+            divergence_audit_cid=audit_cid,
+            consensus_topology_cid=topology_cid,
+            consensus_probe_cid=probe_cid,
+            ratified=bool(ratified),
+            verification_ok=bool(verify_ok),
+            verification_reason=str(verify_reason),
+            n_envelope_bytes=int(envelope_bytes),
+            n_structured_bits=int(structured_bits),
+            cram_factor_w38=float(cram_factor),
+        )
+        self._last_result = result
+        self._last_envelope = envelope
+        out_local = dict(out)
+        out_local["disjoint_consensus_reference"] = result.as_dict()
+        if envelope is not None:
+            out_local["disjoint_consensus_reference_envelope"] = (
+                envelope.as_dict())
+        return out_local
+
+    def decode(
+            self,
+            handoffs: Sequence[_DecodedHandoff],
+    ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> (
+            "W38DisjointConsensusReferenceResult | None"):
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> (
+            "DisjointConsensusReferenceRatificationEnvelope | None"):
+        return self._last_envelope
+
+
+def build_trivial_disjoint_consensus_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w37_registry: CrossHostBasisTrajectoryRegistry | None = None,
+) -> DisjointConsensusReferenceRegistry:
+    return DisjointConsensusReferenceRegistry(
+        schema=schema,
+        inner_w37_registry=inner_w37_registry,
+        consensus_enabled=False,
+        manifest_v8_disabled=True,
+        allow_consensus_reference_divergence_abstain=False,
+        registered_consensus_host_ids=frozenset(),
+        registered_consensus_oracle_ids=frozenset(),
+        registered_trajectory_host_ids=frozenset(),
+    )
+
+
+def build_disjoint_consensus_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w37_registry: CrossHostBasisTrajectoryRegistry,
+        registered_consensus_host_ids: Iterable[str] = (),
+        registered_consensus_oracle_ids: Iterable[str] = (),
+        registered_trajectory_host_ids: Iterable[str] = (),
+        consensus_enabled: bool = True,
+        manifest_v8_disabled: bool = False,
+        allow_consensus_reference_divergence_abstain: bool = True,
+        consensus_strength_min: float = (
+            W38_DEFAULT_CONSENSUS_STRENGTH_MIN),
+        divergence_margin_min: float = (
+            W38_DEFAULT_DIVERGENCE_MARGIN_MIN),
+) -> DisjointConsensusReferenceRegistry:
+    return DisjointConsensusReferenceRegistry(
+        schema=schema,
+        inner_w37_registry=inner_w37_registry,
+        consensus_enabled=bool(consensus_enabled),
+        manifest_v8_disabled=bool(manifest_v8_disabled),
+        allow_consensus_reference_divergence_abstain=bool(
+            allow_consensus_reference_divergence_abstain),
+        consensus_strength_min=float(consensus_strength_min),
+        divergence_margin_min=float(divergence_margin_min),
+        registered_consensus_host_ids=frozenset(
+            str(h) for h in registered_consensus_host_ids),
+        registered_consensus_oracle_ids=frozenset(
+            str(o) for o in registered_consensus_oracle_ids),
+        registered_trajectory_host_ids=frozenset(
+            str(h) for h in registered_trajectory_host_ids),
+    )

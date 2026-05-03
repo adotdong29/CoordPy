@@ -5,10 +5,112 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.38,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.39,
 > 2026-05-02.
 
-## TL;DR — SDK v3.38
+## TL;DR — SDK v3.39
+
+The programme now has **thirty-five** coupled research axes.  SDK
+v3.39 mints axis 35: **disjoint cross-source consensus-reference
+trajectory-divergence adjudication + manifest-v8 CID** (W38).  W38
+wraps W37's anchor-cross-host basis-trajectory ratification with a
+controller-pre-registered ``ConsensusReferenceProbe`` whose host
+topology is *mechanically disjoint* from W37's trajectory hosts (the
+``DisjointConsensusReferenceRegistry`` raises
+``DisjointTopologyError`` otherwise; the verifier additionally
+rejects envelopes claiming an overlapping topology).  When W37 chooses
+to reroute on a trajectory-anchored top_set and the disjoint consensus
+reference disagrees within ``divergence_margin_min`` (Jaccard), W38
+abstains via the ``CONSENSUS_DIVERGENCE_ABSTAINED`` branch.
+
+The load-bearing change is *cross-source* rather than cross-cell or
+cross-host.  W37 raises the adversary bar to "compromise 2 of N
+trajectory hosts coordinately" but cannot break that bar at the
+capsule layer (``W37-L-MULTI-HOST-COLLUSION-CAP``).  W38 raises it
+to "compromise 2 of N trajectory hosts AND the disjoint registered
+consensus reference".  When the disjoint reference is itself
+compromised in lock-step, W38 cannot recover; this is the new
+proved-conditional ``W38-L-CONSENSUS-COLLUSION-CAP`` limitation
+theorem.
+
+**Headline SDK v3.39 results.**
+
+* **R-85-COLLUDED-CROSS-HOST-TRAJECTORY (load-bearing).**  W38
+  improves over W37 from 0.500 to **1.000** trust precision across
+  5/5 seeds, **Δ_trust_precision_w38_w37 = +0.500** (min and max
+  equal).  W38 reroutes 0 cells, abstains via DIVERGENCE on 8
+  cells/seed; overhead = 1 visible token/cell.
+
+* **R-85-TRIVIAL-W38.**  With consensus disabled, divergence-abstain
+  disabled, and manifest-v8 disabled, W38 reduces to W37
+  byte-for-byte across 5/5 seeds;
+  ``all_byte_equivalent_w38_w37 = True``.
+
+* **R-85-NO-COLLUSION-CONSENSUS-AGREES.**  Consensus reference
+  agrees with the W37 reroute; W38 ratifies; no correctness or
+  trust-precision regression vs W37.
+
+* **R-85-CONSENSUS-ALSO-COMPROMISED.**  Hard falsifier: when the
+  disjoint consensus reference is itself compromised in lock-step
+  with the colluding trajectory hosts, W38 cannot recover.  Δ_trust_
+  precision = 0.000; W38-L-CONSENSUS-COLLUSION-CAP fires.
+
+* **R-85-NO-CONSENSUS-REFERENCE.**  Falsifier: when no consensus
+  probe is registered, W38 returns ``CONSENSUS_NO_REFERENCE``;
+  correctness/trust-precision unchanged from W37; the W38 audit
+  envelope still records the NO_REFERENCE branch.
+
+**Density / efficiency**: On R-85-COLLUDED-CROSS-HOST-TRAJECTORY,
+W38 carries about **9,072 structured bits per visible W38 token**
+at one visible token overhead/cell.  This is controller-verified
+structured cross-source consensus-reference state, not hidden-state
+transfer.
+
+**Trust boundary**: 14 new W38 failure modes in
+``verify_disjoint_consensus_reference_ratification``, mechanically
+tested.  Cumulative enumerated trust boundary across W22 + W29 +
+W30 + W31 + W32 + W33 + W34 + W35 + W36 + W37 + W38 =
+**140 enumerated failure modes**.
+
+**Live / two-Mac status**: Local Ollama and `192.168.12.191:11434`
+are reachable.  `192.168.12.248:11434` still times out on `/api/tags`
+(Mac 2 ARP-incomplete for the **31st milestone in a row**; ``ping``
+reports "Host is down").  The bounded W38 cross-source consensus
+probe used local ``gemma2:9b`` and remote ``qwen2.5:14b`` as
+trajectory hosts and remote ``qwen3.5:35b`` as the disjoint
+consensus host (different model class on the same physical host;
+defensible weak proxy for capsule-layer disjointness, not a true
+3-host disjoint topology).  Result recorded in
+``vision_mvp/experiments/artifacts/phase85/xllm_consensus_probe_2026_05_02.json``.
+
+**Stable-vs-experimental boundary**: W38 is exported only under
+`__experimental__`; stable runtime contract remains unchanged.
+SDK_VERSION `wevra.sdk.v3.39`; package version `0.5.12`.  The
+lingering ``vision_mvp.__version__ == "0.5.9"`` vs
+``pyproject.toml == "0.5.11"`` misalignment from earlier milestones
+is closed: both are now ``0.5.12``.
+
+**Open walls after W38**: W38-L-CONSENSUS-COLLUSION-CAP is a new
+proved-conditional limitation theorem at the capsule layer (when the
+disjoint consensus reference is also compromised, recovery requires
+native-latent evidence outside the capsule layer or a 3+-host
+disjoint consensus topology).  W38-C-NATIVE-LATENT remains open.
+W38-C-MULTI-HOST remains hardware-bounded until Mac 2 (or a third
+reachable host) joins the topology.  Cross-source consensus audit is
+now sealed in manifest-v8; cross-cell trajectory audit remains in
+manifest-v7; per-cell host-diversity audit remains in manifest-v6;
+per-cell live-aware multi-anchor audit remains in manifest-v4; the
+cross-source × cross-cell × per-cell audit boundary is now
+structurally explicit in the envelope hierarchy.
+
+See `docs/RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md` for the
+full note and
+`docs/SUCCESS_CRITERION_W38_DISJOINT_CONSENSUS_REFERENCE.md` for the
+success bar.
+
+---
+
+## Earlier TL;DR — SDK v3.38
 
 The programme now has **thirty-four** coupled research axes.  SDK
 v3.38 mints axis 34: **anchor-cross-host basis-trajectory ratification

@@ -1,6 +1,57 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (SDK v3.38 / W37, 2026-05-02).**
+> **Latest milestone marker (SDK v3.39 / W38, 2026-05-02).**
+> *Disjoint cross-source consensus-reference trajectory-divergence
+> adjudication + manifest-v8 CID*.  W38 wraps W37's anchor-cross-host
+> basis-trajectory ratification with a controller-pre-registered
+> ``ConsensusReferenceProbe`` whose host topology is mechanically
+> disjoint from W37's trajectory hosts (the
+> ``DisjointConsensusReferenceRegistry`` raises
+> ``DisjointTopologyError`` otherwise).  When W37 chooses to reroute
+> on a trajectory-anchored top_set and the disjoint consensus
+> reference disagrees within ``divergence_margin_min`` (Jaccard), W38
+> abstains via ``CONSENSUS_DIVERGENCE_ABSTAINED``.  This *bounds*
+> (does not close) the ``W37-L-MULTI-HOST-COLLUSION-CAP`` limitation
+> theorem: it raises the capsule-layer adversary bar from "compromise
+> 2 of N trajectory hosts" to "compromise 2 of N trajectory hosts AND
+> the disjoint registered consensus reference".  Geometry-aware dense-
+> control integration materially helped at the cross-source consensus
+> boundary: on R-85-COLLUDED-CROSS-HOST-TRAJECTORY, W38 raises trust
+> precision over W37 from 0.500 to **1.000**
+> (**Δ_trust_precision_w38_w37 = +0.500**, min and max equal across
+> 5/5 seeds).  Trust/audit survived: W38 adds 14 mechanically tested
+> verifier failure modes and manifest-v8 CID binding (over five
+> component CIDs), bringing the cumulative W22..W38 trust boundary to
+> **140 enumerated failure modes**.  Bounded-context efficiency
+> improved in the audited cross-source sense: about **9.07k structured
+> bits per visible W38 token** on the load-bearing regime.  Multi-host
+> evidence broadened only within a bounded 3-host topology (mac1 +
+> mac_remote trajectory pair + mac_remote qwen2.5-coder:14b consensus
+> on the same physical host as a defensible weak proxy for capsule-
+> layer disjointness): **8/8 responsive on all 3 hosts, 7/8
+> trajectory-pair agreements (the one disagreement is a
+> ``num_predict=4`` truncation), 7/8 cross-source consensus
+> agreements, 8/8 consensus-gold correlation** at temperature 0;
+> ``192.168.12.248`` still times out (Mac 2 ARP-incomplete for the
+> **31st milestone in a row**).  Earlier loose ends closed versus
+> sharpened: W38 *bounds* (not closes) the
+> W37-L-MULTI-HOST-COLLUSION-CAP and proves a new
+> ``W38-L-CONSENSUS-COLLUSION-CAP`` limitation theorem at the capsule
+> layer; it does not close native latent and still cannot recover
+> under simultaneous compromise of the disjoint consensus reference
+> at the capsule layer.  Release readiness improves materially: W38
+> is experimental, stable runtime unchanged, version reconciled to
+> SDK v3.39 / 0.5.12 (the lingering 0.5.9 (vision_mvp) vs 0.5.11
+> (pyproject) misalignment from earlier milestones is now closed).
+> **Net effect on the original thesis**: materially stronger than W37
+> at the cross-source consensus boundary, still blocked by a deeper
+> trust/semantics wall for true native latent, by simultaneous
+> consensus-collusion at the capsule layer, and by Mac 2
+> unavailability.
+> See ``docs/RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md`` and
+> ``docs/SUCCESS_CRITERION_W38_DISJOINT_CONSENSUS_REFERENCE.md``.
+
+> **Earlier milestone marker (SDK v3.38 / W37, 2026-05-02).**
 > *Anchor-cross-host basis-trajectory ratification + manifest-v7 CID*.
 > W37 wraps W36's host-diverse trust-subspace guard with a closed-form
 > per-(host, oracle, top_set) EWMA over *anchored* historical

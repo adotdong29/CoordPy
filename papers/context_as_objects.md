@@ -1,13 +1,64 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
-> Updated through SDK v3.38, 2026-05-02 (W22 → W37 cumulative
+> Updated through SDK v3.39, 2026-05-02 (W22 → W38 cumulative
 > trust + dense-control + live-aware multi-anchor / trust-subspace /
-> host-diverse / cross-host trajectory guard ladder summarised in
-> § 14.2 and § 17).
+> host-diverse / cross-host trajectory / disjoint-consensus-reference
+> guard ladder summarised in § 14.2 and § 17).
 >
-> **Latest milestone marker (SDK v3.38 / W37, 2026-05-02).** The
-> programme now has **thirty-four** coupled research axes.  W37 wraps
+> **Latest milestone marker (SDK v3.39 / W38, 2026-05-02).** The
+> programme now has **thirty-five** coupled research axes.  W38 wraps
+> W37's anchor-cross-host basis-trajectory ratification with a
+> controller-pre-registered ``ConsensusReferenceProbe`` whose host
+> topology is *mechanically disjoint* from W37's trajectory hosts (the
+> ``DisjointConsensusReferenceRegistry`` raises
+> ``DisjointTopologyError`` otherwise; the verifier additionally
+> rejects envelopes claiming an overlapping topology).  When W37
+> chooses to reroute on a trajectory-anchored top_set and the disjoint
+> consensus reference disagrees within ``divergence_margin_min``
+> (Jaccard), W38 abstains via ``CONSENSUS_DIVERGENCE_ABSTAINED``.  The
+> envelope binds a manifest-v8 CID over five components
+> (parent_w37_cid, consensus_reference_state_cid,
+> divergence_audit_cid, consensus_topology_cid, consensus_probe_cid).
+> On R-85-COLLUDED-CROSS-HOST-TRAJECTORY, W38 raises trust precision
+> over W37 from 0.500 to **1.000**
+> (**Δ_trust_precision_w38_w37 = +0.500**, min and max equal across
+> 5/5 seeds), abstains via DIVERGENCE on 8 cells/seed, and adds one
+> visible-token overhead/cell while carrying about **9.07k structured
+> bits per visible W38 token**.  On the four named falsifiers
+> (R-85-TRIVIAL-W38, R-85-NO-COLLUSION-CONSENSUS-AGREES,
+> R-85-CONSENSUS-ALSO-COMPROMISED, R-85-NO-CONSENSUS-REFERENCE) W38
+> preserves W37 behavior and trust precision exactly.  W38 adds 14
+> mechanically tested verifier failure modes, bringing the cumulative
+> W22..W38 trust boundary to **140 enumerated failure modes**.  A new
+> proved-conditional limitation theorem
+> **W38-L-CONSENSUS-COLLUSION-CAP** is recorded: when the disjoint
+> consensus reference is itself compromised in lock-step with the
+> colluding trajectory hosts, W38 cannot recover at the capsule layer
+> (the W38 analog of W34-L-MULTI-ANCHOR-CAP and
+> W37-L-MULTI-HOST-COLLUSION-CAP); closure requires native-latent
+> evidence outside the capsule layer or a 3+-host disjoint topology.
+> W38 is explicitly NOT native latent transfer, NOT transformer-
+> internal hidden-state projection, and NOT a KV-cache transplant; it
+> is an audited capsule-layer cross-source consensus-reference proxy
+> with mechanical disjoint-topology enforcement.  Mac 2 still times
+> out (31st milestone in a row); bounded W38 3-host live consensus
+> probe across local ``gemma2:9b``, remote ``qwen2.5:14b`` (trajectory
+> pair), and remote ``qwen2.5-coder:14b`` (disjoint consensus host on
+> the same physical host as a defensible weak proxy for capsule-layer
+> disjointness) produced **8/8 responsive on all 3 hosts, 7/8
+> trajectory-pair agreements (the one disagreement is a
+> ``num_predict=4`` truncation), 7/8 cross-source consensus
+> agreements, 8/8 consensus-gold correlation** at temperature 0.
+> Versioning reconciliation: ``vision_mvp.__version__`` and
+> ``pyproject.toml`` ``project.version`` are now both ``0.5.12`` (the
+> lingering 0.5.9 vs 0.5.11 misalignment from earlier milestones is
+> closed).  See
+> ``docs/RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md`` and
+> ``docs/SUCCESS_CRITERION_W38_DISJOINT_CONSENSUS_REFERENCE.md``.
+
+> **Previous milestone marker (SDK v3.38 / W37, 2026-05-02).** The
+> programme has **thirty-four** coupled research axes.  W37 wraps
 > W36's host-diverse trust-subspace guard with a closed-form,
 > zero-parameter, per-(host, oracle, top_set) EWMA over *anchored*
 > historical observations: a single-host current cell can be safely

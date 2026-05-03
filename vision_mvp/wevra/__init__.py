@@ -587,6 +587,32 @@ from .team_coord import (
     W37_BRANCH_TRAJECTORY_DISAGREEMENT,
     W37_BRANCH_TRAJECTORY_POISONED,
     W37_ALL_BRANCHES,
+    # SDK v3.39 — disjoint cross-source consensus-reference trajectory-
+    # divergence adjudication + manifest-v8 CID (W38). EXPERIMENTAL —
+    # see __experimental__.
+    ConsensusReferenceProbe,
+    DisjointConsensusReferenceRatificationEnvelope,
+    DisjointConsensusReferenceRegistry,
+    W38DisjointConsensusReferenceResult,
+    DisjointConsensusReferenceOrchestrator,
+    DisjointTopologyError,
+    verify_disjoint_consensus_reference_ratification,
+    select_disjoint_consensus_divergence,
+    build_trivial_disjoint_consensus_registry,
+    build_disjoint_consensus_registry,
+    W38_DISJOINT_CONSENSUS_SCHEMA_VERSION,
+    W38_DEFAULT_CONSENSUS_STRENGTH_MIN,
+    W38_DEFAULT_DIVERGENCE_MARGIN_MIN,
+    W38_BRANCH_CONSENSUS_RESOLVED,
+    W38_BRANCH_TRIVIAL_CONSENSUS_PASSTHROUGH,
+    W38_BRANCH_CONSENSUS_REJECTED,
+    W38_BRANCH_CONSENSUS_DISABLED,
+    W38_BRANCH_CONSENSUS_NO_TRIGGER,
+    W38_BRANCH_CONSENSUS_RATIFIED,
+    W38_BRANCH_CONSENSUS_NO_REFERENCE,
+    W38_BRANCH_CONSENSUS_DIVERGENCE_ABSTAINED,
+    W38_BRANCH_CONSENSUS_REFERENCE_WEAK,
+    W38_ALL_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -600,7 +626,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.38"
+SDK_VERSION = "wevra.sdk.v3.39"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -761,6 +787,18 @@ __experimental__: tuple[str, ...] = (
     "select_cross_host_trajectory_projection",
     "build_trivial_cross_host_trajectory_registry",
     "build_cross_host_trajectory_registry",
+    # W38 family — disjoint cross-source consensus-reference trajectory-
+    # divergence adjudication + manifest-v8 CID.
+    "ConsensusReferenceProbe",
+    "DisjointConsensusReferenceRatificationEnvelope",
+    "DisjointConsensusReferenceRegistry",
+    "W38DisjointConsensusReferenceResult",
+    "DisjointConsensusReferenceOrchestrator",
+    "DisjointTopologyError",
+    "verify_disjoint_consensus_reference_ratification",
+    "select_disjoint_consensus_divergence",
+    "build_trivial_disjoint_consensus_registry",
+    "build_disjoint_consensus_registry",
 )
 
 __all__ = [
@@ -1212,6 +1250,31 @@ __all__ = [
     "W37_BRANCH_TRAJECTORY_DISAGREEMENT",
     "W37_BRANCH_TRAJECTORY_POISONED",
     "W37_ALL_BRANCHES",
+    # W38 family — disjoint cross-source consensus-reference trajectory-
+    # divergence adjudication + manifest-v8 CID.
+    "ConsensusReferenceProbe",
+    "DisjointConsensusReferenceRatificationEnvelope",
+    "DisjointConsensusReferenceRegistry",
+    "W38DisjointConsensusReferenceResult",
+    "DisjointConsensusReferenceOrchestrator",
+    "DisjointTopologyError",
+    "verify_disjoint_consensus_reference_ratification",
+    "select_disjoint_consensus_divergence",
+    "build_trivial_disjoint_consensus_registry",
+    "build_disjoint_consensus_registry",
+    "W38_DISJOINT_CONSENSUS_SCHEMA_VERSION",
+    "W38_DEFAULT_CONSENSUS_STRENGTH_MIN",
+    "W38_DEFAULT_DIVERGENCE_MARGIN_MIN",
+    "W38_BRANCH_CONSENSUS_RESOLVED",
+    "W38_BRANCH_TRIVIAL_CONSENSUS_PASSTHROUGH",
+    "W38_BRANCH_CONSENSUS_REJECTED",
+    "W38_BRANCH_CONSENSUS_DISABLED",
+    "W38_BRANCH_CONSENSUS_NO_TRIGGER",
+    "W38_BRANCH_CONSENSUS_RATIFIED",
+    "W38_BRANCH_CONSENSUS_NO_REFERENCE",
+    "W38_BRANCH_CONSENSUS_DIVERGENCE_ABSTAINED",
+    "W38_BRANCH_CONSENSUS_REFERENCE_WEAK",
+    "W38_ALL_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

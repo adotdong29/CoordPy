@@ -53,6 +53,8 @@ quantitative bar, on which bench, at which $n$. The phrase
 "under W3-Cn" where W3-Cn is a named conjecture in
 `THEOREM_REGISTRY.md`. The strict reading W3-C7 is **retracted**.
 
+Last touched: SDK v3.39 (W38 family) 2026-05-02.
+
 ### "Solves" without a defining gate
 
 > *"Wevra solves context."*
@@ -148,6 +150,53 @@ behavior.  Mac 2 still times out (30th milestone), so the live
 trajectory probe is two-reachable-host evidence only.  Two registered
 hosts emitting a coordinated wrong top_set across enough cells can
 defeat W37 at the capsule layer (W37-L-MULTI-HOST-COLLUSION-CAP).
+
+### "W38 closes the multi-host blocker" or "W38 closes W37-L-MULTI-HOST-COLLUSION-CAP"
+
+> *"W38 finally beats two-host collusion at the capsule layer."*
+
+Forbidden.  W38 **bounds** (does not close)
+``W37-L-MULTI-HOST-COLLUSION-CAP``.  The bound is conditional on the
+existence of an uncompromised disjoint registered consensus reference.
+W38 raises the capsule-layer adversary bar from "compromise 2 of N
+trajectory hosts" to "compromise 2 of N trajectory hosts AND the
+disjoint registered consensus reference".  When that reference is
+itself compromised in lock-step, W38 cannot recover; this is the new
+proved-conditional ``W38-L-CONSENSUS-COLLUSION-CAP`` limitation
+theorem.
+
+W38 also does not access hidden states, KV cache, attention weights,
+or embeddings.  The ``ConsensusReferenceProbe`` is a controller-pre-
+registered audited capsule-layer probe carrying a sealed tuple of
+bytes; it is NOT a runtime ground-truth oracle and NOT a
+transformer-internal projection.  The disjoint topology is enforced
+*mechanically* in two places: the registry's ``__post_init__`` raises
+``DisjointTopologyError`` when ``consensus_host_ids ∩
+trajectory_host_ids != ∅``, and the verifier rejects envelopes
+claiming an overlapping topology
+(``w38_disjoint_topology_violation``).
+
+Permitted phrasing: *"W38 wraps W37 with a disjoint cross-source
+consensus-reference cross-check; when W37 reroutes on a colluded
+trajectory and an uncompromised disjoint reference disagrees, W38
+abstains via DIVERGENCE_ABSTAINED.  When the disjoint reference is
+itself compromised, W38 cannot recover at the capsule layer."*
+
+Forbidden phrasing: *"W38 closes W37-L-MULTI-HOST-COLLUSION-CAP"*,
+*"W38 closes W38-L-CONSENSUS-COLLUSION-CAP"*, *"W38 closes
+W38-C-NATIVE-LATENT"*, *"W38 gives true 3-host evidence"*, *"W38
+makes the repo release-ready by itself"*, *"W38 solves context for
+multi-agent teams"*.
+
+The honest reading is narrower: on R-85-COLLUDED-CROSS-HOST-
+TRAJECTORY, W38 improves over W37 by +0.500 trust precision while
+preserving correctness.  On the four named falsifiers (trivial,
+no-collusion, consensus-also-compromised, no-consensus-reference),
+W38 preserves W37 behavior or honestly fails.  Mac 2 still times out
+(31st milestone), so the live consensus probe sourced its disjoint
+consensus host from a different model class on the same physical
+host as one trajectory host -- a defensible weak proxy for capsule-
+layer disjointness, NOT a true 3-physical-host disjoint topology.
 
 ### "Beats" without a baseline
 

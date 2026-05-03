@@ -5,6 +5,176 @@ programme's phase-by-phase narrative lives in
 `vision_mvp/RESULTS_PHASE*.md` and
 `docs/context_zero_master_plan.md`.
 
+## [0.5.12 / 3.39] — 2026-05-02 — SDK v3.39 — disjoint cross-source consensus-reference trajectory-divergence adjudication + manifest-v8 CID + R-85 Phase-85 benchmark family + W38 collusion-bounding limitation theorem + bounded 3-host live consensus probe + version reconciliation
+
+*Strictly additive on SDK v3.38.  The stable Wevra product/runtime
+(`RunSpec → run report`) is byte-for-byte unchanged.  W38 surface lives
+under `__experimental__`.*
+
+### Added — W38 family
+
+* **`DisjointConsensusReferenceOrchestrator`** wraps W37
+  (`CrossHostBasisTrajectoryOrchestrator`) with a disjoint
+  cross-source consensus-reference layer.  At every cell where W37
+  reroutes on a trajectory-anchored top_set, W38 cross-checks the
+  candidate top_set against a controller-pre-registered
+  `ConsensusReferenceProbe` whose host topology is mechanically
+  disjoint from W37's trajectory hosts.  If the W37 candidate
+  diverges from the consensus reference by ≥ `divergence_margin_min`
+  (Jaccard), W38 abstains via the `CONSENSUS_DIVERGENCE_ABSTAINED`
+  branch.
+
+* **Mechanical disjoint-topology enforcement**: the
+  `DisjointConsensusReferenceRegistry.__post_init__` raises
+  `DisjointTopologyError` if `consensus_host_ids ∩ trajectory_host_
+  ids ≠ ∅`.  The verifier additionally rejects envelopes claiming an
+  overlapping topology (`w38_disjoint_topology_violation` failure
+  mode).
+
+* **`ConsensusReferenceProbe`**: closed-form, zero-parameter,
+  controller-pre-registered audited capsule-layer probe carrying
+  `(top_set, consensus_host_ids, consensus_oracle_ids,
+  consensus_strength, cell_idx)`.  Explicitly NOT a runtime
+  ground-truth oracle.
+
+* **Manifest-v8 CID** over five component CIDs (`parent_w37_cid`,
+  `consensus_reference_state_cid`, `divergence_audit_cid`,
+  `consensus_topology_cid`, `consensus_probe_cid`) detecting
+  cross-component swaps that the W37 manifest-v7 alone cannot detect.
+
+* **`verify_disjoint_consensus_reference_ratification`** enumerates
+  14 disjoint W38 failure modes
+  (`empty_w38_envelope`, `w38_schema_version_unknown`,
+   `w38_schema_cid_mismatch`, `w37_parent_cid_mismatch`,
+   `w38_projection_branch_unknown`,
+   `w38_consensus_host_unregistered`,
+   `w38_consensus_oracle_unregistered`,
+   `w38_disjoint_topology_violation`,
+   `w38_consensus_strength_out_of_range`,
+   `w38_divergence_threshold_invalid`,
+   `w38_consensus_state_cid_mismatch`,
+   `w38_consensus_probe_cid_mismatch`,
+   `w38_consensus_topology_cid_mismatch`,
+   `w38_manifest_v8_cid_mismatch` (and `w38_outer_cid_mismatch`
+   co-defined)).
+  Cumulative W22..W38 trust boundary: **140 enumerated failure modes**.
+
+### Added — R-85 Phase-85 benchmark family
+
+* `vision_mvp/experiments/phase85_disjoint_consensus_reference.py`
+  with five regimes:
+
+  * `trivial_w38` — byte-for-W37 preservation.
+  * `colluded_cross_host_trajectory` — load-bearing W38 collusion
+    bound.  Across 5 seeds × 16 cells/seed,
+    **Δ_trust_precision_w38_w37 = +0.500** (min and max equal),
+    W38 trust precision = **1.000**, W38 reroutes 0 cells, abstains
+    via DIVERGENCE on 8 cells/seed; overhead = 1 visible token/cell.
+  * `no_collusion_consensus_agrees` — Δ = 0 across 5 seeds.
+  * `consensus_also_compromised` — `W38-L-CONSENSUS-COLLUSION-CAP`
+    fires; Δ = 0 across 5 seeds.
+  * `no_consensus_reference` — W38 returns
+    `CONSENSUS_NO_REFERENCE`; Δ = 0 across 5 seeds.
+
+* Artifacts in
+  `vision_mvp/experiments/artifacts/phase85/{trivial_w38, colluded_cross_host_trajectory, no_collusion_consensus_agrees, consensus_also_compromised, no_consensus_reference}_seed_sweep.json`.
+
+### Added — bounded live W38 cross-source consensus probe
+
+* `vision_mvp/experiments/phase85_xllm_consensus_probe.py` --
+  bounded 3-host probe: `mac1` (localhost gemma2:9b) and
+  `mac_remote` (192.168.12.191 qwen2.5:14b) as trajectory hosts;
+  `mac_consensus` (192.168.12.191 qwen2.5-coder:14b) as the
+  disjoint consensus host (different model class on the same
+  physical host -- defensible weak proxy for capsule-layer
+  disjointness, NOT a true 3-host disjoint topology).
+
+* Result: **8/8 responsive on all 3 hosts**, **7/8 trajectory-pair
+  agreements** (the one disagreement is a `num_predict=4`
+  truncation: gold "h2o" → mac_remote answered "h"),
+  **7/8 cross-source consensus agreements**,
+  **8/8 consensus-gold correlation** at temperature 0.
+
+* This is the strongest honest 3-host bounded consensus evidence
+  the current infrastructure supports.  It does NOT close
+  `W38-C-MULTI-HOST` (true 3-host disjoint topology -- which
+  requires Mac 2 or another physical host) and does NOT close
+  `W38-L-CONSENSUS-COLLUSION-CAP` (no live colluded scenario was
+  attempted; the live probe is gold-correlated agreement evidence,
+  not an attack-recovery measurement).
+
+* Honest infra note: the qwen3.5:35b MoE host on Mac 1 was
+  empirically non-responsive at temperature 0 + `num_predict=4`
+  (the W34-INFRA pattern) -- recorded as `W38-INFRA-1`
+  (consensus host model availability under one-word prompt budget;
+  qwen2.5-coder:14b was used as the available substitute disjoint
+  consensus model).
+
+* Artifact:
+  `vision_mvp/experiments/artifacts/phase85/xllm_consensus_probe_2026_05_02.json`.
+
+### Theory
+
+* **W38-1** — verifier boundary: 14 disjoint W38 failure modes
+  mechanically tested.  *Proved by inspection + mechanically
+  checked*.
+* **W38-2** — trivial reduction: disabled consensus + disabled
+  divergence-abstain + disabled manifest-v8 reduces to W37
+  byte-for-byte.  *Empirical*.
+* **W38-3** — disjoint-consensus collusion bound (load-bearing):
+  *Proved-conditional + empirical*.
+* **W38-4** — disjoint-topology mechanical enforcement.  *Proved by
+  inspection + mechanically tested*.
+* **W38-L-CONSENSUS-COLLUSION-CAP** — proved-conditional limitation
+  theorem.  *Empirical on R-85-CONSENSUS-ALSO-COMPROMISED*.
+* **W38-L-DISJOINT-CONSENSUS-REQUIRED** — falsifier.  *Proved by
+  inspection + empirical on R-85-NO-CONSENSUS-REFERENCE*.
+* **W38-C-NATIVE-LATENT** — open conjecture (architecture-dependent).
+* **W38-C-MULTI-HOST** — open conjecture (hardware-bounded; Mac 2
+  ARP-incomplete for the 31st milestone in a row).
+
+### Mac 2 status
+
+* `192.168.12.248:11434/api/tags` times out at 5 s; `ping` reports
+  "Host is down"; ARP entry incomplete.  Mac 2 has been ARP-
+  incomplete for the **31st milestone in a row**.
+
+### Tests / regression
+
+* New: `vision_mvp/tests/test_phase85_disjoint_consensus_reference.py`
+  — 31 unit tests covering 3 divergence-score tests, 5 selector
+  tests, 16 verifier tests (clean envelope + 14 enumerated failure
+  modes + outer CID mismatch), 2 registry tests, 5 bank tests.
+* Focused W22..W38 regression: **594/594 phase69-85** tests pass
+  (was 563/563 phase69-84 at SDK v3.38; W38 added 31).
+* Broad regression: see `pytest vision_mvp/tests` count recorded in
+  the milestone report.
+
+### Versioning / release
+
+* `SDK_VERSION` bumped to `wevra.sdk.v3.39`.
+* `vision_mvp.__version__` bumped to `0.5.12`.
+* `pyproject.toml` `project.version` bumped to `0.5.12`.  The
+  lingering `0.5.9` (vision_mvp) vs `0.5.11` (pyproject) misalignment
+  from earlier milestones is now closed.
+* W38 surface exported under `__experimental__`; stable runtime
+  contract byte-for-byte unchanged.
+
+### Documentation
+
+* `docs/RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md` (new).
+* `docs/SUCCESS_CRITERION_W38_DISJOINT_CONSENSUS_REFERENCE.md` (new).
+* `docs/RESEARCH_STATUS.md` — TL;DR updated to SDK v3.39.
+* `docs/THEOREM_REGISTRY.md` — W38 theorems and limitation theorem
+  added.
+* `docs/HOW_NOT_TO_OVERSTATE.md` — W38 do-not-overstate rules added.
+* `docs/context_zero_master_plan.md` — milestone marker updated.
+* `papers/context_as_objects.md` — milestone marker updated.
+* `README.md` and `docs/START_HERE.md` — current-milestone summary
+  updated.
+
+---
+
 ## [0.5.11 / 3.38] — 2026-05-02 — SDK v3.38 — anchor-cross-host basis-trajectory ratification + manifest-v7 CID + R-84 Phase-84 benchmark family + bounded live cross-host trajectory probe
 
 *Strictly additive on SDK v3.37.  The stable Wevra product/runtime

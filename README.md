@@ -7,7 +7,56 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.38 (May 2026).** Anchor-cross-host basis-
+**Latest milestone: SDK v3.39 (May 2026).** Disjoint cross-source
+consensus-reference trajectory-divergence adjudication + manifest-v8
+CID (W38 family).  W38 wraps W37's anchor-cross-host basis-trajectory
+ratification with a controller-pre-registered
+``ConsensusReferenceProbe`` whose host topology is *mechanically
+disjoint* from W37's trajectory hosts (the
+``DisjointConsensusReferenceRegistry`` raises
+``DisjointTopologyError`` otherwise; the verifier additionally rejects
+envelopes claiming an overlapping topology).  When W37 chooses to
+reroute on a trajectory-anchored top_set and the disjoint consensus
+reference disagrees within ``divergence_margin_min`` (Jaccard), W38
+abstains via the ``CONSENSUS_DIVERGENCE_ABSTAINED`` branch.  This
+**bounds** (does not close) the W37-L-MULTI-HOST-COLLUSION-CAP
+limitation theorem: it raises the capsule-layer adversary bar from
+"compromise 2 of N trajectory hosts" to "compromise 2 of N trajectory
+hosts AND the disjoint registered consensus reference".  On
+**R-85-COLLUDED-CROSS-HOST-TRAJECTORY**, W38 raises trust precision
+over W37 from 0.500 to **1.000**
+(**Δ_trust_precision_w38_w37 = +0.500**, min and max equal across 5/5
+seeds), abstains via DIVERGENCE on 8 cells/seed, and adds one visible
+token/cell while carrying about **9.07k structured bits per visible
+W38 token**.  On **R-85-CONSENSUS-ALSO-COMPROMISED** the new
+proved-conditional limitation theorem **W38-L-CONSENSUS-COLLUSION-CAP**
+fires (the disjoint consensus reference is itself compromised in
+lock-step ⇒ W38 cannot recover; closure requires native-latent
+evidence outside the capsule layer or a 3+-host disjoint topology).
+On **R-85-TRIVIAL-W38**, **R-85-NO-COLLUSION-CONSENSUS-AGREES**, and
+**R-85-NO-CONSENSUS-REFERENCE** falsifiers, W38 preserves W37
+behavior with no correctness or trust-precision regression.  W38
+adds 14 verifier failure modes, bringing the cumulative W22..W38
+trust boundary to **140 enumerated modes**.  This is **not native
+latent transfer** and not transformer-internal hidden-state
+projection; it is an audited capsule-layer cross-source consensus-
+reference proxy with mechanical disjoint-topology enforcement.  Fresh
+preflight found local Ollama and `192.168.12.191` reachable, with
+`192.168.12.248` still timing out (Mac 2 ARP-incomplete for the **31st
+milestone in a row**, ``ping`` reports "Host is down"); the bounded
+W38 3-host consensus probe observed **8/8 responsive on all 3 hosts,
+7/8 trajectory-pair agreements (the one disagreement is a
+``num_predict=4`` truncation), 7/8 cross-source consensus
+agreements, and 8/8 consensus-gold correlation** across local
+``gemma2:9b``, remote ``qwen2.5:14b`` (trajectory pair), and remote
+``qwen2.5-coder:14b`` (disjoint consensus host) at temperature 0.
+Versioning reconciliation: ``vision_mvp.__version__`` and
+``pyproject.toml`` ``project.version`` are now both ``0.5.12`` (the
+lingering 0.5.9 vs 0.5.11 misalignment from earlier milestones is
+closed).  Stable runtime contract unchanged; W38 remains
+experimental.
+
+**Earlier milestone: SDK v3.38 (May 2026).** Anchor-cross-host basis-
 trajectory ratification + manifest-v7 CID (W37 family).  W37 wraps
 W36's host-diverse trust-subspace guard with a closed-form,
 zero-parameter, per-(host, oracle, top_set) EWMA over *anchored*
