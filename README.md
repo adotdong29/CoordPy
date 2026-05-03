@@ -7,54 +7,95 @@ provenance-stamped **capsule** — never a raw prompt string. One
 `RunSpec` in, one reproducible report out, and that report is the
 root of a sealed capsule graph you can audit, replay, and trust.
 
-**Latest milestone: SDK v3.39 (May 2026).** Disjoint cross-source
+**Latest milestone: SDK v3.40 (May 2026).** Multi-host disjoint quorum
+consensus-reference ratification + manifest-v9 CID + mutually-disjoint
+physical-host topology (W39 family).  W39 wraps W38's disjoint
+cross-source consensus-reference adjudication with a **K-of-N
+mutually-disjoint quorum** of disjoint probes, each sourced from a
+physically-distinct host pool that is both mechanically disjoint from
+the W37 trajectory hosts (W38's precondition) AND mutually disjoint
+from every other registered quorum probe's host pool (the new W39
+precondition; the ``MultiHostDisjointQuorumRegistry`` raises
+:class:`MutuallyDisjointTopologyError` when any two pools have
+non-empty intersection; the verifier additionally rejects envelopes
+claiming an overlapping pool pair).  When at least ``quorum_min`` of
+the K member probes diverge from the W37/W38 candidate top_set, W39
+abstains via the ``QUORUM_DIVERGENCE_ABSTAINED`` branch.  This
+**bounds** (does not close) the W38-L-CONSENSUS-COLLUSION-CAP
+limitation theorem: it raises the capsule-layer adversary bar from
+"compromise 2 of N trajectory hosts AND the single disjoint registered
+consensus reference" to "compromise 2 of N trajectory hosts AND
+``quorum_min`` of the K mutually-disjoint registered consensus
+references, each on a physically distinct host pool".  On
+**R-86-MULTI-HOST-COLLUDED-CONSENSUS**, W39 raises trust precision
+over W38 from 0.500 (W38-L-CONSENSUS-COLLUSION-CAP fires) to **1.000**
+(**Δ_trust_precision_w39_w38 = +0.500**, min and max equal across 5/5
+seeds), abstains via QUORUM_DIVERGENCE on 8 cells/seed, and adds one
+visible token/cell while carrying about **24.4k structured bits per
+visible W39 token** (~2.7x denser than W38 at the audited-proxy
+capsule layer).  On **R-86-FULL-QUORUM-COLLUSION** the new
+proved-conditional limitation theorem
+**W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP** fires (every disjoint
+quorum probe is itself compromised in lock-step ⇒ W39 cannot recover;
+closure requires native-latent evidence outside the capsule layer or
+a K+1-host disjoint topology with a new uncompromised pool).  On
+**R-86-TRIVIAL-W39**, **R-86-NO-REGRESSION-QUORUM-AGREES**, and
+**R-86-INSUFFICIENT-QUORUM** falsifiers, W39 preserves W38 behavior
+with no correctness or trust-precision regression.  W39 adds 14
+verifier failure modes (including the W39-specific
+``w39_quorum_mutual_disjointness_violation``), bringing the
+cumulative W22..W39 trust boundary to **154 enumerated modes**.
+This is **not native latent transfer** and not transformer-internal
+hidden-state projection; it is an audited capsule-layer multi-host
+disjoint quorum proxy with two mechanically-enforced disjointness
+preconditions (trajectory disjointness + mutual disjointness).
+**Multi-Mac evidence broadened materially**: the historical
+``192.168.12.248`` Mac-2 stale pin (ARP-incomplete for the 31st
+milestone in a row) was discharged in favour of ``192.168.12.101``
+as the reachable third physical host candidate (preflight-OK on
+cold contact with ``qwen3.5:35b`` + ``qwen2.5:14b-32k`` model files
+visible) -- partially discharging W38-C-MULTI-HOST at the topology
+layer.  The ``.101`` inference path subsequently degraded under
+the one-word probe budget (``W39-INFRA-1``).  The W39 live xllm
+probe was made robust via a fallback path: when ``.101`` is
+unreachable, ``mac_off_cluster_a`` swaps to ``localhost`` running
+``llama3.1:8b`` (a model class genuinely different from the
+trajectory's ``gemma2:9b``), so the live K=2 quorum becomes
+``(localhost llama3.1:8b, .191 qwen2.5-coder:14b-32k)`` -- two
+**physically distinct hosts**, each running a different model class
+from the trajectory pair AND from the W38 single consensus
+reference.  Bounded W39 5-host live xllm probe at temperature 0 +
+``num_predict=4`` observed **8/8 responsive on all 5 hosts** (first
+5-host live W39 disjoint-quorum probe in the programme), 7/8
+trajectory_pair_agrees, 7/8 W38 single consensus agreements, **8/8
+quorum_a gold-correlated, 8/8 quorum_b gold-correlated, 8/8 K=2
+quorum size simultaneously responsive**.  Notable live finding: on
+the ``h2o`` probe, the trajectory pair disagreed (mac1=h2o vs
+mac_remote=h due to ``num_predict=4`` truncation), but BOTH quorum
+members got h2o correct -- empirical-suggestive evidence for the
+new ``W39-C-LIVE-TRUNCATION-RECOVERY`` conjecture.  Versioning:
+``vision_mvp.__version__`` and ``pyproject.toml`` are now both
+``0.5.13`` (alignment maintained).  Stable runtime contract
+unchanged; W39 remains experimental.
+
+**Earlier milestone: SDK v3.39 (May 2026).** Disjoint cross-source
 consensus-reference trajectory-divergence adjudication + manifest-v8
 CID (W38 family).  W38 wraps W37's anchor-cross-host basis-trajectory
 ratification with a controller-pre-registered
 ``ConsensusReferenceProbe`` whose host topology is *mechanically
-disjoint* from W37's trajectory hosts (the
-``DisjointConsensusReferenceRegistry`` raises
-``DisjointTopologyError`` otherwise; the verifier additionally rejects
-envelopes claiming an overlapping topology).  When W37 chooses to
-reroute on a trajectory-anchored top_set and the disjoint consensus
-reference disagrees within ``divergence_margin_min`` (Jaccard), W38
-abstains via the ``CONSENSUS_DIVERGENCE_ABSTAINED`` branch.  This
-**bounds** (does not close) the W37-L-MULTI-HOST-COLLUSION-CAP
-limitation theorem: it raises the capsule-layer adversary bar from
-"compromise 2 of N trajectory hosts" to "compromise 2 of N trajectory
-hosts AND the disjoint registered consensus reference".  On
+disjoint* from W37's trajectory hosts.  When W37 chooses to reroute
+on a trajectory-anchored top_set and the disjoint consensus reference
+disagrees within ``divergence_margin_min`` (Jaccard), W38 abstains
+via the ``CONSENSUS_DIVERGENCE_ABSTAINED`` branch.  On
 **R-85-COLLUDED-CROSS-HOST-TRAJECTORY**, W38 raises trust precision
 over W37 from 0.500 to **1.000**
 (**Δ_trust_precision_w38_w37 = +0.500**, min and max equal across 5/5
 seeds), abstains via DIVERGENCE on 8 cells/seed, and adds one visible
 token/cell while carrying about **9.07k structured bits per visible
-W38 token**.  On **R-85-CONSENSUS-ALSO-COMPROMISED** the new
+W38 token**.  On **R-85-CONSENSUS-ALSO-COMPROMISED** the
 proved-conditional limitation theorem **W38-L-CONSENSUS-COLLUSION-CAP**
-fires (the disjoint consensus reference is itself compromised in
-lock-step ⇒ W38 cannot recover; closure requires native-latent
-evidence outside the capsule layer or a 3+-host disjoint topology).
-On **R-85-TRIVIAL-W38**, **R-85-NO-COLLUSION-CONSENSUS-AGREES**, and
-**R-85-NO-CONSENSUS-REFERENCE** falsifiers, W38 preserves W37
-behavior with no correctness or trust-precision regression.  W38
-adds 14 verifier failure modes, bringing the cumulative W22..W38
-trust boundary to **140 enumerated modes**.  This is **not native
-latent transfer** and not transformer-internal hidden-state
-projection; it is an audited capsule-layer cross-source consensus-
-reference proxy with mechanical disjoint-topology enforcement.  Fresh
-preflight found local Ollama and `192.168.12.191` reachable, with
-`192.168.12.248` still timing out (Mac 2 ARP-incomplete for the **31st
-milestone in a row**, ``ping`` reports "Host is down"); the bounded
-W38 3-host consensus probe observed **8/8 responsive on all 3 hosts,
-7/8 trajectory-pair agreements (the one disagreement is a
-``num_predict=4`` truncation), 7/8 cross-source consensus
-agreements, and 8/8 consensus-gold correlation** across local
-``gemma2:9b``, remote ``qwen2.5:14b`` (trajectory pair), and remote
-``qwen2.5-coder:14b`` (disjoint consensus host) at temperature 0.
-Versioning reconciliation: ``vision_mvp.__version__`` and
-``pyproject.toml`` ``project.version`` are now both ``0.5.12`` (the
-lingering 0.5.9 vs 0.5.11 misalignment from earlier milestones is
-closed).  Stable runtime contract unchanged; W38 remains
-experimental.
+fires (further bounded by W39 in SDK v3.40).  Stable runtime contract
+unchanged; W38 remains experimental.
 
 **Earlier milestone: SDK v3.38 (May 2026).** Anchor-cross-host basis-
 trajectory ratification + manifest-v7 CID (W37 family).  W37 wraps

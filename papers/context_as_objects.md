@@ -1,13 +1,95 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
-> Updated through SDK v3.39, 2026-05-02 (W22 → W38 cumulative
+> Updated through SDK v3.40, 2026-05-02 (W22 → W39 cumulative
 > trust + dense-control + live-aware multi-anchor / trust-subspace /
-> host-diverse / cross-host trajectory / disjoint-consensus-reference
-> guard ladder summarised in § 14.2 and § 17).
+> host-diverse / cross-host trajectory / disjoint-consensus-reference /
+> multi-host-disjoint-quorum guard ladder summarised in § 14.2 and
+> § 17).
 >
-> **Latest milestone marker (SDK v3.39 / W38, 2026-05-02).** The
-> programme now has **thirty-five** coupled research axes.  W38 wraps
+> **Latest milestone marker (SDK v3.40 / W39, 2026-05-02).** The
+> programme now has **thirty-six** coupled research axes.  W39 wraps
+> W38's disjoint cross-source consensus-reference adjudication with
+> a **K-of-N mutually-disjoint quorum** of disjoint probes, each
+> sourced from a physically-distinct host pool that is both
+> mechanically disjoint from the W37 trajectory hosts (W38's
+> precondition) AND mutually disjoint from every other registered
+> quorum probe's host pool (the new W39 precondition; the
+> ``MultiHostDisjointQuorumRegistry`` raises
+> :class:`MutuallyDisjointTopologyError` when any two pools have
+> non-empty intersection; the verifier additionally rejects envelopes
+> claiming an overlapping pool pair).  When at least ``quorum_min``
+> of the K member probes diverge from the W37/W38 candidate top_set,
+> W39 abstains via the ``QUORUM_DIVERGENCE_ABSTAINED`` branch.  The
+> envelope binds a manifest-v9 CID over six components
+> (parent_w38_cid, quorum_state_cid, quorum_audit_cid,
+> quorum_topology_cid, quorum_decision_cid, mutual_disjointness_cid).
+> On R-86-MULTI-HOST-COLLUDED-CONSENSUS, W39 raises trust precision
+> over W38 from 0.500 (W38-L-CONSENSUS-COLLUSION-CAP fires) to
+> **1.000** (**Δ_trust_precision_w39_w38 = +0.500**, min and max
+> equal across 5/5 seeds), abstains via QUORUM_DIVERGENCE on 8
+> cells/seed, and adds one visible-token overhead/cell while
+> carrying about **24.4k structured bits per visible W39 token**
+> (~2.7x denser than W38's 9.07k bits/token at the audited-proxy
+> capsule layer).  On the four named falsifiers (R-86-TRIVIAL-W39,
+> R-86-NO-REGRESSION-QUORUM-AGREES, R-86-FULL-QUORUM-COLLUSION,
+> R-86-INSUFFICIENT-QUORUM) W39 preserves W38 behavior and trust
+> precision exactly.  W39 adds 14 mechanically tested verifier
+> failure modes (including the W39-specific
+> ``w39_quorum_mutual_disjointness_violation``), bringing the
+> cumulative W22..W39 trust boundary to **154 enumerated failure
+> modes**.  A new proved-conditional limitation theorem
+> **W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP** is recorded: when
+> all K registered disjoint quorum probes are themselves compromised
+> in lock-step with the colluding trajectory hosts, W39 cannot
+> recover at the capsule layer (the W39 analog of
+> W34-L-MULTI-ANCHOR-CAP, W37-L-MULTI-HOST-COLLUSION-CAP, and
+> W38-L-CONSENSUS-COLLUSION-CAP); closure requires native-latent
+> evidence outside the capsule layer or a K+1-host disjoint topology
+> with a new uncompromised pool.  W39 is explicitly NOT native latent
+> transfer, NOT transformer-internal hidden-state projection, and
+> NOT a KV-cache transplant; it is an audited capsule-layer
+> multi-host disjoint quorum proxy with two mechanically-enforced
+> disjointness preconditions (trajectory disjointness inherited from
+> W38 + mutual disjointness new in W39).  **Lab topology
+> resolution**: the historical Mac-2 endpoint
+> (``192.168.12.248``) has been ARP-incomplete for the 31st
+> milestone in a row; ``192.168.12.101`` was identified as the
+> reachable third physical host candidate, **partially discharging
+> W38-C-MULTI-HOST at the topology layer** (preflight-OK on cold
+> contact with ``qwen3.5:35b`` + ``qwen2.5:14b-32k`` model files
+> visible).  The ``.101`` Ollama inference path subsequently
+> degraded under the one-word probe budget (``W39-INFRA-1``).  The
+> W39 live xllm probe was made robust via a fallback path: when
+> ``.101`` is unreachable, ``mac_off_cluster_a`` swaps to
+> ``localhost`` running ``llama3.1:8b`` (a model class genuinely
+> different from the trajectory's ``gemma2:9b``), so the live K=2
+> quorum becomes ``(localhost llama3.1:8b, .191
+> qwen2.5-coder:14b-32k)`` -- two physically distinct hosts, each
+> running a different model class from the trajectory pair AND from
+> the W38 single consensus reference.  Bounded W39 5-host live
+> xllm probe at temperature 0 + ``num_predict=4`` produced **8/8
+> responsive on all 5 hosts** (first 5-host live W39 disjoint-quorum
+> probe in the programme), 7/8 trajectory-pair agreements, 7/8 W38
+> single consensus agreements, **8/8 quorum_a gold-correlated, 8/8
+> quorum_b gold-correlated, 8/8 K=2 quorum size simultaneously
+> responsive**.  Notable live finding: on the ``h2o`` probe, the
+> trajectory pair disagreed (``mac1=h2o`` vs ``mac_remote=h`` due to
+> ``num_predict=4`` truncation), but BOTH quorum members got
+> ``h2o`` correct -- empirical-suggestive evidence for the new
+> ``W39-C-LIVE-TRUNCATION-RECOVERY`` conjecture (the W39 multi-host
+> disjoint quorum can recover from trajectory-pair-only truncation
+> errors at the live layer when the quorum members use a different
+> generation budget; this is a recovery axis distinct from the
+> collusion bound; sharper validation requires a dedicated live
+> truncation-recovery bench).  Versioning: ``vision_mvp.__version__``
+> and ``pyproject.toml`` ``project.version`` are now both ``0.5.13``
+> (alignment maintained).  See
+> ``docs/RESULTS_WEVRA_W39_MULTI_HOST_DISJOINT_QUORUM.md`` and
+> ``docs/SUCCESS_CRITERION_W39_MULTI_HOST_DISJOINT_QUORUM.md``.
+
+> **Previous milestone marker (SDK v3.39 / W38, 2026-05-02).** The
+> programme has **thirty-five** coupled research axes.  W38 wraps
 > W37's anchor-cross-host basis-trajectory ratification with a
 > controller-pre-registered ``ConsensusReferenceProbe`` whose host
 > topology is *mechanically disjoint* from W37's trajectory hosts (the

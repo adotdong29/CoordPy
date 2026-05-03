@@ -29039,3 +29039,1434 @@ def build_disjoint_consensus_registry(
         registered_trajectory_host_ids=frozenset(
             str(h) for h in registered_trajectory_host_ids),
     )
+
+
+# =============================================================================
+# SDK v3.40 — W39 family
+# Multi-host disjoint quorum consensus-reference ratification +
+# manifest-v9 CID + mutually-disjoint physical-host topology.
+#
+# W39 wraps W38's disjoint cross-source consensus-reference
+# trajectory-divergence adjudication with a *quorum* of K disjoint
+# probes, each sourced from a physically-distinct host pool that is
+# both mechanically disjoint from the W37 trajectory hosts (W38's
+# precondition) AND mutually disjoint from every other registered
+# quorum probe's host pool (the new W39 precondition).
+#
+# W38's deepest open wall is W38-L-CONSENSUS-COLLUSION-CAP: when the
+# single registered disjoint consensus reference is itself compromised
+# in lock-step with the colluding trajectory hosts, W38 cannot
+# recover.  W39 raises the capsule-layer adversary bar from
+# "compromise 2 of N trajectory hosts AND the single disjoint
+# registered consensus reference" to "compromise 2 of N trajectory
+# hosts AND `quorum_min` of the K mutually-disjoint registered
+# consensus references, each on a physically distinct host pool".
+#
+# W39 does NOT close W38-L-CONSENSUS-COLLUSION-CAP in general; it
+# bounds it conditional on `quorum_min` of the K registered probes
+# remaining uncompromised.  When all K disjoint probes are themselves
+# compromised in lock-step with the colluding trajectory hosts, W39
+# cannot recover; this is the new W39-L-FULL-DISJOINT-QUORUM-
+# COLLUSION-CAP limitation theorem (the W39 analog of W34-L-MULTI-
+# ANCHOR-CAP, W37-L-MULTI-HOST-COLLUSION-CAP, and W38-L-CONSENSUS-
+# COLLUSION-CAP).
+#
+# What W39 is NOT (do-not-overstate)
+# ----------------------------------
+#   * NOT a transformer-internal hidden-state projection.
+#   * NOT a runtime KV-cache transplant.
+#   * NOT a learned quorum model (zero parameters).
+#   * NOT proof of temporal ordering at the model layer.
+#   * NOT a runtime ground-truth oracle (each quorum probe is a
+#     controller-pre-registered audited capsule-layer probe).
+#   * NOT closure of W37-L-MULTI-HOST-COLLUSION-CAP at the capsule
+#     layer (only further-bounded).
+#   * NOT closure of W38-L-CONSENSUS-COLLUSION-CAP at the capsule
+#     layer (only further-bounded by raising the adversary bar from a
+#     single disjoint reference to a K-of-N mutually-disjoint quorum).
+#   * NOT closure of the new W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP
+#     limitation theorem (when all K disjoint probes are compromised
+#     in lock-step, W39 cannot recover; recovery requires native-
+#     latent evidence outside the capsule layer or a K+1-host
+#     disjoint topology).
+# =============================================================================
+
+
+W39_MULTI_HOST_DISJOINT_QUORUM_SCHEMA_VERSION: str = (
+    "wevra.multi_host_disjoint_quorum.v1")
+
+W39_BRANCH_QUORUM_RESOLVED = "quorum_resolved"
+W39_BRANCH_TRIVIAL_QUORUM_PASSTHROUGH = "trivial_quorum_passthrough"
+W39_BRANCH_QUORUM_REJECTED = "quorum_rejected"
+W39_BRANCH_QUORUM_DISABLED = "quorum_disabled"
+W39_BRANCH_QUORUM_NO_TRIGGER = "quorum_no_trigger"
+W39_BRANCH_QUORUM_RATIFIED = "quorum_ratified"
+W39_BRANCH_QUORUM_DIVERGENCE_ABSTAINED = (
+    "quorum_divergence_abstained")
+W39_BRANCH_QUORUM_NO_REFERENCES = "quorum_no_references"
+W39_BRANCH_QUORUM_INSUFFICIENT = "quorum_insufficient"
+W39_BRANCH_QUORUM_SPLIT = "quorum_split"
+W39_BRANCH_QUORUM_REFERENCE_WEAK = "quorum_reference_weak"
+
+W39_ALL_BRANCHES: tuple[str, ...] = (
+    W39_BRANCH_QUORUM_RESOLVED,
+    W39_BRANCH_TRIVIAL_QUORUM_PASSTHROUGH,
+    W39_BRANCH_QUORUM_REJECTED,
+    W39_BRANCH_QUORUM_DISABLED,
+    W39_BRANCH_QUORUM_NO_TRIGGER,
+    W39_BRANCH_QUORUM_RATIFIED,
+    W39_BRANCH_QUORUM_DIVERGENCE_ABSTAINED,
+    W39_BRANCH_QUORUM_NO_REFERENCES,
+    W39_BRANCH_QUORUM_INSUFFICIENT,
+    W39_BRANCH_QUORUM_SPLIT,
+    W39_BRANCH_QUORUM_REFERENCE_WEAK,
+)
+
+W39_DEFAULT_QUORUM_MIN: int = 2
+W39_DEFAULT_MIN_QUORUM_PROBES: int = 2
+W39_DEFAULT_QUORUM_STRENGTH_MIN: float = 0.66
+W39_DEFAULT_QUORUM_DIVERGENCE_MARGIN_MIN: float = 0.10
+
+
+class MutuallyDisjointTopologyError(ValueError):
+    """Raised when a W39 registry has overlapping quorum host pools.
+
+    Each registered W39 quorum host pool must be (a) disjoint from the
+    W37 trajectory hosts (inherited from W38) and (b) pairwise
+    disjoint from every other registered quorum host pool.  A registry
+    where any two pools have non-empty intersection raises this error
+    at construction time so a misconfigured controller cannot quietly
+    register two quorum probes that share a physical host.
+    """
+
+
+@dataclasses.dataclass(frozen=True)
+class MultiHostDisjointQuorumProbe:
+    """One W39 multi-host disjoint quorum probe.
+
+    A W39 quorum probe is a frozen tuple of K
+    :class:`ConsensusReferenceProbe` instances, each tagged with its
+    registered pool index and consensus strength.  The W39 mechanism
+    does NOT instantiate any per-probe runtime ground-truth oracle:
+    each member probe is itself a controller-pre-registered audited
+    capsule-layer artefact, mechanically disjoint from the W37
+    trajectory hosts and mutually disjoint from every other member
+    probe's host pool.
+    """
+
+    member_probes: tuple[ConsensusReferenceProbe, ...]
+    quorum_min: int
+    min_quorum_probes: int
+    cell_idx: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "member_probes": [
+                p.as_dict() for p in self.member_probes],
+            "quorum_min": int(self.quorum_min),
+            "min_quorum_probes": int(self.min_quorum_probes),
+            "cell_idx": int(self.cell_idx),
+        }
+
+
+def _compute_w39_quorum_state_cid(
+        *,
+        probe: MultiHostDisjointQuorumProbe | None,
+) -> str:
+    payload = _canonical_json_bytes({
+        "quorum_probe": (
+            probe.as_dict() if probe is not None else None),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w39_quorum_topology_cid(
+        *,
+        registered_quorum_pool_host_ids: Sequence[Iterable[str]],
+        registered_quorum_pool_oracle_ids: Sequence[Iterable[str]],
+        registered_trajectory_host_ids: Iterable[str],
+) -> str:
+    pools = []
+    for host_pool, oracle_pool in zip(
+            registered_quorum_pool_host_ids,
+            registered_quorum_pool_oracle_ids):
+        pools.append({
+            "host_ids": [str(h) for h in sorted(host_pool)],
+            "oracle_ids": [str(o) for o in sorted(oracle_pool)],
+        })
+    payload = _canonical_json_bytes({
+        "pools": pools,
+        "registered_trajectory_host_ids": [
+            str(h) for h in sorted(registered_trajectory_host_ids)],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w39_mutual_disjointness_cid(
+        *,
+        registered_quorum_pool_host_ids: Sequence[Iterable[str]],
+) -> str:
+    """CID over the explicit pairwise-disjointness witness.
+
+    The CID is over the canonical sorted form of every (i, j) pair's
+    host-set intersection (which must be empty for a well-formed
+    registry).  This is load-bearing: it lets a verifier reject an
+    envelope whose claimed topology silently has overlapping pools
+    even if the outer topology CID happens to match a different
+    registered topology of equal canonical form.
+    """
+    pools = [sorted(set(str(h) for h in pool))
+             for pool in registered_quorum_pool_host_ids]
+    pairs = []
+    for i in range(len(pools)):
+        for j in range(i + 1, len(pools)):
+            inter = sorted(set(pools[i]) & set(pools[j]))
+            pairs.append({
+                "i": int(i), "j": int(j),
+                "intersection": inter,
+            })
+    payload = _canonical_json_bytes({
+        "n_pools": int(len(pools)),
+        "pairs": pairs,
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w39_quorum_decision_cid(
+        *,
+        projection_branch: str,
+        n_agree: int,
+        n_disagree: int,
+        n_weak: int,
+        n_total: int,
+        decision_top_set: Sequence[str],
+        per_probe_divergence_scores: Sequence[float],
+        per_probe_branches: Sequence[str],
+) -> str:
+    payload = _canonical_json_bytes({
+        "projection_branch": str(projection_branch),
+        "n_agree": int(n_agree),
+        "n_disagree": int(n_disagree),
+        "n_weak": int(n_weak),
+        "n_total": int(n_total),
+        "decision_top_set": [str(t) for t in sorted(decision_top_set)],
+        "per_probe_divergence_scores": [
+            round(float(s), 4) for s in per_probe_divergence_scores],
+        "per_probe_branches": [str(b) for b in per_probe_branches],
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w39_quorum_audit_cid(
+        *,
+        projection_branch: str,
+        w38_top_set: Sequence[str],
+        decision_top_set: Sequence[str],
+        n_agree: int,
+        n_disagree: int,
+        n_weak: int,
+        n_total: int,
+        quorum_min: int,
+        min_quorum_probes: int,
+        consensus_strength_min: float,
+        divergence_margin_min: float,
+) -> str:
+    payload = _canonical_json_bytes({
+        "projection_branch": str(projection_branch),
+        "w38_top_set": [str(t) for t in sorted(w38_top_set)],
+        "decision_top_set": [
+            str(t) for t in sorted(decision_top_set)],
+        "n_agree": int(n_agree),
+        "n_disagree": int(n_disagree),
+        "n_weak": int(n_weak),
+        "n_total": int(n_total),
+        "quorum_min": int(quorum_min),
+        "min_quorum_probes": int(min_quorum_probes),
+        "consensus_strength_min": round(
+            float(consensus_strength_min), 4),
+        "divergence_margin_min": round(
+            float(divergence_margin_min), 4),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w39_manifest_v9_cid(
+        *,
+        parent_w38_cid: str,
+        quorum_state_cid: str,
+        quorum_audit_cid: str,
+        quorum_topology_cid: str,
+        quorum_decision_cid: str,
+        mutual_disjointness_cid: str,
+) -> str:
+    payload = _canonical_json_bytes({
+        "parent_w38_cid": str(parent_w38_cid),
+        "quorum_state_cid": str(quorum_state_cid),
+        "quorum_audit_cid": str(quorum_audit_cid),
+        "quorum_topology_cid": str(quorum_topology_cid),
+        "quorum_decision_cid": str(quorum_decision_cid),
+        "mutual_disjointness_cid": str(mutual_disjointness_cid),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _compute_w39_outer_cid(
+        *,
+        schema_version: str,
+        schema_cid: str,
+        parent_w38_cid: str,
+        quorum_state_cid: str,
+        quorum_audit_cid: str,
+        quorum_topology_cid: str,
+        quorum_decision_cid: str,
+        mutual_disjointness_cid: str,
+        manifest_v9_cid: str,
+        cell_index: int,
+) -> str:
+    payload = _canonical_json_bytes({
+        "schema_version": str(schema_version),
+        "schema_cid": str(schema_cid),
+        "parent_w38_cid": str(parent_w38_cid),
+        "quorum_state_cid": str(quorum_state_cid),
+        "quorum_audit_cid": str(quorum_audit_cid),
+        "quorum_topology_cid": str(quorum_topology_cid),
+        "quorum_decision_cid": str(quorum_decision_cid),
+        "mutual_disjointness_cid": str(mutual_disjointness_cid),
+        "manifest_v9_cid": str(manifest_v9_cid),
+        "cell_index": int(cell_index),
+    })
+    return hashlib.sha256(payload).hexdigest()
+
+
+def select_multi_host_disjoint_quorum_decision(
+        *,
+        quorum_probe: MultiHostDisjointQuorumProbe | None,
+        w38_candidate_top_set: Sequence[str],
+        w38_rerouted: bool,
+        quorum_min: int = W39_DEFAULT_QUORUM_MIN,
+        min_quorum_probes: int = W39_DEFAULT_MIN_QUORUM_PROBES,
+        consensus_strength_min: float = (
+            W39_DEFAULT_QUORUM_STRENGTH_MIN),
+        divergence_margin_min: float = (
+            W39_DEFAULT_QUORUM_DIVERGENCE_MARGIN_MIN),
+) -> tuple[str, int, int, int, int,
+           tuple[str, ...], tuple[float, ...], tuple[str, ...]]:
+    """Select the W39 multi-host disjoint quorum projection branch.
+
+    Deterministic, closed-form, zero-parameter.  Returns
+    ``(branch, n_agree, n_disagree, n_weak, n_total,
+       decision_top_set, per_probe_divergence_scores,
+       per_probe_branches)``.
+
+    Branches:
+      * ``QUORUM_NO_REFERENCES`` -- no quorum probe registered.
+      * ``QUORUM_NO_TRIGGER`` -- the W37 (and therefore W38) layer
+        did not reroute, so there is nothing to cross-check at the
+        W39 layer.
+      * ``QUORUM_INSUFFICIENT`` -- fewer than ``min_quorum_probes``
+        member probes are registered for the current cell; W39 falls
+        through to W38.
+      * ``QUORUM_REFERENCE_WEAK`` -- *all* member probes have
+        ``consensus_strength`` below ``consensus_strength_min``; W39
+        cannot rely on the quorum and falls through to W38.
+      * ``QUORUM_DIVERGENCE_ABSTAINED`` -- W37/W38 rerouted but at
+        least ``quorum_min`` of the strong member probes diverge
+        from the W38 candidate top_set by >= ``divergence_margin_min``
+        (Jaccard); W39 abstains.
+      * ``QUORUM_RATIFIED`` -- W37/W38 rerouted, at least
+        ``quorum_min`` of the strong member probes agree with the
+        W38 candidate top_set, AND fewer than ``quorum_min`` of them
+        disagree.
+      * ``QUORUM_SPLIT`` -- W37/W38 rerouted but neither side reaches
+        ``quorum_min``; W39 falls through to W38's decision.
+    """
+    if quorum_probe is None or not quorum_probe.member_probes:
+        return (W39_BRANCH_QUORUM_NO_REFERENCES, 0, 0, 0, 0,
+                (), (), ())
+    if not w38_rerouted:
+        return (W39_BRANCH_QUORUM_NO_TRIGGER, 0, 0, 0,
+                len(quorum_probe.member_probes), (), (), ())
+    n_total = int(len(quorum_probe.member_probes))
+    if n_total < int(min_quorum_probes):
+        return (W39_BRANCH_QUORUM_INSUFFICIENT, 0, 0, 0,
+                n_total, (), (), ())
+    n_agree = 0
+    n_disagree = 0
+    n_weak = 0
+    per_probe_divergence: list[float] = []
+    per_probe_branches: list[str] = []
+    decision_top: tuple[str, ...] = ()
+    for member in quorum_probe.member_probes:
+        strength = float(member.consensus_strength)
+        if (math.isnan(strength) or math.isinf(strength)
+                or strength < float(consensus_strength_min)):
+            n_weak += 1
+            per_probe_divergence.append(0.0)
+            per_probe_branches.append(W39_BRANCH_QUORUM_REFERENCE_WEAK)
+            continue
+        member_top = tuple(sorted(str(t) for t in member.top_set))
+        div = _w38_top_set_divergence_score(
+            w38_candidate_top_set, member_top)
+        per_probe_divergence.append(float(div))
+        if div >= float(divergence_margin_min):
+            n_disagree += 1
+            per_probe_branches.append(
+                W39_BRANCH_QUORUM_DIVERGENCE_ABSTAINED)
+        else:
+            n_agree += 1
+            per_probe_branches.append(W39_BRANCH_QUORUM_RATIFIED)
+            if not decision_top:
+                decision_top = member_top
+    if n_weak == n_total:
+        return (W39_BRANCH_QUORUM_REFERENCE_WEAK, n_agree, n_disagree,
+                n_weak, n_total, (), tuple(per_probe_divergence),
+                tuple(per_probe_branches))
+    if n_disagree >= int(quorum_min):
+        return (W39_BRANCH_QUORUM_DIVERGENCE_ABSTAINED,
+                n_agree, n_disagree, n_weak, n_total,
+                (), tuple(per_probe_divergence),
+                tuple(per_probe_branches))
+    if (n_agree >= int(quorum_min)
+            and n_disagree < int(quorum_min)):
+        return (W39_BRANCH_QUORUM_RATIFIED,
+                n_agree, n_disagree, n_weak, n_total,
+                decision_top, tuple(per_probe_divergence),
+                tuple(per_probe_branches))
+    return (W39_BRANCH_QUORUM_SPLIT,
+            n_agree, n_disagree, n_weak, n_total,
+            (), tuple(per_probe_divergence),
+            tuple(per_probe_branches))
+
+
+@dataclasses.dataclass(frozen=True)
+class MultiHostDisjointQuorumRatificationEnvelope:
+    """Content-addressed W39 multi-host disjoint quorum envelope."""
+
+    schema_version: str
+    schema_cid: str
+    parent_w38_cid: str
+    quorum_probe: MultiHostDisjointQuorumProbe | None
+    quorum_state_cid: str
+    quorum_topology_cid: str
+    quorum_decision_cid: str
+    mutual_disjointness_cid: str
+    projection_branch: str
+    w38_top_set: tuple[str, ...]
+    decision_top_set: tuple[str, ...]
+    n_agree: int
+    n_disagree: int
+    n_weak: int
+    n_total: int
+    quorum_min: int
+    min_quorum_probes: int
+    consensus_strength_min: float
+    divergence_margin_min: float
+    per_probe_divergence_scores: tuple[float, ...]
+    per_probe_branches: tuple[str, ...]
+    quorum_audit_cid: str
+    manifest_v9_cid: str
+    cell_index: int
+    wire_required: bool = False
+    w39_cid: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.w39_cid:
+            object.__setattr__(self, "w39_cid",
+                               self.recompute_w39_cid())
+
+    def recompute_w39_cid(self) -> str:
+        return _compute_w39_outer_cid(
+            schema_version=self.schema_version,
+            schema_cid=self.schema_cid,
+            parent_w38_cid=self.parent_w38_cid,
+            quorum_state_cid=self.quorum_state_cid,
+            quorum_audit_cid=self.quorum_audit_cid,
+            quorum_topology_cid=self.quorum_topology_cid,
+            quorum_decision_cid=self.quorum_decision_cid,
+            mutual_disjointness_cid=self.mutual_disjointness_cid,
+            manifest_v9_cid=self.manifest_v9_cid,
+            cell_index=int(self.cell_index),
+        )
+
+    def to_canonical_bytes(self) -> bytes:
+        return _canonical_json_bytes({
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w38_cid": self.parent_w38_cid,
+            "quorum_probe": (
+                self.quorum_probe.as_dict()
+                if self.quorum_probe is not None else None),
+            "quorum_state_cid": self.quorum_state_cid,
+            "quorum_topology_cid": self.quorum_topology_cid,
+            "quorum_decision_cid": self.quorum_decision_cid,
+            "mutual_disjointness_cid": self.mutual_disjointness_cid,
+            "projection_branch": self.projection_branch,
+            "w38_top_set": [str(t) for t in self.w38_top_set],
+            "decision_top_set": [
+                str(t) for t in self.decision_top_set],
+            "n_agree": int(self.n_agree),
+            "n_disagree": int(self.n_disagree),
+            "n_weak": int(self.n_weak),
+            "n_total": int(self.n_total),
+            "quorum_min": int(self.quorum_min),
+            "min_quorum_probes": int(self.min_quorum_probes),
+            "consensus_strength_min": round(
+                float(self.consensus_strength_min), 4),
+            "divergence_margin_min": round(
+                float(self.divergence_margin_min), 4),
+            "per_probe_divergence_scores": [
+                round(float(s), 4)
+                for s in self.per_probe_divergence_scores],
+            "per_probe_branches": [
+                str(b) for b in self.per_probe_branches],
+            "quorum_audit_cid": self.quorum_audit_cid,
+            "manifest_v9_cid": self.manifest_v9_cid,
+            "cell_index": int(self.cell_index),
+        })
+
+    def to_decoder_text(self) -> str:
+        return f"<w39_ref:{self.w39_cid[:16]}>"
+
+    @property
+    def n_envelope_bytes(self) -> int:
+        return len(self.to_canonical_bytes())
+
+    @property
+    def n_wire_tokens(self) -> int:
+        if not self.wire_required:
+            return 0
+        return _whitespace_token_count(self.to_decoder_text())
+
+    @property
+    def n_structured_bits(self) -> int:
+        return int(8 * self.n_envelope_bytes)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "schema_cid": self.schema_cid,
+            "parent_w38_cid": self.parent_w38_cid,
+            "quorum_probe": (
+                self.quorum_probe.as_dict()
+                if self.quorum_probe is not None else None),
+            "quorum_state_cid": self.quorum_state_cid,
+            "quorum_topology_cid": self.quorum_topology_cid,
+            "quorum_decision_cid": self.quorum_decision_cid,
+            "mutual_disjointness_cid": self.mutual_disjointness_cid,
+            "projection_branch": self.projection_branch,
+            "w38_top_set": [str(t) for t in self.w38_top_set],
+            "decision_top_set": [
+                str(t) for t in self.decision_top_set],
+            "n_agree": int(self.n_agree),
+            "n_disagree": int(self.n_disagree),
+            "n_weak": int(self.n_weak),
+            "n_total": int(self.n_total),
+            "quorum_min": int(self.quorum_min),
+            "min_quorum_probes": int(self.min_quorum_probes),
+            "consensus_strength_min": round(
+                float(self.consensus_strength_min), 4),
+            "divergence_margin_min": round(
+                float(self.divergence_margin_min), 4),
+            "per_probe_divergence_scores": [
+                round(float(s), 4)
+                for s in self.per_probe_divergence_scores],
+            "per_probe_branches": [
+                str(b) for b in self.per_probe_branches],
+            "quorum_audit_cid": self.quorum_audit_cid,
+            "manifest_v9_cid": self.manifest_v9_cid,
+            "cell_index": int(self.cell_index),
+            "wire_required": bool(self.wire_required),
+            "w39_cid": self.w39_cid,
+            "n_envelope_bytes": self.n_envelope_bytes,
+            "n_wire_tokens": self.n_wire_tokens,
+            "n_structured_bits": int(self.n_structured_bits),
+            "decoder_text": self.to_decoder_text(),
+        }
+
+
+def verify_multi_host_disjoint_quorum_ratification(
+        env: MultiHostDisjointQuorumRatificationEnvelope | None,
+        *,
+        registered_schema: SchemaCapsule,
+        registered_parent_w38_cid: str,
+        registered_quorum_pool_host_ids: tuple[frozenset[str], ...],
+        registered_quorum_pool_oracle_ids: tuple[frozenset[str], ...],
+        registered_trajectory_host_ids: frozenset[str],
+        registered_quorum_topology_cid: str,
+        registered_mutual_disjointness_cid: str,
+) -> LatentVerificationOutcome:
+    """Pure-function verifier for the W39 envelope.
+
+    Enumerates 14 disjoint failure modes, disjoint from W22..W38:
+
+    1.  ``empty_w39_envelope``
+    2.  ``w39_schema_version_unknown``
+    3.  ``w39_schema_cid_mismatch``
+    4.  ``w38_parent_cid_mismatch``
+    5.  ``w39_projection_branch_unknown``
+    6.  ``w39_quorum_probe_unregistered_host``
+    7.  ``w39_quorum_probe_unregistered_oracle``
+    8.  ``w39_quorum_disjoint_topology_violation``
+    9.  ``w39_quorum_mutual_disjointness_violation``
+    10. ``w39_quorum_thresholds_invalid``
+    11. ``w39_quorum_state_cid_mismatch``
+    12. ``w39_quorum_decision_cid_mismatch``
+    13. ``w39_quorum_topology_cid_mismatch``
+    14. ``w39_manifest_v9_cid_mismatch`` (with
+        ``w39_outer_cid_mismatch`` co-defined).
+    """
+    n_checks = 0
+    if env is None:
+        return LatentVerificationOutcome(
+            ok=False, reason="empty_w39_envelope", n_checks=n_checks)
+    n_checks += 1
+    if env.schema_version != (
+            W39_MULTI_HOST_DISJOINT_QUORUM_SCHEMA_VERSION):
+        return LatentVerificationOutcome(
+            ok=False, reason="w39_schema_version_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.schema_cid != registered_schema.cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w39_schema_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.parent_w38_cid != str(registered_parent_w38_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w38_parent_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.projection_branch not in W39_ALL_BRANCHES:
+        return LatentVerificationOutcome(
+            ok=False, reason="w39_projection_branch_unknown",
+            n_checks=n_checks)
+    n_checks += 1
+    # Per-member-probe registration check (host).
+    registered_hosts_union: set[str] = set()
+    for pool in registered_quorum_pool_host_ids:
+        registered_hosts_union |= set(str(h) for h in pool)
+    if env.quorum_probe is not None:
+        for member in env.quorum_probe.member_probes:
+            for host_id in member.consensus_host_ids:
+                if (str(host_id)
+                        and str(host_id) not in registered_hosts_union):
+                    return LatentVerificationOutcome(
+                        ok=False,
+                        reason=("w39_quorum_probe_unregistered_host"),
+                        n_checks=n_checks)
+    n_checks += 1
+    # Per-member-probe registration check (oracle).
+    registered_oracles_union: set[str] = set()
+    for pool in registered_quorum_pool_oracle_ids:
+        registered_oracles_union |= set(str(o) for o in pool)
+    if env.quorum_probe is not None:
+        for member in env.quorum_probe.member_probes:
+            for oracle_id in member.consensus_oracle_ids:
+                if (str(oracle_id)
+                        and str(oracle_id)
+                        not in registered_oracles_union):
+                    return LatentVerificationOutcome(
+                        ok=False,
+                        reason=(
+                            "w39_quorum_probe_unregistered_oracle"),
+                        n_checks=n_checks)
+    n_checks += 1
+    # Disjoint-topology check (each pool vs trajectory hosts).
+    traj_set = set(str(h) for h in registered_trajectory_host_ids)
+    for pool in registered_quorum_pool_host_ids:
+        overlap = set(str(h) for h in pool) & traj_set
+        if overlap:
+            return LatentVerificationOutcome(
+                ok=False,
+                reason="w39_quorum_disjoint_topology_violation",
+                n_checks=n_checks)
+    n_checks += 1
+    # Mutual-disjointness check (every pair of pools is disjoint).
+    pools_list = [set(str(h) for h in pool)
+                  for pool in registered_quorum_pool_host_ids]
+    for i in range(len(pools_list)):
+        for j in range(i + 1, len(pools_list)):
+            if pools_list[i] & pools_list[j]:
+                return LatentVerificationOutcome(
+                    ok=False,
+                    reason=(
+                        "w39_quorum_mutual_disjointness_violation"),
+                    n_checks=n_checks)
+    n_checks += 1
+    cs_min = float(env.consensus_strength_min)
+    div_min = float(env.divergence_margin_min)
+    qm = int(env.quorum_min)
+    mqp = int(env.min_quorum_probes)
+    if (math.isnan(cs_min) or math.isinf(cs_min)
+            or cs_min < 0.0 or cs_min > 1.0
+            or math.isnan(div_min) or math.isinf(div_min)
+            or div_min < 0.0 or div_min > 1.0
+            or qm < 1 or mqp < 1
+            or qm > 16 or mqp > 16):
+        return LatentVerificationOutcome(
+            ok=False, reason="w39_quorum_thresholds_invalid",
+            n_checks=n_checks)
+    n_checks += 1
+    expected_state_cid = _compute_w39_quorum_state_cid(
+        probe=env.quorum_probe)
+    if expected_state_cid != env.quorum_state_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w39_quorum_state_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    expected_decision_cid = _compute_w39_quorum_decision_cid(
+        projection_branch=env.projection_branch,
+        n_agree=int(env.n_agree),
+        n_disagree=int(env.n_disagree),
+        n_weak=int(env.n_weak),
+        n_total=int(env.n_total),
+        decision_top_set=env.decision_top_set,
+        per_probe_divergence_scores=(
+            env.per_probe_divergence_scores),
+        per_probe_branches=env.per_probe_branches,
+    )
+    if expected_decision_cid != env.quorum_decision_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w39_quorum_decision_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if (env.quorum_topology_cid
+            != str(registered_quorum_topology_cid)):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w39_quorum_topology_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if (env.mutual_disjointness_cid
+            != str(registered_mutual_disjointness_cid)):
+        return LatentVerificationOutcome(
+            ok=False,
+            reason="w39_quorum_mutual_disjointness_violation",
+            n_checks=n_checks)
+    n_checks += 1
+    expected_audit = _compute_w39_quorum_audit_cid(
+        projection_branch=env.projection_branch,
+        w38_top_set=env.w38_top_set,
+        decision_top_set=env.decision_top_set,
+        n_agree=int(env.n_agree),
+        n_disagree=int(env.n_disagree),
+        n_weak=int(env.n_weak),
+        n_total=int(env.n_total),
+        quorum_min=int(env.quorum_min),
+        min_quorum_probes=int(env.min_quorum_probes),
+        consensus_strength_min=float(env.consensus_strength_min),
+        divergence_margin_min=float(env.divergence_margin_min),
+    )
+    expected_manifest = _compute_w39_manifest_v9_cid(
+        parent_w38_cid=env.parent_w38_cid,
+        quorum_state_cid=env.quorum_state_cid,
+        quorum_audit_cid=expected_audit,
+        quorum_topology_cid=env.quorum_topology_cid,
+        quorum_decision_cid=env.quorum_decision_cid,
+        mutual_disjointness_cid=env.mutual_disjointness_cid,
+    )
+    if (expected_audit != env.quorum_audit_cid
+            or expected_manifest != env.manifest_v9_cid):
+        return LatentVerificationOutcome(
+            ok=False, reason="w39_manifest_v9_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    if env.recompute_w39_cid() != env.w39_cid:
+        return LatentVerificationOutcome(
+            ok=False, reason="w39_outer_cid_mismatch",
+            n_checks=n_checks)
+    n_checks += 1
+    return LatentVerificationOutcome(
+        ok=True, reason="ok", n_checks=n_checks)
+
+
+@dataclasses.dataclass
+class MultiHostDisjointQuorumRegistry:
+    """Controller-side registry for W39 multi-host disjoint quorum.
+
+    Mechanically enforces TWO disjointness preconditions at
+    construction time:
+
+    * **Trajectory disjointness** (inherited from W38): every
+      registered quorum pool's host set is disjoint from
+      ``registered_trajectory_host_ids``; otherwise
+      :class:`DisjointTopologyError` is raised.
+    * **Mutual disjointness** (new in W39): every pair of registered
+      quorum pools has empty host-set intersection; otherwise
+      :class:`MutuallyDisjointTopologyError` is raised.
+    """
+
+    schema: SchemaCapsule | None = None
+    inner_w38_registry: (
+        DisjointConsensusReferenceRegistry | None) = None
+    quorum_enabled: bool = True
+    manifest_v9_disabled: bool = False
+    allow_disjoint_quorum_divergence_abstain: bool = True
+    quorum_min: int = W39_DEFAULT_QUORUM_MIN
+    min_quorum_probes: int = W39_DEFAULT_MIN_QUORUM_PROBES
+    consensus_strength_min: float = W39_DEFAULT_QUORUM_STRENGTH_MIN
+    divergence_margin_min: float = (
+        W39_DEFAULT_QUORUM_DIVERGENCE_MARGIN_MIN)
+    registered_quorum_pool_host_ids: tuple[frozenset[str], ...] = ()
+    registered_quorum_pool_oracle_ids: tuple[
+        frozenset[str], ...] = ()
+    registered_trajectory_host_ids: frozenset[str] = frozenset()
+
+    _envelopes: dict[
+        str, MultiHostDisjointQuorumRatificationEnvelope] = (
+        dataclasses.field(default_factory=dict))
+    n_w39_registered: int = 0
+    n_w39_rejected: int = 0
+    n_quorum_ratified: int = 0
+    n_quorum_divergence_abstained: int = 0
+    n_quorum_no_references: int = 0
+    n_quorum_no_trigger: int = 0
+    n_quorum_insufficient: int = 0
+    n_quorum_split: int = 0
+    n_quorum_reference_weak: int = 0
+
+    def __post_init__(self) -> None:
+        # Trajectory-disjointness (W38 precondition).
+        traj_set = set(self.registered_trajectory_host_ids)
+        for i, pool in enumerate(self.registered_quorum_pool_host_ids):
+            overlap = set(pool) & traj_set
+            if overlap:
+                raise DisjointTopologyError(
+                    "W39 trajectory disjointness violated: pool "
+                    f"{i} host_ids ∩ trajectory_host_ids = "
+                    f"{sorted(overlap)!r}")
+        # Mutual-disjointness (W39 precondition).
+        pools_list = [
+            set(pool)
+            for pool in self.registered_quorum_pool_host_ids]
+        for i in range(len(pools_list)):
+            for j in range(i + 1, len(pools_list)):
+                inter = pools_list[i] & pools_list[j]
+                if inter:
+                    raise MutuallyDisjointTopologyError(
+                        "W39 mutual disjointness violated: "
+                        f"pool {i} ∩ pool {j} = {sorted(inter)!r}")
+
+    @property
+    def is_trivial(self) -> bool:
+        return (not bool(self.quorum_enabled)
+                and bool(self.manifest_v9_disabled)
+                and not bool(
+                    self.allow_disjoint_quorum_divergence_abstain))
+
+    @property
+    def has_wire_required_layer(self) -> bool:
+        return not self.is_trivial
+
+    @property
+    def quorum_topology_cid(self) -> str:
+        return _compute_w39_quorum_topology_cid(
+            registered_quorum_pool_host_ids=(
+                self.registered_quorum_pool_host_ids),
+            registered_quorum_pool_oracle_ids=(
+                self.registered_quorum_pool_oracle_ids),
+            registered_trajectory_host_ids=(
+                self.registered_trajectory_host_ids),
+        )
+
+    @property
+    def mutual_disjointness_cid(self) -> str:
+        return _compute_w39_mutual_disjointness_cid(
+            registered_quorum_pool_host_ids=(
+                self.registered_quorum_pool_host_ids),
+        )
+
+    def register_envelope(
+            self,
+            envelope: MultiHostDisjointQuorumRatificationEnvelope,
+            *,
+            registered_parent_w38_cid: str,
+    ) -> LatentVerificationOutcome:
+        if self.schema is None:
+            outcome = LatentVerificationOutcome(
+                ok=False, reason="schema_unregistered", n_checks=0)
+            self.n_w39_rejected += 1
+            return outcome
+        outcome = verify_multi_host_disjoint_quorum_ratification(
+            envelope,
+            registered_schema=self.schema,
+            registered_parent_w38_cid=str(registered_parent_w38_cid),
+            registered_quorum_pool_host_ids=(
+                self.registered_quorum_pool_host_ids),
+            registered_quorum_pool_oracle_ids=(
+                self.registered_quorum_pool_oracle_ids),
+            registered_trajectory_host_ids=frozenset(
+                self.registered_trajectory_host_ids),
+            registered_quorum_topology_cid=(
+                self.quorum_topology_cid),
+            registered_mutual_disjointness_cid=(
+                self.mutual_disjointness_cid),
+        )
+        if outcome.ok:
+            self._envelopes[envelope.w39_cid] = envelope
+            self.n_w39_registered += 1
+            br = envelope.projection_branch
+            if br == W39_BRANCH_QUORUM_RATIFIED:
+                self.n_quorum_ratified += 1
+            elif br == W39_BRANCH_QUORUM_DIVERGENCE_ABSTAINED:
+                self.n_quorum_divergence_abstained += 1
+            elif br == W39_BRANCH_QUORUM_NO_REFERENCES:
+                self.n_quorum_no_references += 1
+            elif br == W39_BRANCH_QUORUM_NO_TRIGGER:
+                self.n_quorum_no_trigger += 1
+            elif br == W39_BRANCH_QUORUM_INSUFFICIENT:
+                self.n_quorum_insufficient += 1
+            elif br == W39_BRANCH_QUORUM_SPLIT:
+                self.n_quorum_split += 1
+            elif br == W39_BRANCH_QUORUM_REFERENCE_WEAK:
+                self.n_quorum_reference_weak += 1
+        else:
+            self.n_w39_rejected += 1
+        return outcome
+
+
+@dataclasses.dataclass(frozen=True)
+class W39MultiHostDisjointQuorumResult:
+    """Audit record for one W39 decode call."""
+
+    answer: dict[str, Any]
+    inner_w38_branch: str
+    decoder_branch: str
+    projection_branch: str
+    w38_top_set: tuple[str, ...]
+    decision_top_set: tuple[str, ...]
+    n_agree: int
+    n_disagree: int
+    n_weak: int
+    n_total: int
+    parent_w38_cid: str
+    cell_index: int
+    n_w38_visible_tokens: int
+    n_w39_visible_tokens: int
+    n_w39_overhead_tokens: int
+    w39_cid: str
+    manifest_v9_cid: str
+    quorum_state_cid: str
+    quorum_audit_cid: str
+    quorum_topology_cid: str
+    quorum_decision_cid: str
+    mutual_disjointness_cid: str
+    ratified: bool
+    verification_ok: bool
+    verification_reason: str
+    n_envelope_bytes: int
+    n_structured_bits: int
+    cram_factor_w39: float
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "root_cause": str(self.answer.get("root_cause", "unknown")),
+            "services": tuple(self.answer.get("services", ())),
+            "remediation": str(self.answer.get(
+                "remediation", "investigate")),
+            "inner_w38_branch": str(self.inner_w38_branch),
+            "decoder_branch": str(self.decoder_branch),
+            "projection_branch": str(self.projection_branch),
+            "w38_top_set": [str(t) for t in self.w38_top_set],
+            "decision_top_set": [
+                str(t) for t in self.decision_top_set],
+            "n_agree": int(self.n_agree),
+            "n_disagree": int(self.n_disagree),
+            "n_weak": int(self.n_weak),
+            "n_total": int(self.n_total),
+            "parent_w38_cid": str(self.parent_w38_cid),
+            "cell_index": int(self.cell_index),
+            "n_w38_visible_tokens": int(self.n_w38_visible_tokens),
+            "n_w39_visible_tokens": int(self.n_w39_visible_tokens),
+            "n_w39_overhead_tokens": int(self.n_w39_overhead_tokens),
+            "w39_cid": str(self.w39_cid),
+            "manifest_v9_cid": str(self.manifest_v9_cid),
+            "quorum_state_cid": str(self.quorum_state_cid),
+            "quorum_audit_cid": str(self.quorum_audit_cid),
+            "quorum_topology_cid": str(self.quorum_topology_cid),
+            "quorum_decision_cid": str(self.quorum_decision_cid),
+            "mutual_disjointness_cid": str(
+                self.mutual_disjointness_cid),
+            "ratified": bool(self.ratified),
+            "verification_ok": bool(self.verification_ok),
+            "verification_reason": str(self.verification_reason),
+            "n_envelope_bytes": int(self.n_envelope_bytes),
+            "n_structured_bits": int(self.n_structured_bits),
+            "cram_factor_w39": float(self.cram_factor_w39),
+        }
+
+
+@dataclasses.dataclass
+class MultiHostDisjointQuorumOrchestrator:
+    """Multi-host disjoint quorum guard around W38."""
+
+    inner: DisjointConsensusReferenceOrchestrator
+    registry: MultiHostDisjointQuorumRegistry
+    enabled: bool = True
+    require_w39_verification: bool = True
+
+    _last_result: "W39MultiHostDisjointQuorumResult | None" = None
+    _last_envelope: (
+        "MultiHostDisjointQuorumRatificationEnvelope | None") = None
+    _cell_index: int = 0
+    _quorum_provider: Any = None
+
+    @property
+    def schema(self) -> "SchemaCapsule | None":
+        return self.registry.schema
+
+    def reset_session(self) -> None:
+        self.inner.reset_session()
+        self._last_result = None
+        self._last_envelope = None
+        self._cell_index = 0
+
+    def set_quorum_provider(self, provider: Any) -> None:
+        """Register a callable producing a quorum probe per cell.
+
+        The callable receives ``(orch, w38_result)`` and returns a
+        :class:`MultiHostDisjointQuorumProbe` or ``None``.  ``None``
+        triggers the ``QUORUM_NO_REFERENCES`` branch.
+        """
+        self._quorum_provider = provider
+
+    def _build_envelope(
+            self,
+            *,
+            parent_w38_cid: str,
+            probe: MultiHostDisjointQuorumProbe | None,
+            projection_branch: str,
+            w38_top_set: tuple[str, ...],
+            decision_top_set: tuple[str, ...],
+            n_agree: int,
+            n_disagree: int,
+            n_weak: int,
+            n_total: int,
+            per_probe_divergence_scores: tuple[float, ...],
+            per_probe_branches: tuple[str, ...],
+            wire_required: bool,
+    ) -> MultiHostDisjointQuorumRatificationEnvelope:
+        state_cid = _compute_w39_quorum_state_cid(probe=probe)
+        topology_cid = self.registry.quorum_topology_cid
+        mutual_cid = self.registry.mutual_disjointness_cid
+        decision_cid = _compute_w39_quorum_decision_cid(
+            projection_branch=projection_branch,
+            n_agree=int(n_agree),
+            n_disagree=int(n_disagree),
+            n_weak=int(n_weak),
+            n_total=int(n_total),
+            decision_top_set=decision_top_set,
+            per_probe_divergence_scores=per_probe_divergence_scores,
+            per_probe_branches=per_probe_branches,
+        )
+        audit_cid = _compute_w39_quorum_audit_cid(
+            projection_branch=projection_branch,
+            w38_top_set=w38_top_set,
+            decision_top_set=decision_top_set,
+            n_agree=int(n_agree),
+            n_disagree=int(n_disagree),
+            n_weak=int(n_weak),
+            n_total=int(n_total),
+            quorum_min=int(self.registry.quorum_min),
+            min_quorum_probes=int(self.registry.min_quorum_probes),
+            consensus_strength_min=float(
+                self.registry.consensus_strength_min),
+            divergence_margin_min=float(
+                self.registry.divergence_margin_min),
+        )
+        manifest_cid = _compute_w39_manifest_v9_cid(
+            parent_w38_cid=parent_w38_cid,
+            quorum_state_cid=state_cid,
+            quorum_audit_cid=audit_cid,
+            quorum_topology_cid=topology_cid,
+            quorum_decision_cid=decision_cid,
+            mutual_disjointness_cid=mutual_cid,
+        )
+        return MultiHostDisjointQuorumRatificationEnvelope(
+            schema_version=(
+                W39_MULTI_HOST_DISJOINT_QUORUM_SCHEMA_VERSION),
+            schema_cid=str(self.schema.cid),
+            parent_w38_cid=str(parent_w38_cid),
+            quorum_probe=probe,
+            quorum_state_cid=state_cid,
+            quorum_topology_cid=topology_cid,
+            quorum_decision_cid=decision_cid,
+            mutual_disjointness_cid=mutual_cid,
+            projection_branch=str(projection_branch),
+            w38_top_set=tuple(w38_top_set),
+            decision_top_set=tuple(decision_top_set),
+            n_agree=int(n_agree),
+            n_disagree=int(n_disagree),
+            n_weak=int(n_weak),
+            n_total=int(n_total),
+            quorum_min=int(self.registry.quorum_min),
+            min_quorum_probes=int(self.registry.min_quorum_probes),
+            consensus_strength_min=float(
+                self.registry.consensus_strength_min),
+            divergence_margin_min=float(
+                self.registry.divergence_margin_min),
+            per_probe_divergence_scores=tuple(
+                float(s) for s in per_probe_divergence_scores),
+            per_probe_branches=tuple(
+                str(b) for b in per_probe_branches),
+            quorum_audit_cid=audit_cid,
+            manifest_v9_cid=manifest_cid,
+            cell_index=int(self._cell_index),
+            wire_required=bool(wire_required),
+        )
+
+    def decode_rounds(
+            self,
+            per_round_handoffs: Sequence[Sequence[_DecodedHandoff]],
+    ) -> dict[str, Any]:
+        if not self.enabled or self.schema is None:
+            out = self.inner.decode_rounds(per_round_handoffs)
+            n_w38_visible = int(
+                out.get("disjoint_consensus_reference", {}).get(
+                    "n_w38_visible_tokens", 0))
+            return self._pack(
+                out=out,
+                decoder_branch=W39_BRANCH_QUORUM_DISABLED,
+                projection_branch="",
+                envelope=None,
+                n_w39_visible=n_w38_visible,
+                w39_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason="disabled",
+                w38_top_set=(),
+                decision_top_set=(),
+                n_agree=0, n_disagree=0, n_weak=0, n_total=0,
+                parent_w38_cid="",
+            )
+
+        out = self.inner.decode_rounds(per_round_handoffs)
+        w38_result = self.inner.last_result
+        n_w38_visible = int(
+            w38_result.n_w38_visible_tokens
+            if w38_result is not None else 0)
+        inner_w38_branch = str(
+            w38_result.decoder_branch if w38_result is not None else "")
+
+        if self.registry.is_trivial:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W39_BRANCH_TRIVIAL_QUORUM_PASSTHROUGH,
+                projection_branch="",
+                envelope=None,
+                n_w39_visible=n_w38_visible,
+                w39_overhead=0,
+                ratified=True,
+                verify_ok=True,
+                verify_reason="trivial_passthrough",
+                w38_top_set=(),
+                decision_top_set=(),
+                n_agree=0, n_disagree=0, n_weak=0, n_total=0,
+                parent_w38_cid="",
+            )
+
+        # Build the W39 multi-host disjoint quorum probe.
+        probe: MultiHostDisjointQuorumProbe | None = None
+        if self._quorum_provider is not None:
+            try:
+                probe = self._quorum_provider(self, w38_result)
+            except Exception:
+                probe = None
+
+        # W38 reroutes either via CONSENSUS_RATIFIED or via
+        # CONSENSUS_NO_REFERENCE / CONSENSUS_NO_TRIGGER /
+        # CONSENSUS_REFERENCE_WEAK that fall through to W37's
+        # rerouted decision.  The W38 candidate top_set is the
+        # last-cell W37 candidate sealed in the W38 envelope.
+        w38_envelope = self.inner.last_envelope
+        w38_top: tuple[str, ...] = ()
+        w38_rerouted = False
+        if w38_result is not None:
+            w38_top = tuple(sorted(str(t)
+                                   for t in w38_result.w37_top_set))
+            # W38 considers itself "rerouted" when its W37 inner
+            # rerouted (the top_set is non-empty) regardless of
+            # whether W38 itself ratified or fell through.  The
+            # quorum cross-check should fire when the underlying
+            # W37 reroute decision is in play.
+            w38_rerouted = bool(w38_top)
+
+        (proj_branch, n_agree, n_disagree, n_weak, n_total,
+         decision_top, per_div, per_branch) = (
+            select_multi_host_disjoint_quorum_decision(
+                quorum_probe=probe,
+                w38_candidate_top_set=w38_top,
+                w38_rerouted=w38_rerouted,
+                quorum_min=int(self.registry.quorum_min),
+                min_quorum_probes=int(
+                    self.registry.min_quorum_probes),
+                consensus_strength_min=float(
+                    self.registry.consensus_strength_min),
+                divergence_margin_min=float(
+                    self.registry.divergence_margin_min),
+            ))
+
+        decoder_branch = W39_BRANCH_QUORUM_RESOLVED
+        w39_answer = dict(out)
+        if (proj_branch == W39_BRANCH_QUORUM_DIVERGENCE_ABSTAINED
+                and self.registry.allow_disjoint_quorum_divergence_abstain
+                and w38_rerouted):
+            # Drop the W38 rerouted services.  The disjoint quorum
+            # detected divergence at quorum_min level.
+            w39_answer["services"] = ()
+            decoder_branch = W39_BRANCH_QUORUM_DIVERGENCE_ABSTAINED
+        elif proj_branch == W39_BRANCH_QUORUM_RATIFIED:
+            decoder_branch = W39_BRANCH_QUORUM_RATIFIED
+        elif proj_branch in (
+                W39_BRANCH_QUORUM_NO_REFERENCES,
+                W39_BRANCH_QUORUM_NO_TRIGGER,
+                W39_BRANCH_QUORUM_INSUFFICIENT,
+                W39_BRANCH_QUORUM_SPLIT,
+                W39_BRANCH_QUORUM_REFERENCE_WEAK):
+            decoder_branch = proj_branch
+
+        parent_w38_cid = ""
+        if (w38_result is not None
+                and w38_envelope is not None):
+            parent_w38_cid = str(w38_envelope.w38_cid)
+        if not parent_w38_cid:
+            parent_payload = _canonical_json_bytes({
+                "inner_w38_branch": inner_w38_branch,
+                "n_w38_visible": int(n_w38_visible),
+                "cell_index": int(self._cell_index),
+            })
+            parent_w38_cid = hashlib.sha256(parent_payload).hexdigest()
+
+        envelope = self._build_envelope(
+            parent_w38_cid=parent_w38_cid,
+            probe=probe,
+            projection_branch=proj_branch,
+            w38_top_set=w38_top,
+            decision_top_set=tuple(decision_top),
+            n_agree=int(n_agree),
+            n_disagree=int(n_disagree),
+            n_weak=int(n_weak),
+            n_total=int(n_total),
+            per_probe_divergence_scores=per_div,
+            per_probe_branches=per_branch,
+            wire_required=self.registry.has_wire_required_layer,
+        )
+        outcome = self.registry.register_envelope(
+            envelope,
+            registered_parent_w38_cid=parent_w38_cid,
+        )
+        verify_ok = bool(outcome.ok)
+        verify_reason = str(outcome.reason)
+        if not verify_ok and self.require_w39_verification:
+            self._cell_index += 1
+            return self._pack(
+                out=out,
+                decoder_branch=W39_BRANCH_QUORUM_REJECTED,
+                projection_branch=proj_branch,
+                envelope=envelope,
+                n_w39_visible=n_w38_visible,
+                w39_overhead=0,
+                ratified=False,
+                verify_ok=False,
+                verify_reason=verify_reason,
+                w38_top_set=w38_top,
+                decision_top_set=tuple(decision_top),
+                n_agree=int(n_agree),
+                n_disagree=int(n_disagree),
+                n_weak=int(n_weak),
+                n_total=int(n_total),
+                parent_w38_cid=parent_w38_cid,
+            )
+
+        w39_overhead = int(envelope.n_wire_tokens)
+        n_w39_visible = int(n_w38_visible + w39_overhead)
+        out_local = dict(out)
+        for k, v in w39_answer.items():
+            out_local[k] = v
+        if "services" not in w39_answer:
+            out_local["services"] = ()
+        self._cell_index += 1
+        return self._pack(
+            out=out_local,
+            decoder_branch=decoder_branch,
+            projection_branch=proj_branch,
+            envelope=envelope,
+            n_w39_visible=n_w39_visible,
+            w39_overhead=w39_overhead,
+            ratified=True,
+            verify_ok=verify_ok,
+            verify_reason=verify_reason,
+            w38_top_set=w38_top,
+            decision_top_set=tuple(decision_top),
+            n_agree=int(n_agree),
+            n_disagree=int(n_disagree),
+            n_weak=int(n_weak),
+            n_total=int(n_total),
+            parent_w38_cid=parent_w38_cid,
+        )
+
+    def _pack(
+            self,
+            *,
+            out: dict[str, Any],
+            decoder_branch: str,
+            projection_branch: str,
+            envelope: (
+                MultiHostDisjointQuorumRatificationEnvelope | None),
+            n_w39_visible: int,
+            w39_overhead: int,
+            ratified: bool,
+            verify_ok: bool,
+            verify_reason: str,
+            w38_top_set: tuple[str, ...],
+            decision_top_set: tuple[str, ...],
+            n_agree: int,
+            n_disagree: int,
+            n_weak: int,
+            n_total: int,
+            parent_w38_cid: str,
+    ) -> dict[str, Any]:
+        envelope_bytes = (envelope.n_envelope_bytes
+                          if envelope is not None else 0)
+        structured_bits = (envelope.n_structured_bits
+                           if envelope is not None else 0)
+        wire = max(1, int(w39_overhead))
+        cram_factor = (float(structured_bits) / float(wire)
+                       if structured_bits > 0 else 0.0)
+        w39_cid = str(envelope.w39_cid) if envelope is not None else ""
+        manifest_cid = (str(envelope.manifest_v9_cid)
+                        if envelope is not None else "")
+        state_cid = (str(envelope.quorum_state_cid)
+                     if envelope is not None else "")
+        audit_cid = (str(envelope.quorum_audit_cid)
+                     if envelope is not None else "")
+        topology_cid = (str(envelope.quorum_topology_cid)
+                        if envelope is not None
+                        else self.registry.quorum_topology_cid)
+        decision_cid = (str(envelope.quorum_decision_cid)
+                        if envelope is not None else "")
+        mutual_cid = (str(envelope.mutual_disjointness_cid)
+                      if envelope is not None
+                      else self.registry.mutual_disjointness_cid)
+        n_w38_visible = int(out.get(
+            "disjoint_consensus_reference", {}).get(
+            "n_w38_visible_tokens", 0))
+        inner_w38_branch = str(out.get(
+            "disjoint_consensus_reference", {}).get(
+                "decoder_branch", ""))
+        result = W39MultiHostDisjointQuorumResult(
+            answer=dict(out),
+            inner_w38_branch=inner_w38_branch,
+            decoder_branch=str(decoder_branch),
+            projection_branch=str(projection_branch),
+            w38_top_set=tuple(w38_top_set),
+            decision_top_set=tuple(decision_top_set),
+            n_agree=int(n_agree),
+            n_disagree=int(n_disagree),
+            n_weak=int(n_weak),
+            n_total=int(n_total),
+            parent_w38_cid=str(parent_w38_cid),
+            cell_index=int(self._cell_index - 1
+                           if self._cell_index > 0 else 0),
+            n_w38_visible_tokens=int(n_w38_visible),
+            n_w39_visible_tokens=int(n_w39_visible),
+            n_w39_overhead_tokens=int(w39_overhead),
+            w39_cid=w39_cid,
+            manifest_v9_cid=manifest_cid,
+            quorum_state_cid=state_cid,
+            quorum_audit_cid=audit_cid,
+            quorum_topology_cid=topology_cid,
+            quorum_decision_cid=decision_cid,
+            mutual_disjointness_cid=mutual_cid,
+            ratified=bool(ratified),
+            verification_ok=bool(verify_ok),
+            verification_reason=str(verify_reason),
+            n_envelope_bytes=int(envelope_bytes),
+            n_structured_bits=int(structured_bits),
+            cram_factor_w39=float(cram_factor),
+        )
+        self._last_result = result
+        self._last_envelope = envelope
+        out_local = dict(out)
+        out_local["multi_host_disjoint_quorum"] = result.as_dict()
+        if envelope is not None:
+            out_local["multi_host_disjoint_quorum_envelope"] = (
+                envelope.as_dict())
+        return out_local
+
+    def decode(
+            self,
+            handoffs: Sequence[_DecodedHandoff],
+    ) -> dict[str, Any]:
+        return self.decode_rounds([handoffs])
+
+    @property
+    def last_result(self) -> (
+            "W39MultiHostDisjointQuorumResult | None"):
+        return self._last_result
+
+    @property
+    def last_envelope(self) -> (
+            "MultiHostDisjointQuorumRatificationEnvelope | None"):
+        return self._last_envelope
+
+
+def build_trivial_multi_host_disjoint_quorum_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w38_registry: (
+            DisjointConsensusReferenceRegistry | None) = None,
+) -> MultiHostDisjointQuorumRegistry:
+    return MultiHostDisjointQuorumRegistry(
+        schema=schema,
+        inner_w38_registry=inner_w38_registry,
+        quorum_enabled=False,
+        manifest_v9_disabled=True,
+        allow_disjoint_quorum_divergence_abstain=False,
+        registered_quorum_pool_host_ids=(),
+        registered_quorum_pool_oracle_ids=(),
+        registered_trajectory_host_ids=frozenset(),
+    )
+
+
+def build_multi_host_disjoint_quorum_registry(
+        *,
+        schema: SchemaCapsule,
+        inner_w38_registry: DisjointConsensusReferenceRegistry,
+        registered_quorum_pool_host_ids: Sequence[Iterable[str]] = (),
+        registered_quorum_pool_oracle_ids: Sequence[
+            Iterable[str]] = (),
+        registered_trajectory_host_ids: Iterable[str] = (),
+        quorum_enabled: bool = True,
+        manifest_v9_disabled: bool = False,
+        allow_disjoint_quorum_divergence_abstain: bool = True,
+        quorum_min: int = W39_DEFAULT_QUORUM_MIN,
+        min_quorum_probes: int = W39_DEFAULT_MIN_QUORUM_PROBES,
+        consensus_strength_min: float = (
+            W39_DEFAULT_QUORUM_STRENGTH_MIN),
+        divergence_margin_min: float = (
+            W39_DEFAULT_QUORUM_DIVERGENCE_MARGIN_MIN),
+) -> MultiHostDisjointQuorumRegistry:
+    pool_hosts = tuple(
+        frozenset(str(h) for h in pool)
+        for pool in registered_quorum_pool_host_ids)
+    pool_oracles = tuple(
+        frozenset(str(o) for o in pool)
+        for pool in registered_quorum_pool_oracle_ids)
+    return MultiHostDisjointQuorumRegistry(
+        schema=schema,
+        inner_w38_registry=inner_w38_registry,
+        quorum_enabled=bool(quorum_enabled),
+        manifest_v9_disabled=bool(manifest_v9_disabled),
+        allow_disjoint_quorum_divergence_abstain=bool(
+            allow_disjoint_quorum_divergence_abstain),
+        quorum_min=int(quorum_min),
+        min_quorum_probes=int(min_quorum_probes),
+        consensus_strength_min=float(consensus_strength_min),
+        divergence_margin_min=float(divergence_margin_min),
+        registered_quorum_pool_host_ids=pool_hosts,
+        registered_quorum_pool_oracle_ids=pool_oracles,
+        registered_trajectory_host_ids=frozenset(
+            str(h) for h in registered_trajectory_host_ids),
+    )

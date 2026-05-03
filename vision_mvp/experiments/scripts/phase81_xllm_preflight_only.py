@@ -21,6 +21,26 @@ import urllib.error
 import urllib.request
 
 
+def _mac2_candidates() -> tuple[tuple[str, str, str], ...]:
+    env = os.environ.get("WEVRA_OLLAMA_URL_MAC2")
+    candidates = [
+        (env, env, "any") if env else None,
+        ("http://192.168.12.248:11434", "192.168.12.248", "any"),
+        ("http://192.168.12.101:11434", "192.168.12.101", "any"),
+    ]
+    deduped: list[tuple[str, str, str]] = []
+    seen_urls: set[str] = set()
+    for item in candidates:
+        if item is None:
+            continue
+        host_url, host_id, model_id = item
+        if host_url in seen_urls:
+            continue
+        seen_urls.add(host_url)
+        deduped.append((host_url, host_id, model_id))
+    return tuple(deduped)
+
+
 HOSTS_TO_PREFLIGHT = (
     ("http://localhost:11434", "localhost", "gemma2:9b"),
     ("http://localhost:11434", "localhost", "llama3.1:8b"),
@@ -35,9 +55,9 @@ HOSTS_TO_PREFLIGHT = (
      "qwen2.5-coder:14b-32k"),
     ("http://192.168.12.191:11434", "192.168.12.191",
      "qwen3.5:35b"),
-    # Mac 2 — expected ARP-incomplete.
-    ("http://192.168.12.248:11434", "192.168.12.248", "any"),
-)
+    # Mac 2 — prefer explicit override, then probe historical/current
+    # candidate endpoints instead of pinning to one stale address.
+) + _mac2_candidates()
 
 
 def preflight_check_tags(host_url: str, model_id: str,

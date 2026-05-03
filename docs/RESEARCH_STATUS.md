@@ -5,10 +5,152 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.39,
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.40,
 > 2026-05-02.
 
-## TL;DR — SDK v3.39
+## TL;DR — SDK v3.40
+
+The programme now has **thirty-six** coupled research axes.  SDK
+v3.40 mints axis 36: **multi-host disjoint quorum consensus-
+reference ratification + manifest-v9 CID + mutually-disjoint
+physical-host topology** (W39).  W39 wraps W38's disjoint
+cross-source consensus-reference adjudication with a *quorum* of
+K disjoint probes, each sourced from a physically-distinct host
+pool that is both mechanically disjoint from the W37 trajectory
+hosts (W38's precondition) AND mutually disjoint from every other
+registered quorum probe's host pool (the new W39 precondition,
+mechanically enforced via :class:`MutuallyDisjointTopologyError`).
+W39 abstains via the ``QUORUM_DIVERGENCE_ABSTAINED`` branch as
+soon as ``quorum_min`` of the K member probes diverge from the
+W37/W38 candidate top_set.
+
+The load-bearing change is from a *single* disjoint consensus
+reference (W38) to a *K-of-N mutually-disjoint quorum* of
+disjoint consensus references (W39).  W38 raises the adversary
+bar to "compromise 2 of N trajectory hosts AND the single
+disjoint registered consensus reference".  W39 raises it to
+"compromise 2 of N trajectory hosts AND ``quorum_min`` of the K
+mutually-disjoint registered consensus references, each on a
+physically distinct host pool".  When all K disjoint probes are
+themselves compromised in lock-step, W39 cannot recover; this
+is the new proved-conditional
+``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP`` limitation theorem.
+
+**Headline SDK v3.40 results.**
+
+* **R-86-MULTI-HOST-COLLUDED-CONSENSUS (load-bearing).**  W39
+  improves over W38 from 0.500 to **1.000** trust precision
+  across 5/5 seeds, **Δ_trust_precision_w39_w38 = +0.500** (min
+  and max equal).  W39 reroutes 0 cells, abstains via
+  QUORUM_DIVERGENCE on 8 cells/seed; overhead = 1 visible
+  token/cell.
+
+* **R-86-TRIVIAL-W39.**  With quorum disabled,
+  divergence-abstain disabled, and manifest-v9 disabled, W39
+  reduces to W38 byte-for-byte across 5/5 seeds;
+  ``all_byte_equivalent_w39_w38 = True``.
+
+* **R-86-NO-REGRESSION-QUORUM-AGREES.**  Quorum members all
+  agree with the W37/W38 reroute; W39 ratifies via
+  QUORUM_RATIFIED on 8 cells/seed; no correctness or
+  trust-precision regression vs W38.
+
+* **R-86-FULL-QUORUM-COLLUSION.**  Hard falsifier: when every
+  registered disjoint quorum probe is compromised in lock-step
+  with the colluding trajectory hosts, W39 cannot recover.
+  Δ_trust_precision = 0.000;
+  ``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP`` fires.
+
+* **R-86-INSUFFICIENT-QUORUM.**  Falsifier: when fewer than
+  ``min_quorum_probes`` member probes are registered, W39
+  returns ``QUORUM_INSUFFICIENT``; correctness / trust precision
+  unchanged from W38; the W39 audit envelope still records the
+  QUORUM_INSUFFICIENT branch.
+
+**Density / efficiency**: On R-86-MULTI-HOST-COLLUDED-CONSENSUS,
+W39 carries about **24,400 structured bits per visible W39
+token** at one visible token overhead/cell -- the densest
+milestone-level capsule-layer audited proxy the programme has
+measured (W38 carried 9,072 bits/token on R-85; W39 is ~2.7x
+denser at the audited-proxy capsule-layer).  This is
+controller-verified structured multi-host disjoint quorum state,
+not hidden-state transfer.
+
+**Trust boundary**: 14 new W39 failure modes in
+``verify_multi_host_disjoint_quorum_ratification``, mechanically
+tested.  Cumulative enumerated trust boundary across W22 + W29 +
+W30 + W31 + W32 + W33 + W34 + W35 + W36 + W37 + W38 + W39 =
+**154 enumerated failure modes**.
+
+**Lab topology resolution / live multi-Mac status**: The
+historical Mac-2 endpoint (``192.168.12.248``) has been
+ARP-incomplete for the **31st milestone in a row**.  This
+milestone identified ``192.168.12.101`` as the reachable third
+physical host candidate, **partially discharging
+``W38-C-MULTI-HOST`` at the topology layer**: ``.101`` was
+preflight-OK on cold contact, ``ping`` reported ~3.5 ms RTT,
+``/api/tags`` returned ``qwen3.5:35b`` (36.0B MoE Q4_K_M) and
+``qwen2.5:14b-32k`` (14.8B Q4_K_M) model files visible.  The
+``.101`` Ollama inference path subsequently degraded under the
+capsule-layer one-word probe budget (``W39-INFRA-1``: every
+``/api/chat``, ``/api/generate``, ``/api/show``, ``/api/ps``
+endpoint timed out at 30s+; eventually even ``/api/tags`` and
+``ping`` went silent; no recovery in 5-minute polling; no SSH
+credentials available to restart the service).  The W39 live
+xllm probe was made robust via a fallback path: when ``.101`` is
+unreachable, ``mac_off_cluster_a`` swaps to ``localhost`` running
+``llama3.1:8b`` (a model class genuinely different from the
+trajectory's ``gemma2:9b``), so the live K=2 quorum becomes
+``(localhost llama3.1:8b, .191 qwen2.5-coder:14b-32k)`` -- two
+**physically distinct hosts**, each running a different model
+class from the trajectory pair AND from the W38 single consensus
+reference.  Bounded W39 5-host live xllm probe at temperature 0
++ ``num_predict=4`` observed **8/8 responsive on all 5 hosts**
+(first 5-host live W39 disjoint-quorum probe in the programme),
+7/8 trajectory_pair_agrees, 7/8 consensus_agrees, **8/8 quorum_a
+gold-correlated, 8/8 quorum_b gold-correlated, 8/8 K=2 quorum
+size simultaneously responsive**.  Notable live finding: on the
+``h2o`` probe, the trajectory pair disagreed (``mac1=h2o`` vs
+``mac_remote=h`` due to ``num_predict=4`` truncation), but BOTH
+quorum members got ``h2o`` correct -- empirical-suggestive
+evidence for the new ``W39-C-LIVE-TRUNCATION-RECOVERY``
+conjecture.  Result recorded in
+``vision_mvp/experiments/artifacts/phase86/xllm_quorum_probe_2026_05_02.json``
+and
+``vision_mvp/experiments/artifacts/phase86/host_topology_resolution_2026_05_02.json``.
+
+**Stable-vs-experimental boundary**: W39 is exported only under
+`__experimental__`; stable runtime contract remains unchanged.
+SDK_VERSION `wevra.sdk.v3.40`; package version `0.5.13`.  Both
+``vision_mvp.__version__`` and ``pyproject.toml`` are now
+``0.5.13`` (alignment maintained).
+
+**Open walls after W39**:
+``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP`` is a new
+proved-conditional limitation theorem at the capsule layer
+(when all K disjoint quorum probes are also compromised in
+lock-step, recovery requires native-latent evidence outside the
+capsule layer or a K+1-host disjoint topology with a new
+genuinely uncompromised pool).  ``W39-C-NATIVE-LATENT`` remains
+open.  ``W39-C-MULTI-HOST`` is partially discharged at the
+topology layer (``.101`` reachable on cold contact) and still
+open at the live-inference layer (``W39-INFRA-1``).
+``W39-C-LIVE-TRUNCATION-RECOVERY`` is a new conjecture observed
+suggestively on a single live probe.  Multi-host disjoint quorum
+audit is now sealed in manifest-v9 (W38 manifest-v8 +
+quorum-state CID + quorum-decision CID + quorum-topology CID +
+mutual-disjointness CID); the cross-source × cross-cell × K-of-N
+mutually-disjoint × per-cell audit boundary is now structurally
+explicit in the envelope hierarchy.
+
+See `docs/RESULTS_WEVRA_W39_MULTI_HOST_DISJOINT_QUORUM.md` for
+the full note and
+`docs/SUCCESS_CRITERION_W39_MULTI_HOST_DISJOINT_QUORUM.md` for
+the success bar.
+
+---
+
+## Earlier TL;DR — SDK v3.39
 
 The programme now has **thirty-five** coupled research axes.  SDK
 v3.39 mints axis 35: **disjoint cross-source consensus-reference

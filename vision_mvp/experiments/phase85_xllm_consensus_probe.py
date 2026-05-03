@@ -16,8 +16,10 @@ Threat model on this probe:
   collusion attack on the trajectory dense models would NOT
   automatically corrupt the MoE consensus.  We record the residual
   hardware-bound caveat explicitly.
-* Mac 2 (192.168.12.248) remains ARP-incomplete (31st milestone in a
-  row); the strongest honest 3-host topology is therefore unavailable.
+* The historical Mac 2 endpoint (192.168.12.248) has often been
+  unreachable. This probe now checks an explicit override first and
+  then falls back across known candidate URLs so the live topology is
+  not pinned to a stale address.
 
 Each probe is a single-prompt cross-host request at temperature 0 with
 ``num_predict=4``, the same discipline as Phase 84's W37 trajectory
@@ -85,6 +87,20 @@ _HOSTS: dict[str, dict[str, str]] = {
 }
 
 
+def _mac2_candidates() -> tuple[str, ...]:
+    env = os.environ.get("WEVRA_OLLAMA_URL_MAC2")
+    candidates = [
+        env,
+        "http://192.168.12.248:11434",
+        "http://192.168.12.101:11434",
+    ]
+    deduped: list[str] = []
+    for candidate in candidates:
+        if candidate and candidate not in deduped:
+            deduped.append(candidate)
+    return tuple(deduped)
+
+
 def _preflight(host_id: str, base_url: str,
                timeout_s: float = 5.0) -> bool:
     try:
@@ -94,6 +110,27 @@ def _preflight(host_id: str, base_url: str,
             return response.status == 200
     except (urllib.error.URLError, OSError):
         return False
+
+
+def _resolve_mac2_status(timeout_s: float = 5.0) -> dict[str, Any]:
+    candidate_results: list[dict[str, Any]] = []
+    for candidate in _mac2_candidates():
+        ok = _preflight("mac2", candidate, timeout_s=timeout_s)
+        candidate_results.append({
+            "base_url": candidate,
+            "preflight_ok": bool(ok),
+        })
+        if ok:
+            return {
+                "status": "reachable",
+                "resolved_url": candidate,
+                "candidate_results": candidate_results,
+            }
+    return {
+        "status": "unreachable",
+        "resolved_url": None,
+        "candidate_results": candidate_results,
+    }
 
 
 def _ask(host_id: str, model: str, base_url: str, prompt: str,
@@ -150,16 +187,18 @@ def run_phase85_xllm_consensus_probe(
         }
         if ok:
             available.append(host_id)
-    mac2_ok = _preflight(
-        "mac2", "http://192.168.12.248:11434", timeout_s=8.0)
-    mac2_status = ("reachable" if mac2_ok
-                   else "ARP-incomplete (31st milestone)")
+    mac2 = _resolve_mac2_status(timeout_s=8.0)
+    if mac2["status"] == "reachable":
+        mac2_status = f"reachable via {mac2['resolved_url']}"
+    else:
+        mac2_status = "unreachable across historical/candidate URLs"
     n_required = ("mac1", "mac_remote", "mac_consensus")
     if not all(h in available for h in n_required):
         return {
             "verdict": "live_consensus_probe_unavailable",
             "preflight": preflight,
             "mac2_status": mac2_status,
+            "mac2_candidates": mac2["candidate_results"],
             "missing_required_hosts": [
                 h for h in n_required if h not in available],
             "n_required": list(n_required),
@@ -238,6 +277,7 @@ def run_phase85_xllm_consensus_probe(
         "n_probes": len(per_probe),
         "available": available,
         "mac2_status": mac2_status,
+        "mac2_candidates": mac2["candidate_results"],
         "n_responsive_all_3": int(n_responsive_all),
         "n_consensus_agrees_w_trajectory": int(n_consensus_agrees),
         "n_consensus_disagrees_w_trajectory": int(

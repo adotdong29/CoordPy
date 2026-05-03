@@ -613,6 +613,36 @@ from .team_coord import (
     W38_BRANCH_CONSENSUS_DIVERGENCE_ABSTAINED,
     W38_BRANCH_CONSENSUS_REFERENCE_WEAK,
     W38_ALL_BRANCHES,
+    # SDK v3.40 — multi-host disjoint quorum consensus-reference
+    # ratification + manifest-v9 CID + mutually-disjoint physical-host
+    # topology (W39). EXPERIMENTAL — see __experimental__.
+    MultiHostDisjointQuorumProbe,
+    MultiHostDisjointQuorumRatificationEnvelope,
+    MultiHostDisjointQuorumRegistry,
+    W39MultiHostDisjointQuorumResult,
+    MultiHostDisjointQuorumOrchestrator,
+    MutuallyDisjointTopologyError,
+    verify_multi_host_disjoint_quorum_ratification,
+    select_multi_host_disjoint_quorum_decision,
+    build_trivial_multi_host_disjoint_quorum_registry,
+    build_multi_host_disjoint_quorum_registry,
+    W39_MULTI_HOST_DISJOINT_QUORUM_SCHEMA_VERSION,
+    W39_DEFAULT_QUORUM_MIN,
+    W39_DEFAULT_MIN_QUORUM_PROBES,
+    W39_DEFAULT_QUORUM_STRENGTH_MIN,
+    W39_DEFAULT_QUORUM_DIVERGENCE_MARGIN_MIN,
+    W39_BRANCH_QUORUM_RESOLVED,
+    W39_BRANCH_TRIVIAL_QUORUM_PASSTHROUGH,
+    W39_BRANCH_QUORUM_REJECTED,
+    W39_BRANCH_QUORUM_DISABLED,
+    W39_BRANCH_QUORUM_NO_TRIGGER,
+    W39_BRANCH_QUORUM_RATIFIED,
+    W39_BRANCH_QUORUM_DIVERGENCE_ABSTAINED,
+    W39_BRANCH_QUORUM_NO_REFERENCES,
+    W39_BRANCH_QUORUM_INSUFFICIENT,
+    W39_BRANCH_QUORUM_SPLIT,
+    W39_BRANCH_QUORUM_REFERENCE_WEAK,
+    W39_ALL_BRANCHES,
 )
 from .team_policy import (
     LearnedTeamAdmissionPolicy,
@@ -626,7 +656,7 @@ from .team_policy import (
 )
 
 
-SDK_VERSION = "wevra.sdk.v3.39"
+SDK_VERSION = "wevra.sdk.v3.40"
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
 # Legacy schema — still emitted by mock-only runs that don't touch
 # the unified runtime path. Consumers should accept both.
@@ -799,6 +829,19 @@ __experimental__: tuple[str, ...] = (
     "select_disjoint_consensus_divergence",
     "build_trivial_disjoint_consensus_registry",
     "build_disjoint_consensus_registry",
+    # W39 family — multi-host disjoint quorum consensus-reference
+    # ratification + manifest-v9 CID + mutually-disjoint physical-host
+    # topology.
+    "MultiHostDisjointQuorumProbe",
+    "MultiHostDisjointQuorumRatificationEnvelope",
+    "MultiHostDisjointQuorumRegistry",
+    "W39MultiHostDisjointQuorumResult",
+    "MultiHostDisjointQuorumOrchestrator",
+    "MutuallyDisjointTopologyError",
+    "verify_multi_host_disjoint_quorum_ratification",
+    "select_multi_host_disjoint_quorum_decision",
+    "build_trivial_multi_host_disjoint_quorum_registry",
+    "build_multi_host_disjoint_quorum_registry",
 )
 
 __all__ = [
@@ -1275,6 +1318,36 @@ __all__ = [
     "W38_BRANCH_CONSENSUS_DIVERGENCE_ABSTAINED",
     "W38_BRANCH_CONSENSUS_REFERENCE_WEAK",
     "W38_ALL_BRANCHES",
+    # W39 family — multi-host disjoint quorum consensus-reference
+    # ratification + manifest-v9 CID + mutually-disjoint physical-host
+    # topology.
+    "MultiHostDisjointQuorumProbe",
+    "MultiHostDisjointQuorumRatificationEnvelope",
+    "MultiHostDisjointQuorumRegistry",
+    "W39MultiHostDisjointQuorumResult",
+    "MultiHostDisjointQuorumOrchestrator",
+    "MutuallyDisjointTopologyError",
+    "verify_multi_host_disjoint_quorum_ratification",
+    "select_multi_host_disjoint_quorum_decision",
+    "build_trivial_multi_host_disjoint_quorum_registry",
+    "build_multi_host_disjoint_quorum_registry",
+    "W39_MULTI_HOST_DISJOINT_QUORUM_SCHEMA_VERSION",
+    "W39_DEFAULT_QUORUM_MIN",
+    "W39_DEFAULT_MIN_QUORUM_PROBES",
+    "W39_DEFAULT_QUORUM_STRENGTH_MIN",
+    "W39_DEFAULT_QUORUM_DIVERGENCE_MARGIN_MIN",
+    "W39_BRANCH_QUORUM_RESOLVED",
+    "W39_BRANCH_TRIVIAL_QUORUM_PASSTHROUGH",
+    "W39_BRANCH_QUORUM_REJECTED",
+    "W39_BRANCH_QUORUM_DISABLED",
+    "W39_BRANCH_QUORUM_NO_TRIGGER",
+    "W39_BRANCH_QUORUM_RATIFIED",
+    "W39_BRANCH_QUORUM_DIVERGENCE_ABSTAINED",
+    "W39_BRANCH_QUORUM_NO_REFERENCES",
+    "W39_BRANCH_QUORUM_INSUFFICIENT",
+    "W39_BRANCH_QUORUM_SPLIT",
+    "W39_BRANCH_QUORUM_REFERENCE_WEAK",
+    "W39_ALL_BRANCHES",
     "LearnedTeamAdmissionPolicy", "TeamTrainSample", "TeamTrainStats",
     "train_team_admission_policy", "featurise_team_handoff",
     "KNOWN_SOURCE_ROLES", "KNOWN_CLAIM_KINDS",

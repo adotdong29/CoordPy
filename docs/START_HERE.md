@@ -17,7 +17,9 @@ this one. Everything else in the repo should make sense after this page.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.39)         | [`RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md`](RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md) |
+> | Latest milestone (SDK v3.40)         | [`RESULTS_WEVRA_W39_MULTI_HOST_DISJOINT_QUORUM.md`](RESULTS_WEVRA_W39_MULTI_HOST_DISJOINT_QUORUM.md) |
+> | Pre-committed success bar (SDK v3.40)| [`SUCCESS_CRITERION_W39_MULTI_HOST_DISJOINT_QUORUM.md`](SUCCESS_CRITERION_W39_MULTI_HOST_DISJOINT_QUORUM.md) |
+> | Previous milestone (SDK v3.39)       | [`RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md`](RESULTS_WEVRA_W38_DISJOINT_CONSENSUS_REFERENCE.md) |
 > | Pre-committed success bar (SDK v3.39)| [`SUCCESS_CRITERION_W38_DISJOINT_CONSENSUS_REFERENCE.md`](SUCCESS_CRITERION_W38_DISJOINT_CONSENSUS_REFERENCE.md) |
 > | Previous milestone (SDK v3.38)       | [`RESULTS_WEVRA_W37_CROSS_HOST_BASIS_TRAJECTORY.md`](RESULTS_WEVRA_W37_CROSS_HOST_BASIS_TRAJECTORY.md) |
 > | Pre-committed success bar (SDK v3.38)| [`SUCCESS_CRITERION_W37_CROSS_HOST_BASIS_TRAJECTORY.md`](SUCCESS_CRITERION_W37_CROSS_HOST_BASIS_TRAJECTORY.md) |

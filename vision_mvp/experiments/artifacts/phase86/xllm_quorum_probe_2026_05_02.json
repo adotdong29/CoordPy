@@ -1,0 +1,534 @@
+{
+  "verdict": "bounded_quorum_probe",
+  "n_probes": 8,
+  "available": [
+    "mac1",
+    "mac_remote",
+    "mac_consensus",
+    "mac_off_cluster_a",
+    "mac_quorum_b"
+  ],
+  "off_cluster_status": "unreachable across historical/candidate URLs -- W39-INFRA-1 fallback applied: mac_off_cluster_a swapped to http://localhost:11434 (llama3.1:8b); the live K=2 quorum is now (localhost llama3.1:8b, .191 qwen2.5-coder:14b-32k) -- two physically distinct hosts, each running a different model class from the trajectory pair (gemma2:9b, qwen2.5:14b) and from the W38 single consensus reference (qwen2.5-coder:14b).",
+  "off_cluster_candidates": [
+    {
+      "base_url": "http://192.168.12.101:11434",
+      "preflight_ok": false
+    },
+    {
+      "base_url": "http://192.168.12.248:11434",
+      "preflight_ok": false
+    }
+  ],
+  "fallback_applied": true,
+  "n_responsive_all_5": 8,
+  "n_quorum_size_2": 8,
+  "n_quorum_size_2_agree_with_trajectory": 7,
+  "n_quorum_size_2_disagree_with_trajectory": 0,
+  "n_traj_pair_agrees": 7,
+  "n_consensus_agrees_with_trajectory": 7,
+  "n_quorum_a_agrees_with_trajectory": 7,
+  "n_quorum_a_disagrees_with_trajectory": 0,
+  "n_quorum_a_gold_correlated": 8,
+  "n_quorum_b_agrees_with_trajectory": 7,
+  "n_quorum_b_disagrees_with_trajectory": 0,
+  "n_quorum_b_gold_correlated": 8,
+  "quorum_a_responsive_rate": 0.875,
+  "quorum_b_responsive_rate": 0.875,
+  "quorum_a_gold_correlation_rate": 1.0,
+  "quorum_b_gold_correlation_rate": 1.0,
+  "preflight": {
+    "mac1": {
+      "host_id": "mac1",
+      "base_url": "http://localhost:11434",
+      "model": "gemma2:9b",
+      "role": "trajectory",
+      "preflight_ok": true
+    },
+    "mac_remote": {
+      "host_id": "mac_remote",
+      "base_url": "http://192.168.12.191:11434",
+      "model": "qwen2.5:14b",
+      "role": "trajectory",
+      "preflight_ok": true
+    },
+    "mac_consensus": {
+      "host_id": "mac_consensus",
+      "base_url": "http://192.168.12.191:11434",
+      "model": "qwen2.5-coder:14b",
+      "role": "consensus",
+      "preflight_ok": true
+    },
+    "mac_off_cluster_a": {
+      "host_id": "mac_off_cluster_a",
+      "base_url": "http://localhost:11434",
+      "model": "llama3.1:8b",
+      "role": "quorum",
+      "preflight_ok": true
+    },
+    "mac_quorum_b": {
+      "host_id": "mac_quorum_b",
+      "base_url": "http://192.168.12.191:11434",
+      "model": "qwen2.5-coder:14b-32k",
+      "role": "quorum",
+      "preflight_ok": true
+    },
+    "mac_off_cluster_a_original": {
+      "host_id": "mac_off_cluster_a_original",
+      "base_url": "http://192.168.12.101:11434",
+      "model": "qwen2.5:14b-32k",
+      "role": "quorum",
+      "preflight_ok": false,
+      "infra_observation": "W39-INFRA-1: 192.168.12.101 was preflight-OK on first contact in this session (api/tags returned qwen3.5:35b + qwen2.5:14b-32k inventory) but the Ollama process subsequently entered a fully-hung state (TCP connect succeeds, every API endpoint returns Empty reply from server, polled 30 times at 10s interval over 5 minutes with no recovery, no SSH credentials available to restart the service); the W39 mechanism path stays valid via the cross-physical-host fallback registered as mac_off_cluster_a."
+    }
+  },
+  "per_probe": [
+    {
+      "probe_id": "p1",
+      "prompt": "Answer in exactly one word: capital city of France?",
+      "gold": "paris",
+      "responses": {
+        "mac1": {
+          "answer": "paris",
+          "latency_s": 12.089,
+          "model_id": "gemma2:9b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_remote": {
+          "answer": "paris",
+          "latency_s": 24.744,
+          "model_id": "qwen2.5:14b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_consensus": {
+          "answer": "paris",
+          "latency_s": 30.422,
+          "model_id": "qwen2.5-coder:14b",
+          "role": "consensus",
+          "skipped": false
+        },
+        "mac_off_cluster_a": {
+          "answer": "paris",
+          "latency_s": 9.06,
+          "model_id": "llama3.1:8b",
+          "role": "quorum",
+          "skipped": false
+        },
+        "mac_quorum_b": {
+          "answer": "paris",
+          "latency_s": 0.563,
+          "model_id": "qwen2.5-coder:14b-32k",
+          "role": "quorum",
+          "skipped": false
+        }
+      },
+      "responsive_traj_pair": true,
+      "responsive_consensus": true,
+      "responsive_quorum_a": true,
+      "responsive_quorum_b": true,
+      "responsive_all_5": true,
+      "trajectory_pair_agrees": true,
+      "consensus_agrees_with_trajectory": true,
+      "quorum_a_agrees_with_trajectory": true,
+      "quorum_a_disagrees_with_trajectory": false,
+      "quorum_a_gold_correlated": true,
+      "quorum_b_agrees_with_trajectory": true,
+      "quorum_b_disagrees_with_trajectory": false,
+      "quorum_b_gold_correlated": true,
+      "responsive_disjoint_quorum_members": 2
+    },
+    {
+      "probe_id": "p2",
+      "prompt": "Answer in exactly one word: chemical symbol for water?",
+      "gold": "h2o",
+      "responses": {
+        "mac1": {
+          "answer": "h2o",
+          "latency_s": 1.724,
+          "model_id": "gemma2:9b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_remote": {
+          "answer": "h",
+          "latency_s": 21.763,
+          "model_id": "qwen2.5:14b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_consensus": {
+          "answer": "h2o",
+          "latency_s": 30.992,
+          "model_id": "qwen2.5-coder:14b",
+          "role": "consensus",
+          "skipped": false
+        },
+        "mac_off_cluster_a": {
+          "answer": "h2o",
+          "latency_s": 1.275,
+          "model_id": "llama3.1:8b",
+          "role": "quorum",
+          "skipped": false
+        },
+        "mac_quorum_b": {
+          "answer": "h2o",
+          "latency_s": 0.646,
+          "model_id": "qwen2.5-coder:14b-32k",
+          "role": "quorum",
+          "skipped": false
+        }
+      },
+      "responsive_traj_pair": true,
+      "responsive_consensus": true,
+      "responsive_quorum_a": true,
+      "responsive_quorum_b": true,
+      "responsive_all_5": true,
+      "trajectory_pair_agrees": false,
+      "consensus_agrees_with_trajectory": false,
+      "quorum_a_agrees_with_trajectory": false,
+      "quorum_a_disagrees_with_trajectory": false,
+      "quorum_a_gold_correlated": true,
+      "quorum_b_agrees_with_trajectory": false,
+      "quorum_b_disagrees_with_trajectory": false,
+      "quorum_b_gold_correlated": true,
+      "responsive_disjoint_quorum_members": 2
+    },
+    {
+      "probe_id": "p3",
+      "prompt": "Answer in exactly one word: how many continents?",
+      "gold": "seven",
+      "responses": {
+        "mac1": {
+          "answer": "seven",
+          "latency_s": 2.671,
+          "model_id": "gemma2:9b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_remote": {
+          "answer": "seven",
+          "latency_s": 22.025,
+          "model_id": "qwen2.5:14b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_consensus": {
+          "answer": "seven",
+          "latency_s": 30.541,
+          "model_id": "qwen2.5-coder:14b",
+          "role": "consensus",
+          "skipped": false
+        },
+        "mac_off_cluster_a": {
+          "answer": "seven",
+          "latency_s": 5.178,
+          "model_id": "llama3.1:8b",
+          "role": "quorum",
+          "skipped": false
+        },
+        "mac_quorum_b": {
+          "answer": "seven",
+          "latency_s": 0.593,
+          "model_id": "qwen2.5-coder:14b-32k",
+          "role": "quorum",
+          "skipped": false
+        }
+      },
+      "responsive_traj_pair": true,
+      "responsive_consensus": true,
+      "responsive_quorum_a": true,
+      "responsive_quorum_b": true,
+      "responsive_all_5": true,
+      "trajectory_pair_agrees": true,
+      "consensus_agrees_with_trajectory": true,
+      "quorum_a_agrees_with_trajectory": true,
+      "quorum_a_disagrees_with_trajectory": false,
+      "quorum_a_gold_correlated": true,
+      "quorum_b_agrees_with_trajectory": true,
+      "quorum_b_disagrees_with_trajectory": false,
+      "quorum_b_gold_correlated": true,
+      "responsive_disjoint_quorum_members": 2
+    },
+    {
+      "probe_id": "p4",
+      "prompt": "Answer in exactly one word: opposite of hot?",
+      "gold": "cold",
+      "responses": {
+        "mac1": {
+          "answer": "cold",
+          "latency_s": 5.155,
+          "model_id": "gemma2:9b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_remote": {
+          "answer": "cold",
+          "latency_s": 21.561,
+          "model_id": "qwen2.5:14b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_consensus": {
+          "answer": "cold",
+          "latency_s": 31.02,
+          "model_id": "qwen2.5-coder:14b",
+          "role": "consensus",
+          "skipped": false
+        },
+        "mac_off_cluster_a": {
+          "answer": "cold",
+          "latency_s": 0.801,
+          "model_id": "llama3.1:8b",
+          "role": "quorum",
+          "skipped": false
+        },
+        "mac_quorum_b": {
+          "answer": "cold",
+          "latency_s": 0.38,
+          "model_id": "qwen2.5-coder:14b-32k",
+          "role": "quorum",
+          "skipped": false
+        }
+      },
+      "responsive_traj_pair": true,
+      "responsive_consensus": true,
+      "responsive_quorum_a": true,
+      "responsive_quorum_b": true,
+      "responsive_all_5": true,
+      "trajectory_pair_agrees": true,
+      "consensus_agrees_with_trajectory": true,
+      "quorum_a_agrees_with_trajectory": true,
+      "quorum_a_disagrees_with_trajectory": false,
+      "quorum_a_gold_correlated": true,
+      "quorum_b_agrees_with_trajectory": true,
+      "quorum_b_disagrees_with_trajectory": false,
+      "quorum_b_gold_correlated": true,
+      "responsive_disjoint_quorum_members": 2
+    },
+    {
+      "probe_id": "p5",
+      "prompt": "Answer in exactly one word: planet closest to the sun?",
+      "gold": "mercury",
+      "responses": {
+        "mac1": {
+          "answer": "mercury",
+          "latency_s": 1.237,
+          "model_id": "gemma2:9b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_remote": {
+          "answer": "mercury",
+          "latency_s": 21.942,
+          "model_id": "qwen2.5:14b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_consensus": {
+          "answer": "mercury",
+          "latency_s": 30.451,
+          "model_id": "qwen2.5-coder:14b",
+          "role": "consensus",
+          "skipped": false
+        },
+        "mac_off_cluster_a": {
+          "answer": "mercury",
+          "latency_s": 1.039,
+          "model_id": "llama3.1:8b",
+          "role": "quorum",
+          "skipped": false
+        },
+        "mac_quorum_b": {
+          "answer": "mercury",
+          "latency_s": 0.623,
+          "model_id": "qwen2.5-coder:14b-32k",
+          "role": "quorum",
+          "skipped": false
+        }
+      },
+      "responsive_traj_pair": true,
+      "responsive_consensus": true,
+      "responsive_quorum_a": true,
+      "responsive_quorum_b": true,
+      "responsive_all_5": true,
+      "trajectory_pair_agrees": true,
+      "consensus_agrees_with_trajectory": true,
+      "quorum_a_agrees_with_trajectory": true,
+      "quorum_a_disagrees_with_trajectory": false,
+      "quorum_a_gold_correlated": true,
+      "quorum_b_agrees_with_trajectory": true,
+      "quorum_b_disagrees_with_trajectory": false,
+      "quorum_b_gold_correlated": true,
+      "responsive_disjoint_quorum_members": 2
+    },
+    {
+      "probe_id": "p6",
+      "prompt": "Answer in exactly one word: largest ocean on Earth?",
+      "gold": "pacific",
+      "responses": {
+        "mac1": {
+          "answer": "pacific",
+          "latency_s": 1.142,
+          "model_id": "gemma2:9b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_remote": {
+          "answer": "pacific",
+          "latency_s": 20.701,
+          "model_id": "qwen2.5:14b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_consensus": {
+          "answer": "pacific",
+          "latency_s": 34.703,
+          "model_id": "qwen2.5-coder:14b",
+          "role": "consensus",
+          "skipped": false
+        },
+        "mac_off_cluster_a": {
+          "answer": "pacific",
+          "latency_s": 3.687,
+          "model_id": "llama3.1:8b",
+          "role": "quorum",
+          "skipped": false
+        },
+        "mac_quorum_b": {
+          "answer": "pacific",
+          "latency_s": 0.551,
+          "model_id": "qwen2.5-coder:14b-32k",
+          "role": "quorum",
+          "skipped": false
+        }
+      },
+      "responsive_traj_pair": true,
+      "responsive_consensus": true,
+      "responsive_quorum_a": true,
+      "responsive_quorum_b": true,
+      "responsive_all_5": true,
+      "trajectory_pair_agrees": true,
+      "consensus_agrees_with_trajectory": true,
+      "quorum_a_agrees_with_trajectory": true,
+      "quorum_a_disagrees_with_trajectory": false,
+      "quorum_a_gold_correlated": true,
+      "quorum_b_agrees_with_trajectory": true,
+      "quorum_b_disagrees_with_trajectory": false,
+      "quorum_b_gold_correlated": true,
+      "responsive_disjoint_quorum_members": 2
+    },
+    {
+      "probe_id": "p7",
+      "prompt": "Answer in exactly one word: 2 plus 3 equals?",
+      "gold": "five",
+      "responses": {
+        "mac1": {
+          "answer": "five",
+          "latency_s": 1.488,
+          "model_id": "gemma2:9b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_remote": {
+          "answer": "five",
+          "latency_s": 22.299,
+          "model_id": "qwen2.5:14b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_consensus": {
+          "answer": "five",
+          "latency_s": 31.685,
+          "model_id": "qwen2.5-coder:14b",
+          "role": "consensus",
+          "skipped": false
+        },
+        "mac_off_cluster_a": {
+          "answer": "five",
+          "latency_s": 0.952,
+          "model_id": "llama3.1:8b",
+          "role": "quorum",
+          "skipped": false
+        },
+        "mac_quorum_b": {
+          "answer": "five",
+          "latency_s": 0.651,
+          "model_id": "qwen2.5-coder:14b-32k",
+          "role": "quorum",
+          "skipped": false
+        }
+      },
+      "responsive_traj_pair": true,
+      "responsive_consensus": true,
+      "responsive_quorum_a": true,
+      "responsive_quorum_b": true,
+      "responsive_all_5": true,
+      "trajectory_pair_agrees": true,
+      "consensus_agrees_with_trajectory": true,
+      "quorum_a_agrees_with_trajectory": true,
+      "quorum_a_disagrees_with_trajectory": false,
+      "quorum_a_gold_correlated": true,
+      "quorum_b_agrees_with_trajectory": true,
+      "quorum_b_disagrees_with_trajectory": false,
+      "quorum_b_gold_correlated": true,
+      "responsive_disjoint_quorum_members": 2
+    },
+    {
+      "probe_id": "p8",
+      "prompt": "Answer in exactly one word: programming language named after a snake?",
+      "gold": "python",
+      "responses": {
+        "mac1": {
+          "answer": "python",
+          "latency_s": 1.267,
+          "model_id": "gemma2:9b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_remote": {
+          "answer": "python",
+          "latency_s": 21.976,
+          "model_id": "qwen2.5:14b",
+          "role": "trajectory",
+          "skipped": false
+        },
+        "mac_consensus": {
+          "answer": "python",
+          "latency_s": 31.566,
+          "model_id": "qwen2.5-coder:14b",
+          "role": "consensus",
+          "skipped": false
+        },
+        "mac_off_cluster_a": {
+          "answer": "python",
+          "latency_s": 0.955,
+          "model_id": "llama3.1:8b",
+          "role": "quorum",
+          "skipped": false
+        },
+        "mac_quorum_b": {
+          "answer": "python",
+          "latency_s": 0.348,
+          "model_id": "qwen2.5-coder:14b-32k",
+          "role": "quorum",
+          "skipped": false
+        }
+      },
+      "responsive_traj_pair": true,
+      "responsive_consensus": true,
+      "responsive_quorum_a": true,
+      "responsive_quorum_b": true,
+      "responsive_all_5": true,
+      "trajectory_pair_agrees": true,
+      "consensus_agrees_with_trajectory": true,
+      "quorum_a_agrees_with_trajectory": true,
+      "quorum_a_disagrees_with_trajectory": false,
+      "quorum_a_gold_correlated": true,
+      "quorum_b_agrees_with_trajectory": true,
+      "quorum_b_disagrees_with_trajectory": false,
+      "quorum_b_gold_correlated": true,
+      "responsive_disjoint_quorum_members": 2
+    }
+  ]
+}
