@@ -826,7 +826,13 @@ class CapsuleLedger:
         return retired
 
     def admit_and_seal(self, capsule: ContextCapsule) -> ContextCapsule:
-        """Convenience: admit then seal. The common path."""
+        """Convenience: admit then seal. The common path. Idempotent
+        on CID — re-admitting an already-sealed capsule is a no-op
+        and returns the previously-sealed copy unchanged.
+        """
+        existing = self._by_cid.get(capsule.cid)
+        if existing is not None and existing.lifecycle == CapsuleLifecycle.SEALED:
+            return existing
         return self.seal(self.admit(capsule))
 
     # ------------------------------------------------------------

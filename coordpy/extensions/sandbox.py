@@ -44,14 +44,17 @@ SandboxFactory = Callable[..., SandboxBackend]
 _REGISTRY: dict[str, SandboxFactory] = {}
 
 
-def register_sandbox(name: str, factory: SandboxFactory,
-                      *, overwrite: bool = False) -> None:
+def register_sandbox(
+    name: str,
+    factory: "SandboxFactory | SandboxBackend",
+    *, overwrite: bool = False,
+) -> None:
     """Register a sandbox backend under ``name``.
 
-    Raises ``ValueError`` on conflict unless ``overwrite=True``. The
-    factory is called with no positional args and arbitrary kwargs at
-    ``get_sandbox`` time; for zero-config backends, a class object is
-    a valid factory.
+    Accepts either a factory callable (returning a ``SandboxBackend``)
+    or an already-built backend instance — instances are wrapped in a
+    nullary factory automatically. Raises ``ValueError`` on conflict
+    unless ``overwrite=True``.
     """
     if not isinstance(name, str) or not name:
         raise ValueError("sandbox name must be a non-empty string")
@@ -59,7 +62,15 @@ def register_sandbox(name: str, factory: SandboxFactory,
         raise ValueError(
             f"sandbox {name!r} is already registered; "
             f"pass overwrite=True to replace")
-    _REGISTRY[name] = factory
+    if not callable(factory):
+        instance = factory
+        if not isinstance(instance, SandboxBackend):
+            raise TypeError(
+                f"register_sandbox({name!r}, ...) requires either a "
+                f"factory callable or a SandboxBackend instance; got "
+                f"{type(instance).__name__}")
+        factory = lambda **_kw: instance  # noqa: E731
+    _REGISTRY[name] = factory  # type: ignore[assignment]
 
 
 def get_sandbox(name: str, **kwargs: Any) -> SandboxBackend:

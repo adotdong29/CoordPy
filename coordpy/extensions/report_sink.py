@@ -40,15 +40,32 @@ ReportSinkFactory = Callable[..., ReportSink]
 _REGISTRY: dict[str, ReportSinkFactory] = {}
 
 
-def register_report_sink(name: str, factory: ReportSinkFactory,
-                          *, overwrite: bool = False) -> None:
+def register_report_sink(
+    name: str,
+    factory: "ReportSinkFactory | ReportSink",
+    *, overwrite: bool = False,
+) -> None:
+    """Register a report sink under ``name``.
+
+    Accepts either a factory callable (returning a ``ReportSink``)
+    or an already-built sink instance — instances are wrapped in a
+    nullary factory so users can pass whichever is more natural.
+    """
     if not isinstance(name, str) or not name:
         raise ValueError("report-sink name must be a non-empty string")
     if name in _REGISTRY and not overwrite:
         raise ValueError(
             f"report sink {name!r} is already registered; "
             f"pass overwrite=True to replace")
-    _REGISTRY[name] = factory
+    if not callable(factory):
+        instance = factory
+        if not isinstance(instance, ReportSink):
+            raise TypeError(
+                f"register_report_sink({name!r}, ...) requires either "
+                f"a factory callable or a ReportSink instance; got "
+                f"{type(instance).__name__}")
+        factory = lambda **_kw: instance  # noqa: E731
+    _REGISTRY[name] = factory  # type: ignore[assignment]
 
 
 def get_report_sink(name: str, **kwargs: Any) -> ReportSink:
@@ -57,7 +74,13 @@ def get_report_sink(name: str, **kwargs: Any) -> ReportSink:
         raise KeyError(
             f"unknown report sink {name!r}; "
             f"known: {sorted(_REGISTRY)}")
-    inst = _REGISTRY[name](**kwargs)
+    factory = _REGISTRY[name]
+    try:
+        inst = factory(**kwargs)
+    except TypeError as e:
+        raise TypeError(
+            f"factory for report sink {name!r} could not be called: {e}"
+        ) from e
     if not isinstance(inst, ReportSink):
         raise TypeError(
             f"factory for {name!r} returned {type(inst).__name__}, "

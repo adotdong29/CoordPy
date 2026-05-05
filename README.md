@@ -199,7 +199,10 @@ export COORDPY_API_KEY=...
 ```
 
 See [`examples/agent_team.py`](examples/agent_team.py) for the full
-runnable version.
+runnable version. For a richer end-to-end demo that drives every
+documented layer of the SDK against the synthetic backend (no
+network, no LLM required), see
+[`examples/build_with_coordpy.py`](examples/build_with_coordpy.py).
 
 Other practical entry paths:
 

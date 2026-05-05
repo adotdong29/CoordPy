@@ -44,15 +44,31 @@ TaskBankFactory = Callable[..., TaskBankLoader]
 _REGISTRY: dict[str, TaskBankFactory] = {}
 
 
-def register_task_bank(name: str, factory: TaskBankFactory,
-                        *, overwrite: bool = False) -> None:
+def register_task_bank(
+    name: str,
+    factory: "TaskBankFactory | TaskBankLoader",
+    *, overwrite: bool = False,
+) -> None:
+    """Register a task bank loader under ``name``.
+
+    Accepts either a factory callable (returning a
+    ``TaskBankLoader``) or an already-built loader instance.
+    """
     if not isinstance(name, str) or not name:
         raise ValueError("task-bank name must be a non-empty string")
     if name in _REGISTRY and not overwrite:
         raise ValueError(
             f"task bank {name!r} is already registered; "
             f"pass overwrite=True to replace")
-    _REGISTRY[name] = factory
+    if not callable(factory):
+        instance = factory
+        if not isinstance(instance, TaskBankLoader):
+            raise TypeError(
+                f"register_task_bank({name!r}, ...) requires either "
+                f"a factory callable or a TaskBankLoader instance; "
+                f"got {type(instance).__name__}")
+        factory = lambda **_kw: instance  # noqa: E731
+    _REGISTRY[name] = factory  # type: ignore[assignment]
 
 
 def get_task_bank(name: str, **kwargs: Any) -> TaskBankLoader:
