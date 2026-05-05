@@ -80,25 +80,27 @@ dev = [
 [project.urls]
 Homepage = "https://github.com/adotdong29/context-zero"
 Documentation = "https://github.com/adotdong29/context-zero#readme"
+Source = "https://github.com/adotdong29/context-zero"
+Repository = "https://github.com/adotdong29/context-zero.git"
 Issues = "https://github.com/adotdong29/context-zero/issues"
 Changelog = "https://github.com/adotdong29/context-zero/blob/main/CHANGELOG.md"
 
 [project.scripts]
-# CoordPy SDK surface — these are the stable, contract-tested entry points.
-coordpy = "vision_mvp.coordpy._cli:main_run"
-coordpy-import = "vision_mvp.coordpy._cli:main_import"
-coordpy-ci = "vision_mvp.coordpy._cli:main_ci"
-# Inspect / audit the capsule graph of a finished report (SDK v3).
-coordpy-capsule = "vision_mvp.coordpy._cli:main_capsule"
-# Research-programme legacy entry point — runs CASR research demos
-# (scale/phase/test/info). Retained for continuity with Phase-1..44
-# scripts and kept out of the CoordPy SDK contract on purpose. The
-# public product CLI is `coordpy`.
-casr = "vision_mvp.__main__:main"
+# CoordPy SDK surface — stable, contract-tested entry points.
+coordpy = "coordpy._cli:main_run"
+coordpy-import = "coordpy._cli:main_import"
+coordpy-ci = "coordpy._cli:main_ci"
+# Inspect / audit the capsule graph of a finished report.
+coordpy-capsule = "coordpy._cli:main_capsule"
 
 [tool.setuptools.packages.find]
-include = ["vision_mvp*"]
-exclude = ["vision_mvp.tests*"]
+include = ["coordpy*"]
+exclude = ["tests*", "examples*"]
+
+[tool.setuptools]
+# Don't auto-include MANIFEST.in data into the wheel; the wheel ships
+# only what is listed in ``[tool.setuptools.package-data]`` below.
+include-package-data = false
 
 [tool.setuptools.package-data]
-vision_mvp = ["*.md", "tasks/data/*.jsonl"]
+"coordpy._internal.tasks" = ["data/*.jsonl"]

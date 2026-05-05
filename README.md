@@ -85,20 +85,21 @@ end-to-end in a runnable SDK.
 
 ## Install
 
-CoordPy is not on PyPI yet. Today, the supported install path is from a
-clone:
+```bash
+pip install coordpy
+# Just the CLIs in an isolated env:
+pipx install coordpy
+```
+
+Or from a clone (development install):
 
 ```bash
 git clone https://github.com/adotdong29/context-zero.git
 cd context-zero
 pip install -e .
-
-# once published to PyPI:
-# pip install coordpy
-# pipx install coordpy            # if you only want the CLIs
 ```
 
-Only required dependency is NumPy. The optional LLM-agent demo
+The only required dependency is NumPy. The optional LLM-agent demo
 talks HTTP to a local Ollama instance — no Python binding required.
 
 For model access, CoordPy now supports two simple stable paths:
@@ -124,9 +125,10 @@ coordpy-capsule  verify --report /tmp/coordpy-smoke/product_report.json
 ## Quickstart
 
 ```python
-from vision_mvp.coordpy import RunSpec, run
+import coordpy
 
-report = run(RunSpec(profile="local_smoke", out_dir="/tmp/coordpy-smoke"))
+report = coordpy.run(coordpy.RunSpec(profile="local_smoke",
+                                     out_dir="/tmp/coordpy-smoke"))
 assert report["readiness"]["ready"]
 assert report["provenance"]["schema"] == "coordpy.provenance.v1"
 
@@ -137,6 +139,7 @@ assert cv["chain_ok"]
 print(f"RUN_REPORT CID = {cv['root_cid']}")
 print(report["summary_text"])
 ```
+
 
 A first real-LLM team is one extra line:
 
@@ -157,7 +160,7 @@ Everything below is deeper release-scope detail and historical research context.
 The easiest stable path is now the lightweight agent/team API:
 
 ```python
-from vision_mvp.coordpy import AgentTeam, agent
+from coordpy import AgentTeam, agent
 
 team = AgentTeam.from_env(
     [
@@ -192,47 +195,29 @@ export COORDPY_API_KEY=...
 # export COORDPY_API_BASE_URL=https://your-provider.example/v1
 ```
 
-See [`examples/06_agent_team_api.py`](examples/06_agent_team_api.py)
-for the full runnable version.
+See [`examples/agent_team.py`](examples/agent_team.py) for the full
+runnable version.
 
 Other practical entry paths:
 
 * **Smallest stable product path**: run `coordpy --profile local_smoke`
   and inspect the resulting `RunReport` plus sealed capsule graph.
   This is the fastest way to see the shipped SDK and CLI in action.
-* **Smallest older local-LLM team example**:
-  [`examples/04_local_llm.py`](examples/04_local_llm.py). This runs a
-  simple local Ollama-backed multi-agent comparison and makes the
-  bounded-context / token-savings story concrete.
-* **Richer end-to-end team workflow**:
-  [`examples/05_real_code_review.py`](examples/05_real_code_review.py).
-  Use this when you want a more realistic task shape than the smoke
-  profile.
 * **Direct capsule-level team coordination API (experimental)**:
   [`docs/CAPSULE_TEAM_FORMALISM.md`](docs/CAPSULE_TEAM_FORMALISM.md)
-  plus `vision_mvp.coordpy.__experimental__`. This is where
+  plus `coordpy.__experimental__`. This is where
   `TEAM_HANDOFF`, `ROLE_VIEW`, `TEAM_DECISION`, and the lower-level
   team-coordination machinery live if you want to build directly on the
   research surface rather than stay on the stable runtime.
-
-If you want the older substrate demos rather than the
-shipped CoordPy runtime, start with:
-
-* [`examples/01_basic_consensus.py`](examples/01_basic_consensus.py)
-* [`examples/02_drift_tracking.py`](examples/02_drift_tracking.py)
-* [`examples/03_scaling_demo.py`](examples/03_scaling_demo.py)
-
-Those are useful for understanding the historical substrate, but
-they are not the main product entry path.
 
 ## Stable vs experimental — at a glance
 
 | Surface | What you get | Stability |
 |---|---|---|
-| `vision_mvp.coordpy` SDK — `RunSpec`, `run`, `RunReport`, `SweepSpec`, `run_sweep`, `CoordPyConfig`, `Agent`, `AgentTeam`, `agent`, `create_team`, `profiles`, `ci_gate`, `import_data`, `extensions`, capsule primitives, schema constants, `OpenAICompatibleBackend`, `backend_from_env` | The product / runtime contract | **Stable** |
+| `coordpy` SDK — `RunSpec`, `run`, `RunReport`, `SweepSpec`, `run_sweep`, `CoordPyConfig`, `Agent`, `AgentTeam`, `agent`, `create_team`, `profiles`, `ci_gate`, `import_data`, `extensions`, capsule primitives, schema constants, `OpenAICompatibleBackend`, `backend_from_env` | The product / runtime contract | **Stable** |
 | Console scripts — `coordpy`, `coordpy-import`, `coordpy-ci`, `coordpy-capsule` | The CLI surface | **Stable v3** |
 | Capsule view / provenance / report schemas — `coordpy.capsule_view.v1`, `coordpy.provenance.v1`, `phase45.product_report.v2` | On-disk contracts | **Stable** |
-| `vision_mvp.coordpy.__experimental__` — W22..W42 trust-adjudication / multi-agent-coordination ladder, R-69..R-89 benchmark drivers, bounded live cross-host probes | Research surface, included for audit and reproduction | **Experimental** — may move, rename, or be withdrawn as the next programme starts |
+| `coordpy.__experimental__` — W22..W42 trust-adjudication / multi-agent-coordination ladder, R-69..R-89 benchmark drivers, bounded live cross-host probes | Research surface, included for audit and reproduction | **Experimental** — may move, rename, or be withdrawn as the next programme starts |
 | Transformer-internal trust transfer (`W42-C-NATIVE-LATENT`); K+1-host disjoint topology beyond the two-Mac pair (`W42-C-MULTI-HOST`) | Architecture-bound open frontiers | **Out of scope for this release** — see [Out of scope](#out-of-scope-for-this-release) |
 
 The full stability matrix lives further down in
@@ -300,13 +285,13 @@ release.
   ``pyproject.toml``).
 * Capsule contract types and ``coordpy.run`` /
   ``coordpy.RunReport`` orchestration (W3-7..W3-31 and W3-32..W3-41).
-* Public package version: ``vision_mvp.__version__ = 0.5.16`` ==
+* Public package version: ``coordpy.__version__ = 0.5.16`` ==
   ``pyproject.toml`` ``project.version = 0.5.16``;
   ``SDK_VERSION = "coordpy.sdk.v3.43"``.
 
 ### Experimental but included
 
-Everything under ``vision_mvp.coordpy.__experimental__`` is
+Everything under ``coordpy.__experimental__`` is
 **experimental research surface** included in the release for
 audit, reproduction, and downstream research.  This covers the
 entire capsule-layer trust-adjudication / multi-agent-coordination
@@ -319,9 +304,9 @@ research ladder:
   branches, and the 196 cumulative enumerated trust-boundary
   failure modes).
 * The R-69..R-89 benchmark family drivers
-  (``vision_mvp.experiments.phase69_*`` through
+  (``coordpy._internal.experiments`` (research)
   ``phase89_role_invariant_synthesis``) and the matching unit
-  tests under ``vision_mvp/tests/``.
+  research notes that document the ladder.
 * The bounded live cross-host probes
   (``phase8x_xllm_*`` and ``phase89_xllm_role_invariance_probe``).
 
@@ -360,12 +345,7 @@ If you want the historical or research-heavy material, start here:
 * [`ARCHITECTURE.md`](ARCHITECTURE.md)
 * [`papers/context_as_objects.md`](papers/context_as_objects.md)
 * [`docs/archive/`](docs/archive/)
-* `vision_mvp/RESULTS_PHASE*.md`
-
-If you want the historical substrate specifically, use the legacy
-`casr` console script or the older examples in [`examples/`](examples/).
-Those remain useful research artifacts, but they are not the main
-CoordPy product surface.
+* [`docs/`](docs/) research notes
 
 ## Honest caveats
 
@@ -374,7 +354,7 @@ CoordPy product surface.
   scope, but it does not claim transformer-internal / native-latent
   transfer.
 - **The research ladder is included, but not stable.** Everything under
-  `vision_mvp.coordpy.__experimental__` remains research API.
+  `coordpy.__experimental__` remains research API.
 - **Live multi-host evidence is still bounded by the available lab
   topology.** The released system ships on the strongest evidence
   available here, not on a hypothetical broader host substrate.
