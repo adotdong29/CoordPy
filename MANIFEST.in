@@ -8,8 +8,14 @@ include ARCHITECTURE.md
 include CONTRIBUTING.md
 include SECURITY.md
 include CITATION.cff
+include RELEASING.md
 include MANIFEST.in
 include pyproject.toml
+
+# Runnable smoke driver + demo (handy for downstream auditors).
+recursive-include tests *.py
+include examples/agent_team.py
+include examples/build_with_coordpy.py
 
 # PEP 561 typing marker.
 include coordpy/py.typed

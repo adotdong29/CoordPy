@@ -55,13 +55,17 @@ Tests live under ``coordpy/tests/`` (when present) and are run with
 
 ## Releasing
 
-Maintainers release to PyPI via:
+Full runbook: [`RELEASING.md`](RELEASING.md).
+
+Quick path (manual upload):
 
 ```bash
-python -m build
-python -m twine check dist/*
-python -m twine upload dist/*
+./scripts/release.sh check     # build + twine-check + smoke-test the wheel
+./scripts/release.sh upload    # then push to PyPI
 ```
 
-Tag the release as ``vX.Y.Z`` to match
-``pyproject.toml`` / ``coordpy.__version__``.
+Recommended path: push a ``vX.Y.Z`` tag — the
+``.github/workflows/release.yml`` Trusted Publisher workflow
+builds and uploads to PyPI automatically. See
+[`RELEASING.md`](RELEASING.md) for one-time PyPI Trusted
+Publisher configuration.
