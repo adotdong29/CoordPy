@@ -92,7 +92,7 @@ try:
     import numpy as np
 except ImportError as ex:
     raise ImportError(
-        "vision_mvp.coordpy.capsule_decoder_v2 requires numpy "
+        "coordpy.capsule_decoder_v2 requires numpy "
         "for MLP and DeepSet gradient training") from ex
 
 from .capsule import ContextCapsule

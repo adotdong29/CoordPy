@@ -241,8 +241,8 @@ def build_default_recipe_registry() -> SafeRecipeRegistry:
     """
     reg = SafeRecipeRegistry()
 
-    # vision_mvp.core.code_semantics — pure AST helpers
-    cs = "vision_mvp.core.code_semantics"
+    # coordpy._internal.core.code_semantics — pure AST helpers
+    cs = "coordpy._internal.core.code_semantics"
     reg.register(cs, "_call_name", curated_recipe(_recipe_call_name))
     reg.register(cs, "_call_matches", curated_recipe(_recipe_call_matches))
     reg.register(cs, "_collect_store_names",
@@ -272,8 +272,8 @@ def build_default_recipe_registry() -> SafeRecipeRegistry:
     reg.register(cs, "analyze_module",
                  curated_recipe(_recipe_analyze_module))
 
-    # vision_mvp.core.code_corpus_runtime — generator classifier
-    ccr = "vision_mvp.core.code_corpus_runtime"
+    # coordpy._internal.core.code_corpus_runtime — generator classifier
+    ccr = "coordpy._internal.core.code_corpus_runtime"
     reg.register(ccr, "_function_is_generator",
                  curated_recipe(_recipe_function_is_generator))
 

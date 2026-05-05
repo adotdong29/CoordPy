@@ -2,15 +2,15 @@
 
 Usage (as a module):
 
-    python3 -m vision_mvp.product --profile bundled_57 \\
-            --out-dir vision_mvp/artifacts/rc1
+    coordpy --profile bundled_57 \\
+            --out-dir /tmp/coordpy_run/rc1
 
-    python3 -m vision_mvp.product --profile local_smoke --out-dir /tmp/cz-smoke
-    python3 -m vision_mvp.product --profile aspen_mac1_coder \\
-            --out-dir vision_mvp/artifacts/mac1
-    python3 -m vision_mvp.product --profile public_jsonl \\
+    coordpy --profile local_smoke --out-dir /tmp/cz-smoke
+    coordpy --profile aspen_mac1_coder \\
+            --out-dir /tmp/coordpy_run/mac1
+    coordpy --profile public_jsonl \\
             --jsonl /path/to/swe_bench_lite.jsonl \\
-            --out-dir vision_mvp/artifacts/public_lite
+            --out-dir /tmp/coordpy_run/public_lite
 
 The runner does three things, in order, and emits a single
 ``product_report.json`` + ``product_summary.txt`` into ``--out-dir``:
@@ -159,7 +159,7 @@ def _real_sweep_stub(sweep_cfg: dict) -> dict:
     runs and make the product runner the *orchestration* surface."""
     cmd = [
         sys.executable, "-m",
-        "vision_mvp.experiments.phase42_parser_sweep",
+        "coordpy._internal.experiments.phase42_parser_sweep",
         "--mode", "real",
         "--model", str(sweep_cfg["model"]),
         "--ollama-url", str(sweep_cfg["ollama_url"]),
@@ -174,7 +174,7 @@ def _real_sweep_stub(sweep_cfg: dict) -> dict:
     capture_cmd = None
     if sweep_cfg.get("enable_raw_capture"):
         capture_cmd = cmd[:]
-        capture_cmd[2] = "vision_mvp.experiments.phase44_semantic_residue"
+        capture_cmd[2] = "coordpy._internal.experiments.phase44_semantic_residue"
     return {
         "mode": "real",
         "executed_in_process": False,

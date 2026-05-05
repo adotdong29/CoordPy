@@ -18,10 +18,10 @@ Scope discipline
 
 * This is **research-grade** code. It is not part of the CoordPy
   product runtime contract (the SWE-bench-Lite-shape sweep path).
-  Importing from ``vision_mvp.coordpy.team_coord`` gives you the new
+  Importing from ``coordpy.team_coord`` gives you the new
   multi-agent coordination model; the CoordPy SDK's stable surface
   (``RunSpec`` → run report) is unchanged.
-* The substrate primitive ``vision_mvp.core.role_handoff`` is
+* The substrate primitive ``coordpy._internal.core.role_handoff`` is
   unchanged. The capsule-native flow can wrap or replace the
   substrate; both can run side by side. The substrate is the
   routing-table / inbox primitive; the capsule layer is the
@@ -554,7 +554,7 @@ def _candidate_service_tag(cand: ContextCapsule) -> str:
 
     The match is intentionally narrow: only the exact ``service=<tag>``
     token (the same key the existing
-    :func:`vision_mvp.tasks.incident_triage._decoder_from_handoffs`
+    :func:`coordpy._internal.tasks.incident_triage._decoder_from_handoffs`
     uses to populate the auditor's ``services`` set) is honoured. Any
     other identifier-shaped token in the payload is ignored.
     """
@@ -825,7 +825,7 @@ class CrossRoleCorroborationAdmissionPolicy:
     * **Falsifiable**: a stream where the *decoy* has strictly more
       distinct-role coverage AND strictly more raw mentions than
       gold falsifies W8-1. The W8-1 falsifier regime is named in
-      :file:`vision_mvp/experiments/phase55_decoy_plurality.py` as
+      :file:`coordpy/_internal/experiments/phase55_decoy_plurality.py` as
       the *decoy-corroborated decoy* falsifier.
 
     Lifecycle invariants
@@ -1725,7 +1725,7 @@ def audit_team_lifecycle(ledger: CapsuleLedger
 
 
 # Closed-vocabulary causal-claim-kind set per root_cause label. The
-# table mirrors ``vision_mvp.tasks.incident_triage._decoder_from_handoffs``'s
+# table mirrors ``coordpy._internal.tasks.incident_triage._decoder_from_handoffs``'s
 # priority list and groups claim_kinds by which root_cause they
 # *causally entail* under the incident-triage decoder.
 #
@@ -1796,9 +1796,9 @@ CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE: dict[str, frozenset[str]] = {
 
 
 # The decoder's priority over claim_kinds (mirror of
-# ``vision_mvp.tasks.incident_triage._decoder_from_handoffs``). Kept in
+# ``coordpy._internal.tasks.incident_triage._decoder_from_handoffs``). Kept in
 # closed vocabulary so the bundle decoder is self-contained and does
-# not import from ``vision_mvp.tasks`` (which would create a layering
+# not import from ``coordpy._internal.tasks`` (which would create a layering
 # inversion). The list is in *priority order* — highest priority first.
 _DECODER_PRIORITY: tuple[tuple[str, str, str], ...] = (
     ("DISK_FILL_CRITICAL", "disk_fill", "rotate_logs_and_clear_backup"),
@@ -1823,7 +1823,7 @@ class _DecodedHandoff:
 
     Kept structural rather than nominal so the decoder works against
     either ``ContextCapsule`` payloads or the
-    ``vision_mvp.tasks.incident_triage.TypedHandoff`` shape — same
+    ``coordpy._internal.tasks.incident_triage.TypedHandoff`` shape — same
     interface ``substrate`` and ``capsule_*`` strategies already share.
     """
     source_role: str
@@ -1861,7 +1861,7 @@ class BundleAwareTeamDecoder:
     1. Compute the ``root_cause`` and ``remediation`` from the
        admitted handoffs' ``claim_kinds`` via the priority decoder
        (same priority as
-       :func:`vision_mvp.tasks.incident_triage._decoder_from_handoffs`).
+       :func:`coordpy._internal.tasks.incident_triage._decoder_from_handoffs`).
     2. Look up the *causal claim-kind set* for that root_cause:
        ``CCK = CAUSAL_CLAIM_KINDS_PER_ROOT_CAUSE[root_cause]``.
     3. For each admitted handoff, extract its ``service=<tag>`` token.
@@ -1967,7 +1967,7 @@ class BundleAwareTeamDecoder:
         """Run the bundle-aware decode over a sequence of admitted
         handoffs and return ``{"root_cause", "services", "remediation"}``
         — the same shape as
-        :func:`vision_mvp.tasks.incident_triage._decoder_from_handoffs`.
+        :func:`coordpy._internal.tasks.incident_triage._decoder_from_handoffs`.
         """
         kinds = {h.claim_kind for h in handoffs}
         root_cause, remediation = _decoded_root_cause(kinds)
@@ -2749,7 +2749,7 @@ class LayeredClaimNormalizer:
         * On every key in :data:`CLAIM_KIND_SYNONYMS`, layered ≡ W12
           (W13-3 backward-compat).
         * On every variant in :data:`OUT_OF_VOCAB_KINDS` named in
-          ``vision_mvp/experiments/phase59_real_llm_multi_round.py``
+          ``coordpy/_internal/experiments/phase59_real_llm_multi_round.py``
           (DEADLOCK_PROBABLY_DETECTED_MAYBE, POOL_LOOKING_BUSY,
           QUERY_SOMEWHAT_SLUGGISH, DISK_GETTING_FULL_PROBABLY), the
           heuristic layer fires and resolves to the matching canonical
@@ -2958,7 +2958,7 @@ class LayeredRobustMultiRoundBundleDecoder:
 # This file ships only the *protocol* (prompt rendering + role schema +
 # claim parser). The benchmark driver (``Phase61``) and the magnitude-
 # filtering synthetic extractor live in
-# ``vision_mvp/experiments/phase61_producer_ambiguity_preservation.py``.
+# ``coordpy/_internal/experiments/phase61_producer_ambiguity_preservation.py``.
 
 
 # Producer-prompt mode names — closed vocabulary, one per element.
@@ -3198,7 +3198,7 @@ def _render_naive_prompt(*,
                            events: Sequence[tuple[str, str]],
                            allowed_kinds: Sequence[str]) -> str:
     """Render the legacy Phase-58/59/60 prompt. Byte-for-byte equal
-    to ``vision_mvp.experiments.phase59_real_llm_multi_round.
+    to ``coordpy._internal.experiments.phase59_real_llm_multi_round.
     _round_ollama_prompt`` (W14-3 backward-compat anchor).
 
     The rendered text is reproduced here so the W14 protocol module
@@ -3446,7 +3446,7 @@ def _render_magnitude_hinted_prompt(*,
 # Other benchmarks should construct their own ``RoleExtractionSchema``
 # table; this one ships as a convenience for Phase-58..Phase-61
 # drivers and is mechanically aligned with
-# ``vision_mvp.core.extractor_noise.incident_triage_known_kinds``.
+# ``coordpy._internal.core.extractor_noise.incident_triage_known_kinds``.
 INCIDENT_TRIAGE_OBSERVATION_KINDS: tuple[str, ...] = (
     "LATENCY_SPIKE", "ERROR_RATE_SPIKE", "FW_BLOCK_SURGE",
 )
@@ -4542,7 +4542,7 @@ class RelationalCompatibilityDisambiguator:
     *strongly conditional* on the bench property (R-65-COMPAT); the
     three named falsifiers (R-65-NO-COMPAT / -CONFOUND / -DECEIVE)
     are pre-committed in
-    ``vision_mvp.experiments.phase65_relational_disambiguation`` and
+    ``coordpy._internal.experiments.phase65_relational_disambiguation`` and
     mechanically verified by ``Phase65FalsifierTests``.
 
     Backward-compat (W18-3)
@@ -4835,7 +4835,7 @@ W19_SYMMETRIC_NOISE_KINDS: frozenset[str] = frozenset({
 # incident-triage benchmark family. Maps each specific-tier kind
 # to the producer role that *canonically* emits it (matches the
 # subscription table in
-# :func:`vision_mvp.tasks.incident_triage.build_role_subscriptions`).
+# :func:`coordpy._internal.tasks.incident_triage.build_role_subscriptions`).
 # The W19 primary-identification uses this table to disambiguate
 # between (a) the canonical primary disambiguator and (b)
 # secondary asymmetric witnesses from non-canonical roles whose
@@ -5118,7 +5118,7 @@ class BundleContradictionDisambiguator:
     or R-66-CONFOUND-RESOLVABLE); the named falsifiers
     R-66-DECEIVE-TOTAL (W19-Λ-total) and R-66-OUTSIDE-REQUIRED
     (W19-Λ-outside) are pre-committed in
-    ``vision_mvp.experiments.phase66_deceptive_ambiguity`` and
+    ``coordpy._internal.experiments.phase66_deceptive_ambiguity`` and
     mechanically verified by ``Phase66FalsifierTests``.
 
     Backward-compat (W19-3)

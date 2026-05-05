@@ -1,7 +1,7 @@
 """Phase-46 CI/deployment consumer.
 
 Consumes a ``product_report.json`` (``phase45.product_report.v1``)
-emitted by ``vision_mvp.product.runner`` and produces a pass/fail
+emitted by ``coordpy._internal.product.runner`` and produces a pass/fail
 verdict suitable for a CI pipeline (GitHub Actions, local make
 target, deployment controller, etc.).
 
@@ -29,12 +29,12 @@ blocker list on stdout + in the output JSON.
 
 Usage:
 
-    python3 -m vision_mvp.product.ci_gate \\
-        --report vision_mvp/artifacts/phase45_rc_bundled/product_report.json \\
+    coordpy.ci_gate \\
+        --report /tmp/coordpy_run/phase45_rc_bundled/product_report.json \\
         --min-ready-fraction 1.0 --min-pass-at-1 1.0
 
     # Multi-report mode — every report must pass.
-    python3 -m vision_mvp.product.ci_gate \\
+    coordpy.ci_gate \\
         --report A/product_report.json B/product_report.json \\
         --require-profile bundled_57 bundled_57_mock_sweep
 """

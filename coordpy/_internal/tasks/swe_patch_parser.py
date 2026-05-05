@@ -277,7 +277,7 @@ def parse_patch_block(text: str,
 
     ``unified_diff_parser`` is injected to keep this module free
     of the Phase-40 unified-diff parser import (callers pass in
-    ``vision_mvp.tasks.swe_bench_bridge.parse_unified_diff``).
+    ``coordpy._internal.tasks.swe_bench_bridge.parse_unified_diff``).
     """
     if text is None or not text or not text.strip():
         return ParseOutcome(

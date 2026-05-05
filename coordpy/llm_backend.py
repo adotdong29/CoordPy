@@ -1,7 +1,7 @@
 """LLM backend abstraction (SDK v3.6).
 
 Lifts the runtime's LLM-call surface above the Ollama-only HTTP path
-that ``vision_mvp.core.llm_client.LLMClient`` historically represented.
+that ``coordpy._internal.core.llm_client.LLMClient`` historically represented.
 Adds a small duck-typed Protocol matching what the runtime's inner
 loop already expects (``generate``) and three concrete backend names:
 
@@ -75,7 +75,7 @@ from typing import Any, Protocol, runtime_checkable
 class LLMBackend(Protocol):
     """The minimum surface the CoordPy inner loop expects from an LLM
     backend. Matches the duck-type contract of
-    ``vision_mvp.core.llm_client.LLMClient.generate``.
+    ``coordpy._internal.core.llm_client.LLMClient.generate``.
 
     A backend MUST expose:
 
@@ -101,7 +101,7 @@ class LLMBackend(Protocol):
 @dataclasses.dataclass
 class OllamaBackend:
     """``LLMBackend`` adapter over
-    ``vision_mvp.core.llm_client.LLMClient``.
+    ``coordpy._internal.core.llm_client.LLMClient``.
 
     Default behaviour is byte-for-byte identical to the existing
     runtime's implicit Ollama path: the runtime's old code path was

@@ -610,7 +610,7 @@ class ContextCapsule:
         ps = tuple(parents)
         if (bd.max_parents is not None
                 and len(ps) > bd.max_parents):
-            raise ValueError(
+            raise CapsuleAdmissionError(
                 f"capsule has {len(ps)} parents but budget.max_parents="
                 f"{bd.max_parents}")
         # We canonicalise to measure bytes; cheap and lets the
@@ -618,7 +618,7 @@ class ContextCapsule:
         blob = _canonical(payload)
         nb = n_bytes if n_bytes is not None else len(blob)
         if (bd.max_bytes is not None and nb > bd.max_bytes):
-            raise ValueError(
+            raise CapsuleAdmissionError(
                 f"capsule payload is {nb} bytes but "
                 f"budget.max_bytes={bd.max_bytes}")
         cid = _capsule_cid(kind, payload, bd, ps)
@@ -1068,7 +1068,7 @@ def capsule_from_handle(handle: Any,
                          parents: Iterable[str] = (),
                          ) -> ContextCapsule:
     """Build a ``HANDLE`` capsule from a
-    ``vision_mvp.core.context_ledger.Handle``.
+    ``coordpy._internal.core.context_ledger.Handle``.
 
     Payload carries the handle's CID, span, fingerprint, and
     metadata — enough for a downstream consumer to reproduce the
@@ -1105,7 +1105,7 @@ def capsule_from_handoff(handoff: Any,
                           parents: Iterable[str] = (),
                           ) -> ContextCapsule:
     """Build a ``HANDOFF`` capsule from a
-    ``vision_mvp.core.role_handoff.TypedHandoff``.
+    ``coordpy._internal.core.role_handoff.TypedHandoff``.
 
     The capsule carries the handoff's full ``as_dict`` so downstream
     reasoning about the role-cast + claim-kind + payload is

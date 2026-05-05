@@ -21,7 +21,7 @@ time, or by declaring an ``entry_points`` block in its own
 ``importlib.metadata.entry_points()``.
 
 This surface is contract-tested
-(``vision_mvp/tests/test_coordpy_extensions.py``). Any rename or
+(``coordpy/tests/test_coordpy_extensions.py``). Any rename or
 removal here is a breaking SDK change and must bump
 ``coordpy.SDK_VERSION``.
 """

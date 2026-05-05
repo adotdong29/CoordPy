@@ -66,7 +66,7 @@ Scope discipline (what this phase DOES NOT claim):
     substring match on the gold answer's supporting bytes — a
     conservative lower bound on relevance (Theorem P29-2).
 
-See ``vision_mvp/RESULTS_PHASE29.md`` for the framing, theorem set,
+See ``docs/RESULTS_PHASE29.md`` for the framing, theorem set,
 and headline numbers.
 """
 

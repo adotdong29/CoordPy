@@ -2,7 +2,7 @@
 
 A SandboxBackend is the boundary where patched code + hidden tests
 run. CoordPy ships three built-ins (``in_process``, ``subprocess``,
-``docker``) wired to the existing ``vision_mvp.tasks.swe_sandbox``
+``docker``) wired to the existing ``coordpy._internal.tasks.swe_sandbox``
 implementations. External packages can register new backends via
 the in-process registry or an ``entry_points`` block
 (``coordpy.sandboxes``).
@@ -25,7 +25,7 @@ class SandboxBackend(Protocol):
 
     The concrete object returned by a factory must expose ``name()``,
     ``is_available()``, and ``run(...)``. Its ``run`` signature is the
-    ``vision_mvp.tasks.swe_sandbox.Sandbox`` protocol, so the existing
+    ``coordpy._internal.tasks.swe_sandbox.Sandbox`` protocol, so the existing
     ``in_process`` / ``subprocess`` / ``docker`` backends satisfy this
     interface by construction.
     """
@@ -67,7 +67,7 @@ def get_sandbox(name: str, **kwargs: Any) -> SandboxBackend:
 
     Built-ins (``in_process`` / ``subprocess`` / ``docker``) are
     lazily registered on first call so the extension package has no
-    import-order dependency on ``vision_mvp.tasks``.
+    import-order dependency on ``coordpy._internal.tasks``.
     """
     _ensure_builtins_registered()
     if name not in _REGISTRY:

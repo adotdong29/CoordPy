@@ -228,8 +228,16 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
         ap.print_help()
         return 1
 
-    with open(args.report, "r", encoding="utf-8") as fh:
-        report = json.load(fh)
+    try:
+        with open(args.report, "r", encoding="utf-8") as fh:
+            report = json.load(fh)
+    except FileNotFoundError:
+        print(f"error: report not found: {args.report}", file=sys.stderr)
+        return 2
+    except json.JSONDecodeError as e:
+        print(f"error: report is not valid JSON: {args.report}: {e}",
+              file=sys.stderr)
+        return 2
     cv = report.get("capsules")
     if not isinstance(cv, dict) or cv.get("schema") != "coordpy.capsule_view.v1":
         print("error: report has no capsule view "

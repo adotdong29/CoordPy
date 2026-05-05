@@ -72,7 +72,7 @@ from .capsule_policy import (
 # =============================================================================
 
 
-# Mirror of vision_mvp/tasks/incident_triage.py::_decoder_from_handoffs.
+# Mirror of coordpy/_internal/tasks/incident_triage.py::_decoder_from_handoffs.
 # We replicate the table here to avoid importing the task module (and
 # pulling in its scenario-bank dependencies) from the SDK surface. If a
 # caller wants a different decoder, they pass their own priority map.

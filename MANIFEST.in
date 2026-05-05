@@ -7,8 +7,12 @@ include CHANGELOG.md
 include ARCHITECTURE.md
 include CONTRIBUTING.md
 include SECURITY.md
+include CITATION.cff
 include MANIFEST.in
 include pyproject.toml
+
+# PEP 561 typing marker.
+include coordpy/py.typed
 
 # Data files the runtime loads at run time.
 recursive-include coordpy/_internal/tasks/data *.jsonl

@@ -78,7 +78,7 @@ try:
     import numpy as np
 except ImportError as ex:
     raise ImportError(
-        "vision_mvp.coordpy.capsule_decoder_relational requires numpy"
+        "coordpy.capsule_decoder_relational requires numpy"
     ) from ex
 
 from .capsule import ContextCapsule

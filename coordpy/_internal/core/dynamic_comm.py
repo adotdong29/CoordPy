@@ -90,9 +90,9 @@ which is still independent of the raw event stream size ``|X|``
 Files that consume this module
 ------------------------------
 
-* ``vision_mvp/tasks/contested_incident.py`` — Phase-35 benchmark
+* ``coordpy/_internal/tasks/contested_incident.py`` — Phase-35 benchmark
   task family (contested root-cause scenarios).
-* ``vision_mvp/experiments/phase35_contested_incident.py`` — driver.
+* ``coordpy/_internal/experiments/phase35_contested_incident.py`` — driver.
 
 Theoretical anchor: RESULTS_PHASE35.md § B.
 """

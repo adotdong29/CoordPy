@@ -21,16 +21,16 @@ SWE-bench-Lite-shape bank). Three concerns, one invocation:
 
 One command:
 
-    python3 -m vision_mvp.product.import_data \\
+    coordpy.import_data \\
         --jsonl /path/to/swe_bench_lite.jsonl \\
-        --out   vision_mvp/artifacts/public_lite_audit.json
+        --out   /tmp/coordpy_run/public_lite_audit.json
 
 Exit code is 0 iff both the schema audit and the readiness verdict
 are clean. A non-zero exit carries the blocker list, suitable for a
 CI gate. The operator's normal path is then:
 
-    python3 -m vision_mvp.product.import_data --jsonl X --out Y
-    python3 -m vision_mvp.product --profile public_jsonl \\
+    coordpy.import_data --jsonl X --out Y
+    coordpy --profile public_jsonl \\
             --jsonl X --out-dir Z
 
 If no public JSONL is on local disk, the runner still accepts a

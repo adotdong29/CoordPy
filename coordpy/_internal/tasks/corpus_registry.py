@@ -1,7 +1,7 @@
 """Multi-corpus registry for Phase-23 external validity benchmarking.
 
 Phase 22 established the exact-memory + exact-planning pipeline on a
-single real Python codebase (`vision_mvp/core/`). Phase 23 needs to
+single real Python codebase (`coordpy/_internal/core/`). Phase 23 needs to
 exercise the same pipeline across *several* real codebases of
 different family, size, and metadata coverage. This module provides
 the reusable loader.

@@ -86,10 +86,13 @@ end-to-end in a runnable SDK.
 ## Install
 
 ```bash
-pip install coordpy
+pip install coordpy-ai
 # Just the CLIs in an isolated env:
-pipx install coordpy
+pipx install coordpy-ai
 ```
+
+The distribution name on PyPI is ``coordpy-ai``; the import name is
+``coordpy`` (``import coordpy``).
 
 Or from a clone (development install):
 

@@ -50,7 +50,7 @@ Scope discipline (what this harness DOES NOT claim):
     used in Phase 29), NOT LLM-judged. We never ask a model to
     grade another model.
 
-See ``vision_mvp/RESULTS_PHASE30.md`` for the framing and theorems.
+See ``docs/RESULTS_PHASE30.md`` for the framing and theorems.
 """
 
 from __future__ import annotations

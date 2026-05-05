@@ -1,31 +1,38 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "coordpy"
-version = "0.5.16"
-description = "CoordPy — bounded-context orchestration and evaluation SDK (first shipped product from the Context Zero research programme)."
+name = "coordpy-ai"
+dynamic = ["version"]
+description = "CoordPy — bounded-context orchestration and evaluation SDK for auditable AI agent teams."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     { name = "Context Zero Contributors" },
 ]
+maintainers = [
+    { name = "Context Zero Contributors" },
+]
 keywords = [
+    "agents",
     "multi-agent",
     "coordination",
     "llm",
+    "ai",
     "context",
     "evaluation",
     "swe-bench",
     "bounded-context",
+    "provenance",
+    "auditability",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -33,9 +40,11 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
 ]
 dependencies = [
     "numpy>=1.23",
@@ -51,7 +60,7 @@ scientific = [
 crypto = [
     "cryptography>=41.0",
     # galois is optional — the repo ships an inline prime-field GF(p)
-    # fallback (core/gf.py); install galois for better performance.
+    # fallback; install galois for better performance.
 ]
 dl = [
     "torch>=2.1",
@@ -62,19 +71,21 @@ heavy = [
     "transformers>=4.35",
     "RestrictedPython>=7.0",
 ]
-# Docker-first sandbox backend (Slice 2 target — declared here so
-# `pip install coordpy[docker]` resolves once the backend lands).
+# Docker-first sandbox backend (declared so ``pip install
+# coordpy-ai[docker]`` resolves cleanly).
 docker = [
     "docker>=6.0",
 ]
-# Multi-node cluster (ASPEN) tooling. Declared as a slot; the
-# cluster client itself lives outside this repo.
+# Multi-node cluster (ASPEN) tooling slot; the cluster client lives
+# outside this repo.
 cluster = []
 dev = [
     "black",
     "ruff",
     "mypy",
     "pytest",
+    "build",
+    "twine",
 ]
 
 [project.urls]
@@ -93,6 +104,9 @@ coordpy-ci = "coordpy._cli:main_ci"
 # Inspect / audit the capsule graph of a finished report.
 coordpy-capsule = "coordpy._cli:main_capsule"
 
+[tool.setuptools.dynamic]
+version = { attr = "coordpy._version.__version__" }
+
 [tool.setuptools.packages.find]
 include = ["coordpy*"]
 exclude = ["tests*", "examples*"]
@@ -103,4 +117,35 @@ exclude = ["tests*", "examples*"]
 include-package-data = false
 
 [tool.setuptools.package-data]
+# Ship the runtime data and the PEP 561 ``py.typed`` marker so
+# downstream type checkers honour the inline annotations.
+coordpy = ["py.typed"]
 "coordpy._internal.tasks" = ["data/*.jsonl"]
+
+# ---------------------------------------------------------------------
+# Tool configuration
+# ---------------------------------------------------------------------
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+extend-select = ["E", "F", "I", "UP", "B"]
+ignore = [
+    "E501",  # line length is enforced by formatter, not linter
+    "E741",  # ambiguous variable names — common in numeric / math code
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312", "py313", "py314"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"

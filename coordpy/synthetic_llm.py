@@ -1,11 +1,11 @@
 """Synthetic LLM clients — deterministic, in-process, no network.
 
 The capsule-native PROMPT / LLM_RESPONSE slice (SDK v3.4) is wired
-into the LLM-backed sweep path in ``vision_mvp.coordpy.runtime``. To
+into the LLM-backed sweep path in ``coordpy.runtime``. To
 exercise that wiring without real LLM access — for unit tests,
 contract checks, and the cross-model parser-boundary research
 experiment — this module provides ``SyntheticLLMClient``: a tiny
-duck-typed substitute for ``vision_mvp.core.llm_client.LLMClient``
+duck-typed substitute for ``coordpy._internal.core.llm_client.LLMClient``
 that returns canned strings keyed by ``(instance_id_hint,
 model_tag)``.
 
@@ -26,7 +26,7 @@ LLM driver. It exists so:
   * Capsule-layer contract tests can drive the LLM-backed path
     without an Ollama endpoint.
   * The cross-model parser-boundary research
-    (``vision_mvp.experiments.parser_boundary_cross_model``) can
+    (``coordpy._internal.experiments.parser_boundary_cross_model``) can
     sweep a small set of synthetic distributions through the
     real parser pipeline with reproducible seeds.
   * The PROMPT / LLM_RESPONSE capsule slice has empirical
@@ -61,7 +61,7 @@ ResponseFn = Callable[[str, str], str]
 @dataclasses.dataclass
 class SyntheticLLMClient:
     """Deterministic, in-process duck-typed substitute for
-    ``vision_mvp.core.llm_client.LLMClient``.
+    ``coordpy._internal.core.llm_client.LLMClient``.
 
     Construct with ``model_tag`` (records which synthetic
     distribution this client represents) and either a

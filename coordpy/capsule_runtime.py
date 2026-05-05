@@ -50,8 +50,8 @@ What this module is NOT
     hashes and the post-hoc fold leaves them ``None``.
 
   * Not a rewrite of the readiness, sweep, sandbox, or LLM-client
-    primitives. The legacy code paths under ``vision_mvp.tasks.*``,
-    ``vision_mvp.experiments.phase44_public_readiness``, and the
+    primitives. The legacy code paths under ``coordpy._internal.tasks.*``,
+    ``coordpy._internal.experiments.phase44_public_readiness``, and the
     ``run_swe_loop_sandboxed`` execution loop run byte-for-byte the
     same. What changes is the *contract* under which their outputs
     cross the run-boundary: every output now becomes a sealed
@@ -61,7 +61,7 @@ What this module is NOT
     re-hash check is a TOCTOU detector for honest writers, not a
     defence against an adversary with concurrent write access to
     the output directory. The trust boundary is the same as CoordPy's
-    sandbox boundary (see ``vision_mvp.tasks.swe_sandbox``).
+    sandbox boundary (see ``coordpy._internal.tasks.swe_sandbox``).
 
 Public surface (additive on SDK v3)
 -----------------------------------
@@ -320,7 +320,7 @@ class CapsuleNativeRunContext:
         """Seal a READINESS_CHECK capsule with parent = profile.
 
         ``verdict`` is the dict returned by
-        ``vision_mvp.experiments.phase44_public_readiness.run_readiness``.
+        ``coordpy._internal.experiments.phase44_public_readiness.run_readiness``.
         """
         prof = self._require_profile()
         cap = capsule_from_readiness(verdict, parents=(prof.cid,))

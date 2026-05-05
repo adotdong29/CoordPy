@@ -29,6 +29,9 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 ```
 
+The distribution name on PyPI is ``coordpy-ai``; the import name is
+``coordpy``.
+
 Run the smoke test before you push anything:
 
 ```bash

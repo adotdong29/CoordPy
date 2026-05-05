@@ -85,7 +85,7 @@ class SweepSpec:
     # as real mode (and therefore exercises the PROMPT /
     # LLM_RESPONSE capsule slice), but the LLM client is a
     # deterministic in-process substitute (see
-    # ``vision_mvp.coordpy.synthetic_llm.SyntheticLLMClient``).
+    # ``coordpy.synthetic_llm.SyntheticLLMClient``).
     # ``synthetic_model_tag`` selects one of the canned
     # distributions in ``SYNTHETIC_MODEL_PROFILES``. No network is
     # required; ``acknowledge_heavy`` is unused.
@@ -100,7 +100,7 @@ class SweepSpec:
         if self.mode == "synthetic" and not self.synthetic_model_tag:
             raise ValueError(
                 "synthetic mode requires synthetic_model_tag=<tag> "
-                "(see vision_mvp.coordpy.synthetic_llm.SYNTHETIC_MODEL_PROFILES)")
+                "(see coordpy.synthetic_llm.SYNTHETIC_MODEL_PROFILES)")
 
 
 def _load_bank(spec: SweepSpec, n_distractors: int):
@@ -573,7 +573,7 @@ def _synthetic_cells(spec: SweepSpec,
       * SDK v3.4 contract tests covering the PROMPT /
         LLM_RESPONSE slice without an Ollama endpoint.
       * The cross-model parser-boundary research experiment
-        (``vision_mvp.experiments.parser_boundary_cross_model``)
+        (``coordpy._internal.experiments.parser_boundary_cross_model``)
         sweeping multiple synthetic distributions through the
         real parser.
     """
@@ -602,7 +602,7 @@ def _resolve_launch_cmd(spec: SweepSpec) -> list[str]:
     import sys
     cmd = [
         sys.executable, "-m",
-        "vision_mvp.experiments.phase42_parser_sweep",
+        "coordpy._internal.experiments.phase42_parser_sweep",
         "--mode", "real",
         "--model", str(spec.model),
         "--ollama-url", str(spec.endpoint or ""),
@@ -645,7 +645,7 @@ def run_sweep(spec: SweepSpec,
     ``HeavyRunNotAcknowledged`` instead of staging.
 
     ``ctx`` (optional) is a ``CapsuleNativeRunContext`` from
-    ``vision_mvp.coordpy.capsule_runtime``. When provided, the runtime
+    ``coordpy.capsule_runtime``. When provided, the runtime
     seals each cell as a ``SWEEP_CELL`` capsule *in flight*: the
     SWEEP_SPEC capsule is sealed before any cell runs, and each cell
     is sealed as soon as its results land. Mid-run failure leaves an
@@ -656,7 +656,7 @@ def run_sweep(spec: SweepSpec,
     capsules afterwards).
 
     ``llm_backend`` (optional, SDK v3.6) is any object satisfying
-    the duck-typed :class:`vision_mvp.coordpy.llm_backend.LLMBackend`
+    the duck-typed :class:`coordpy.llm_backend.LLMBackend`
     Protocol. When provided in real mode, the inner loop calls
     ``llm_backend.generate`` instead of constructing a default
     Ollama ``LLMClient``. This is the integration point for the
@@ -725,7 +725,7 @@ def run_sweep(spec: SweepSpec,
             raw_capture_cmd = launch_cmd[:]
             # swap the experiment module to the raw-capture variant
             raw_capture_cmd[2] = (
-                "vision_mvp.experiments.phase44_semantic_residue")
+                "coordpy._internal.experiments.phase44_semantic_residue")
         return {
             "schema": "coordpy.sweep.v2",
             "mode": "real", "executed_in_process": False,

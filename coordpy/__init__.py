@@ -211,7 +211,7 @@ from .capsule_decoder_v2 import (
 # SDK v3.5 — capsule-native multi-agent team coordination *research
 # slice*. Strictly additive on v3.4: the run-boundary product
 # runtime contract is unchanged. The new surface lives in
-# ``vision_mvp.coordpy.team_coord`` and ``team_policy`` and emits
+# ``coordpy.team_coord`` and ``team_policy`` and emits
 # three new closed-vocabulary capsule kinds (TEAM_HANDOFF,
 # ROLE_VIEW, TEAM_DECISION). The team-level lifecycle audit
 # (``audit_team_lifecycle``) mechanically verifies invariants

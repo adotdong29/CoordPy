@@ -45,15 +45,15 @@ Reproducible runs
 -----------------
 
     # Bundled bank — both checks must pass.
-    python3 -m vision_mvp.experiments.phase44_public_readiness \\
-        --jsonl vision_mvp/tasks/data/swe_lite_style_bank.jsonl \\
-        --out vision_mvp/results_phase44_readiness_bundled.json
+    python3 -m coordpy._internal.experiments.phase44_public_readiness \\
+        --jsonl coordpy/_internal/tasks/data/swe_lite_style_bank.jsonl \\
+        --out /tmp/coordpy_results_phase44_readiness_bundled.json
 
     # External public SWE-bench-Lite JSONL (place at this path).
-    python3 -m vision_mvp.experiments.phase44_public_readiness \\
+    python3 -m coordpy._internal.experiments.phase44_public_readiness \\
         --jsonl /path/to/swe_bench_lite.jsonl \\
         --limit 50 \\
-        --out vision_mvp/results_phase44_readiness_swe_lite.json
+        --out /tmp/coordpy_results_phase44_readiness_swe_lite.json
 """
 
 from __future__ import annotations
