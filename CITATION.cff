@@ -1,23 +1,21 @@
 cff-version: 1.2.0
-title: "CoordPy: Bounded-context orchestration and evaluation SDK for AI agent teams"
-message: "If you use CoordPy in your research, please cite it using the metadata below."
+title: "coordpy: Coordinating LLM agent teams with content-addressed context"
+message: "If you use coordpy in research, please cite it using this metadata."
 type: software
 authors:
   - name: "Context Zero Contributors"
 repository-code: "https://github.com/adotdong29/context-zero"
 url: "https://github.com/adotdong29/context-zero"
 abstract: >
-  CoordPy is the shipped product surface from the Context Zero
-  research programme. It models cross-agent context as typed,
-  content-addressed, lifecycle-bounded capsules with explicit
-  budgets and provenance, and provides a reproducible RunSpec/
-  RunReport contract plus a sealed capsule graph that downstream
-  tools can audit and replay end-to-end.
+  coordpy models cross-agent context as typed, content-addressed
+  objects with byte budgets, declared parents, and a fixed
+  lifecycle. A run produces a RunReport whose root is a sealed
+  capsule DAG, plus a provenance manifest, that downstream tools
+  can re-verify from the bytes on disk.
 keywords:
   - multi-agent
   - llm
-  - bounded-context
+  - context
   - provenance
-  - auditability
   - evaluation
 license: MIT

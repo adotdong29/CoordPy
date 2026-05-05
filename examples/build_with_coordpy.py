@@ -1,26 +1,21 @@
-"""End-to-end demo: build a real auditable agent-team workflow with CoordPy.
+"""End-to-end demo of the coordpy SDK.
 
-This example does not require a network or an LLM — it uses CoordPy's
-synthetic backend so anyone can run it::
+Runs without a network or an LLM by using the synthetic backend, so
+anyone can execute it after a fresh install:
 
     pip install coordpy-ai
     python examples/build_with_coordpy.py
 
-What it demonstrates, top to bottom:
+The demo walks through eight steps:
 
-1. Run an ``AgentTeam`` of three agents end-to-end with a synthetic
-   backend, capturing the team's capsule trail.
-2. Promote the team's run into a fully-fledged ``RunReport`` by
-   running the bundled ``local_smoke`` profile.
-3. Re-verify the on-disk capsule chain from bytes (the audit story).
-4. Run the SDK's lifecycle audit on the report.
-5. Apply the ``coordpy-ci`` gate programmatically.
-6. Register a custom ``ReportSink`` and emit through it.
-7. Round-trip the report through ``build_report_ledger`` and check
-   the rebuilt root CID matches the embedded one.
-
-Every step prints a short header + the relevant CoordPy field so you
-can see what each layer does.
+    1. Spin up a three-agent team with the synthetic backend.
+    2. Run the bundled ``local_smoke`` profile and produce a RunReport.
+    3. Re-verify the on-disk capsule chain from bytes.
+    4. Run the lifecycle audit.
+    5. Apply the ``coordpy-ci`` gate programmatically.
+    6. Register a custom ReportSink and emit through it.
+    7. Build a skeleton ledger from the finished report.
+    8. Print a green/red summary.
 """
 
 from __future__ import annotations

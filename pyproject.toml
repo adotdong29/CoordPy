@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "coordpy-ai"
 dynamic = ["version"]
-description = "CoordPy — bounded-context orchestration and evaluation SDK for auditable AI agent teams."
+description = "SDK and CLI for coordinating LLM agent teams with content-addressed context capsules and reproducible run reports."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"

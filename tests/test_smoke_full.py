@@ -1,11 +1,10 @@
-"""Exhaustive smoke-driver for the CoordPy public surface.
+"""Smoke-driver for the public coordpy surface.
 
-Spins every documented stable symbol of the SDK end-to-end against an
-installed ``coordpy-ai`` wheel. The script is intentionally hermetic
-(no network, no LLM calls) and self-cleaning. It exits non-zero on
-the first contract surprise.
+Exercises every documented stable symbol against an installed
+``coordpy-ai`` wheel. Self-contained: no network, no LLM, no
+external state. Exits non-zero on the first failed check.
 
-Run from the repo root::
+Usage:
 
     python tests/test_smoke_full.py
 """

@@ -1,120 +1,137 @@
-# Releasing CoordPy
+# Releasing
 
-This document is the **runbook** for publishing CoordPy to PyPI under
-the distribution name [``coordpy-ai``](https://pypi.org/project/coordpy-ai/).
+How to publish coordpy to PyPI as
+[`coordpy-ai`](https://pypi.org/project/coordpy-ai/).
 
-## Pre-flight (every release)
+## Pre-flight
 
-1. Bump the version in **one** place:
+1. Bump the version in one place:
 
-       coordpy/_version.py        # __version__ = "X.Y.Z"
+   ```
+   coordpy/_version.py        # __version__ = "X.Y.Z"
+   ```
 
-   ``pyproject.toml`` reads the version dynamically from that
-   module via ``[tool.setuptools.dynamic]`` so there is nothing else
-   to edit.
+   `pyproject.toml` reads it dynamically from that module via
+   `[tool.setuptools.dynamic]`, so there is nothing else to edit.
 
-2. Add a new entry to ``CHANGELOG.md`` under
-   ``## [X.Y.Z] — short title``.
+2. Add an entry to `CHANGELOG.md` under
+   `## [X.Y.Z]`.
 
-3. Make sure ``main`` is clean and the smoke suite passes against
-   a freshly-built wheel:
+3. Make sure main is clean and the wheel passes the gates:
 
-       ./scripts/release.sh check
+   ```
+   ./scripts/release.sh check
+   ```
 
 4. Tag the release:
 
-       git tag -a vX.Y.Z -m "coordpy-ai vX.Y.Z"
-       git push --follow-tags
+   ```
+   git tag -a vX.Y.Z -m "coordpy-ai vX.Y.Z"
+   git push --follow-tags
+   ```
 
-## Recommended path: PyPI Trusted Publisher (no API token needed)
+## Recommended: PyPI Trusted Publisher
 
-CoordPy ships a GitHub Actions workflow at
-``.github/workflows/release.yml`` that builds the sdist + wheel and
-uploads to PyPI via [Trusted Publishers][tp] when you push a
-``v*`` tag. Set up the project once in PyPI:
+`.github/workflows/release.yml` builds and uploads on `v*` tags
+using PyPI Trusted Publishers, so no API token is stored in the
+repository.
 
-1. Go to <https://pypi.org/manage/account/publishing/> and add a
-   pending publisher with these fields:
+One-time setup on PyPI
+(<https://pypi.org/manage/account/publishing/>):
 
-       PyPI Project Name : coordpy-ai
-       Owner             : adotdong29
-       Repository        : context-zero
-       Workflow filename : release.yml
-       Environment       : pypi
+```
+PyPI Project Name : coordpy-ai
+Owner             : adotdong29
+Repository        : context-zero
+Workflow filename : release.yml
+Environment       : pypi
+```
 
-2. In your GitHub repository, create an environment named ``pypi``
-   under **Settings → Environments**.
+In GitHub, create an environment named `pypi` under
+**Settings → Environments**.
 
-3. Push a tag:
+Then push a tag:
 
-       git tag -a v0.5.16 -m "coordpy-ai 0.5.16"
-       git push --follow-tags
+```
+git tag -a v0.5.16 -m "coordpy-ai 0.5.16"
+git push --follow-tags
+```
 
-   The workflow builds, ``twine check``-s, and uploads automatically.
+The workflow builds, checks, smoke-tests, and uploads. See
+<https://docs.pypi.org/trusted-publishers/> for background.
 
-[tp]: https://docs.pypi.org/trusted-publishers/
-
-## Manual path: build + upload from your laptop
+## Manual upload
 
 You will need a PyPI API token from
-<https://pypi.org/manage/account/token/>. Save it in
-``~/.pypirc`` (mode ``600``) or pass it via the
-``TWINE_PASSWORD`` env var.
+<https://pypi.org/manage/account/token/>. Store it in `~/.pypirc`
+(mode 600) or pass it via `TWINE_PASSWORD`.
 
-### TestPyPI dry run (always do this first for a new project)
+### TestPyPI dry run
 
-    python -m pip install --upgrade build twine
-    rm -rf dist build *.egg-info
-    python -m build
-    python -m twine check dist/*
-    python -m twine upload --repository testpypi dist/*
+Recommended for first-time uploads of a new project.
 
-Then verify in a clean venv:
+```
+python -m pip install --upgrade build twine
+rm -rf dist build *.egg-info
+python -m build
+python -m twine check dist/*
+python -m twine upload --repository testpypi dist/*
+```
 
-    python -m venv /tmp/coordpy-test
-    /tmp/coordpy-test/bin/pip install \
-        --index-url https://test.pypi.org/simple/ \
-        --extra-index-url https://pypi.org/simple/ \
-        coordpy-ai
-    /tmp/coordpy-test/bin/python -c "import coordpy; print(coordpy.__version__)"
-    /tmp/coordpy-test/bin/coordpy --profile local_smoke --out-dir /tmp/cp-test
+Verify in a clean venv:
 
-### Real PyPI upload
+```
+python -m venv /tmp/cp-test
+/tmp/cp-test/bin/pip install \
+    --index-url https://test.pypi.org/simple/ \
+    --extra-index-url https://pypi.org/simple/ \
+    coordpy-ai
+/tmp/cp-test/bin/python -c "import coordpy; print(coordpy.__version__)"
+/tmp/cp-test/bin/coordpy --profile local_smoke --out-dir /tmp/cp-out
+```
 
-    rm -rf dist build *.egg-info
-    python -m build
-    python -m twine check dist/*
-    python -m twine upload dist/*
+### Real PyPI
 
-(Or equivalently: ``./scripts/release.sh upload``.)
+```
+rm -rf dist build *.egg-info
+python -m build
+python -m twine check dist/*
+python -m twine upload dist/*
+```
 
-After upload, sanity-check by installing from PyPI in a clean venv:
+Or just:
 
-    python -m venv /tmp/coordpy-prod
-    /tmp/coordpy-prod/bin/pip install coordpy-ai
-    /tmp/coordpy-prod/bin/python -c "import coordpy; print(coordpy.__version__)"
-    /tmp/coordpy-prod/bin/coordpy --profile local_smoke --out-dir /tmp/cp-prod
+```
+./scripts/release.sh upload
+```
 
-## Version naming convention
+After upload, sanity-check from a fresh venv:
 
-CoordPy follows semantic versioning at the wire level:
+```
+python -m venv /tmp/cp-prod
+/tmp/cp-prod/bin/pip install coordpy-ai
+/tmp/cp-prod/bin/python -c "import coordpy; print(coordpy.__version__)"
+/tmp/cp-prod/bin/coordpy --profile local_smoke --out-dir /tmp/cp-out
+```
 
-- **MAJOR** — incompatible change to the report schema or the
+## Versioning
+
+- **MAJOR**: incompatible change to the report schema or the
   capsule contract. Don't ship without a deprecation cycle.
-- **MINOR** — additive change to the public SDK; old code keeps
-  working byte-for-byte.
-- **PATCH** — bug fixes and ergonomic improvements that don't add
-  or remove API.
+- **MINOR**: additive change to the public SDK; existing code
+  keeps working.
+- **PATCH**: bug fixes and ergonomic improvements with no API
+  surface change.
 
-The SDK research-line tag (``coordpy.sdk.v3.4x``) lives separately
-in ``coordpy.SDK_VERSION`` and is independent from the PyPI
-version.
+The research-line tag (`coordpy.sdk.v3.4x`) lives separately on
+`coordpy.SDK_VERSION` and is independent of the PyPI version.
 
-## Yanking a release
+## Yanking
 
-If a release ships with a critical bug, yank it from PyPI rather
-than deleting it:
+If a release ships a critical bug, yank rather than delete:
 
-    python -m twine yank coordpy-ai==X.Y.Z --reason "<reason>"
+```
+python -m twine yank coordpy-ai==X.Y.Z --reason "<reason>"
+```
 
-Then publish a fix as ``X.Y.(Z+1)``.
+Then publish a fix as `X.Y.(Z+1)`.

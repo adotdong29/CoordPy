@@ -1,52 +1,35 @@
-"""CoordPy — the first finished product from the Context Zero programme.
+"""coordpy: SDK and CLI for coordinating LLM agent teams.
 
-**CoordPy is a context-capsule runtime.** Every piece of context that
-crosses a role boundary, a layer boundary, or a run boundary is a
-typed, content-addressed, lifecycle-bounded, budget-bounded,
-provenance-stamped **capsule** — never a raw prompt string. ``RunSpec``
-in, one reproducible, provenance-stamped report out, where the report
-is the root of a capsule graph you can audit, replay, and trust.
+Cross-agent context is modelled as typed, content-addressed
+``ContextCapsule`` objects with byte budgets, declared parents, and
+a fixed lifecycle. ``coordpy.run(RunSpec(...))`` produces a
+``RunReport`` whose root is a sealed capsule DAG, plus a
+``provenance.json`` manifest and a detached ``meta_manifest.json``
+witness, all of which can be re-verified from the bytes on disk.
 
-Positioning (honest)
---------------------
-* Context Zero is the *research programme* — 45+ phases, dozens of
-  research shards, and the EXTENDED_MATH / PROOFS corpus.
-* CoordPy is the *first shipped product surface* from that programme.
-  Its load-bearing idea is the **Context Capsule**: the contract
-  every inter-role / inter-layer / inter-run artifact satisfies.
-* The individual primitives under a capsule (content addressing,
-  hash-chained logs, typed claim kinds, frozen lifecycle, capability-
-  style typed references) are inherited from Git / Merkle DAGs /
-  IPFS / actor systems / session types. What CoordPy claims as new is
-  the *unification* — one contract, implemented end-to-end in a
-  runnable SDK — and the product-level decision that "context is not
-  a prompt; context is an object."
+Stable public surface:
 
-Public surface (stable, contract-tested)
-----------------------------------------
-* Capsule primitives (SDK v3)
-    * ``ContextCapsule``, ``CapsuleKind``, ``CapsuleLifecycle``
-    * ``CapsuleBudget``, ``CapsuleLedger``, ``CapsuleView``
-    * ``CapsuleAdmissionError``, ``CapsuleLifecycleError``
-    * ``CAPSULE_VIEW_SCHEMA``, ``render_view``
-    * ``build_report_ledger`` — fold a finished report into a capsule DAG
-* Run model (preserved from v2)
-    * ``RunSpec``, ``run``
-    * ``SweepSpec``, ``run_sweep``, ``HeavyRunNotAcknowledged``
-    * ``CoordPyConfig``
-    * ``profiles``, ``report``, ``ci_gate``, ``import_data``,
-      ``extensions``
-* Provenance
-    * ``PROVENANCE_SCHEMA``, ``build_manifest``
-* Version / schema constants
-    * ``__version__``, ``SDK_VERSION``
-    * ``PRODUCT_REPORT_SCHEMA``, ``PRODUCT_REPORT_SCHEMA_V1``
-    * ``CI_VERDICT_SCHEMA``, ``IMPORT_AUDIT_SCHEMA``
-    * ``CAPSULE_VIEW_SCHEMA``
+  * Capsule primitives: ``ContextCapsule``, ``CapsuleKind``,
+    ``CapsuleLifecycle``, ``CapsuleBudget``, ``CapsuleLedger``,
+    ``CapsuleView``, ``CapsuleAdmissionError``,
+    ``CapsuleLifecycleError``, ``render_view``,
+    ``verify_chain_from_view_dict``, ``build_report_ledger``,
+    ``CAPSULE_VIEW_SCHEMA``.
 
-Everything not re-exported here is considered **internal** or
-**experimental** and may change without notice. See
-``docs/context_zero_master_plan.md`` for the stability matrix.
+  * Run model: ``RunSpec``, ``run``, ``SweepSpec``, ``run_sweep``,
+    ``HeavyRunNotAcknowledged``, ``CoordPyConfig``.
+
+  * Submodules: ``profiles``, ``report``, ``ci_gate``,
+    ``import_data``, ``extensions``.
+
+  * Provenance: ``PROVENANCE_SCHEMA``, ``build_manifest``.
+
+  * Versioning: ``__version__``, ``SDK_VERSION``,
+    ``PRODUCT_REPORT_SCHEMA``, ``PRODUCT_REPORT_SCHEMA_V1``,
+    ``CI_VERDICT_SCHEMA``, ``IMPORT_AUDIT_SCHEMA``.
+
+Anything not re-exported here is internal or experimental and may
+change without notice.
 """
 
 from __future__ import annotations
