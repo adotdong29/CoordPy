@@ -3,6 +3,33 @@
 Release history for the coordpy SDK. For installation and usage,
 see [`README.md`](README.md).
 
+## [0.5.18] AgentTeam: usable default budgets
+
+A subagent build-test against `coordpy-ai 0.5.17` from PyPI hit
+`CapsuleAdmissionError: capsule has 73 tokens but
+budget.max_tokens=64` on the very first agent's first turn of an
+otherwise normal three-agent code-review pipeline. The cap was
+documented only in source. This release fixes the documented
+"lightweight team SDK" path so it admits a real agent response
+on first try.
+
+Changes:
+
+- `_default_budget_for(TEAM_HANDOFF)`: `max_tokens` 64 → 4096,
+  `max_bytes` 2 KiB → 64 KiB.
+- `_default_budget_for(ROLE_VIEW)`: `max_tokens` 1024 → 32k,
+  `max_bytes` 16 KiB → 256 KiB.
+- `AgentTeam(handoff_budget=...)` constructor knob, also
+  available on `AgentTeam.from_env(...)` and
+  `AgentTeam.from_config(...)`. Pass any
+  `coordpy.CapsuleBudget` to override the per-handoff capsule
+  budget. Tighten for benchmarks; widen for very long turns.
+- `capsule_team_handoff(budget=...)` accepts the same kwarg for
+  callers building handoff capsules directly.
+
+Backwards-compatible: any code that admitted under the old
+defaults still admits under the new ones.
+
 ## [0.5.17] Curate the public surface
 
 `dir(coordpy)` now returns the 82-name stable surface instead of

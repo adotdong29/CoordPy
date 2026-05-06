@@ -193,6 +193,7 @@ def capsule_team_handoff(*,
                             round: int = 0,
                             parents: Iterable[str] = (),
                             n_tokens: int | None = None,
+                            budget: "CapsuleBudget | None" = None,
                             ) -> ContextCapsule:
     """Build a ``TEAM_HANDOFF`` capsule directly (no substrate twin).
 
@@ -202,6 +203,10 @@ def capsule_team_handoff(*,
     capsule. The ``payload_sha256`` is exposed in the payload so
     downstream consumers can prove the handoff bytes' identity
     without re-canonicalising the capsule.
+
+    Pass ``budget=CapsuleBudget(...)`` to override the default
+    (4096 tokens / 64 KiB) — useful for tight benchmarks or
+    for very large agent turns.
     """
     sha = _payload_sha256(payload)
     n_tok = n_tokens
@@ -220,6 +225,7 @@ def capsule_team_handoff(*,
         kind=CapsuleKind.TEAM_HANDOFF,
         payload=body,
         parents=parents,
+        budget=budget,
         n_tokens=int(n_tok),
         metadata={
             "source_role": str(source_role),

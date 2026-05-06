@@ -513,22 +513,24 @@ def _default_budget_for(kind: str) -> CapsuleBudget:
     if kind == CapsuleKind.TEAM_HANDOFF:
         # SDK v3.5 — capsule-native handoff. Payload is
         # (source_role, to_role, claim_kind, payload string,
-        # round, payload_sha256). Bounded payload string at 2 KiB
-        # so a moderate-detail claim fits; max_tokens is the
-        # PER-CAPSULE token budget for this handoff (the role-
-        # local cap is enforced by ROLE_VIEW.max_parents +
-        # ROLE_VIEW.max_tokens, not here). max_parents=8 covers
-        # multi-source corroboration patterns.
-        return CapsuleBudget(max_bytes=1 << 11, max_tokens=64,
+        # round, payload_sha256). The default needs to fit a
+        # normal-sized LLM agent turn: a typical review or
+        # planning step from a 4k-context model is several
+        # hundred tokens, occasionally a few thousand. We size
+        # the per-capsule budget at 4096 tokens / 64 KiB so the
+        # documented "lightweight team SDK" path admits a real
+        # response on the first try; tighter benchmarks set
+        # this explicitly.
+        return CapsuleBudget(max_bytes=1 << 16, max_tokens=4096,
                               max_parents=8)
     if kind == CapsuleKind.ROLE_VIEW:
-        # SDK v3.5 — role-local admitted view. max_parents is the
-        # role-local inbox capacity (default 32, override per
-        # benchmark). max_tokens is the role-local token budget
-        # (sum over admitted handoffs' payload tokens). Default
-        # 1024 tokens is generous; benchmarks tighten it.
-        return CapsuleBudget(max_parents=32, max_tokens=1024,
-                              max_bytes=1 << 14)
+        # SDK v3.5 — role-local admitted view. max_tokens is the
+        # role-local token budget (sum over admitted handoffs'
+        # payload tokens). 32 KiB / 32k tokens covers a
+        # multi-turn role inbox without forcing every benchmark
+        # to override the default; benchmarks tighten it.
+        return CapsuleBudget(max_parents=32, max_tokens=32768,
+                              max_bytes=1 << 18)
     if kind == CapsuleKind.TEAM_DECISION:
         # SDK v3.5 — team-level decision. Payload is the role's
         # final structured answer + a bounded evidence_summary.
