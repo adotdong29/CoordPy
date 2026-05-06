@@ -22,7 +22,7 @@ from __future__ import annotations
 import dataclasses
 from typing import Any, Sequence
 
-from .capsule import CapsuleLedger, render_view
+from .capsule import CapsuleBudget, CapsuleLedger, render_view
 from .llm_backend import LLMBackend, backend_from_config, backend_from_env
 from .team_coord import capsule_team_handoff
 
@@ -113,6 +113,7 @@ class AgentTeam:
         team_instructions: str = "",
         max_visible_handoffs: int = 4,
         capture_capsules: bool = True,
+        handoff_budget: "CapsuleBudget | None" = None,
     ) -> None:
         if not agents:
             raise ValueError("AgentTeam requires at least one agent")
@@ -123,6 +124,11 @@ class AgentTeam:
         self.team_instructions = team_instructions.strip()
         self.max_visible_handoffs = int(max_visible_handoffs)
         self.capture_capsules = bool(capture_capsules)
+        # Override the default per-handoff capsule budget. ``None``
+        # means use ``_default_budget_for(TEAM_HANDOFF)`` (4096
+        # tokens / 64 KiB), which fits typical LLM agent turns.
+        # Tighten for benchmarks; widen for very long turns.
+        self.handoff_budget = handoff_budget
 
     @classmethod
     def from_env(
@@ -137,6 +143,7 @@ class AgentTeam:
         team_instructions: str = "",
         max_visible_handoffs: int = 4,
         capture_capsules: bool = True,
+        handoff_budget: "CapsuleBudget | None" = None,
     ) -> "AgentTeam":
         """Construct a team from common env-driven backend settings.
 
@@ -160,6 +167,7 @@ class AgentTeam:
             team_instructions=team_instructions,
             max_visible_handoffs=max_visible_handoffs,
             capture_capsules=capture_capsules,
+            handoff_budget=handoff_budget,
         )
 
     @classmethod
@@ -172,6 +180,7 @@ class AgentTeam:
         team_instructions: str = "",
         max_visible_handoffs: int = 4,
         capture_capsules: bool = True,
+        handoff_budget: "CapsuleBudget | None" = None,
     ) -> "AgentTeam":
         """Construct a team from a stable ``CoordPyConfig``."""
 
@@ -186,6 +195,7 @@ class AgentTeam:
             team_instructions=team_instructions,
             max_visible_handoffs=max_visible_handoffs,
             capture_capsules=capture_capsules,
+            handoff_budget=handoff_budget,
         )
 
     def run(self, task: str) -> TeamResult:
@@ -224,6 +234,7 @@ class AgentTeam:
                     payload=output,
                     round=0,
                     parents=(parent_cid,) if parent_cid else (),
+                    budget=self.handoff_budget,
                 )
                 sealed = ledger.admit_and_seal(handoff)
                 capsule_cid = sealed.cid
