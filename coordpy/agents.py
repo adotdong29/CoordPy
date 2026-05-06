@@ -56,13 +56,29 @@ class AgentTurn:
 
 @dataclasses.dataclass(frozen=True)
 class TeamResult:
-    """Result of a lightweight team run."""
+    """Result of a lightweight team run.
+
+    ``final_output`` is the **last agent's reply, verbatim** — it is
+    not an aggregation across all agents. ``last_output`` is an
+    alias kept for clarity; new code should prefer it. To inspect
+    every turn, walk ``turns``.
+
+    ``root_cid`` matches ``capsule_view["root_cid"]`` by
+    construction.
+    """
 
     task: str
     final_output: str
     turns: tuple[AgentTurn, ...]
     capsule_view: dict[str, Any] | None = None
     root_cid: str | None = None
+
+    @property
+    def last_output(self) -> str:
+        """Alias for ``final_output`` — explicitly the last agent's
+        reply, not an aggregation.
+        """
+        return self.final_output
 
 
 def agent(
@@ -78,9 +94,32 @@ def agent(
 
     if not isinstance(name, str) or not name.strip():
         raise ValueError("agent(name=...) requires a non-empty string")
+    if any(c in name for c in "\n\r\t"):
+        raise ValueError(
+            "agent(name=...) must not contain newlines or tabs "
+            "(would mangle log lines and CLI tables)"
+        )
+    if len(name) > 256:
+        raise ValueError(
+            f"agent(name=...) is {len(name)} chars; please keep it "
+            f"under 256 chars (typical agent name is one or two "
+            f"words)"
+        )
     if not isinstance(instructions, str) or not instructions.strip():
         raise ValueError(
             "agent(..., instructions=...) requires a non-empty string"
+        )
+    if not isinstance(max_tokens, int) or max_tokens <= 0:
+        raise ValueError(
+            f"agent(..., max_tokens=...) must be a positive int; "
+            f"got {max_tokens!r}"
+        )
+    if not isinstance(temperature, (int, float)) or not (
+        0.0 <= temperature <= 2.0
+    ):
+        raise ValueError(
+            f"agent(..., temperature=...) must be a number in "
+            f"[0.0, 2.0]; got {temperature!r}"
         )
     return Agent(
         name=name,
@@ -135,6 +174,26 @@ class AgentTeam:
         # tokens / 64 KiB), which fits typical LLM agent turns.
         # Tighten for benchmarks; widen for very long turns.
         self.handoff_budget = handoff_budget
+        # Surface duplicate agent names as a warning. They are
+        # valid (e.g. multiple "reviewer" agents with different
+        # instructions), but accidental dupes are a footgun for
+        # owner-attribution audits — turns are then
+        # distinguishable only by capsule CID.
+        names = [a.name for a in self.agents]
+        seen, dupes = set(), []
+        for n in names:
+            if n in seen and n not in dupes:
+                dupes.append(n)
+            seen.add(n)
+        if dupes:
+            import warnings
+            warnings.warn(
+                f"AgentTeam has duplicate agent name(s): "
+                f"{sorted(dupes)!r}. This is allowed but the audit "
+                f"trail will need capsule CIDs to distinguish them; "
+                f"prefer unique names if the trail will be reviewed.",
+                stacklevel=2,
+            )
 
     @classmethod
     def from_env(
@@ -207,6 +266,11 @@ class AgentTeam:
     def run(self, task: str) -> TeamResult:
         """Run the team once over ``task`` and return a stable result."""
 
+        if not isinstance(task, str) or not task.strip():
+            raise ValueError(
+                "AgentTeam.run(task=...) requires a non-empty string"
+            )
+
         ledger = CapsuleLedger() if self.capture_capsules else None
         turns: list[AgentTurn] = []
         recent_handoffs: list[tuple[str, str]] = []
@@ -259,7 +323,16 @@ class AgentTeam:
             if len(recent_handoffs) > self.max_visible_handoffs:
                 recent_handoffs = recent_handoffs[-self.max_visible_handoffs :]
 
-        view = render_view(ledger).as_dict() if ledger is not None else None
+        # Pass the chain head as ``root_cid`` so the view and the
+        # returned ``TeamResult.root_cid`` agree byte-for-byte.
+        # AgentTeam runs seal a TEAM_HANDOFF chain rather than a
+        # full RUN_REPORT, so without this the view has
+        # ``root_cid=None`` while the TeamResult has the chain head.
+        view = (
+            render_view(ledger, root_cid=parent_cid).as_dict()
+            if ledger is not None
+            else None
+        )
         final_output = turns[-1].output
         root_cid = (
             view.get("root_cid") if view is not None else None

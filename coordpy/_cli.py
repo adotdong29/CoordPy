@@ -249,10 +249,13 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
     else:
         cv = report.get("capsules") if isinstance(report, dict) else None
     if not isinstance(cv, dict) or cv.get("schema") != "coordpy.capsule_view.v1":
-        print("error: input has no capsule view "
-              "(expected coordpy.capsule_view.v1 either at the top "
-              "level or under ``capsules``; got pre-SDK-v3 report "
-              "or malformed JSON)",
+        # Note: this is the schema-mismatch path. Genuinely
+        # malformed JSON is caught earlier as JSONDecodeError.
+        print("error: input is not a coordpy capsule view "
+              "(expected schema 'coordpy.capsule_view.v1' either at "
+              "the top level or under the 'capsules' key; this "
+              "looks like a pre-SDK-v3 report or an unrelated JSON "
+              "document)",
               file=sys.stderr)
         return 2
 
