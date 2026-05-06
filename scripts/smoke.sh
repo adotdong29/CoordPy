@@ -45,9 +45,13 @@ skip_if_missing "ruff check"        ruff check .
 # by the smoke check. Run `black .` to format, `mypy coordpy` to
 # type-check, on the files you touch.
 
+# Resolve the bundled mini fixture for coordpy-import.
+FIXTURE="$("$PY" -c 'import coordpy, os; print(os.path.join(os.path.dirname(coordpy.__file__), "_internal/tasks/data/swe_real_shape_mini.jsonl"))')"
+
 run "coordpy --profile local_smoke" "$PY" -m coordpy --profile local_smoke --out-dir "$OUT/smoke"
 run "coordpy-ci"                    coordpy-ci --report "$OUT/smoke/product_report.json" --min-pass-at-1 1.0
 run "coordpy-capsule verify"        coordpy-capsule verify --report "$OUT/smoke/product_report.json"
+run "coordpy-import"                coordpy-import --jsonl "$FIXTURE" --out "$OUT/audit.json"
 run "tests/test_smoke_full.py"      "$PY" tests/test_smoke_full.py
 
 echo ""

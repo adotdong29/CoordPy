@@ -1,38 +1,5 @@
 # Contributing
 
-Thanks for considering a contribution. The package is small enough
-that the rules fit on one page.
-
-## Stable surface
-
-The public contract is `coordpy.RunSpec` / `coordpy.run` /
-`RunReport` and the four CLIs (`coordpy`, `coordpy-import`,
-`coordpy-ci`, `coordpy-capsule`). Don't change the report shape
-or the four on-disk schemas without a version bump.
-
-The schemas and where they live:
-
-| Schema constant | Defined in |
-|---|---|
-| `CAPSULE_VIEW_SCHEMA` (`coordpy.capsule_view.v1`) | `coordpy/capsule.py` |
-| `PROVENANCE_SCHEMA` (`coordpy.provenance.v1`) | `coordpy/provenance.py` |
-| `PRODUCT_REPORT_SCHEMA` (`phase45.product_report.v2`) | `coordpy/_internal/product/runner.py` |
-| `CI_VERDICT_SCHEMA` | `coordpy/_internal/product/ci_gate.py` |
-| `IMPORT_AUDIT_SCHEMA` | `coordpy/_internal/product/import_data.py` |
-
-The capsule lifecycle invariants are load-bearing. Changes need a
-matching test:
-
-- Capsule construction invariants C1..C4 — `coordpy/capsule.py`,
-  on `ContextCapsule.new`, `CapsuleLedger.admit`,
-  `CapsuleLedger.seal`.
-- Team-coordination lifecycle invariants T-1..T-7 —
-  `coordpy/lifecycle_audit.py` and `coordpy/team_coord.py`.
-
-`coordpy.__experimental__` (defined in `coordpy/__init__.py`) can
-move, rename, or disappear between releases. Pin against the
-experimental tuple if you depend on it.
-
 ## Setup
 
 Supported Python versions: 3.10, 3.11, 3.12, 3.13, 3.14.
@@ -47,78 +14,191 @@ pip install -e ".[dev]"
 PyPI distribution name is `coordpy-ai`; import name is `coordpy`.
 
 The `[dev]` extra installs `ruff`, `black`, `mypy`, `pytest`,
-`build`, and `twine`. Lint and type-check rules live under
-`[tool.ruff]`, `[tool.black]`, `[tool.mypy]` in `pyproject.toml`.
-Run the same commands CI runs:
+`build`, and `twine`. Tool config lives under `[tool.ruff]`,
+`[tool.black]`, `[tool.mypy]` in `pyproject.toml`.
 
-```bash
-ruff check .
-black --check .
-mypy coordpy
-```
+## Pre-push gate
 
-## Smoke checks
-
-Before pushing:
+Before every push, run:
 
 ```bash
 ./scripts/smoke.sh
 ```
 
-That runs `ruff`, the four CLIs in order, and
-`tests/test_smoke_full.py`. It mirrors what CI runs.
+That runs `ruff`, then the four console scripts in order
+(`coordpy --profile local_smoke`, `coordpy-ci`,
+`coordpy-capsule verify`, `coordpy-import` against a bundled
+fixture), then `tests/test_smoke_full.py`. CI runs the same
+set, so a clean local `smoke.sh` should mean a green CI.
 
-Or run the steps individually:
+`black` and `mypy` are in the `[dev]` extra. They aren't required
+to push; run them on files you touch if you want.
 
-```bash
-ruff check .
-coordpy --profile local_smoke --out-dir /tmp/cp-smoke
-coordpy-ci --report /tmp/cp-smoke/product_report.json --min-pass-at-1 1.0
-coordpy-capsule verify --report /tmp/cp-smoke/product_report.json
-python tests/test_smoke_full.py
-```
-
-`black` and `mypy` are in the `[dev]` extra but are not enforced
-by `smoke.sh` because the codebase predates them. Run `black .`
-to format, `mypy coordpy` to type-check, on the files you
-touch — both are useful, neither is a release blocker today.
-
-To run the full pytest suite (fixtures live alongside the modules
-under test):
+To run the full pytest suite or a single test:
 
 ```bash
-pytest
+pytest                              # whole suite
+pytest -k smoke                     # just smoke tests
+pytest tests/test_smoke_full.py -v  # one file, verbose
 ```
 
-`local_smoke` writes ~7 small artefacts to the `--out-dir`
-(`product_report.json`, `capsule_view.json`, `provenance.json`,
-`meta_manifest.json`, `readiness_verdict.json`,
-`product_summary.txt`, `sweep_result.json`). The directory is
-disposable; nothing else writes there.
+## Public surface
 
-The full smoke driver runs in under five seconds and exercises
-every documented public symbol.
+The public contract is `coordpy.RunSpec` / `coordpy.run` /
+`RunReport` and the four console scripts.
+
+The capsule lifecycle invariants are load-bearing. Touching one
+needs a regression test that names the invariant in its
+docstring.
+
+Capsule construction and admission, all in `coordpy/capsule.py`:
+
+- **C1**: a capsule's CID is a SHA-256 of its canonical content,
+  so identical payloads have identical CIDs.
+- **C2**: every capsule has a kind from `CapsuleKind.ALL`.
+- **C3**: admission honours the capsule's byte / parent
+  budget; oversize raises `CapsuleAdmissionError`.
+- **C4**: `seal` is monotonic — sealed capsules are immutable.
+
+Team-coordination lifecycle, in `coordpy/lifecycle_audit.py` and
+`coordpy/team_coord.py`:
+
+- **T-1..T-3**: every TEAM_HANDOFF declares one source role,
+  one target role, and parents reachable from the source's
+  ROLE_VIEW.
+- **T-4..T-5**: every TEAM_DECISION has parents that include
+  every TEAM_HANDOFF it adjudicates.
+- **T-6..T-7**: ROLE_VIEW and TEAM_DECISION transitions are
+  monotonic — once sealed, they stay reachable from the run's
+  RUN_REPORT capsule.
+
+The five on-disk schemas are pinned to specific files and tests:
+
+| Schema constant | Defined in | Pinned by `tests/test_smoke_full.py` |
+|---|---|---|
+| `CAPSULE_VIEW_SCHEMA` (`coordpy.capsule_view.v1`) | `coordpy/capsule.py` | yes |
+| `PROVENANCE_SCHEMA` (`coordpy.provenance.v1`) | `coordpy/provenance.py` | yes |
+| `PRODUCT_REPORT_SCHEMA` (`phase45.product_report.v2`) | `coordpy/_internal/product/runner.py` | yes |
+| `CI_VERDICT_SCHEMA` | `coordpy/_internal/product/ci_gate.py` | indirectly |
+| `IMPORT_AUDIT_SCHEMA` | `coordpy/_internal/product/import_data.py` | indirectly |
+
+Don't change any of these without a version bump (procedure below).
+
+`coordpy.__experimental__` (defined in `coordpy/__init__.py`) is
+a research surface. Pin against the `__experimental__` tuple if
+you depend on it. Promotion to stable is a release-cycle
+decision, not a PR-time one.
+
+## Bumping a schema
+
+Schemas use suffixed semantic versions like `coordpy.foo.v1`. The
+recipe is the same in every case:
+
+1. **Add a new constant.** Don't mutate the old one. For example,
+   to bump `PROVENANCE_SCHEMA`:
+
+   ```python
+   # coordpy/provenance.py
+   PROVENANCE_SCHEMA   = "coordpy.provenance.v2"   # new
+   PROVENANCE_SCHEMA_V1 = "coordpy.provenance.v1"  # keep for readers
+   ```
+
+2. **Update producers.** Find the code that emits the schema
+   and bump the string it writes. For `PROVENANCE_SCHEMA` that
+   producer is `build_manifest` in `coordpy/provenance.py`; for
+   the report and CI/import schemas, look in the matching file
+   listed in the table above. If the on-disk shape changes, add
+   a reader helper that accepts both versions during the
+   migration window:
+
+   ```python
+   def parse_provenance(d: dict) -> dict:
+       schema = d.get("schema")
+       if schema == PROVENANCE_SCHEMA:        # new
+           return _parse_v2(d)
+       if schema == PROVENANCE_SCHEMA_V1:     # old
+           return _parse_v1(d)
+       raise ValueError(f"unknown provenance schema: {schema!r}")
+   ```
+
+3. **Update `tests/test_smoke_full.py`.** It pins each schema
+   constant by literal value; bump those literals.
+
+4. **Add a `CHANGELOG.md` entry** noting the schema bump and any
+   migration steps for downstream consumers.
+
+Backwards-incompatible schema changes need a major version
+bump; see [`RELEASING.md`](RELEASING.md) for the release-side
+procedure.
+
+## Debugging a failing capsule chain
+
+When a run reports `chain_ok=False` or `coordpy-capsule verify`
+prints a verdict other than `OK`, work through these steps in
+order:
+
+1. **Read the verdict line.** `coordpy-capsule verify` shows four
+   sub-checks (chain recompute embedded / on-disk view agreement
+   / artefacts on disk / meta_manifest on disk). The first one
+   to fail is usually the proximate cause.
+
+2. **Check `--full` view.** `coordpy-capsule view --full --report
+   <path>` prints every capsule with its CID, kind, lifecycle,
+   parent count, and byte/token counts. A wrong parent count or
+   an unexpected `RETIRED` lifecycle is often the smoking gun.
+
+3. **Diff producer vs. consumer.** If the embedded chain is OK
+   but the on-disk view disagrees, something rewrote the file
+   between sealing and verification. Re-run with a fresh
+   `--out-dir` to rule out a stale or shared output directory,
+   then compare the embedded view against the on-disk view:
+
+   ```bash
+   diff <(jq -S '.capsules' product_report.json) \
+        <(jq -S . capsule_view.json)
+   ```
+
+4. **Re-run with the smoke profile.** If `local_smoke` itself
+   fails, treat it as a regression and bisect recent changes to
+   `coordpy/capsule.py`, `coordpy/capsule_runtime.py`, or
+   `coordpy/_internal/product/runner.py`.
+
+5. **Run the lifecycle audit.** `coordpy-capsule audit --report
+   <path>` checks eleven L-1..L-11 rules. Each rule is named in
+   the module docstring at the top of
+   `coordpy/lifecycle_audit.py`; the audit output names the
+   capsule kind and CID that broke the invariant.
+
+## Adding a backend
+
+The supported backend layout is `coordpy.LLMBackend` (a Protocol
+defined in `coordpy/llm_backend.py`). To add a new one:
+
+1. Implement a class with the same call shape as
+   `OllamaBackend` / `OpenAICompatibleBackend`.
+2. Register it via `coordpy.make_backend(name, ...)` if you want
+   it nameable from `COORDPY_BACKEND`.
+3. Add tests under `tests/`. The smoke driver's section 16 is a
+   useful template.
+
+`coordpy.extensions` covers the same pattern for sandboxes
+(`SandboxBackend`), report sinks (`ReportSink`), and task banks
+(`TaskBankLoader`).
 
 ## Pull requests
 
 - One logical change per PR; keep diffs focused.
 - Update or add tests for any behaviour change.
-- If you touch a schema:
-  1. Bump the schema version in the file listed in the table
-     above (the file lives directly under `coordpy/` for the
-     capsule and provenance schemas, and under
-     `coordpy/_internal/product/` for the product / CI / import
-     schemas).
-  2. Update `tests/test_smoke_full.py`, which pins each schema
-     constant by value.
-  3. Update any per-schema test that lives next to the file you
-     bumped.
-- Run `./scripts/smoke.sh` before review.
+- Run `./scripts/smoke.sh` and confirm it ends with
+  `ALL SMOKE CHECKS PASSED`.
+- Touch a schema → follow the bump recipe above.
+- Touch a capsule lifecycle invariant → cite the C/T number in
+  the PR description and add a regression test.
 
 ## Releasing
 
-The version lives in **one place**: `coordpy/_version.py`
-(`__version__ = "X.Y.Z"`). `pyproject.toml` reads it dynamically.
+The version is single-source-of-truth in `coordpy/_version.py`.
+`pyproject.toml` reads it dynamically.
 
 Full runbook: [`RELEASING.md`](RELEASING.md). Quick path:
 
@@ -128,4 +208,5 @@ Full runbook: [`RELEASING.md`](RELEASING.md). Quick path:
 ```
 
 The recommended path is to push a `vX.Y.Z` tag and let
-`.github/workflows/release.yml` upload via PyPI Trusted Publisher.
+`.github/workflows/release.yml` upload via PyPI Trusted
+Publisher.

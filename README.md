@@ -4,35 +4,18 @@ Python SDK and CLI for coordinating teams of LLM agents with
 content-addressed, lifecycle-bounded context objects ("capsules"),
 plus a reproducible run/report contract.
 
-PyPI: [`coordpy-ai`](https://pypi.org/project/coordpy-ai/) ·
-import: `coordpy`
+PyPI: [`coordpy-ai`](https://pypi.org/project/coordpy-ai/) · import: `coordpy`
 
-## What it does
+## Overview
 
 Multi-agent stacks usually pass context around as raw prompts and
 JSON. That works until something breaks and you can't reconstruct
-what each agent actually saw. coordpy treats context as typed
+what each agent actually saw. `coordpy` treats context as typed
 objects with content-derived IDs, declared parents, byte budgets,
 and a fixed lifecycle. A run produces a `RunReport` whose root is
 a sealed capsule DAG written to disk alongside a provenance
 manifest, and you can re-verify the whole thing from the bytes
 later.
-
-The four pieces:
-
-- **Capsules.** Every cross-boundary artefact (prompt, response,
-  parse outcome, role handoff, run report) is a typed object with
-  a SHA-256 content ID and an enforced lifecycle.
-- **Runtime.** `coordpy.run(RunSpec(...))` produces a `RunReport`
-  whose root is a sealed capsule DAG, plus a `provenance.json`
-  manifest and a detached `meta_manifest.json` witness.
-- **Team coordination.** Agents exchange `TEAM_HANDOFF`,
-  `ROLE_VIEW`, and `TEAM_DECISION` capsules under a
-  mechanically-checked T-1..T-7 lifecycle audit.
-- **Evaluation harness.** Reproducible profiles (`local_smoke`,
-  `bundled_57`, `public_jsonl`, ...), a `coordpy-ci` gate that
-  consumes the report, and a `coordpy-capsule verify` CLI that
-  re-hashes the on-disk capsule chain end-to-end.
 
 ## Install
 
@@ -49,57 +32,21 @@ coordpy --version           # coordpy 0.5.16 (coordpy.sdk.v3.43)
 python -c "import coordpy; print(coordpy.__version__)"
 ```
 
-The PyPI distribution is `coordpy-ai`; the import name is
-`coordpy`. The only required dependency is NumPy.
+The first parenthetical (`coordpy.sdk.v3.43`) is the
+research-line tag exposed at `coordpy.SDK_VERSION`. It tracks
+the underlying research programme and is independent of the
+PyPI version.
 
-Optional extras:
+The only required dependency is NumPy. Optional extras:
 
 | Extra | Pulls in | When you want it |
 |---|---|---|
 | `[scientific]` | `scipy`, `networkx` | numerical / graph helpers |
 | `[crypto]` | `cryptography` | optional signed-capsule paths |
-| `[dl]` | `torch`, `peft` | the deep-learning research surface |
-| `[heavy]` | `hnswlib`, `transformers`, `RestrictedPython` | full research stack |
+| `[dl]` | `torch`, `peft` | the deep-learning research path |
+| `[heavy]` | `hnswlib`, `transformers`, `RestrictedPython` | full research stack (heavy) |
 | `[docker]` | `docker` | Docker-backed sandbox |
 | `[dev]` | `ruff`, `black`, `mypy`, `pytest`, `build`, `twine` | contributing |
-
-## Run a profile end to end
-
-The four CLIs below should be run in order. The first one writes
-`product_report.json` and a handful of other artefacts under
-`--out-dir`; the next three consume that report.
-
-```bash
-# 1. Run the bundled smoke profile (writes ~7 artefacts to --out-dir).
-coordpy --profile local_smoke --out-dir /tmp/cp-smoke
-
-# 2. Apply the CI gate to the report.
-coordpy-ci --report /tmp/cp-smoke/product_report.json --min-pass-at-1 1.0
-
-# 3. Inspect the capsule graph that the run produced.
-coordpy-capsule view   --report /tmp/cp-smoke/product_report.json
-coordpy-capsule verify --report /tmp/cp-smoke/product_report.json
-```
-
-`coordpy-import` audits an external SWE-bench-Lite-style JSONL
-that you supply. To try it without finding your own file, run it
-against the bundled mini fixture:
-
-```bash
-coordpy-import \
-    --jsonl "$(python -c 'import coordpy, os; print(os.path.join(os.path.dirname(coordpy.__file__), "_internal/tasks/data/swe_real_shape_mini.jsonl"))')" \
-    --out /tmp/audit.json
-```
-
-In your own pipelines, point `--jsonl` at your real file.
-
-For development:
-
-```bash
-git clone https://github.com/adotdong29/context-zero.git
-cd context-zero
-pip install -e ".[dev]"
-```
 
 ## Quickstart
 
@@ -118,14 +65,51 @@ assert report["capsules"]["chain_ok"]
 print(report["capsules"]["root_cid"])
 ```
 
-`coordpy.run` prints a human-readable summary to stdout while the
-run executes. The returned `report` dict is the same shape as the
-`product_report.json` written under `out_dir`.
+`coordpy.run` writes seven files into `out_dir`. The two you
+will reach for most are `product_report.json` (the same shape
+as the returned dict) and `capsule_view.json` (the sealed
+capsule chain that `coordpy-capsule verify` re-hashes); the
+others (`provenance.json`, `meta_manifest.json`,
+`readiness_verdict.json`, `product_summary.txt`,
+`sweep_result.json`) are always written and are useful for
+audit. The `root_cid` is the SHA-256 of the run's `RUN_REPORT`
+capsule; it is stable for a given input but differs between
+runs because provenance includes a wall-clock timestamp.
+
+## Console scripts
+
+| Command | Purpose |
+|---|---|
+| `coordpy --profile <name> --out-dir <dir>` | Run a profile end to end and write the seven artefacts. |
+| `coordpy-ci --report <product_report.json>` | Apply the CI pass/fail gate to a finished report. |
+| `coordpy-capsule view --report ...` | Summarise the capsule graph. |
+| `coordpy-capsule verify --report ...` | Re-hash the capsule chain end to end. |
+| `coordpy-import --jsonl <file>` | Audit a SWE-bench-Lite-style JSONL for compatibility. |
+
+A typical chain:
+
+```bash
+coordpy --profile local_smoke --out-dir /tmp/cp-smoke
+coordpy-ci --report /tmp/cp-smoke/product_report.json --min-pass-at-1 1.0
+coordpy-capsule view   --report /tmp/cp-smoke/product_report.json
+coordpy-capsule verify --report /tmp/cp-smoke/product_report.json
+```
+
+To exercise `coordpy-import` against the bundled mini fixture
+(no external file required):
+
+```bash
+FIXTURE=$(python -c 'import coordpy, os; print(os.path.join(os.path.dirname(coordpy.__file__), "_internal/tasks/data/swe_real_shape_mini.jsonl"))')
+coordpy-import --jsonl "$FIXTURE" --out /tmp/audit.json
+```
 
 ## Agent teams
 
-`AgentTeam.from_env` reads its backend configuration from the
-`COORDPY_*` environment variables listed below.
+`AgentTeam.from_env` reads its backend from `COORDPY_*`
+environment variables and **requires a configured backend** to
+run — either a reachable Ollama server or an OpenAI-compatible
+API key. To run a team without a network, see the
+`SyntheticLLMClient` example below.
 
 ```python
 from coordpy import AgentTeam, agent
@@ -164,11 +148,22 @@ export COORDPY_API_KEY=...
 # export COORDPY_API_BASE_URL=https://your-provider.example/v1
 ```
 
-See [`examples/agent_team.py`](examples/agent_team.py) for the
-minimal version, and
+To run a team without a network or an API key, pass a
+`SyntheticLLMClient` directly:
+
+```python
+from coordpy import create_team, agent
+from coordpy.synthetic_llm import SyntheticLLMClient
+
+team = create_team(
+    [agent("planner", "..."), agent("writer", "...")],
+    backend=SyntheticLLMClient(default_response="ok"),
+)
+print(team.run("hi").final_output)
+```
+
 [`examples/build_with_coordpy.py`](examples/build_with_coordpy.py)
-for an eight-step demo that drives every public layer of the SDK
-against the synthetic backend (no network or API key required).
+is an eight-step demo that drives every public layer this way.
 
 ## Public surface
 
@@ -177,19 +172,28 @@ against the synthetic backend (no network or API key required).
 | `coordpy` SDK: `RunSpec`, `run`, `RunReport`, `SweepSpec`, `run_sweep`, `CoordPyConfig`, `Agent`, `AgentTeam`, `agent`, `create_team`, `profiles`, `report`, `ci_gate`, `import_data`, `extensions`, capsule primitives, schema constants, `OpenAICompatibleBackend`, `OllamaBackend`, `backend_from_env` | Stable |
 | Console scripts: `coordpy`, `coordpy-import`, `coordpy-ci`, `coordpy-capsule` | Stable |
 | On-disk schemas: `coordpy.capsule_view.v1`, `coordpy.provenance.v1`, `phase45.product_report.v2` | Stable |
-| `coordpy.__experimental__`: research-grade trust adjudication and multi-agent coordination ladder | Experimental, may move or disappear |
+| `coordpy.__experimental__` (a tuple of names exported under that attribute): research-grade trust-adjudication primitives and the multi-agent coordination ladder behind the research papers | Experimental, may move or disappear between releases |
 
-The experimental surface ships in the same wheel for reproducibility
-and audit. Pin against the experimental tuple if you depend on it.
+The experimental surface ships in the same wheel for
+reproducibility and audit. Pin against
+`coordpy.__experimental__` if you depend on it.
 
 ## Limitations
 
-- The runtime is the capsule layer. It does not provide
+- `coordpy` works at the capsule layer. It does not provide
   transformer-internal trust transfer or hidden-state access.
-- Cross-host evidence in the test corpus is bounded by the lab
-  topology that produced it.
+- The bundled cross-host evidence comes from the small two-node
+  lab where it was generated. Behaviour at larger scales has not
+  been measured.
 - Not peer-reviewed. The code, tests, results notes, and theorem
   registry are public so they can be challenged.
+
+## Where to go next
+
+- Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Releasing to PyPI: [`RELEASING.md`](RELEASING.md)
+- Security policy: [`SECURITY.md`](SECURITY.md)
+- Changelog: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## License
 
