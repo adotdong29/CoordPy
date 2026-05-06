@@ -142,6 +142,9 @@ from .agents import (
     Agent, AgentTurn, TeamResult, AgentTeam, agent, create_team,
 )
 
+# Synthetic LLM client for tests / examples / hermetic CI.
+from .synthetic_llm import SyntheticLLMClient, make_synthetic_response_fn
+
 # Capsule admission policies (Phase 46 research milestone). The
 # SDK contract is unchanged — `CapsuleLedger.admit_and_seal` is
 # byte-for-byte the same — but external callers can now opt into
@@ -1023,6 +1026,9 @@ _STABLE_PUBLIC: tuple[str, ...] = (
     "LLMBackend", "OllamaBackend", "OpenAICompatibleBackend",
     "MLXDistributedBackend", "make_backend", "backend_from_env",
     "backend_from_config",
+    # Synthetic LLM client (no network, deterministic; for tests
+    # and examples).
+    "SyntheticLLMClient", "make_synthetic_response_fn",
     # Capsule adapters
     "capsule_from_handle", "capsule_from_handoff",
     "capsule_from_provenance", "capsule_from_sweep_cell",

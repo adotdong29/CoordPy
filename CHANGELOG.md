@@ -3,32 +3,62 @@
 Release history for the coordpy SDK. For installation and usage,
 see [`README.md`](README.md).
 
-## [0.5.18] AgentTeam: usable default budgets
+## [0.5.18] AgentTeam: usable default budgets, agent() validation, friendlier CLI
 
 A subagent build-test against `coordpy-ai 0.5.17` from PyPI hit
 `CapsuleAdmissionError: capsule has 73 tokens but
 budget.max_tokens=64` on the very first agent's first turn of an
-otherwise normal three-agent code-review pipeline. The cap was
-documented only in source. This release fixes the documented
-"lightweight team SDK" path so it admits a real agent response
-on first try.
+otherwise routine three-agent code-review pipeline. A second
+hostile build-test on the 0.5.18-rc surfaced four more papercuts
+in adjacent surfaces. This release closes all of them.
 
-Changes:
+### Defaults
 
 - `_default_budget_for(TEAM_HANDOFF)`: `max_tokens` 64 → 4096,
   `max_bytes` 2 KiB → 64 KiB.
 - `_default_budget_for(ROLE_VIEW)`: `max_tokens` 1024 → 32k,
   `max_bytes` 16 KiB → 256 KiB.
-- `AgentTeam(handoff_budget=...)` constructor knob, also
-  available on `AgentTeam.from_env(...)` and
-  `AgentTeam.from_config(...)`. Pass any
+
+### `AgentTeam` / `create_team` knobs
+
+- `AgentTeam(handoff_budget=...)` constructor knob, also wired
+  through `AgentTeam.from_env(...)`, `AgentTeam.from_config(...)`,
+  and the convenience `create_team(...)` function. Pass any
   `coordpy.CapsuleBudget` to override the per-handoff capsule
   budget. Tighten for benchmarks; widen for very long turns.
 - `capsule_team_handoff(budget=...)` accepts the same kwarg for
   callers building handoff capsules directly.
 
+### Validation
+
+- `agent("")` and `agent(None, ...)` now raise `ValueError`
+  immediately with a clear message. Previously they constructed
+  an `Agent` with an empty/None name and only failed later (or
+  silently produced an unusable agent).
+
+### Test ergonomics
+
+- `coordpy.SyntheticLLMClient` and `make_synthetic_response_fn`
+  are re-exported at the top level (and visible via
+  `dir(coordpy)`), so tests and examples don't need the
+  `coordpy.synthetic_llm` submodule path.
+
+### CLI: `coordpy-capsule`
+
+- `view` / `verify` / `cid` / `audit` now accept either a
+  `product_report.json` **or** a bare `capsule_view.json` /
+  `TeamResult.capsule_view` dump. Previously the CLI required
+  the wrapper shape (`{"capsules": ...}`), which made
+  `team.run()` outputs unusable through the documented default
+  command.
+- `cid` on a view with no `RUN_REPORT` capsule (typical for
+  `AgentTeam.run()` outputs, which seal `TEAM_HANDOFF` chains)
+  now exits 2 with a clear message instead of printing a blank
+  line.
+
 Backwards-compatible: any code that admitted under the old
-defaults still admits under the new ones.
+defaults still admits under the new ones; any CLI invocation
+that worked before still works.
 
 ## [0.5.17] Curate the public surface
 
