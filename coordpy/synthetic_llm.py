@@ -48,7 +48,7 @@ It is NOT:
 from __future__ import annotations
 
 import dataclasses
-from typing import Any, Callable
+from typing import Callable
 
 
 # A canned-response producer takes (prompt, instance_id_guess) and

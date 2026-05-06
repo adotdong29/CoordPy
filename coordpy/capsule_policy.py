@@ -70,13 +70,12 @@ Theoretical anchor: ``docs/CAPSULE_FORMALISM.md`` § 5
 from __future__ import annotations
 
 import dataclasses
-import json
 import math
 import random
 from typing import Any, Iterable, Sequence
 
 from .capsule import (
-    CapsuleAdmissionError, CapsuleBudget, CapsuleKind, CapsuleLedger,
+    CapsuleAdmissionError, CapsuleKind, CapsuleLedger,
     CapsuleLifecycleError, ContextCapsule,
 )
 

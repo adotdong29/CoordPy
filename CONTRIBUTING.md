@@ -65,13 +65,29 @@ Before pushing:
 ./scripts/smoke.sh
 ```
 
+That runs `ruff`, the four CLIs in order, and
+`tests/test_smoke_full.py`. It mirrors what CI runs.
+
 Or run the steps individually:
 
 ```bash
+ruff check .
 coordpy --profile local_smoke --out-dir /tmp/cp-smoke
 coordpy-ci --report /tmp/cp-smoke/product_report.json --min-pass-at-1 1.0
 coordpy-capsule verify --report /tmp/cp-smoke/product_report.json
 python tests/test_smoke_full.py
+```
+
+`black` and `mypy` are in the `[dev]` extra but are not enforced
+by `smoke.sh` because the codebase predates them. Run `black .`
+to format, `mypy coordpy` to type-check, on the files you
+touch — both are useful, neither is a release blocker today.
+
+To run the full pytest suite (fixtures live alongside the modules
+under test):
+
+```bash
+pytest
 ```
 
 `local_smoke` writes ~7 small artefacts to the `--out-dir`
@@ -87,9 +103,17 @@ every documented public symbol.
 
 - One logical change per PR; keep diffs focused.
 - Update or add tests for any behaviour change.
-- If you touch a schema, bump the schema version in the file
-  listed above and update the test that pins it.
-- Run `ruff`, `black`, `mypy`, and the smoke driver before review.
+- If you touch a schema:
+  1. Bump the schema version in the file listed in the table
+     above (the file lives directly under `coordpy/` for the
+     capsule and provenance schemas, and under
+     `coordpy/_internal/product/` for the product / CI / import
+     schemas).
+  2. Update `tests/test_smoke_full.py`, which pins each schema
+     constant by value.
+  3. Update any per-schema test that lives next to the file you
+     bumped.
+- Run `./scripts/smoke.sh` before review.
 
 ## Releasing
 

@@ -129,22 +129,69 @@ coordpy = ["py.typed"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+# Lint the public surface only. The ``_internal`` tree is research
+# code with no API stability promise (see ``coordpy/_internal/__init__.py``)
+# and is not held to formatter rules.
+extend-exclude = [
+    "coordpy/_internal",
+    "build",
+    "dist",
+    ".release-venv",
+]
 
 [tool.ruff.lint]
-extend-select = ["E", "F", "I", "UP", "B"]
+# Focus on real bugs. Stylistic preferences (B905 zip strict,
+# B007/B009 unused loop var, F541 empty f-string, F841 unused
+# local) are turned off because they fire heavily on legacy
+# numeric / research code without indicating a real defect.
+select = ["E", "F", "B"]
 ignore = [
-    "E501",  # line length is enforced by formatter, not linter
-    "E741",  # ambiguous variable names — common in numeric / math code
+    "E501",  # line length is enforced by the formatter
+    "E741",  # ambiguous variable names; common in math code
+    "B007",  # unused loop variable
+    "B008",  # function calls in default args; idiomatic here
+    "B009",  # getattr with constant
+    "B904",  # `raise ... from err`; not always desired
+    "B905",  # zip strict=; not available pre-3.10
+    "F541",  # f-string without placeholders
+    "F841",  # unused local variable
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# Re-export files: import order is significant for the public
+# API surface; ruff's import-sort / unused-import checks are
+# not the right tool.
+"coordpy/__init__.py" = ["E402", "F401", "F403", "I001"]
+"coordpy/extensions/__init__.py" = ["F401"]
+# Research modules that re-export sub-symbols and use
+# conditional imports for optional dependencies.
+"coordpy/team_coord.py" = ["E402", "F401"]
+"coordpy/integrated_synthesis.py" = ["E402", "F401"]
+"coordpy/capsule_runtime.py" = ["E402", "F401"]
+"coordpy/capsule_decoder.py" = ["F401"]
+"coordpy/capsule_decoder_v2.py" = ["F401"]
+"coordpy/role_invariant_synthesis.py" = ["E402", "F401"]
+# Test scripts use ad-hoc imports near where they exercise an API.
+"tests/*" = ["E402", "F401"]
 
 [tool.black]
 line-length = 100
 target-version = ["py310", "py311", "py312", "py313", "py314"]
+extend-exclude = """
+/(
+    coordpy/_internal
+  | build
+  | dist
+  | \\.release-venv
+)/
+"""
 
 [tool.mypy]
 python_version = "3.10"
 ignore_missing_imports = true
 warn_unused_ignores = true
+files = ["coordpy"]
+exclude = "coordpy/_internal"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

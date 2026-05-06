@@ -57,12 +57,11 @@ from __future__ import annotations
 import dataclasses
 import math
 from collections import defaultdict
-from typing import Any, Callable, Iterable, Sequence
+from typing import Any, Sequence
 
 from .capsule import ContextCapsule
 from .capsule_policy import (
-    ADMIT, REJECT, AdmissionPolicy, LearnedAdmissionPolicy,
-    featurise_capsule, feature_index,
+    ADMIT, AdmissionPolicy, featurise_capsule, feature_index,
 )
 
 

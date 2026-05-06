@@ -66,18 +66,37 @@ smoke() {
 }
 
 verify_tag_matches_version() {
+    # Read the version directly from the file, without importing
+    # ``coordpy`` (which would pull in numpy and the rest of the
+    # runtime; the release venv intentionally only has build /
+    # twine / check-wheel-contents installed).
     local version
-    version="$("$VPY" -c 'from coordpy._version import __version__; print(__version__)')"
+    version="$(grep -E '^__version__' coordpy/_version.py \
+        | head -n 1 \
+        | sed -E 's/.*"([^"]+)".*/\1/')"
+    if [ -z "$version" ]; then
+        echo "ERROR: could not parse __version__ from coordpy/_version.py" >&2
+        exit 3
+    fi
     local tag
     tag="$(git describe --tags --exact-match HEAD 2>/dev/null || true)"
-    if [ -n "$tag" ] && [ "$tag" != "v$version" ]; then
-        echo "ERROR: HEAD tag $tag does not match coordpy/_version.py ($version)" >&2
-        echo "       expected tag: v$version" >&2
+    if [ -z "$tag" ]; then
+        echo "ERROR: HEAD has no exact-match git tag." >&2
+        echo "       coordpy/_version.py is $version, so tag with:" >&2
+        echo "         git tag -a v$version -m 'coordpy-ai v$version'" >&2
+        exit 3
+    fi
+    if [ "$tag" != "v$version" ]; then
+        echo "ERROR: HEAD tag $tag does not match coordpy/_version.py ($version)." >&2
+        echo "       Expected tag: v$version" >&2
         exit 3
     fi
     if [ -n "$(git status --porcelain)" ]; then
-        echo "WARNING: working tree is dirty; commit before tagging." >&2
+        echo "ERROR: working tree is dirty; commit before tagging." >&2
+        git status --short >&2
+        exit 3
     fi
+    echo "==> tag v$version matches coordpy/_version.py and tree is clean"
 }
 
 case "$CMD" in
@@ -103,10 +122,13 @@ case "$CMD" in
         "$VPY" -m twine upload --repository testpypi dist/*
         ;;
     upload)
+        # Run the tag + clean-tree gate first; no point building
+        # something that would not be allowed to ship anyway.
+        ensure_tooling
+        verify_tag_matches_version
         build
         verify
         smoke
-        verify_tag_matches_version
         echo "==> uploading to PyPI"
         echo "    target: https://pypi.org/project/coordpy-ai/"
         "$VPY" -m twine upload dist/*

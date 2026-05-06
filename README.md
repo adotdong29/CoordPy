@@ -81,12 +81,17 @@ coordpy-capsule view   --report /tmp/cp-smoke/product_report.json
 coordpy-capsule verify --report /tmp/cp-smoke/product_report.json
 ```
 
-`coordpy-import` audits an external SWE-bench-Lite-style JSONL.
-You supply the file:
+`coordpy-import` audits an external SWE-bench-Lite-style JSONL
+that you supply. To try it without finding your own file, run it
+against the bundled mini fixture:
 
 ```bash
-coordpy-import --jsonl <your-swe-bench-lite.jsonl> --out audit.json
+coordpy-import \
+    --jsonl "$(python -c 'import coordpy, os; print(os.path.join(os.path.dirname(coordpy.__file__), "_internal/tasks/data/swe_real_shape_mini.jsonl"))')" \
+    --out /tmp/audit.json
 ```
+
+In your own pipelines, point `--jsonl` at your real file.
 
 For development:
 

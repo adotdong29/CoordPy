@@ -63,15 +63,15 @@ import dataclasses
 import math
 import random
 import re
-from typing import Any, Iterable, Sequence
+from typing import Any, Sequence
 
 import numpy as np
 
 from coordpy.capsule import ContextCapsule
 from coordpy.team_coord import (
-    AdmissionDecision, AdmissionPolicy, RoleBudget, REASON_ADMIT,
+    AdmissionDecision, REASON_ADMIT,
     REASON_SCORE_LOW, _enforce_budget,
-    _candidate_claim_kind, _candidate_n_tokens, _candidate_payload_sha,
+    _candidate_n_tokens,
 )
 
 

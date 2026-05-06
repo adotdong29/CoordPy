@@ -7,8 +7,10 @@ How to publish coordpy to PyPI as
 > upload tooling needs `pip install --upgrade`, which fails on
 > distro-managed Python interpreters (Debian, Ubuntu, RHEL).
 > `./scripts/release.sh` handles this by maintaining its own
-> private venv at `.release-venv/`. The manual path below assumes
-> you are already inside a venv.
+> private venv at `.release-venv/`; the interpreter that creates
+> it can be picked with `PYTHON=python3.12 ./scripts/release.sh
+> ...`. The manual path below assumes you are already inside a
+> venv.
 
 ## Pre-flight
 
@@ -49,9 +51,13 @@ How to publish coordpy to PyPI as
    git push --follow-tags
    ```
 
-   `./scripts/release.sh upload` enforces the tag-matches-version
-   invariant; the GitHub workflow does not, so be careful when
-   tagging by hand.
+   `./scripts/release.sh upload` exits 3 (without uploading) unless:
+     - HEAD has an exact-match git tag, AND
+     - that tag is `v` + `coordpy._version.__version__`, AND
+     - the working tree is clean.
+
+   The GitHub Trusted Publisher workflow does **not** check the
+   tag-vs-version invariant, so be careful when tagging by hand.
 
 ## Recommended: PyPI Trusted Publisher
 
@@ -89,7 +95,28 @@ You will need:
 - `build`, `twine`, and `check-wheel-contents` installed in that
   venv. (`./scripts/release.sh` will install them automatically.)
 - A PyPI API token from <https://pypi.org/manage/account/token/>,
-  in `~/.pypirc` (mode 600) or in the `TWINE_PASSWORD` env var.
+  configured one of two ways:
+
+  Either via `~/.pypirc` (set permissions to 600 so other users
+  on the machine can't read it: `chmod 600 ~/.pypirc`):
+
+  ```
+  [pypi]
+    username = __token__
+    password = pypi-AgEIcHlwaS5vcmc...        # paste your token
+
+  [testpypi]
+    repository = https://test.pypi.org/legacy/
+    username = __token__
+    password = pypi-AgENdGVzdC5weXBpLm9yZ...   # separate test token
+  ```
+
+  Or via env vars:
+
+  ```
+  export TWINE_USERNAME=__token__
+  export TWINE_PASSWORD=pypi-AgE...
+  ```
 
 ### TestPyPI dry run
 
