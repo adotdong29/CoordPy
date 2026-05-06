@@ -195,6 +195,33 @@ defined in `coordpy/llm_backend.py`). To add a new one:
 - Touch a capsule lifecycle invariant → cite the C/T number in
   the PR description and add a regression test.
 
+## Private working files
+
+The repo is public, so we don't track personal scratch notes or
+agent-tooling files. The following paths are gitignored and
+won't ever be picked up by `git add`:
+
+- `CLAUDE.md`, `.claude/` — agent / tooling instructions
+- `NOTES.md`, `SCRATCH.md`, `TODO.md` — personal scratch
+- `*.local.md`, `*.private.md`, `*.scratch.md` — any
+  similarly-named file at any depth
+- `.notes/`, `.private/` — entire private trees
+
+Keep your own copies of these wherever you like in your working
+tree; they stay local. If you need a private file at a path
+that isn't in the list, add it to `.gitignore` in the same PR.
+
+To check that nothing private is staged before pushing:
+
+```bash
+git status
+git diff --cached
+```
+
+`./scripts/smoke.sh` does not enforce this; reviewers should
+flag any file matching the private patterns that sneaks into a
+PR.
+
 ## Releasing
 
 The version is single-source-of-truth in `coordpy/_version.py`.

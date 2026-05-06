@@ -32,3 +32,20 @@ vision_mvp/results*.json
 # stray runner output that would otherwise land in CWD
 /audit.json
 /.release-venv/
+
+# ---------------------------------------------------------------------
+# Private / local-only working files. These never ship to the public
+# repo. Keep your own copies wherever you like; the paths below are
+# deliberately untracked so a stray `git add .` can't publish them.
+# See CONTRIBUTING.md > Private working files.
+# ---------------------------------------------------------------------
+CLAUDE.md
+.claude/
+.notes/
+NOTES.md
+SCRATCH.md
+TODO.md
+*.local.md
+*.private.md
+*.scratch.md
+.private/
