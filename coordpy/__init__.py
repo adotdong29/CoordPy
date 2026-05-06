@@ -979,6 +979,86 @@ __experimental__: tuple[str, ...] = (
     "build_trivial_role_invariant_registry",
 )
 
+# ----------------------------------------------------------------
+# Curated public surface for ``dir(coordpy)`` and IDE autocomplete.
+#
+# The full ``__all__`` below preserves every re-export for back-
+# compat (so ``from coordpy import *`` keeps working byte-for-byte
+# in code that already depends on it), but ``dir(coordpy)`` returns
+# only the stable, documented surface. Research / experimental
+# names live behind ``coordpy.__experimental__`` (a tuple of name
+# strings); they remain importable as ``coordpy.<name>`` but are
+# not surfaced by autocomplete or ``help(coordpy)``.
+# ----------------------------------------------------------------
+
+_STABLE_PUBLIC: tuple[str, ...] = (
+    # Run model
+    "RunSpec", "run", "RunReport",
+    "SweepSpec", "run_sweep", "HeavyRunNotAcknowledged",
+    "CoordPyConfig",
+    # Submodules
+    "profiles", "report", "ci_gate", "import_data", "extensions",
+    # Capsule primitives
+    "ContextCapsule", "CapsuleKind", "CapsuleLifecycle",
+    "CapsuleBudget", "CapsuleLedger", "CapsuleView",
+    "CapsuleAdmissionError", "CapsuleLifecycleError",
+    "render_view", "verify_chain_from_view_dict",
+    "build_report_ledger",
+    "CAPSULE_VIEW_SCHEMA",
+    # Capsule-native runtime
+    "CapsuleNativeRunContext", "ContentAddressMismatch",
+    "seal_and_write_artifact",
+    "verify_artifacts_on_disk", "verify_meta_manifest_on_disk",
+    "CONSTRUCTION_IN_FLIGHT", "CONSTRUCTION_POST_HOC",
+    # Lifecycle audit
+    "CapsuleLifecycleAudit", "LifecycleAuditReport",
+    "audit_capsule_lifecycle", "audit_capsule_lifecycle_from_view",
+    # Layered API
+    "CoordPySimpleAPI", "CoordPyBuilderAPI", "CoordPyAdvancedAPI",
+    "BuilderSpec",
+    # Agent team surface
+    "Agent", "AgentTurn", "TeamResult", "AgentTeam",
+    "agent", "create_team",
+    # LLM backends
+    "LLMBackend", "OllamaBackend", "OpenAICompatibleBackend",
+    "MLXDistributedBackend", "make_backend", "backend_from_env",
+    "backend_from_config",
+    # Capsule adapters
+    "capsule_from_handle", "capsule_from_handoff",
+    "capsule_from_provenance", "capsule_from_sweep_cell",
+    "capsule_from_sweep_spec", "capsule_from_profile",
+    "capsule_from_readiness", "capsule_from_artifact",
+    "capsule_from_report",
+    "capsule_from_patch_proposal", "capsule_from_test_verdict",
+    "capsule_from_meta_manifest",
+    "capsule_from_parse_outcome", "PARSE_OUTCOME_ORACLE",
+    "capsule_from_prompt", "capsule_from_llm_response",
+    "PROMPT_TEXT_CAP", "LLM_RESPONSE_TEXT_CAP",
+    # Capsule admission policies (stable wrappers)
+    "AdmissionPolicy", "FIFOPolicy", "KindPriorityPolicy",
+    "SmallestFirstPolicy", "BudgetedAdmissionLedger",
+    # Provenance + report schemas
+    "PROVENANCE_SCHEMA", "build_manifest",
+    "PRODUCT_REPORT_SCHEMA", "PRODUCT_REPORT_SCHEMA_V1",
+    "CI_VERDICT_SCHEMA", "IMPORT_AUDIT_SCHEMA",
+    # Versioning
+    "__version__", "SDK_VERSION",
+    # Experimental access pointer
+    "__experimental__",
+)
+
+
+def __dir__() -> list[str]:
+    """Return the stable public surface only.
+
+    Research / experimental names live in :data:`__experimental__`
+    and are reachable as ``coordpy.<name>`` for back-compat, but
+    are intentionally hidden from ``dir(coordpy)`` and IDE
+    autocomplete.
+    """
+    return sorted(_STABLE_PUBLIC)
+
+
 __all__ = [
     # Execution
     "RunSpec", "run", "RunReport",
