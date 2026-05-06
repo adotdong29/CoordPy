@@ -1,7 +1,8 @@
 name: Publish to PyPI
 
-# Triggered by pushing a ``v*`` tag (e.g. ``v0.5.16``). Uses
-# PyPI Trusted Publishers so no API token is stored in the repo.
+# Triggered by pushing a ``v*`` tag (e.g. ``v0.5.16``) or by pushing
+# to a ``release/*`` branch. Uses PyPI Trusted Publishers so no API
+# token is stored in the repo.
 #
 # Pending publisher to register on PyPI before the first run:
 #   Project name      : coordpy-ai
@@ -16,6 +17,8 @@ on:
   push:
     tags:
       - "v*"
+    branches:
+      - "release/**"
   workflow_dispatch:
 
 permissions:
