@@ -36,23 +36,56 @@ The four pieces:
 
 ## Install
 
+Requires Python 3.10 or newer.
+
 ```bash
 pip install coordpy-ai
 ```
 
-The PyPI distribution is `coordpy-ai`; the import name is
-`coordpy`. The only required dependency is NumPy. Optional extras:
-`coordpy-ai[scientific]`, `[dl]`, `[heavy]`, `[crypto]`,
-`[docker]`, `[dev]`.
-
-The package installs four console scripts:
+Verify:
 
 ```bash
+coordpy --version           # coordpy 0.5.16 (coordpy.sdk.v3.43)
+python -c "import coordpy; print(coordpy.__version__)"
+```
+
+The PyPI distribution is `coordpy-ai`; the import name is
+`coordpy`. The only required dependency is NumPy.
+
+Optional extras:
+
+| Extra | Pulls in | When you want it |
+|---|---|---|
+| `[scientific]` | `scipy`, `networkx` | numerical / graph helpers |
+| `[crypto]` | `cryptography` | optional signed-capsule paths |
+| `[dl]` | `torch`, `peft` | the deep-learning research surface |
+| `[heavy]` | `hnswlib`, `transformers`, `RestrictedPython` | full research stack |
+| `[docker]` | `docker` | Docker-backed sandbox |
+| `[dev]` | `ruff`, `black`, `mypy`, `pytest`, `build`, `twine` | contributing |
+
+## Run a profile end to end
+
+The four CLIs below should be run in order. The first one writes
+`product_report.json` and a handful of other artefacts under
+`--out-dir`; the next three consume that report.
+
+```bash
+# 1. Run the bundled smoke profile (writes ~7 artefacts to --out-dir).
 coordpy --profile local_smoke --out-dir /tmp/cp-smoke
-coordpy-import   --jsonl path/to/swe_bench_lite.jsonl --out audit.json
-coordpy-ci       --report /tmp/cp-smoke/product_report.json --min-pass-at-1 1.0
-coordpy-capsule  view   --report /tmp/cp-smoke/product_report.json
-coordpy-capsule  verify --report /tmp/cp-smoke/product_report.json
+
+# 2. Apply the CI gate to the report.
+coordpy-ci --report /tmp/cp-smoke/product_report.json --min-pass-at-1 1.0
+
+# 3. Inspect the capsule graph that the run produced.
+coordpy-capsule view   --report /tmp/cp-smoke/product_report.json
+coordpy-capsule verify --report /tmp/cp-smoke/product_report.json
+```
+
+`coordpy-import` audits an external SWE-bench-Lite-style JSONL.
+You supply the file:
+
+```bash
+coordpy-import --jsonl <your-swe-bench-lite.jsonl> --out audit.json
 ```
 
 For development:
@@ -78,10 +111,16 @@ assert report["provenance"]["schema"] == "coordpy.provenance.v1"
 assert report["capsules"]["chain_ok"]
 
 print(report["capsules"]["root_cid"])
-print(report["summary_text"])
 ```
 
+`coordpy.run` prints a human-readable summary to stdout while the
+run executes. The returned `report` dict is the same shape as the
+`product_report.json` written under `out_dir`.
+
 ## Agent teams
+
+`AgentTeam.from_env` reads its backend configuration from the
+`COORDPY_*` environment variables listed below.
 
 ```python
 from coordpy import AgentTeam, agent
@@ -102,15 +141,17 @@ result = team.run("Explain what coordpy does.")
 print(result.final_output)
 ```
 
-Backend configuration via environment:
+Local Ollama:
 
 ```bash
-# Local Ollama
 export COORDPY_BACKEND=ollama
 export COORDPY_MODEL=qwen2.5:0.5b
 export COORDPY_OLLAMA_URL=http://localhost:11434
+```
 
-# OpenAI-compatible provider
+OpenAI-compatible provider:
+
+```bash
 export COORDPY_BACKEND=openai
 export COORDPY_MODEL=gpt-4o-mini
 export COORDPY_API_KEY=...

@@ -7,8 +7,11 @@
 #   ./scripts/release.sh testpypi      # build + check + upload to TestPyPI
 #   ./scripts/release.sh upload        # build + check + upload to real PyPI
 #
-# Requires: python -m build, twine, check-wheel-contents.
-# Pre-flight: bump coordpy/_version.py, update CHANGELOG, commit.
+# Build tooling (build, twine, check-wheel-contents) is installed
+# into a private venv under .release-venv so this script works on
+# distros where the system Python is managed (Debian/Ubuntu, etc.).
+#
+# Set PYTHON=... to pick the interpreter that creates the venv.
 
 set -euo pipefail
 
@@ -18,6 +21,8 @@ cd "$ROOT"
 CMD="${1:-check}"
 
 PY="${PYTHON:-python3}"
+VENV="$ROOT/.release-venv"
+VPY="$VENV/bin/python"
 
 clean() {
     echo "==> cleaning build artifacts"
@@ -26,21 +31,26 @@ clean() {
 }
 
 ensure_tooling() {
-    "$PY" -m pip install --quiet --upgrade pip build twine check-wheel-contents
+    if [ ! -x "$VPY" ]; then
+        echo "==> creating release venv at .release-venv"
+        "$PY" -m venv "$VENV"
+    fi
+    "$VPY" -m pip install --quiet --upgrade pip
+    "$VPY" -m pip install --quiet --upgrade build twine check-wheel-contents
 }
 
 build() {
     clean
     ensure_tooling
     echo "==> building sdist + wheel"
-    "$PY" -m build
+    "$VPY" -m build
 }
 
 verify() {
     echo "==> twine check"
-    "$PY" -m twine check dist/*
+    "$VPY" -m twine check dist/*
     echo "==> check-wheel-contents"
-    "$PY" -m check_wheel_contents dist/*.whl
+    "$VPY" -m check_wheel_contents dist/*.whl
 }
 
 smoke() {
@@ -53,6 +63,21 @@ smoke() {
     "$venv/bin/python" tests/test_smoke_full.py
     "$venv/bin/python" examples/build_with_coordpy.py
     rm -rf "$(dirname "$venv")"
+}
+
+verify_tag_matches_version() {
+    local version
+    version="$("$VPY" -c 'from coordpy._version import __version__; print(__version__)')"
+    local tag
+    tag="$(git describe --tags --exact-match HEAD 2>/dev/null || true)"
+    if [ -n "$tag" ] && [ "$tag" != "v$version" ]; then
+        echo "ERROR: HEAD tag $tag does not match coordpy/_version.py ($version)" >&2
+        echo "       expected tag: v$version" >&2
+        exit 3
+    fi
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "WARNING: working tree is dirty; commit before tagging." >&2
+    fi
 }
 
 case "$CMD" in
@@ -75,15 +100,16 @@ case "$CMD" in
         verify
         smoke
         echo "==> uploading to TestPyPI"
-        "$PY" -m twine upload --repository testpypi dist/*
+        "$VPY" -m twine upload --repository testpypi dist/*
         ;;
     upload)
         build
         verify
         smoke
+        verify_tag_matches_version
         echo "==> uploading to PyPI"
         echo "    target: https://pypi.org/project/coordpy-ai/"
-        "$PY" -m twine upload dist/*
+        "$VPY" -m twine upload dist/*
         ;;
     *)
         echo "usage: $0 {clean|build|check|testpypi|upload}" >&2
