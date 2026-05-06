@@ -1,31 +1,38 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "coordpy"
-version = "0.5.16"
-description = "CoordPy — bounded-context orchestration and evaluation SDK (first shipped product from the Context Zero research programme)."
+name = "coordpy-ai"
+dynamic = ["version"]
+description = "SDK and CLI for coordinating LLM agent teams with content-addressed context capsules and reproducible run reports."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     { name = "Context Zero Contributors" },
 ]
+maintainers = [
+    { name = "Context Zero Contributors" },
+]
 keywords = [
+    "agents",
     "multi-agent",
     "coordination",
     "llm",
+    "ai",
     "context",
     "evaluation",
     "swe-bench",
     "bounded-context",
+    "provenance",
+    "auditability",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -33,9 +40,11 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
 ]
 dependencies = [
     "numpy>=1.23",
@@ -51,7 +60,7 @@ scientific = [
 crypto = [
     "cryptography>=41.0",
     # galois is optional — the repo ships an inline prime-field GF(p)
-    # fallback (core/gf.py); install galois for better performance.
+    # fallback; install galois for better performance.
 ]
 dl = [
     "torch>=2.1",
@@ -62,43 +71,128 @@ heavy = [
     "transformers>=4.35",
     "RestrictedPython>=7.0",
 ]
-# Docker-first sandbox backend (Slice 2 target — declared here so
-# `pip install coordpy[docker]` resolves once the backend lands).
+# Docker-first sandbox backend (declared so ``pip install
+# coordpy-ai[docker]`` resolves cleanly).
 docker = [
     "docker>=6.0",
 ]
-# Multi-node cluster (ASPEN) tooling. Declared as a slot; the
-# cluster client itself lives outside this repo.
+# Multi-node cluster (ASPEN) tooling slot; the cluster client lives
+# outside this repo.
 cluster = []
 dev = [
     "black",
     "ruff",
     "mypy",
     "pytest",
+    "build",
+    "twine",
 ]
 
 [project.urls]
 Homepage = "https://github.com/adotdong29/context-zero"
 Documentation = "https://github.com/adotdong29/context-zero#readme"
+Source = "https://github.com/adotdong29/context-zero"
+Repository = "https://github.com/adotdong29/context-zero.git"
 Issues = "https://github.com/adotdong29/context-zero/issues"
 Changelog = "https://github.com/adotdong29/context-zero/blob/main/CHANGELOG.md"
 
 [project.scripts]
-# CoordPy SDK surface — these are the stable, contract-tested entry points.
-coordpy = "vision_mvp.coordpy._cli:main_run"
-coordpy-import = "vision_mvp.coordpy._cli:main_import"
-coordpy-ci = "vision_mvp.coordpy._cli:main_ci"
-# Inspect / audit the capsule graph of a finished report (SDK v3).
-coordpy-capsule = "vision_mvp.coordpy._cli:main_capsule"
-# Research-programme legacy entry point — runs CASR research demos
-# (scale/phase/test/info). Retained for continuity with Phase-1..44
-# scripts and kept out of the CoordPy SDK contract on purpose. The
-# public product CLI is `coordpy`.
-casr = "vision_mvp.__main__:main"
+# CoordPy SDK surface — stable, contract-tested entry points.
+coordpy = "coordpy._cli:main_run"
+coordpy-import = "coordpy._cli:main_import"
+coordpy-ci = "coordpy._cli:main_ci"
+# Inspect / audit the capsule graph of a finished report.
+coordpy-capsule = "coordpy._cli:main_capsule"
+
+[tool.setuptools.dynamic]
+version = { attr = "coordpy._version.__version__" }
 
 [tool.setuptools.packages.find]
-include = ["vision_mvp*"]
-exclude = ["vision_mvp.tests*"]
+include = ["coordpy*"]
+exclude = ["tests*", "examples*"]
+
+[tool.setuptools]
+# Don't auto-include MANIFEST.in data into the wheel; the wheel ships
+# only what is listed in ``[tool.setuptools.package-data]`` below.
+include-package-data = false
 
 [tool.setuptools.package-data]
-vision_mvp = ["*.md", "tasks/data/*.jsonl"]
+# Ship the runtime data and the PEP 561 ``py.typed`` marker so
+# downstream type checkers honour the inline annotations.
+coordpy = ["py.typed"]
+"coordpy._internal.tasks" = ["data/*.jsonl"]
+
+# ---------------------------------------------------------------------
+# Tool configuration
+# ---------------------------------------------------------------------
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+# Lint the public surface only. The ``_internal`` tree is research
+# code with no API stability promise (see ``coordpy/_internal/__init__.py``)
+# and is not held to formatter rules.
+extend-exclude = [
+    "coordpy/_internal",
+    "build",
+    "dist",
+    ".release-venv",
+]
+
+[tool.ruff.lint]
+# Focus on real bugs. Stylistic preferences (B905 zip strict,
+# B007/B009 unused loop var, F541 empty f-string, F841 unused
+# local) are turned off because they fire heavily on legacy
+# numeric / research code without indicating a real defect.
+select = ["E", "F", "B"]
+ignore = [
+    "E501",  # line length is enforced by the formatter
+    "E741",  # ambiguous variable names; common in math code
+    "B007",  # unused loop variable
+    "B008",  # function calls in default args; idiomatic here
+    "B009",  # getattr with constant
+    "B904",  # `raise ... from err`; not always desired
+    "B905",  # zip strict=; not available pre-3.10
+    "F541",  # f-string without placeholders
+    "F841",  # unused local variable
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Re-export files: import order is significant for the public
+# API surface; ruff's import-sort / unused-import checks are
+# not the right tool.
+"coordpy/__init__.py" = ["E402", "F401", "F403", "I001"]
+"coordpy/extensions/__init__.py" = ["F401"]
+# Research modules that re-export sub-symbols and use
+# conditional imports for optional dependencies.
+"coordpy/team_coord.py" = ["E402", "F401"]
+"coordpy/integrated_synthesis.py" = ["E402", "F401"]
+"coordpy/capsule_runtime.py" = ["E402", "F401"]
+"coordpy/capsule_decoder.py" = ["F401"]
+"coordpy/capsule_decoder_v2.py" = ["F401"]
+"coordpy/role_invariant_synthesis.py" = ["E402", "F401"]
+# Test scripts use ad-hoc imports near where they exercise an API.
+"tests/*" = ["E402", "F401"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312", "py313", "py314"]
+extend-exclude = """
+/(
+    coordpy/_internal
+  | build
+  | dist
+  | \\.release-venv
+)/
+"""
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = true
+files = ["coordpy"]
+exclude = "coordpy/_internal"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"

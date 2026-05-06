@@ -1,19 +1,51 @@
 # Changelog
 
-The Changelog tracks **CoordPy SDK** releases. The research programme's
-phase-by-phase narrative lives in `vision_mvp/RESULTS_PHASE*.md` and
-`docs/context_zero_master_plan.md`.
+Release history for the coordpy SDK. For installation and usage,
+see [`README.md`](README.md).
 
-If you are trying to understand what CoordPy does or how to install and
-use it, start with [`README.md`](README.md) and
-[`docs/START_HERE.md`](docs/START_HERE.md). The changelog is release
-history, not the primary onboarding path.
+## [0.5.16] First PyPI release as `coordpy-ai`
 
-> **Current release: SDK v3.43 (May 2026) — first public release of
-> CoordPy and final release of the SDK v3.4x line.** See the v3.43
-> entry below for the exact scope; see the
-> [README](README.md#final-release-scope-v343) for stable-vs-
-> experimental boundaries and out-of-scope next-programme work.
+Prepares the SDK for PyPI publication. Distribution name is
+`coordpy-ai`; import name is still `coordpy`. The runtime
+contract (one `RunSpec` in, one `RunReport` out with a sealed
+capsule graph) is unchanged.
+
+Packaging
+- Distribution renamed to `coordpy-ai`. `pip install coordpy-ai`
+  exposes `import coordpy`.
+- PEP 621 / PEP 639 metadata. SPDX `license = "MIT"` plus
+  `license-files = ["LICENSE"]`. Dropped the now-redundant
+  `License :: OSI Approved` classifier.
+- Single-source version: `dynamic = ["version"]` reads
+  `coordpy._version.__version__`.
+- PEP 561 `py.typed` marker in the wheel and a `Typing :: Typed`
+  classifier.
+- Added `maintainers`, broader keywords, the CPython
+  implementation classifier, and config blocks for `ruff`,
+  `black`, `mypy`, and `pytest`.
+- `CITATION.cff` for citation discovery.
+- Source layout flattened. The SDK is at top-level `coordpy/`;
+  runtime-internal modules live under `coordpy/_internal/`. The
+  legacy `vision_mvp` namespace is gone. Wheel went from ~2.4 MB
+  to ~770 KB.
+
+Fixes
+- `CapsuleLedger.admit_and_seal` is now idempotent on CID, as the
+  docstring already claimed.
+- `ContextCapsule.new` raises `CapsuleAdmissionError` (not a bare
+  `ValueError`) on budget violations.
+- `register_report_sink`, `register_sandbox`, and
+  `register_task_bank` accept either a factory callable or an
+  already-built instance.
+- `coordpy-capsule view|verify|cid|audit` prints a clean
+  `error: report not found: ...` and exits 2 on a missing or
+  malformed report path instead of dumping a traceback.
+
+Tests and examples
+- `tests/test_smoke_full.py`: 20 sections, ~80 checks against the
+  installed wheel. Runs in under five seconds with no network.
+- `examples/build_with_coordpy.py`: eight-step demo using only
+  the public SDK and the synthetic backend.
 
 ## [0.5.16 / 3.43] — 2026-05-03 — SDK v3.43 — first public CoordPy release; final release of the SDK v3.4x line
 

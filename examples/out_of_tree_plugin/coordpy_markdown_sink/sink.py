@@ -79,11 +79,11 @@ def register() -> None:
     """Register the markdown sink factory with CoordPy.
 
     Imported lazily so that simply importing this package does not
-    force a transitive import of ``vision_mvp.coordpy``. CoordPy calls
+    force a transitive import of ``coordpy``. CoordPy calls
     ``register()`` once, when it first resolves report-sink entry
     points.
     """
-    from vision_mvp.coordpy.extensions import register_report_sink
+    from coordpy.extensions import register_report_sink
 
     register_report_sink(
         "markdown",

@@ -28,7 +28,7 @@ out_of_tree_plugin/
 pip install -e ./examples/out_of_tree_plugin
 
 # verify registration:
-python -c "from vision_mvp.coordpy.extensions import list_report_sinks; \
+python -c "from coordpy.extensions import list_report_sinks; \
            print(list_report_sinks())"
 # -> ['jsonfile', 'markdown', 'stdout']
 
