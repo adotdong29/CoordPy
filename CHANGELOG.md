@@ -3,6 +3,18 @@
 Release history for the coordpy SDK. For installation and usage,
 see [`README.md`](README.md).
 
+## [0.5.17] Curate the public surface
+
+`dir(coordpy)` now returns the 82-name stable surface instead of
+the 687 names that were re-exported at module level. Research /
+experimental names live behind `coordpy.__experimental__` (a
+tuple of name strings) and remain importable as
+`coordpy.<name>` for back-compat, but they no longer pollute
+autocomplete or `help(coordpy)`.
+
+`__all__` is unchanged, so `from coordpy import *` keeps working
+byte-for-byte for any code that already depended on it.
+
 ## [0.5.16] First PyPI release as `coordpy-ai`
 
 Prepares the SDK for PyPI publication. Distribution name is
