@@ -238,15 +238,33 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
         print(f"error: report is not valid JSON: {args.report}: {e}",
               file=sys.stderr)
         return 2
-    cv = report.get("capsules")
+    # Accept either:
+    #   (a) a product_report.json with the embedded capsule view at
+    #       ``report["capsules"]`` (the runner's output shape), or
+    #   (b) a bare capsule_view.json / TeamResult.capsule_view dump
+    #       (the file IS the view).
+    if (isinstance(report, dict)
+            and report.get("schema") == "coordpy.capsule_view.v1"):
+        cv = report
+    else:
+        cv = report.get("capsules") if isinstance(report, dict) else None
     if not isinstance(cv, dict) or cv.get("schema") != "coordpy.capsule_view.v1":
-        print("error: report has no capsule view "
-              "(pre-SDK-v3 report or malformed)",
+        print("error: input has no capsule view "
+              "(expected coordpy.capsule_view.v1 either at the top "
+              "level or under ``capsules``; got pre-SDK-v3 report "
+              "or malformed JSON)",
               file=sys.stderr)
         return 2
 
     if args.sub == "cid":
-        print(cv.get("root_cid") or "")
+        root_cid = cv.get("root_cid")
+        if not root_cid:
+            print("error: capsule view has no RUN_REPORT root capsule "
+                  "(this is normal for AgentTeam.run() outputs, which "
+                  "seal a TEAM_HANDOFF chain rather than a full RUN_REPORT)",
+                  file=sys.stderr)
+            return 2
+        print(root_cid)
         return 0
 
     if args.sub == "audit":

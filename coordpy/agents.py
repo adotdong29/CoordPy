@@ -76,6 +76,12 @@ def agent(
 ) -> Agent:
     """Convenience constructor mirroring lightweight agent SDK style."""
 
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("agent(name=...) requires a non-empty string")
+    if not isinstance(instructions, str) or not instructions.strip():
+        raise ValueError(
+            "agent(..., instructions=...) requires a non-empty string"
+        )
     return Agent(
         name=name,
         instructions=instructions,
@@ -316,6 +322,7 @@ def create_team(
     team_instructions: str = "",
     max_visible_handoffs: int = 4,
     capture_capsules: bool = True,
+    handoff_budget: "CapsuleBudget | None" = None,
 ) -> AgentTeam:
     """Convenience constructor mirroring lightweight team SDK style.
 
@@ -323,6 +330,9 @@ def create_team(
     object, or pass ``model=...`` plus ``backend_name=...`` /
     ``base_url=...`` / ``api_key=...`` to let CoordPy build a backend
     for you.
+
+    ``handoff_budget`` overrides the per-handoff capsule budget; see
+    :class:`AgentTeam` for the default and the override semantics.
     """
 
     resolved_backend = backend
@@ -346,6 +356,7 @@ def create_team(
         team_instructions=team_instructions,
         max_visible_handoffs=max_visible_handoffs,
         capture_capsules=capture_capsules,
+        handoff_budget=handoff_budget,
     )
 
 
