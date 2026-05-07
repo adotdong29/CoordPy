@@ -71,7 +71,12 @@ def register_report_sink(
 def get_report_sink(name: str, **kwargs: Any) -> ReportSink:
     _ensure_builtins_registered()
     if name not in _REGISTRY:
-        raise KeyError(
+        # ``LookupError`` is the abstract base of KeyError; we
+        # raise it directly so callers catching ``LookupError``
+        # work, and the message renders cleanly without the
+        # outer-quote artefact ``KeyError`` produces. Built-in
+        # sinks: ``stdout``, ``jsonfile``.
+        raise LookupError(
             f"unknown report sink {name!r}; "
             f"known: {sorted(_REGISTRY)}")
     factory = _REGISTRY[name]

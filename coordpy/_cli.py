@@ -281,12 +281,6 @@ def _cmd_ci(argv: list[str] | None = None) -> int:
 
 
 def _cmd_capsule(argv: list[str] | None = None) -> int:
-    if argv is None:
-        argv = sys.argv[1:]
-    if "--version" in argv:
-        from . import __version__, SDK_VERSION
-        print(f"coordpy-capsule {__version__} ({SDK_VERSION})")
-        return 0
     """``coordpy-capsule`` — inspect / audit the capsule graph of a
     finished product report.
 
@@ -294,7 +288,11 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
       view   — print a short capsule-graph summary (default).
       verify — re-hash the chain in capsule_view.json and print OK / BAD.
       cid    — print the RUN_REPORT capsule's CID for the report.
+      audit  — run the SDK v3.4 lifecycle audit (L-1..L-11).
     """
+    from . import __version__, SDK_VERSION
+    if argv is None:
+        argv = sys.argv[1:]
     ap = argparse.ArgumentParser(
         prog="coordpy-capsule",
         description=(
@@ -306,6 +304,10 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
             "Exit codes: 0 = OK; 2 = bad arguments / report not "
             "found; 3 = chain re-derivation failed (verify); "
             "4 = lifecycle audit failed or TAMPERED (audit)."))
+    ap.add_argument(
+        "--version", action="version",
+        version=f"coordpy-capsule {__version__} ({SDK_VERSION})",
+        help="print version and exit")
     sub = ap.add_subparsers(dest="sub")
 
     def _add_report_arg(p: argparse.ArgumentParser) -> None:
@@ -322,15 +324,30 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
             help="alias for the positional REPORT path")
 
     p_view = sub.add_parser(
-        "view", help="summarise the capsule graph of a report")
+        "view", help="summarise the capsule graph of a report",
+        description=(
+            "Print a short summary of the capsule graph in a finished "
+            "product report (capsule count by kind, chain head CID, "
+            "and provenance schema). Pass --full to dump every "
+            "capsule header instead of just the rollup."))
     _add_report_arg(p_view)
     p_view.add_argument("--full", action="store_true",
                           help="print every capsule header, not just stats")
     p_verify = sub.add_parser(
-        "verify", help="re-hash the capsule chain and verify C5")
+        "verify", help="re-hash the capsule chain and verify C5",
+        description=(
+            "Re-derive every capsule's CID from its payload and "
+            "metadata, then walk the parent chain top-to-bottom. "
+            "Prints OK on success, BAD with the first mismatch on "
+            "failure. Exit code 3 on chain failure; this is the "
+            "C5 invariant and the load-bearing CI gate."))
     _add_report_arg(p_verify)
     p_cid = sub.add_parser(
-        "cid", help="print the RUN_REPORT capsule CID for a report")
+        "cid", help="print the RUN_REPORT capsule CID for a report",
+        description=(
+            "Print the CID of the RUN_REPORT capsule (the chain "
+            "head) for a finished product report. Useful for "
+            "pinning a specific run by its content hash."))
     _add_report_arg(p_cid)
     p_audit = sub.add_parser(
         "audit",
@@ -338,7 +355,14 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
               "capsule view (eleven invariants L-1..L-11). "
               "Prints OK / BAD / TAMPERED plus typed counter"
               "examples on violation. Also re-derives the "
-              "capsule chain (defense in depth)."))
+              "capsule chain (defense in depth)."),
+        description=(
+            "Run the SDK v3.4 lifecycle audit (L-1..L-11) on the "
+            "capsule view of a finished report. Verdicts: OK = all "
+            "invariants pass; BAD = a lifecycle invariant failed "
+            "(prints typed counterexamples); TAMPERED = the chain "
+            "did not re-derive (defence in depth). Exit code 4 on "
+            "BAD or TAMPERED."))
     _add_report_arg(p_audit)
     args = ap.parse_args(argv)
 
