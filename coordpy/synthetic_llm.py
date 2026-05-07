@@ -111,12 +111,17 @@ class SyntheticLLMClient:
 
 
 def _extract_instance_id_from_prompt(prompt: str) -> str:
-    """Extract the ``INSTANCE: <id>`` annotation that
-    ``build_patch_generator_prompt`` emits as the first line after
-    the role header.
+    """Extract a routing key from the prompt.
 
-    Falls back to ``""`` if the prompt does not match. Conservative
-    by design — the canned producer is responsible for handling
+    Looks for, in order:
+
+      1. ``INSTANCE: <id>`` — the SWE-bench format
+         ``build_patch_generator_prompt`` emits.
+      2. ``Agent: <name>`` — the AgentTeam header (the runtime
+         puts this at line 0 of every prompt).
+
+    Falls back to ``""`` if neither match. Conservative by
+    design — the canned producer is responsible for handling
     unknown instances.
     """
     if not prompt:
@@ -129,6 +134,8 @@ def _extract_instance_id_from_prompt(prompt: str) -> str:
             if "REPO:" in rest:
                 rest = rest.split("REPO:", 1)[0].strip()
             return rest
+        if line.startswith("Agent:"):
+            return line[len("Agent:"):].strip()
     return ""
 
 

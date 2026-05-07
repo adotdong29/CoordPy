@@ -90,3 +90,10 @@ def render_summary(report: dict[str, Any]) -> str:
             lines.append(f"  by_kind   : {kind_str}")
     lines.append(f"artifacts   : {report.get('artifacts', [])}")
     return "\n".join(lines) + "\n"
+
+
+__all__ = ("render_summary",)
+
+
+def __dir__() -> list[str]:
+    return sorted(__all__)

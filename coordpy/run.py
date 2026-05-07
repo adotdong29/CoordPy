@@ -100,15 +100,11 @@ def run(spec: RunSpec) -> dict[str, Any]:
     # Surface output-path problems as a clear ValueError before
     # any work happens, instead of bubbling a bare OSError /
     # FileNotFoundError out of one of the seven write sites.
+    # Auto-creates the out_dir and any missing parents so a
+    # relative path like ``./relative/path`` works the same as
+    # an absolute one.
     import os as _os
     out_dir = spec.out_dir
-    parent = _os.path.dirname(_os.path.abspath(out_dir)) or "."
-    if not _os.path.isdir(parent):
-        raise ValueError(
-            f"RunSpec.out_dir parent does not exist: {parent!r} "
-            f"(out_dir={out_dir!r}). Create it first or pick a "
-            f"writable path."
-        )
     try:
         _os.makedirs(out_dir, exist_ok=True)
         _probe = _os.path.join(out_dir, ".coordpy_write_probe")

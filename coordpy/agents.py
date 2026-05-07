@@ -374,10 +374,14 @@ class AgentTeam:
         recent_handoffs: Sequence[tuple[str, str]],
     ) -> str:
         parts = []
-        if self.team_instructions:
-            parts.append(self.team_instructions)
+        # Put the agent identity at the top of the prompt so a
+        # synthetic backend's ``prompt.splitlines()[0]`` routing
+        # (a common test pattern) finds it regardless of whether
+        # team_instructions is set.
         parts.append(f"Agent: {member.name}")
         parts.append(f"Role: {member.effective_role}")
+        if self.team_instructions:
+            parts.append(self.team_instructions)
         parts.append(member.instructions.strip())
         parts.append(f"Task: {task.strip()}")
         if recent_handoffs:

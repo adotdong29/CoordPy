@@ -1041,6 +1041,24 @@ def verify_chain_from_view_dict(view: dict[str, Any]) -> bool:
     Returns True iff the recomputed chain head equals
     ``view["chain_head"]``.
 
+    What is authenticated
+    ---------------------
+    The chain commits to ``(prev_chain_hash, capsule.cid,
+    capsule.kind, "SEALED")`` for each capsule. So the chain
+    detects: a changed CID, a changed kind, a reordered capsule,
+    a deleted capsule, an inserted capsule, or a rewritten
+    ``chain_head``.
+
+    What is *not* authenticated
+    ---------------------------
+    Non-CID summary fields on a capsule entry — ``n_tokens``,
+    ``n_bytes``, ``emitted_at``, ``metadata``, ``parents``, and
+    any extra keys a downstream tool added — are **not** part of
+    the chain. They are derived stats / metadata, not capsule
+    identity. To audit those, use ``audit_capsule_lifecycle_from_view``
+    (which checks lifecycle invariants L-1..L-11) or hash the
+    full view object yourself before persisting it.
+
     Theorem W3-37 (Chain-from-headers verification, proved by
     inspection): the chain step depends only on (prev,
     capsule.cid, capsule.kind, ``"SEALED"``) — every term is a

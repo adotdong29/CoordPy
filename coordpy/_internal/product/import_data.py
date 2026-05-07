@@ -274,3 +274,14 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+__all__ = (
+    "IMPORT_SCHEMA",
+    "audit_jsonl",
+    "main",
+)
+
+
+def __dir__() -> list[str]:
+    return sorted(__all__)

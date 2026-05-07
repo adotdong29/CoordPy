@@ -277,3 +277,17 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+__all__ = (
+    "CI_SCHEMA",
+    "EXPECTED_REPORT_SCHEMA",
+    "EXPECTED_REPORT_SCHEMAS",
+    "evaluate_report",
+    "aggregate",
+    "main",
+)
+
+
+def __dir__() -> list[str]:
+    return sorted(__all__)

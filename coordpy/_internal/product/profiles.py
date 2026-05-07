@@ -252,3 +252,19 @@ def is_untrusted(profile_name: str) -> bool:
 
 def model_capability_table() -> dict[str, tuple[str, ...]]:
     return dict(_MODEL_CAPABILITY)
+
+
+__all__ = (
+    "SCHEMA_VERSION",
+    "TRUST_TRUSTED",
+    "TRUST_UNTRUSTED",
+    "list_profiles",
+    "get_profile",
+    "is_untrusted",
+    "model_availability",
+    "model_capability_table",
+)
+
+
+def __dir__() -> list[str]:
+    return sorted(__all__)
