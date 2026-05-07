@@ -98,6 +98,14 @@ def _cmd_run(argv: list[str] | None = None) -> int:
         if api_key is None:
             ap.error(
                 f"--api-key-env {args.api_key_env!r} is not set in the environment")
+    # Pre-flight: an explicit ``--jsonl`` that doesn't exist
+    # should exit 2 with a one-line error, not bubble a deep
+    # FileNotFoundError out of the readiness driver.
+    if args.jsonl and not os.path.isfile(args.jsonl):
+        print(f"error: --jsonl file not found: {args.jsonl}",
+              file=sys.stderr)
+        return 2
+
     config = CoordPyConfig.from_env(
         model=args.model,
         llm_backend=args.backend,

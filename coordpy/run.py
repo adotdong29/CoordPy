@@ -66,6 +66,12 @@ class RunSpec:
                           JSONL paths so two runs of the same
                           mock-mode profile produce identical
                           full-DAG CIDs (Theorem W3-41).
+                          **Default is False** — capsule CIDs
+                          will differ between runs because
+                          provenance includes a timestamp.
+                          Set to True for byte-identical replay
+                          (mock-mode profiles + ``in_process`` /
+                          ``subprocess`` sandbox + frozen JSONL).
     """
 
     profile: str

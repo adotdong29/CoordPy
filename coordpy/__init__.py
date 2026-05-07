@@ -7,6 +7,29 @@ a fixed lifecycle. ``coordpy.run(RunSpec(...))`` produces a
 ``provenance.json`` manifest and a detached ``meta_manifest.json``
 witness, all of which can be re-verified from the bytes on disk.
 
+Quickstart (no network — uses the synthetic backend)::
+
+    from coordpy import (
+        agent, create_team, SyntheticLLMClient,
+        verify_chain_from_view_dict,
+    )
+
+    team = create_team(
+        [
+            agent("planner", "Plan the answer in 2-3 steps."),
+            agent("writer",  "Write the final answer for the user."),
+        ],
+        backend=SyntheticLLMClient(default_response="ok"),
+    )
+    result = team.run("Explain coordpy in one sentence.")
+    print(result.final_output)
+    assert verify_chain_from_view_dict(result.capsule_view)
+
+For the full runtime path (profiles, CI gate, capsule view), see
+``coordpy.run(coordpy.RunSpec(profile="local_smoke", out_dir="..."))``
+and the four console scripts (``coordpy``, ``coordpy-import``,
+``coordpy-ci``, ``coordpy-capsule``).
+
 Stable public surface:
 
   * Agent-team API: ``Agent``, ``AgentTeam``, ``AgentTurn``,
