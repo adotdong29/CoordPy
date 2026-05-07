@@ -75,6 +75,26 @@ class RunSpec:
     # graph, not on wall clock.
     deterministic: bool = False
 
+    def __post_init__(self) -> None:
+        # Validate the load-bearing fields up front so a typo is
+        # caught at construction, not deferred to profile lookup.
+        # ``out_dir`` accepts strings and ``os.PathLike`` (e.g.
+        # ``pathlib.Path``); the runner stringifies it before use.
+        import os as _os
+        if not isinstance(self.profile, str) or not self.profile:
+            raise TypeError(
+                f"RunSpec.profile must be a non-empty str (the name "
+                f"of a registered profile); got "
+                f"{type(self.profile).__name__}={self.profile!r}"
+            )
+        if not isinstance(self.out_dir, (str, _os.PathLike)) or (
+            isinstance(self.out_dir, str) and not self.out_dir
+        ):
+            raise TypeError(
+                f"RunSpec.out_dir must be a non-empty str or os.PathLike; "
+                f"got {type(self.out_dir).__name__}={self.out_dir!r}"
+            )
+
 
 def run(spec: RunSpec) -> dict[str, Any]:
     """Execute a ``RunSpec`` and return the product report dict.

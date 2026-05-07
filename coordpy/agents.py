@@ -184,6 +184,12 @@ class AgentTeam:
         # tokens / 64 KiB), which fits typical LLM agent turns.
         # Tighten for benchmarks; widen for very long turns.
         self.handoff_budget = handoff_budget
+        # The ledger from the most recent ``run()`` call, exposed
+        # so callers can audit / retire / re-render the chain
+        # without reaching into private state. ``None`` until the
+        # team has been run at least once. Reset at the start of
+        # every ``run()`` so successive calls don't alias.
+        self.last_ledger: "CapsuleLedger | None" = None
         # Surface duplicate agent names as a warning. They are
         # valid (e.g. multiple "reviewer" agents with different
         # instructions), but accidental dupes are a footgun for
@@ -282,6 +288,10 @@ class AgentTeam:
             )
 
         ledger = CapsuleLedger() if self.capture_capsules else None
+        # Make the ledger available for post-run inspection
+        # (audit / retire / re-render) without forcing the caller
+        # to reach into private state.
+        self.last_ledger = ledger
         turns: list[AgentTurn] = []
         recent_handoffs: list[tuple[str, str]] = []
         parent_cid: str | None = None

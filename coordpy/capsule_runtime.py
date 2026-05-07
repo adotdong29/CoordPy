@@ -211,6 +211,26 @@ class CapsuleNativeRunContext:
     capsule and the call to ``admit_and_seal``. The in-flight
     register tracks failures: a step that raises will leave a
     ``failed`` entry that never reaches the ledger.
+
+    Standalone use (no profile / sweep / SWE-bench coordinates)
+    -----------------------------------------------------------
+    The ``seal_*`` helpers above are coupled to SWE-bench-style
+    coordinates (``instance_id`` / ``strategy`` / ``parser_mode`` /
+    ``apply_mode`` / ``n_distractors``). For ad-hoc capsule
+    construction, build a ``ContextCapsule`` directly and admit
+    it through the public ``ledger`` attribute::
+
+        ctx = CapsuleNativeRunContext()
+        c = ContextCapsule.new(
+            kind=CapsuleKind.ARTIFACT,
+            payload={"hello": "world"},
+        )
+        sealed = ctx.ledger.admit_and_seal(c)
+        view = ctx.ledger.render_view()  # or coordpy.render_view(ctx.ledger)
+
+    The ``ledger`` attribute is part of the public surface; you
+    can also call ``ctx.ledger.retire(cid)`` to mark a capsule
+    retired without breaking the chain (Capsule Contract C6).
     """
 
     def __init__(self) -> None:
