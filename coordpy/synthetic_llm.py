@@ -79,6 +79,14 @@ class SyntheticLLMClient:
     n_calls: int = 0
 
     def __post_init__(self) -> None:
+        # Validate up front so a misconfigured client raises at
+        # construction, not deep inside ``team.run`` with a
+        # confusing TypeError from the capsule sealing path.
+        if not isinstance(self.default_response, str):
+            raise TypeError(
+                f"SyntheticLLMClient(default_response=...) must be "
+                f"a str; got {type(self.default_response).__name__}"
+            )
         # Required so the runtime's _real_cells dispatch can also
         # see ``model`` and ``base_url`` as if this were a real
         # LLMClient. The capsule layer reads ``model_tag`` directly

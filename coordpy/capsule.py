@@ -898,6 +898,25 @@ class CapsuleLedger:
     # ------------------------------------------------------------
 
     def chain_head(self) -> str:
+        """Return the rolling chain hash after the last sealed capsule.
+
+        ``chain_head`` is **not** a capsule CID. It is a separate
+        rolling SHA-256 over ``(prev_chain_hash, capsule.cid,
+        capsule.kind, "SEALED")`` for every sealed capsule in
+        order, starting from ``GENESIS``. It commits to the
+        ordered set of (cid, kind) pairs in the ledger.
+
+        ``root_cid``, by contrast, is the CID of the topmost
+        capsule a caller hands to ``render_view`` — typically
+        the RUN_REPORT capsule for a runner, or the last
+        TEAM_HANDOFF capsule for an AgentTeam run. The two are
+        related but distinct:
+
+          * tampering with any capsule's CID changes
+            ``chain_head`` (caught by ``verify_chain``);
+          * ``root_cid`` only changes if the topmost capsule
+            itself changes.
+        """
         return self._chain_head
 
     def verify_chain(self) -> bool:
@@ -1088,6 +1107,14 @@ def verify_chain_from_view_dict(view: dict[str, Any]) -> bool:
     is therefore a faithful re-derivation of the runtime's chain
     semantics from disk bytes.
     """
+    # Reject views whose declared schema isn't the one this
+    # function knows how to verify. A missing or unknown schema
+    # means the bytes weren't produced by a coordpy version we
+    # can recompute against — failing closed is the right move.
+    schema = view.get("schema")
+    if schema != CAPSULE_VIEW_SCHEMA:
+        return False
+
     prev = CapsuleLedger.GENESIS
     _ALLOWED_LIFECYCLES = {
         CapsuleLifecycle.SEALED, CapsuleLifecycle.RETIRED,

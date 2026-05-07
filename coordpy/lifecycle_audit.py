@@ -604,7 +604,32 @@ def audit_capsule_lifecycle_from_view(view: dict[str, Any]
     This is the right entry point for *forensic* audits where the
     auditor only has the on-disk ``capsule_view.json``, not the
     runtime ctx that produced it.
+
+    Raises ``ValueError`` if ``view`` is not a coordpy capsule
+    view dict (missing ``schema`` / ``capsules`` / ``chain_head``,
+    or wrong schema string). The previous "EMPTY" verdict was too
+    quiet a failure mode for malformed input — callers reading
+    ``verdict`` would mistake it for "no violations".
     """
+    if not isinstance(view, dict):
+        raise ValueError(
+            f"audit_capsule_lifecycle_from_view expected a dict; "
+            f"got {type(view).__name__}"
+        )
+    schema = view.get("schema")
+    if schema != "coordpy.capsule_view.v1":
+        raise ValueError(
+            f"audit_capsule_lifecycle_from_view: view.schema is "
+            f"{schema!r}; expected 'coordpy.capsule_view.v1'. "
+            f"Either the input is not a capsule view or it was "
+            f"produced by an unsupported coordpy version."
+        )
+    for required in ("capsules", "chain_head"):
+        if required not in view:
+            raise ValueError(
+                f"audit_capsule_lifecycle_from_view: view is missing "
+                f"required key {required!r}"
+            )
     ledger = CapsuleLedger()
     # Reconstruct sealed capsules in their stored order. We bypass
     # the admit_and_seal lifecycle because the view's parents may be

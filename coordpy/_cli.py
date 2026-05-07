@@ -289,16 +289,22 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
         return 0
 
     if args.sub == "audit":
-        # SDK v3.3 lifecycle audit: mechanically verifies eight
-        # invariants L-1..L-8 over the capsule view. Returns a
-        # short summary + typed counterexamples on BAD.
+        # SDK v3.3 lifecycle audit: mechanically verifies the
+        # L-1..L-11 invariants over the capsule view. Defense in
+        # depth: also re-derive the chain so a CI pipeline that
+        # only runs ``audit`` can't ship a tampered view as
+        # green. ``coordpy-capsule verify`` is still the
+        # dedicated entry point for chain-only checks.
         from .lifecycle_audit import audit_capsule_lifecycle_from_view
+        from .capsule import verify_chain_from_view_dict
         report_audit = audit_capsule_lifecycle_from_view(cv)
+        chain_ok = verify_chain_from_view_dict(cv)
         print(f"verdict        = {report_audit.verdict}")
         print(f"rules_passed   = "
                f"{len(report_audit.rules_passed)} / "
                f"{len(report_audit.rules_checked)}")
         print(f"violations     = {len(report_audit.violations)}")
+        print(f"chain_verified = {chain_ok}")
         print(f"by_kind        = {report_audit.stats}")
         if report_audit.violations:
             print()
@@ -308,7 +314,14 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
                        f"{(v['capsule_cid'] or '-')[:16]:<16s} "
                        f"kind={v['capsule_kind']:<14s} "
                        f"detail={v['detail'][:140]}")
-        return 0 if report_audit.verdict in ("OK", "EMPTY") else 4
+        if not chain_ok:
+            print()
+            print("error: capsule chain re-derivation FAILED — the "
+                  "view has been tampered with, or its on-disk "
+                  "bytes don't match the recorded CIDs.",
+                  file=sys.stderr)
+        ok = report_audit.verdict in ("OK", "EMPTY") and chain_ok
+        return 0 if ok else 4
 
     if args.sub == "verify":
         # SDK v3.2: stronger verify. Four independent on-disk
