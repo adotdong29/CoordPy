@@ -58,10 +58,17 @@ class AgentTurn:
 class TeamResult:
     """Result of a lightweight team run.
 
-    ``final_output`` is the **last agent's reply, verbatim** — it is
-    not an aggregation across all agents. ``last_output`` is an
-    alias kept for clarity; new code should prefer it. To inspect
-    every turn, walk ``turns``.
+    ``final_output`` is the **last agent's reply, verbatim** — it
+    is not an aggregation across all agents. ``last_output`` is
+    an alias kept for clarity; new code should prefer it. To
+    inspect every turn, walk ``turns``.
+
+    ``capsule_view`` is the JSON-shape ``dict`` produced by
+    ``coordpy.render_view(...).as_dict()``. It is intentionally
+    a dict (not a ``CapsuleView`` dataclass) so it round-trips
+    cleanly through JSON for storage / RPC / CI artefact use —
+    pass it directly to ``coordpy.verify_chain_from_view_dict``
+    or ``coordpy.audit_capsule_lifecycle_from_view``.
 
     ``root_cid`` matches ``capsule_view["root_cid"]`` by
     construction.

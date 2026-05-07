@@ -9,6 +9,20 @@ witness, all of which can be re-verified from the bytes on disk.
 
 Stable public surface:
 
+  * Agent-team API: ``Agent``, ``AgentTeam``, ``AgentTurn``,
+    ``TeamResult``, ``agent``, ``create_team``.
+
+  * LLM backends: ``LLMBackend`` (Protocol), ``OllamaBackend``,
+    ``OpenAICompatibleBackend``, ``MLXDistributedBackend``,
+    ``SyntheticLLMClient`` (test/no-network),
+    ``make_backend``, ``backend_from_env``, ``backend_from_config``.
+
+  * Run model: ``RunSpec``, ``run``, ``RunReport``, ``SweepSpec``,
+    ``run_sweep``, ``HeavyRunNotAcknowledged``, ``CoordPyConfig``.
+
+  * Submodules: ``profiles``, ``report``, ``ci_gate``,
+    ``import_data``, ``extensions``.
+
   * Capsule primitives: ``ContextCapsule``, ``CapsuleKind``,
     ``CapsuleLifecycle``, ``CapsuleBudget``, ``CapsuleLedger``,
     ``CapsuleView``, ``CapsuleAdmissionError``,
@@ -16,11 +30,14 @@ Stable public surface:
     ``verify_chain_from_view_dict``, ``build_report_ledger``,
     ``CAPSULE_VIEW_SCHEMA``.
 
-  * Run model: ``RunSpec``, ``run``, ``SweepSpec``, ``run_sweep``,
-    ``HeavyRunNotAcknowledged``, ``CoordPyConfig``.
+  * Capsule-native runtime: ``CapsuleNativeRunContext``,
+    ``ContentAddressMismatch``, ``seal_and_write_artifact``,
+    ``verify_artifacts_on_disk``,
+    ``verify_meta_manifest_on_disk``.
 
-  * Submodules: ``profiles``, ``report``, ``ci_gate``,
-    ``import_data``, ``extensions``.
+  * Lifecycle audit: ``audit_capsule_lifecycle``,
+    ``audit_capsule_lifecycle_from_view``,
+    ``CapsuleLifecycleAudit``, ``LifecycleAuditReport``.
 
   * Provenance: ``PROVENANCE_SCHEMA``, ``build_manifest``.
 
@@ -28,8 +45,10 @@ Stable public surface:
     ``PRODUCT_REPORT_SCHEMA``, ``PRODUCT_REPORT_SCHEMA_V1``,
     ``CI_VERDICT_SCHEMA``, ``IMPORT_AUDIT_SCHEMA``.
 
-Anything not re-exported here is internal or experimental and may
-change without notice.
+Anything not in the lists above (notably the ``W22``..``W42``
+research-surface symbols exported under the
+``coordpy.__experimental__`` tuple) is internal or experimental
+and may change without notice.
 """
 
 from __future__ import annotations
@@ -1078,7 +1097,19 @@ def __dir__() -> list[str]:
     return sorted(_STABLE_PUBLIC)
 
 
-__all__ = [
+# ``__all__`` controls ``from coordpy import *``. We restrict
+# it to the curated stable surface (same set ``__dir__`` returns)
+# so a ``from coordpy import *`` does NOT flood the caller's
+# namespace with the 500+ research / experimental names.
+# Research surface is still importable as ``coordpy.<name>``
+# attribute access — it's just not part of the wildcard import.
+__all__ = list(_STABLE_PUBLIC)
+
+# The full re-export tuple is preserved for back-compat with any
+# code that historically did ``coordpy.__all__`` introspection
+# (rare but possible). Anyone who genuinely needs the full set
+# can use ``coordpy.__all_full__``.
+__all_full__ = [
     # Execution
     "RunSpec", "run", "RunReport",
     # Unified runtime (Slice 2)

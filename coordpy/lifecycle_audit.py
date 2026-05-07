@@ -694,7 +694,35 @@ def audit_capsule_lifecycle_from_view(view: dict[str, Any]
             chain_hash="",  # forensic — chain check is W3-37, separate
             prev_chain_hash="",
         ))
-    return CapsuleLifecycleAudit(ledger=ledger).run()
+    audit_report = CapsuleLifecycleAudit(ledger=ledger).run()
+    # Defense in depth: also re-derive the capsule chain. The
+    # lifecycle invariants L-1..L-11 commit to the capsule
+    # *graph*, not to the bytes — a forger could mutate a
+    # payload while leaving CIDs alone and L-rules pass. The
+    # chain re-derive (Theorem W3-37) closes that surface, and
+    # we surface a TAMPERED verdict so a Python-only consumer
+    # is not less protected than the ``coordpy-capsule audit``
+    # CLI wrapper.
+    from .capsule import verify_chain_from_view_dict
+    if not verify_chain_from_view_dict(view):
+        violation = {
+            "rule": "chain_re_derivation",
+            "capsule_cid": None,
+            "capsule_kind": "(view)",
+            "detail": ("verify_chain_from_view_dict failed: the "
+                       "view's capsule CIDs do not match the "
+                       "recorded chain head, or its schema is "
+                       "unsupported. The view has been tampered "
+                       "with or was produced by an unsupported "
+                       "coordpy version."),
+        }
+        violations = list(audit_report.violations) + [violation]
+        return dataclasses.replace(
+            audit_report,
+            verdict="TAMPERED",
+            violations=violations,
+        )
+    return audit_report
 
 
 __all__ = [

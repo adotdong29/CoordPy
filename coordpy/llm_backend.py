@@ -199,7 +199,17 @@ class OpenAICompatibleBackend:
 
     def generate(self, prompt: str, max_tokens: int = 80,
                  temperature: float = 0.0) -> str:
-        url = self.base_url.rstrip("/") + "/v1/chat/completions"
+        # Build the chat-completions URL whether the user gave us
+        # the provider root (``https://api.openai.com``) or
+        # already included the ``/v1`` suffix
+        # (``https://api.openai.com/v1``). Either form works,
+        # which matches user intuition (the ``/v1`` is sometimes
+        # written as part of the base, sometimes not).
+        base = self.base_url.rstrip("/")
+        if base.endswith("/v1"):
+            url = base + "/chat/completions"
+        else:
+            url = base + "/v1/chat/completions"
         body = {
             "model": self.model,
             "messages": [{"role": "user", "content": prompt}],
@@ -234,10 +244,14 @@ class OpenAICompatibleBackend:
             if e.code == 404:
                 raise ValueError(
                     f"OpenAICompatibleBackend got HTTP 404 from "
-                    f"{url}. The base_url should be the root that "
-                    f"hosts ``/v1/chat/completions`` — e.g. "
-                    f"``https://api.openai.com/v1`` (without the "
-                    f"``/chat/completions`` suffix)."
+                    f"{url}. The base_url should be either the "
+                    f"provider root (e.g. "
+                    f"``https://api.openai.com``) or the same "
+                    f"root with ``/v1`` appended (e.g. "
+                    f"``https://api.openai.com/v1``); both forms "
+                    f"are accepted. Do not include "
+                    f"``/chat/completions`` — the backend appends "
+                    f"that itself."
                 ) from e
             raise
         except urllib.error.URLError as e:

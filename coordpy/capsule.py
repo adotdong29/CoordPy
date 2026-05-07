@@ -854,6 +854,9 @@ class CapsuleLedger:
     # ------------------------------------------------------------
 
     def get(self, cid: str) -> ContextCapsule:
+        """Look up a sealed capsule by CID. Raises ``KeyError``
+        if the CID is not in this ledger.
+        """
         return self._by_cid[cid]
 
     def __contains__(self, cid: str) -> bool:
@@ -863,13 +866,22 @@ class CapsuleLedger:
         return len(self._entries)
 
     def all_capsules(self) -> list[ContextCapsule]:
+        """Return every sealed capsule in append order."""
         return [e.capsule for e in self._entries]
 
     def by_kind(self, kind: str) -> list[ContextCapsule]:
+        """Return every sealed capsule of the given ``kind`` in
+        append order. Pass any value of ``coordpy.CapsuleKind``.
+        """
         return [e.capsule for e in self._entries
                  if e.capsule.kind == kind]
 
     def parents_of(self, cid: str) -> list[ContextCapsule]:
+        """Return the sealed capsules that ``cid`` declares as
+        parents. Parents not present in this ledger are skipped
+        (the ledger is the SEALED set; orphan parent CIDs are
+        rejected by ``admit`` per Contract C5).
+        """
         cap = self._by_cid[cid]
         return [self._by_cid[p] for p in cap.parents
                  if p in self._by_cid]
@@ -927,6 +939,16 @@ class CapsuleLedger:
         return self._chain_head
 
     def verify_chain(self) -> bool:
+        """Recompute the rolling chain from this ledger's sealed
+        entries and check it matches ``chain_head``. Returns True
+        iff every step's hash matches.
+
+        This is the in-memory counterpart of
+        ``verify_chain_from_view_dict`` (which works on a JSON
+        view). Use ``verify_chain`` when you have the live
+        ``CapsuleLedger``; use ``verify_chain_from_view_dict``
+        when you only have the on-disk JSON.
+        """
         prev = self.GENESIS
         for e in self._entries:
             # Recompute from the sealed capsule's durable fields
@@ -944,6 +966,11 @@ class CapsuleLedger:
         return True
 
     def stats(self) -> dict[str, Any]:
+        """Return summary counts about this ledger as a JSON-safe
+        dict: total entries, admit / seal / retire counters, and
+        per-kind / per-lifecycle breakdowns. Embedded in the
+        ``CapsuleView.stats`` field by ``render_view``.
+        """
         by_kind: dict[str, int] = {}
         by_lifecycle: dict[str, int] = {}
         for e in self._entries:

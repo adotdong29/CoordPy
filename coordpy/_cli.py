@@ -224,7 +224,10 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
             "Inspect the capsule graph that every CoordPy run emits. "
             "Capsules are the SDK-v3 load-bearing unit: every "
             "boundary-crossing artefact is a typed, content-addressed, "
-            "lifecycle-bounded, provenance-stamped capsule."))
+            "lifecycle-bounded, provenance-stamped capsule.\n\n"
+            "Exit codes: 0 = OK; 2 = bad arguments / report not "
+            "found; 3 = chain re-derivation failed (verify); "
+            "4 = lifecycle audit failed or TAMPERED (audit)."))
     sub = ap.add_subparsers(dest="sub")
 
     def _add_report_arg(p: argparse.ArgumentParser) -> None:
