@@ -177,8 +177,25 @@ def _cmd_ci(argv: list[str] | None = None) -> int:
     ap.add_argument("--require-sweep-executed", action="store_true")
     ap.add_argument("--out", default=None)
     args = ap.parse_args(argv)
-    verdicts = []
+    # Auto-resolve directory -> directory/product_report.json
+    # so callers can pass the run's --out-dir directly (the
+    # obvious thing). This matches what coordpy-capsule does.
+    resolved: list[str] = []
     for p in args.report:
+        if os.path.isdir(p):
+            candidate = os.path.join(p, "product_report.json")
+            if not os.path.isfile(candidate):
+                print(f"error: --report {p!r} is a directory but "
+                      f"contains no product_report.json. Pass the "
+                      f"file directly, or pass the --out-dir of "
+                      f"a finished ``coordpy`` run.",
+                      file=sys.stderr)
+                return 2
+            resolved.append(candidate)
+        else:
+            resolved.append(p)
+    verdicts = []
+    for p in resolved:
         v = evaluate_report(
             p,
             allow_profiles=tuple(args.allow_profile)
@@ -224,7 +241,8 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
             "Inspect the capsule graph that every CoordPy run emits. "
             "Capsules are the SDK-v3 load-bearing unit: every "
             "boundary-crossing artefact is a typed, content-addressed, "
-            "lifecycle-bounded, provenance-stamped capsule.\n\n"
+            "lifecycle-bounded capsule (and every payload-bearing kind "
+            "carries a provenance stamp in its metadata).\n\n"
             "Exit codes: 0 = OK; 2 = bad arguments / report not "
             "found; 3 = chain re-derivation failed (verify); "
             "4 = lifecycle audit failed or TAMPERED (audit)."))
@@ -283,11 +301,32 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
               "PATH``", file=sys.stderr)
         return 2
 
+    # Auto-resolve directory -> directory/product_report.json
+    # (or directory/capsule_view.json, which is the bare-view
+    # form). Lets callers pass the run's --out-dir directly.
+    if os.path.isdir(args.report):
+        for candidate_name in ("product_report.json",
+                                "capsule_view.json"):
+            candidate = os.path.join(args.report, candidate_name)
+            if os.path.isfile(candidate):
+                args.report = candidate
+                break
+        else:
+            print(f"error: --report {args.report!r} is a directory "
+                  f"but contains neither product_report.json nor "
+                  f"capsule_view.json. Pass the file directly, or "
+                  f"pass the --out-dir of a finished ``coordpy`` "
+                  f"run.", file=sys.stderr)
+            return 2
     try:
         with open(args.report, "r", encoding="utf-8") as fh:
             report = json.load(fh)
     except FileNotFoundError:
         print(f"error: report not found: {args.report}", file=sys.stderr)
+        return 2
+    except IsADirectoryError:
+        print(f"error: report path is a directory: {args.report}",
+              file=sys.stderr)
         return 2
     except json.JSONDecodeError as e:
         print(f"error: report is not valid JSON: {args.report}: {e}",

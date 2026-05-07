@@ -1194,6 +1194,18 @@ def verify_chain_from_view_dict(view: dict[str, Any]) -> bool:
                 return False
             if derived_cid != cid:
                 return False
+            # When the payload is present, also re-derive the
+            # byte-length envelope. ``n_bytes`` is the
+            # canonical-byte length of the payload; if a forger
+            # mutates this header field while leaving the
+            # payload alone, the chain re-derive of CID would
+            # still pass (CID doesn't include n_bytes), but the
+            # lifecycle envelope is broken. Catch it.
+            stated_n_bytes = cap.get("n_bytes")
+            if stated_n_bytes is not None:
+                actual_n_bytes = len(_canonical(cap["payload"]))
+                if int(stated_n_bytes) != actual_n_bytes:
+                    return False
 
         # Reproduce ``_chain_step`` over the durable fields. Lifecycle
         # is forced to SEALED to match the runtime's chain semantics

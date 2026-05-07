@@ -59,7 +59,15 @@ from .config import CoordPyConfig
 from .provenance import PROVENANCE_SCHEMA, build_manifest
 from .run import RunSpec, run
 
-# Public alias for the stable report shape returned by ``run``.
+# Public **type alias** for the stable report shape returned by
+# ``coordpy.run(...)``. A ``RunReport`` is a JSON-shape dict with
+# keys ``readiness``, ``provenance``, ``capsules``, ``sweep``,
+# ``artifacts``, ``summary_text``, ``profile``, etc. (see
+# ``phase45.product_report.v2``). ``RunReport`` is the parameterised
+# generic ``dict[str, object]`` — useful as a type hint, but **not
+# a class**: ``isinstance(report, RunReport)`` raises a TypeError.
+# To check the shape of a runtime value, look at ``report["schema"]``
+# instead.
 RunReport = dict[str, object]
 
 # Re-export the product modules under stable names. These are part of

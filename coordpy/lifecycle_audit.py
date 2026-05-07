@@ -703,7 +703,14 @@ def audit_capsule_lifecycle_from_view(view: dict[str, Any]
     # we surface a TAMPERED verdict so a Python-only consumer
     # is not less protected than the ``coordpy-capsule audit``
     # CLI wrapper.
+    #
+    # An EMPTY view (zero capsules, valid schema) is NOT a
+    # tamper — it just means there was nothing to audit. Skip
+    # the chain re-derive in that case so an empty chain
+    # cannot be confused with a forgery.
     from .capsule import verify_chain_from_view_dict
+    if not cap_records:
+        return audit_report
     if not verify_chain_from_view_dict(view):
         violation = {
             "rule": "chain_re_derivation",

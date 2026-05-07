@@ -112,7 +112,26 @@ class SyntheticLLMClient:
         self.n_calls += 1
         instance_id = _extract_instance_id_from_prompt(prompt)
         if self.response_fn is not None:
-            return self.response_fn(prompt, instance_id)
+            # Accept either ``response_fn(prompt)`` or
+            # ``response_fn(prompt, instance_id)``. The two-arg
+            # form is the documented one (matches the
+            # ``ResponseFn`` Callable type alias above), but the
+            # one-arg form is what most users naively reach for
+            # when stubbing an LLM, so we adapt to either.
+            try:
+                return self.response_fn(prompt, instance_id)
+            except TypeError:
+                # Fall through only if the failure is an arity
+                # mismatch on OUR call, not a TypeError from
+                # within the user's function.
+                import inspect
+                try:
+                    sig = inspect.signature(self.response_fn)
+                except (TypeError, ValueError):
+                    raise
+                if len(sig.parameters) == 1:
+                    return self.response_fn(prompt)  # type: ignore[call-arg]
+                raise
         if instance_id and instance_id in (self.responses or {}):
             return self.responses[instance_id]
         return self.default_response
