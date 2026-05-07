@@ -326,6 +326,7 @@ class AgentTeam:
                 round=0,
                 parents=(),
                 budget=self.handoff_budget,
+                agent_name="user",
             )
             sealed_task = ledger.admit_and_seal(task_capsule)
             parent_cid = sealed_task.cid
@@ -371,6 +372,7 @@ class AgentTeam:
                     round=0,
                     parents=(parent_cid,) if parent_cid else (),
                     budget=self.handoff_budget,
+                    agent_name=member.name,
                 )
                 sealed = ledger.admit_and_seal(handoff)
                 capsule_cid = sealed.cid

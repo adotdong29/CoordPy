@@ -204,29 +204,47 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
             "boundary-crossing artefact is a typed, content-addressed, "
             "lifecycle-bounded, provenance-stamped capsule."))
     sub = ap.add_subparsers(dest="sub")
+
+    def _add_report_arg(p: argparse.ArgumentParser) -> None:
+        # Accept either a positional ``REPORT`` path or a
+        # ``--report PATH`` flag. Positional takes priority if
+        # both are given.
+        p.add_argument(
+            "report_pos", nargs="?", metavar="REPORT", default=None,
+            help="path to product_report.json or capsule_view.json")
+        p.add_argument(
+            "--report", default=None,
+            help="alias for the positional REPORT path")
+
     p_view = sub.add_parser(
         "view", help="summarise the capsule graph of a report")
-    p_view.add_argument("--report", required=True,
-                          help="path to product_report.json")
+    _add_report_arg(p_view)
     p_view.add_argument("--full", action="store_true",
                           help="print every capsule header, not just stats")
     p_verify = sub.add_parser(
         "verify", help="re-hash the capsule chain and verify C5")
-    p_verify.add_argument("--report", required=True)
+    _add_report_arg(p_verify)
     p_cid = sub.add_parser(
         "cid", help="print the RUN_REPORT capsule CID for a report")
-    p_cid.add_argument("--report", required=True)
+    _add_report_arg(p_cid)
     p_audit = sub.add_parser(
         "audit",
         help=("run the SDK v3.3 lifecycle audit on a finished "
               "capsule view (eight invariants L-1..L-8). Prints "
               "OK / BAD plus typed counterexamples on violation."))
-    p_audit.add_argument("--report", required=True)
+    _add_report_arg(p_audit)
     args = ap.parse_args(argv)
 
     if args.sub is None:
         ap.print_help()
         return 1
+    # Resolve the report path (positional wins over --report).
+    args.report = args.report_pos or args.report
+    if not args.report:
+        print("error: pass the report path either positionally "
+              "(``coordpy-capsule view PATH``) or as ``--report "
+              "PATH``", file=sys.stderr)
+        return 2
 
     try:
         with open(args.report, "r", encoding="utf-8") as fh:

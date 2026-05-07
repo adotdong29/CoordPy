@@ -1089,10 +1089,22 @@ def verify_chain_from_view_dict(view: dict[str, Any]) -> bool:
     semantics from disk bytes.
     """
     prev = CapsuleLedger.GENESIS
+    _ALLOWED_LIFECYCLES = {
+        CapsuleLifecycle.SEALED, CapsuleLifecycle.RETIRED,
+    }
     for cap in view.get("capsules", []):
         cid = cap.get("cid")
         kind = cap.get("kind")
         if not isinstance(cid, str) or not isinstance(kind, str):
+            return False
+        # Lifecycle must be SEALED or RETIRED. The chain hash is
+        # computed over the SEALED state (RETIRED is an audit
+        # overlay, not a different chain), so any other value
+        # (PROPOSED / ADMITTED / DRAFT / etc.) means the view was
+        # tampered with — a forger could otherwise downgrade
+        # lifecycle without re-sealing.
+        lifecycle = cap.get("lifecycle")
+        if lifecycle is not None and lifecycle not in _ALLOWED_LIFECYCLES:
             return False
 
         # End-to-end tamper detection (the strong case): when the

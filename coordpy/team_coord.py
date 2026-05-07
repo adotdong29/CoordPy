@@ -194,15 +194,25 @@ def capsule_team_handoff(*,
                             parents: Iterable[str] = (),
                             n_tokens: int | None = None,
                             budget: "CapsuleBudget | None" = None,
+                            agent_name: str | None = None,
                             ) -> ContextCapsule:
     """Build a ``TEAM_HANDOFF`` capsule directly (no substrate twin).
 
     Identity is content-addressed by ``(source, to, kind, payload,
-    round)`` plus the parent CIDs (Capsule Contract C1). Two
-    byte-identical handoffs at the same round collapse to one
+    round, agent_name)`` plus the parent CIDs (Capsule Contract C1).
+    Two byte-identical handoffs at the same round collapse to one
     capsule. The ``payload_sha256`` is exposed in the payload so
     downstream consumers can prove the handoff bytes' identity
     without re-canonicalising the capsule.
+
+    ``agent_name`` is the name of the agent that produced the
+    handoff. Threading it through the body (and therefore the CID)
+    means duplicate-role teams (three agents all at role
+    ``"reviewer"``) can still attribute each capsule to a specific
+    agent, and the attribution is CID-protected — a tamper that
+    rewrites ``agent_name`` is detected by chain re-derivation.
+    Pass ``None`` (default) to omit the field for backwards
+    compatibility with pre-0.5.19 capsule shapes.
 
     Pass ``budget=CapsuleBudget(...)`` to override the default
     (4096 tokens / 64 KiB) — useful for tight benchmarks or
@@ -221,19 +231,23 @@ def capsule_team_handoff(*,
         "payload_sha256": sha,
         "n_tokens": int(n_tok),
     }
+    metadata: dict[str, Any] = {
+        "source_role": str(source_role),
+        "to_role": str(to_role),
+        "claim_kind": str(claim_kind),
+        "round": int(round),
+        "payload_sha256": sha,
+    }
+    if agent_name is not None:
+        body["agent_name"] = str(agent_name)
+        metadata["agent_name"] = str(agent_name)
     return ContextCapsule.new(
         kind=CapsuleKind.TEAM_HANDOFF,
         payload=body,
         parents=parents,
         budget=budget,
         n_tokens=int(n_tok),
-        metadata={
-            "source_role": str(source_role),
-            "to_role": str(to_role),
-            "claim_kind": str(claim_kind),
-            "round": int(round),
-            "payload_sha256": sha,
-        },
+        metadata=metadata,
     )
 
 
