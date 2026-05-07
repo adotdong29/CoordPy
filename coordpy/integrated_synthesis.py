@@ -508,6 +508,16 @@ class IntegratedSynthesisRegistry:
 
 @dataclasses.dataclass
 class W41IntegratedSynthesisResult:
+    """Per-cell audit record for the W41 integrated-synthesis layer.
+
+    Combines the producer axis (W40 decoder), the trust axis
+    (W22..W34 trust-adjudication ladder), and the cross-axis
+    witness into a single decision branch (``integrated_branch``)
+    plus the per-axis sub-branches that contributed to it. Every
+    field is included in the W41 ratification envelope and feeds
+    the manifest-v11 CID.
+    """
+
     answer: dict[str, Any]
     inner_w40_decoder_branch: str
     decoder_branch: str
@@ -1163,6 +1173,8 @@ def build_trivial_integrated_synthesis_registry(
         inner_w40_registry: (
             CrossHostResponseHeterogeneityRegistry | None) = None,
 ) -> IntegratedSynthesisRegistry:
+    """Build a trivial pass-through integrated-synthesis registry (W41).
+    """
     return IntegratedSynthesisRegistry(
         schema=schema,
         inner_w40_registry=inner_w40_registry,
@@ -1182,6 +1194,13 @@ def build_integrated_synthesis_registry(
         abstain_on_axes_diverged: bool = True,
         require_both_axes_for_ratification: bool = False,
 ) -> IntegratedSynthesisRegistry:
+    """Build a real W41 integrated-synthesis registry.
+
+    Combines the producer and trust axes (with optional
+    cross-axis witness) into a single per-cell admission
+    decision per ``W41-C-INTEGRATED``. Pair with the trivial
+    form for the disabled case.
+    """
     return IntegratedSynthesisRegistry(
         schema=schema,
         inner_w40_registry=inner_w40_registry,

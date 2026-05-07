@@ -497,6 +497,15 @@ class RoleInvariantSynthesisRegistry:
 
 @dataclasses.dataclass
 class W42RoleInvariantResult:
+    """Per-cell audit record for the W42 role-invariant-synthesis layer.
+
+    Adds the role-handoff invariance axis to the W41
+    integrated-synthesis decision: the cell's final
+    ``invariance_branch`` records whether role-handoff invariance
+    held, and ``decoder_branch`` is the combined W42 verdict that
+    the manifest-v12 CID commits to.
+    """
+
     answer: dict[str, Any]
     inner_w41_decoder_branch: str
     decoder_branch: str
@@ -1141,6 +1150,8 @@ def build_trivial_role_invariant_registry(
         schema: SchemaCapsule,
         inner_w41_registry: IntegratedSynthesisRegistry | None = None,
 ) -> RoleInvariantSynthesisRegistry:
+    """Build a trivial pass-through role-invariant-synthesis registry (W42).
+    """
     return RoleInvariantSynthesisRegistry(
         schema=schema,
         inner_w41_registry=inner_w41_registry,
@@ -1160,6 +1171,12 @@ def build_role_invariant_registry(
         manifest_v12_disabled: bool = False,
         abstain_on_invariance_diverged: bool = True,
 ) -> RoleInvariantSynthesisRegistry:
+    """Build a real W42 role-invariant-synthesis registry.
+
+    Adds the role-handoff invariance axis to the integrated
+    decision surface per ``W42-C-ROLE-INVARIANT``. Pair with
+    the trivial form for the disabled case.
+    """
     policy = RoleInvariancePolicyRegistry()
     for e in policy_entries:
         policy.register(e)

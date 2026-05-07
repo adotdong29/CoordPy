@@ -550,7 +550,16 @@ def _run_profile_capsule_native(profile_name: str, *,
                 "jsonl_override": jsonl_override,
             },
             "runtime_config": (
-                config.as_dict() if config is not None else None),
+                # Overlay the *effective* values so a reader doesn't
+                # see ``out_dir=None`` next to a real on-disk
+                # ``output.out_dir``. The runtime_config reflects
+                # what the run actually used, not just what env
+                # vars set.
+                {**config.as_dict(),
+                 "out_dir": out_dir,
+                 "jsonl": jsonl_override or (
+                     config.as_dict().get("jsonl"))}
+                if config is not None else None),
         },
     )
     if deterministic:
@@ -794,7 +803,16 @@ def _run_profile_post_hoc(profile_name: str, *,
                 "jsonl_override": jsonl_override,
             },
             "runtime_config": (
-                config.as_dict() if config is not None else None),
+                # Overlay the *effective* values so a reader doesn't
+                # see ``out_dir=None`` next to a real on-disk
+                # ``output.out_dir``. The runtime_config reflects
+                # what the run actually used, not just what env
+                # vars set.
+                {**config.as_dict(),
+                 "out_dir": out_dir,
+                 "jsonl": jsonl_override or (
+                     config.as_dict().get("jsonl"))}
+                if config is not None else None),
         },
     )
     if deterministic:

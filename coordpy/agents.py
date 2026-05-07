@@ -36,7 +36,13 @@ _TeamT = TypeVar("_TeamT", bound="AgentTeam")
 
 @dataclasses.dataclass(frozen=True)
 class Agent:
-    """One team member in the stable lightweight agent surface."""
+    """One team member in the stable lightweight agent surface.
+
+    ``instructions`` is the agent's system-prompt text. The
+    ``system_prompt`` property is provided as an alias for
+    callers familiar with the OpenAI / LangChain / AutoGen
+    naming convention.
+    """
 
     name: str
     instructions: str
@@ -46,19 +52,42 @@ class Agent:
     max_tokens: int = 256
 
     @property
+    def system_prompt(self) -> str:
+        """Alias for ``instructions``. ``system_prompt`` is the
+        more common name in other agent SDKs (OpenAI Assistants,
+        LangChain, AutoGen); coordpy uses ``instructions`` as
+        the canonical name and exposes both for interop.
+        """
+        return self.instructions
+
+    @property
     def effective_role(self) -> str:
         return self.role or self.name
 
 
 @dataclasses.dataclass(frozen=True)
 class AgentTurn:
-    """One agent invocation inside an :class:`AgentTeam` run."""
+    """One agent invocation inside an :class:`AgentTeam` run.
+
+    ``output`` is the agent's reply text. The ``response``
+    property is provided as an alias for callers familiar with
+    OpenAI / LangChain naming.
+    """
 
     agent_name: str
     role: str
     prompt: str
     output: str
     capsule_cid: str | None = None
+
+    @property
+    def response(self) -> str:
+        """Alias for ``output`` — the agent's reply text. Other
+        agent SDKs call this ``response`` / ``message`` /
+        ``content``; coordpy uses ``output`` as the canonical
+        name and exposes ``response`` for interop.
+        """
+        return self.output
 
 
 @dataclasses.dataclass(frozen=True)
@@ -97,14 +126,34 @@ class TeamResult:
 
 def agent(
     name: str,
-    instructions: str,
+    instructions: str | None = None,
     *,
+    system_prompt: str | None = None,
     role: str | None = None,
     backend: Any | None = None,
     temperature: float = 0.2,
     max_tokens: int = 256,
 ) -> Agent:
-    """Convenience constructor mirroring lightweight agent SDK style."""
+    """Convenience constructor mirroring lightweight agent SDK style.
+
+    The agent's system-prompt text can be passed as the second
+    positional argument (``instructions``), or as the keyword
+    ``system_prompt=`` for callers familiar with other agent
+    SDKs. The two are aliases; passing both raises ``ValueError``.
+    """
+
+    if instructions is not None and system_prompt is not None:
+        raise ValueError(
+            "agent(...) accepts either ``instructions`` OR "
+            "``system_prompt``, not both — they are aliases."
+        )
+    if instructions is None:
+        instructions = system_prompt
+    if instructions is None:
+        raise ValueError(
+            "agent(name, instructions=...) requires a non-empty "
+            "string (or pass ``system_prompt=``)"
+        )
 
     if not isinstance(name, str) or not name.strip():
         raise ValueError("agent(name=...) requires a non-empty string")
@@ -247,6 +296,18 @@ class AgentTeam:
         ``COORDPY_API_KEY``. Legacy ``COORDPY_LLM_*`` and OpenAI-
         compatible fallbacks ``OPENAI_BASE_URL`` / ``OPENAI_API_KEY``
         are also supported.
+
+        Subclassing
+        -----------
+        ``MyTeam.from_env(...)`` returns a ``MyTeam`` instance,
+        not the bare ``AgentTeam``. The return annotation is a
+        ``_TeamT`` TypeVar bound to ``AgentTeam``; under PEP 563
+        (``from __future__ import annotations`` in this module)
+        ``inspect.signature(...).return_annotation`` reads as
+        the literal string ``'_TeamT'`` — use
+        ``typing.get_type_hints`` or
+        ``inspect.signature(..., eval_str=True)`` (Python 3.10+)
+        to resolve it to the live TypeVar object.
         """
 
         backend = backend_from_env(

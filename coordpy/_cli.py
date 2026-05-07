@@ -45,7 +45,9 @@ def _cmd_run(argv: list[str] | None = None) -> int:
             "Provider config: prefer COORDPY_BACKEND, "
             "COORDPY_API_BASE_URL, COORDPY_API_KEY "
             "(legacy COORDPY_LLM_* names and OPENAI_* fallbacks "
-            "are also supported for OpenAI-compatible providers)."))
+            "are also supported for OpenAI-compatible providers).\n\n"
+            "Exit codes: 0 = OK; 1 = readiness failed / no sweep "
+            "produced; 2 = bad arguments."))
     ap.add_argument("--profile", required=True,
                      choices=_profiles.list_profiles())
     ap.add_argument("--out-dir", required=True)
@@ -128,7 +130,10 @@ def _cmd_import(argv: list[str] | None = None) -> int:
         return 0
     ap = argparse.ArgumentParser(
         prog="coordpy-import",
-        description="Audit a public JSONL for SWE-bench-Lite compatibility.")
+        description=(
+            "Audit a public JSONL for SWE-bench-Lite compatibility.\n\n"
+            "Exit codes: 0 = OK; 1 = audit found problems; "
+            "2 = bad arguments / file not found."))
     ap.add_argument("--version", action="store_true",
                       help="print version and exit")
     ap.add_argument("--jsonl", required=True)
@@ -168,7 +173,9 @@ def _cmd_ci(argv: list[str] | None = None) -> int:
         description=(
             "Consume one or more product_report.json files (or run "
             "output directories — the JSON file is auto-resolved) "
-            "and emit a pass/fail verdict suitable for a CI gate."))
+            "and emit a pass/fail verdict suitable for a CI gate.\n\n"
+            "Exit codes: 0 = all reports OK; 1 = at least one "
+            "blocker; 2 = bad arguments / report not found."))
     ap.add_argument("--report", nargs="+", required=True,
                       help=("path(s) to product_report.json or to a "
                             "run output directory"))

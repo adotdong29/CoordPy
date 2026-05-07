@@ -25381,6 +25381,13 @@ def build_trivial_trust_subspace_registry(
         inner_w34_registry: LiveAwareMultiAnchorRegistry | None = None,
         registered_oracle_ids: Iterable[str] = (),
 ) -> TrustSubspaceDenseRegistry:
+    """Build a trivial pass-through trust-subspace registry (W35).
+
+    Returns a registry whose every lookup admits the input
+    unchanged. The trivial registry exists so every cell can
+    invoke the same admission interface even when the trust-
+    subspace axis is disabled.
+    """
     return TrustSubspaceDenseRegistry(
         schema=schema,
         inner_w34_registry=inner_w34_registry,
@@ -25405,6 +25412,14 @@ def build_trust_subspace_dense_registry(
         min_basis_observations: int = W35_DEFAULT_MIN_BASIS_OBSERVATIONS,
         abstain_on_unstable_consensus: bool = True,
 ) -> TrustSubspaceDenseRegistry:
+    """Build a real trust-subspace dense-control registry (W35).
+
+    Evaluates the trust-subspace dense-control axis on each
+    candidate handoff and admits / abstains per
+    ``W35-C-DENSE-CONTROL``. Pair with
+    ``build_trivial_trust_subspace_registry`` for the disabled
+    case.
+    """
     return TrustSubspaceDenseRegistry(
         schema=schema,
         inner_w34_registry=inner_w34_registry,
@@ -26461,6 +26476,8 @@ def build_trivial_host_diverse_registry(
         inner_w35_registry: TrustSubspaceDenseRegistry | None = None,
         registered_oracle_ids: Iterable[str] = (),
 ) -> HostDiverseRegistry:
+    """Build a trivial pass-through host-diverse trust-subspace registry (W36).
+    """
     return HostDiverseRegistry(
         schema=schema,
         inner_w35_registry=inner_w35_registry,
@@ -26487,6 +26504,12 @@ def build_host_diverse_registry(
             W36_DEFAULT_HOST_DIVERSITY_MARGIN_MIN),
         abstain_on_unverified_host_projection: bool = True,
 ) -> HostDiverseRegistry:
+    """Build a real host-diverse trust-subspace registry (W36).
+
+    Evaluates the cross-host trust-diversity axis per
+    ``W36-C-HOST-DIVERSE``. Pair with the trivial form for the
+    disabled case.
+    """
     return HostDiverseRegistry(
         schema=schema,
         inner_w35_registry=inner_w35_registry,
@@ -27867,6 +27890,8 @@ def build_trivial_cross_host_trajectory_registry(
         inner_w36_registry: HostDiverseRegistry | None = None,
         registered_oracle_ids: Iterable[str] = (),
 ) -> CrossHostBasisTrajectoryRegistry:
+    """Build a trivial pass-through cross-host basis-trajectory registry (W37).
+    """
     return CrossHostBasisTrajectoryRegistry(
         schema=schema,
         inner_w36_registry=inner_w36_registry,
@@ -27901,6 +27926,12 @@ def build_cross_host_trajectory_registry(
         trajectory_history_window: int = (
             W37_DEFAULT_TRAJECTORY_HISTORY_WINDOW),
 ) -> CrossHostBasisTrajectoryRegistry:
+    """Build a real cross-host basis-trajectory registry (W37).
+
+    Evaluates the cross-host trajectory axis per
+    ``W37-C-BASIS-TRAJECTORY``. Pair with the trivial form for
+    the disabled case.
+    """
     return CrossHostBasisTrajectoryRegistry(
         schema=schema,
         inner_w36_registry=inner_w36_registry,
@@ -29016,6 +29047,8 @@ def build_trivial_disjoint_consensus_registry(
         schema: SchemaCapsule,
         inner_w37_registry: CrossHostBasisTrajectoryRegistry | None = None,
 ) -> DisjointConsensusReferenceRegistry:
+    """Build a trivial pass-through disjoint-consensus registry (W38).
+    """
     return DisjointConsensusReferenceRegistry(
         schema=schema,
         inner_w37_registry=inner_w37_registry,
@@ -29043,6 +29076,12 @@ def build_disjoint_consensus_registry(
         divergence_margin_min: float = (
             W38_DEFAULT_DIVERGENCE_MARGIN_MIN),
 ) -> DisjointConsensusReferenceRegistry:
+    """Build a real disjoint-consensus reference registry (W38).
+
+    Evaluates the disjoint-consensus reference axis per
+    ``W38-C-DISJOINT-CONSENSUS``. Pair with the trivial form
+    for the disabled case.
+    """
     return DisjointConsensusReferenceRegistry(
         schema=schema,
         inner_w37_registry=inner_w37_registry,
@@ -30438,6 +30477,8 @@ def build_trivial_multi_host_disjoint_quorum_registry(
         inner_w38_registry: (
             DisjointConsensusReferenceRegistry | None) = None,
 ) -> MultiHostDisjointQuorumRegistry:
+    """Build a trivial pass-through multi-host disjoint-quorum registry (W39).
+    """
     return MultiHostDisjointQuorumRegistry(
         schema=schema,
         inner_w38_registry=inner_w38_registry,
@@ -30468,6 +30509,12 @@ def build_multi_host_disjoint_quorum_registry(
         divergence_margin_min: float = (
             W39_DEFAULT_QUORUM_DIVERGENCE_MARGIN_MIN),
 ) -> MultiHostDisjointQuorumRegistry:
+    """Build a real multi-host disjoint-quorum registry (W39).
+
+    Evaluates the multi-host disjoint-quorum axis per
+    ``W39-C-MULTI-HOST-DISJOINT``. Pair with the trivial form
+    for the disabled case.
+    """
     pool_hosts = tuple(
         frozenset(str(h) for h in pool)
         for pool in registered_quorum_pool_host_ids)
@@ -31989,6 +32036,8 @@ def build_trivial_cross_host_response_heterogeneity_registry(
         inner_w39_registry: (
             MultiHostDisjointQuorumRegistry | None) = None,
 ) -> CrossHostResponseHeterogeneityRegistry:
+    """Build a trivial pass-through cross-host response-heterogeneity registry (W40).
+    """
     return CrossHostResponseHeterogeneityRegistry(
         schema=schema,
         inner_w39_registry=inner_w39_registry,
@@ -32017,6 +32066,12 @@ def build_cross_host_response_heterogeneity_registry(
         min_response_signature_probes: int = (
             W40_DEFAULT_MIN_RESPONSE_SIGNATURE_PROBES),
 ) -> CrossHostResponseHeterogeneityRegistry:
+    """Build a real cross-host response-heterogeneity registry (W40).
+
+    Evaluates the cross-host response-heterogeneity axis per
+    ``W40-C-RESPONSE-HET``. Pair with the trivial form for the
+    disabled case.
+    """
     pool_hosts = tuple(
         frozenset(str(h) for h in pool)
         for pool in registered_member_pool_host_ids)
