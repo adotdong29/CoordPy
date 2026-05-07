@@ -20,11 +20,18 @@ Design constraints:
 from __future__ import annotations
 
 import dataclasses
-from typing import Any, Sequence
+from typing import Any, Sequence, TypeVar
 
 from .capsule import CapsuleBudget, CapsuleLedger, render_view
 from .llm_backend import LLMBackend, backend_from_config, backend_from_env
 from .team_coord import capsule_team_handoff
+
+
+# Self-type for classmethods so subclasses are inferred as their
+# own type (PEP 673 in spirit; written as a TypeVar bound for
+# Python 3.10 compat). ``MyTeam.from_env(...)`` correctly
+# infers as ``MyTeam`` instead of ``AgentTeam``.
+_TeamT = TypeVar("_TeamT", bound="AgentTeam")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -220,7 +227,7 @@ class AgentTeam:
 
     @classmethod
     def from_env(
-        cls,
+        cls: type[_TeamT],
         agents: Sequence[Agent],
         *,
         model: str | None = None,
@@ -232,7 +239,7 @@ class AgentTeam:
         max_visible_handoffs: int = 4,
         capture_capsules: bool = True,
         handoff_budget: "CapsuleBudget | None" = None,
-    ) -> "AgentTeam":
+    ) -> _TeamT:
         """Construct a team from common env-driven backend settings.
 
         Preferred env names:
@@ -260,7 +267,7 @@ class AgentTeam:
 
     @classmethod
     def from_config(
-        cls,
+        cls: type[_TeamT],
         agents: Sequence[Agent],
         *,
         config: Any,
@@ -269,7 +276,7 @@ class AgentTeam:
         max_visible_handoffs: int = 4,
         capture_capsules: bool = True,
         handoff_budget: "CapsuleBudget | None" = None,
-    ) -> "AgentTeam":
+    ) -> _TeamT:
         """Construct a team from a stable ``CoordPyConfig``."""
 
         backend = backend_from_config(config, model=model)

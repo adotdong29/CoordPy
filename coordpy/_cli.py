@@ -165,8 +165,13 @@ def _cmd_ci(argv: list[str] | None = None) -> int:
         return 0
     ap = argparse.ArgumentParser(
         prog="coordpy-ci",
-        description="Consume product_report.json, emit pass/fail verdict.")
-    ap.add_argument("--report", nargs="+", required=True)
+        description=(
+            "Consume one or more product_report.json files (or run "
+            "output directories — the JSON file is auto-resolved) "
+            "and emit a pass/fail verdict suitable for a CI gate."))
+    ap.add_argument("--report", nargs="+", required=True,
+                      help=("path(s) to product_report.json or to a "
+                            "run output directory"))
     ap.add_argument("--version", action="store_true",
                       help="print version and exit")
     ap.add_argument("--require-profile", nargs="+", default=None)
@@ -254,7 +259,9 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
         # both are given.
         p.add_argument(
             "report_pos", nargs="?", metavar="REPORT", default=None,
-            help="path to product_report.json or capsule_view.json")
+            help=("path to product_report.json or "
+                    "capsule_view.json (or a run output directory; "
+                    "the JSON file is auto-resolved)"))
         p.add_argument(
             "--report", default=None,
             help="alias for the positional REPORT path")

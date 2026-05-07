@@ -335,6 +335,10 @@ def make_backend(name: str, **kwargs: Any) -> LLMBackend:
       * ``"openai"``           — :class:`OpenAICompatibleBackend`
       * ``"openai_compatible"`` — :class:`OpenAICompatibleBackend`
       * ``"mlx_distributed"``  — :class:`MLXDistributedBackend`
+      * ``"synthetic"``        — :class:`SyntheticLLMClient`
+        (no network; for tests, examples, hermetic CI). Pass
+        ``default_response=...`` and / or ``response_fn=...``
+        as kwargs.
     """
     if name == "ollama":
         return OllamaBackend(**kwargs)
@@ -342,10 +346,13 @@ def make_backend(name: str, **kwargs: Any) -> LLMBackend:
         return OpenAICompatibleBackend(**kwargs)
     if name == "mlx_distributed":
         return MLXDistributedBackend(**kwargs)
+    if name == "synthetic":
+        from .synthetic_llm import SyntheticLLMClient
+        return SyntheticLLMClient(**kwargs)
     raise ValueError(
         f"unknown LLM backend {name!r}; "
         f"valid: 'ollama', 'openai', 'openai_compatible', "
-        f"'mlx_distributed'")
+        f"'mlx_distributed', 'synthetic'")
 
 
 def backend_from_env(
@@ -421,9 +428,19 @@ def backend_from_env(
             api_key=resolved_key,
             timeout=600.0 if timeout is None else float(timeout),
         )
+    if backend_name == "synthetic":
+        # No-network test/example backend. ``model`` is honoured
+        # as the synthetic ``model_tag`` so PROMPT / LLM_RESPONSE
+        # capsules see a stable identifier.
+        from .synthetic_llm import SyntheticLLMClient
+        return SyntheticLLMClient(
+            model_tag=(model or os.environ.get("COORDPY_MODEL")
+                          or "synthetic.default"),
+        )
     raise ValueError(
         f"unknown backend {backend_name!r}; valid: 'ollama', 'openai', "
-        f"'openai_compatible', 'provider', 'mlx_distributed'")
+        f"'openai_compatible', 'provider', 'mlx_distributed', "
+        f"'synthetic'")
 
 
 def backend_from_config(

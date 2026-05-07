@@ -89,7 +89,21 @@ def evaluate_report(report_path: str,
                         "expected": list(EXPECTED_REPORT_SCHEMAS),
                         "got": got_schema}
     if not schema_ok:
+        # Short-circuit: if the input shape isn't a product
+        # report, the downstream profile / readiness / sweep /
+        # artifact checks will all fire spurious blockers
+        # because they're inspecting a structurally-different
+        # document. One ``schema_mismatch`` blocker is the
+        # actionable signal; cascade five is noise.
         blockers.append(f"schema_mismatch:{got_schema!r}")
+        return {
+            "schema": CI_SCHEMA,
+            "report_path": report_path,
+            "product_report_profile": report.get("profile"),
+            "ok": False,
+            "blockers": blockers,
+            "checks": checks,
+        }
 
     # 2. Profile compatibility.
     prof = report.get("profile")

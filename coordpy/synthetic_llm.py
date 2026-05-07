@@ -70,6 +70,27 @@ class SyntheticLLMClient:
 
     The client exposes a ``generate(prompt, max_tokens,
     temperature) -> str`` method matching ``LLMClient.generate``.
+
+    ``response_fn`` arity
+    ---------------------
+    Either ``response_fn(prompt) -> str`` or
+    ``response_fn(prompt, instance_id) -> str`` is accepted.
+    The two-arg form receives the routing key extracted from the
+    prompt (the ``Agent: <name>`` header that ``AgentTeam`` emits,
+    or the ``INSTANCE: <id>`` header for SWE-bench-style flows).
+
+    Pickling caveat
+    ---------------
+    A client with ``response_fn=lambda...`` (or any non-picklable
+    callable) does not survive ``pickle.dumps`` — that's a
+    standard Python lambda limitation, not a coordpy issue. For
+    multiprocessing use, pass a module-level function:
+
+        def my_responder(prompt: str) -> str: ...
+        client = SyntheticLLMClient(response_fn=my_responder)
+
+    A client with only ``responses=...`` (no ``response_fn``)
+    pickles cleanly.
     """
 
     model_tag: str = "synthetic.default"
