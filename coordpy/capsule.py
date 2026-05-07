@@ -1054,15 +1054,32 @@ def verify_chain_from_view_dict(view: dict[str, Any]) -> bool:
     a deleted capsule, an inserted capsule, or a rewritten
     ``chain_head``.
 
+    Strong (full-payload) case
+    --------------------------
+    When a capsule entry carries ``payload``, ``budget``, and
+    ``parents`` (i.e. the view was rendered with
+    ``include_payload=True`` or the capsule kind is one of the
+    "payload-always" kinds — ARTIFACT, META_MANIFEST,
+    PATCH_PROPOSAL, TEST_VERDICT, PARSE_OUTCOME, PROMPT,
+    LLM_RESPONSE), this function additionally **re-derives the
+    CID** from those bytes and verifies it matches the listed
+    CID. So under the strong case, mutating the payload — or
+    the recorded ``metadata.payload_sha256`` — without also
+    forging the chain head is detected.
+
     What is *not* authenticated
     ---------------------------
     Non-CID summary fields on a capsule entry — ``n_tokens``,
-    ``n_bytes``, ``emitted_at``, ``metadata``, ``parents``, and
-    any extra keys a downstream tool added — are **not** part of
-    the chain. They are derived stats / metadata, not capsule
-    identity. To audit those, use ``audit_capsule_lifecycle_from_view``
-    (which checks lifecycle invariants L-1..L-11) or hash the
-    full view object yourself before persisting it.
+    ``n_bytes``, ``emitted_at``, ``metadata``, and any extra
+    keys a downstream tool added — are **not** part of the
+    chain. They are derived stats / metadata, not capsule
+    identity. When a capsule's payload is *absent* from the view
+    (header-only rendering), this function only checks
+    chain-list integrity (CID order + chain_head) and cannot
+    detect a swapped payload. Use ``include_payload=True`` for
+    end-to-end tamper detection on small chains; use
+    ``audit_capsule_lifecycle_from_view`` for the lifecycle
+    invariants L-1..L-11.
 
     Theorem W3-37 (Chain-from-headers verification, proved by
     inspection): the chain step depends only on (prev,
@@ -1077,6 +1094,28 @@ def verify_chain_from_view_dict(view: dict[str, Any]) -> bool:
         kind = cap.get("kind")
         if not isinstance(cid, str) or not isinstance(kind, str):
             return False
+
+        # End-to-end tamper detection (the strong case): when the
+        # capsule entry includes the payload, budget, and parents,
+        # re-derive the CID from those and check it matches the
+        # listed CID. This catches "edit payload but leave CID
+        # alone" and "edit metadata.payload_sha256" — the chain
+        # alone only commits to the CID list, so without this
+        # re-derive an attacker could swap a capsule's payload
+        # while leaving its CID intact.
+        if "payload" in cap and "budget" in cap and "parents" in cap:
+            try:
+                derived_cid = _capsule_cid(
+                    kind=kind,
+                    payload=cap["payload"],
+                    budget=CapsuleBudget(**cap["budget"]),
+                    parents=tuple(cap.get("parents") or ()),
+                )
+            except Exception:
+                return False
+            if derived_cid != cid:
+                return False
+
         # Reproduce ``_chain_step`` over the durable fields. Lifecycle
         # is forced to SEALED to match the runtime's chain semantics
         # (RETIRED is an audit overlay; the chain hash is computed

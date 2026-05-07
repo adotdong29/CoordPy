@@ -280,7 +280,21 @@ class AgentTeam:
         )
 
     def run(self, task: str) -> TeamResult:
-        """Run the team once over ``task`` and return a stable result."""
+        """Run the team once over ``task`` and return a stable result.
+
+        Each agent's reply is sealed as a TEAM_HANDOFF capsule.
+        The default per-handoff budget is 64 KiB / 4096 tokens;
+        if your task or your agent replies are larger than that,
+        construct the team with
+        ``handoff_budget=coordpy.CapsuleBudget(max_bytes=...,
+        max_tokens=...)`` to widen it.
+
+        Raises ``ValueError`` on empty / whitespace ``task``.
+        Raises ``TypeError`` if the backend's ``generate(...)``
+        returns something other than ``str``.
+        Raises ``CapsuleAdmissionError`` if a single handoff
+        exceeds the configured budget.
+        """
 
         if not isinstance(task, str) or not task.strip():
             raise ValueError(
@@ -329,6 +343,18 @@ class AgentTeam:
                 max_tokens=member.max_tokens,
                 temperature=member.temperature,
             )
+            # Type-guard the backend's return so a misbehaving
+            # backend produces a clean TypeError naming the
+            # offender — not a deeper AttributeError /
+            # UnicodeEncodeError from the capsule sealing path.
+            if not isinstance(output, str):
+                raise TypeError(
+                    f"backend.generate(...) for agent "
+                    f"{member.name!r} returned "
+                    f"{type(output).__name__}, expected str. "
+                    f"Backends must return a string; if your "
+                    f"backend produces bytes, decode them first."
+                )
 
             capsule_cid: str | None = None
             if ledger is not None:
@@ -368,8 +394,18 @@ class AgentTeam:
         # AgentTeam runs seal a TEAM_HANDOFF chain rather than a
         # full RUN_REPORT, so without this the view has
         # ``root_cid=None`` while the TeamResult has the chain head.
+        #
+        # ``include_payload=True`` is on by default for AgentTeam
+        # because the chain is bounded (one capsule per agent +
+        # the leading task capsule), the payloads are small (the
+        # task string + each agent's reply), and the result is
+        # tamper-detectable end-to-end:
+        # ``verify_chain_from_view_dict`` re-derives each CID from
+        # the payload bytes when payloads are present.
         view = (
-            render_view(ledger, root_cid=parent_cid).as_dict()
+            render_view(
+                ledger, root_cid=parent_cid, include_payload=True,
+            ).as_dict()
             if ledger is not None
             else None
         )
