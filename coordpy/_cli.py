@@ -49,10 +49,18 @@ def _cmd_run(argv: list[str] | None = None) -> int:
             "Exit codes: 0 = OK; 1 = readiness failed / no sweep "
             "produced; 2 = bad arguments."))
     ap.add_argument("--profile", required=True,
-                     choices=_profiles.list_profiles())
-    ap.add_argument("--out-dir", required=True)
+                     choices=_profiles.list_profiles(),
+                     metavar="PROFILE",
+                     help=("name of a registered profile. Run with "
+                           "--help to see the full choice list, or "
+                           "see the README for the profile catalogue."))
+    ap.add_argument("--out-dir", required=True,
+                     help=("directory for product_report.json and "
+                           "the rest of the run's artifacts. "
+                           "Created if missing."))
     ap.add_argument("--jsonl", default=None,
-                     help="override profile JSONL")
+                     help=("override the profile's JSONL path. "
+                           "File must exist; checked before launch."))
     ap.add_argument("--model", default=None,
                      help="override the profile's model tag for real sweeps")
     ap.add_argument("--backend", default=None,
@@ -69,8 +77,13 @@ def _cmd_run(argv: list[str] | None = None) -> int:
                      help=("read the provider API key from this "
                            "environment variable instead of "
                            "COORDPY_API_KEY / OPENAI_API_KEY"))
-    ap.add_argument("--skip-sweep", action="store_true")
-    ap.add_argument("--force-sweep", action="store_true")
+    ap.add_argument("--skip-sweep", action="store_true",
+                     help=("run readiness only; do not execute the "
+                           "sweep. Useful for fast configuration checks."))
+    ap.add_argument("--force-sweep", action="store_true",
+                     help=("run the sweep even if readiness reports "
+                           "blockers. Use sparingly; intended for "
+                           "diagnosing why readiness fails."))
     ap.add_argument("--acknowledge-heavy", action="store_true",
                      help=("acknowledge the cost of a real-LLM sweep and "
                             "run it in-process. Without this flag, real "
@@ -144,12 +157,23 @@ def _cmd_import(argv: list[str] | None = None) -> int:
             "2 = bad arguments / file not found."))
     ap.add_argument("--version", action="store_true",
                       help="print version and exit")
-    ap.add_argument("--jsonl", required=True)
-    ap.add_argument("--limit", type=int, default=None)
+    ap.add_argument("--jsonl", required=True,
+                     help="path to a JSONL file to audit")
+    ap.add_argument("--limit", type=int, default=None,
+                     help=("audit at most N records (default: all). "
+                           "Useful for quick spot-checks on large files."))
     ap.add_argument("--sandbox", choices=("in_process", "subprocess"),
-                     default="subprocess")
-    ap.add_argument("--skip-readiness", action="store_true")
-    ap.add_argument("--out", default=None)
+                     default="subprocess",
+                     help=("execution sandbox for the readiness probe. "
+                           "Default: subprocess. Use in_process only "
+                           "for JSONL you have audited yourself."))
+    ap.add_argument("--skip-readiness", action="store_true",
+                     help=("skip the readiness probe and audit "
+                           "structure only. Faster but weaker."))
+    ap.add_argument("--out", default=None,
+                     help=("write the full audit report (JSON) to "
+                           "this path in addition to printing the "
+                           "summary."))
     args = ap.parse_args(argv)
     report = audit_jsonl(
         args.jsonl, limit=args.limit,
@@ -189,13 +213,29 @@ def _cmd_ci(argv: list[str] | None = None) -> int:
                             "run output directory"))
     ap.add_argument("--version", action="store_true",
                       help="print version and exit")
-    ap.add_argument("--require-profile", nargs="+", default=None)
-    ap.add_argument("--allow-profile", nargs="+", default=None)
-    ap.add_argument("--min-ready-fraction", type=float, default=1.0)
-    ap.add_argument("--min-pass-at-1", type=float, default=1.0)
-    ap.add_argument("--allow-not-ready", action="store_true")
-    ap.add_argument("--require-sweep-executed", action="store_true")
-    ap.add_argument("--out", default=None)
+    ap.add_argument("--require-profile", nargs="+", default=None,
+                     metavar="PROFILE",
+                     help=("require each report to be produced by one "
+                           "of these profiles; mismatch is a blocker."))
+    ap.add_argument("--allow-profile", nargs="+", default=None,
+                     metavar="PROFILE",
+                     help=("allow only these profiles; reports from "
+                           "other profiles are rejected."))
+    ap.add_argument("--min-ready-fraction", type=float, default=1.0,
+                     help=("minimum readiness fraction across reports "
+                           "(0.0-1.0). Default: 1.0 (all must be ready)."))
+    ap.add_argument("--min-pass-at-1", type=float, default=1.0,
+                     help=("minimum pass@1 across reports (0.0-1.0). "
+                           "Default: 1.0."))
+    ap.add_argument("--allow-not-ready", action="store_true",
+                     help=("treat not-ready as non-blocking. Off by "
+                           "default so CI fails closed."))
+    ap.add_argument("--require-sweep-executed", action="store_true",
+                     help=("require each report to record an executed "
+                           "sweep (not just a staged launch command)."))
+    ap.add_argument("--out", default=None,
+                     help=("write the aggregate verdict (JSON) to "
+                           "this path."))
     args = ap.parse_args(argv)
     # Auto-resolve directory -> directory/product_report.json
     # so callers can pass the run's --out-dir directly (the

@@ -52,9 +52,10 @@ class RunSpec:
                           marked ``trust=untrusted`` (e.g.
                           ``public_jsonl``). Only use for JSONL
                           you have audited yourself.
-    report_sinks        : names of registered ReportSink
-                          extensions to emit to after the
-                          standard artifacts land.
+    report_sinks        : tuple of names of registered ReportSink
+                          extensions to emit to after the standard
+                          artifacts land. Must be a ``tuple[str, ...]``;
+                          pass ``("stdout",)`` not ``["stdout"]``.
     config              : optional ``CoordPyConfig``.
     capsule_native      : when True (default), capsules drive the
                           runtime; when False, capsules describe
@@ -117,6 +118,47 @@ class RunSpec:
             raise TypeError(
                 f"RunSpec.out_dir must be a non-empty str or os.PathLike; "
                 f"got {type(self.out_dir).__name__}={self.out_dir!r}"
+            )
+        # The remaining fields are typed and documented; reject
+        # type confusion at construction so the misuse surfaces
+        # next to the ``RunSpec(...)`` call instead of as a
+        # mysterious failure inside the runner.
+        if self.jsonl_override is not None and (
+            not isinstance(self.jsonl_override, (str, _os.PathLike))
+            or (isinstance(self.jsonl_override, str)
+                and not self.jsonl_override)
+        ):
+            raise TypeError(
+                f"RunSpec.jsonl_override must be None or a non-empty "
+                f"str/os.PathLike; got "
+                f"{type(self.jsonl_override).__name__}="
+                f"{self.jsonl_override!r}"
+            )
+        for _name in (
+            "skip_sweep", "force_sweep", "acknowledge_heavy",
+            "allow_unsafe_sandbox", "capsule_native", "deterministic",
+        ):
+            _val = getattr(self, _name)
+            if not isinstance(_val, bool):
+                raise TypeError(
+                    f"RunSpec.{_name} must be a bool; got "
+                    f"{type(_val).__name__}={_val!r}"
+                )
+        if not isinstance(self.report_sinks, tuple) or not all(
+            isinstance(_s, str) and _s for _s in self.report_sinks
+        ):
+            raise TypeError(
+                f"RunSpec.report_sinks must be a tuple of non-empty "
+                f"str sink names; got "
+                f"{type(self.report_sinks).__name__}="
+                f"{self.report_sinks!r}"
+            )
+        if self.config is not None and not isinstance(
+            self.config, CoordPyConfig
+        ):
+            raise TypeError(
+                f"RunSpec.config must be None or a CoordPyConfig; "
+                f"got {type(self.config).__name__}={self.config!r}"
             )
 
 
