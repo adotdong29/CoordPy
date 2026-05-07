@@ -299,13 +299,26 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
         from .capsule import verify_chain_from_view_dict
         report_audit = audit_capsule_lifecycle_from_view(cv)
         chain_ok = verify_chain_from_view_dict(cv)
-        print(f"verdict        = {report_audit.verdict}")
-        print(f"rules_passed   = "
+        # Combined verdict: a view is OK iff lifecycle invariants
+        # AND chain re-derivation both pass. Renamed the
+        # lifecycle-only field to ``lifecycle_verdict`` so a
+        # reader skimming stdout doesn't see ``verdict = OK``
+        # next to ``chain_verified = False`` and walk away
+        # confused.
+        if report_audit.verdict in ("OK", "EMPTY") and chain_ok:
+            combined = report_audit.verdict
+        elif not chain_ok:
+            combined = "TAMPERED"
+        else:
+            combined = report_audit.verdict
+        print(f"verdict           = {combined}")
+        print(f"lifecycle_verdict = {report_audit.verdict}")
+        print(f"rules_passed      = "
                f"{len(report_audit.rules_passed)} / "
                f"{len(report_audit.rules_checked)}")
-        print(f"violations     = {len(report_audit.violations)}")
-        print(f"chain_verified = {chain_ok}")
-        print(f"by_kind        = {report_audit.stats}")
+        print(f"violations        = {len(report_audit.violations)}")
+        print(f"chain_verified    = {chain_ok}")
+        print(f"by_kind           = {report_audit.stats}")
         if report_audit.violations:
             print()
             print("counterexamples (first 8):")
