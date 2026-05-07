@@ -300,6 +300,12 @@ class AgentTeam:
             raise ValueError(
                 "AgentTeam.run(task=...) requires a non-empty string"
             )
+        if "\x00" in task:
+            raise ValueError(
+                "AgentTeam.run(task=...) must not contain NUL bytes; "
+                "they are valid in Python strings but a footgun for "
+                "downstream JSON / log / shell consumers"
+            )
 
         ledger = CapsuleLedger() if self.capture_capsules else None
         # Make the ledger available for post-run inspection

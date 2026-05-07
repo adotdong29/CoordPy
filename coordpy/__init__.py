@@ -755,9 +755,22 @@ from .team_policy import (
 
 
 SDK_VERSION = "coordpy.sdk.v3.43"
+
+# On-disk schema strings.
+#
+# Two prefixes coexist for historical reasons:
+#   * ``coordpy.<thing>.v1`` — schemas introduced after the
+#     package rename (CAPSULE_VIEW_SCHEMA, PROVENANCE_SCHEMA).
+#   * ``phaseN.<thing>.vM`` — schemas inherited from the
+#     research programme that produced this code; the prefix
+#     records which research phase first emitted them and is
+#     pinned for back-compat with already-recorded reports on
+#     disk. Renaming would require a major version bump and a
+#     migration window, so the strings stay as they are.
+#
+# The strings are *opaque identifiers*; readers should compare
+# by value, not parse the prefix.
 PRODUCT_REPORT_SCHEMA = "phase45.product_report.v2"
-# Legacy schema — still emitted by mock-only runs that don't touch
-# the unified runtime path. Consumers should accept both.
 PRODUCT_REPORT_SCHEMA_V1 = "phase45.product_report.v1"
 CI_VERDICT_SCHEMA = "phase46.ci_verdict.v1"
 IMPORT_AUDIT_SCHEMA = "phase46.import_audit.v1"

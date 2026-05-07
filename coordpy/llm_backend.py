@@ -216,8 +216,37 @@ class OpenAICompatibleBackend:
             headers=headers,
         )
         t0 = time.time()
-        with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-            payload = json.loads(resp.read().decode("utf-8"))
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                payload = json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            # Wrap the most common misconfig modes with a clear,
+            # actionable message that names the URL and the env
+            # var to set, so users don't have to read urllib's
+            # bare ``HTTP Error 401`` and guess.
+            if e.code in (401, 403):
+                raise PermissionError(
+                    f"OpenAICompatibleBackend got HTTP {e.code} "
+                    f"from {url}. Check that COORDPY_API_KEY (or "
+                    f"the ``api_key=`` argument) is set to a "
+                    f"valid token for this provider."
+                ) from e
+            if e.code == 404:
+                raise ValueError(
+                    f"OpenAICompatibleBackend got HTTP 404 from "
+                    f"{url}. The base_url should be the root that "
+                    f"hosts ``/v1/chat/completions`` — e.g. "
+                    f"``https://api.openai.com/v1`` (without the "
+                    f"``/chat/completions`` suffix)."
+                ) from e
+            raise
+        except urllib.error.URLError as e:
+            raise ConnectionError(
+                f"OpenAICompatibleBackend could not reach {url} "
+                f"({type(e).__name__}: {e}). Check that the host "
+                f"is reachable and COORDPY_API_BASE_URL / "
+                f"base_url= is correct."
+            ) from e
         self.n_calls += 1
         self.total_wall_s += time.time() - t0
         self.last_response_payload = payload

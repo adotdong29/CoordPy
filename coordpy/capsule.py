@@ -633,6 +633,13 @@ class ContextCapsule:
         )
 
     def metadata_dict(self) -> dict[str, Any]:
+        """Return the metadata as a fresh ``dict``.
+
+        Capsule metadata is stored as a frozen tuple of
+        ``(key, value)`` pairs (so the capsule is hashable);
+        this helper returns it in the more familiar dict shape
+        for callers that want to read fields by key.
+        """
         return dict(self.metadata)
 
     def as_dict(self) -> dict[str, Any]:
@@ -1107,6 +1114,12 @@ def verify_chain_from_view_dict(view: dict[str, Any]) -> bool:
     is therefore a faithful re-derivation of the runtime's chain
     semantics from disk bytes.
     """
+    # Fail closed on the wrong shape entirely. A non-dict input
+    # (e.g. a JSON string that wasn't parsed, ``None``) is just a
+    # "no, that doesn't verify" — we don't raise because callers
+    # frequently feed this function untrusted input.
+    if not isinstance(view, dict):
+        return False
     # Reject views whose declared schema isn't the one this
     # function knows how to verify. A missing or unknown schema
     # means the bytes weren't produced by a coordpy version we

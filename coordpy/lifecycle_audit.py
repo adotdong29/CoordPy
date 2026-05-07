@@ -125,6 +125,14 @@ class LifecycleAuditReport:
         return tuple(r for r in self.rules_checked if r not in passed)
 
     def as_dict(self) -> dict[str, Any]:
+        """Return the audit report as a JSON-safe ``dict``.
+
+        Contains ``verdict``, ``rules_checked``, ``rules_passed``,
+        ``failed_rules``, ``violations``, and ``stats``. This is
+        the shape downstream tools (``coordpy-capsule audit`` CLI,
+        CI scripts) consume; the dataclass itself stays for
+        Python callers who prefer attribute access.
+        """
         return {
             "verdict": self.verdict,
             "rules_checked": list(self.rules_checked),
@@ -137,7 +145,7 @@ class LifecycleAuditReport:
 
 class CapsuleLifecycleAudit:
     """Mechanical checker for the lifecycle correspondence
-    invariants L-1..L-8.
+    invariants L-1..L-11.
 
     Instantiate with a ``CapsuleNativeRunContext`` *or* a finished
     ``CapsuleLedger`` (with optional ``in_flight_failures``).
@@ -596,7 +604,7 @@ def audit_capsule_lifecycle_from_view(view: dict[str, Any]
     audit against it.
 
     The view's headers always carry CID + kind + parents + lifecycle
-    + sizes (Theorem W3-12), so the lifecycle invariants L-2..L-8
+    + sizes (Theorem W3-12), so the lifecycle invariants L-2..L-11
     are checkable purely from the view. L-1 (no orphan capsules)
     is vacuously true on a view (the view is the SEALED set; failed
     in-flight entries never appear there).

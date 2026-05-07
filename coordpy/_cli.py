@@ -120,9 +120,17 @@ def _cmd_run(argv: list[str] | None = None) -> int:
 
 def _cmd_import(argv: list[str] | None = None) -> int:
     from coordpy._internal.product.import_data import audit_jsonl, _render_summary
+    if argv is None:
+        argv = sys.argv[1:]
+    if "--version" in argv:
+        from . import __version__, SDK_VERSION
+        print(f"coordpy-import {__version__} ({SDK_VERSION})")
+        return 0
     ap = argparse.ArgumentParser(
         prog="coordpy-import",
         description="Audit a public JSONL for SWE-bench-Lite compatibility.")
+    ap.add_argument("--version", action="store_true",
+                      help="print version and exit")
     ap.add_argument("--jsonl", required=True)
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--sandbox", choices=("in_process", "subprocess"),
@@ -149,10 +157,18 @@ def _cmd_ci(argv: list[str] | None = None) -> int:
     from coordpy._internal.product.ci_gate import (
         evaluate_report, aggregate, _render_verdict,
     )
+    if argv is None:
+        argv = sys.argv[1:]
+    if "--version" in argv:
+        from . import __version__, SDK_VERSION
+        print(f"coordpy-ci {__version__} ({SDK_VERSION})")
+        return 0
     ap = argparse.ArgumentParser(
         prog="coordpy-ci",
         description="Consume product_report.json, emit pass/fail verdict.")
     ap.add_argument("--report", nargs="+", required=True)
+    ap.add_argument("--version", action="store_true",
+                      help="print version and exit")
     ap.add_argument("--require-profile", nargs="+", default=None)
     ap.add_argument("--allow-profile", nargs="+", default=None)
     ap.add_argument("--min-ready-fraction", type=float, default=1.0)
@@ -188,6 +204,12 @@ def _cmd_ci(argv: list[str] | None = None) -> int:
 
 
 def _cmd_capsule(argv: list[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+    if "--version" in argv:
+        from . import __version__, SDK_VERSION
+        print(f"coordpy-capsule {__version__} ({SDK_VERSION})")
+        return 0
     """``coordpy-capsule`` — inspect / audit the capsule graph of a
     finished product report.
 
@@ -229,16 +251,28 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
     _add_report_arg(p_cid)
     p_audit = sub.add_parser(
         "audit",
-        help=("run the SDK v3.3 lifecycle audit on a finished "
-              "capsule view (eight invariants L-1..L-8). Prints "
-              "OK / BAD plus typed counterexamples on violation."))
+        help=("run the SDK v3.4 lifecycle audit on a finished "
+              "capsule view (eleven invariants L-1..L-11). "
+              "Prints OK / BAD / TAMPERED plus typed counter"
+              "examples on violation. Also re-derives the "
+              "capsule chain (defense in depth)."))
     _add_report_arg(p_audit)
     args = ap.parse_args(argv)
 
     if args.sub is None:
         ap.print_help()
         return 1
-    # Resolve the report path (positional wins over --report).
+    # Resolve the report path. Both forms are accepted, but a
+    # caller who sets BOTH probably has a bug — reject loudly
+    # rather than silently dropping one of the values.
+    if args.report_pos and args.report and args.report_pos != args.report:
+        print(f"error: pass the report path either positionally "
+              f"(``coordpy-capsule {args.sub} PATH``) or as "
+              f"``--report PATH``, not both. Got "
+              f"positional={args.report_pos!r} and "
+              f"--report={args.report!r}.",
+              file=sys.stderr)
+        return 2
     args.report = args.report_pos or args.report
     if not args.report:
         print("error: pass the report path either positionally "

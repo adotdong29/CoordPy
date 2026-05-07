@@ -37,17 +37,35 @@ class RunSpec:
 
     Fields
     ------
-    profile           : name of a registered profile.
-    out_dir           : output directory; created if missing.
-    jsonl_override    : optional override for the profile's JSONL path.
-    skip_sweep        : run readiness only.
-    force_sweep       : run the sweep even if readiness fails.
-    acknowledge_heavy : explicit cost gate for real-LLM sweeps.
-                        Required for in-process execution of real
-                        profiles (see ``coordpy.runtime``).
-    report_sinks      : names of registered ReportSink extensions to
-                        emit to after the standard artifacts land.
-    config            : optional ``CoordPyConfig``.
+    profile             : name of a registered profile.
+    out_dir             : output directory; created if missing.
+                          Accepts ``str`` or ``os.PathLike``
+                          (e.g. ``pathlib.Path``).
+    jsonl_override      : optional override for the profile's
+                          JSONL path.
+    skip_sweep          : run readiness only.
+    force_sweep         : run the sweep even if readiness fails.
+    acknowledge_heavy   : explicit cost gate for real-LLM sweeps.
+                          Required for in-process execution of
+                          real profiles (see ``coordpy.runtime``).
+    allow_unsafe_sandbox: skip the Docker requirement for profiles
+                          marked ``trust=untrusted`` (e.g.
+                          ``public_jsonl``). Only use for JSONL
+                          you have audited yourself.
+    report_sinks        : names of registered ReportSink
+                          extensions to emit to after the
+                          standard artifacts land.
+    config              : optional ``CoordPyConfig``.
+    capsule_native      : when True (default), capsules drive the
+                          runtime; when False, capsules describe
+                          the run post-hoc. The two paths produce
+                          CID-equivalent ledgers for non-ARTIFACT
+                          kinds (Theorem W3-34).
+    deterministic       : when True, strip per-run wall-clock
+                          fields from PROVENANCE / RUN_REPORT /
+                          JSONL paths so two runs of the same
+                          mock-mode profile produce identical
+                          full-DAG CIDs (Theorem W3-41).
     """
 
     profile: str

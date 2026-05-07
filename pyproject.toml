@@ -11,10 +11,10 @@ requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [
-    { name = "Context Zero Contributors" },
+    { name = "Context Zero Contributors", email = "context-zero@users.noreply.github.com" },
 ]
 maintainers = [
-    { name = "Context Zero Contributors" },
+    { name = "Context Zero Contributors", email = "context-zero@users.noreply.github.com" },
 ]
 keywords = [
     "agents",
