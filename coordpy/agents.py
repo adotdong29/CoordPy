@@ -296,6 +296,26 @@ class AgentTeam:
         recent_handoffs: list[tuple[str, str]] = []
         parent_cid: str | None = None
 
+        # Seal the task itself as the first capsule in the chain
+        # so root_cid commits to (task, agent_outputs...). Without
+        # this, two distinct tasks whose final agent reply
+        # happened to match would produce the same root_cid — a
+        # real audit-correctness issue. Capsule kind is
+        # TEAM_HANDOFF with source_role="user" / claim_kind="task".
+        if ledger is not None and self.agents:
+            first_role = self.agents[0].effective_role
+            task_capsule = capsule_team_handoff(
+                source_role="user",
+                to_role=first_role,
+                claim_kind="task",
+                payload=task,
+                round=0,
+                parents=(),
+                budget=self.handoff_budget,
+            )
+            sealed_task = ledger.admit_and_seal(task_capsule)
+            parent_cid = sealed_task.cid
+
         for idx, member in enumerate(self.agents):
             backend = self._resolve_backend(member)
             role = member.effective_role

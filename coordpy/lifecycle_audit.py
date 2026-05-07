@@ -111,11 +111,25 @@ class LifecycleAuditReport:
     violations: list[dict[str, Any]]
     stats: dict[str, int]
 
+    @property
+    def failed_rules(self) -> tuple[str, ...]:
+        """Names of rules that produced at least one violation,
+        deduplicated, in the order they appear in ``rules_checked``.
+
+        Convenience for ``rules_checked - rules_passed``: when an
+        audit returns ``verdict="BAD"`` you usually want a short
+        list of rule names that fired, not the full N-element
+        ``rules_checked`` tuple.
+        """
+        passed = set(self.rules_passed)
+        return tuple(r for r in self.rules_checked if r not in passed)
+
     def as_dict(self) -> dict[str, Any]:
         return {
             "verdict": self.verdict,
             "rules_checked": list(self.rules_checked),
             "rules_passed": list(self.rules_passed),
+            "failed_rules": list(self.failed_rules),
             "violations": list(self.violations),
             "stats": dict(self.stats),
         }

@@ -220,17 +220,28 @@ class CapsuleNativeRunContext:
     construction, build a ``ContextCapsule`` directly and admit
     it through the public ``ledger`` attribute::
 
+        from coordpy import (
+            CapsuleNativeRunContext, ContextCapsule, CapsuleKind,
+            render_view, verify_chain_from_view_dict,
+        )
+
         ctx = CapsuleNativeRunContext()
         c = ContextCapsule.new(
             kind=CapsuleKind.ARTIFACT,
             payload={"hello": "world"},
         )
         sealed = ctx.ledger.admit_and_seal(c)
-        view = ctx.ledger.render_view()  # or coordpy.render_view(ctx.ledger)
 
-    The ``ledger`` attribute is part of the public surface; you
-    can also call ``ctx.ledger.retire(cid)`` to mark a capsule
-    retired without breaking the chain (Capsule Contract C6).
+        view_dict = render_view(ctx.ledger).as_dict()
+        assert verify_chain_from_view_dict(view_dict)
+
+    ``coordpy.render_view`` (a module-level function) returns a
+    ``CapsuleView`` object; call ``.as_dict()`` to get the
+    JSON-shape needed by ``verify_chain_from_view_dict`` and the
+    on-disk format. The ``ledger`` attribute is part of the
+    public surface; you can also call ``ctx.ledger.retire(cid)``
+    to mark a capsule retired without breaking the chain
+    (Capsule Contract C6).
     """
 
     def __init__(self) -> None:

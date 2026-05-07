@@ -781,7 +781,12 @@ class CapsuleLedger:
         """
         if capsule.lifecycle != CapsuleLifecycle.ADMITTED:
             raise CapsuleLifecycleError(
-                f"seal() expects ADMITTED, got {capsule.lifecycle}")
+                f"seal() expects a capsule in ADMITTED state, got "
+                f"{capsule.lifecycle}. The common path is "
+                f"``ledger.admit_and_seal(capsule)`` (which is "
+                f"idempotent). If you need the explicit two-step "
+                f"form, call ``ledger.admit(capsule)`` first."
+            )
         if capsule.cid in self._by_cid:
             return self._by_cid[capsule.cid]
         sealed = dataclasses.replace(
