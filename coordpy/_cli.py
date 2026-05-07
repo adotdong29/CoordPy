@@ -329,8 +329,14 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
         agree = True
         disk_chain_recompute_ok = True
         if os.path.exists(view_path):
-            with open(view_path, "r", encoding="utf-8") as fh:
-                disk_view = json.load(fh)
+            try:
+                with open(view_path, "r", encoding="utf-8") as fh:
+                    disk_view = json.load(fh)
+            except json.JSONDecodeError as e:
+                print(f"error: capsule_view.json on disk is "
+                      f"malformed (truncated or corrupt): "
+                      f"{view_path}: {e}", file=sys.stderr)
+                return 3
             agree = disk_view.get("chain_head") == embedded_head
             disk_chain_recompute_ok = verify_chain_from_view_dict(
                 disk_view)
@@ -345,8 +351,14 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
         manifest_path = os.path.join(out_dir, "meta_manifest.json")
         manifest_check = None
         if os.path.exists(manifest_path):
-            with open(manifest_path, "r", encoding="utf-8") as fh:
-                manifest = json.load(fh)
+            try:
+                with open(manifest_path, "r", encoding="utf-8") as fh:
+                    manifest = json.load(fh)
+            except json.JSONDecodeError as e:
+                print(f"error: meta_manifest.json on disk is "
+                      f"malformed (truncated or corrupt): "
+                      f"{manifest_path}: {e}", file=sys.stderr)
+                return 3
             manifest_check = verify_meta_manifest_on_disk(
                 manifest, base_dir=out_dir)
 

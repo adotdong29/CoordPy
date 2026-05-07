@@ -127,8 +127,30 @@ class OllamaBackend:
 
     def generate(self, prompt: str, max_tokens: int = 80,
                  temperature: float = 0.0) -> str:
-        return self._client.generate(
-            prompt, max_tokens=max_tokens, temperature=temperature)
+        try:
+            return self._client.generate(
+                prompt, max_tokens=max_tokens, temperature=temperature)
+        except Exception as e:
+            # Wrap urllib's bare "Connection refused" / "Name or
+            # service not known" with a clear message that names
+            # the URL and the env var, so users don't have to
+            # guess where to look.
+            msg = str(e).lower()
+            if any(k in msg for k in (
+                "connection refused",
+                "name or service not known",
+                "temporary failure in name resolution",
+                "no route to host",
+                "network is unreachable",
+            )):
+                url = self.base_url or "http://127.0.0.1:11434"
+                raise ConnectionError(
+                    f"OllamaBackend could not reach {url} "
+                    f"({type(e).__name__}: {e}). Check that an "
+                    f"Ollama server is running there, or set "
+                    f"COORDPY_OLLAMA_URL / pass base_url=..."
+                ) from e
+            raise
 
 
 @dataclasses.dataclass

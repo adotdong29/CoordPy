@@ -97,6 +97,30 @@ def run(spec: RunSpec) -> dict[str, Any]:
     else:
         resolved_config = CoordPyConfig.from_env(**spec.config.as_dict())
 
+    # Surface output-path problems as a clear ValueError before
+    # any work happens, instead of bubbling a bare OSError /
+    # FileNotFoundError out of one of the seven write sites.
+    import os as _os
+    out_dir = spec.out_dir
+    parent = _os.path.dirname(_os.path.abspath(out_dir)) or "."
+    if not _os.path.isdir(parent):
+        raise ValueError(
+            f"RunSpec.out_dir parent does not exist: {parent!r} "
+            f"(out_dir={out_dir!r}). Create it first or pick a "
+            f"writable path."
+        )
+    try:
+        _os.makedirs(out_dir, exist_ok=True)
+        _probe = _os.path.join(out_dir, ".coordpy_write_probe")
+        with open(_probe, "w") as _fh:
+            _fh.write("ok")
+        _os.remove(_probe)
+    except OSError as e:
+        raise ValueError(
+            f"RunSpec.out_dir is not writable: {out_dir!r} "
+            f"({type(e).__name__}: {e}). Pick a writable path."
+        ) from e
+
     report = run_profile(
         spec.profile,
         out_dir=spec.out_dir,

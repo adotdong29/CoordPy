@@ -114,6 +114,16 @@ def agent(
             f"agent(..., max_tokens=...) must be a positive int; "
             f"got {max_tokens!r}"
         )
+    if max_tokens > 1_000_000:
+        # No real LLM has a million-token output budget. Catch
+        # obvious bugs (forgotten exponent, wrong unit) without
+        # constraining any real use.
+        raise ValueError(
+            f"agent(..., max_tokens=...) is {max_tokens:,}, which "
+            f"exceeds the 1,000,000-token sanity cap; this is "
+            f"almost certainly a bug — pass an explicit smaller "
+            f"value if you really mean it"
+        )
     if not isinstance(temperature, (int, float)) or not (
         0.0 <= temperature <= 2.0
     ):
