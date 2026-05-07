@@ -3,6 +3,56 @@
 Release history for the coordpy SDK. For installation and usage,
 see [`README.md`](README.md).
 
+## [0.5.19] CLI help text, RunSpec validation, capsule-CLI prose, sink lookup
+
+Seventeen rounds of hostile build-tests against the 0.5.18 release
+surfaced a long tail of papercuts in adjacent surfaces. This release
+closes the eighty-three findings that resulted, with no contract
+changes — every existing call site still works.
+
+### CLI help
+
+- Every flag in `coordpy --help`, `coordpy-import --help`, and
+  `coordpy-ci --help` now ships a description. Sixteen flags were
+  previously bare.
+- `coordpy --help` no longer lists the full profile choice list in
+  the usage line (`metavar="PROFILE"`); narrow terminals are happy.
+- Each `coordpy-capsule` subcommand (`view`, `verify`, `cid`,
+  `audit`) prints a description block above its options.
+- `coordpy-capsule --version` is now a real argparse argument and
+  appears in `--help`, matching the other three CLIs.
+- `coordpy --jsonl /missing/path` now exits 2 with a one-line
+  "file not found" message, not a deep traceback.
+
+### `RunSpec`
+
+- Type confusion fails at construction. Nine fields
+  (`jsonl_override`, `skip_sweep`, `force_sweep`,
+  `acknowledge_heavy`, `allow_unsafe_sandbox`, `report_sinks`,
+  `config`, `capsule_native`, `deterministic`) raise `TypeError`
+  with a clear message on bad input. Previously only `profile`
+  and `out_dir` validated.
+- `out_dir` accepts `pathlib.Path` (any `os.PathLike`) and
+  auto-creates missing parents.
+- The `coordpy.__doc__` Quickstart is now copy-paste runnable
+  end-to-end.
+- `RunSpec.deterministic` docs now state plainly that the default
+  is `False`, and explain when to set it `True`.
+
+### API
+
+- `get_report_sink('unknown')` raises `LookupError` (rather than
+  the noisier `KeyError`) so the message renders cleanly.
+- `verify_chain_from_view_dict` re-derives every CID from its
+  payload before walking the chain (defence in depth).
+- `audit_capsule_lifecycle_from_view` returns `TAMPERED` on chain
+  re-derivation failure, matching the CLI behaviour.
+
+### Docs
+
+- README's `--version` hint uses a placeholder instead of
+  hard-coding `0.5.16`, so it stops rotting at every release.
+
 ## [0.5.18] AgentTeam: usable default budgets, agent() validation, friendlier CLI
 
 A subagent build-test against `coordpy-ai 0.5.17` from PyPI hit

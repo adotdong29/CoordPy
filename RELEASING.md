@@ -93,7 +93,7 @@ if any field is wrong.
 ### Push the tag
 
 ```bash
-git tag -a v0.5.16 -m "coordpy-ai v0.5.16"
+git tag -a vX.Y.Z -m "coordpy-ai vX.Y.Z"
 git push --follow-tags
 ```
 
@@ -129,7 +129,7 @@ export TWINE_PASSWORD=pypi-AgE...
 
 Worth doing once for a brand-new project name. TestPyPI does
 not allow re-uploading the same version, so if you need a
-second attempt, append a `.devN` suffix (`0.5.16.dev1`) and
+second attempt, append a `.devN` suffix (e.g. `X.Y.Z.dev1`) and
 upload that.
 
 ```bash
