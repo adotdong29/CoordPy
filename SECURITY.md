@@ -13,7 +13,7 @@ Only the latest minor release receives security fixes.
 
 Please do not open a public GitHub issue for security problems.
 Open a private security advisory at
-<https://github.com/adotdong29/context-zero/security/advisories/new>.
+<https://github.com/adotdong29/CoordPy/security/advisories/new>.
 
 We aim to acknowledge reports within five business days and to
 ship a fix or mitigation within thirty days for confirmed issues.

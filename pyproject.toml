@@ -11,23 +11,27 @@ requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [
-    { name = "Context Zero Contributors", email = "context-zero@users.noreply.github.com" },
+    { name = "CoordPy Contributors", email = "coordpy@users.noreply.github.com" },
 ]
 maintainers = [
-    { name = "Context Zero Contributors", email = "context-zero@users.noreply.github.com" },
+    { name = "CoordPy Contributors", email = "coordpy@users.noreply.github.com" },
 ]
 keywords = [
     "agents",
     "multi-agent",
+    "agent-orchestration",
     "coordination",
     "llm",
     "ai",
     "context",
+    "context-engineering",
+    "capsule",
     "evaluation",
     "swe-bench",
     "bounded-context",
     "provenance",
     "auditability",
+    "reproducibility",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -89,12 +93,12 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/adotdong29/context-zero"
-Documentation = "https://github.com/adotdong29/context-zero#readme"
-Source = "https://github.com/adotdong29/context-zero"
-Repository = "https://github.com/adotdong29/context-zero.git"
-Issues = "https://github.com/adotdong29/context-zero/issues"
-Changelog = "https://github.com/adotdong29/context-zero/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/adotdong29/CoordPy"
+Documentation = "https://github.com/adotdong29/CoordPy#readme"
+Source = "https://github.com/adotdong29/CoordPy"
+Repository = "https://github.com/adotdong29/CoordPy.git"
+Issues = "https://github.com/adotdong29/CoordPy/issues"
+Changelog = "https://github.com/adotdong29/CoordPy/blob/main/CHANGELOG.md"
 
 [project.scripts]
 # CoordPy SDK surface — stable, contract-tested entry points.

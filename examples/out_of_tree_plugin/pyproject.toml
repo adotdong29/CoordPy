@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
-    { name = "Context Zero Contributors" },
+    { name = "CoordPy Contributors" },
 ]
 # Intentionally no hard dependency on `coordpy`: this package only needs
 # `coordpy` at runtime, and pinning it here would make the exemplar

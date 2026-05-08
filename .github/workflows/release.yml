@@ -7,7 +7,7 @@ name: Publish to PyPI
 # Pending publisher to register on PyPI before the first run:
 #   Project name      : coordpy-ai
 #   Owner             : adotdong29
-#   Repository        : context-zero
+#   Repository        : CoordPy
 #   Workflow filename : release.yml
 #   Environment       : pypi
 #

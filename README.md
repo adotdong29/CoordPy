@@ -1,4 +1,9 @@
-# coordpy
+# CoordPy
+
+[![PyPI](https://img.shields.io/pypi/v/coordpy-ai.svg)](https://pypi.org/project/coordpy-ai/)
+[![Python](https://img.shields.io/pypi/pyversions/coordpy-ai.svg)](https://pypi.org/project/coordpy-ai/)
+[![Downloads](https://static.pepy.tech/badge/coordpy-ai/month)](https://pepy.tech/project/coordpy-ai)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Python SDK and CLI for coordinating teams of LLM agents with
 content-addressed, lifecycle-bounded context objects ("capsules"),

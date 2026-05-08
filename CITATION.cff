@@ -1,11 +1,11 @@
 cff-version: 1.2.0
-title: "coordpy: Coordinating LLM agent teams with content-addressed context"
-message: "If you use coordpy in research, please cite it using this metadata."
+title: "CoordPy: Coordinating LLM agent teams with content-addressed context"
+message: "If you use CoordPy in research, please cite it using this metadata."
 type: software
 authors:
-  - name: "Context Zero Contributors"
-repository-code: "https://github.com/adotdong29/context-zero"
-url: "https://github.com/adotdong29/context-zero"
+  - name: "CoordPy Contributors"
+repository-code: "https://github.com/adotdong29/CoordPy"
+url: "https://github.com/adotdong29/CoordPy"
 abstract: >
   coordpy models cross-agent context as typed, content-addressed
   objects with byte budgets, declared parents, and a fixed

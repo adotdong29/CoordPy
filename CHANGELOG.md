@@ -3,6 +3,23 @@
 Release history for the coordpy SDK. For installation and usage,
 see [`README.md`](README.md).
 
+## [Unreleased]
+
+- Renamed the GitHub repository to `CoordPy`. All `project.urls`,
+  `CITATION.cff`, `SECURITY.md` advisory link, the `CONTRIBUTING.md`
+  clone snippet, and the Trusted-Publisher field documented in
+  `RELEASING.md` / `.github/workflows/release.yml` now point at
+  `github.com/adotdong29/CoordPy`. Old URLs auto-redirect; no
+  contract change.
+- README gained PyPI version, Python-version, monthly-downloads, and
+  license badges, and the project header now reads `# CoordPy`.
+- Author / copyright string changed from "Context Zero Contributors"
+  to "CoordPy Contributors" in `pyproject.toml`, `LICENSE`, and the
+  out-of-tree-plugin example.
+- Four new PyPI keywords for search discoverability:
+  `agent-orchestration`, `context-engineering`, `capsule`,
+  `reproducibility`.
+
 ## [0.5.19] CLI help text, RunSpec validation, capsule-CLI prose, sink lookup
 
 Seventeen rounds of hostile build-tests against the 0.5.18 release
