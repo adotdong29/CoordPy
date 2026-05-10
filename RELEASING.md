@@ -77,7 +77,7 @@ pending publisher** and fill in:
 ```
 PyPI Project Name : coordpy-ai
 Owner             : adotdong29
-Repository        : context-zero
+Repository        : CoordPy
 Workflow filename : release.yml
 Environment       : pypi
 ```
