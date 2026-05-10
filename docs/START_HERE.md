@@ -20,7 +20,7 @@ CoordPy gives you a stable runtime contract for AI agent teamwork:
   report and its artifacts from disk.
 
 This repo also includes the full experimental research ladder under
-`vision_mvp.coordpy.__experimental__`, but the released product
+`coordpy.__experimental__`, but the released product
 surface is the stable SDK and CLI.
 
 ## Who it is for
@@ -39,29 +39,24 @@ results links in [Where to read next](#where-to-read-next).
 
 ## Install
 
-CoordPy is not on PyPI yet. Today, the exact install path is from a
-clone:
+CoordPy is on PyPI as
+[`coordpy-ai`](https://pypi.org/project/coordpy-ai/) and imports as
+`coordpy`. Requires Python 3.10 or newer.
 
 ```bash
-git clone https://github.com/adotdong29/context-zero.git
-cd context-zero
-pip install -e .
-```
-
-Once published to PyPI, the intended public install paths are:
-
-```bash
-pip install coordpy
-pipx install coordpy
+pip install coordpy-ai
+# or, isolated:
+pipx install coordpy-ai
 ```
 
 The CLI commands installed by the package are:
 
 ```bash
-coordpy
-coordpy-import
-coordpy-ci
-coordpy-capsule
+coordpy-team    # run / replay / sweep / compare an AgentTeam preset
+coordpy-capsule # view / verify / verify-view / audit a sealed chain
+coordpy         # run a research profile end to end
+coordpy-import  # audit a SWE-bench-Lite-style JSONL
+coordpy-ci      # apply the CI pass/fail gate to a finished report
 ```
 
 Only required dependency is NumPy. Optional extras are available for
@@ -71,35 +66,27 @@ heavier local setups: `coordpy[scientific]`, `coordpy[dl]`,
 
 ## Minimal quickstart
 
-Run the local smoke profile:
+The recommended front door is the `coordpy-team` CLI driving a
+curated preset against a configured backend:
 
 ```bash
-coordpy --profile local_smoke --out-dir /tmp/coordpy-smoke
-coordpy-capsule verify --report /tmp/coordpy-smoke/product_report.json
+export COORDPY_BACKEND=ollama
+export COORDPY_MODEL=qwen2.5:14b
+export COORDPY_OLLAMA_URL=http://localhost:11434
+
+coordpy-team run \
+    --preset quant_desk \
+    --task examples/scenario_bullish.txt \
+    --out-dir /tmp/desk-run
+
+coordpy-capsule verify-view \
+    --view /tmp/desk-run/team_capsule_view.json
 ```
 
-Minimal Python path:
+Equivalent Python path:
 
 ```python
-from vision_mvp.coordpy import RunSpec, run
-
-report = run(RunSpec(profile="local_smoke", out_dir="/tmp/coordpy-smoke"))
-assert report["readiness"]["ready"]
-print(report["summary_text"])
-```
-
-If you want the real-LLM demo path with a local Ollama endpoint:
-
-```bash
-COORDPY_OLLAMA_URL=http://localhost:11434 \
-  coordpy --profile local_smoke --acknowledge-heavy --out-dir /tmp/coordpy-smoke
-```
-
-If you want the simplest stable agent-team API instead of `RunSpec`,
-use the lightweight team surface:
-
-```python
-from vision_mvp.coordpy import AgentTeam, agent
+from coordpy import AgentTeam, agent
 
 team = AgentTeam.from_env(
     [
@@ -112,6 +99,17 @@ team = AgentTeam.from_env(
 )
 result = team.run("Explain what CoordPy does.")
 print(result.final_output)
+```
+
+The structured-research path through the original `RunSpec` /
+`RunReport` contract is still available and stable:
+
+```python
+from coordpy import RunSpec, run
+
+report = run(RunSpec(profile="local_smoke", out_dir="/tmp/coordpy-smoke"))
+assert report["readiness"]["ready"]
+print(report["summary_text"])
 ```
 
 Common environment variables:
@@ -134,19 +132,22 @@ export COORDPY_API_KEY=...
 
 **Stable and released in SDK v3.43**
 
-* `vision_mvp.coordpy` SDK surface: `RunSpec`, `run`, `RunReport`,
-  `SweepSpec`, `run_sweep`, `CoordPyConfig`, `Agent`, `AgentTeam`,
-  `agent`, `create_team`, `profiles`, `ci_gate`, `import_data`,
+* `coordpy` SDK surface: `RunSpec`, `run`, `RunReport`,
+  `SweepSpec`, `run_sweep`, `CoordPyConfig`, `Agent`, `AgentTurn`,
+  `ActionDecision`, `AgentTeam`, `TeamResult`, `agent`,
+  `create_team`, `replay_team_result`, `presets`,
+  `TEAM_RESULT_SCHEMA`, `profiles`, `ci_gate`, `import_data`,
   `extensions`, capsule primitives, schema constants,
   `OpenAICompatibleBackend`, `backend_from_env`
-* CLI surface: `coordpy`, `coordpy-import`, `coordpy-ci`,
-  `coordpy-capsule`
+* CLI surface: `coordpy-team`, `coordpy-capsule`, `coordpy`,
+  `coordpy-import`, `coordpy-ci`
 * On-disk schemas: `coordpy.capsule_view.v1`,
-  `coordpy.provenance.v1`, `phase45.product_report.v2`
+  `coordpy.team_result.v1`, `coordpy.provenance.v1`,
+  `phase45.product_report.v2`
 
 **Experimental but included**
 
-* `vision_mvp.coordpy.__experimental__`
+* `coordpy.__experimental__`
 * W22..W42 trust/adjudication and multi-agent coordination ladder
 * R-69..R-89 benchmark drivers
 * bounded live cross-host probes
@@ -166,17 +167,14 @@ If you want to use CoordPy:
 
 * [`README.md`](../README.md) — product landing page, install, CLI,
   stable surface
-* [`examples/06_agent_team_api.py`](../examples/06_agent_team_api.py) —
-  simplest stable provider-backed agent-team example
-* [`examples/04_local_llm.py`](../examples/04_local_llm.py) — smallest
-  local-LLM multi-agent example
-* [`examples/05_real_code_review.py`](../examples/05_real_code_review.py) —
-  richer end-to-end team workflow example
-* [`examples/`](../examples/) — all short runnable examples, including
-  the older substrate demos
-* [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md) — direct
-  capsule-level team coordination model for the experimental surface
-* [`ARCHITECTURE.md`](../ARCHITECTURE.md) — architectural overview
+* [`examples/01_quickstart.py`](../examples/01_quickstart.py) —
+  smallest stable provider-backed agent-team example
+* [`examples/02_quant_desk.py`](../examples/02_quant_desk.py) —
+  curated four-role quant-desk preset against a real backend
+* [`examples/03_replay_and_audit.py`](../examples/03_replay_and_audit.py) —
+  dump a sealed manifest, replay it on a fresh backend, re-hash
+  the new chain
+* [`examples/`](../examples/) — full ladder + bundled scenario file
 
 If you want to understand the released result:
 

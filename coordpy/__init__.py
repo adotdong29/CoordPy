@@ -139,8 +139,14 @@ from .api_layers import (
 # "create a few agents and run them" path; it stays above the
 # research-grade team ladder while still sealing a capsule trail.
 from .agents import (
-    Agent, AgentTurn, TeamResult, AgentTeam, agent, create_team,
+    Agent, AgentTurn, ActionDecision, TeamResult, AgentTeam,
+    ProgressCallback, ShouldContinue, TEAM_RESULT_SCHEMA,
+    agent, create_team, replay_team_result,
 )
+# Curated agent-team presets — quant_desk_team, code_review_team,
+# research_writer_team. Imported as a submodule so callers can
+# discover all presets via ``dir(coordpy.presets)``.
+from . import presets as presets
 
 # Synthetic LLM client for tests / examples / hermetic CI.
 from .synthetic_llm import SyntheticLLMClient, make_synthetic_response_fn
@@ -1020,8 +1026,9 @@ _STABLE_PUBLIC: tuple[str, ...] = (
     "CoordPySimpleAPI", "CoordPyBuilderAPI", "CoordPyAdvancedAPI",
     "BuilderSpec",
     # Agent team surface
-    "Agent", "AgentTurn", "TeamResult", "AgentTeam",
-    "agent", "create_team",
+    "Agent", "AgentTurn", "ActionDecision", "TeamResult", "AgentTeam",
+    "ProgressCallback", "ShouldContinue", "TEAM_RESULT_SCHEMA",
+    "agent", "create_team", "replay_team_result", "presets",
     # LLM backends
     "LLMBackend", "OllamaBackend", "OpenAICompatibleBackend",
     "MLXDistributedBackend", "make_backend", "backend_from_env",
@@ -1631,8 +1638,9 @@ __all__ = [
     # Layered API (end-user / developer / researcher ergonomics)
     "CoordPySimpleAPI", "CoordPyBuilderAPI", "CoordPyAdvancedAPI", "BuilderSpec",
     # Stable lightweight agent/team surface
-    "Agent", "AgentTurn", "TeamResult", "AgentTeam", "agent",
-    "create_team",
+    "Agent", "AgentTurn", "ActionDecision", "TeamResult", "AgentTeam",
+    "ProgressCallback", "ShouldContinue", "TEAM_RESULT_SCHEMA",
+    "agent", "create_team", "replay_team_result", "presets",
     # Config
     "CoordPyConfig",
     # Provenance

@@ -194,6 +194,9 @@ def capsule_team_handoff(*,
                             parents: Iterable[str] = (),
                             n_tokens: int | None = None,
                             budget: "CapsuleBudget | None" = None,
+                            prompt_sha256: str | None = None,
+                            prompt_bytes: int | None = None,
+                            model_tag: str | None = None,
                             ) -> ContextCapsule:
     """Build a ``TEAM_HANDOFF`` capsule directly (no substrate twin).
 
@@ -207,6 +210,16 @@ def capsule_team_handoff(*,
     Pass ``budget=CapsuleBudget(...)`` to override the default
     (4096 tokens / 64 KiB) — useful for tight benchmarks or
     for very large agent turns.
+
+    Optional witness fields ``prompt_sha256`` / ``prompt_bytes`` /
+    ``model_tag`` make the handoff a structured witness of the LLM
+    call that produced it: an auditor can prove "the agent saw
+    exactly THIS prompt and produced exactly THIS handoff" without
+    sealing a separate PROMPT capsule. The lightweight
+    :class:`coordpy.AgentTeam` runtime sets all three on every
+    handoff it seals, so a sealed ``team_capsule_view.json``
+    is sufficient to verify byte-faithful replay against a new
+    backend.
     """
     sha = _payload_sha256(payload)
     n_tok = n_tokens
@@ -221,19 +234,28 @@ def capsule_team_handoff(*,
         "payload_sha256": sha,
         "n_tokens": int(n_tok),
     }
+    metadata: dict[str, Any] = {
+        "source_role": str(source_role),
+        "to_role": str(to_role),
+        "claim_kind": str(claim_kind),
+        "round": int(round),
+        "payload_sha256": sha,
+    }
+    if prompt_sha256 is not None:
+        body["prompt_sha256"] = str(prompt_sha256)
+        metadata["prompt_sha256"] = str(prompt_sha256)
+    if prompt_bytes is not None:
+        body["prompt_bytes"] = int(prompt_bytes)
+    if model_tag is not None:
+        body["model_tag"] = str(model_tag)
+        metadata["model_tag"] = str(model_tag)
     return ContextCapsule.new(
         kind=CapsuleKind.TEAM_HANDOFF,
         payload=body,
         parents=parents,
         budget=budget,
         n_tokens=int(n_tok),
-        metadata={
-            "source_role": str(source_role),
-            "to_role": str(to_role),
-            "claim_kind": str(claim_kind),
-            "round": int(round),
-            "payload_sha256": sha,
-        },
+        metadata=metadata,
     )
 
 

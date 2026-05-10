@@ -1,0 +1,16 @@
+Date: 2026-05-03 (Friday close).
+Universe: US large-cap equities; focus on AAPL, NVDA, MSFT.
+Market context:
+  - SPX +0.4% on the week, breadth narrow (top-10 names = 62% of return).
+  - 10y yield 4.31%, +6 bp on the week; VIX 14.2.
+  - NVDA: beat consensus on data-center revenue, guidance modestly raised.
+  - AAPL: services strong, hardware unit growth flat; supply chain stable.
+  - MSFT: Azure growth re-accelerating, capex guidance up.
+News tape (last 24h):
+  - Fed minutes: dot plot unchanged; one fewer cut priced for 2026 H2.
+  - Treasury auction: 7y solid bid-to-cover, no concession.
+  - Geopolitics: Taiwan Strait quiet; Red Sea shipping incidents flat WoW.
+Risk constraints:
+  - Single-name max position 4% of NAV.
+  - Sector concentration cap: tech at most 30% gross exposure.
+  - No new positions in names with earnings inside 5 trading days.

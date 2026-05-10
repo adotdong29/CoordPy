@@ -1,10 +1,14 @@
 """CoordPy console entry points.
 
-Three scripts, wired into ``pyproject.toml`` ``[project.scripts]``:
+Five scripts, wired into ``pyproject.toml`` ``[project.scripts]``:
 
-    coordpy        — run a profile, emit a provenance-stamped report
-    coordpy-import — audit a public JSONL for SWE-bench-Lite compatibility
-    coordpy-ci     — consume product_report.json, emit pass/fail verdict
+    coordpy-team    — run / replay / sweep / compare an AgentTeam preset
+                      (the recommended front-door CLI for new users)
+    coordpy-capsule — view / verify / verify-view / audit a sealed
+                      capsule chain (works on both team and RunSpec runs)
+    coordpy         — run a profile, emit a provenance-stamped report
+    coordpy-import  — audit a public JSONL for SWE-bench-Lite compatibility
+    coordpy-ci      — consume product_report.json, emit pass/fail verdict
 
 These are thin wrappers over the already-stable product modules.
 They intentionally do *not* expose experimental knobs.
@@ -406,6 +410,464 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
     return 0
 
 
+def _cmd_team(argv: list[str] | None = None) -> int:
+    """``coordpy-team`` — run / replay / sweep / compare an
+    :class:`AgentTeam` from the CLI.
+
+    Subcommands:
+      run     — drive a curated preset (e.g. ``quant_desk``) over a
+                scenario file or stdin, dump a re-verifiable bundle.
+      replay  — re-run a sealed ``team_result.json`` against a new
+                backend/model. Validates per-turn prompt SHAs.
+      sweep   — run the same task at multiple
+                ``--max-visible-handoffs`` settings; surfaces the
+                bounded-context savings as a real-numbers table.
+      compare — run the task on backend A, replay against backend B,
+                report side-by-side telemetry and ACTION agreement.
+    """
+    from .agents import replay_team_result
+    from .llm_backend import backend_from_env
+    from . import presets as _presets_mod
+    from . import _pretty as _pp
+
+    ap = argparse.ArgumentParser(
+        prog="coordpy-team",
+        description=(
+            "Run, replay, sweep, or compare a CoordPy AgentTeam "
+            "from the CLI. The lightweight team surface is the "
+            "easiest path for external builders; this CLI removes "
+            "the need to write Python to drive it."
+        ),
+    )
+    sub = ap.add_subparsers(dest="sub")
+
+    def _add_backend_args(p, *, suffix: str = "") -> None:
+        p.add_argument(
+            f"--backend{suffix}", default=None,
+            choices=["ollama", "openai", "openai_compatible",
+                     "provider", "mlx_distributed"],
+            help=f"override COORDPY_BACKEND{suffix}.")
+        p.add_argument(f"--model{suffix}", default=None,
+                        help=f"override COORDPY_MODEL{suffix}.")
+        p.add_argument(f"--base-url{suffix}", default=None,
+                        help=f"override the backend base URL{suffix}.")
+        p.add_argument(
+            f"--api-key-env{suffix}", default=None,
+            help=("env var holding the API key (avoids leaking the "
+                  "key into argv); falls back to COORDPY_API_KEY."))
+
+    p_run = sub.add_parser(
+        "run",
+        help=(
+            "drive an AgentTeam preset over a task. Use "
+            "--task PATH (file) or --task - (stdin)."
+        ),
+    )
+    p_run.add_argument(
+        "--preset", default="quant_desk",
+        choices=["quant_desk", "code_review", "research_writer"],
+        help="curated preset to run (default: quant_desk).")
+    p_run.add_argument(
+        "--task", required=True,
+        help="path to a task/scenario .txt; pass '-' to read stdin.")
+    p_run.add_argument(
+        "--out-dir", required=True,
+        help=("output dir for final_output.txt + team_capsule_view.json "
+              "+ team_result.json + team_report.md."))
+    _add_backend_args(p_run)
+    p_run.add_argument("--max-visible-handoffs", type=int, default=2)
+    p_run.add_argument("--max-tokens", type=int, default=360)
+    p_run.add_argument("--temperature", type=float, default=0.0)
+    p_run.add_argument(
+        "--quiet", action="store_true",
+        help="skip the per-turn live progress display.")
+
+    p_replay = sub.add_parser(
+        "replay",
+        help=(
+            "re-run a sealed team_result.json against a new backend/"
+            "model. Records new TEAM_HANDOFF capsules."
+        ),
+    )
+    p_replay.add_argument(
+        "--result", required=True,
+        help="path to team_result.json (coordpy.team_result.v1).")
+    p_replay.add_argument(
+        "--out-dir", required=True,
+        help="output dir for the replay's bundle.")
+    _add_backend_args(p_replay)
+    p_replay.add_argument(
+        "--quiet", action="store_true",
+        help="skip the per-turn live progress display.")
+
+    p_sweep = sub.add_parser(
+        "sweep",
+        help=(
+            "run the same task at multiple max_visible_handoffs "
+            "settings and report the bounded-context savings."
+        ),
+    )
+    p_sweep.add_argument(
+        "--preset", default="quant_desk",
+        choices=["quant_desk", "code_review", "research_writer"])
+    p_sweep.add_argument("--task", required=True)
+    p_sweep.add_argument(
+        "--out-dir", required=True,
+        help="output dir; one subdir per sweep config.")
+    p_sweep.add_argument(
+        "--handoffs", default="1,2,8",
+        help="comma-separated max_visible_handoffs values "
+             "(default: 1,2,8).")
+    _add_backend_args(p_sweep)
+    p_sweep.add_argument("--max-tokens", type=int, default=360)
+    p_sweep.add_argument("--temperature", type=float, default=0.0)
+    p_sweep.add_argument(
+        "--quiet", action="store_true",
+        help="skip the per-turn live progress display.")
+
+    p_compare = sub.add_parser(
+        "compare",
+        help=(
+            "run on backend A then replay against backend B; report "
+            "side-by-side telemetry and ACTION agreement."
+        ),
+    )
+    p_compare.add_argument(
+        "--preset", default="quant_desk",
+        choices=["quant_desk", "code_review", "research_writer"])
+    p_compare.add_argument("--task", required=True)
+    p_compare.add_argument(
+        "--out-dir", required=True,
+        help="output dir; will write subdirs original/ and replay/.")
+    _add_backend_args(p_compare)
+    p_compare.add_argument(
+        "--replay-backend", default=None,
+        choices=["ollama", "openai", "openai_compatible",
+                 "provider", "mlx_distributed"],
+        help="replay-side backend.")
+    p_compare.add_argument("--replay-model", default=None)
+    p_compare.add_argument("--replay-base-url", default=None)
+    p_compare.add_argument("--replay-api-key-env", default=None)
+    p_compare.add_argument("--max-visible-handoffs", type=int, default=2)
+    p_compare.add_argument("--max-tokens", type=int, default=360)
+    p_compare.add_argument("--temperature", type=float, default=0.0)
+    p_compare.add_argument(
+        "--quiet", action="store_true",
+        help="skip the per-turn live progress display.")
+
+    args = ap.parse_args(argv)
+    if args.sub is None:
+        ap.print_help()
+        return 1
+
+    def _resolve_api_key(env_name: str | None) -> str | None:
+        return os.environ.get(env_name) if env_name else None
+
+    def _live(turn) -> None:
+        cid = (turn.capsule_cid or "")[:12] or "-"
+        head = (turn.output or "").strip().splitlines()[0] if turn.output else ""
+        head = head[:96] + ("…" if len(head) > 96 else "")
+        print(
+            "  "
+            f"{_pp.style(turn.role.ljust(22), 'cyan')} "
+            f"capsule={_pp.style(cid, 'dim')}  "
+            f"in={turn.prompt_tokens:>5d}  out={turn.output_tokens:>5d}  "
+            f"wall={turn.wall_ms/1000:6.2f}s  vis={turn.visible_handoffs}",
+            flush=True,
+        )
+        if head:
+            print(f"  {_pp.style('↳', 'dim')} {head}", flush=True)
+
+    def _print_team_summary(result, *, paths=None, label: str = "RUN") -> None:
+        print()
+        print(_pp.header(label + " — final output"))
+        print((result.final_output or "").strip())
+        print()
+        action = result.parse_action()
+        cramming = result.cramming_estimate()
+        items = [
+            ("backend", f"{result.backend_model} @ "
+                        f"{result.backend_base_url or '(default)'}"),
+            ("turns", len(result.turns)),
+            ("total_tokens", f"{result.total_tokens}  "
+                              f"(in={result.total_prompt_tokens}, "
+                              f"out={result.total_output_tokens})"),
+            ("total_wall", f"{result.total_wall_ms / 1000.0:.2f} s"),
+            ("capsule_root", result.root_cid or "-"),
+        ]
+        if action is not None:
+            verdict_color = "green" if action.action == "EXECUTE" else (
+                "yellow" if action.action == "EXECUTE-WITH-MODS"
+                else ("red" if action.action == "NO-ACTION" else "cyan"))
+            items.append(
+                ("parsed_action",
+                 _pp.style(action.action, "bold", verdict_color)))
+        items.extend([
+            ("bounded_words", cramming["bounded_words"]),
+            ("naive_words", cramming["naive_words"]),
+            ("savings", _pp.style(
+                f"{cramming['saved_words']} words "
+                f"({cramming['savings_pct']:.1f}%)  "
+                f"~{cramming['estimated_tokens_saved']} tokens",
+                "bold", "green",
+            )),
+        ])
+        print(_pp.header(label + " — telemetry"))
+        print(_pp.kv(items))
+        if paths:
+            print()
+            print(_pp.header(label + " — artefacts"))
+            for label2, p in paths.items():
+                print(f"  {_pp.style(label2.ljust(14), 'dim')}  {p}")
+
+    progress = None if getattr(args, "quiet", False) else _live
+
+    preset_factory = {
+        "quant_desk": _presets_mod.quant_desk_team,
+        "code_review": _presets_mod.code_review_team,
+        "research_writer": _presets_mod.research_writer_team,
+    }
+
+    if args.sub == "run":
+        api_key = _resolve_api_key(getattr(args, "api_key_env", None))
+        task = (sys.stdin.read() if args.task == "-"
+                else open(args.task, "r", encoding="utf-8").read())
+        team = preset_factory[args.preset](
+            model=args.model,
+            backend_name=args.backend,
+            base_url=args.base_url,
+            api_key=api_key,
+            temperature=args.temperature,
+            max_tokens=args.max_tokens,
+            max_visible_handoffs=args.max_visible_handoffs,
+        )
+        backend = team.backend
+        print(_pp.header(
+            f"coordpy-team run — preset={args.preset}, "
+            f"max_visible_handoffs={args.max_visible_handoffs}"))
+        print(_pp.kv([
+            ("backend", f"{type(backend).__name__}"),
+            ("model", getattr(backend, "model", "")),
+            ("base_url", getattr(backend, "base_url", None) or "(default)"),
+            ("temperature", args.temperature),
+            ("max_tokens", args.max_tokens),
+        ]))
+        print()
+        print(_pp.header("RUN — live turns"))
+        result = team.run(task, progress=progress)
+        paths = result.dump(args.out_dir)
+        _print_team_summary(result, paths=paths, label="RUN")
+        return 0
+
+    if args.sub == "replay":
+        api_key = _resolve_api_key(getattr(args, "api_key_env", None))
+        backend = backend_from_env(
+            args.backend, model=args.model,
+            base_url=args.base_url, api_key=api_key)
+        print(_pp.header(
+            f"coordpy-team replay — model={getattr(backend, 'model', '')}"))
+        print(_pp.kv([
+            ("source_manifest", args.result),
+            ("replay_backend", type(backend).__name__),
+            ("replay_model", getattr(backend, "model", "")),
+            ("replay_base_url",
+             getattr(backend, "base_url", None) or "(default)"),
+        ]))
+        print()
+        print(_pp.header("REPLAY — live turns"))
+        result = replay_team_result(
+            args.result, backend=backend, progress=progress)
+        paths = result.dump(args.out_dir)
+        _print_team_summary(result, paths=paths, label="REPLAY")
+        return 0
+
+    if args.sub == "sweep":
+        api_key = _resolve_api_key(getattr(args, "api_key_env", None))
+        task = (sys.stdin.read() if args.task == "-"
+                else open(args.task, "r", encoding="utf-8").read())
+        try:
+            handoff_settings = [
+                int(x.strip()) for x in args.handoffs.split(",") if x.strip()
+            ]
+        except ValueError:
+            print("error: --handoffs must be comma-separated ints",
+                  file=sys.stderr)
+            return 2
+        if not handoff_settings:
+            print("error: --handoffs is empty", file=sys.stderr)
+            return 2
+        out_root = os.path.abspath(args.out_dir)
+        os.makedirs(out_root, exist_ok=True)
+        rows: list[list[object]] = []
+        for h in handoff_settings:
+            print()
+            print(_pp.header(
+                f"sweep config: max_visible_handoffs={h}"))
+            team = preset_factory[args.preset](
+                model=args.model,
+                backend_name=args.backend,
+                base_url=args.base_url,
+                api_key=api_key,
+                temperature=args.temperature,
+                max_tokens=args.max_tokens,
+                max_visible_handoffs=h,
+            )
+            print(_pp.kv([
+                ("model", getattr(team.backend, "model", "")),
+                ("base_url",
+                 getattr(team.backend, "base_url", None) or "(default)"),
+            ]))
+            print()
+            print(_pp.header(f"sweep h={h} — live turns"))
+            result = team.run(task, progress=progress)
+            sub_dir = os.path.join(out_root, f"h{h}")
+            paths = result.dump(sub_dir)
+            action = result.parse_action()
+            cramming = result.cramming_estimate()
+            rows.append([
+                f"h={h}",
+                result.total_prompt_tokens,
+                result.total_output_tokens,
+                result.total_tokens,
+                f"{result.total_wall_ms / 1000.0:.1f} s",
+                cramming["bounded_words"],
+                cramming["naive_words"],
+                f"{cramming['savings_pct']:.1f}%",
+                action.action if action else "-",
+            ])
+            print()
+            print(_pp.kv([
+                ("config_dir", sub_dir),
+                ("savings",
+                 _pp.style(
+                    f"{cramming['saved_words']} words "
+                    f"({cramming['savings_pct']:.1f}%)",
+                    "bold", "green")),
+                ("parsed_action",
+                 action.action if action else "-"),
+            ]))
+        print()
+        print(_pp.header("sweep — comparison"))
+        print(_pp.table(
+            ["config", "in_tok", "out_tok", "tok_total",
+             "wall", "bounded_w", "naive_w", "saved_pct", "action"],
+            rows,
+            align=["l", "r", "r", "r", "r", "r", "r", "r", "l"],
+        ))
+        return 0
+
+    if args.sub == "compare":
+        api_key = _resolve_api_key(getattr(args, "api_key_env", None))
+        replay_api_key = _resolve_api_key(
+            getattr(args, "replay_api_key_env", None))
+        task = (sys.stdin.read() if args.task == "-"
+                else open(args.task, "r", encoding="utf-8").read())
+        out_root = os.path.abspath(args.out_dir)
+        os.makedirs(out_root, exist_ok=True)
+        team = preset_factory[args.preset](
+            model=args.model,
+            backend_name=args.backend,
+            base_url=args.base_url,
+            api_key=api_key,
+            temperature=args.temperature,
+            max_tokens=args.max_tokens,
+            max_visible_handoffs=args.max_visible_handoffs,
+        )
+        print(_pp.header(
+            f"compare — original on {getattr(team.backend, 'model', '')}"))
+        print(_pp.kv([
+            ("model_A", getattr(team.backend, "model", "")),
+            ("base_url_A",
+             getattr(team.backend, "base_url", None) or "(default)"),
+            ("max_visible_handoffs", args.max_visible_handoffs),
+        ]))
+        print()
+        print(_pp.header("ORIG — live turns"))
+        result_a = team.run(task, progress=progress)
+        paths_a = result_a.dump(os.path.join(out_root, "original"))
+        action_a = result_a.parse_action()
+        print()
+        print(_pp.kv([
+            ("orig_root", result_a.root_cid),
+            ("orig_action", action_a.action if action_a else "-"),
+            ("orig_tokens", result_a.total_tokens),
+            ("orig_wall", f"{result_a.total_wall_ms / 1000.0:.1f} s"),
+        ]))
+        replay_backend = backend_from_env(
+            args.replay_backend or args.backend,
+            model=args.replay_model,
+            base_url=args.replay_base_url,
+            api_key=replay_api_key or api_key,
+        )
+        print()
+        print(_pp.header(
+            f"compare — replay on {getattr(replay_backend, 'model', '')}"))
+        print(_pp.kv([
+            ("model_B", getattr(replay_backend, "model", "")),
+            ("base_url_B",
+             getattr(replay_backend, "base_url", None) or "(default)"),
+            ("source_manifest", paths_a["team_result"]),
+        ]))
+        print()
+        print(_pp.header("REPLAY — live turns"))
+        from .agents import replay_team_result as _replay
+        result_b = _replay(
+            paths_a["team_result"], backend=replay_backend,
+            progress=progress)
+        paths_b = result_b.dump(os.path.join(out_root, "replay"))
+        action_b = result_b.parse_action()
+        prompt_match = all(
+            t1.prompt_sha256 == t2.prompt_sha256
+            for t1, t2 in zip(result_a.turns, result_b.turns)
+        )
+        action_match = (
+            action_a is not None and action_b is not None
+            and action_a.action == action_b.action
+        )
+        print()
+        print(_pp.header("compare — side-by-side"))
+        print(_pp.table(
+            ["metric", "ORIG (A)", "REPLAY (B)"],
+            [
+                ["model", result_a.backend_model,
+                 result_b.backend_model],
+                ["prompt_tokens",
+                 result_a.total_prompt_tokens,
+                 result_b.total_prompt_tokens],
+                ["output_tokens",
+                 result_a.total_output_tokens,
+                 result_b.total_output_tokens],
+                ["total_tokens",
+                 result_a.total_tokens, result_b.total_tokens],
+                ["total_wall",
+                 f"{result_a.total_wall_ms / 1000.0:.1f} s",
+                 f"{result_b.total_wall_ms / 1000.0:.1f} s"],
+                ["root_cid",
+                 (result_a.root_cid or "-")[:18] + "…",
+                 (result_b.root_cid or "-")[:18] + "…"],
+                ["parsed_action",
+                 action_a.action if action_a else "-",
+                 action_b.action if action_b else "-"],
+            ],
+            align=["l", "r", "r"],
+        ))
+        print()
+        print(_pp.kv([
+            ("prompt_sha_match (all turns)",
+             _pp.style("yes" if prompt_match else "NO",
+                       "bold", "green" if prompt_match else "red")),
+            ("action_agreement",
+             _pp.style("yes" if action_match else "NO",
+                       "bold", "green" if action_match else "yellow")),
+            ("orig_dir", os.path.join(out_root, "original")),
+            ("replay_dir", os.path.join(out_root, "replay")),
+        ]))
+        return 0
+
+    ap.print_help()
+    return 1
+
+
 def main_run() -> int:
     return _cmd_run()
 
@@ -420,6 +882,10 @@ def main_ci() -> int:
 
 def main_capsule() -> int:
     return _cmd_capsule()
+
+
+def main_team() -> int:
+    return _cmd_team()
 
 
 if __name__ == "__main__":
