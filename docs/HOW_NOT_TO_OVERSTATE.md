@@ -2581,3 +2581,71 @@ The honest summary one may emit:
   topology axis of **W33-C-MULTI-HOST** AND **W34-C-MULTI-HOST**,
   and the latent cross-agent-trust axis of
   **W33-C-LATENT-CROSS-AGENT-TRUST**."
+
+
+### "W46 implements transformer-internal memory" or "W46 closes the deep-coupling conjecture"
+
+> *"W46 implements transformer-internal time attention over the
+> model's KV cache."*
+
+Forbidden.  W46 implements a **capsule-layer, multi-layer,
+memory-conditioned controller** that operates over W43 channel
+encodings.  It does NOT read hidden states, transplant KV cache,
+inspect attention weights, or modify the model's attention
+computation.  The W43 conjectures
+(W43-C-MIXED-CURVATURE-LATENT,
+W43-C-COLLECTIVE-KV-POOLING,
+W43-C-FULL-GRASSMANNIAN-HOMOTOPY) and
+W45-C-DEEP-TRANSFORMER-COUPLING carry forward unchanged.
+
+Permitted phrasing: *"W46 is a multi-layer learned manifold
+memory controller at the capsule layer.  It fits a stack of
+closed-form ridge layers on layer-wise residuals, applies a
+rank-r role adapter, encodes channel features into a learned
+dictionary basis, performs causally-masked cosine-similarity
+time-attention over a bounded memory bank of past gate logits,
+emits a packed multi-line MANIFOLD_CTRL model-facing control
+block, and binds a deterministic shared-prefix capsule.  Every
+component is content-addressed; the W46 envelope verifier
+enumerates 21 disjoint failure modes; cumulative trust boundary
+across W22..W46 = 261 enumerated failure modes."*
+
+Forbidden phrasing: *"W46 is true deep learning"* (it is
+stage-wise closed-form ridge), *"W46 manipulates the model's
+attention"* (it does not), *"W46 pools KV cache across turns"*
+(it binds byte-identical prefix bytes, not KV state), *"W46
+implements rank-r LoRA on a transformer"* (it implements a
+rank-r perturbation of the capsule-layer policy parameters),
+*"W46 closes deep-transformer-coupling"* (the conjecture
+W45-C-DEEP-TRANSFORMER-COUPLING carries forward).
+
+The honest reading is narrower: on R-93-LONG-BRANCHING-MEMORY,
+W46 lifts deep-turns precision from 0.000 (W44 / W45) to 1.000
+(min == max across 5/5 seeds) because the multi-layer +
+causally-masked time-attention readout pools positive gate
+evidence from past turns that the single-cell W45 controller
+cannot see.  On R-93-COMPRESSED-CONTROL-PACKING the packed
+MANIFOLD_CTRL block adds approximately 9-10 structured bits
+per visible ctrl-token at L=2 / K=4 / 5 roles, with a
+structurally bounded ≤ 40-extra-tokens-per-turn overhead vs the
+W45 single-line hint.  The shared-prefix capsule emits
+byte-identical prefix bytes across consecutive turns (1 reuse
+per 4-turn run with prefix_turns=2).  We have not solved
+deep-transformer-coupling; we have empirically demonstrated
+that a closed-form multi-layer + memory + dictionary + packed-
+control + shared-prefix capsule-layer mechanism lifts six of
+the eight measurable surfaces vs the W45 single-layer
+controller.  The cap remains: under all-six-channel + forged-
+bank compromise, W46 cannot recover (downstream protect rate =
+0.000 across 5/5 seeds — the W46-L-MEMORY-COMPROMISE-CAP
+reproduces honestly).
+
+The full hidden-state-aware deep-controller direction
+(W45-C-DEEP-TRANSFORMER-COUPLING,
+W43-C-MIXED-CURVATURE-LATENT,
+W43-C-COLLECTIVE-KV-POOLING,
+W43-C-FULL-GRASSMANNIAN-HOMOTOPY, plus the deliberately
+deferred W46-C-AUTOGRAD-DEEP-STACK) remains substrate-
+blocked / deliberately-deferred and out of capsule-layer scope.
+
+Last touched: post-W45 research milestone (W46 family) 2026-05-10.

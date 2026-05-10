@@ -12220,6 +12220,162 @@ manifold capsules; **W44**: live manifold-conditioned behaviour;
 of the product-manifold / cram-singularity line at the capsule
 layer.
 
+## After v0.5.20 + W43 PMC + W44 LMCC + W45 LMC — W46 Manifold Memory Controller (research milestone, NOT a release)
+
+W46 is the post-W45 research milestone. Where W45 introduced a
+single-layer learned controller producing one fitted gating
+decision per turn from a flat per-cell feature vector, W46 adds
+seven content-addressed components on top — all closed-form-
+fittable in pure Python / stdlib:
+
+* **Multi-layer learned controller stack.** ``L`` layers
+  applied to the per-channel feature vector; each layer fits a
+  projection + softmax attention pool via stage-wise ridge on
+  the previous layer's residual. The W45 single-layer
+  controller is the ``L=1`` degenerate case. The W46 default
+  is ``L=2``.
+
+* **Manifold memory bank.** A bounded, content-addressed ring
+  buffer of past turn entries: turn index, role, role-handoff-
+  signature CID, per-channel feature vector, per-channel
+  logits, gate logit, ratify probability, decision branch,
+  dictionary index, dictionary residual L1. The bank's
+  ``head_cid`` is computed per-turn and bound under the W46
+  envelope.
+
+* **Causally-masked time-attention.** When ratifying turn
+  ``t``, the controller pools past gate logits via
+  cosine-similarity-weighted softmax over strictly admissible
+  (``turn_index < t``) memory entries. The mask is strict — a
+  turn cannot attend to itself or to the future.
+
+* **Multi-rank role adapter stack.** Generalises the W45
+  rank-1 LoRA-style adapter to rank ``r >= 1``. Per-role delta
+  carries ``r * n_channels + 1`` scalars; basis vectors are
+  signed per-channel logits + cyclic rotations.
+
+* **Learned dictionary basis.** A small ``K``-prototype
+  dictionary over flattened channel features, fitted via
+  deterministic farthest-point seeding + 1-pass mean
+  refinement. Per-turn encoding is a sparse code
+  ``(index, residual)`` with bijective decode.
+
+* **Packed ``MANIFOLD_CTRL`` control surface.** A multi-line
+  model-facing control block carrying ``route + conf + p +
+  layer_logits + mem_attn + dict_idx + mem_summary``. Strictly
+  more structured bits per visible-token than the W45
+  single-line hint at a bounded constant overhead (≤ 40
+  extra tokens per turn).
+
+* **Shared-prefix capsule.** A deterministic prefix derived
+  from the first ``prefix_turns`` prior outputs + the
+  registered policy entry. Once the team has produced
+  ``prefix_turns`` outputs, the prefix bytes are byte-identical
+  across consecutive turns; the capsule binds the
+  ``prefix_reused`` flag and the ``prior_output_shas``. Honest
+  scope: this guarantees identical *prefix bytes*, not
+  identical KV state.
+
+W46 ships at ``coordpy.manifold_memory`` and
+``coordpy.r93_benchmark``, reachable only via explicit import.
+It is **not** added to ``coordpy.__experimental__`` at this
+milestone. The released ``coordpy.__version__`` and
+``coordpy.SDK_VERSION`` are unchanged. The first-run UX is
+unaffected; the smoke driver reports "ALL CHECKS PASSED" with
+the W46 module on disk; the W43 / W44 / W45 benchmark families
+reproduce byte-for-byte.
+
+**The 8 questions, after W46:**
+
+1. **Is the product still trustworthy?** *Yes. The released
+   CoordPy 0.5.20 contract is byte-for-byte unchanged; the W46
+   surface is a sibling class (``ManifoldMemoryTeam``)
+   reachable only via explicit import.*
+2. **Did the trust boundary widen?** *Yes: +21 new disjoint
+   enumerated failure modes at the W46 verifier; cumulative
+   across W22..W46 = 261 enumerated failure modes.*
+3. **Is the capsule chain still content-addressed end-to-end?**
+   *Yes — and richer. W46 adds the
+   ``ManifoldMemoryHandoffEnvelope`` (binding TEAM_HANDOFF +
+   W45 envelope + W44 envelope + W43 envelope + multi-layer
+   controller params + memory bank head + dictionary CID +
+   five new content-addressed witnesses: time-attention,
+   multi-rank-adapter, control-token, prefix-capsule, and
+   prompt-construction).*
+4. **Did the cramming axis advance?** *Yes on the
+   structured-bits per visible-token axis: W46 preserves all
+   W43/W44/W45 structured bits AND adds per-turn dictionary
+   index, layer logits, time-attention readout, and
+   role-pattern memory summary at a bounded ≤ 40-extra-
+   tokens-per-turn constant cost. The packed ``MANIFOLD_CTRL``
+   block carries ~9–10 structured bits per visible
+   ctrl-token at L=2 / K=4 / 5 roles. The shared-prefix
+   capsule emits byte-identical prefix bytes across consecutive
+   turns once the team has produced ``prefix_turns`` outputs —
+   an honest capsule-layer surface for "shared KV state" (no
+   transformer-internal KV is touched).*
+5. **Did the geometry/learning axis advance?** *Yes
+   substantially. W46 introduces multi-layer fitted stack
+   (closed-form ridge on layer-wise residuals), causally-
+   masked time-attention over a bounded memory bank, rank-r
+   LoRA-style role adapters, a learned K-prototype dictionary
+   with bijective decode, a packed multi-token model-facing
+   control surface, and a deterministic shared-prefix
+   capsule. ``W44-C-LIVE-LATENT`` is *further bounded* at the
+   capsule layer: hyperbolic and euclidean channels now flow
+   through the multi-layer + memory + dictionary path with
+   measurable contribution. The carry-forwards
+   ``W43-C-MIXED-CURVATURE-LATENT``,
+   ``W43-C-COLLECTIVE-KV-POOLING``,
+   ``W43-C-FULL-GRASSMANNIAN-HOMOTOPY``, and
+   ``W45-C-DEEP-TRANSFORMER-COUPLING`` carry forward unchanged
+   — substrate-blocked. The new
+   ``W46-C-AUTOGRAD-DEEP-STACK`` is *deliberately deferred*
+   (stage-wise closed-form is preserved for determinism and
+   audit; an autograd path is a future milestone). Sharpened
+   limitations: ``W46-L-MEMORY-COMPROMISE-CAP`` strengthens
+   ``W45-L-LEARNED-COMPROMISE-CAP`` to all-six-channel +
+   forged-bank; ``W46-L-CONTROL-TOKEN-MODEL-INDIFFERENCE-CAP``
+   strengthens ``W45-L-PROMPT-HINT-MODEL-INDIFFERENCE-CAP`` to
+   the packed-control surface;
+   ``W46-L-SHARED-PREFIX-NOT-KV-CACHE-CAP`` is a new
+   limitation theorem explicitly bounding the shared-prefix
+   capsule to byte-identical prefix bytes (not KV state);
+   ``W46-L-RIDGE-STACK-EXTRAPOLATION-CAP`` extends the W45
+   extrapolation cap to the multi-layer stack + memory bank.*
+6. **Did release readiness truly improve?** *N/A. W46 is a
+   research milestone, not a release. The released CoordPy
+   0.5.20 line is byte-for-byte unchanged.*
+7. **Is the original thesis materially stronger or still
+   blocked by a deeper trust/semantics wall?** *MATERIALLY
+   STRONGER on the depth + memory axis; the deeper substrate
+   wall is unchanged. The W46 mechanism demonstrates that
+   capsule-layer manifold state can be fitted via a multi-
+   layer closed-form stack with content-addressed memory and
+   causally-masked time-attention while preserving full
+   replay determinism and audit. The new
+   ``W46-C-AUTOGRAD-DEEP-STACK`` conjecture explicitly names
+   a future direction (SGD / backprop-trained version of the
+   stack) and marks it deliberately deferred.*
+8. **Did anything previously claimed get retracted?** *NO new
+   retractions at W46; the W41-INFRA-1 retraction (``.101`` is
+   Apple TV) carries forward unchanged.*
+
+Named open frontier after W46: ``W43-C-MIXED-CURVATURE-LATENT``,
+``W43-C-COLLECTIVE-KV-POOLING``, ``W43-C-FULL-GRASSMANNIAN-
+HOMOTOPY`` (carry forward), ``W44-C-LIVE-LATENT`` (further
+bounded by W46 at the capsule layer; transformer-internal
+direction still open),
+``W45-C-DEEP-TRANSFORMER-COUPLING`` (carry forward), plus the
+new ``W46-C-AUTOGRAD-DEEP-STACK`` (SGD / backprop-trained
+multi-layer stack — deliberately deferred). The honest
+storyline for the programme is now: **W43**: executable
+product-manifold capsules; **W44**: live manifold-conditioned
+behaviour; **W45**: first serious learned / transformer-facing
+approximation; **W46**: deeper, multi-layer, memory-conditioned,
+transformer-facing approximation with packed model-facing
+control + shared-prefix capsule reuse.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

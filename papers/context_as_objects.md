@@ -2,7 +2,71 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W44 research-line update (W45 Learned Manifold Controller,
+> **Post-W45 research-line update (W46 Manifold Memory Controller,
+> 2026-05-10).** After W45 made the manifold-conditioned routing /
+> gating policy *shaped by data* via a single-layer fitted
+> controller, the programme opened a new research line on *deeper,
+> memory-conditioned, transformer-facing* approximation. W46 is
+> held outside the stable SDK contract — it lives at
+> `coordpy.manifold_memory` and is reachable only via explicit
+> import; the released v0.5.20 wheel's public surface is
+> byte-for-byte unchanged. The paper's main thesis (capsules as the
+> coordination primitive; bounded-context transfer instead of
+> transcript replay; replayable / auditable runs; "token cramming"
+> as the practical released frontier) is materially
+> **strengthened** on a new axis by W46: the controller becomes
+> genuinely deeper — *multi-layer* (closed-form-stacked, fitted
+> stage-wise on layer-wise residuals), *memory-conditioned*
+> (bounded ring buffer of past channel features + gate logits with
+> causally-masked time-attention), *multi-rank* (rank-r LoRA-style
+> role adapters), *dictionary-coded* (sparse code over a learned
+> K-prototype dictionary with bijective decode),
+> *packed-control-emitting* (multi-line ``MANIFOLD_CTRL`` model-
+> facing block carrying ``route + conf + p + layer_logits +
+> mem_attn + dict_idx + mem_summary``), and *shared-prefix-aware*
+> (deterministic prefix-capsule whose bytes are byte-identical
+> across consecutive turns once the team has produced
+> ``prefix_turns`` outputs). The W46 envelope binds the underlying
+> TEAM_HANDOFF capsule CID, the W45/W44/W43 envelope CIDs, the
+> multi-layer-controller parameter CID, the dictionary CID, the
+> time-attention witness CID, the multi-rank-adapter witness CID,
+> the control-token witness CID, the prefix-capsule CID, the
+> memory-bank head CID, the causal-mask witness CID, and the
+> prompt-construction witness CID under one ``memory_outer_cid``,
+> verified through 21 enumerated W46 failure modes disjoint from
+> the W22..W45 boundary (cumulative trust boundary across
+> W22..W46 = **261 named failure modes**). Headline R-93 results
+> (5 seeds × 12 cell families): long-branching-memory deep-turns
+> precision **+1.000** strict gain over W45 (min == max);
+> cyclic-consensus preservation **1.000** (W46 matches the W45
+> ceiling under the multi-layer + memory + control + prefix
+> path); role-shift adaptation rank-2 **+1.000** strict gain over
+> shared-only; control-token round-trip **1.000** with ≤ 40-token
+> overhead bound (W45 hint = 0.000); memory-facing task-correct
+> rate **+1.000** under the deterministic
+> ``MemoryAwareSyntheticBackend``; causal-mask preservation
+> **1.000** (future-inject delta = 0.0); dictionary reconstruction
+> **1.000** (avg L1 = 0.0, closest-prototype-rate = 1.0);
+> shared-prefix reuse **1.000** (1 reuse per 4-turn run);
+> replay-determinism **1.000**; the falsifier passes (no false
+> abstentions); the new ``W46-L-MEMORY-COMPROMISE-CAP`` limitation
+> reproduces honestly under all-six-channel + forged-bank attack.
+> Honest scope: W46 does NOT close any of the W43 conjectures
+> (``W43-C-MIXED-CURVATURE-LATENT``,
+> ``W43-C-COLLECTIVE-KV-POOLING``,
+> ``W43-C-FULL-GRASSMANNIAN-HOMOTOPY``); it *further bounds* (not
+> closes) ``W44-C-LIVE-LATENT`` at the capsule layer;
+> ``W45-C-DEEP-TRANSFORMER-COUPLING`` carries forward; a new
+> ``W46-C-AUTOGRAD-DEEP-STACK`` conjecture is *deliberately
+> deferred* (stage-wise closed-form is preserved for
+> determinism and audit; an autograd / backprop path is a
+> future milestone). See
+> ``docs/RESULTS_COORDPY_W46_MANIFOLD_MEMORY.md`` for the full
+> result note and
+> ``docs/SUCCESS_CRITERION_W46_MANIFOLD_MEMORY.md`` for the
+> pre-committed bar.
+>
+> **Earlier post-W44 research-line update (W45 Learned Manifold Controller,
 > 2026-05-10).** After W44 made the W43 channels live-coupled
 > through hand-designed thresholds, the programme opened a new
 > research line on *learning* the manifold-conditioned routing /

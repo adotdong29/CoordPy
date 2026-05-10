@@ -5,9 +5,200 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W44 W45
-> milestone (Learned Manifold Controller research line),
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W45 W46
+> milestone (Manifold Memory Controller research line),
 > 2026-05-10.
+
+## TL;DR — W46 Manifold Memory Controller (post-W45 research milestone)
+
+The programme now has **forty-three** coupled research axes.
+W46 mints axis 43: **manifold memory controller (MMC) +
+multi-layer fitted controller stack + causally-masked
+time-attention over a bounded memory bank + multi-rank
+LoRA-style role adapter + learned dictionary basis + packed
+multi-token `MANIFOLD_CTRL` model-facing control surface +
+deterministic shared-prefix capsule**. W46 is the first
+capsule-native CoordPy layer where the controller has
+**non-trivial depth and explicit memory**. It is **held outside
+the stable SDK contract** at this milestone (the W46 module
+ships at `coordpy.manifold_memory` and is reachable only via
+explicit import). The released v3.43 line is byte-for-byte
+unchanged; the W43 PMC, W44 LMCC, and W45 LMC surfaces are
+unchanged.
+
+The load-bearing change is from a *single-layer fitted
+controller producing one decision per turn from a flat feature
+vector* (W45) to a *multi-layer, memory-conditioned,
+content-addressed controller stack with packed model-facing
+control surface and shared-prefix capsule reuse* (W46). Seven
+content-addressed components — all closed-form-fittable in
+pure Python:
+
+1. **Multi-layer learned controller stack.** ``L`` layers fit
+   stage-wise via ridge on layer-wise residuals.
+2. **Manifold memory bank.** Bounded ring buffer of past turn
+   entries with capsule-CID provenance per entry; per-turn
+   head_cid bound under the envelope.
+3. **Causally-masked time-attention.** Cosine-similarity
+   softmax pool over strictly admissible past entries.
+4. **Multi-rank role adapter stack.** Rank-r LoRA-style basis
+   = signed per-channel logits + cyclic rotations.
+5. **Learned dictionary basis.** K-prototype clustering with
+   bijective encode/decode.
+6. **Packed model-facing control surface.** ``MANIFOLD_CTRL``
+   multi-line block carrying route + conf + p + layer_logits +
+   mem_attn + dict_idx + mem_summary.
+7. **Shared-prefix capsule.** Byte-identical prefix bytes
+   across consecutive turns once the team has produced
+   ``prefix_turns`` outputs; honest "identical prefix bytes"
+   claim (not KV state).
+
+The W46 envelope binds the underlying TEAM_HANDOFF capsule CID,
+the W45/W44/W43 envelope CIDs, the multi-layer-controller
+parameter CID, the dictionary CID, the memory-bank head CID,
+the time-attention witness CID, the multi-rank-adapter witness
+CID, the control-token witness CID, the prefix-capsule CID, the
+causal-mask witness CID, and the prompt-construction witness
+CID — all under one `memory_outer_cid`, verified through 21
+enumerated failure modes disjoint from the W22..W45 boundary
+(cumulative trust boundary across W22..W46 = **261 named
+failure modes**).
+
+**Headline W46 results (R-93 across 5 seeds × 12 families):**
+
+* **R-93-LONG-BRANCHING-MEMORY.** Deep-turns precision:
+  baseline 1.000 (no gate), W44 / W45 = 0.000 (single-cell
+  view abstains on borderline turns), W46 = **1.000** across
+  5/5 seeds (min == max). The multi-layer + memory bank's
+  time-attention readout pools positive gate evidence from
+  prior establishing turns, lifting deep turns from
+  systematically-abstain (W45) to systematically-ratify
+  (W46).
+
+* **R-93-COMPRESSED-CONTROL-PACKING.** Round-trip + bounded
+  overhead: W45 hint = 0.000; W46 packed `MANIFOLD_CTRL` =
+  **1.000** across 5/5 seeds. Max per-turn overhead = 38
+  tokens (≤ 40 bar). Approximately 9–10 structured bits per
+  visible ctrl-token at L=2 / K=4 / 5 roles.
+
+* **R-93-MEMORY-FACING-HINT-RESPONSE.** Task-correct rate on
+  the deterministic `MemoryAwareSyntheticBackend`: W45 =
+  0.000; W46 = **1.000** across 5/5 seeds.
+
+* **R-93-ROLE-SHIFT-ADAPTATION.** Multi-rank advantage: rank-2
+  W46 = 1.000 vs shared-only W46 = 0.000 across 5/5 seeds
+  (Δ = +1.000 on role3 + role2 sign-flip + axis-flip
+  regime).
+
+* **R-93-CAUSAL-MASK-PRESERVATION.** Future-inject delta =
+  0.0 across 5/5 seeds. The time-attention readout is
+  strictly mask-respecting; injecting a future memory entry
+  does not change the pooled value.
+
+* **R-93-DICTIONARY-RECONSTRUCTION.** Bijective decode:
+  avg L1 = 0.0; closest-prototype-rate = 1.0 across 5/5
+  seeds.
+
+* **R-93-SHARED-PREFIX-REUSE.** Prefix-reused-per-run = 1 (on
+  a 4-turn run with prefix_turns=2); cumulative
+  visible-tokens-saved-via-prefix-reuse = 4 per run.
+
+* **R-93-CYCLIC-CONSENSUS-MEMORY.** Preservation:
+  W45 = W46 = **1.000** across 5/5 seeds (the multi-layer +
+  memory + control + prefix path does not regress against the
+  W45 ceiling).
+
+* **R-93-W46-FALSIFIER.** No false abstentions on the clean
+  linear-flow regime: W46 = **1.000** across 5/5 seeds.
+
+* **R-93-W46-COMPROMISE-CAP.** Downstream-protect rate =
+  0.000 across 5/5 seeds — the limitation reproduces
+  honestly. The W46-L-MEMORY-COMPROMISE-CAP theorem covers
+  this regime explicitly.
+
+* **R-93-REPLAY-DETERMINISM.** Bit-perfect replay across two
+  independent runs of `ManifoldMemoryTeam.run`: 1.000 across
+  5/5 seeds (same final_output, same root_cid, same per-turn
+  `memory_outer_cid`, same per-turn `memory_bank_head_cid`,
+  same `controller_params_cid`).
+
+* **R-93-TRIVIAL-MEMORY-PASSTHROUGH.** With the trivial
+  registry, `ManifoldMemoryTeam.run` reduces to `AgentTeam.run`
+  byte-for-byte: 1.000 across all five arms (baseline / W43 /
+  W44 / W45 / W46), 5/5 seeds.
+
+**Sharpened limitations at W46:**
+
+* **W46-L-MEMORY-COMPROMISE-CAP** strengthens
+  W45-L-LEARNED-COMPROMISE-CAP: under all-six-channel +
+  forged-memory-bank attack, the multi-layer controller
+  cannot recover at the capsule layer.
+
+* **W46-L-CONTROL-TOKEN-MODEL-INDIFFERENCE-CAP** strengthens
+  W45-L-PROMPT-HINT-MODEL-INDIFFERENCE-CAP: the packed
+  `MANIFOLD_CTRL` block guarantees the model's *context*
+  contains the controller's recommendation + layer logits +
+  memory attention readout + dictionary index + memory
+  role-pattern signature; whether the model conditions on
+  them is unmeasured.
+
+* **W46-L-SHARED-PREFIX-NOT-KV-CACHE-CAP** is new: the
+  shared-prefix capsule guarantees *byte-identical prefix
+  bytes* across consecutive turns. Whether the underlying
+  transformer's KV cache reuses the encoding is a model-side
+  runtime concern outside the W46 surface.
+
+* **W46-L-RIDGE-STACK-EXTRAPOLATION-CAP** extends
+  W45-L-RIDGE-EXTRAPOLATION-CAP to the multi-layer stack +
+  memory-bank-dependent time-attention readout.
+
+**Carried-forward / new conjectures (substrate-blocked or
+deliberately deferred):**
+
+* `W43-C-MIXED-CURVATURE-LATENT`,
+  `W43-C-COLLECTIVE-KV-POOLING`,
+  `W43-C-FULL-GRASSMANNIAN-HOMOTOPY` carry forward unchanged.
+* `W44-C-LIVE-LATENT` is **further bounded** at the capsule
+  layer by W46 (hyperbolic + euclidean channels flow through
+  the multi-layer + memory + dictionary path with measurable
+  contribution); the transformer-internal direction remains
+  open.
+* `W45-C-DEEP-TRANSFORMER-COUPLING` carries forward.
+* **`W46-C-AUTOGRAD-DEEP-STACK`** is a new conjecture covering
+  the SGD / backprop-trained version of the W46 multi-layer
+  stack. The W46 milestone *deliberately defers* this
+  direction to preserve deterministic replay and audit; the
+  conjecture is structurally compatible with the current
+  envelope chain.
+
+**Validation summary:**
+
+* `tests/test_smoke_full.py` reports "ALL CHECKS PASSED" with
+  the W46 module on disk.
+* `coordpy/r90_benchmark.py`, `coordpy/r91_benchmark.py`, and
+  `coordpy/r92_benchmark.py` reproduce W43 / W44 / W45 results
+  byte-for-byte (8 + 7 + 9 = 24 families).
+* `tests/test_manifold_memory.py` — 44 tests passed.
+* `tests/test_r93_benchmark.py` — 20 tests passed (one per
+  pre-committed hypothesis + aggregator + per-seed
+  determinism).
+* Total: **224 tests passed** across the full `tests/` directory.
+
+The honest reading of the programme post-W46 is:
+
+* **W43**: executable product-manifold capsules.
+* **W44**: live manifold-conditioned behaviour.
+* **W45**: first serious learned / transformer-facing
+  approximation at the capsule layer.
+* **W46**: deeper, multi-layer, memory-conditioned,
+  transformer-facing approximation with packed model-facing
+  control + shared-prefix capsule reuse.
+
+The deep-substrate frontier (transformer-internal
+mixed-curvature attention, KV pooling, continuous
+Grassmannian homotopy, hidden-state-aware time attention)
+remains substrate-blocked. The new
+`W46-C-AUTOGRAD-DEEP-STACK` direction is deliberately deferred.
 
 ## TL;DR — W45 Learned Manifold Controller (post-W44 research milestone)
 

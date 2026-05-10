@@ -215,6 +215,36 @@ byte-for-byte unchanged. See
 [`RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md`](RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md)
 for the full result note.
 
+**Post-W45 research milestone — W46 Manifold Memory Controller**
+
+The next research step after W45 (W46) introduces the **Manifold
+Memory Controller (MMC)** layer: the first capsule-native
+CoordPy layer where the gating policy is shaped by a **bounded,
+content-addressed memory of past turns**, runs through a
+**multi-layer fitted controller stack**, applies **rank-r role
+adapters**, encodes channel features into a **learned
+dictionary basis**, emits a **packed multi-token
+`MANIFOLD_CTRL` model-facing control surface**, and reuses a
+**deterministic shared-prefix capsule** across consecutive
+turns. Seven content-addressed components — all closed-form-
+fittable in pure Python: (i) multi-layer learned controller
+stack fitted stage-wise on layer-wise residuals; (ii) bounded
+manifold memory bank with capsule-CID provenance per entry;
+(iii) causally-masked time-attention readout (cosine-similarity
+softmax over admissible past entries); (iv) rank-r LoRA-style
+role adapter stack; (v) learned K-prototype dictionary basis
+with bijective encode/decode; (vi) `MANIFOLD_CTRL` packed
+multi-line control block carrying `route + conf + p +
+layer_logits + mem_attn + dict_idx + mem_summary`; (vii)
+shared-prefix capsule derived from the first-N prior-output
+SHAs that emits byte-identical prefix bytes across turns. W46
+is held outside the stable SDK contract — it ships at
+`coordpy.manifold_memory` and is reachable only via explicit
+import; the released v0.5.20 wheel's public surface is
+byte-for-byte unchanged. See
+[`RESULTS_COORDPY_W46_MANIFOLD_MEMORY.md`](RESULTS_COORDPY_W46_MANIFOLD_MEMORY.md)
+for the full result note.
+
 ## Where to read next
 
 If you want to use CoordPy:
@@ -265,6 +295,8 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Post-W45 research milestone (W46)    | [`RESULTS_COORDPY_W46_MANIFOLD_MEMORY.md`](RESULTS_COORDPY_W46_MANIFOLD_MEMORY.md) |
+> | Pre-committed success bar (W46)      | [`SUCCESS_CRITERION_W46_MANIFOLD_MEMORY.md`](SUCCESS_CRITERION_W46_MANIFOLD_MEMORY.md) |
 > | Post-W44 research milestone (W45)    | [`RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md`](RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md) |
 > | Pre-committed success bar (W45)      | [`SUCCESS_CRITERION_W45_LEARNED_MANIFOLD.md`](SUCCESS_CRITERION_W45_LEARNED_MANIFOLD.md) |
 > | Post-W43 research milestone (W44)    | [`RESULTS_COORDPY_W44_LIVE_MANIFOLD.md`](RESULTS_COORDPY_W44_LIVE_MANIFOLD.md) |
