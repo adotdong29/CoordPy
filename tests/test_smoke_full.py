@@ -17,6 +17,7 @@ import importlib.metadata as _md
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import time
@@ -110,6 +111,18 @@ def main() -> int:  # noqa: C901 — driver script, length is fine
             check("on-disk view chain_head == embedded",
                   disk_view["chain_head"]
                   == report["capsules"]["chain_head"])
+            capsule_cli = shutil.which("coordpy-capsule")
+            if capsule_cli:
+                proc = subprocess.run(
+                    [capsule_cli, "verify", "--report", report_path],
+                    check=False,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                )
+                check("coordpy-capsule verify exits 0",
+                      proc.returncode == 0,
+                      (proc.stdout or proc.stderr).strip()[:200])
 
         section("5. build_report_ledger round-trip")
         led, root_cid = coordpy.build_report_ledger(report)

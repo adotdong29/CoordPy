@@ -196,9 +196,11 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
     finished product report.
 
     Subcommands:
-      view   — print a short capsule-graph summary (default).
-      verify — re-hash the chain in capsule_view.json and print OK / BAD.
-      cid    — print the RUN_REPORT capsule's CID for the report.
+      view        — print a short capsule-graph summary (default).
+      verify      — re-hash the chain in capsule_view.json and print OK / BAD.
+      verify-view — alias for ``verify`` when pointing directly at a
+                    bare ``capsule_view.json`` file.
+      cid         — print the RUN_REPORT capsule's CID for the report.
     """
     ap = argparse.ArgumentParser(
         prog="coordpy-capsule",
@@ -217,6 +219,10 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
     p_verify = sub.add_parser(
         "verify", help="re-hash the capsule chain and verify C5")
     p_verify.add_argument("--report", required=True)
+    p_verify_view = sub.add_parser(
+        "verify-view",
+        help="re-hash a bare capsule_view.json / team_capsule_view.json")
+    p_verify_view.add_argument("--view", required=True)
     p_cid = sub.add_parser(
         "cid", help="print the RUN_REPORT capsule CID for a report")
     p_cid.add_argument("--report", required=True)
@@ -232,14 +238,20 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
         ap.print_help()
         return 1
 
+    report_path = None
+    if args.sub == "verify-view":
+        report_path = args.view
+    else:
+        report_path = args.report
+
     try:
-        with open(args.report, "r", encoding="utf-8") as fh:
+        with open(report_path, "r", encoding="utf-8") as fh:
             report = json.load(fh)
     except FileNotFoundError:
-        print(f"error: report not found: {args.report}", file=sys.stderr)
+        print(f"error: report not found: {report_path}", file=sys.stderr)
         return 2
     except json.JSONDecodeError as e:
-        print(f"error: report is not valid JSON: {args.report}: {e}",
+        print(f"error: report is not valid JSON: {report_path}: {e}",
               file=sys.stderr)
         return 2
     # Accept either:
@@ -293,7 +305,7 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
                        f"detail={v['detail'][:140]}")
         return 0 if report_audit.verdict in ("OK", "EMPTY") else 4
 
-    if args.sub == "verify":
+    if args.sub in ("verify", "verify-view"):
         # SDK v3.2: stronger verify. Four independent on-disk
         # checks, each printed with its own verdict:
         #
@@ -318,7 +330,7 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
         from .capsule_runtime import (
             verify_artifacts_on_disk, verify_meta_manifest_on_disk,
         )
-        out_dir = os.path.dirname(os.path.abspath(args.report))
+        out_dir = os.path.dirname(os.path.abspath(report_path))
         view_path = os.path.join(out_dir, "capsule_view.json")
         embedded_head = cv.get("chain_head")
         ok_embedded = bool(cv.get("chain_ok"))
@@ -387,7 +399,7 @@ def _cmd_capsule(argv: list[str] | None = None) -> int:
 
     # view
     stats = cv.get("stats") or {}
-    print(f"=== coordpy capsule graph: {args.report} ===")
+    print(f"=== coordpy capsule graph: {report_path} ===")
     print(f"  root_cid   : {cv.get('root_cid') or '-'}")
     print(f"  chain_head : {cv.get('chain_head') or '-'}")
     print(f"  chain_ok   : {cv.get('chain_ok')}")

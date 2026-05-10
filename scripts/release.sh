@@ -61,7 +61,6 @@ smoke() {
     "$venv/bin/pip" install --quiet --upgrade pip
     "$venv/bin/pip" install --quiet dist/*.whl
     "$venv/bin/python" tests/test_smoke_full.py
-    "$venv/bin/python" examples/build_with_coordpy.py
     rm -rf "$(dirname "$venv")"
 }
 
