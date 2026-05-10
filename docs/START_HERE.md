@@ -194,6 +194,27 @@ unchanged. See
 [`RESULTS_COORDPY_W44_LIVE_MANIFOLD.md`](RESULTS_COORDPY_W44_LIVE_MANIFOLD.md)
 for the full result note.
 
+**Post-W44 research milestone — W45 Learned Manifold Controller**
+
+The next research step after W44 (W45) introduces the **Learned
+Manifold Controller (LMC)** layer: the first capsule-native
+CoordPy layer where the gating decisions themselves are *shaped
+by data*. Five learned components — all closed-form-fittable in
+pure NumPy-free Python: (i) learned channel encoder mapping each
+of the six W43 channels to a fixed-dim feature vector (now
+including the previously audit-only hyperbolic and euclidean
+channels); (ii) attention-style softmax routing over channels;
+(iii) shared-base + LoRA-style rank-1 role-specific adapter; (iv)
+margin-calibrated gate via sigmoid; (v) a content-addressed
+`MANIFOLD_HINT: route=<int> conf=<bucket> p=<prob>` prompt
+control that real (or synthetic) LLM backends can read. W45 is
+held outside the stable SDK contract — it ships at
+`coordpy.learned_manifold` and is reachable only via explicit
+import; the released v0.5.20 wheel's public surface is
+byte-for-byte unchanged. See
+[`RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md`](RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md)
+for the full result note.
+
 ## Where to read next
 
 If you want to use CoordPy:
@@ -244,6 +265,8 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Post-W44 research milestone (W45)    | [`RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md`](RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md) |
+> | Pre-committed success bar (W45)      | [`SUCCESS_CRITERION_W45_LEARNED_MANIFOLD.md`](SUCCESS_CRITERION_W45_LEARNED_MANIFOLD.md) |
 > | Post-W43 research milestone (W44)    | [`RESULTS_COORDPY_W44_LIVE_MANIFOLD.md`](RESULTS_COORDPY_W44_LIVE_MANIFOLD.md) |
 > | Pre-committed success bar (W44)      | [`SUCCESS_CRITERION_W44_LIVE_MANIFOLD.md`](SUCCESS_CRITERION_W44_LIVE_MANIFOLD.md) |
 > | Post-release research milestone (W43) | [`RESULTS_COORDPY_W43_PRODUCT_MANIFOLD.md`](RESULTS_COORDPY_W43_PRODUCT_MANIFOLD.md) |

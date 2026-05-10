@@ -5,9 +5,169 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-v3.43 W44
-> milestone (Live Manifold-Coupled Coordination research line),
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W44 W45
+> milestone (Learned Manifold Controller research line),
 > 2026-05-10.
+
+## TL;DR — W45 Learned Manifold Controller (post-W44 research milestone)
+
+The programme now has **forty-two** coupled research axes. W45
+mints axis 42: **learned manifold controller (LMC) +
+attention-style routing over W43 channels + LoRA-style
+role-specific adapter + margin-calibrated gate + model-facing
+learned prompt hint**. W45 is the first capsule-native CoordPy
+layer where the gating decisions themselves are *shaped by data*,
+not by hand-designed thresholds. It is **held outside the stable
+SDK contract** at this milestone (the W45 module ships at
+`coordpy.learned_manifold` and is reachable only via explicit
+import). The released v3.43 line is byte-for-byte unchanged; the
+W43 PMC surface (`coordpy.product_manifold`,
+`coordpy.r90_benchmark`) and the W44 LMCC surface
+(`coordpy.live_manifold`, `coordpy.r91_benchmark`) are unchanged.
+
+The load-bearing change is from *hand-designed live gates* (W44)
+to a *fitted, content-addressed learned controller* (W45). Five
+learned components — all closed-form-fittable in pure
+NumPy-free Python:
+
+1. **Learned channel encoder.** Each of the six W43 channels is
+   mapped through a fitted projection head to a fixed-dim feature
+   vector. The hyperbolic and euclidean channels — audit-only at
+   the W44 layer — become *features* the controller can consume,
+   bounding the open W44-C-LIVE-LATENT carry-forward.
+
+2. **Attention-style routing.** A softmax-weighted attention head
+   pools the six channel feature vectors into a single gate logit.
+   Weights are fit closed-form via ridge regression.
+
+3. **Adapter-decomposed role-specific policy.** Following the
+   shared-base / role-specific-delta decomposition pattern, the
+   gate policy = shared base + low-rank role-specific delta. This
+   is the strongest executable approximation of "role-specific KV
+   state" we can do without substrate access.
+
+4. **Margin-calibrated gating.** The hard W44 thresholds are
+   replaced with a learned signed margin mapped through sigmoid.
+
+5. **Factoradic-conditioned learned prompt hint.** The W44
+   factoradic compressor emitted only `FACTORADIC_ROUTE: <int>`.
+   W45 adds a content-addressed `MANIFOLD_HINT: route=<int>
+   conf=<bucket> p=<prob>` the model can read.
+
+The W45 envelope binds the underlying TEAM_HANDOFF capsule CID,
+the W44 envelope CID, the W43 envelope CID, the controller
+parameter CID, the attention-routing witness CID, the role-adapter
+witness CID, the causal-mask witness CID, the prompt-construction
+witness CID, and the hint witness CID — all under one
+`learned_outer_cid`, verified through 14+ enumerated failure
+modes disjoint from the W22..W44 boundary (cumulative trust
+boundary across W22..W45 = **240 named failure modes**).
+
+**Headline W45 results (R-92 across 5 seeds × 9 families):**
+
+* **R-92-LEARNED-CALIBRATION-GAIN.** Precision: baseline 0.733,
+  W43 0.733, W44 0.600, W45 **1.000**, Δ vs W44 = **+0.400** across
+  5/5 seeds (min == max). The hand-designed W44 threshold
+  (`spherical_agreement_min = 0.85`) fires false abstains on
+  borderline cells at cosine 0.707; the fitted learned margin
+  classifies them correctly.
+
+* **R-92-ATTENTION-SPECIALIZATION.** Attention-specialization rate:
+  baseline / W43 / W44 = 0.000; W45 = **1.000** across 5/5 seeds.
+  The trained controller's per-channel logits specialise per
+  signature: the spherical-diagnostic signature scores spherical
+  top; the subspace-diagnostic signature scores subspace top.
+
+* **R-92-ROLE-ADAPTER-RECOVERY.** Role3-precision: shared-only
+  controller 0.000, with-adapter controller **1.000**, Δ =
+  **+0.500** strict (over baseline 0.500) across 5/5 seeds. The
+  rank-1 role-specific delta inverts the gate sign for role3's
+  flipped convention.
+
+* **R-92-FACTORADIC-HINT-COMPRESSION.** Hint-round-trip rate:
+  baseline / W43 / W44 = 0.000; W45 = **1.000** across 5/5 seeds.
+  The factoradic route + confidence bucket recover byte-for-byte
+  from the audit envelope; the per-turn visible-token added cost
+  is bounded.
+
+* **R-92-MODEL-FACING-HINT-RESPONSE.** Task-correct rate under
+  `HintAwareSyntheticBackend`: baseline / W43 / W44 = 0.000; W45 =
+  **1.000** across 5/5 seeds. The hint surface adds a measurable
+  behavioural channel that hint-aware backends can read.
+
+* **R-92-W45-FALSIFIER.** No-false-abstain rate: 1.000 across 5/5
+  seeds. The W45 layer does NOT over-claim on the
+  no-geometry-needed regime.
+
+* **R-92-W45-COMPROMISE-CAP.** Downstream-protect rate: baseline /
+  W43 / W44 / W45 = **0.000** across 5/5 seeds. The
+  `W45-L-LEARNED-COMPROMISE-CAP` limitation reproduces honestly:
+  when the adversary forges all six channel observations, the
+  learned controller cannot recover at the capsule layer.
+
+* **R-92-REPLAY-DETERMINISM.** Bit-perfect replay: 1.000 across 5/5
+  seeds. Two independent runs produce byte-identical envelopes
+  and controller parameter CIDs.
+
+* **R-92-TRIVIAL-LEARNED-PASSTHROUGH.** Passthrough sanity: all
+  four arms (baseline, W43, W44, W45) achieve 1.000 across 5/5
+  seeds. The trivially-configured W45 reduces to AgentTeam
+  byte-for-byte (the **W45-L-TRIVIAL-LEARNED-PASSTHROUGH**
+  falsifier).
+
+**Stable SDK contract preserved.** The CoordPy 0.5.20 stable smoke
+driver (`tests/test_smoke_full.py`) reports "ALL CHECKS PASSED"
+with the W45 module on disk; the W45 surface is **not** exported
+under `coordpy.__experimental__` at this milestone, so the
+released wheel's public surface is byte-for-byte unchanged.
+
+**Honest scope.** W45 introduces five NEW proved-conditional
+theorems and four NEW proved-conditional limitation theorems at
+the capsule layer (`W45-T-LEARNED-COUPLING-DETERMINISM`,
+`W45-T-RIDGE-FITTER-SOUNDNESS`,
+`W45-T-ATTENTION-ROUTING-SUFFICIENCY`,
+`W45-T-LORA-STYLE-ADAPTER-SUFFICIENCY`,
+`W45-T-VERIFIER-SOUNDNESS`,
+`W45-L-TRIVIAL-LEARNED-PASSTHROUGH`,
+`W45-L-LEARNED-COMPROMISE-CAP`,
+`W45-L-PROMPT-HINT-MODEL-INDIFFERENCE-CAP`,
+`W45-L-RIDGE-EXTRAPOLATION-CAP`) and one open conjecture
+(`W45-C-DEEP-TRANSFORMER-COUPLING`). The W44-C-LIVE-LATENT
+conjecture is *bounded* (not closed) by W45: the hyperbolic and
+euclidean channels are now consumed by the executable learned
+controller, but consumption is at the capsule layer, not the
+transformer layer. The W43 conjectures
+(`W43-C-MIXED-CURVATURE-LATENT`,
+`W43-C-COLLECTIVE-KV-POOLING`,
+`W43-C-FULL-GRASSMANNIAN-HOMOTOPY`) carry forward unchanged.
+
+**Per-channel learned verdicts** (force-verdicted at the W45 layer):
+
+| Channel | Pre-W45 verdict | W45 verdict |
+|---|---|---|
+| Spherical consensus | live gate (W44) | learned-margin gate + input feature |
+| Subspace drift | live gate (W44) | learned-margin gate + input feature |
+| Causal clock | live gate (W44) | learned-margin gate + input feature |
+| Factoradic route | live compressor (W44) | learned + confidence-bucketed |
+| Hyperbolic branch | audit-only (W44) | **learned input feature** |
+| Euclidean attribute | audit-only (W44) | **learned input feature** |
+
+See:
+
+* `docs/SUCCESS_CRITERION_W45_LEARNED_MANIFOLD.md` — pre-committed
+  H1..H12 success bar.
+* `docs/RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md` — full results
+  note + architecture triage + theorem statements + per-channel
+  verdicts.
+* `coordpy/learned_manifold.py` — the W45 layer (~1700 LoC,
+  NumPy-free, closed-form ridge fitter + attention router + role
+  adapter + margin gate + hint witness).
+* `coordpy/r92_benchmark.py` — the R-92 benchmark family.
+* `tests/test_learned_manifold.py`, `tests/test_r92_benchmark.py`
+  — 51 tests, all passing. 160 tests total in `tests/`.
+
+The historical W43/W44 + v3.43 release sections are preserved
+verbatim below.
 
 ## TL;DR — W44 Live Manifold-Coupled Coordination (post-W43 research milestone)
 

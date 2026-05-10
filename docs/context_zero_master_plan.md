@@ -1,6 +1,39 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-v3.43 / W44, 2026-05-10 —
+> **Latest milestone marker (post-W44 / W45, 2026-05-10 —
+> Learned Manifold Controller, third post-release research
+> milestone).** *Closed-form-fitted, content-addressed manifold
+> controller + attention-style routing over W43 channels +
+> LoRA-style role-specific adapter + margin-calibrated gating +
+> model-facing learned prompt hint + 14-mode verifier.* W45 is the
+> first capsule-native CoordPy layer where the gating decisions
+> themselves are **shaped by data** — a real, executable, deeply-
+> learning-shaped controller that consumes all six W43 channels
+> through softmax attention, fits per-channel projections + a
+> shared bias + per-role rank-1 deltas + a margin offset via pure
+> closed-form ridge regression, and emits a model-facing
+> `MANIFOLD_HINT: route=<int> conf=<bucket> p=<prob>` prompt
+> control. The R-92 benchmark family across 5 seeds × 9 cell
+> families records: calibration-gain precision +0.400 over W44
+> (min == max), attention-specialization 1.000 (W44/W43/baseline =
+> 0.000), role3-precision +0.500 vs shared-only adapter,
+> factoradic+hint round-trip 1.000, model-facing task-correct
+> rate +1.000 under `HintAwareSyntheticBackend`,
+> replay-determinism 1.000, falsifier passes, and the new
+> `W45-L-LEARNED-COMPROMISE-CAP` limitation reproduces honestly.
+> Cumulative trust boundary across W22..W45 = **240 named failure
+> modes**. The W44-C-LIVE-LATENT conjecture is *bounded* (not
+> closed) by W45: the hyperbolic and euclidean channels — audit-
+> only at W44 — are now consumed at the learned layer as input
+> features. Released SDK contract preserved byte-for-byte; the
+> W45 module ships at `coordpy.learned_manifold` and is reachable
+> only via explicit import. See
+> `docs/RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md` and
+> `docs/SUCCESS_CRITERION_W45_LEARNED_MANIFOLD.md`; Step 42 below
+> answers the eight forced master-plan synthesis questions for
+> W45.
+
+> **Earlier milestone marker (post-v3.43 / W44, 2026-05-10 —
 > Live Manifold-Coupled Coordination, second post-release research
 > milestone).** *Live behavioural gating + factoradic compression +
 > prompt-construction witness + per-channel verdicts under real
@@ -12047,6 +12080,145 @@ HOMOTOPY`` (carry forward), plus the new ``W44-C-LIVE-LATENT``
 behavioural channels at the live layer; substrate-blocked or
 domain-specific). All four require new architectural substrate
 or domain-specific observation builders beyond the W44 mechanism.
+
+---
+
+## Step 42 — W45 Learned Manifold Controller (LMC) — third post-release research milestone
+
+W44 made the W43 channels live-coupled through hand-designed
+thresholds; W45 asks the harder question of how much of the live
+mechanism *survives being learned from data*. The W45 milestone
+does NOT bump the SDK version, does NOT modify the stable surface,
+and is held under explicit-import access at
+``coordpy.learned_manifold``. This is the first capsule-layer
+milestone in the programme where the gating decisions themselves
+are **shaped by data** rather than by hand-designed thresholds.
+
+**Mechanism.** Five learned components, all closed-form-fittable in
+pure NumPy-free Python:
+
+  1. **Learned channel encoder.** Each of the six W43 channels is
+     mapped through a fitted projection head to a fixed-dim feature
+     vector. The hyperbolic and euclidean channels — audit-only at
+     the W44 layer — become *features* the controller can consume,
+     bounding the open W44-C-LIVE-LATENT carry-forward.
+
+  2. **Attention-style routing.** A softmax-weighted attention head
+     pools the six channel feature vectors into a single scalar
+     gate logit. Weights are fitted closed-form via ridge regression.
+
+  3. **Adapter-decomposed role-specific policy.** Following the
+     shared-base / role-specific-delta decomposition pattern
+     ("LoRA-style at the capsule layer"), the gate policy = shared
+     base + low-rank role-specific delta.
+
+  4. **Margin-calibrated gating.** Hard W44 thresholds replaced
+     with a learned signed margin mapped through sigmoid.
+
+  5. **Factoradic-conditioned learned prompt hint.** Adds a
+     content-addressed ``MANIFOLD_HINT: route=<int> conf=<bucket>
+     p=<prob>`` to the prompt that real (or synthetic) LLM backends
+     can read.
+
+The W45 envelope binds the underlying TEAM_HANDOFF capsule CID,
+the W44 envelope CID, the W43 envelope CID, the controller
+parameter CID, the attention-routing witness CID, the role-adapter
+witness CID, the causal-mask witness CID, the prompt-construction
+witness CID, and the hint witness CID — all under one
+``learned_outer_cid``, verified through 14+ enumerated W45 failure
+modes disjoint from the W22..W44 boundary (cumulative trust
+boundary across W22..W45 = **240 named failure modes**).
+
+**Headline R-92 results (5 seeds × 9 cell families):**
+calibration-gain precision +0.400 strict gain over W44 (min ==
+max across 5/5 seeds), attention-specialization 1.000 (vs 0.000
+for baseline / W43 / W44 — the first benchmark in the programme
+where attention weights are *measurably* specialised per
+signature), role3-precision +0.500 vs shared-only adapter
+(min == max), factoradic + hint round-trip 1.000 across 5/5
+seeds, model-facing task-correct rate +1.000 under the
+``HintAwareSyntheticBackend`` (W44 → W45 = 0.000 → 1.000), replay-
+determinism 1.000, falsifier passes (no false abstentions), and
+the ``W45-L-LEARNED-COMPROMISE-CAP`` limitation reproduces
+honestly across 5/5 seeds. The released SDK contract is preserved
+byte-for-byte (the smoke driver reports ALL CHECKS PASSED with
+the W45 module on disk).
+
+**The 8 questions, after W45:**
+
+1. **Did the model materially advance?** *YES on the learning
+   axis: the first capsule-layer mechanism in CoordPy where the
+   gating decisions themselves are shaped by data — through
+   attention-style routing, LoRA-style role-specific deltas, and
+   margin-calibrated gating, all closed-form-fittable.*
+2. **Were new mechanisms produced?** *YES. The
+   ``LearnedManifoldOrchestrator`` (learned-margin gate) is new;
+   the ridge-fitted ``LearnedControllerParams`` is new; the
+   attention-routing witness CID is new; the role-adapter witness
+   CID is new; the causal-mask witness CID is new; the
+   model-facing ``MANIFOLD_HINT`` prompt control is new; the
+   ``LearnedManifoldHandoffEnvelope`` (binding TEAM_HANDOFF + W44
+   envelope + W43 envelope + controller params + four learned
+   witnesses + hint witness under one outer CID) is new.*
+3. **Is the cram frontier strictly improved?** *YES on the
+   model-facing transfer axis: W45 preserves the W43 +1808
+   structured bits per envelope AND the W44 visible-token
+   compression, AND adds a per-turn 2-bit confidence bucket + a
+   recoverable rounded ratify probability — additional content-
+   addressed structured bits at zero net visible-token cost. The
+   hint surface adds a measurable behavioural channel under the
+   ``HintAwareSyntheticBackend``.*
+4. **Did multi-channel evidence materially broaden?** *YES on
+   the learning axis. R-92 is the first benchmark family in the
+   programme that compares a fitted, content-addressed controller
+   against the hand-designed W44 gates with real agent execution.
+   Hyperbolic and euclidean channels — audit-only at W44 — are
+   now consumed at the W45 layer as input features, with
+   measurable per-channel logit contributions.*
+5. **Which caveats were closed vs only sharpened?** *Closed at
+   the learned layer: the hand-designed W44 thresholds are now
+   replaceable by a fitted margin. Bounded (not closed):
+   W44-C-LIVE-LATENT — the hyperbolic and euclidean channels are
+   now consumed at the capsule layer by the executable controller,
+   but transformer-internal consumption remains substrate-blocked.
+   Sharpened: ``W45-L-LEARNED-COMPROMISE-CAP`` strengthens
+   ``W44-L-LIVE-DUAL-CHANNEL-COLLUSION-CAP`` to all six channels;
+   ``W45-L-PROMPT-HINT-MODEL-INDIFFERENCE-CAP`` strengthens
+   ``W44-L-MODEL-INDIFFERENCE-CAP`` to the richer learned-hint
+   surface; ``W45-L-RIDGE-EXTRAPOLATION-CAP`` is a new
+   limitation theorem honestly bounding the controller's
+   out-of-distribution behaviour. The W43 substrate conjectures
+   carry forward unchanged.*
+6. **Did release readiness truly improve?** *N/A. W45 is a
+   research milestone, not a release. The released CoordPy 0.5.20
+   line is byte-for-byte unchanged.*
+7. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on
+   the learning axis; the deeper substrate wall is unchanged. The
+   W45 mechanism demonstrates that capsule-layer manifold state
+   can be fitted from data via closed-form ridge regression,
+   attention-style routing over channels, and LoRA-style role-
+   specific deltas while preserving full content-addressed audit.
+   The new ``W45-C-DEEP-TRANSFORMER-COUPLING`` conjecture
+   explicitly names the next direction (deep coupling to
+   transformer internals) and explicitly marks it
+   substrate-blocked.*
+8. **Did anything previously claimed get retracted?** *NO new
+   retractions at W45; the W41-INFRA-1 retraction (``.101`` is
+   Apple TV) carries forward unchanged.*
+
+Named open frontier after W45: ``W43-C-MIXED-CURVATURE-LATENT``,
+``W43-C-COLLECTIVE-KV-POOLING``, ``W43-C-FULL-GRASSMANNIAN-
+HOMOTOPY`` (carry forward), ``W44-C-LIVE-LATENT`` (bounded by W45
+at the capsule layer; transformer-internal direction still open),
+plus the new ``W45-C-DEEP-TRANSFORMER-COUPLING`` (deep, hidden-
+state-consuming, KV-adjusting controller). All five require new
+architectural substrate beyond the W45 mechanism. The honest
+storyline for the programme is now: **W43**: executable product-
+manifold capsules; **W44**: live manifold-conditioned behaviour;
+**W45**: first serious learned / transformer-facing approximation
+of the product-manifold / cram-singularity line at the capsule
+layer.
 
 ---
 

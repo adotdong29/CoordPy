@@ -2,7 +2,59 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W43 research-line update (W44 Live Manifold-Coupled
+> **Post-W44 research-line update (W45 Learned Manifold Controller,
+> 2026-05-10).** After W44 made the W43 channels live-coupled
+> through hand-designed thresholds, the programme opened a new
+> research line on *learning* the manifold-conditioned routing /
+> gating policy from cell observations. W45 is held outside the
+> stable SDK contract — it lives at `coordpy.learned_manifold` and
+> is reachable only via explicit import; the released v0.5.20
+> wheel's public surface is byte-for-byte unchanged. The paper's
+> main thesis (capsules as the coordination primitive;
+> bounded-context transfer instead of transcript replay; replayable
+> / auditable runs; "token cramming" as the practical released
+> frontier) is materially **strengthened** on a new axis by W45:
+> the gating decisions themselves become *shaped by data* via five
+> learned components, all closed-form-fittable in pure NumPy-free
+> Python — a learned channel encoder, attention-style routing over
+> the six W43 channels, a LoRA-style role-specific adapter,
+> margin-calibrated gating, and a content-addressed
+> ``MANIFOLD_HINT: route=<int> conf=<bucket> p=<prob>`` prompt
+> control. The hyperbolic and euclidean channels — audit-only at
+> the W44 layer — are now consumed at the W45 layer as input
+> features, *bounding* (not closing) the open ``W44-C-LIVE-LATENT``
+> carry-forward. The W45 envelope binds the underlying
+> TEAM_HANDOFF capsule CID, the W44 envelope CID, the W43 envelope
+> CID, the controller parameter CID, the attention-routing witness
+> CID, the role-adapter witness CID, the causal-mask witness CID,
+> the prompt-construction witness CID, and the hint witness CID
+> under one ``learned_outer_cid``, verified through 14+ enumerated
+> W45 failure modes disjoint from the W22..W44 boundary (cumulative
+> trust boundary across W22..W45 = **240 named failure modes**).
+> Headline R-92 results (5 seeds × 9 cell families):
+> calibration-gain precision **+0.400** strict gain over W44 (min
+> == max); attention-specialization **1.000** (W44 / W43 / baseline
+> = 0.000 — the first benchmark in the programme where attention
+> weights are measurably specialised per signature); role3-
+> precision **+0.500** vs shared-only adapter; factoradic + hint
+> round-trip **1.000** across 5/5 seeds; model-facing task-correct
+> rate **+1.000** under the deterministic
+> ``HintAwareSyntheticBackend``; replay-determinism **1.000**;
+> falsifier passes (no false abstentions); the new
+> ``W45-L-LEARNED-COMPROMISE-CAP`` limitation reproduces honestly.
+> Honest scope: W45 does NOT close any of the W43 conjectures
+> (``W43-C-MIXED-CURVATURE-LATENT``,
+> ``W43-C-COLLECTIVE-KV-POOLING``,
+> ``W43-C-FULL-GRASSMANNIAN-HOMOTOPY``); it *bounds* (not closes)
+> ``W44-C-LIVE-LATENT`` at the capsule layer; a new
+> ``W45-C-DEEP-TRANSFORMER-COUPLING`` conjecture covers the
+> hidden-state / KV-cache-consuming direction (still substrate-
+> blocked). See ``docs/RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md``
+> for the full result note and
+> ``docs/SUCCESS_CRITERION_W45_LEARNED_MANIFOLD.md`` for the
+> pre-committed bar.
+>
+> **Earlier post-W43 research-line update (W44 Live Manifold-Coupled
 > Coordination, 2026-05-10).** After W43 made the product-manifold
 > capsule executable as a closed-form audit-only layer, the
 > programme opened a new research line on *live behavioural
