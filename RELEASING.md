@@ -36,7 +36,9 @@ How to publish coordpy to PyPI as
 
    This builds the sdist + wheel, runs `twine check`,
    `check-wheel-contents`, installs the wheel into a fresh venv,
-   and runs `tests/test_smoke_full.py`.
+   runs `tests/test_smoke_full.py`, then exercises the installed
+   `coordpy` and `coordpy-capsule verify` entry points against the
+   bundled `local_smoke` profile.
 
 5. **Tag** the release. The tag must match `_version.py` exactly:
 
@@ -128,7 +130,7 @@ export TWINE_PASSWORD=pypi-AgE...
 
 Worth doing once for a brand-new project name. TestPyPI does
 not allow re-uploading the same version, so if you need a
-second attempt, append a `.devN` suffix (`0.5.16.dev1`) and
+second attempt, append a `.devN` suffix (`X.Y.Z.dev1`) and
 upload that.
 
 ```bash
