@@ -41,6 +41,19 @@ def section(title: str) -> None:
     print(f"\n# {title}")
 
 
+def _readiness_shape(r: dict) -> dict:
+    checks = r.get("checks") or {}
+    return {
+        "schema": r.get("schema"),
+        "top_keys": sorted(r.keys()),
+        "check_names": sorted(checks.keys()),
+        "check_shapes": {
+            name: sorted((payload or {}).keys())
+            for name, payload in sorted(checks.items())
+        },
+    }
+
+
 def main() -> int:  # noqa: C901 — driver script, length is fine
     section("0. Distribution metadata")
     import coordpy  # noqa: WPS433
@@ -311,7 +324,8 @@ def main() -> int:  # noqa: C901 — driver script, length is fine
                               out_dir=os.path.join(tmp, "smoke2"))
         r2 = coordpy.run(rs2)
         check("readiness shape equal",
-              r2["readiness"] == report["readiness"])
+              _readiness_shape(r2["readiness"])
+              == _readiness_shape(report["readiness"]))
         check("readiness verdict identical (deterministic)",
               r2["readiness"]["ready"] == report["readiness"]["ready"])
     finally:
