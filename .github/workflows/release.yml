@@ -60,7 +60,8 @@ jobs:
           /tmp/cp/bin/pip install --quiet --upgrade pip
           /tmp/cp/bin/pip install --quiet dist/*.whl
           /tmp/cp/bin/python tests/test_smoke_full.py
-          /tmp/cp/bin/python examples/build_with_coordpy.py
+          /tmp/cp/bin/coordpy --profile local_smoke --out-dir /tmp/coordpy-release-smoke
+          /tmp/cp/bin/coordpy-capsule verify --report /tmp/coordpy-release-smoke/product_report.json
 
       - name: Upload distribution as workflow artifact
         uses: actions/upload-artifact@v4

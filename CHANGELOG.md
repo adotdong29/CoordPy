@@ -3,6 +3,121 @@
 Release history for the coordpy SDK. For installation and usage,
 see [`README.md`](README.md).
 
+## [0.5.20] coordpy-team CLI front door, replay-fidelity audit trail, curated presets
+
+This release turns the lightweight `AgentTeam` surface into a real
+front door for new users: a CLI you can drive without writing
+Python, three curated multi-role presets, and a sealed manifest
+shape that survives replay against a different backend.
+
+### CLI
+
+- New `coordpy-team` console script with four subcommands:
+  - `coordpy-team run` — drive a curated preset over a task file
+    (or stdin), dump a four-file replayable bundle.
+  - `coordpy-team replay` — re-run a sealed `team_result.json`
+    against any backend at the original sampling settings; fails
+    loudly on per-turn `prompt_sha256` mismatch.
+  - `coordpy-team sweep` — run the same task at multiple
+    `max_visible_handoffs` settings; emit a side-by-side savings
+    table.
+  - `coordpy-team compare` — run on backend A, replay on backend
+    B, report side-by-side telemetry and `ACTION` agreement.
+- New `coordpy._pretty` TTY-aware presentation helpers (stdlib
+  only) for the new CLI; degrades gracefully to plain ASCII when
+  piped or redirected.
+
+### Replay fidelity
+
+This was the load-bearing audit fix. Pre-0.5.20, replaying a
+sealed manifest could silently substitute the loader's defaults
+(`temperature=0.2`, `max_tokens=256`) for the original sampling
+settings, so a `quant_desk_team` run sealed at `temperature=0.0`
+would not reproduce on replay. As of 0.5.20:
+
+- `AgentTurn` persists `temperature`, `max_tokens`, `model_tag`,
+  `prompt_sha256`, `prompt_words`, `naive_prompt_words`,
+  `visible_handoffs`, `wall_ms`, real `prompt_tokens` /
+  `output_tokens`, and `backend_base_url`.
+- `TeamResult.dump(out_dir)` writes
+  `team_result.json` (schema `coordpy.team_result.v1`),
+  `team_capsule_view.json`, `team_report.md`, and
+  `final_output.txt` — the four-file bundle that
+  `coordpy-team replay` reads.
+- `coordpy.replay_team_result(...)` re-applies the per-turn
+  `temperature` and `max_tokens` from the manifest, not the
+  loader's defaults; verifies the per-turn `prompt_sha256` to
+  detect tampering; and seals fresh `TEAM_HANDOFF` capsules
+  carrying the *new* model tag with the *original* prompt SHA so
+  an auditor can prove "same prompt, different model."
+- `capsule_team_handoff(...)` now accepts optional
+  `prompt_sha256` / `prompt_bytes` / `model_tag` kwargs, stored
+  in both the capsule body and metadata so `coordpy-capsule
+  view --full` surfaces them in the audit view.
+
+### Curated presets
+
+- New `coordpy.presets` module with three opinionated multi-role
+  teams that all share the bounded-context handoff story:
+  - `presets.quant_desk_team(...)` — four-role US-equity quant
+    desk; emits an `ACTION` line that
+    `TeamResult.parse_action()` extracts as a structured
+    `ActionDecision`.
+  - `presets.code_review_team(...)` — three-role code-review
+    team; emits an `APPROVE / REQUEST-CHANGES / BLOCK` verdict.
+  - `presets.research_writer_team(...)` — three-role
+    plan/research/write team for general Q&A.
+
+### `AgentTeam` improvements
+
+- `AgentTeam(task_summary=...)` and `AgentTeam.from_env(...,
+  task_summary=...)` — agents 1..N see the one-line summary
+  instead of the full task, so the bounded-context savings story
+  is operational, not aspirational.
+- `AgentTeam.run(task, *, progress=callable, should_continue=callable)`
+  — a `ProgressCallback` fires once per finalised turn
+  (essential UX for slow local LLMs), and a `ShouldContinue`
+  callback can stop the team early (e.g. "the risk manager
+  rejected all signals — abort").
+- Per-turn handoff capsule budget is now auto-sized to the
+  agent's `max_tokens` plus headroom (default `max(member.max_tokens,
+  output_words+32, 128)`). The 0.5.18 `handoff_budget` knob still
+  pins an explicit budget when set.
+- `TeamResult.cramming_estimate()` reports the bounded vs naive
+  token saving in real numbers; surfaced in `team_report.md`.
+- `TeamResult.parse_action()` extracts a synthesizer's `ACTION:`
+  line into a structured `ActionDecision`.
+- `TeamResult.render_markdown()` produces a polished single-page
+  report.
+
+### Public surface
+
+New top-level re-exports (visible in `dir(coordpy)`):
+`ActionDecision`, `ProgressCallback`, `ShouldContinue`,
+`TEAM_RESULT_SCHEMA`, `replay_team_result`, and the `presets`
+submodule.
+
+### Onboarding
+
+- README now leads with the capsules + token-cramming framing and
+  a five-minute first-run path through `coordpy-team`.
+- `docs/START_HERE.md` drops the stale "not on PyPI yet" wording,
+  the broken `vision_mvp.coordpy.*` import paths, and the
+  references to the deleted `examples/04..06` files. The example
+  ladder is rebuilt around the public API
+  (`01_quickstart.py`, `02_quant_desk.py`, `03_replay_and_audit.py`)
+  with a bundled `scenario_bullish.txt` for the quant-desk path.
+
+### Compatibility
+
+- Existing `team_result.json` manifests written by 0.5.16..0.5.19
+  still replay; the new per-turn generation params are read when
+  present and fall back to the lightweight defaults when absent.
+- `coordpy.__init__` re-export list grows; nothing existing was
+  removed or renamed.
+- `capsule_team_handoff` keyword-only signature is additive (new
+  optional kwargs); existing callers are unaffected.
+
 ## [0.5.18] AgentTeam: usable default budgets, agent() validation, friendlier CLI
 
 A subagent build-test against `coordpy-ai 0.5.17` from PyPI hit

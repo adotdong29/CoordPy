@@ -12,10 +12,10 @@ include RELEASING.md
 include MANIFEST.in
 include pyproject.toml
 
-# Runnable smoke driver + demo (handy for downstream auditors).
+# Runnable smoke driver + current examples (handy for downstream
+# auditors).
 recursive-include tests *.py
-include examples/agent_team.py
-include examples/build_with_coordpy.py
+recursive-include examples *.py *.txt *.md *.toml
 
 # PEP 561 typing marker.
 include coordpy/py.typed

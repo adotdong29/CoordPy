@@ -101,8 +101,12 @@ Changelog = "https://github.com/adotdong29/context-zero/blob/main/CHANGELOG.md"
 coordpy = "coordpy._cli:main_run"
 coordpy-import = "coordpy._cli:main_import"
 coordpy-ci = "coordpy._cli:main_ci"
-# Inspect / audit the capsule graph of a finished report.
+# Inspect / audit the capsule graph of a finished report (works on
+# both RunSpec runs and AgentTeam runs).
 coordpy-capsule = "coordpy._cli:main_capsule"
+# Run / replay / sweep / compare a lightweight AgentTeam preset
+# from the CLI. The recommended front door for new users.
+coordpy-team = "coordpy._cli:main_team"
 
 [tool.setuptools.dynamic]
 version = { attr = "coordpy._version.__version__" }

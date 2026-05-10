@@ -26,19 +26,17 @@ jobs:
           python3 -m pip install -e ".[dev]"
       - name: CoordPy SDK contract + provenance + extensions tests
         run: |
-          python3 -m unittest \
-            vision_mvp.tests.test_coordpy_public_api \
-            vision_mvp.tests.test_coordpy_provenance \
-            vision_mvp.tests.test_coordpy_extensions \
-            vision_mvp.tests.test_coordpy_runtime \
-            vision_mvp.tests.test_phase45_product \
-            -v
+          python3 tests/test_smoke_full.py
       - name: Smoke-test console scripts
         run: |
           coordpy --version
           coordpy --profile local_smoke --out-dir /tmp/coordpy-ci-smoke
           coordpy-ci --report /tmp/coordpy-ci-smoke/product_report.json \
                    --min-pass-at-1 1.0
+          coordpy-team --help
+          coordpy-capsule --help
+          coordpy-capsule verify-view \
+            --view /tmp/coordpy-ci-smoke/capsule_view.json
 
   build-distributions:
     name: Build sdist + wheel

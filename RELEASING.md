@@ -36,8 +36,9 @@ How to publish coordpy to PyPI as
 
    This builds the sdist + wheel, runs `twine check`,
    `check-wheel-contents`, installs the wheel into a fresh venv,
-   and runs `tests/test_smoke_full.py` plus
-   `examples/build_with_coordpy.py`.
+   runs `tests/test_smoke_full.py`, then exercises the installed
+   `coordpy` and `coordpy-capsule verify` entry points against the
+   bundled `local_smoke` profile.
 
 5. **Tag** the release. The tag must match `_version.py` exactly:
 
@@ -64,11 +65,11 @@ via OIDC — no API token stored in the repo.
 
 ### One-time setup
 
-You must do this **before the first release**. PyPI calls the
-config a **pending publisher** until the project actually
-exists on PyPI; after the first successful upload it converts
-into a regular Trusted Publisher automatically and there is
-nothing more to configure.
+Use this when configuring a new or replacement Trusted Publisher.
+PyPI calls the config a **pending publisher** until the project
+actually exists on PyPI; after the first successful upload it
+converts into a regular Trusted Publisher automatically and there
+is nothing more to configure.
 
 At <https://pypi.org/manage/account/publishing/>, click **Add a
 pending publisher** and fill in:
@@ -93,7 +94,7 @@ if any field is wrong.
 ### Push the tag
 
 ```bash
-git tag -a v0.5.16 -m "coordpy-ai v0.5.16"
+git tag -a vX.Y.Z -m "coordpy-ai vX.Y.Z"
 git push --follow-tags
 ```
 
@@ -129,7 +130,7 @@ export TWINE_PASSWORD=pypi-AgE...
 
 Worth doing once for a brand-new project name. TestPyPI does
 not allow re-uploading the same version, so if you need a
-second attempt, append a `.devN` suffix (`0.5.16.dev1`) and
+second attempt, append a `.devN` suffix (`X.Y.Z.dev1`) and
 upload that.
 
 ```bash

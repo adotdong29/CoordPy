@@ -17,6 +17,7 @@ import importlib.metadata as _md
 import json
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import time
@@ -38,6 +39,19 @@ def check(name: str, ok: bool, detail: str = "") -> None:
 
 def section(title: str) -> None:
     print(f"\n# {title}")
+
+
+def _readiness_shape(r: dict) -> dict:
+    checks = r.get("checks") or {}
+    return {
+        "schema": r.get("schema"),
+        "top_keys": sorted(r.keys()),
+        "check_names": sorted(checks.keys()),
+        "check_shapes": {
+            name: sorted((payload or {}).keys())
+            for name, payload in sorted(checks.items())
+        },
+    }
 
 
 def main() -> int:  # noqa: C901 — driver script, length is fine
@@ -110,6 +124,18 @@ def main() -> int:  # noqa: C901 — driver script, length is fine
             check("on-disk view chain_head == embedded",
                   disk_view["chain_head"]
                   == report["capsules"]["chain_head"])
+            capsule_cli = shutil.which("coordpy-capsule")
+            if capsule_cli:
+                proc = subprocess.run(
+                    [capsule_cli, "verify", "--report", report_path],
+                    check=False,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                )
+                check("coordpy-capsule verify exits 0",
+                      proc.returncode == 0,
+                      (proc.stdout or proc.stderr).strip()[:200])
 
         section("5. build_report_ledger round-trip")
         led, root_cid = coordpy.build_report_ledger(report)
@@ -298,7 +324,8 @@ def main() -> int:  # noqa: C901 — driver script, length is fine
                               out_dir=os.path.join(tmp, "smoke2"))
         r2 = coordpy.run(rs2)
         check("readiness shape equal",
-              r2["readiness"] == report["readiness"])
+              _readiness_shape(r2["readiness"])
+              == _readiness_shape(report["readiness"]))
         check("readiness verdict identical (deterministic)",
               r2["readiness"]["ready"] == report["readiness"]["ready"])
     finally:

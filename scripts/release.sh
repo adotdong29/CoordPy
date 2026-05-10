@@ -55,14 +55,19 @@ verify() {
 
 smoke() {
     echo "==> install wheel into a throwaway venv and run the smoke driver"
+    local root
     local venv
-    venv="$(mktemp -d -t coordpy_release_XXXX)/venv"
+    local out_dir
+    root="$(mktemp -d -t coordpy_release_XXXX)"
+    venv="$root/venv"
+    out_dir="$root/coordpy-smoke"
     "$PY" -m venv "$venv"
     "$venv/bin/pip" install --quiet --upgrade pip
     "$venv/bin/pip" install --quiet dist/*.whl
     "$venv/bin/python" tests/test_smoke_full.py
-    "$venv/bin/python" examples/build_with_coordpy.py
-    rm -rf "$(dirname "$venv")"
+    "$venv/bin/coordpy" --profile local_smoke --out-dir "$out_dir"
+    "$venv/bin/coordpy-capsule" verify --report "$out_dir/product_report.json"
+    rm -rf "$root"
 }
 
 verify_tag_matches_version() {
