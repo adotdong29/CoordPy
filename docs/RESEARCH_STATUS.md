@@ -5,8 +5,233 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: SDK v3.43 (final
-> release), 2026-05-03.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-v3.43 W44
+> milestone (Live Manifold-Coupled Coordination research line),
+> 2026-05-10.
+
+## TL;DR — W44 Live Manifold-Coupled Coordination (post-W43 research milestone)
+
+The programme now has **forty-one** coupled research axes. W44
+mints axis 41: **live manifold-coupled coordination (LMCC) +
+behavioural gating + factoradic compression + prompt-construction
+witness**. W44 is the first capsule-native CoordPy layer that lets
+the W43 product-manifold channels actually *change run behaviour*
+in a sequential agent team. It is **held outside the stable SDK
+contract** at this milestone (the W44 module ships at
+`coordpy.live_manifold` and is reachable only via explicit import).
+The released v3.43 line is byte-for-byte unchanged; the W43 PMC
+surface (`coordpy.product_manifold`, `coordpy.r90_benchmark`) is
+unchanged.
+
+The load-bearing change is from *closed-form audit-only manifold
+state* (W43) to *live behavioural coupling* (W44). Three W43
+channels become *active live gates* — when the spherical, subspace,
+or causal channel detects a violation against the registered
+policy, the live orchestrator substitutes a deterministic abstain
+output for the agent's `generate()` call, so the next agent's
+prompt never sees the bad upstream handoff. A fourth channel
+(factoradic route) becomes a *live compressor* that replaces the
+textual rendering of the role-arrival ordering with a single
+integer header, reducing the visible prompt-token cost while
+preserving the full route in the audit envelope. Two channels
+(hyperbolic, euclidean) remain *audit-only* at the live layer —
+W44 force-verdicts each channel honestly. The W44 envelope binds
+the underlying TEAM_HANDOFF capsule CID, the W43 envelope CID, the
+prompt-construction witness CID, and the live witness CID under
+one ``live_outer_cid``, verified through 12 enumerated failure
+modes disjoint from the W22..W43 boundary (cumulative trust
+boundary across W22..W44 = **226 named failure modes**).
+
+**Headline W44 results (R-91 across 5 seeds × 7 families):**
+
+* **R-91-LIVE-CAUSAL-GATE.** Downstream-protect rate: baseline
+  `AgentTeam` 0.600, W43 closed-form 0.600, W44 live-coupled
+  **1.000**, Δ = **+0.400** across 5/5 seeds (min == max). The
+  causal-clock channel substitutes the abstain output for the
+  agent's `generate()` call when the Lamport partial order is
+  violated.
+
+* **R-91-LIVE-SPHERICAL-GATE.** Downstream-protect rate: baseline
+  0.600, W43 0.600, W44 **1.000**, Δ = **+0.400** across 5/5
+  seeds. The spherical channel substitutes the abstain output
+  when the observed cosine agreement falls below the registered
+  threshold.
+
+* **R-91-LIVE-SUBSPACE-GATE.** Downstream-protect rate: baseline
+  0.600, W43 0.600, W44 **1.000**, Δ = **+0.400** across 5/5
+  seeds. The subspace channel substitutes the abstain output
+  when the principal-angle drift exceeds the registered tolerance.
+
+* **R-91-LIVE-FACTORADIC-COMPRESSION.** Visible prompt tokens
+  saved per run at n_roles=8: baseline 0, W43 0, W44 **314** (min
+  == max). The factoradic channel replaces the textual role-
+  arrival rendering with a single `FACTORADIC_ROUTE: <int>`
+  header.
+
+* **R-91-LIVE-FALSIFIER.** No-false-abstain rate: 1.000 across
+  5/5 seeds. The W44 layer does NOT over-claim on the
+  no-geometry-needed regime.
+
+* **R-91-LIVE-DUAL-CHANNEL-COLLUSION.** Downstream-protect rate:
+  baseline 0.000, W43 0.000, W44 **0.000** across 5/5 seeds. The
+  W44-L-LIVE-DUAL-CHANNEL-COLLUSION-CAP limitation reproduces
+  honestly: when the adversary forges both the spherical
+  signature and the subspace basis to match the registered
+  policy, the live gate ratifies on the wrong cell.
+
+* **R-91-TRIVIAL-LIVE-PASSTHROUGH.** Passthrough sanity: all three
+  arms (baseline, W43 closed-form, W44 live-coupled) achieve 1.000
+  across 5/5 seeds. The trivially-configured W44 reduces to
+  AgentTeam byte-for-byte (the **W44-L-TRIVIAL-LIVE-PASSTHROUGH**
+  falsifier).
+
+**Stable SDK contract preserved.** The CoordPy 0.5.20 stable smoke
+driver (`tests/test_smoke_full.py`) reports "ALL CHECKS PASSED"
+with the W44 module on disk; the W44 surface is **not** exported
+under `coordpy.__experimental__` at this milestone, so the released
+wheel's public surface is byte-for-byte unchanged.
+
+**Realism anchor (not load-bearing).** The W44 surface runs cleanly
+against a real local Ollama backend (`qwen2.5:0.5b` at
+`localhost:11434`): a 4-agent `LiveManifoldTeam` with the
+factoradic compressor records **31 visible prompt tokens saved
+across 3 active turns at temperature 0**, with the capsule chain
+sealed cleanly. This is a realism anchor only; the H1..H10 success
+bar is satisfied entirely on the deterministic
+`SyntheticLLMClient` testbed.
+
+**Honest scope.** W44 introduces three NEW proved-conditional
+limitation theorems at the capsule layer
+(`W44-L-TRIVIAL-LIVE-PASSTHROUGH`,
+`W44-L-LIVE-DUAL-CHANNEL-COLLUSION-CAP`,
+`W44-L-MODEL-INDIFFERENCE-CAP`) and one open conjecture
+(`W44-C-LIVE-LATENT` — the hyperbolic and euclidean channels could
+become behaviourally meaningful only via either a learned
+controller or a domain-specific observation builder). The W44
+milestone explicitly does NOT close any of the W43 conjectures
+(`W43-C-MIXED-CURVATURE-LATENT`, `W43-C-COLLECTIVE-KV-POOLING`,
+`W43-C-FULL-GRASSMANNIAN-HOMOTOPY`).
+
+**Per-channel live verdicts** (force-verdicted at the W44 layer):
+
+| Channel | Live verdict | Behavioural? | R-91 evidence |
+|---|---|---|---|
+| Spherical consensus | active gate | yes | `r91_live_spherical_gate` Δ +0.400 |
+| Subspace drift | active gate | yes | `r91_live_subspace_gate` Δ +0.400 |
+| Causal clock | active gate | yes | `r91_live_causal_gate` Δ +0.400 |
+| Factoradic route | live compressor | yes (visible tokens) | `r91_live_factoradic_compression` +314 |
+| Hyperbolic branch | audit-only | **no** | not exercised by R-91 |
+| Euclidean attribute | audit-only | **no** | not exercised by R-91 |
+
+See:
+
+* `docs/SUCCESS_CRITERION_W44_LIVE_MANIFOLD.md` — pre-committed
+  H1..H10 success bar.
+* `docs/RESULTS_COORDPY_W44_LIVE_MANIFOLD.md` — full results note +
+  architecture triage + theorem statements + per-channel verdicts.
+* `coordpy/live_manifold.py` — the W44 layer (~1100 LoC,
+  dependency-free).
+* `coordpy/r91_benchmark.py` — the R-91 benchmark family.
+* `tests/test_live_manifold.py`, `tests/test_r91_benchmark.py` —
+  51 tests, all passing.
+
+The historical W43 + v3.43 release sections are preserved verbatim
+below.
+
+## Earlier TL;DR — W43 Product-Manifold Capsule (post-v3.43 research milestone)
+
+The programme now has **forty** coupled research axes. W43 mints
+axis 40: **product-manifold capsule (PMC) + factoradic routing +
+subspace state + causal lattice**. W43 is the first post-release
+research milestone after the CoordPy 0.5.20 final release; it is
+**held outside the stable SDK contract** at this milestone (the
+W43 module ships at `coordpy.product_manifold` and is reachable
+only via explicit import). The released v3.43 line is byte-for-
+byte unchanged.
+
+The load-bearing change is a **mixed-curvature, six-channel
+decomposition** of each cell's coordination state: a hyperbolic
+branch channel (Poincare-disk-style, bit-perfect round-trip up to
+2*dim path bits), a spherical consensus channel (unit-norm
+signature over claim_kinds), a euclidean attribute channel, a
+factoradic route channel (bijective Lehmer code; ceil(log2(n!))
+bits per cell at zero visible-token cost), a subspace state
+channel (bounded-rank QR-canonicalised basis approximating Gr(k,
+d)), and a Lamport vector-clock channel with explicit dependency-
+closure admissibility check. The W43 envelope binds seven
+component CIDs under one ``manifest_v13_cid`` and is verified
+through 18 enumerated failure modes disjoint from the W22..W42
+boundary (cumulative trust boundary across W22..W43 = 214 named
+failure modes).
+
+**Headline W43 results (R-90 across 5 seeds × 8 families):**
+
+* **R-90-CONSENSUS-CYCLE.** Trust precision: W42 baseline 0.600,
+  W43 PMC 1.000, Δ = **+0.400** across 5/5 seeds. The spherical
+  channel detects divergent claim-kind signatures.
+
+* **R-90-CAUSAL-VIOLATION.** Causal-rejection rate: W42 baseline
+  0.000, W43 PMC **1.000** across 5/5 seeds. The Lamport vector-
+  clock channel rejects 100% of out-of-order handoffs.
+
+* **R-90-COMPACT-STATE-TRANSFER.** Structured bits per visible-
+  token overhead: W42 baseline 1536, W43 PMC **1808** (a strict
+  +272-bit gain at n=8 roles, growing to +292 bits at n=12).
+
+* **R-90-ROUTING-COMPRESSION.** Factoradic side-channel: W42
+  baseline 0, W43 PMC **16 bits** at n=8 (= ceil(log2(8!))) at
+  zero visible-token cost.
+
+* **R-90-SUBSPACE-DRIFT.** Trust precision: W42 baseline 0.600,
+  W43 PMC 1.000, Δ = **+0.400** across 5/5 seeds. The bounded-
+  rank subspace channel rejects principal-angle drift above the
+  registered tolerance.
+
+* **R-90-LONG-BRANCH.** Hyperbolic round-trip: W43 PMC achieves
+  bit-perfect path recovery for branch trees of depth 12 across
+  5/5 seeds.
+
+* **R-90-LINEAR-FLOW-FALSIFIER.** No-false-abstain rate: 1.000
+  across 5/5 seeds. The W43 layer does NOT over-claim on the
+  no-geometry-needed regime.
+
+* **R-90-TRIVIAL-PMC.** Passthrough sanity: all three arms (W42
+  passthrough, W42 active, W43 PMC active) achieve 1.000 across
+  5/5 seeds. The trivially-configured W43 reduces to W42 byte-
+  for-byte (the W43-L-TRIVIAL-PASSTHROUGH falsifier).
+
+**Stable SDK contract preserved.** The CoordPy 0.5.20 stable
+smoke driver (`tests/test_smoke_full.py`) reports "ALL CHECKS
+PASSED" with the W43 module on disk; the W43 surface is **not**
+exported under `coordpy.__experimental__` at this milestone, so
+the released wheel's public surface is byte-for-byte unchanged.
+
+**Honest scope.** W43 introduces three NEW proved-conditional
+limitation theorems at the capsule layer (`W43-L-DUAL-CHANNEL-
+COLLUSION-CAP`, `W43-L-FORGED-CAUSAL-CLOCK-CAP`, `W43-L-
+OBLIVIOUS-FACTORADIC-CAP`) and three open conjectures
+(`W43-C-MIXED-CURVATURE-LATENT`, `W43-C-COLLECTIVE-KV-POOLING`,
+`W43-C-FULL-GRASSMANNIAN-HOMOTOPY`) that require new substrate
+beyond the capsule layer. The W43 milestone explicitly does NOT
+claim transformer-internal mixed-curvature attention, KV-cache
+pooling, or continuous Grassmannian homotopy — each channel is a
+mathematically motivated bounded approximation of one direction
+in the architecture vision.
+
+See:
+
+* `docs/SUCCESS_CRITERION_W43_PRODUCT_MANIFOLD.md` — pre-committed
+  H1..H10 success bar.
+* `docs/RESULTS_COORDPY_W43_PRODUCT_MANIFOLD.md` — full results
+  note + architecture triage + theorem statements.
+* `coordpy/product_manifold.py` — the W43 layer (~1500 LoC,
+  dependency-free).
+* `coordpy/r90_benchmark.py` — the R-90 benchmark family.
+* `tests/test_product_manifold.py`, `tests/test_r90_benchmark.py`
+  — 58 tests, all passing.
+
+The historical v3.43 release section is preserved verbatim
+below.
 
 > New reader note. If you are here to install or use CoordPy, start
 > with [`README.md`](../README.md) and

@@ -161,6 +161,39 @@ export COORDPY_API_KEY=...
 Those are next-programme architecture questions, not blockers to the
 released CoordPy v3.43 line.
 
+**Post-release research milestone — W43 Product-Manifold Capsule**
+
+After 0.5.20 shipped, the next research step (W43) introduced the
+**Product-Manifold Capsule (PMC)** layer: a six-channel mixed-
+curvature decomposition (hyperbolic / spherical / euclidean
+geometry + factoradic discrete control + subspace state +
+causal lattice). W43 is held outside the stable SDK contract — it
+ships at `coordpy.product_manifold` and is reachable only via
+explicit import; the released v0.5.20 wheel's public surface is
+byte-for-byte unchanged. See
+[`RESULTS_COORDPY_W43_PRODUCT_MANIFOLD.md`](RESULTS_COORDPY_W43_PRODUCT_MANIFOLD.md)
+for the full result note.
+
+**Post-W43 research milestone — W44 Live Manifold-Coupled Coordination**
+
+The next research step after W43 (W44) introduces the **Live
+Manifold-Coupled Coordination (LMCC)** layer: the first
+capsule-native CoordPy layer that lets three of the W43 channels
+(spherical / subspace / causal) actually *change run behaviour*
+in a sequential agent team via a manifold-conditioned gating
+policy that substitutes a deterministic abstain output for the
+agent's `generate()` call when the registered policy is violated.
+A fourth channel (factoradic route) becomes a *live compressor*
+that replaces the textual rendering of the role-arrival ordering
+with a single integer header. The remaining two channels
+(hyperbolic, euclidean) remain audit-only at the live layer. W44
+is held outside the stable SDK contract — it ships at
+`coordpy.live_manifold` and is reachable only via explicit import;
+the released v0.5.20 wheel's public surface is byte-for-byte
+unchanged. See
+[`RESULTS_COORDPY_W44_LIVE_MANIFOLD.md`](RESULTS_COORDPY_W44_LIVE_MANIFOLD.md)
+for the full result note.
+
 ## Where to read next
 
 If you want to use CoordPy:
@@ -211,7 +244,11 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
-> | Latest milestone (SDK v3.43 final)   | [`RESULTS_COORDPY_W42_ROLE_INVARIANT_SYNTHESIS.md`](RESULTS_COORDPY_W42_ROLE_INVARIANT_SYNTHESIS.md) |
+> | Post-W43 research milestone (W44)    | [`RESULTS_COORDPY_W44_LIVE_MANIFOLD.md`](RESULTS_COORDPY_W44_LIVE_MANIFOLD.md) |
+> | Pre-committed success bar (W44)      | [`SUCCESS_CRITERION_W44_LIVE_MANIFOLD.md`](SUCCESS_CRITERION_W44_LIVE_MANIFOLD.md) |
+> | Post-release research milestone (W43) | [`RESULTS_COORDPY_W43_PRODUCT_MANIFOLD.md`](RESULTS_COORDPY_W43_PRODUCT_MANIFOLD.md) |
+> | Pre-committed success bar (W43)      | [`SUCCESS_CRITERION_W43_PRODUCT_MANIFOLD.md`](SUCCESS_CRITERION_W43_PRODUCT_MANIFOLD.md) |
+> | Latest release milestone (SDK v3.43 final)   | [`RESULTS_COORDPY_W42_ROLE_INVARIANT_SYNTHESIS.md`](RESULTS_COORDPY_W42_ROLE_INVARIANT_SYNTHESIS.md) |
 > | Pre-committed success bar (SDK v3.43)| [`SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md`](SUCCESS_CRITERION_W42_ROLE_INVARIANT_SYNTHESIS.md) |
 > | Previous milestone (SDK v3.42 RC2)   | [`RESULTS_COORDPY_W41_INTEGRATED_SYNTHESIS.md`](RESULTS_COORDPY_W41_INTEGRATED_SYNTHESIS.md) |
 > | Pre-committed success bar (SDK v3.42)| [`SUCCESS_CRITERION_W41_INTEGRATED_SYNTHESIS.md`](SUCCESS_CRITERION_W41_INTEGRATED_SYNTHESIS.md) |

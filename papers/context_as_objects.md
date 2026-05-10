@@ -1,6 +1,91 @@
 # Context as Objects: Capsule-Native Coordination for Multi-Agent Teams
 
 > Main paper draft for the Context Zero programme.
+>
+> **Post-W43 research-line update (W44 Live Manifold-Coupled
+> Coordination, 2026-05-10).** After W43 made the product-manifold
+> capsule executable as a closed-form audit-only layer, the
+> programme opened a new research line on *live behavioural
+> coupling* of the manifold channels to actual agent run behaviour.
+> W44 is held outside the stable SDK contract — it lives at
+> `coordpy.live_manifold` and is reachable only via explicit
+> import; the released v0.5.20 wheel's public surface is byte-
+> for-byte unchanged. The paper's main thesis (capsules as the
+> coordination primitive; bounded-context transfer instead of
+> transcript replay; replayable / auditable runs; "token cramming"
+> as the practical released frontier) is materially
+> **strengthened** on a new axis by W44: three of the W43 channels
+> (spherical / subspace / causal) become *active live gates* that
+> substitute a deterministic abstain output for the agent's
+> ``generate()`` call when the registered policy is violated;
+> downstream prompts therefore never see the bad upstream handoff.
+> A fourth channel (factoradic route) becomes a *live compressor*
+> that replaces the textual rendering of the role-arrival ordering
+> with a single integer header in the prompt. Two channels
+> (hyperbolic, euclidean) remain audit-only at the live layer —
+> W44 force-verdicts each channel honestly. The W44 envelope binds
+> the underlying TEAM_HANDOFF capsule CID, the W43 envelope CID,
+> the prompt-construction witness CID, and the live witness CID
+> under one ``live_outer_cid``, verified through 12 enumerated
+> failure modes disjoint from the W22..W43 boundary (cumulative
+> trust boundary across W22..W44 = **226 named failure modes**).
+> Headline R-91 results (5 seeds × 7 cell families):
+> downstream-protect rate **+0.400** strict gain on each of the
+> three gate families (causal, spherical, subspace; min == max);
+> **314 visible prompt tokens saved per run** on the factoradic-
+> compression family at n_roles=8; falsifier passes (no false
+> abstentions); the new ``W44-L-LIVE-DUAL-CHANNEL-COLLUSION-CAP``
+> limitation reproduces honestly. Honest scope: W44 does NOT
+> close any of the W43 conjectures
+> (``W43-C-MIXED-CURVATURE-LATENT``,
+> ``W43-C-COLLECTIVE-KV-POOLING``,
+> ``W43-C-FULL-GRASSMANNIAN-HOMOTOPY``); a new
+> ``W44-C-LIVE-LATENT`` conjecture covers the audit-only
+> hyperbolic and euclidean channels. See
+> ``docs/RESULTS_COORDPY_W44_LIVE_MANIFOLD.md`` for the full
+> result note and
+> ``docs/SUCCESS_CRITERION_W44_LIVE_MANIFOLD.md`` for the
+> pre-committed bar.
+>
+> **Earlier post-release research-line update (W43 Product-Manifold
+> Capsule, 2026-05-10).** After the v3.43 final release shipped,
+> the programme opened a research line on a *mixed-curvature
+> product manifold* decomposition of the capsule-layer state. W43
+> is held outside the stable SDK contract — it lives at
+> `coordpy.product_manifold` and is reachable only via explicit
+> import; the released v0.5.20 wheel's public surface is byte-
+> for-byte unchanged. The paper's main thesis (capsules as the
+> coordination primitive; bounded-context transfer instead of
+> transcript replay; replayable / auditable runs; "token cramming"
+> as the practical released frontier) is materially **strengthened**
+> on six axes by W43: a hyperbolic branch channel (Poincare-disk-
+> style; bit-perfect round-trip up to ``2 * dim`` path bits), a
+> spherical consensus channel (unit-norm L2 signature over
+> claim_kinds), a euclidean attribute channel, a factoradic route
+> channel (bijective Lehmer code; ``ceil(log2(n!))`` bits per cell
+> at zero visible-token cost), a subspace state channel (bounded-
+> rank QR-canonicalised basis; one point on Gr(k, d) per cell), and
+> a Lamport vector-clock channel with explicit dependency-closure
+> admissibility check. The W43 envelope binds seven content-
+> addressed component CIDs under one ``manifest_v13_cid`` and is
+> verified through 18 enumerated failure modes disjoint from the
+> W22..W42 boundary (cumulative trust boundary across W22..W43 =
+> 214 named failure modes). Headline R-90 results (5 seeds × 8
+> cell families): trust precision **+0.400** on consensus-cycle
+> and subspace-drift cells, causal-rejection rate **+1.000** on
+> out-of-order handoffs, structured-bit gain of **+272 bits per
+> visible-token overhead** at n=8 roles. Honest scope: W43 does
+> NOT close ``W43-C-MIXED-CURVATURE-LATENT`` (transformer-internal
+> mixed-curvature attention), ``W43-C-COLLECTIVE-KV-POOLING``
+> (host-collective KV-cache sharing), or
+> ``W43-C-FULL-GRASSMANNIAN-HOMOTOPY`` (continuous Gr(k, d)
+> homotopy) — all three require new architectural substrate
+> beyond the capsule layer. See
+> ``docs/RESULTS_COORDPY_W43_PRODUCT_MANIFOLD.md`` for the full
+> result note and
+> ``docs/SUCCESS_CRITERION_W43_PRODUCT_MANIFOLD.md`` for the
+> pre-committed bar.
+>
 > Updated through **SDK v3.43 (final release of the v3.4x line)**,
 > 2026-05-03 (W22 → W42 cumulative trust + dense-control +
 > live-aware multi-anchor / trust-subspace / host-diverse /

@@ -1,6 +1,47 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (SDK v3.43 / W42, 2026-05-03 — FINAL
+> **Latest milestone marker (post-v3.43 / W44, 2026-05-10 —
+> Live Manifold-Coupled Coordination, second post-release research
+> milestone).** *Live behavioural gating + factoradic compression +
+> prompt-construction witness + per-channel verdicts under real
+> agent execution.* W44 is the first capsule-native CoordPy layer
+> that lets the W43 product-manifold channels actually *change run
+> behaviour* in a sequential agent team. Three W43 channels
+> (spherical / subspace / causal) become *active live gates* that
+> substitute a deterministic abstain output for the agent's
+> ``generate()`` call when the registered policy is violated; a
+> fourth channel (factoradic route) becomes a *live compressor*
+> that replaces the textual rendering of the role-arrival ordering
+> with a single integer header in the prompt. Two channels
+> (hyperbolic, euclidean) remain audit-only at the live layer —
+> W44 force-verdicts each channel honestly. The R-91 benchmark
+> family across 5 seeds × 7 cell families records: downstream-
+> protect rate +0.400 strict gain on each of the three gate
+> families (W43 closed-form 0.600 → W44 live-coupled 1.000, min ==
+> max); 314 visible prompt tokens saved per run on the factoradic-
+> compression family at n_roles=8; falsifier passes (no false
+> abstentions); the new ``W44-L-LIVE-DUAL-CHANNEL-COLLUSION-CAP``
+> limitation reproduces honestly. Cumulative trust boundary across
+> W22..W44 = **226 named failure modes**. Released SDK contract
+> preserved byte-for-byte; the W44 module ships at
+> ``coordpy.live_manifold`` and is reachable only via explicit
+> import. See ``docs/RESULTS_COORDPY_W44_LIVE_MANIFOLD.md`` and
+> ``docs/SUCCESS_CRITERION_W44_LIVE_MANIFOLD.md``; Step 41 below
+> answers the eight forced master-plan synthesis questions for W44.
+
+> **Earlier milestone marker (post-v3.43 / W43, 2026-05-10 —
+> first post-release research milestone, Product-Manifold Capsule).**
+> *Mixed-curvature six-channel decomposition + manifest-v13 CID +
+> 18 enumerated failure modes.* W43 mints axis 40 of the programme
+> as the strongest closed-form capsule-layer mechanism; cumulative
+> trust boundary across W22..W43 = 214 enumerated failure modes.
+> Released SDK contract preserved byte-for-byte. See
+> ``docs/RESULTS_COORDPY_W43_PRODUCT_MANIFOLD.md`` and
+> ``docs/SUCCESS_CRITERION_W43_PRODUCT_MANIFOLD.md``; Step 40
+> below answers the eight forced master-plan synthesis questions
+> for W43.
+
+> **Earlier milestone marker (SDK v3.43 / W42, 2026-05-03 — FINAL
 > RELEASE of the CoordPy SDK v3.4x line).**  *Cross-role-invariant
 > synthesis + manifest-v12 CID + role-handoff-signature axis +
 > composite-collusion bounding + final-release declaration*.  W42
@@ -11805,6 +11846,207 @@ Named open frontier after W42: ``W42-C-NATIVE-LATENT``
 layer scope); ``W42-C-MULTI-HOST`` (K+1-host disjoint topology;
 hardware-bounded).  Both require new architectural substrate
 beyond what this repo can support.
+
+## Step 40 — W43 Product-Manifold Capsule (PMC) — first post-release research milestone
+
+CoordPy 0.5.20 has shipped as the final release of the v3.4x
+research line. The next research step does NOT bump the SDK
+version, does NOT modify the stable surface, and is held under
+explicit-import access at ``coordpy.product_manifold``. This is
+the first capsule-layer milestone in the programme that operates
+on a *mixed-curvature product manifold* rather than a single
+hyperbolic / spherical / euclidean geometry.
+
+**Mechanism.** The W43 layer decomposes each cell's coordination
+state across six interlocking channels, each with its own
+content-addressed encoding:
+
+  * a **hyperbolic branch channel** (Poincare-disk-style; bit-
+    perfect round-trip up to ``2 * dim`` path bits)
+  * a **spherical consensus channel** (unit-norm L2 signature
+    over claim_kinds; cosine-distance consensus)
+  * a **euclidean attribute channel** (linear vector of cell
+    attributes)
+  * a **factoradic route channel** (bijective Lehmer code;
+    ``ceil(log2(n!))`` bits per cell at zero visible-token cost)
+  * a **subspace state channel** (bounded-rank QR-canonicalised
+    basis; one point on Gr(k, d) per cell with principal-angle
+    drift comparison)
+  * a **causal-clock channel** (Lamport vector clock with
+    explicit dependency-closure admissibility check)
+
+Each channel's encoding is content-addressed; seven component CIDs
+(manifold_state, factoradic_route, subspace_basis, causal_clock,
+manifold_audit, manifold_witness, plus the per-channel CIDs) bind
+under one ``manifest_v13_cid`` and are verified through 18
+enumerated W43 failure modes disjoint from the W22..W42 boundary
+(cumulative trust boundary across W22..W43 = **214 named failure
+modes**).
+
+**Headline R-90 results (5 seeds × 8 cell families):** trust
+precision +0.400 on consensus-cycle and subspace-drift cells
+(W42 baseline 0.600 → W43 PMC 1.000); causal-rejection rate
++1.000 (W42 0.000 → W43 1.000); factoradic side-channel +16
+structured bits per cell at n=8 at zero visible-token cost; 7×256
++ ceil(log2(n!)) = **1808 structured bits per visible-token
+overhead** at n=8 (vs W42's 1536). The released SDK contract is
+preserved byte-for-byte (the smoke driver reports ALL CHECKS
+PASSED with the W43 module on disk).
+
+**The 8 questions, after W43:**
+
+1. **Did the model materially advance?** *YES on the manifold-
+   decomposition axis: the first capsule-layer mechanism that
+   operates on six orthogonal channels (3 geometry + 1 discrete
+   control + 1 subspace + 1 causal lattice) and content-
+   addresses each independently.*
+2. **Were new mechanisms produced?** *YES.  The Lehmer-coded
+   factoradic side-channel is new in CoordPy; the QR-
+   canonicalised subspace carrier is new; the Lamport-clock
+   admissibility gate is new; the Poincare-disk-style branch
+   encoding is new; the per-cell envelope binding seven
+   component CIDs under ``manifest_v13_cid`` is new.*
+3. **Is the cram frontier strictly improved?** *YES.  W43
+   carries ~1808 structured bits per visible-token overhead at
+   n=8 (vs W42's ~1536); the strict gain is +272 bits per cell
+   on the compact-state-transfer benchmark, growing to +292
+   bits per cell at n=12.*
+4. **Did multi-channel evidence materially broaden?** *YES.
+   The R-90 family is the first benchmark in the programme that
+   stresses six orthogonal evidence channels per cell; each
+   channel produces an independently-measurable R-90 family
+   with strict gains over the W42 baseline that does NOT
+   exercise that channel.*
+5. **Which caveats were closed vs only sharpened?** *Sharpened
+   at the capsule layer: the W42-L-FULL-COMPOSITE-COLLUSION-CAP
+   wall is now joined by the W43-L-DUAL-CHANNEL-COLLUSION-CAP
+   wall (adversary must additionally forge spherical signature
+   + subspace basis); the W43-L-FORGED-CAUSAL-CLOCK-CAP and
+   W43-L-OBLIVIOUS-FACTORADIC-CAP walls are introduced.  Three
+   conjectures left open: ``W43-C-MIXED-CURVATURE-LATENT``
+   (transformer-internal mixed-curvature attention), ``W43-C-
+   COLLECTIVE-KV-POOLING`` (host-collective KV-cache sharing),
+   ``W43-C-FULL-GRASSMANNIAN-HOMOTOPY`` (continuous Gr(k, d)
+   homotopy).  All three are out of capsule-layer scope.*
+6. **Did release readiness truly improve?** *N/A.  W43 is a
+   research milestone, not a release.  The released CoordPy
+   0.5.20 line is byte-for-byte unchanged.*
+7. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on
+   the manifold-decomposition + cram-frontier axes; the deeper
+   trust/semantics wall is now strictly BOUNDED on six
+   orthogonal channels.  The remaining substrate-layer walls
+   (mixed-curvature attention, KV pooling, Grassmannian
+   homotopy) are explicitly architecture-bound.*
+8. **Did anything previously claimed get retracted?** *NO new
+   retractions at W43; the W41-INFRA-1 retraction (``.101`` is
+   Apple TV) carries forward unchanged.*
+
+Named open frontier after W43: ``W43-C-MIXED-CURVATURE-LATENT``
+(transformer-internal mixed-curvature attention; out of capsule-
+layer scope); ``W43-C-COLLECTIVE-KV-POOLING`` (host-collective
+KV-cache sharing; substrate-blocked); ``W43-C-FULL-GRASSMANNIAN-
+HOMOTOPY`` (continuous Gr(k, d) homotopy; substrate-blocked).
+All three require new architectural substrate beyond what the
+capsule layer can support.
+
+## Step 41 — W44 Live Manifold-Coupled Coordination (LMCC) — second post-release research milestone
+
+W43 made the product-manifold capsule executable as a closed-form
+audit-only layer; W44 asks the harder question of how much of W43
+*survives contact with actual model execution*. The W44 milestone
+does NOT bump the SDK version, does NOT modify the stable surface,
+and is held under explicit-import access at
+``coordpy.live_manifold``. This is the first capsule-layer
+milestone in the programme that lets W43 channels actually *change
+run behaviour* in a sequential agent team.
+
+**Mechanism.** Three of the W43 channels become *active live
+gates*; one becomes a *live compressor*; two remain audit-only:
+
+  * **Spherical / subspace / causal channels** — when a registered
+    policy is violated, the live orchestrator substitutes a
+    deterministic abstain output for the agent's ``generate()``
+    call. Downstream prompts never see the bad upstream handoff.
+  * **Factoradic route channel** — replaces the textual rendering
+    of the role-arrival ordering with a single ``FACTORADIC_ROUTE:
+    <int>`` header in the prompt. The full route is recoverable
+    bijectively from the audit envelope.
+  * **Hyperbolic / euclidean channels** — recorded in the W43
+    envelope, not yet behaviorally consumed; force-verdicted as
+    *audit-only* at the live layer.
+
+The W44 envelope binds the underlying TEAM_HANDOFF capsule CID,
+the W43 envelope CID, the prompt-construction witness CID, and the
+live witness CID under one ``live_outer_cid``, verified through 12
+enumerated W44 failure modes disjoint from the W22..W43 boundary
+(cumulative trust boundary across W22..W44 = **226 named failure
+modes**).
+
+**Headline R-91 results (5 seeds × 7 cell families):**
+downstream-protect rate +0.400 strict gain over the W43 closed-
+form arm on each of the three gate families (causal, spherical,
+subspace), min == max across 5/5 seeds; visible prompt tokens
+saved = 314 per run on the factoradic-compression family at
+n_roles=8 (W43 0 → W44 314, min == max); falsifier passes (no
+false abstentions); the ``W44-L-LIVE-DUAL-CHANNEL-COLLUSION-CAP``
+limitation reproduces honestly. The released SDK contract is
+preserved byte-for-byte (the smoke driver reports ALL CHECKS
+PASSED with the W44 module on disk).
+
+**The 8 questions, after W44:**
+
+1. **Did the model materially advance?** *YES on the live-coupling
+   axis: the first capsule-layer mechanism that lets the W43
+   manifold channels actually change run behaviour in a sequential
+   agent team.*
+2. **Were new mechanisms produced?** *YES. The
+   ``LiveManifoldOrchestrator`` gate (channel-conditioned
+   abstain substitution) is new; the factoradic compressor
+   prompt builder is new; the prompt-construction witness CID
+   is new; the ``LiveManifoldHandoffEnvelope`` (binding
+   TEAM_HANDOFF + W43 envelope + live witness under one outer
+   CID) is new.*
+3. **Is the cram frontier strictly improved?** *YES on the
+   model-facing transfer axis: W44 preserves the W43 +1808
+   structured bits per envelope while reducing visible prompt
+   tokens by 4..16 per active turn at n_roles=8 (314 visible
+   tokens saved per run on R-91, min == max across 5/5 seeds).*
+4. **Did multi-channel evidence materially broaden?** *YES on the
+   live execution axis. R-91 is the first benchmark in the
+   programme that compares live-coupled vs closed-form-audit
+   on the same channels with real agent execution.*
+5. **Which caveats were closed vs only sharpened?** *Closed at the
+   live layer: the W43 closed-form channels now influence run
+   behaviour through gating + compression. Sharpened: a new
+   ``W44-L-LIVE-DUAL-CHANNEL-COLLUSION-CAP`` limitation theorem
+   tightens the W43-L-DUAL-CHANNEL-COLLUSION-CAP wall to the live
+   layer; a new ``W44-L-MODEL-INDIFFERENCE-CAP`` honestly bounds
+   the factoradic compressor's behavioural effect on real LLMs.
+   The W43 substrate conjectures (mixed-curvature latent, KV
+   pooling, Grassmannian homotopy) carry forward unchanged. A new
+   ``W44-C-LIVE-LATENT`` conjecture covers the audit-only
+   hyperbolic and euclidean channels.*
+6. **Did release readiness truly improve?** *N/A. W44 is a
+   research milestone, not a release. The released CoordPy
+   0.5.20 line is byte-for-byte unchanged.*
+7. **Is the original thesis materially stronger or still blocked
+   by a deeper trust/semantics wall?** *MATERIALLY STRONGER on
+   the live-coupling axis; the deeper substrate wall is unchanged.
+   The W44 mechanism demonstrates that capsule-layer manifold
+   state can drive actual run behaviour while preserving full
+   content-addressed audit.*
+8. **Did anything previously claimed get retracted?** *NO new
+   retractions at W44; the W41-INFRA-1 retraction (``.101`` is
+   Apple TV) carries forward unchanged.*
+
+Named open frontier after W44: ``W43-C-MIXED-CURVATURE-LATENT``,
+``W43-C-COLLECTIVE-KV-POOLING``, ``W43-C-FULL-GRASSMANNIAN-
+HOMOTOPY`` (carry forward), plus the new ``W44-C-LIVE-LATENT``
+(promoting the audit-only hyperbolic and euclidean channels to
+behavioural channels at the live layer; substrate-blocked or
+domain-specific). All four require new architectural substrate
+or domain-specific observation builders beyond the W44 mechanism.
 
 ---
 
