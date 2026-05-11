@@ -5,9 +5,72 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W47 W48
-> milestone (Shared-State Transformer-Proxy research line),
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W48 W49
+> milestone (Multi-Block Cross-Bank Coordination research line),
 > 2026-05-11.
+
+## TL;DR — W49 Multi-Block Cross-Bank Coordination (post-W48 research milestone)
+
+The programme now has **forty-six** coupled research axes.
+W49 mints axis 46: **multi-block, multi-bank, retention-headed,
+dictionary-compressed** capsule-native layer with `L_p`-stacked
+`ProxyTransformerBlock`s (each = multi-head attention +
+position-wise tanh feed-forward + trainable residual scale),
+**role-conditioned multi-bank pseudo-KV** (one bank per role
+plus a shared team bank) with a trainable `BankRouter` for
+writes and a trainable `BankMixGate` for reads, a trainable
+**`EvictionPolicy`** that scores slots over
+`(age, role_match, write_gate)` (replaces FIFO), a separate
+trainable **`RetentionHead`** answering binary "was this fact
+stored?" questions against the multi-bank read, a trainable
+**`DictionaryCodebook`** (K-prototype) that quantises the
+latent-control payload to a packed `LATENT_CTRL_V2` block, a
+content-addressed **`SharedLatentCapsule` per turn** whose
+chain is recoverable from the envelope chain alone, and a
+per-turn **`CrammingWitness`** recording structured-bits /
+visible-token frontier. W49 is the strongest *executable proxy*
+for deep, role-aware, retention-headed transformer-internal
+coupling we can write today at the capsule layer; it does
+NOT touch real KV bytes, hidden states, or attention weights.
+W49 is **held outside the stable SDK contract** at this
+milestone (the W49 module ships at
+`coordpy.multi_block_proxy`); the released v0.5.20 wheel's
+public surface is byte-for-byte unchanged. SDK contract,
+capsule-view schema, provenance schema, and the W43..W48
+surfaces are unchanged.
+
+W49 directly attacks the post-W48 question of **how to push
+depth + role-conditioned memory + retention + compression at the
+capsule layer**. The R-96 + R-97 benchmark families across 3
+seeds × 16 cell families show:
+
+* multi-block depth +0.292 acc on three-way XOR composition
+  (vs W48 single-block);
+* multi-bank role recall +0.208 cosine vs single-bank;
+* learned eviction +0.859 cosine on bank overflow vs FIFO;
+* retention head +0.500 binary accuracy on the synthetic
+  regime (vs no-head baseline at 0.5 chance);
+* dictionary compression saves 25% of W48 control-block tokens
+  while round-tripping bijectively;
+* shared-latent capsule chain-walks back 1.000 across 3 seeds;
+* cross-bank causal interference perturbation = 0.000 (proves
+  role-bank isolation);
+* replay determinism 1.000;
+* envelope verifier detects 8/8 disjoint forgeries (22 disjoint
+  failure modes total; cumulative W22..W49 = **323 named
+  failure modes**);
+* long-branch retention +0.268 cosine on a length-12 path
+  vs W48 single-bank;
+* cycle reconstruction +0.461 cosine;
+* cramming structured-bits / visible-token ratio 5.0 vs 3.0
+  (1.67× ratio);
+* `MultiBlockAwareSyntheticBackend` H14 live anchor:
+  task-correct rate 1.000 vs transcript-replay 0.000;
+* aggressive-compression info/token +0.500;
+* `r97_multi_block_distribution_cap` limitation reproduces
+  honestly (downstream_protect_rate = 0.000 under adversarial
+  training-distribution forgery, strengthening
+  `W48-L-PROXY-DISTRIBUTION-CAP`).
 
 ## TL;DR — W48 Shared-State Transformer-Proxy (post-W47 research milestone)
 

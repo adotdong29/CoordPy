@@ -2,7 +2,68 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W47 research-line update (W48 Shared-State
+> **Post-W48 research-line update (W49 Multi-Block Cross-Bank
+> Coordination, 2026-05-11).** After W48 introduced a shared
+> base state + single pseudo-KV bank + single-block multi-head
+> proxy attention, the programme pushed simultaneously on
+> *depth*, *role-conditioned multi-bank memory*, *learned
+> eviction*, *retention*, and *dictionary compression*: W49
+> stacks `L_p = 2` `ProxyTransformerBlock`s (each with multi-
+> head attention + position-wise tanh feed-forward + trainable
+> residual scale); runs **per-role + shared multi-bank pseudo-
+> KV** with a trainable `BankRouter` for writes and a trainable
+> `BankMixGate` for reads; replaces the FIFO ring with a
+> trainable `EvictionPolicy` that scores slots by
+> `(age, role_match, write_gate)`; adds a separate
+> `RetentionHead` answering "was this fact stored?"; trains a
+> `K`-prototype `DictionaryCodebook` that quantises the
+> latent-control payload to a single codebook index emitted as
+> a `LATENT_CTRL_V2` block; and evolves a content-addressed
+> `SharedLatentCapsule` per turn whose chain is recoverable from
+> the envelope chain alone. Each turn binds a per-turn
+> `CrammingWitness` recording structured-bits / visible-token
+> frontier. The W49 envelope verifier enumerates 22 disjoint
+> failure modes; **cumulative trust boundary across W22..W49 =
+> 323 enumerated failure modes**. Headline R-96 / R-97 results
+> (3 seeds × 16 cell families): multi-block depth +0.292 acc on
+> a three-way XOR composition; multi-bank recall +0.208 cosine;
+> learned eviction +0.859 cosine on overflow; retention head
+> +0.500 binary accuracy; dictionary saves 25% of control-block
+> tokens; shared-latent chain-walk 1.000; cross-bank
+> interference 0.000 (proves role isolation); replay
+> determinism 1.000; verifier detects 8/8 forgeries;
+> long-branch retention +0.268 on a length-12 path; cycle
+> reconstruction +0.461 cosine; cramming bits-per-token 5.0 vs
+> 3.0 (1.67×); `MultiBlockAwareSyntheticBackend` live anchor
+> 1.000 vs 0.000 transcript-replay; aggressive compression
+> +0.500 info/visible-token; multi_block_distribution_cap 0.000
+> (limitation reproduces). Honest scope: W49 does NOT close any
+> of `W43-C-MIXED-CURVATURE-LATENT`,
+> `W43-C-COLLECTIVE-KV-POOLING`,
+> `W43-C-FULL-GRASSMANNIAN-HOMOTOPY`,
+> `W47-C-DEEP-TRANSFORMER-COUPLING`,
+> `W48-C-DEEP-TRANSFORMER-COUPLING`,
+> `W48-C-REAL-KV-COUPLED-PROXY`,
+> `W48-C-MULTI-HOST-SHARED-STATE`. New limitations:
+> `W49-L-NO-REAL-KV-CAP` (multi-bank still reproduces the
+> algebraic interface, NOT real KV bytes),
+> `W49-L-MULTI-BLOCK-DISTRIBUTION-CAP` (strengthens W48-L-
+> PROXY-DISTRIBUTION-CAP),
+> `W49-L-PURE-PYTHON-TRAINING-COST-CAP` (carries forward),
+> `W49-L-CTRL-AWARE-MODEL-INDIFFERENCE-CAP` (carries forward).
+> New conjectures: `W49-C-DEEP-TRANSFORMER-COUPLING` (carries
+> forward, bounds W48-C further) and
+> `W49-C-CROSS-MODEL-LATENT-TRANSFER` (cross-tokenizer latent
+> transfer requires backend support). The W49 module ships at
+> `coordpy.multi_block_proxy` and is reachable only via explicit
+> import; the released v0.5.20 wheel's public surface is byte-
+> for-byte unchanged. See
+> `docs/RESULTS_COORDPY_W49_MULTI_BLOCK_PROXY.md` for the full
+> result note and
+> `docs/SUCCESS_CRITERION_W49_MULTI_BLOCK_PROXY.md` for the
+> pre-committed bar.
+>
+> **Earlier post-W47 research-line update (W48 Shared-State
 > Transformer-Proxy, 2026-05-11).** After W47 made the
 > manifold-memory controller end-to-end trainable via pure-
 > Python reverse-mode AD + Adam SGD, the programme attacked the

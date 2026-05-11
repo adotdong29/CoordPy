@@ -12658,6 +12658,121 @@ See `docs/RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md` and
 `docs/SUCCESS_CRITERION_W48_SHARED_STATE_PROXY.md` for full
 results.
 
+## After v0.5.20 + W43..W48 — W49 Multi-Block Cross-Bank Coordination (research milestone, NOT a release)
+
+**Step 48 — W49 Multi-Block Cross-Bank Coordination (post-W48 research milestone, 2026-05-11).**
+
+W49 mints axis 46 of the programme: **multi-block stacked,
+role-conditioned multi-bank, retention-headed, dictionary-
+compressed** capsule-native layer. Where W48 shipped a single
+block over a single pseudo-KV bank, W49 introduces:
+
+1. **Multi-block proxy transformer stack.** `L_p`-stacked
+   `ProxyTransformerBlock`s (default `L_p = 2`); each block is
+   a multi-head proxy attention sub-layer + position-wise tanh
+   feed-forward sub-layer + trainable residual scale.
+
+2. **Role-conditioned multi-bank pseudo-KV.** Per-role banks
+   plus a shared team bank inside `MultiBankPseudoKV`. Writes
+   are routed by a learned `BankRouter` sigmoid; reads
+   aggregate via a learned `BankMixGate` over (role-bank read,
+   shared-bank read).
+
+3. **Learned eviction policy.** `EvictionPolicy` — trainable
+   sigmoid scorer over `(slot_age, role_match, write_gate)`
+   that picks which slot to evict when a bank is at capacity.
+
+4. **Retention/recall head.** `RetentionHead` — separate
+   two-layer tanh-then-sigmoid head answering "was this fact
+   stored?" against the multi-bank read.
+
+5. **Dictionary codebook compression.** `DictionaryCodebook` —
+   `K`-prototype codebook (default `K = 8`); the latent-control
+   payload is quantised to a single codebook index emitted as
+   a packed `LATENT_CTRL_V2` block.
+
+6. **Content-addressed `SharedLatentCapsule` per turn.** The
+   latent at turn `t` is the trained `SharedLatentProjector`
+   projection of the multi-block output of turn `t-1`. Chain-
+   walk through `shared_latent_parent_cid` recovers all prior
+   latent states from the envelope chain alone.
+
+7. **`CrammingWitness`.** Per-turn structured-bits +
+   visible-token + shared-latent capsule bytes + bits-per-
+   visible-token witness, content-addressed.
+
+8. **22 disjoint envelope-verifier failure modes.** Cumulative
+   trust boundary across W22..W49 = **323 enumerated failure
+   modes**.
+
+9. **`MultiBlockProxyTeam` orchestrator.** Reduces to
+   `SharedStateProxyTeam.run` byte-for-byte under trivial
+   config (the `W49-L-TRIVIAL-MULTI-BLOCK-PASSTHROUGH`
+   falsifier).
+
+The R-96 + R-97 benchmark families across 3 seeds × 16 cell
+families: trivial-passthrough 1.000 across all three arms;
+multi_block_depth +0.292 acc on a three-way XOR composition vs
+single-block W48; multi_bank_recall +0.208 cosine on per-role
+fact recall; learned_eviction +0.859 cosine on FIFO-overflow
+recall; retention_head +0.500 binary recall accuracy;
+dictionary_compression +25% token savings vs W48; shared_latent
+chain-walk 1.000; cross_bank_interference 0.000 (perfect
+isolation); replay_determinism 1.000; verifier_soundness 1.000
+(8/8 forgeries detected); long_branch_retention +0.268 cosine
+on length-12 path; cycle_reconstruction +0.461 cosine; cramming
+ratio 5.0 vs W48's 3.0 bits/visible-token (1.67×);
+shared_state_vs_transcript +1.000 task-correct (live anchor on
+`MultiBlockAwareSyntheticBackend`); aggressive_compression
++0.500 info/visible-token; multi_block_distribution_cap 0.000
+(limitation reproduces honestly).
+
+W49 is the strongest *executable proxy* for transformer-
+internal coupling at the capsule layer:
+
+* W43..W48 substrate-blocked conjectures
+  (`W43-C-MIXED-CURVATURE-LATENT`,
+  `W43-C-COLLECTIVE-KV-POOLING`,
+  `W43-C-FULL-GRASSMANNIAN-HOMOTOPY`,
+  `W47-C-DEEP-TRANSFORMER-COUPLING`,
+  `W48-C-DEEP-TRANSFORMER-COUPLING`,
+  `W48-C-REAL-KV-COUPLED-PROXY`,
+  `W48-C-MULTI-HOST-SHARED-STATE`)
+  **carry forward unchanged**.
+* `W49-L-NO-REAL-KV-CAP` (new) carries the substrate caps
+  forward explicitly.
+* `W49-L-MULTI-BLOCK-DISTRIBUTION-CAP` (new, strengthens
+  `W48-L-PROXY-DISTRIBUTION-CAP`) reproduces honestly.
+* `W49-C-DEEP-TRANSFORMER-COUPLING` (new conjectural direction,
+  bounds W48-C-DEEP-TRANSFORMER-COUPLING further).
+* `W49-C-CROSS-MODEL-LATENT-TRANSFER` (new conjectural
+  direction): cross-tokenizer latent transfer requires backend
+  support outside W49 scope.
+
+Released SDK contract preserved byte-for-byte; the W49 module
+ships at `coordpy.multi_block_proxy` and is reachable only via
+explicit import. The honest programme storyline is now:
+**W43**: executable product-manifold capsules; **W44**: live
+manifold-conditioned behaviour; **W45**: closed-form ridge
+learned controller; **W46**: deeper memory-conditioned
+approximation with packed control + shared-prefix capsule;
+**W47**: autograd-trained, end-to-end-differentiable
+capsule-native manifold-memory stack; **W48**:
+shared-state transformer-proxy with team-shared base state,
+pseudo-KV factor bank, multi-head proxy attention,
+reconstruction, branch/cycle bias; **W49**: **multi-block
+cross-bank coordination** with `L_p`-stacked proxy transformer
+blocks, role-conditioned multi-bank pseudo-KV, learned
+eviction, retention head, dictionary codebook, per-turn
+shared-latent capsule, and cramming witness — **the strongest
+honest capsule-layer reconstruction of a multi-block
+transformer block stack with role-aware memory we can write
+today**.
+
+See `docs/RESULTS_COORDPY_W49_MULTI_BLOCK_PROXY.md` and
+`docs/SUCCESS_CRITERION_W49_MULTI_BLOCK_PROXY.md` for full
+results.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

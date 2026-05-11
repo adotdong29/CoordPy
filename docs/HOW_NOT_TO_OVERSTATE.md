@@ -2,10 +2,77 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W47
-> W48 milestone (Shared-State Transformer-Proxy research line), 2026-05-11.
-> Earlier: post-W46 W47 milestone (Autograd Manifold Stack) 2026-05-10. Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03. Earlier: SDK v3.42 (W41 family) 2026-05-03. Earlier: SDK v3.38 (W37 family) 2026-05-02. Earlier: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
+> README-of-README must satisfy these rules. Last touched: post-W48
+> W49 milestone (Multi-Block Cross-Bank Coordination research line), 2026-05-11.
+> Earlier: post-W47 W48 milestone (Shared-State Transformer-Proxy) 2026-05-11. Earlier: post-W46 W47 milestone (Autograd Manifold Stack) 2026-05-10. Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03. Earlier: SDK v3.42 (W41 family) 2026-05-03. Earlier: SDK v3.38 (W37 family) 2026-05-02. Earlier: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
 > v3.33 (W32 family) 2026-05-01.
+
+## W49 (Multi-Block Cross-Bank Coordination) — explicit do-not-overstate rules
+
+W49 stacks `L_p`-block proxy transformers on top of role-
+conditioned multi-bank pseudo-KV, learned eviction, retention
+head, dictionary-codebook compression, and a content-addressed
+per-turn shared-latent capsule. The strongest *executable
+proxy* available at the capsule layer without substrate
+access.
+
+* *"W49 is a real `L_p`-block transformer"* — forbidden unless
+  qualified as "`L_p`-block capsule-layer proxy transformer
+  over a pseudo-KV factor bank". W49 reproduces a transformer
+  block stack's *algebraic interface* at the capsule layer;
+  it does not transplant a real transformer's stacked blocks
+  + KV cache + hidden states.
+
+* *"W49 supports real KV"* — forbidden. The multi-bank
+  pseudo-KV banks reproduce the algebraic interface; they do
+  not transplant real KV bytes.
+
+* *"W49 closes the transformer-coupling conjecture"* —
+  forbidden. The substrate-blocked W43 conjectures
+  (`W43-C-MIXED-CURVATURE-LATENT`,
+  `W43-C-COLLECTIVE-KV-POOLING`,
+  `W43-C-FULL-GRASSMANNIAN-HOMOTOPY`) and the carry-forwards
+  (`W47-C-DEEP-TRANSFORMER-COUPLING`,
+  `W48-C-DEEP-TRANSFORMER-COUPLING`,
+  `W48-C-REAL-KV-COUPLED-PROXY`,
+  `W48-C-MULTI-HOST-SHARED-STATE`) **all carry forward
+  unchanged**. W49 *strengthens the bounding* by adding more
+  depth + role isolation + retention + compression +
+  audit-ready shared-latent chains, but it does not close
+  transformer-internal substrate access.
+
+* *"W49 generalises across distributions"* — forbidden. The
+  `W49-L-MULTI-BLOCK-DISTRIBUTION-CAP` limitation reproduces
+  honestly on R-97: mean `downstream_protect_rate = 0.000`
+  across 3 seeds when the adversary controls the multi-bank
+  banks + training distribution.
+
+* *"W49 trains efficiently"* — forbidden. The pure-Python
+  reverse-mode autograd from W47 has per-step cost
+  approximately `L_p` × W48 (`O(L_p · n_params · n_examples)`).
+  `W49-L-PURE-PYTHON-TRAINING-COST-CAP` carries forward;
+  production training requires NumPy/JAX/PyTorch bindings.
+
+* *"W49 makes real LLMs condition on the multi-block headers"*
+  — forbidden. `W49-L-CTRL-AWARE-MODEL-INDIFFERENCE-CAP`
+  carries forward from W48. The H14 task-correct rate is
+  measured on the deterministic
+  `MultiBlockAwareSyntheticBackend`; on real LLMs the saving
+  is bounded to "the trained packed control block +
+  shared-latent header are in the model's context". Real-LLM
+  conditioning on `LATENT_CTRL_V2:` is conjectural.
+
+* *"W49 transfers latent state across hosts/models"* —
+  forbidden. `W49-C-CROSS-MODEL-LATENT-TRANSFER` is conjectural
+  and requires backend-side tokenizer-agnostic adapter outside
+  W49 scope.
+
+* *"W49 bumps the version"* — forbidden. `coordpy.__version__`
+  remains `"0.5.20"`; `coordpy.SDK_VERSION` remains
+  `"coordpy.sdk.v3.43"`. The released wheel surface is byte-
+  for-byte unchanged. W49 ships at `coordpy.multi_block_proxy`
+  and is reachable only through an explicit import — same
+  convention as W43..W48.
 
 ## W48 (Shared-State Transformer-Proxy) — explicit do-not-overstate rules
 

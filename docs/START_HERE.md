@@ -248,6 +248,36 @@ is byte-for-byte unchanged. See
 [`RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md`](RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md)
 for the full result note.
 
+**Post-W48 research milestone — W49 Multi-Block Cross-Bank Coordination**
+
+The next research step after W48 (W49) introduces the
+**Multi-Block Cross-Bank Coordination (MBCC)** layer: the first
+capsule-native CoordPy layer where `L_p`-stacked proxy
+transformer blocks (each with multi-head attention + position-
+wise feed-forward + residual scale) sit on top of **role-
+conditioned multi-bank pseudo-KV** (one bank per role plus a
+shared team bank), with reads aggregated by a learned **bank-mix
+gate** and writes routed by a learned **bank-router**, slot
+evictions decided by a trainable **eviction policy** (replacing
+W48's FIFO), a separate **retention head** that answers a
+binary "was this fact stored?" question against the multi-bank
+read, a **dictionary codebook** (`K`-prototype) that quantises
+the latent-control payload to a packed `LATENT_CTRL_V2` block
+with strictly more structured bits per visible token than W48,
+and a **content-addressed `SharedLatentCapsule` per turn** whose
+value is the trained projection of the prior turn's multi-block
+output and whose chain is recoverable from the envelope chain
+alone. Each turn binds a per-turn `CrammingWitness` recording
+structured-bits / visible-token frontier. Carries forward
+W48's 22-mode verifier surface — **cumulative trust boundary
+across W22..W49 = 323 enumerated failure modes**. W49 is held
+outside the stable SDK contract — it ships at
+`coordpy.multi_block_proxy` and is reachable only via explicit
+import; the released v0.5.20 wheel's public surface is byte-for-
+byte unchanged. See
+[`RESULTS_COORDPY_W49_MULTI_BLOCK_PROXY.md`](RESULTS_COORDPY_W49_MULTI_BLOCK_PROXY.md)
+for the full result note.
+
 **Post-W46 research milestone — W47 Autograd Manifold Stack**
 
 The next research step after W46 (W47) introduces the **Autograd
@@ -356,6 +386,8 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Post-W48 research milestone (W49)    | [`RESULTS_COORDPY_W49_MULTI_BLOCK_PROXY.md`](RESULTS_COORDPY_W49_MULTI_BLOCK_PROXY.md) |
+> | Pre-committed success bar (W49)      | [`SUCCESS_CRITERION_W49_MULTI_BLOCK_PROXY.md`](SUCCESS_CRITERION_W49_MULTI_BLOCK_PROXY.md) |
 > | Post-W47 research milestone (W48)    | [`RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md`](RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md) |
 > | Pre-committed success bar (W48)      | [`SUCCESS_CRITERION_W48_SHARED_STATE_PROXY.md`](SUCCESS_CRITERION_W48_SHARED_STATE_PROXY.md) |
 > | Post-W46 research milestone (W47)    | [`RESULTS_COORDPY_W47_AUTOGRAD_MANIFOLD.md`](RESULTS_COORDPY_W47_AUTOGRAD_MANIFOLD.md) |

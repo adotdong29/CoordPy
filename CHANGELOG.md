@@ -13,6 +13,50 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W49 Multi-Block Cross-Bank Coordination** (post-W48,
+  2026-05-11) — `coordpy.multi_block_proxy`,
+  `coordpy.r96_benchmark`, `coordpy.r97_benchmark`. The
+  strongest *executable proxy* for deep, role-aware,
+  retention-headed transformer-internal coupling at the capsule
+  layer: an `L_p`-stacked **multi-block proxy transformer**
+  (`L_p = 2` default; each block = multi-head attention +
+  position-wise tanh feed-forward + trainable residual scale);
+  **role-conditioned multi-bank pseudo-KV** (one bank per role
+  plus a shared team bank, with a trainable `BankRouter` for
+  writes and a trainable `BankMixGate` for reads); a trainable
+  **`EvictionPolicy`** that scores slots over
+  `(age, role_match, write_gate)` and replaces FIFO under
+  capacity pressure; a separate trainable **`RetentionHead`**
+  answering binary "was this fact stored?" questions against the
+  multi-bank read; a trainable **`DictionaryCodebook`**
+  (`K = 8` default) that quantises the latent-control payload
+  to a packed `LATENT_CTRL_V2` block carrying
+  `code=<int>/<bits>b mask=... bits=...`; a content-addressed
+  **`SharedLatentCapsule`** evolving per turn (chain-walk
+  recovers all prior latent states from the envelope chain
+  alone); a per-turn **`CrammingWitness`** recording structured-
+  bits / visible-token frontier; a 22-mode envelope verifier.
+  Cumulative trust boundary W22..W49 = **323 named failure
+  modes**. R-96 + R-97 benchmarks (3 seeds × 16 cell families):
+  multi_block_depth +0.292 acc on three-way XOR composition;
+  multi_bank_recall +0.208 cosine; learned_eviction +0.859
+  cosine on overflow; retention_head +0.500 accuracy;
+  dictionary saves 25% control-block tokens; shared-latent
+  chain-walk 1.000; cross-bank interference 0.000 (proves
+  isolation); replay determinism 1.000; long-branch retention
+  +0.268 cosine; cycle reconstruction +0.461 cosine; cramming
+  bits/token 5.0 vs 3.0 (1.67×); live-anchor task-correct rate
+  1.000 vs 0.000; aggressive compression +0.500 info/token;
+  multi_block_distribution_cap 0.000 (limitation reproduces).
+  Does NOT close W43..W48 substrate-blocked conjectures. New
+  limitations: `W49-L-NO-REAL-KV-CAP`,
+  `W49-L-MULTI-BLOCK-DISTRIBUTION-CAP` (strengthens
+  `W48-L-PROXY-DISTRIBUTION-CAP`). New conjectures:
+  `W49-C-DEEP-TRANSFORMER-COUPLING` (carry-forward, bounds W48
+  further), `W49-C-CROSS-MODEL-LATENT-TRANSFER`. See
+  `docs/RESULTS_COORDPY_W49_MULTI_BLOCK_PROXY.md` and
+  `docs/SUCCESS_CRITERION_W49_MULTI_BLOCK_PROXY.md`.
+
 - **W48 Shared-State Transformer-Proxy** (post-W47, 2026-05-11) —
   `coordpy.shared_state_proxy`, `coordpy.r95_benchmark`. The
   strongest *executable proxy* for transformer-internal
