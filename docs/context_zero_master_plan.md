@@ -12368,13 +12368,186 @@ bounded by W46 at the capsule layer; transformer-internal
 direction still open),
 ``W45-C-DEEP-TRANSFORMER-COUPLING`` (carry forward), plus the
 new ``W46-C-AUTOGRAD-DEEP-STACK`` (SGD / backprop-trained
-multi-layer stack — deliberately deferred). The honest
+multi-layer stack — deliberately deferred at W46). The honest
 storyline for the programme is now: **W43**: executable
 product-manifold capsules; **W44**: live manifold-conditioned
 behaviour; **W45**: first serious learned / transformer-facing
 approximation; **W46**: deeper, multi-layer, memory-conditioned,
 transformer-facing approximation with packed model-facing
 control + shared-prefix capsule reuse.
+
+## After v0.5.20 + W43 PMC + W44 LMCC + W45 LMC + W46 MMC — W47 Autograd Manifold Stack (research milestone, NOT a release)
+
+W47 is the post-W46 research milestone. Where W46 introduced a
+multi-layer, memory-conditioned, stage-wise-closed-form-ridge-
+fitted controller, W47 makes the entire stack **end-to-end
+trainable by autograd SGD/Adam** — closing the
+`W46-C-AUTOGRAD-DEEP-STACK` carry-forward under the explicit
+"pure-Python reverse-mode AD + Adam SGD" reading. Nine
+trainable, content-addressed components — all in pure Python
+with no NumPy/JAX/PyTorch dependency:
+
+* **Pure-Python reverse-mode autograd engine.** A `Variable`
+  class with topologically-sorted backward pass. Supports `+`,
+  `-`, `*`, `/`, `**`, `dot`, `matmul`, `tanh`, `sigmoid`,
+  `relu`, `exp`, `log`, `softmax`, `mean`, `sum`. Bound by a
+  finite-difference gradient check passing for every supported
+  op at max FD err < 1e-9 on the R-94 test points.
+
+* **Trainable multi-layer manifold stack.** An `L`-layer
+  fully-connected tanh stack over flattened channel features
+  (24 inputs at the W43/W45/W46 defaults), trained by Adam SGD
+  on a binary cross-entropy loss. The final layer collapses to
+  a single scalar gate logit. Seed-deterministic initialisation
+  via a pure-Python LCG.
+
+* **Trainable rank-r LoRA-style role adapter.** Per-role
+  trainable factor matrices `A` (in_dim × r) and `B` (r,); the
+  per-role delta is `B^T A^T h`, a scalar additive correction
+  to the gate logit. Trained jointly with the stack on per-role
+  residuals.
+
+* **Trainable K-prototype dictionary.** `K` trainable prototype
+  vectors, jointly optimised via a soft-assignment
+  cross-entropy + straight-through residual reconstruction
+  loss. Encode remains bijective at inference (closest
+  prototype + residual = original feature vector).
+
+* **Trainable QKV memory head.** Three trainable projections
+  (`W_Q`, `W_K`, scalar `W_V`) plus two trainable biases. The
+  head implements scaled dot-product attention exactly as a
+  transformer attention head, but at the capsule layer over
+  the W46 memory bank. Strictly more expressive than the W46
+  cosine pool on engineered OOD memory regimes.
+
+* **Trainable packed control serializer.** A small trainable
+  gate per `MANIFOLD_CTRL` auxiliary field (`layer_logits`,
+  `mem_attn`, `dict_idx`, `mem_summary`). Each gate is a
+  sigmoid-activated scalar trained jointly with the rest of
+  the stack; at inference, gates above 0.5 emit the field,
+  gates below 0.5 suppress. The emit mask is a first-class
+  envelope field.
+
+* **Adam-style optimiser in pure Python.** First-moment +
+  second-moment EMAs over per-parameter gradients with a
+  fixed learning rate, fixed betas (β1 = 0.9, β2 = 0.999),
+  fixed epsilon (1e-8), per-tensor L2 gradient clipping, and
+  a deterministic step counter.
+
+* **Content-addressed training trace.** A sealed
+  `TrainingTraceWitness` records the seed, n_steps, optimiser
+  config, loss/grad-norm history (head + tail), final loss,
+  final params CID, training-set CID, and divergence flag. The
+  trace CID is a first-class field of the W47 envelope; an
+  auditor can re-fit on the same seed + training set and
+  verify the trace CID matches.
+
+* **`AutogradManifoldTeam` orchestrator.** Sits beside W46
+  `ManifoldMemoryTeam`. Reduces to it byte-for-byte under
+  trivial config (the W47-L-TRIVIAL-AUTOGRAD-PASSTHROUGH
+  falsifier).
+
+W47 ships at `coordpy.autograd_manifold` and
+`coordpy.r94_benchmark`, reachable only via explicit import. It
+is **not** added to `coordpy.__experimental__` at this
+milestone. The released `coordpy.__version__` and
+`coordpy.SDK_VERSION` are unchanged. The first-run UX is
+unaffected; the smoke driver reports "ALL CHECKS PASSED" with
+the W47 module on disk; the W43 / W44 / W45 / W46 benchmark
+families reproduce byte-for-byte.
+
+**The 8 questions, after W47:**
+
+1. **Is the product still trustworthy?** *Yes. The released
+   CoordPy 0.5.20 contract is byte-for-byte unchanged; the W47
+   surface is a sibling class (`AutogradManifoldTeam`)
+   reachable only via explicit import.*
+2. **Did the trust boundary widen?** *Yes: +18 new disjoint
+   enumerated failure modes at the W47 verifier; cumulative
+   across W22..W47 = 279 enumerated failure modes.*
+3. **Is the capsule chain still content-addressed end-to-end?**
+   *Yes — and richer. W47 adds the
+   `AutogradManifoldHandoffEnvelope` (binding TEAM_HANDOFF +
+   W46 envelope + autograd-params CID + training-trace CID +
+   per-component CIDs for stack / role adapter / dictionary /
+   memory head / control serializer + the autograd forward
+   witness CID + the emit mask).*
+4. **Did the cramming axis advance?** *Yes — *adaptively*. W47
+   preserves all W43/W44/W45/W46 structured bits AND adds a
+   trained 4-bit emit mask that lets the model-facing
+   `MANIFOLD_CTRL` block *suppress* auxiliary fields that the
+   trained controller has learned are not useful — reducing
+   per-turn visible-token cost adaptively rather than at a
+   fixed budget. The training trace CID adds 256 bits of
+   training provenance per envelope at zero visible-token
+   cost.*
+5. **Did the geometry/learning axis advance?** *Materially.
+   W47 introduces the **first end-to-end-differentiable**
+   capsule-layer manifold stack. A pure-Python reverse-mode
+   autograd engine, an Adam-style optimiser, a trainable
+   rank-r role adapter, a trainable K-prototype dictionary, a
+   trainable QKV memory head (which beats the W46 cosine pool
+   on engineered OOD memory regimes), and a trainable
+   packed-control serializer that learns which fields to emit.
+   `W46-C-AUTOGRAD-DEEP-STACK` is **closed at W47** under the
+   "pure-Python reverse-mode AD + Adam" reading. The substrate
+   conjectures (`W43-C-MIXED-CURVATURE-LATENT`,
+   `W43-C-COLLECTIVE-KV-POOLING`,
+   `W43-C-FULL-GRASSMANNIAN-HOMOTOPY`,
+   `W45-C-DEEP-TRANSFORMER-COUPLING`,
+   `W46-C-DEEP-TRANSFORMER-COUPLING`) carry forward unchanged
+   — still substrate-blocked. New limitations:
+   `W47-L-PURE-PYTHON-TRAINING-COST-CAP` (the pure-Python
+   engine is correct but slow);
+   `W47-L-AUTOGRAD-DISTRIBUTION-CAP` (the trained controller
+   learns whatever distribution it is shown);
+   `W47-L-NO-HIDDEN-STATE-CAP` (carries forward from W46);
+   `W47-L-CTRL-AWARE-MODEL-INDIFFERENCE-CAP` (strengthens
+   W46-L-CONTROL-TOKEN-MODEL-INDIFFERENCE-CAP). New conjectures:
+   `W47-C-LIVE-MULTI-HOST-AUTOGRAD` (cross-host trained
+   controllers); `W47-C-GPU-BACKED-AUTOGRAD-SDK` (NumPy/JAX/
+   PyTorch binding that lifts the training cost cap).*
+6. **Did release readiness truly improve?** *N/A. W47 is a
+   research milestone, not a release. The released CoordPy
+   0.5.20 line is byte-for-byte unchanged.*
+7. **Is the original thesis materially stronger or still
+   blocked by a deeper trust/semantics wall?** *MATERIALLY
+   STRONGER on the trainability axis; the deeper substrate
+   wall is unchanged. W47 demonstrates that capsule-layer
+   manifold state can be **trained end-to-end by autograd
+   SGD/Adam** with full replay determinism, content-addressed
+   training traces, and a 21-mode verifier — preserving every
+   capsule-layer audit property of W43/W44/W45/W46.*
+8. **Did anything previously claimed get retracted?** *NO new
+   retractions at W47; the W41-INFRA-1 retraction (`.101` is
+   Apple TV) carries forward unchanged. The
+   `W46-C-AUTOGRAD-DEEP-STACK` carry-forward is *closed*
+   rather than retracted — its conjectural status at W46 was
+   honest; W47 fulfils it under an explicit "pure-Python
+   reverse-mode AD + Adam SGD" reading.*
+
+Named open frontier after W47: `W43-C-MIXED-CURVATURE-LATENT`,
+`W43-C-COLLECTIVE-KV-POOLING`, `W43-C-FULL-GRASSMANNIAN-HOMOTOPY`
+(carry forward), `W44-C-LIVE-LATENT` (further bounded by
+W47 — the trained autograd stack consumes all six channels and
+is end-to-end-trainable; transformer-internal still open),
+`W45-C-DEEP-TRANSFORMER-COUPLING` (carry forward),
+`W46-C-DEEP-TRANSFORMER-COUPLING` (carry forward), plus the new
+`W47-C-LIVE-MULTI-HOST-AUTOGRAD` and
+`W47-C-GPU-BACKED-AUTOGRAD-SDK`. The honest storyline for the
+programme is now: **W43**: executable product-manifold
+capsules; **W44**: live manifold-conditioned behaviour;
+**W45**: first serious learned / transformer-facing
+approximation (closed-form ridge); **W46**: deeper,
+multi-layer, memory-conditioned, transformer-facing
+approximation with packed model-facing control + shared-prefix
+capsule reuse (closed-form ridge); **W47**: *autograd-trained,
+end-to-end-differentiable* capsule-native manifold-memory stack
+with trainable attention head, trainable dictionary, trainable
+role adapter, trainable packed-control gates, pure-Python Adam
+optimiser, and content-addressed training trace. Closes
+W46-C-AUTOGRAD-DEEP-STACK under the explicit "pure-Python
+reverse-mode AD + Adam" reading.
 
 ---
 

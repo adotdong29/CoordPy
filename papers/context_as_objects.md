@@ -2,7 +2,68 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W45 research-line update (W46 Manifold Memory Controller,
+> **Post-W46 research-line update (W47 Autograd Manifold Stack,
+> 2026-05-10).** After W46 made the manifold-conditioned controller
+> *deeper and memory-conditioned* via stage-wise closed-form ridge,
+> the programme closed the long-standing
+> `W46-C-AUTOGRAD-DEEP-STACK` carry-forward under the explicit
+> "pure-Python reverse-mode AD + Adam SGD" reading. W47 is held
+> outside the stable SDK contract — it lives at
+> `coordpy.autograd_manifold` and is reachable only via explicit
+> import; the released v0.5.20 wheel's public surface is
+> byte-for-byte unchanged. The paper's main thesis is materially
+> **strengthened** on a new axis by W47: the controller becomes
+> *end-to-end-trainable by autograd* — a pure-Python reverse-mode
+> `Variable` engine with topologically-sorted backward, an
+> Adam-style optimiser with first/second-moment EMAs and per-tensor
+> L2 gradient clipping, a trainable multi-layer tanh manifold
+> stack, a trainable rank-r LoRA-style role adapter, a trainable
+> K-prototype dictionary with soft-assignment cross-entropy + L2
+> reconstruction, a trainable QKV memory head over the W46 bank
+> that beats the W46 cosine pool on engineered OOD memory regimes,
+> a trainable packed-control serializer whose 4-bit emit mask is
+> learned per field, and a content-addressed
+> `TrainingTraceWitness` sealing seed + optimiser config + loss
+> history + grad-norm history + final params CID + training-set
+> CID + divergence flag. The W47 envelope binds the W46 envelope
+> CID, the autograd-params CID, the training-trace CID, the
+> autograd-forward witness CID, the per-component CIDs (stack /
+> role adapter / dictionary / memory head / control serializer),
+> the memory-bank head CID, the causal-mask witness CID, the
+> control-token witness CID, the prefix-capsule CID, and the
+> prompt-construction witness CID under one `autograd_outer_cid`,
+> verified through 21 enumerated W47 failure modes disjoint from
+> the W22..W46 boundary (cumulative trust boundary across
+> W22..W47 = **279 named failure modes**). Headline R-94 results
+> (3 seeds × 12 cell families): autograd gradient check passes
+> at max FD err < 1e-9 across 6 op classes; convergence on linear
+> data reaches val_acc 1.000 within 200 SGD steps; deep stack
+> params strictly move on XOR-shaped data; trained QKV head beats
+> the W46 cosine pool on a one-hot key-value memory task
+> (trained = 0.5 vs cosine = 0.0); trainable role adapter rank-2
+> reaches ≥ 0.7 trained accuracy; trainable packed control
+> serializer's 4 sigmoid gates converge to any target boolean
+> mask in 150 SGD steps; replay determinism is bit-perfect across
+> independent fits + runs; verifier soundness detects 6 disjoint
+> forged envelopes; CTRL-aware backend task-correct rate lifts
+> from 0.0 (off / baseline) to 1.0 (full ctrl). Honest scope: W47
+> does NOT close the substrate-blocked W43 / W45 / W46
+> transformer-coupling conjectures; new limitations are
+> `W47-L-PURE-PYTHON-TRAINING-COST-CAP` (the engine is correct
+> but slow), `W47-L-AUTOGRAD-DISTRIBUTION-CAP` (the trained
+> controller learns whatever distribution it is shown — R-94
+> compromise cap mean = 0.25, max = 0.5), `W47-L-NO-HIDDEN-STATE-CAP`
+> (carries forward from W46), and `W47-L-CTRL-AWARE-MODEL-
+> INDIFFERENCE-CAP` (strengthens W46). New conjectures:
+> `W47-C-LIVE-MULTI-HOST-AUTOGRAD` (cross-host trained
+> controllers) and `W47-C-GPU-BACKED-AUTOGRAD-SDK` (NumPy/JAX/
+> PyTorch binding). See
+> `docs/RESULTS_COORDPY_W47_AUTOGRAD_MANIFOLD.md` for the full
+> result note and
+> `docs/SUCCESS_CRITERION_W47_AUTOGRAD_MANIFOLD.md` for the
+> pre-committed bar.
+>
+> **Earlier post-W45 research-line update (W46 Manifold Memory Controller,
 > 2026-05-10).** After W45 made the manifold-conditioned routing /
 > gating policy *shaped by data* via a single-layer fitted
 > controller, the programme opened a new research line on *deeper,

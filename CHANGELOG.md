@@ -3,6 +3,47 @@
 Release history for the coordpy SDK. For installation and usage,
 see [`README.md`](README.md).
 
+## Post-release research milestones (NOT releases; no version bump; no PyPI)
+
+These are research-only additions on top of the released
+0.5.20 line. Each ships at an explicit-import path and is NOT
+re-exported through `coordpy.__init__` or
+`coordpy.__experimental__`. The released SDK contract
+(`coordpy.__version__ == "0.5.20"`,
+`coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
+the public symbols) is byte-for-byte unchanged.
+
+- **W47 Autograd Manifold Stack** (post-W46, 2026-05-10) —
+  `coordpy.autograd_manifold`, `coordpy.r94_benchmark`. First
+  end-to-end-trainable capsule-layer manifold-memory stack:
+  pure-Python reverse-mode `Variable` autograd engine, Adam
+  optimiser, trainable multi-layer tanh stack, trainable
+  rank-r LoRA-style role adapter, trainable K-prototype
+  dictionary, trainable QKV memory head, trainable
+  packed-control serializer, content-addressed
+  `TrainingTraceWitness`, 21-mode envelope verifier. Closes
+  `W46-C-AUTOGRAD-DEEP-STACK` under the explicit "pure-Python
+  reverse-mode AD + Adam SGD" reading. See
+  `docs/RESULTS_COORDPY_W47_AUTOGRAD_MANIFOLD.md` and
+  `docs/SUCCESS_CRITERION_W47_AUTOGRAD_MANIFOLD.md`.
+
+- **W46 Manifold Memory Controller** (post-W45, 2026-05-10) —
+  `coordpy.manifold_memory`, `coordpy.r93_benchmark`. See
+  `docs/RESULTS_COORDPY_W46_MANIFOLD_MEMORY.md`.
+
+- **W45 Learned Manifold Controller** (post-W44, 2026-05-10) —
+  `coordpy.learned_manifold`, `coordpy.r92_benchmark`. See
+  `docs/RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md`.
+
+- **W44 Live Manifold-Coupled Coordination** (post-W43,
+  2026-05-10) — `coordpy.live_manifold`,
+  `coordpy.r91_benchmark`. See
+  `docs/RESULTS_COORDPY_W44_LIVE_MANIFOLD.md`.
+
+- **W43 Product-Manifold Capsule** (post-0.5.20, 2026-05-10) —
+  `coordpy.product_manifold`, `coordpy.r90_benchmark`. See
+  `docs/RESULTS_COORDPY_W43_PRODUCT_MANIFOLD.md`.
+
 ## [0.5.20] coordpy-team CLI front door, replay-fidelity audit trail, curated presets
 
 This release turns the lightweight `AgentTeam` surface into a real

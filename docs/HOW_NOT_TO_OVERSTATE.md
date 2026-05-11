@@ -2,8 +2,68 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03. Earlier: SDK v3.42 (W41 family) 2026-05-03. Earlier: SDK v3.38 (W37 family) 2026-05-02. Earlier: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
+> README-of-README must satisfy these rules. Last touched: post-W46
+> W47 milestone (Autograd Manifold Stack research line), 2026-05-10.
+> Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03. Earlier: SDK v3.42 (W41 family) 2026-05-03. Earlier: SDK v3.38 (W37 family) 2026-05-02. Earlier: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
 > v3.33 (W32 family) 2026-05-01.
+
+## W47 (Autograd Manifold Stack) — explicit do-not-overstate rules
+
+W47 introduces the first **autograd-trained** capsule-layer
+manifold stack. The honest claim is that the stack is *trained
+end-to-end via pure-Python reverse-mode AD + Adam SGD*. Forbidden
+phrasings:
+
+* *"W47 is a real deep neural network"* — forbidden unless
+  qualified as "a depth-L pure-Python autograd-trained capsule-
+  layer proxy". W47 is correct (gradient checks pass) but slow
+  (`W47-L-PURE-PYTHON-TRAINING-COST-CAP`); reaching modern loss
+  targets requires a NumPy/JAX/PyTorch binding which is out of
+  scope at W47.
+
+* *"W47 closes the transformer-coupling conjecture"* —
+  forbidden. W47 closes only `W46-C-AUTOGRAD-DEEP-STACK`
+  (under the explicit "pure-Python reverse-mode AD + Adam"
+  reading). The substrate-blocked carry-forwards
+  (`W43-C-MIXED-CURVATURE-LATENT`,
+  `W43-C-COLLECTIVE-KV-POOLING`,
+  `W43-C-FULL-GRASSMANNIAN-HOMOTOPY`,
+  `W45-C-DEEP-TRANSFORMER-COUPLING`,
+  `W46-C-DEEP-TRANSFORMER-COUPLING`) carry forward.
+
+* *"W47 trains on real LLM traces"* — forbidden. Training is
+  on hermetic synthetic banks pre-committed in the R-94
+  sources. Real-LLM realism anchors are bounded and not
+  load-bearing for the H1..H12 success bar.
+
+* *"W47 beats W46 across the board"* — forbidden. W47 strictly
+  beats W46 on `r94_trainable_memory_head` (trained QKV beats
+  cosine pool), on `r94_autograd_compromise_cap` (W47 mean =
+  0.25 vs W46 = 0.0 — slightly more protective), and on
+  `r94_autograd_ctrl_aware_backend` (full ctrl behavioural
+  lift). On `r94_trainable_dictionary` the W46 closed-form
+  K-prototype is competitive on small banks; W47's claim is
+  *trainability*, not strict reconstruction-error superiority.
+
+* *"W47 is GPU-accelerated"* — forbidden. The pure-Python
+  autograd engine has per-step cost
+  O(n_params × n_examples × n_layers) — no vectorisation, no
+  GPU. The new conjecture
+  `W47-C-GPU-BACKED-AUTOGRAD-SDK` names the GPU direction
+  explicitly and marks it deliberately deferred.
+
+* *"W47 makes the released SDK trainable"* — forbidden. W47
+  ships at `coordpy.autograd_manifold` and is reachable only
+  via explicit import. The released v0.5.20 wheel
+  (`coordpy.__version__`, `coordpy.SDK_VERSION`, the smoke
+  driver, the public symbols) is byte-for-byte unchanged.
+
+Permitted phrasing: *"W47 is the first capsule-layer manifold
+controller trained end-to-end by autograd SGD/Adam (pure-Python
+reverse-mode AD); it preserves every replay-determinism + audit
+property of W43..W46; it closes `W46-C-AUTOGRAD-DEEP-STACK`
+under the explicit pure-Python AD reading; it carries forward
+all substrate-blocked transformer-coupling conjectures."*
 
 The programme has a long history of moves where a candidate result
 was written up too strongly and later had to be sharpened or

@@ -215,6 +215,34 @@ byte-for-byte unchanged. See
 [`RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md`](RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md)
 for the full result note.
 
+**Post-W46 research milestone — W47 Autograd Manifold Stack**
+
+The next research step after W46 (W47) introduces the **Autograd
+Manifold Stack (AMS)** layer: the first capsule-native CoordPy
+layer where the manifold controller is **trained end-to-end by
+autograd SGD/Adam** rather than stage-wise closed-form ridge.
+Nine trainable, content-addressed components — all in pure
+Python with no NumPy/JAX/PyTorch dependency: (i) a reverse-mode
+`Variable` autograd engine with finite-difference gradient
+checks; (ii) a trainable multi-layer tanh manifold stack; (iii)
+a trainable rank-r LoRA-style role adapter; (iv) a trainable
+K-prototype dictionary with soft-assignment cross-entropy; (v)
+a trainable QKV memory head over the W46 bank; (vi) a trainable
+packed-control serializer (4 sigmoid emit gates); (vii) a
+pure-Python Adam optimiser; (viii) a content-addressed
+`TrainingTraceWitness` sealing seed + optimiser config + loss
+history + grad-norm history + final params CID; (ix) an
+`AutogradManifoldTeam` orchestrator that reduces to
+`ManifoldMemoryTeam.run` byte-for-byte under trivial config.
+W47 **closes** the `W46-C-AUTOGRAD-DEEP-STACK` carry-forward
+under the explicit "pure-Python reverse-mode AD + Adam" reading.
+W47 is held outside the stable SDK contract — it ships at
+`coordpy.autograd_manifold` and is reachable only via explicit
+import; the released v0.5.20 wheel's public surface is
+byte-for-byte unchanged. See
+[`RESULTS_COORDPY_W47_AUTOGRAD_MANIFOLD.md`](RESULTS_COORDPY_W47_AUTOGRAD_MANIFOLD.md)
+for the full result note.
+
 **Post-W45 research milestone — W46 Manifold Memory Controller**
 
 The next research step after W45 (W46) introduces the **Manifold
@@ -295,6 +323,8 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Post-W46 research milestone (W47)    | [`RESULTS_COORDPY_W47_AUTOGRAD_MANIFOLD.md`](RESULTS_COORDPY_W47_AUTOGRAD_MANIFOLD.md) |
+> | Pre-committed success bar (W47)      | [`SUCCESS_CRITERION_W47_AUTOGRAD_MANIFOLD.md`](SUCCESS_CRITERION_W47_AUTOGRAD_MANIFOLD.md) |
 > | Post-W45 research milestone (W46)    | [`RESULTS_COORDPY_W46_MANIFOLD_MEMORY.md`](RESULTS_COORDPY_W46_MANIFOLD_MEMORY.md) |
 > | Pre-committed success bar (W46)      | [`SUCCESS_CRITERION_W46_MANIFOLD_MEMORY.md`](SUCCESS_CRITERION_W46_MANIFOLD_MEMORY.md) |
 > | Post-W44 research milestone (W45)    | [`RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md`](RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md) |

@@ -5,9 +5,224 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W45 W46
-> milestone (Manifold Memory Controller research line),
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W46 W47
+> milestone (Autograd Manifold Stack research line),
 > 2026-05-10.
+
+## TL;DR — W47 Autograd Manifold Stack (post-W46 research milestone)
+
+The programme now has **forty-four** coupled research axes.
+W47 mints axis 44: **autograd-trained, end-to-end-differentiable
+capsule-native manifold-memory stack** with a pure-Python
+reverse-mode autograd engine, a trainable multi-layer tanh
+manifold stack, a trainable rank-r LoRA-style role adapter, a
+trainable K-prototype dictionary, a trainable QKV memory head
+over the W46 bank, a trainable packed-control serializer, an
+Adam-style optimiser, and a content-addressed
+`TrainingTraceWitness`. W47 is the first capsule-native CoordPy
+layer where the controller is **trained end-to-end by autograd
+SGD/Adam** rather than stage-wise closed-form ridge. It is
+**held outside the stable SDK contract** at this milestone (the
+W47 module ships at `coordpy.autograd_manifold` and is reachable
+only via explicit import). The released v3.43 line is
+byte-for-byte unchanged; the W43 PMC, W44 LMCC, W45 LMC, and
+W46 MMC surfaces are unchanged.
+
+The load-bearing change is from a *stage-wise closed-form
+ridge* fitter (W46) to *end-to-end-trained autograd parameters*
+across nine trainable, content-addressed components:
+
+1. **Pure-Python reverse-mode autograd engine.** A `Variable`
+   class with topologically-sorted backward; finite-difference
+   gradient checks pass for every supported op
+   (max FD err < 1e-9 across 6 op classes).
+2. **Trainable multi-layer manifold stack.** L-layer tanh FC +
+   linear scalar output, trained by Adam SGD on BCE.
+3. **Trainable rank-r role adapter.** Per-role A·B^T factor
+   pair trained on per-role residuals.
+4. **Trainable K-prototype dictionary.** Soft-assignment
+   cross-entropy + L2-reconstruction loss; bijective at
+   inference.
+5. **Trainable QKV memory head.** Scaled dot-product attention
+   over the W46 memory bank (replaces the W46 cosine pool).
+6. **Trainable packed-control serializer.** 4 trained sigmoid
+   gates choose which `MANIFOLD_CTRL` fields to emit per turn.
+7. **Adam-style optimiser.** First/second moment EMAs + per-
+   tensor L2 grad clip; deterministic step counter.
+8. **Training trace witness.** Sealed record of seed, n_steps,
+   optimiser config, loss/grad-norm history, final params CID,
+   training-set CID, and divergence flag.
+9. **`AutogradManifoldTeam` orchestrator.** Sits beside W46
+   `ManifoldMemoryTeam`; reduces to it byte-for-byte under
+   trivial config (the W47-L-TRIVIAL-AUTOGRAD-PASSTHROUGH
+   falsifier).
+
+The W47 envelope binds the W46 envelope CID, the trained
+autograd-params CID (which itself binds stack / role-adapter /
+dictionary / memory-head / control-serializer / W46-base CIDs),
+the training-trace CID, the autograd-forward witness CID, the
+control-token witness CID, the prefix-capsule CID, the
+memory-bank head CID, the causal-mask witness CID, and the
+prompt-construction witness CID — all under one
+`autograd_outer_cid`, verified through 21 enumerated failure
+modes disjoint from the W22..W46 boundary (cumulative trust
+boundary across W22..W47 = **279 named failure modes**).
+
+**Headline W47 results (R-94 across 3 seeds × 12 families):**
+
+* **R-94-AUTOGRAD-GRADIENT-CHECK.** All 6 op classes (linear,
+  tanh-MLP, sigmoid-BCE, softmax-xent, dot-product,
+  attention-pool) pass finite-difference gradient checks at
+  max FD err < 1e-9. autograd_grad_correct = **1.000** across
+  3/3 seeds.
+
+* **R-94-AUTOGRAD-CONVERGENCE.** Trained val_acc = 1.000 on a
+  linearly separable bank within 200 SGD steps; loss strictly
+  descended from initial. converged_ok = **1.000** across 3/3
+  seeds.
+
+* **R-94-NONLINEAR-SEPARABILITY.** Deep autograd stack params
+  strictly *move* on the XOR-shaped (spherical * causal)
+  bank within 120 steps; the stack does not diverge.
+  deep_stack_trainable = **1.000** across 3/3 seeds. Honest
+  scope: full XOR separation in 120 pure-Python autograd steps
+  is gated by `W47-L-PURE-PYTHON-TRAINING-COST-CAP`.
+
+* **R-94-TRAINABLE-MEMORY-HEAD.** Trained QKV head's pooled-
+  correctness on a one-hot key-value memory task: trained =
+  0.5, baseline cosine pool = 0.0. trained_head_beats_cosine =
+  **1.000** across 3/3 seeds.
+
+* **R-94-TRAINABLE-PACKED-CONTROL.** Trained 4-gate emit mask
+  converges to any target boolean mask within 150 SGD steps;
+  ctrl bytes remain bijective from the envelope.
+  ctrl_round_trip_ok = **1.000** across 3/3 seeds.
+
+* **R-94-TRAINABLE-ROLE-ADAPTER.** Trained rank-2 LoRA-style
+  adapter accuracy ≥ 0.7 on the dual-axis role-shift bank.
+  rank2_role_adapter_ok = **1.000** across 3/3 seeds.
+
+* **R-94-TRAINABLE-DICTIONARY.** Trained K-prototype codebook
+  parameters strictly move from seed-init; loss does not
+  diverge. dict_trainable_ok = **1.000** across 3/3 seeds.
+
+* **R-94-REPLAY-DETERMINISM.** Two independent fits + runs
+  produce byte-identical autograd-params CID,
+  training-trace CID, every `autograd_outer_cid`, and every
+  `memory_bank_head_cid`. replay_determinism_ok = **1.000**
+  across 3/3 seeds.
+
+* **R-94-AUTOGRAD-ENVELOPE-VERIFIER.** Six disjoint forged
+  envelopes (schema mismatch, outer-CID mismatch,
+  witness-CID mismatch, prompt-construction mismatch,
+  emit-mask invalid, plus base verification) all detected.
+  verifier_soundness_ok = **1.000** across 3/3 seeds.
+
+* **R-94-AUTOGRAD-CTRL-AWARE-BACKEND.** Task-correct rate on
+  the deterministic `CtrlAwareAutogradBackend`: full ctrl
+  mode = **1.000**, ctrl-off = 0.000, baseline = 0.000.
+  task_correct_rate = **1.000** across 3/3 seeds.
+
+* **R-94-AUTOGRAD-COMPROMISE-CAP.** Downstream-protect rate:
+  W46 = 0.000, W47 = 0.250 mean (max 0.5) — limitation
+  reproduces. The `W47-L-AUTOGRAD-DISTRIBUTION-CAP` theorem
+  covers this regime explicitly.
+
+* **R-94-TRIVIAL-AUTOGRAD-PASSTHROUGH.** With the trivial
+  registry, `AutogradManifoldTeam.run` reduces to
+  `AgentTeam.run` byte-for-byte: 1.000 across all six arms
+  (baseline / W43 / W44 / W45 / W46 / W47), 3/3 seeds.
+
+**New limitations at W47:**
+
+* **W47-L-PURE-PYTHON-TRAINING-COST-CAP** (proved-conditional):
+  the pure-Python autograd engine has per-step cost
+  O(n_params × n_examples × n_layers); reaching tight modern
+  loss targets within the per-family wall-clock budget
+  requires a NumPy/JAX/PyTorch binding (out of scope at W47).
+
+* **W47-L-AUTOGRAD-DISTRIBUTION-CAP** (proved-conditional;
+  strengthens W46-L-MEMORY-COMPROMISE-CAP): when the
+  adversary controls the training distribution AND the
+  runtime observations, the trained controller learns the
+  adversary's distribution. R-94 H11 measured mean
+  downstream_protect_rate = 0.25 (max 0.5).
+
+* **W47-L-NO-HIDDEN-STATE-CAP** (carries forward from W46):
+  the W47 autograd stack still does not touch transformer
+  hidden state, KV cache, attention weights, or embeddings.
+
+* **W47-L-CTRL-AWARE-MODEL-INDIFFERENCE-CAP** (strengthens
+  W46-L-CONTROL-TOKEN-MODEL-INDIFFERENCE-CAP): the trained
+  packed-control block guarantees only that the trained
+  controller's recommendation + learned emit mask are
+  *present* in the model's context.
+
+**Carried-forward / new conjectures:**
+
+* `W43-C-MIXED-CURVATURE-LATENT`,
+  `W43-C-COLLECTIVE-KV-POOLING`,
+  `W43-C-FULL-GRASSMANNIAN-HOMOTOPY` carry forward unchanged.
+* `W44-C-LIVE-LATENT` is **further bounded** at the capsule
+  layer by W47 (the trained autograd stack consumes all six
+  channels and is end-to-end-trainable); transformer-internal
+  remains open.
+* `W45-C-DEEP-TRANSFORMER-COUPLING` carries forward.
+* **`W46-C-AUTOGRAD-DEEP-STACK`** is **closed at W47** under
+  the explicit assumption that "autograd-trained" means
+  "pure-Python reverse-mode AD + Adam SGD". See
+  W47-T-AUTOGRAD-CORRECTNESS, W47-T-TRAIN-DETERMINISM,
+  W47-T-DEEP-STACK-TRAINABLE.
+* **`W47-C-LIVE-MULTI-HOST-AUTOGRAD`** (new): sharing trained
+  params + memory bank across hosts requires a
+  host-consensus protocol outside the W47 scope.
+* **`W47-C-GPU-BACKED-AUTOGRAD-SDK`** (new): a NumPy/JAX/PyTorch
+  binding of the autograd engine that lifts
+  `W47-L-PURE-PYTHON-TRAINING-COST-CAP` is structurally
+  compatible with the current parameter CIDs but deliberately
+  out of scope to preserve the pure-stdlib hermeticity.
+
+**Validation summary:**
+
+* `tests/test_smoke_full.py` reports "ALL CHECKS PASSED" with
+  the W47 module on disk.
+* `coordpy/r90_benchmark.py`, `coordpy/r91_benchmark.py`,
+  `coordpy/r92_benchmark.py`, and `coordpy/r93_benchmark.py`
+  reproduce W43 / W44 / W45 / W46 results byte-for-byte
+  (8 + 7 + 9 + 12 = 36 families).
+* `tests/test_autograd_manifold.py` — **55 tests passed**
+  (8 autograd-engine, 6 gradient-check, per-component, 6
+  verifier, trivial passthrough).
+* `tests/test_r94_benchmark.py` — **16 tests passed** (one per
+  pre-committed H1..H12 hypothesis + aggregator).
+* Total: **295+ tests passed** across the full `tests/`
+  directory.
+
+The honest reading of the programme post-W47 is:
+
+* **W43**: executable product-manifold capsules.
+* **W44**: live manifold-conditioned behaviour.
+* **W45**: first serious learned / transformer-facing
+  approximation at the capsule layer (closed-form).
+* **W46**: deeper, multi-layer, memory-conditioned,
+  transformer-facing approximation with packed model-facing
+  control + shared-prefix capsule reuse (closed-form).
+* **W47**: **autograd-trained, end-to-end-differentiable**
+  capsule-native manifold-memory stack with trainable
+  attention head, trainable dictionary, trainable role
+  adapter, trainable packed control gates, content-addressed
+  training traces, and pure-Python Adam optimiser. Closes
+  W46-C-AUTOGRAD-DEEP-STACK under the explicit "pure-Python
+  reverse-mode AD + Adam" assumption.
+
+The deep-substrate frontier (transformer-internal
+mixed-curvature attention, KV pooling, continuous
+Grassmannian homotopy, hidden-state-aware time attention,
+GPU-backed autograd, multi-host trained controllers) remains
+substrate-blocked. The new W47 conjectures
+(`W47-C-LIVE-MULTI-HOST-AUTOGRAD`,
+`W47-C-GPU-BACKED-AUTOGRAD-SDK`) are explicitly out of scope
+at this milestone.
 
 ## TL;DR — W46 Manifold Memory Controller (post-W45 research milestone)
 
