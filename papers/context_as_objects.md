@@ -2,7 +2,80 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W46 research-line update (W47 Autograd Manifold Stack,
+> **Post-W47 research-line update (W48 Shared-State
+> Transformer-Proxy, 2026-05-11).** After W47 made the
+> manifold-memory controller end-to-end trainable via pure-
+> Python reverse-mode AD + Adam SGD, the programme attacked the
+> remaining substrate wall by building the **strongest
+> executable proxy for transformer-internal coupling at the
+> capsule layer**: a single team-shared base state vector that
+> lives across turns and roles; a trainable **pseudo-KV factor
+> bank** of low-rank `(K, V)` slots that reproduces the
+> algebraic interface of a transformer KV cache
+> (`softmax(Q·K^T/sqrt(d))·V` with strict causal masking) at
+> the capsule layer; an `H`-head **multi-head proxy attention
+> block** with its own trainable per-head `(W_Q, W_K, W_V)` +
+> trainable output projection; a **slot-memory write head**
+> that decides per turn whether the new observation enters the
+> pseudo-KV bank; a **reconstruction decoder** that recovers
+> prior-turn flat channel features from the current shared
+> state + pseudo-KV read; a **branch/cycle-aware bias matrix**
+> that separates two branches with *identical* channel
+> features; a **bijective branch-history compressor** that
+> packs the team's branch path into a single integer header
+> with explicit visible-token savings; a learned **latent
+> control serializer** that emits a single `LATENT_CTRL:
+> SHARED_STATE_HASH=... mask=... bits=...` line bijective from
+> a sealed `LatentControlWitness`; and a content-addressed
+> `TrainingTraceWitness` (carried forward from W47). W48 is
+> **held outside the stable SDK contract** — it lives at
+> `coordpy.shared_state_proxy` and is reachable only via
+> explicit import; the released v0.5.20 wheel's public surface
+> is byte-for-byte unchanged. The paper's main thesis is
+> materially **strengthened** on a new axis by W48: roles now
+> share a single content-addressed base state and read / write
+> an auditable pseudo-KV factor bank — solving the "every role
+> re-bootstraps" problem at the capsule layer with full
+> byte-deterministic provenance. The W48 envelope binds the
+> shared-state CID, per-role delta CID, multi-head attention
+> CID, write-head CID, reconstruction-decoder CID, branch-bias
+> CID, latent-control CID, pseudo-KV bank head CID, training-
+> trace CID, and all derived witness CIDs under one
+> `proxy_outer_cid`, verified through 22 enumerated W48 failure
+> modes disjoint from W22..W47 (cumulative trust boundary
+> across W22..W48 = **301 named failure modes**). Headline
+> R-95 results (3 seeds × 14 cell families): shared-state CID
+> stable across turns (1.000); pseudo-KV recall reuse
+> `proxy_recall_cosine = 0.750` (W47 = 0.0); multi-head
+> diversity > 0 (W47 single-head = 0); reconstruction L1 < 3×
+> baseline (1.000); branch/cycle bias separates two branches
+> with identical features at 100% accuracy; write-gate
+> selectivity 0.521 (W47 = 0); LATENT_CTRL round-trip 1.000;
+> branch-history saves 67% of textual tokens; replay
+> determinism 1.000; verifier detects 7 disjoint forgeries per
+> seed; SharedStateAwareSyntheticBackend task_correct_rate
+> 1.000 vs W47 0.0. Honest scope: W48 does NOT close the W43
+> substrate-blocked conjectures (`W43-C-MIXED-CURVATURE-
+> LATENT`, `W43-C-COLLECTIVE-KV-POOLING`,
+> `W43-C-FULL-GRASSMANNIAN-HOMOTOPY`) or the carry-forward
+> `W47-C-DEEP-TRANSFORMER-COUPLING`. New limitations:
+> `W48-L-NO-REAL-KV-CAP` (the pseudo-KV bank reproduces the
+> algebraic interface, NOT real KV bytes),
+> `W48-L-PROXY-DISTRIBUTION-CAP` (strengthens
+> `W47-L-AUTOGRAD-DISTRIBUTION-CAP`; mean
+> downstream_protect_rate = 0.222 on R-95),
+> `W48-L-PURE-PYTHON-TRAINING-COST-CAP` (carries forward),
+> `W48-L-CTRL-AWARE-MODEL-INDIFFERENCE-CAP` (carries forward).
+> New conjectures: `W48-C-REAL-KV-COUPLED-PROXY` (coupling the
+> pseudo-KV bank to a real LLM's KV cache through backend
+> hooks) and `W48-C-MULTI-HOST-SHARED-STATE` (sharing the base
+> state + bank across hosts). See
+> `docs/RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md` for the full
+> result note and
+> `docs/SUCCESS_CRITERION_W48_SHARED_STATE_PROXY.md` for the
+> pre-committed bar.
+>
+> **Earlier post-W46 research-line update (W47 Autograd Manifold Stack,
 > 2026-05-10).** After W46 made the manifold-conditioned controller
 > *deeper and memory-conditioned* via stage-wise closed-form ridge,
 > the programme closed the long-standing

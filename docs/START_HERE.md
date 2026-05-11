@@ -215,6 +215,39 @@ byte-for-byte unchanged. See
 [`RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md`](RESULTS_COORDPY_W45_LEARNED_MANIFOLD.md)
 for the full result note.
 
+**Post-W47 research milestone — W48 Shared-State Transformer-Proxy**
+
+The next research step after W47 (W48) introduces the
+**Shared-State Transformer-Proxy (SSTP)** layer: the first
+capsule-native CoordPy layer where a single team-shared base
+state vector lives across turns and roles, a trainable
+**pseudo-KV factor bank** of low-rank `(K, V)` tuples
+reproduces the algebraic interface of a transformer KV cache
+at the capsule layer (`softmax(Q·K^T/sqrt(d))·V` with strict
+causal masking), an `H`-head **multi-head proxy attention
+block** reads and writes the bank, a **slot-memory write head**
+decides per turn whether to append a new slot, a
+**reconstruction decoder** recovers prior-turn flat channel
+features from the current shared state + pseudo-KV read, a
+**branch/cycle-aware bias matrix** separates branches with
+identical channel features, a **bijective branch-history
+compressor** packs the team's branch path into a single
+integer header with explicit visible-token savings, and a
+**learned latent-control serializer** emits a single
+`LATENT_CTRL: SHARED_STATE_HASH=... mask=... bits=...` line.
+Eleven trainable, content-addressed components — all in pure
+Python with no NumPy/JAX/PyTorch dependency, reusing the W47
+`Variable` autograd engine + `AdamOptimizer`. W48 is the
+strongest *executable proxy* for transformer-internal coupling
+we can write today at the capsule layer; it does NOT touch
+real KV bytes, hidden states, or attention weights. W48 is
+held outside the stable SDK contract — it ships at
+`coordpy.shared_state_proxy` and is reachable only via
+explicit import; the released v0.5.20 wheel's public surface
+is byte-for-byte unchanged. See
+[`RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md`](RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md)
+for the full result note.
+
 **Post-W46 research milestone — W47 Autograd Manifold Stack**
 
 The next research step after W46 (W47) introduces the **Autograd
@@ -323,6 +356,8 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Post-W47 research milestone (W48)    | [`RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md`](RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md) |
+> | Pre-committed success bar (W48)      | [`SUCCESS_CRITERION_W48_SHARED_STATE_PROXY.md`](SUCCESS_CRITERION_W48_SHARED_STATE_PROXY.md) |
 > | Post-W46 research milestone (W47)    | [`RESULTS_COORDPY_W47_AUTOGRAD_MANIFOLD.md`](RESULTS_COORDPY_W47_AUTOGRAD_MANIFOLD.md) |
 > | Pre-committed success bar (W47)      | [`SUCCESS_CRITERION_W47_AUTOGRAD_MANIFOLD.md`](SUCCESS_CRITERION_W47_AUTOGRAD_MANIFOLD.md) |
 > | Post-W45 research milestone (W46)    | [`RESULTS_COORDPY_W46_MANIFOLD_MEMORY.md`](RESULTS_COORDPY_W46_MANIFOLD_MEMORY.md) |

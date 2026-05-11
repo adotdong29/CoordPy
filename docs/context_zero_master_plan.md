@@ -12549,6 +12549,115 @@ optimiser, and content-addressed training trace. Closes
 W46-C-AUTOGRAD-DEEP-STACK under the explicit "pure-Python
 reverse-mode AD + Adam" reading.
 
+## After v0.5.20 + W43 PMC + W44 LMCC + W45 LMC + W46 MMC + W47 AMS — W48 Shared-State Transformer-Proxy (research milestone, NOT a release)
+
+**Step 47 — W48 Shared-State Transformer-Proxy (post-W47 research milestone, 2026-05-11).**
+
+W48 mints axis 45 of the programme: **shared-state, multi-head,
+transformer-proxy** capsule-native layer. Where W47 trained a
+single-stack controller end-to-end on isolated per-turn channel
+features, W48 introduces:
+
+1. **Shared base state capsule.** A single team-shared
+   `SharedStateCapsule` of dim `d_state` whose CID is stable
+   across turns and roles. Every role reads the same `s_0`.
+
+2. **Per-role rank-`r` LoRA-style delta.** Per-role `(U, V)`
+   factor tuples additive on the shared base. Trained jointly
+   with the rest.
+
+3. **Trainable pseudo-KV factor bank.** A bounded, content-
+   addressed ring buffer of `(key, value)` slots that reproduces
+   the algebraic interface of a transformer KV cache at the
+   capsule layer — `softmax(Q·K^T/sqrt(d))·V` with strict
+   causal masking. Does NOT touch real KV bytes.
+
+4. **Multi-head proxy attention block.** `H = 2` heads (default)
+   each with its own trainable `(W_Q, W_K, W_V)`; trainable
+   output projection.
+
+5. **Slot-memory write head.** A trainable sigmoid scalar that
+   decides per turn whether the new observation enters the
+   pseudo-KV bank.
+
+6. **Reconstruction decoder.** A two-layer tanh + linear stack
+   that recovers prior-turn flat channel features from the
+   current `(shared_state, flat_channels, pseudo_kv_read)`
+   triple. L1/L2 distances are bound under the envelope.
+
+7. **Branch/cycle-aware bias matrix.** A trainable
+   `(n_branches, n_cycles)` scalar correction added to the
+   gate logit; separates branches with identical channel
+   features.
+
+8. **Bijective branch-history compressor.** Packs the team's
+   branch path into a single integer header with explicit
+   visible-token savings vs textual rendering.
+
+9. **Latent control serializer.** A learned emit-gate over a
+   `LATENT_CTRL: SHARED_STATE_HASH=... mask=... bits=...` line.
+   Bijective from `LatentControlWitness.cid()`.
+
+10. **Training trace witness.** Carries forward W47's
+    `TrainingTraceWitness` — seed + n_steps + optimiser config +
+    loss + grad-norm + final params CID.
+
+11. **`SharedStateProxyTeam` orchestrator.** Sits beside W47
+    `AutogradManifoldTeam`. Reduces to it byte-for-byte under
+    trivial config (the `W48-L-TRIVIAL-SHARED-STATE-PASSTHROUGH`
+    falsifier).
+
+The R-95 benchmark family across 3 seeds × 14 cell families:
+shared-state CID stable across turns (1.000); pseudo-KV reuse
+`proxy_recall_cosine = 0.750` (W47 = 0.0); multi-head diversity
+> 0 (W47 = 0); reconstruction L1 < 3× baseline (1.000);
+branch/cycle bias separates two branches with identical features
+(1.000); write-gate selectivity 0.521 (W47 = 0); LATENT_CTRL
+round-trip 1.000; branch-history saves 67% of textual tokens;
+replay-determinism 1.000; verifier soundness 1.000;
+SharedStateAwareSyntheticBackend task_correct_rate 1.000 vs
+W47 = 0.0; proxy distribution cap reproduces honestly
+(downstream_protect_rate = 0.222). Cumulative trust boundary
+across W22..W48 = **301 named failure modes**.
+
+W48 is the strongest *executable proxy* for transformer-internal
+coupling at the capsule layer:
+
+* W43..W47 substrate-blocked conjectures
+  (`W43-C-MIXED-CURVATURE-LATENT`,
+  `W43-C-COLLECTIVE-KV-POOLING`,
+  `W43-C-FULL-GRASSMANNIAN-HOMOTOPY`,
+  `W47-C-DEEP-TRANSFORMER-COUPLING`) **carry forward unchanged**.
+* `W48-L-NO-REAL-KV-CAP` (new) carries forward the substrate
+  caps explicitly.
+* `W48-L-PROXY-DISTRIBUTION-CAP` (new, strengthens
+  `W47-L-AUTOGRAD-DISTRIBUTION-CAP`) reproduces honestly.
+* `W48-C-REAL-KV-COUPLED-PROXY` (new conjectural direction):
+  coupling the pseudo-KV bank to a real LLM's KV cache through
+  backend hooks requires backend support outside W48 scope.
+* `W48-C-MULTI-HOST-SHARED-STATE` (new conjectural direction):
+  sharing the base state + bank across hosts needs a host-
+  consensus protocol.
+
+Released SDK contract preserved byte-for-byte; the W48 module
+ships at `coordpy.shared_state_proxy` and is reachable only via
+explicit import. The honest programme storyline is now:
+**W43**: executable product-manifold capsules; **W44**: live
+manifold-conditioned behaviour; **W45**: first serious learned /
+transformer-facing approximation (closed-form ridge); **W46**:
+deeper memory-conditioned approximation with packed control +
+shared-prefix capsule reuse; **W47**: autograd-trained, end-to-
+end-differentiable capsule-native manifold-memory stack;
+**W48**: **shared-state transformer-proxy** with a team-shared
+base state, a pseudo-KV factor bank, multi-head proxy attention,
+reconstruction objective, and branch/cycle-aware bias —
+**the strongest honest proxy for transformer-internal coupling
+we can write today at the capsule layer**.
+
+See `docs/RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md` and
+`docs/SUCCESS_CRITERION_W48_SHARED_STATE_PROXY.md` for full
+results.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

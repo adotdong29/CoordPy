@@ -5,9 +5,145 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W46 W47
-> milestone (Autograd Manifold Stack research line),
-> 2026-05-10.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W47 W48
+> milestone (Shared-State Transformer-Proxy research line),
+> 2026-05-11.
+
+## TL;DR — W48 Shared-State Transformer-Proxy (post-W47 research milestone)
+
+The programme now has **forty-five** coupled research axes.
+W48 mints axis 45: **shared-state, multi-head, transformer-
+proxy** capsule-native layer with a single team-shared base
+state, per-role rank-`r` LoRA-style deltas, a trainable
+pseudo-KV factor bank, an `H`-head proxy attention block with
+strict causal masking, a slot-memory write head, a
+reconstruction decoder, a branch/cycle-aware bias matrix, a
+bijective branch-history compressor, and a learned latent-
+control serializer. W48 is the strongest *executable proxy* for
+transformer-internal coupling we can write today at the capsule
+layer; it does NOT touch real KV bytes, hidden states, or
+attention weights. W48 is **held outside the stable SDK
+contract** at this milestone (the W48 module ships at
+`coordpy.shared_state_proxy` and is reachable only via explicit
+import). The released v3.43 line is byte-for-byte unchanged;
+the W43..W47 surfaces are unchanged.
+
+The load-bearing change is from a per-turn end-to-end-trained
+controller (W47) to a *team-shared base state + pseudo-KV
+factor bank + multi-head proxy attention block* across eleven
+trainable, content-addressed components:
+
+1. **Shared base state capsule.** `SharedStateCapsule` with a
+   single content-addressed CID stable across turns + roles.
+2. **Per-role rank-`r` LoRA-style delta.** Per-role `(U, V)`
+   factor tuples additive on the shared base.
+3. **Pseudo-KV factor bank.** Bounded content-addressed ring
+   buffer of `(key, value)` slots with strict causal mask.
+4. **Multi-head proxy attention.** `H = 2` heads (default),
+   each with its own `(W_Q, W_K, W_V)`; trainable output proj.
+5. **Slot-memory write head.** Trainable sigmoid scalar
+   deciding whether to append new slots.
+6. **Reconstruction decoder.** Two-layer tanh + linear stack
+   that reconstructs prior-turn channel features.
+7. **Branch/cycle bias matrix.** Trainable
+   `(n_branches, n_cycles)` scalar correction.
+8. **Branch-history compressor.** Bijective pack of branch-
+   path into a single integer header.
+9. **Latent control serializer.** Learned emit-gate over a
+   `LATENT_CTRL: SHARED_STATE_HASH=... mask=... bits=...` line.
+10. **Training trace witness.** Sealed seed + n_steps +
+    optimiser config + loss + grad-norm + final-params CID
+    (carries forward from W47).
+11. **`SharedStateProxyTeam` orchestrator.** Sits beside W47
+    `AutogradManifoldTeam`; reduces to it byte-for-byte under
+    trivial config (the
+    `W48-L-TRIVIAL-SHARED-STATE-PASSTHROUGH` falsifier).
+
+The W48 envelope binds the shared-state capsule CID, the per-
+role delta CID, the multi-head attention CID, the write-head
+CID, the reconstruction-decoder CID, the branch-cycle-bias CID,
+the latent-control-serializer CID, the pseudo-KV bank head
+CID, the training-trace CID, the proxy-forward witness CID,
+the prompt-construction witness CID, the latent-control witness
+CID, the branch-history witness CID — all under one
+`proxy_outer_cid`, verified through 22 enumerated failure
+modes disjoint from the W22..W47 boundary (cumulative trust
+boundary across W22..W48 = **301 named failure modes**).
+
+**Headline W48 results (R-95 across 3 seeds × 14 families):**
+
+* **R-95-SHARED-STATE-CID-STABILITY.** Every turn references
+  the same `shared_state_capsule_cid` for a given registry.
+  shared_state_cid_stable = **1.000** across 3/3 seeds.
+* **R-95-PSEUDO-KV-REUSE.** The pseudo-KV bank delivers at
+  least one admissible slot read on 3/4 turns of every run.
+  proxy_recall_cosine = **0.750**; W47 = 0.0.
+* **R-95-MULTI-HEAD-SPECIALISATION.** `H=2` proxy attention
+  produces non-zero head diversity on the two-axis regime;
+  `H=1` baseline is 0.0. multi_head_diversity > **0.0**.
+* **R-95-RECONSTRUCTION-OBJECTIVE.** Trained reconstruction
+  L1 < 3× input baseline on every seed; W47 (no decoder) = 0.0.
+  reconstruction_l1_under_baseline = **1.000**.
+* **R-95-BRANCH-CYCLE-BIAS.** Trained bias separates two
+  branches with identical channel features at 100% accuracy.
+  branch_split_acc = **1.000** across 3/3 seeds.
+* **R-95-WRITE-GATE-SELECTIVITY.** Trained write head
+  selectivity = mean_signal_gate - mean_noise_gate = **0.521**
+  across 3 seeds; W47 = 0.0.
+* **R-95-LATENT-CONTROL-ROUND-TRIP.** `LATENT_CTRL` bytes
+  round-trip exactly through `LatentControlWitness`.
+  latent_ctrl_round_trip_ok = **1.000**.
+* **R-95-BRANCH-HISTORY-COMPRESSION.** 67% of textual tokens
+  saved on a 6-step path; bijective decode.
+  compressed_save_ratio = **0.667**.
+* **R-95-REPLAY-DETERMINISM.** Two independent runs produce
+  byte-identical `final_output`, root CID, every
+  `proxy_outer_cid`, every `shared_state_capsule_cid`, every
+  `pseudo_kv_bank_head_cid`. replay_determinism_ok = **1.000**.
+* **R-95-PROXY-ENVELOPE-VERIFIER.** Seven disjoint forgeries
+  detected per seed. verifier_soundness_ok = **1.000**.
+* **R-95-PROXY-DISTRIBUTION-CAP.** Adversarial all-channel
+  forgery + forged training set: mean downstream_protect_rate
+  = **0.222** — `W48-L-PROXY-DISTRIBUTION-CAP` reproduces
+  honestly.
+* **R-95-SHARED-STATE-AWARE-BACKEND.** W48 task_correct_rate
+  = **1.000** on `SharedStateAwareSyntheticBackend`; W47 = 0.0.
+* **R-95-TRIVIAL-SHARED-STATE-PASSTHROUGH.** All seven arms
+  reduce byte-for-byte to baseline. passthrough_ok = **1.000**.
+* **R-95-PROXY-FALSIFIER.** SDK byte-identity preserved.
+  sdk_byte_identity_preserved = **1.000**.
+
+The released SDK contract is byte-for-byte unchanged.
+`coordpy.__version__` is still `"0.5.20"`; `SDK_VERSION` is
+still `"coordpy.sdk.v3.43"`; `coordpy/__init__.py` is
+unchanged; smoke driver reports "ALL CHECKS PASSED".
+
+The W48 layer is the *strongest honest proxy* for transformer-
+internal coupling at the capsule layer:
+
+* W43..W47 conjectures (`W43-C-MIXED-CURVATURE-LATENT`,
+  `W43-C-COLLECTIVE-KV-POOLING`,
+  `W43-C-FULL-GRASSMANNIAN-HOMOTOPY`,
+  `W47-C-DEEP-TRANSFORMER-COUPLING`) remain
+  *substrate-blocked* and **do NOT close** at W48.
+* `W48-L-NO-REAL-KV-CAP` (new) carries forward the substrate
+  caps explicitly: pseudo-KV factor banks reproduce
+  `softmax(Q·K^T/sqrt(d))·V` at the capsule layer, NOT real
+  KV bytes.
+* `W48-L-PROXY-DISTRIBUTION-CAP` (new, strengthens
+  `W47-L-AUTOGRAD-DISTRIBUTION-CAP`) reproduces honestly on
+  R-95.
+* `W48-C-REAL-KV-COUPLED-PROXY` (new conjectural direction):
+  coupling the pseudo-KV bank to a real LLM's KV cache through
+  backend-side hooks requires backend support outside the W48
+  scope.
+* `W48-C-MULTI-HOST-SHARED-STATE` (new conjectural direction):
+  sharing the W48 base state across hosts requires a host-
+  consensus protocol.
+
+See `docs/RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md` and
+`docs/SUCCESS_CRITERION_W48_SHARED_STATE_PROXY.md` for the full
+result notes.
 
 ## TL;DR — W47 Autograd Manifold Stack (post-W46 research milestone)
 

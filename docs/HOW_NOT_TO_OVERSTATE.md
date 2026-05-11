@@ -2,10 +2,85 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W46
-> W47 milestone (Autograd Manifold Stack research line), 2026-05-10.
-> Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03. Earlier: SDK v3.42 (W41 family) 2026-05-03. Earlier: SDK v3.38 (W37 family) 2026-05-02. Earlier: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
+> README-of-README must satisfy these rules. Last touched: post-W47
+> W48 milestone (Shared-State Transformer-Proxy research line), 2026-05-11.
+> Earlier: post-W46 W47 milestone (Autograd Manifold Stack) 2026-05-10. Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03. Earlier: SDK v3.42 (W41 family) 2026-05-03. Earlier: SDK v3.38 (W37 family) 2026-05-02. Earlier: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
 > v3.33 (W32 family) 2026-05-01.
+
+## W48 (Shared-State Transformer-Proxy) — explicit do-not-overstate rules
+
+W48 introduces the strongest **executable proxy** for
+transformer-internal coupling at the capsule layer: a single
+team-shared base state, a trainable pseudo-KV factor bank, a
+multi-head proxy attention block, a write head + reconstruction
+decoder + branch/cycle bias + branch-history compressor + latent
+control serializer. Forbidden phrasings:
+
+* *"W48 is a real transformer block"* — forbidden unless
+  qualified as "a multi-head, depth-1 *capsule-layer* proxy
+  block over a *pseudo-KV factor bank*". W48 reproduces the
+  algebraic interface of a transformer attention head
+  (`softmax(QK^T/sqrt(d))·V` with strict causal masking) but
+  does NOT touch real KV bytes, hidden states, or attention
+  weights.
+
+* *"W48 closes the transformer-coupling conjecture"* —
+  forbidden. The substrate-blocked carry-forwards
+  (`W43-C-MIXED-CURVATURE-LATENT`,
+  `W43-C-COLLECTIVE-KV-POOLING`,
+  `W43-C-FULL-GRASSMANNIAN-HOMOTOPY`,
+  `W45-C-DEEP-TRANSFORMER-COUPLING`,
+  `W46-C-DEEP-TRANSFORMER-COUPLING`,
+  `W47-C-DEEP-TRANSFORMER-COUPLING`) ALL carry forward
+  unchanged. W48 *strengthens the bounding* by adding more
+  capsule-layer scaffolding; it does not close the substrate
+  side.
+
+* *"W48 transplants real KV state"* — forbidden. The pseudo-KV
+  factor bank's slots are *capsule-layer surrogates* with
+  byte-deterministic content-addressed provenance. Real
+  transformer KV cache is on the substrate side and is out of
+  scope. `W48-L-NO-REAL-KV-CAP` names this explicitly.
+
+* *"W48 trains on real LLM traces"* — forbidden. Training is
+  on hermetic synthetic banks pre-committed in the R-95
+  sources. Real-LLM realism anchors are bounded to the
+  `SharedStateAwareSyntheticBackend` and not load-bearing for
+  H1..H14.
+
+* *"W48 beats W47 across the board"* — forbidden. W48 strictly
+  beats W47 on the W48-specific axes (`r95_pseudo_kv_reuse`,
+  `r95_reconstruction_objective`, `r95_branch_cycle_bias`,
+  `r95_write_gate_selectivity`,
+  `r95_shared_state_aware_backend`) and is sanity-equivalent on
+  `r95_trivial_shared_state_passthrough`. On the W47-specific
+  axes (R-94 families) the W47 controller remains the W47
+  reference; W48 does not displace it. The honest framing is
+  "additive layer".
+
+* *"W48 is GPU-accelerated"* — forbidden. W48 reuses the W47
+  pure-Python autograd; `W48-L-PURE-PYTHON-TRAINING-COST-CAP`
+  carries forward.
+
+* *"W48 makes the released SDK trainable"* — forbidden. W48
+  ships at `coordpy.shared_state_proxy` and is reachable only
+  via explicit import. The released v0.5.20 wheel
+  (`coordpy.__version__`, `coordpy.SDK_VERSION`, the smoke
+  driver, the public symbols) is byte-for-byte unchanged.
+
+* *"W48 defeats adversarial training-set forgery"* — forbidden.
+  The `W48-L-PROXY-DISTRIBUTION-CAP` limitation reproduces
+  honestly on `r95_proxy_distribution_cap`: mean
+  downstream_protect_rate = 0.222 across 3 seeds. The trained
+  proxy *learns* the adversary's distribution when the
+  adversary owns the bank + training set.
+
+* *"W48 lifts the H13 backend gain to real LLMs"* — forbidden.
+  The H13 task-correct rate is measured on the deterministic
+  `SharedStateAwareSyntheticBackend`. On real LLMs the saving
+  is bounded to "the SHARED_STATE_HASH, BRANCH_HIST, and
+  LATENT_CTRL headers are in the model's context" — not a
+  guarantee of behavioural lift.
 
 ## W47 (Autograd Manifold Stack) — explicit do-not-overstate rules
 

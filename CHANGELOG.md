@@ -13,6 +13,34 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W48 Shared-State Transformer-Proxy** (post-W47, 2026-05-11) —
+  `coordpy.shared_state_proxy`, `coordpy.r95_benchmark`. The
+  strongest *executable proxy* for transformer-internal
+  coupling at the capsule layer: a single team-shared base
+  state (`SharedStateCapsule`) stable across turns and roles, a
+  per-role rank-`r` LoRA-style delta, a trainable **pseudo-KV
+  factor bank** that reproduces `softmax(Q·K^T/sqrt(d))·V` with
+  strict causal masking at the capsule layer, an `H=2` (default)
+  **multi-head proxy attention block** with its own per-head
+  `(W_Q, W_K, W_V)` + trainable output projection, a
+  **slot-memory write head**, a **reconstruction decoder** that
+  recovers prior-turn flat channel features from
+  `(shared_state, flat_channels, pseudo_kv_read)`, a trainable
+  **branch/cycle-aware bias matrix**, a bijective **branch-
+  history compressor** (`BRANCH_HIST: <int> over <n_b>x<n_c>`),
+  a learned **latent control serializer** (`LATENT_CTRL:
+  SHARED_STATE_HASH=... mask=... bits=...`), content-addressed
+  `TrainingTraceWitness` (reused from W47), and a 22-mode
+  envelope verifier. Cumulative trust boundary W22..W48 = 301
+  named failure modes. Does NOT close substrate-blocked W43
+  conjectures or `W47-C-DEEP-TRANSFORMER-COUPLING`. New
+  limitations: `W48-L-NO-REAL-KV-CAP`,
+  `W48-L-PROXY-DISTRIBUTION-CAP` (strengthens
+  `W47-L-AUTOGRAD-DISTRIBUTION-CAP`). New conjectures:
+  `W48-C-REAL-KV-COUPLED-PROXY`, `W48-C-MULTI-HOST-SHARED-STATE`.
+  See `docs/RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md` and
+  `docs/SUCCESS_CRITERION_W48_SHARED_STATE_PROXY.md`.
+
 - **W47 Autograd Manifold Stack** (post-W46, 2026-05-10) —
   `coordpy.autograd_manifold`, `coordpy.r94_benchmark`. First
   end-to-end-trainable capsule-layer manifold-memory stack:
