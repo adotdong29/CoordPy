@@ -5,9 +5,86 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W49 W50
-> milestone (Cross-Backend Latent Coordination research line),
-> 2026-05-11.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W50 W51
+> milestone (Persistent Cross-Backend Latent Coordination
+> research line), 2026-05-11.
+
+## TL;DR — W51 Persistent Cross-Backend Latent Coordination (post-W50 research milestone)
+
+The programme now has **forty-eight** coupled research axes.
+W51 mints axis 48: **six orthogonal capsule-native advances**
+layered on top of W50 Cross-Backend Latent Coordination —
+(M1) a trainable **GRU-style persistent shared latent state V3**
+with a content-addressed `PersistentLatentStateChain`
+recoverable from the envelope chain alone, plus a learned
+**cross-role mixer** producing per-role views of the team
+state with a learned blend coefficient;
+(M2) a **triple-backend translator** over three backend tags
+`(A, B, C)` with direct translators `A→B`, `A→C`, `B→C` plus a
+trainable **transitivity loss** that penalises disagreement
+between `A→C` (direct) and `A→B→C` (composition);
+(M3) a depth-six **deep proxy transformer stack V2** (vs W50's
+`L=4`) with **branch-specialised heads**, **cycle-specialised
+heads**, and per-layer trainable temperature `tau_l`;
+(M4) a **hierarchical adaptive compression V3** with a coarse
+`K1=32` codebook + per-cluster fine `K2=16` sub-codebooks plus
+a degradation-curve probe across decreasing token budgets —
+achieves **≥ 12 bits/visible-token at full emit**;
+(M5) a **two-headed long-horizon reconstruction V3** (causal +
+branch) at `max_k=8` (vs W50's `max_k=3`) with a degradation
+curve probe across `k ∈ {1..16}`;
+(M6) a **branch/cycle-specialised memory head** with separate
+per-branch and per-cycle storage pages plus learned
+cross-branch consensus + cross-cycle merger.
+
+W51 is the strongest *executable proxy* line we can write
+today at the capsule layer; it does NOT touch real KV bytes,
+hidden states, attention weights, embeddings, or real
+tokenizers. The triple-backend translator operates over the
+W50 carrier exclusively. The H7 realism probe is best-effort:
+when Ollama is unreachable, the witness records
+``anchor_status: "synthetic_only"`` and the
+``W50-C-CROSS-TOKENIZER-LATENT-TRANSFER`` conjecture carries
+forward sharpened as
+``W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY``.
+
+W51 ships at ``coordpy.persistent_shared_latent``,
+``coordpy.cross_backend_translator``,
+``coordpy.deep_proxy_stack_v2``,
+``coordpy.hierarchical_compression``,
+``coordpy.long_horizon_retention``,
+``coordpy.branch_cycle_memory``, and
+``coordpy.w51_team`` — reachable only through explicit
+imports. ``coordpy.__version__`` remains ``0.5.20``; SDK
+contract is byte-for-byte unchanged. R-100 (11 cell families)
+and R-101 (8 cell families) at 3 seeds each verify the
+H1..H18 success criterion — **18/18 H bars pass**.
+Cumulative trust boundary across W22..W51 = **367 enumerated
+failure modes** (343 from W22..W50 + 24 new at W51).
+
+W51 headline results (3 seeds, mean):
+
+* persistent state long-horizon recall: **0.707** (W50 baseline -0.237; gain **+0.945**)
+* 12-turn cosine retention: **0.707** (vs W50 -0.237)
+* 16-turn cosine retention stretch: **0.796** (vs W50 0.037)
+* triple-backend direct fidelity (A→C): **0.887**
+* triple-backend transitivity gap: **0.087** (≤ 0.10 ceiling)
+* branch/cycle memory recall: **0.993** (vs generic 0.785)
+* hierarchical compression bits/visible-token: **13.0** (vs W50 8.0–10.5)
+* compression degradation curve minimum bits/token: **6.17** (≥ 4.0 floor)
+* reconstruction V3 MSE at k=5: **0.409** (≤ 0.50 floor)
+* reconstruction V3 MSE at k=8: **0.462** (≤ 0.60 stretch)
+* W51 envelope verifier: **1.0** (forged rejected, clean accepted)
+* W51 replay determinism: **1.0**
+* W51 distribution cap protect_rate: **0.771** (≥ 0.70)
+* W51 translator compromise cap protect_rate: **0.944**
+* W51 overdepth cap: L=6 − L=4 = **-0.05** on shallow regime (cap reproduces)
+
+W51 directly attacks the post-W50 question of **how to push
+shared-state persistence, cross-backend transitivity, deeper
+proxy depth with branch/cycle specialisation, hierarchical
+compression, longer-horizon reconstruction, and branch/cycle
+memory isolation at the capsule layer**.
 
 ## TL;DR — W50 Cross-Backend Latent Coordination (post-W49 research milestone)
 

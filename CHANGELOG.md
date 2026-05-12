@@ -13,6 +13,66 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W51 Persistent Cross-Backend Latent Coordination** (post-W50,
+  2026-05-11) — `coordpy.persistent_shared_latent`,
+  `coordpy.cross_backend_translator`,
+  `coordpy.deep_proxy_stack_v2`,
+  `coordpy.hierarchical_compression`,
+  `coordpy.long_horizon_retention`,
+  `coordpy.branch_cycle_memory`,
+  `coordpy.w51_team`,
+  `coordpy.r100_benchmark`, `coordpy.r101_benchmark`. Six
+  orthogonal capsule-native advances layered on top of W50:
+  (M1) a trainable **GRU-style persistent shared latent state
+  V3** with the update rule
+  ``s_t = (1 - z_t) ⊙ s_{t-1} + z_t ⊙ tanh(W_h · [s_{t-1}; x_t])``
+  and a content-addressed ``PersistentLatentStateChain``
+  recoverable from the envelope chain alone, plus a learned
+  **cross-role mixer** producing per-role views of the team
+  state with a learned blend coefficient;
+  (M2) a **triple-backend translator** over three backend
+  tags ``(A, B, C)`` with direct translators ``A→B``, ``A→C``,
+  ``B→C`` plus a trainable transitivity loss penalising
+  disagreement between ``A→C`` and ``A→B→C``, with a
+  best-effort real-LLM triple-Ollama realism anchor when
+  ``COORDPY_W51_OLLAMA_REACHABLE=1``;
+  (M3) a depth-six **deep proxy transformer stack V2** (vs
+  W50's ``L=4``) with branch-specialised heads, cycle-
+  specialised heads, and per-layer learned temperature;
+  (M4) a **hierarchical adaptive compression V3** with a
+  coarse ``K1=32`` codebook + per-cluster fine ``K2=16``
+  sub-codebooks plus a degradation-curve probe — achieves
+  ≥ 12 bits/visible-token at full emit (vs W50's 8.0);
+  (M5) a **two-headed long-horizon reconstruction V3**
+  (causal + branch) at ``max_k=8`` (vs W50's ``max_k=3``)
+  with a degradation-curve probe across ``k ∈ {1..16}``;
+  (M6) a **branch/cycle-specialised memory head** with
+  separate per-branch and per-cycle storage pages plus
+  learned cross-branch consensus + cross-cycle merger.
+  Carries forward W50's full 22-mode verifier surface plus
+  24 new disjoint W51 envelope failure modes —
+  **cumulative trust boundary across W22..W51 = 367 enumerated
+  modes**. R-100 (11 cell families, 3 seeds) + R-101 (8 cell
+  families, 3 seeds) verify the H1..H18 success criterion —
+  **18/18 H bars pass**. Headline results: persistent state
+  long-horizon recall 0.707 vs W50 baseline -0.237 (Δ +0.945);
+  triple-backend direct fidelity 0.887 with transitivity gap
+  0.087; branch/cycle memory recall 0.993 vs generic 0.785
+  (Δ +0.208); hierarchical compression 13 bits/visible-token
+  at full emit; 12-turn cosine retention 0.707; 16-turn stretch
+  0.796; reconstruction V3 MSE at k=5 0.409, at k=8 0.462;
+  verifier 1.000; replay determinism 1.000. Honest non-claims:
+  L=6 does NOT strictly improve over L=4 under pure-Python
+  autograd (structural floor + non-regression H4 met instead;
+  the V2 win comes from branch/cycle specialisation H5: +0.056);
+  ``W50-C-CROSS-TOKENIZER-LATENT-TRANSFER`` sharpened forward
+  as ``W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY``. W51 ships
+  at the explicit-import paths above; the released v0.5.20
+  wheel's public surface is byte-for-byte unchanged. See
+  `docs/RESULTS_W51_PERSISTENT_LATENT_COORDINATION.md` and
+  `docs/SUCCESS_CRITERION_W51_PERSISTENT_LATENT_COORDINATION.md`
+  for the full result + pre-committed H bars.
+
 - **W50 Cross-Backend Latent Coordination** (post-W49,
   2026-05-11) — `coordpy.cross_backend_alignment`,
   `coordpy.deep_proxy_stack`,

@@ -12835,6 +12835,81 @@ today, with one best-effort real-LLM realism anchor**.
 See `docs/SUCCESS_CRITERION_W50_CROSS_BACKEND_LATENT_COORDINATION.md`
 for the pre-committed H1..H16 thresholds.
 
+## Axis 48 — W51 Persistent Cross-Backend Latent Coordination
+## (post-W50, 2026-05-11)
+
+After W50 ships, the next post-release research milestone is
+**W51 PXBLC**: six orthogonal capsule-native advances on top
+of W50's five.
+
+1. **M1 ``PersistentStateCell`` + ``CrossRoleMixer``** — a
+   trainable GRU-style persistent latent state ``s_t = (1 -
+   z_t) ⊙ s_{t-1} + z_t ⊙ tanh(W_h · [s_{t-1}; x_t])`` with
+   ``z_t = sigmoid(W_z · [s_{t-1}; x_t])``, plus a learned
+   cross-role mixer producing per-role views with a learned
+   blend coefficient. Content-addressed
+   ``PersistentLatentStateChain`` recoverable from the
+   envelope chain alone.
+
+2. **M2 ``TripleBackendTranslator``** — three direct
+   translators ``A→B``, ``A→C``, ``B→C`` over backend tags,
+   trained jointly with a transitivity loss penalising
+   disagreement between ``A→C`` and ``A→B→C``. Best-effort
+   triple-Ollama realism anchor when
+   ``COORDPY_W51_OLLAMA_REACHABLE=1``.
+
+3. **M3 ``DeepProxyStackV2``** — depth-six (vs W50's L=4)
+   capsule-layer proxy transformer stack with
+   branch-specialised heads, cycle-specialised heads, and
+   per-layer trainable temperature.
+
+4. **M4 ``HierarchicalCodebook`` + ``HierarchicalEmitGate``**
+   — two-level codebook (K1=32 coarse + K2=16 fine
+   per-cluster) plus a hierarchical emit gate. ≥ 12 bits per
+   visible-token at full emit. Degradation-curve probe across
+   decreasing token budgets.
+
+5. **M5 ``LongHorizonReconstructionV3Head``** — two-headed
+   reconstruction head (causal + branch) at ``max_k=8``.
+   MSE-curve probe across ``k ∈ {1..16}``.
+
+6. **M6 ``BranchCycleMemoryHead``** — per-branch and
+   per-cycle memory pages with learned cross-branch
+   consensus + cross-cycle merger.
+
+Envelope chain
+``w47_outer → w48_proxy_outer → w49_multi_block_outer →
+w50_outer → w51_outer`` verified by 24 new disjoint failure
+modes (cumulative W22..W51 = **367 modes**). R-100 (11 cell
+families) and R-101 (8 cell families) at 3 seeds each verify
+H1..H18 — **18/18 H bars pass**.
+
+W43..W50 substrate-blocked conjectures carry forward
+unchanged. ``W50-C-CROSS-TOKENIZER-LATENT-TRANSFER`` is
+*sharpened* to ``W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY``:
+capsule-layer transitivity is now trained and auditable; only
+tokenizer-level transitivity remains carried forward.
+
+Honest non-claims at W51: the L=6 deep stack V2 does NOT
+strictly improve over L=4 on the synthetic regime under
+pure-Python autograd; the structural floor + non-regression
+H4 bar (acc ≥ 0.65 AND Δ ≥ -0.05) is met instead, and the
+actual M3 behavioural win comes from branch/cycle-specialised
+heads (H5: +0.056). The
+``W51-L-DEEP-STACK-OVERDEPTH-CAP`` falsifier reproduces
+honestly (H18: -0.05 on a shallow regime).
+
+Released SDK contract preserved byte-for-byte. The honest
+programme storyline is now: **W43**..**W50** as above, plus
+**W51**: persistent cross-backend latent coordination —
+**the strongest honest capsule-layer persistent + transitive
++ deeply-stacked + hierarchically-compressed + long-horizon-
+reconstructed + branch/cycle-aware shared-state transfer we
+can write today**.
+
+See `docs/SUCCESS_CRITERION_W51_PERSISTENT_LATENT_COORDINATION.md`
+for the pre-committed H1..H18 thresholds.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

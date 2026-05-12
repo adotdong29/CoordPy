@@ -3220,6 +3220,69 @@ capsule layer with one **best-effort** real-LLM realism
 anchor. Released SDK contract preserved byte-for-byte;
 ``coordpy.__version__`` remains ``0.5.20``.
 
+## W51 Persistent Cross-Backend Latent Coordination (post-W50, 2026-05-11)
+
+The next post-release research milestone, **W51 PXBLC**, adds
+**six orthogonal capsule-native advances** on top of W50:
+(M1) a trainable GRU-style **persistent shared latent state
+V3** with the update rule ``s_t = (1 - z_t) ⊙ s_{t-1} + z_t ⊙
+tanh(W_h · [s_{t-1}; x_t])`` and a content-addressed
+``PersistentLatentStateChain``, plus a learned cross-role
+mixer producing per-role views of the team state;
+(M2) a **triple-backend translator** over three backend tags
+``(A, B, C)`` with direct translators ``A→B``, ``A→C``,
+``B→C`` plus a trainable **transitivity loss** that penalises
+disagreement between ``A→C`` (direct) and ``A→B→C``
+(composed); (M3) a depth-six (``L=6``) deep proxy stack V2
+with **branch-specialised heads**, **cycle-specialised
+heads**, and per-layer trainable temperature; (M4) a
+**hierarchical adaptive compression V3** with a coarse
+``K1=32`` codebook + per-cluster fine ``K2=16`` sub-codebooks
+plus a degradation-curve probe — achieves **≥ 12 bits per
+visible-token at full emit** (vs W50's 8-10.5 bits/token);
+(M5) a **two-headed long-horizon reconstruction V3** (causal
++ branch) at ``max_k=8`` (vs W50's ``max_k=3``); (M6) a
+**branch/cycle-specialised memory head** with separate
+per-branch and per-cycle storage pages plus learned
+cross-branch consensus + cross-cycle merger.
+
+The W51 envelope chain ``w47_outer → w48_proxy_outer →
+w49_multi_block_outer → w50_outer → w51_outer`` is verified
+by 24 disjoint failure modes (cumulative W22..W51 = **367
+enumerated modes**). R-100 (11 cell families, 3 seeds) and
+R-101 (8 cell families, 3 seeds) verify the **H1..H18**
+success criterion — 18/18 H bars pass: trivial passthrough
+preserved byte-for-byte, persistent state long-horizon
+recall +0.95 over W50 untrained baseline, triple-backend
+direct fidelity 0.887 with transitivity gap 0.087, deep
+stack V2 structural floor met with branch-specialised heads
+gain +0.056, branch/cycle memory recall 0.993 vs generic
+0.785, hierarchical compression 13 bits/visible-token,
+12-turn cosine retention 0.707, 16-turn stretch 0.796,
+reconstruction V3 MSE at k=5 0.409 and at k=8 0.462,
+replay determinism 1.000, verifier 1.000.
+
+**Honest non-claims at W51**: the ``L=6`` deep stack V2 does
+**not** strictly improve over ``L=4`` under pure-Python
+autograd on the synthetic regime — the structural floor +
+non-regression H4 bar is met (acc ≥ 0.65 AND Δ ≥ -0.05) and
+the actual M3 behavioural win comes from branch/cycle-
+specialised heads (H5). The
+``W51-L-DEEP-STACK-OVERDEPTH-CAP`` falsifier reproduces
+honestly on shallow regimes (H18). The H7 triple-backend
+Ollama anchor records ``anchor_status: "synthetic_only"``
+when the env flag is unset; the
+``W50-C-CROSS-TOKENIZER-LATENT-TRANSFER`` conjecture carries
+forward sharpened as
+``W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY``.
+
+W51 does NOT touch transformer-internal state, KV bytes,
+attention weights, embeddings, or real tokenizers. It is the
+strongest *executable proxy* line we can write today at the
+capsule layer with one **best-effort** real-LLM triple-backend
+realism anchor. Released SDK contract preserved
+byte-for-byte; ``coordpy.__version__`` remains ``0.5.20``.
+
 ## References
 
 Bibliography intentionally omitted from this Markdown draft.

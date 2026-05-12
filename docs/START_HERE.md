@@ -248,6 +248,45 @@ is byte-for-byte unchanged. See
 [`RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md`](RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md)
 for the full result note.
 
+**Post-W50 research milestone — W51 Persistent Cross-Backend Latent Coordination**
+
+The next research step after W50 (W51) introduces the
+**Persistent Cross-Backend Latent Coordination (PXBLC)**
+layer: six orthogonal capsule-native advances on top of W50's
+five. (i) A trainable **GRU-style persistent shared latent
+state V3** that survives across turns, branches, and roles
+via an update gate `z_t = sigmoid(W_z · [s_{t-1}; x_t])`
+plus a content-addressed cross-role mixer with a per-role
+view + learned blend. (ii) A **triple-backend translator**
+over three backend tags `(A, B, C)` with direct translators
+`A→B`, `A→C`, `B→C` plus a **transitivity loss** that
+penalises disagreement between `A→C` and `A→B→C`. (iii) An
+`L=6` **deep proxy stack V2** with **branch-specialised
+heads** + **cycle-specialised heads** + per-layer learned
+temperature. (iv) A **hierarchical adaptive compression V3**
+with a coarse `K1=32` codebook + per-cluster fine `K2=16`
+sub-codebooks plus a degradation-curve probe across
+decreasing token budgets — achieves ≥ 12 bits/visible-token
+at full emit. (v) A **two-headed long-horizon
+reconstruction V3** (causal + branch) at `max_k=8` with a
+degradation curve probe across `k ∈ {1..16}`. (vi) A
+**branch/cycle-specialised memory head** with separate
+per-branch and per-cycle pages plus learned cross-branch
+consensus + cross-cycle merger. 24 new disjoint envelope
+failure modes (cumulative trust boundary = **367 modes
+across W22..W51**). W51 is held outside the stable SDK
+contract — it ships at `coordpy.persistent_shared_latent`,
+`coordpy.cross_backend_translator`,
+`coordpy.deep_proxy_stack_v2`,
+`coordpy.hierarchical_compression`,
+`coordpy.long_horizon_retention`,
+`coordpy.branch_cycle_memory`, and the composition module at
+`coordpy.w51_team`, reachable only via explicit import; the
+released v0.5.20 wheel's public surface is byte-for-byte
+unchanged. See
+[`RESULTS_W51_PERSISTENT_LATENT_COORDINATION.md`](RESULTS_W51_PERSISTENT_LATENT_COORDINATION.md)
+for the full result note.
+
 **Post-W48 research milestone — W49 Multi-Block Cross-Bank Coordination**
 
 The next research step after W48 (W49) introduces the
@@ -386,6 +425,10 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Post-W50 research milestone (W51)    | [`RESULTS_W51_PERSISTENT_LATENT_COORDINATION.md`](RESULTS_W51_PERSISTENT_LATENT_COORDINATION.md) |
+> | Pre-committed success bar (W51)      | [`SUCCESS_CRITERION_W51_PERSISTENT_LATENT_COORDINATION.md`](SUCCESS_CRITERION_W51_PERSISTENT_LATENT_COORDINATION.md) |
+> | Post-W49 research milestone (W50)    | [`RESULTS_W50_CROSS_BACKEND_LATENT_COORDINATION.md`](RESULTS_W50_CROSS_BACKEND_LATENT_COORDINATION.md) |
+> | Pre-committed success bar (W50)      | [`SUCCESS_CRITERION_W50_CROSS_BACKEND_LATENT_COORDINATION.md`](SUCCESS_CRITERION_W50_CROSS_BACKEND_LATENT_COORDINATION.md) |
 > | Post-W48 research milestone (W49)    | [`RESULTS_COORDPY_W49_MULTI_BLOCK_PROXY.md`](RESULTS_COORDPY_W49_MULTI_BLOCK_PROXY.md) |
 > | Pre-committed success bar (W49)      | [`SUCCESS_CRITERION_W49_MULTI_BLOCK_PROXY.md`](SUCCESS_CRITERION_W49_MULTI_BLOCK_PROXY.md) |
 > | Post-W47 research milestone (W48)    | [`RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md`](RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md) |

@@ -2918,3 +2918,113 @@ deferred W46-C-AUTOGRAD-DEEP-STACK) remains substrate-
 blocked / deliberately-deferred and out of capsule-layer scope.
 
 Last touched: post-W45 research milestone (W46 family) 2026-05-10.
+
+
+### "W51 closes cross-tokenizer behavioural transfer" or "W51 trains a true transformer"
+
+> *"W51 closes cross-tokenizer behavioural transfer via the
+> triple-backend translator."*
+
+Forbidden.  W51's `TripleBackendTranslator` operates over
+**capsule-layer carrier values** between three synthetic
+backend tags `(A, B, C)`.  It does NOT touch real tokenizers,
+real model attention, or real model embeddings.  The
+transitivity loss penalises disagreement between `A→C`
+(direct) and `A→B→C` (composed) over capsule-layer carriers
+only.  The `W50-C-CROSS-TOKENIZER-LATENT-TRANSFER` conjecture
+carries forward sharpened as
+`W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY` — capsule-layer
+triple-backend transitivity is now trained and auditable,
+but tokenizer-level transitivity remains substrate-blocked.
+
+> *"W51's L=6 deep stack V2 is a deeper transformer with
+> branch-specialised attention heads."*
+
+Forbidden.  W51's `DeepProxyStackV2` is a **capsule-layer
+proxy transformer stack** at `L=6`.  Its "branch-specialised
+heads" are per-layer learned multiplicative gates over
+**block outputs**, not real attention heads.  The W47/W48/W49/
+W50 substrate-blocked conjectures
+(`W47-C-DEEP-TRANSFORMER-COUPLING`,
+`W48-C-DEEP-TRANSFORMER-COUPLING`,
+`W49-C-DEEP-TRANSFORMER-COUPLING`,
+`W50-C-DEEP-TRANSFORMER-COUPLING`) carry forward unchanged.
+
+Critically, **W51 does NOT claim depth monotonicity**: under
+the pure-Python autograd training cost cap, `L=6` does NOT
+strictly improve over `L=4` on the R-100
+`family_deep_stack_v2_depth_strict_gain` regime (delta +0.014
+on 3 seeds, well within the structural floor + non-regression
+H4 bar of ≥ 0.65 and ≥ -0.05).  The actual M3 behavioural win
+comes from **branch/cycle-specialised heads** (H5: +0.056) —
+attribution to M3 as a whole is acceptable; attribution to
+depth alone is not.  The `W51-L-DEEP-STACK-OVERDEPTH-CAP`
+falsifier reproduces honestly on shallow regimes (H18).
+
+> *"W51's persistent shared latent state V3 is real
+> long-context memory in the LLM."*
+
+Forbidden.  W51's `PersistentStateCell` is a
+**GRU-style trainable capsule-layer state vector** that
+updates per turn via the W47 autograd engine.  It does NOT
+modify the LLM's hidden states, KV cache, or attention.  The
+"persistent latent state chain" is a content-addressed audit
+trail of capsule-layer state values across turns — not real
+model memory.
+
+> *"W51 achieves ≥ 12 bits per real visible LLM token."*
+
+Forbidden.  W51's `HierarchicalCompressionCodebook` packs
+structured bits into a `LATENT_CTRL_V3_H` **capsule-layer
+control block**.  The "visible token" count is a capsule-layer
+surrogate for the packed block; real LLM tokens may or may
+not match this 1-to-1 (the
+`W51-L-CTRL-AWARE-MODEL-INDIFFERENCE-CAP` carries forward
+from W48/W49/W50).  The H15 bar of ≥ 12 bits/visible-token is
+**a structural compression ratio over the W51 carrier**, not
+a behavioural claim about real LLM context absorption.
+
+Permitted phrasing: *"W51 is six orthogonal trainable
+capsule-layer mechanisms layered on top of W50: a GRU-style
+persistent shared latent state V3 with cross-role mixer; a
+triple-backend translator with a trainable transitivity loss
+over capsule carriers; an L=6 deep proxy stack V2 with
+branch/cycle-specialised heads and per-layer learned
+temperatures; a hierarchical adaptive compression V3 with
+K1=32 coarse + K2=16 fine codebooks achieving ≥ 12 bits per
+visible capsule-layer ctrl token at full emit; a two-headed
+long-horizon reconstruction V3 (causal + branch) at max_k=8;
+a branch/cycle-specialised memory head with per-page storage
++ learned consensus + merger. Every component is content-
+addressed; the W51 envelope verifier enumerates 24 disjoint
+failure modes; cumulative trust boundary across W22..W51 =
+**367 enumerated failure modes**.  R-100 (11 cell families)
++ R-101 (8 cell families) at 3 seeds each — 18/18 H bars
+pass.  W51 is the strongest *executable proxy* for
+persistent, transitive, deeply-stacked, hierarchically-
+compressed, long-horizon-reconstructed, branch/cycle-aware
+shared-state transfer at the capsule layer — it is NOT a
+deeper transformer."*
+
+Forbidden phrasing: *"W51 is true cross-tokenizer transfer"*
+(it is not — the W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY
+conjecture carries forward), *"W51 implements transformer-
+internal long-context memory"* (it does not), *"W51 is GPU-
+accelerated"* (it is pure-Python autograd), *"W51 packs ≥ 12
+bits per real LLM token"* (the visible-token count is
+capsule-layer), *"W51's L=6 strictly beats L=4"* (it ties on
+the R-100 regime; the V2 win comes from branch/cycle
+specialisation), *"W51 closes
+W50-C-CROSS-TOKENIZER-LATENT-TRANSFER"* (it sharpens it as
+W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY but does not close).
+
+The full hidden-state-aware deep-controller direction
+(W50-C-DEEP-TRANSFORMER-COUPLING,
+W43-C-MIXED-CURVATURE-LATENT,
+W43-C-COLLECTIVE-KV-POOLING,
+W43-C-FULL-GRASSMANNIAN-HOMOTOPY,
+W48-C-REAL-KV-COUPLED-PROXY,
+W48-C-MULTI-HOST-SHARED-STATE) remains substrate-blocked /
+deliberately-deferred and out of capsule-layer scope.
+
+Last touched: post-W50 research milestone (W51 family) 2026-05-11.
