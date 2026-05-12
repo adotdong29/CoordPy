@@ -2,10 +2,77 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W48
-> W49 milestone (Multi-Block Cross-Bank Coordination research line), 2026-05-11.
-> Earlier: post-W47 W48 milestone (Shared-State Transformer-Proxy) 2026-05-11. Earlier: post-W46 W47 milestone (Autograd Manifold Stack) 2026-05-10. Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03. Earlier: SDK v3.42 (W41 family) 2026-05-03. Earlier: SDK v3.38 (W37 family) 2026-05-02. Earlier: SDK v3.37 (W36 family) 2026-05-02. Earlier: SDK v3.36 (W35 family) 2026-05-02. Earlier: SDK v3.35 (W34 family) 2026-05-01. Earlier: SDK v3.34 (W33 family) 2026-05-01. Earlier: SDK
-> v3.33 (W32 family) 2026-05-01.
+> README-of-README must satisfy these rules. Last touched: post-W49
+> W50 milestone (Cross-Backend Latent Coordination research line), 2026-05-11.
+> Earlier: post-W48 W49 milestone (Multi-Block Cross-Bank Coordination research line), 2026-05-11. Earlier: post-W47 W48 milestone (Shared-State Transformer-Proxy) 2026-05-11. Earlier: post-W46 W47 milestone (Autograd Manifold Stack) 2026-05-10. Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03.
+
+## W50 (Cross-Backend Latent Coordination) — explicit do-not-overstate rules
+
+W50 stacks five orthogonal advances on top of W49: cross-
+backend latent projector (M1), L=4 deep proxy stack (M2),
+adaptive K=16 compression with learned emit-mask (M3),
+role-pair pseudo-KV transfer + adaptive eviction V2 (M4),
+chain-walkable shared-latent carrier V2 + reconstruction V2
+head (M5). It is the strongest *executable proxy* available
+at the capsule layer with one **best-effort** real-LLM
+realism anchor.
+
+* *"W50 is real cross-model latent transfer"* — **forbidden**
+  unless qualified as "cross-backend latent transfer between
+  two synthetic backends, with a best-effort real-LLM anchor".
+  The projector operates over capsule-layer carriers only.
+
+* *"W50 closes ``W49-C-CROSS-MODEL-LATENT-TRANSFER``"* —
+  **forbidden**. The conjecture is *sharpened* to
+  ``W50-C-CROSS-TOKENIZER-LATENT-TRANSFER``: the projector +
+  carrier chain is now trained and auditable, but
+  behavioral transfer across **genuinely different
+  tokenizers** still requires backend-side adapters out of
+  W50 scope.
+
+* *"W50 is transformer-internal cross-model coupling"* —
+  **forbidden**. W50 does NOT touch transformer-internal
+  hidden states, KV cache bytes, attention weights, or
+  embeddings.
+
+* *"W50 supports real KV"* — **forbidden**. The role-pair
+  transfer operates over capsule-layer pseudo-KV slots only.
+
+* *"W50 closes ``W47-C-DEEP-TRANSFORMER-COUPLING`` /
+  ``W48-C-REAL-KV-COUPLED-PROXY`` /
+  ``W49-C-DEEP-TRANSFORMER-COUPLING``"* — **forbidden**.
+  These remain substrate-blocked. W50 *further-bounds* W49
+  by adding depth (L=4), cross-backend latent transfer, and
+  adaptive compression, but does not close them.
+
+* *"W50 is GPU-accelerated"* — **forbidden**. The pure-Python
+  ``Variable`` + ``AdamOptimizer`` autograd engine from W47
+  carries forward; per-module training cost grows as
+  ``O(n_params × n_examples)``. The
+  ``W50-L-PURE-PYTHON-TRAINING-COST-CAP`` is a load-bearing
+  honest constraint.
+
+* *"W50 reaches MSE ≪ 0.05 on reconstruction"* —
+  **forbidden**. The H8 honest bar is MSE ≤ 0.25 (well below
+  the random-prediction baseline of 0.333). Tighter
+  convergence requires NumPy/JAX/PyTorch bindings and is out
+  of W50 scope.
+
+* *"W50 generalises across distributions"* — **forbidden**.
+  The H15 ``W50-L-MULTI-BLOCK-DISTRIBUTION-CAP`` falsifier
+  reproduces honestly when an adversary controls the
+  training distribution; protect rate caps around 0.88
+  mean across 3 seeds.
+
+* *"W50 makes real LLMs condition on the carrier"* —
+  **forbidden**. The H14 task-correct anchor is synthetic
+  (``MultiBlockAwareSyntheticBackend``). On real LLMs the
+  claim is bounded to "the W50 control block is in the
+  model's context".
+
+* *"W50 bumps the version"* — **forbidden**.
+  ``coordpy.__version__`` remains ``0.5.20``; no PyPI
+  release; W50 modules ship at explicit-import paths only.
 
 ## W49 (Multi-Block Cross-Bank Coordination) — explicit do-not-overstate rules
 

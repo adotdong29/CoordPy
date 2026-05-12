@@ -3170,6 +3170,56 @@ and tables:
 8. **Table 3: live real-LLM composition results.**
    Present the v3.18 qwen2.5 and qwen3.5 comparisons compactly.
 
+## Post-W49 — Cross-Backend Latent Coordination (W50)
+
+W50 layers **five orthogonal capsule-native advances** on top of
+W49 Multi-Block Cross-Bank Coordination:
+
+(M1) a trainable **cross-backend latent projector** that maps the
+W49 ``SharedLatentCapsule`` chain between two backend behaviors
+through a shared lingua-franca code. A best-effort real-LLM
+realism anchor runs when ``COORDPY_W50_OLLAMA_REACHABLE=1``;
+otherwise the witness records ``anchor_status:
+"synthetic_only"``. This **bounds**, not closes, the cross-
+tokenizer conjecture. (M2) a deeper proxy transformer stack at
+``L=4`` (vs W49's ``L_p=2``) with per-layer learned mask gates +
+per-layer outer residual scales + a forward witness binding
+per-block activation norms. (M3) an adaptive K=16 prototype
+codebook (vs W49's K=8) + a learned per-bit emit-mask gate;
+the packed ``LATENT_CTRL_V3`` block achieves
+``≥ 8.0 structured bits per visible-token`` under W50 vs W49's
+5.0 baseline (1.86× improvement). (M4) a role-pair-conditioned
+``CrossBankTransferLayer`` that moves slot keys/values between
+role banks via a learned linear projection, paired with
+``AdaptiveEvictionPolicyV2`` — a 5-feature sigmoid scorer
+(adding retention probability and transfer signal to W49's
+3 features). (M5) a chain-walkable ``SharedLatentCarrierV2``
+with a per-role reuse map and a trainable
+``ReconstructionV2Head`` that recovers turn ``t-k`` flat
+features for ``k ≤ 3`` at MSE ``≤ 0.25`` (random-prediction
+baseline = 0.333).
+
+The W50 envelope chain
+``w47_outer → w48_proxy_outer → w49_multi_block_outer →
+w50_outer`` is verified by 20 disjoint failure modes
+(cumulative W22..W50 = **343 enumerated modes**). R-98
+(10 cell families, 3 seeds) and R-99 (7 cell families,
+3 seeds) verify the H1..H16 success criterion: trivial
+passthrough preserved byte-for-byte, cross-backend synthetic
+alignment fidelity ≥ 0.95, deep stack L=4 strictly beats L=2,
+role-pair transfer recall delta ≥ +0.15, adaptive eviction V2
+beats FIFO at signal preservation, 8-turn retention cosine ≥
+0.90, 12-turn retention cosine ≥ 0.70, reconstruction MSE
+≤ 0.25 at k=3, 8 bits/visible-token cramming ratio,
+distribution-cap falsifier reproduces, replay determinism.
+
+W50 does NOT touch transformer-internal state, KV bytes,
+attention weights, embeddings, or real tokenizers. It is the
+strongest *executable proxy* line we can write today at the
+capsule layer with one **best-effort** real-LLM realism
+anchor. Released SDK contract preserved byte-for-byte;
+``coordpy.__version__`` remains ``0.5.20``.
+
 ## References
 
 Bibliography intentionally omitted from this Markdown draft.

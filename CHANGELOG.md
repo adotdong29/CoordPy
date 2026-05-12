@@ -13,6 +13,49 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W50 Cross-Backend Latent Coordination** (post-W49,
+  2026-05-11) — `coordpy.cross_backend_alignment`,
+  `coordpy.deep_proxy_stack`,
+  `coordpy.adaptive_compression`,
+  `coordpy.cross_bank_transfer`,
+  `coordpy.shared_latent_carrier`,
+  `coordpy.w50_team`,
+  `coordpy.r98_benchmark`, `coordpy.r99_benchmark`. Five
+  orthogonal capsule-native advances layered on top of W49:
+  (M1) a trainable cross-backend latent projector that maps
+  the W49 ``SharedLatentCapsule`` chain between two backend
+  behaviors via a shared lingua-franca code, with a
+  best-effort real-LLM realism anchor when
+  ``COORDPY_W50_OLLAMA_REACHABLE=1``; (M2) a deeper proxy
+  transformer stack at ``L=4`` (vs W49's ``L_p=2``) with
+  per-layer learned mask gates + per-layer residual scales;
+  (M3) an adaptive K=16 prototype codebook + learned per-bit
+  emit-mask gate, packed as a ``LATENT_CTRL_V3`` control block
+  with a ``CrammingWitnessV2`` recording structured-bits /
+  visible-token ratio (target ≥ 8.0; W49 baseline 5.0);
+  (M4) a role-pair-conditioned ``CrossBankTransferLayer`` that
+  moves slot keys/values between role banks via a learned
+  linear projection, paired with an
+  ``AdaptiveEvictionPolicyV2`` (5-feature sigmoid scorer);
+  (M5) a chain-walkable ``SharedLatentCarrierV2`` with a
+  trainable ``ReconstructionV2Head`` recovering turn ``t-k``
+  flat features for ``k ≤ 3``. The W50 envelope chain
+  ``w47_outer → w48_proxy_outer → w49_multi_block_outer →
+  w50_outer`` is verified by 20 disjoint failure modes
+  (cumulative W22..W50 = 343 modes). R-98 (10 cell families)
+  and R-99 (7 cell families) at 3 seeds each verify the
+  H1..H16 success criterion. W50 ships at explicit-import
+  paths and is NOT re-exported through `coordpy.__init__`;
+  the released SDK contract (`coordpy.__version__ ==
+  "0.5.20"`, `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`,
+  smoke driver, public symbols) is byte-for-byte unchanged.
+  Honest scope: W50 does NOT touch transformer-internal
+  hidden states, KV cache bytes, attention weights,
+  embeddings, or real tokenizers. The realism anchor
+  **bounds** — not closes — the cross-tokenizer conjecture.
+  Pure-Python only; reuses the W47 ``Variable`` +
+  ``AdamOptimizer`` autograd engine.
+
 - **W49 Multi-Block Cross-Bank Coordination** (post-W48,
   2026-05-11) — `coordpy.multi_block_proxy`,
   `coordpy.r96_benchmark`, `coordpy.r97_benchmark`. The

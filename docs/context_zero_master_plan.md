@@ -12773,6 +12773,68 @@ See `docs/RESULTS_COORDPY_W49_MULTI_BLOCK_PROXY.md` and
 `docs/SUCCESS_CRITERION_W49_MULTI_BLOCK_PROXY.md` for full
 results.
 
+## W50 — Cross-Backend Latent Coordination (XBLC) — post-W49 milestone
+
+W50 mints the 47th coupled research axis with **five orthogonal
+capsule-native advances** layered on top of W49:
+
+1. **M1 ``CrossBackendAlignmentLayer``** — trainable per-
+   backend encoder + decoder routed through a shared lingua-
+   franca code. Alignment fidelity probe on synthetic backend
+   pairs; emits ``CrossBackendAlignmentWitness``. Best-effort
+   real-LLM realism anchor when
+   ``COORDPY_W50_OLLAMA_REACHABLE=1``; otherwise records
+   ``anchor_status: "synthetic_only"``.
+
+2. **M2 ``DeepProxyStack``** — `L=4` stacked
+   ``ProxyTransformerBlock`` (vs W49's ``L_p=2``) with per-
+   layer learned mask gate + per-layer outer residual scale +
+   ``DeepProxyStackForwardWitness``.
+
+3. **M3 ``AdaptiveCompressionCodebook``** (K=16) + learned
+   per-bit emit-mask gate. Packed ``LATENT_CTRL_V3`` block;
+   ``CrammingWitnessV2`` target ≥ 8.0 bits/visible-token vs
+   W49 baseline 5.0.
+
+4. **M4 ``CrossBankTransferLayer`` + ``AdaptiveEvictionPolicyV2``**
+   — trainable role-pair projection moves slot keys/values
+   between role banks; V2 eviction extends W49's sigmoid
+   scorer with retention probability + transfer signal inputs.
+
+5. **M5 ``SharedLatentCarrierV2`` + ``ReconstructionV2Head``**
+   — chain-walkable shared-latent carrier with per-role reuse
+   map and trainable reconstruction head recovering turn
+   ``t-k`` for ``k ≤ 3``.
+
+Envelope chain
+``w47_outer → w48_proxy_outer → w49_multi_block_outer →
+w50_outer`` verified by 20 disjoint failure modes (cumulative
+W22..W50 = **343 modes**). R-98 (10 cell families) and R-99
+(7 cell families) at 3 seeds each verify H1..H16.
+
+W43..W49 substrate-blocked conjectures
+(``W43-C-MIXED-CURVATURE-LATENT``,
+``W43-C-COLLECTIVE-KV-POOLING``,
+``W43-C-FULL-GRASSMANNIAN-HOMOTOPY``,
+``W47-C-DEEP-TRANSFORMER-COUPLING``,
+``W48-C-DEEP-TRANSFORMER-COUPLING``,
+``W48-C-REAL-KV-COUPLED-PROXY``,
+``W48-C-MULTI-HOST-SHARED-STATE``,
+``W49-C-DEEP-TRANSFORMER-COUPLING``) **carry forward
+unchanged**. ``W49-C-CROSS-MODEL-LATENT-TRANSFER`` is
+*sharpened* to ``W50-C-CROSS-TOKENIZER-LATENT-TRANSFER``:
+the projector + carrier are now trained and auditable; only
+tokenizer-level divergence remains carried forward.
+
+Released SDK contract preserved byte-for-byte. The honest
+programme storyline is now: **W43**..**W49** as above, plus
+**W50**: cross-backend latent coordination — **the strongest
+honest capsule-layer cross-backend coordination we can write
+today, with one best-effort real-LLM realism anchor**.
+
+See `docs/SUCCESS_CRITERION_W50_CROSS_BACKEND_LATENT_COORDINATION.md`
+for the pre-committed H1..H16 thresholds.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

@@ -5,9 +5,58 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W48 W49
-> milestone (Multi-Block Cross-Bank Coordination research line),
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W49 W50
+> milestone (Cross-Backend Latent Coordination research line),
 > 2026-05-11.
+
+## TL;DR — W50 Cross-Backend Latent Coordination (post-W49 research milestone)
+
+The programme now has **forty-seven** coupled research axes.
+W50 mints axis 47: **five orthogonal capsule-native advances**
+layered on top of W49 Multi-Block Cross-Bank Coordination —
+(M1) a trainable cross-backend latent projector that maps the
+W49 ``SharedLatentCapsule`` chain between two backend behaviors
+via a shared lingua-franca code, with a best-effort real-LLM
+realism anchor when ``COORDPY_W50_OLLAMA_REACHABLE=1``;
+(M2) a deeper proxy transformer stack at ``L=4`` (vs W49's
+``L_p=2``) with per-layer learned mask gates + per-layer
+residual scales + a ``DeepProxyStackForwardWitness``;
+(M3) an adaptive K=16 prototype codebook (vs W49's K=8) plus a
+learned per-bit emit-mask gate that adapts the visible-token
+footprint to gate decisions, packed as a ``LATENT_CTRL_V3``
+control block and witnessed by ``CrammingWitnessV2``;
+(M4) a role-pair-conditioned ``CrossBankTransferLayer`` that
+moves slot keys/values between role banks via a learned linear
+projection, paired with an ``AdaptiveEvictionPolicyV2`` that
+extends W49's sigmoid scorer with retention-probability and
+transfer-signal inputs;
+(M5) a chain-walkable ``SharedLatentCarrierV2`` with a
+trainable ``ReconstructionV2Head`` that recovers turn ``t-k``
+flat features from the carrier at turn ``t`` for ``k ≤ 3``.
+
+W50 is the strongest *executable proxy* line we can write
+today at the capsule layer; it does NOT touch real KV bytes,
+hidden states, attention weights, embeddings, or real
+tokenizers. The cross-backend projector operates over the
+W49 carrier exclusively. The H11 realism probe is best-effort:
+when Ollama is unreachable, the witness records
+``anchor_status: "synthetic_only"`` and the
+``W49-C-CROSS-MODEL-LATENT-TRANSFER`` conjecture carries
+forward sharpened as
+``W50-C-CROSS-TOKENIZER-LATENT-TRANSFER``.
+
+W50 ships at ``coordpy.cross_backend_alignment``,
+``coordpy.deep_proxy_stack``,
+``coordpy.adaptive_compression``,
+``coordpy.cross_bank_transfer``,
+``coordpy.shared_latent_carrier``, and
+``coordpy.w50_team`` — reachable only through explicit
+imports. ``coordpy.__version__`` remains ``0.5.20``; SDK
+contract is byte-for-byte unchanged. R-98 (10 cell families)
+and R-99 (7 cell families) at 3 seeds each verify the H1..H16
+success criterion. Cumulative trust boundary across W22..W50 =
+**343 enumerated failure modes** (323 from W22..W49 + 20 at
+W50).
 
 ## TL;DR — W49 Multi-Block Cross-Bank Coordination (post-W48 research milestone)
 
