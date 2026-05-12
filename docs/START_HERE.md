@@ -248,6 +248,58 @@ is byte-for-byte unchanged. See
 [`RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md`](RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md)
 for the full result note.
 
+**Post-W52 research milestone — W53 Persistent Mergeable Corruption-Robust Latent Operating System**
+
+The next research step after W52 (W53) introduces the
+**Persistent Mergeable Corruption-Robust Latent Operating
+System (PMCRLOS)** layer: ten orthogonal capsule-native
+advances on top of W52's eight. (i) A 3-layer **persistent
+latent state V5** with a *persistent* skip-link applied at
+every step plus a state-merge head. (ii) A **5-backend
+multi-hop translator V3** over 20 directed edges with
+chain-length-4 transitivity scoring and uncertainty-aware
+arbitration that returns per-dim 1-sigma confidence
+intervals. (iii) The **Mergeable Latent State Capsule
+(MLSC)** load-bearing new abstraction: content-addressed
+mergeable capsules with explicit ``MergeOperator`` and
+content-addressed ``MergeAuditTrail``; supports K-of-N
+consensus quorum with abstain. (iv) A depth-10 **deep proxy
+stack V4** with merge-aware + corruption-aware heads.
+(v) A **four-level ECC codebook V5** (K1=32 × K2=16 × K3=8
+× K4=4 = 16384 codes) plus XOR parity bits per segment;
+≥ 14.5 bits/visible-token at full emit (empirically 17.67)
+plus single-bit corruption detection. (vi) A **four-headed
+long-horizon reconstruction V5** (causal + branch + cycle +
+merged-branch) at ``max_k=16`` with a degradation curve
+probe across ``k ∈ {1..32}``. (vii) A **branch merge memory
+V3** with consensus pages + content-addressed audit +
+abstain semantics. (viii) A **corruption-robust carrier**
+that composes ECC parity + 3-of-3 majority repetition over
+the bits payload; reports detect / partial-correct /
+abstain / silent-failure rates. (ix) A **transcript-vs-shared
+arbiter V2** with explicit per-turn policy over {transcript,
+shared, abstain} + oracle-correctness comparison. (x) An
+**uncertainty / confidence layer** that composes
+per-component confidences into a composite scalar +
+calibration check. 30 new disjoint envelope failure modes
+(cumulative trust boundary = **423 modes across W22..W53**).
+W53 is held outside the stable SDK contract — it ships at
+`coordpy.persistent_latent_v5`,
+`coordpy.multi_hop_translator_v3`,
+`coordpy.mergeable_latent_capsule`,
+`coordpy.deep_proxy_stack_v4`,
+`coordpy.ecc_codebook_v5`,
+`coordpy.long_horizon_retention_v5`,
+`coordpy.branch_merge_memory_v3`,
+`coordpy.corruption_robust_carrier`,
+`coordpy.transcript_vs_shared_arbiter_v2`,
+`coordpy.uncertainty_layer`, and the composition module at
+`coordpy.w53_team`, reachable only via explicit import; the
+released v0.5.20 wheel's public surface is byte-for-byte
+unchanged. See
+[`RESULTS_W53_PMCRLOS.md`](RESULTS_W53_PMCRLOS.md) for the
+full result note.
+
 **Post-W51 research milestone — W52 Quantised Persistent Multi-Hop Latent Coordination**
 
 The next research step after W51 (W52) introduces the

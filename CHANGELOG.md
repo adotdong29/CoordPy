@@ -13,6 +13,73 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W53 Persistent Mergeable Corruption-Robust Latent Operating System**
+  (post-W52, 2026-05-12) — `coordpy.persistent_latent_v5`,
+  `coordpy.multi_hop_translator_v3`,
+  `coordpy.mergeable_latent_capsule`,
+  `coordpy.deep_proxy_stack_v4`,
+  `coordpy.ecc_codebook_v5`,
+  `coordpy.long_horizon_retention_v5`,
+  `coordpy.branch_merge_memory_v3`,
+  `coordpy.corruption_robust_carrier`,
+  `coordpy.transcript_vs_shared_arbiter_v2`,
+  `coordpy.uncertainty_layer`,
+  `coordpy.w53_team`, `coordpy.r104_benchmark`,
+  `coordpy.r105_benchmark`, `coordpy.r106_benchmark`. Ten
+  orthogonal capsule-native advances layered on top of W52:
+  (M1) a 3-layer persistent latent state V5 with persistent
+  identity-init skip-link applied at every step + a state-merge
+  head; chain walks past 32 turns. (M2) a 5-backend (A,B,C,D,E)
+  multi-hop translator V3 over 20 directed edges with chain-
+  length-4 transitivity scoring and uncertainty-aware
+  arbitration that returns per-dim 1-sigma confidence intervals.
+  (M3) the **Mergeable Latent State Capsule (MLSC)** load-bearing
+  new abstraction: content-addressed mergeable capsules with
+  explicit ``MergeOperator`` + content-addressed
+  ``MergeAuditTrail``; supports K-of-N consensus quorum with
+  abstain semantics. (M4) a depth-10 deep proxy stack V4
+  wrapping V3 with merge-aware + corruption-aware (per-layer
+  L2-pathology) heads. (M5) a four-level ECC codebook V5
+  K1=32 × K2=16 × K3=8 × K4=4 with XOR parity bits per segment;
+  ≥ 14.5 bits/visible-token at full emit (empirically 17.67) +
+  single-bit corruption detection. (M6) a four-headed long-
+  horizon reconstruction V5 (causal + branch + cycle + merged-
+  branch) at ``max_k=16`` (vs W52's 12) with a degradation curve
+  probe across ``k ∈ {1..32}``. (M7) a branch merge memory V3
+  with consensus pages populated by K-of-N quorum + content-
+  addressed consensus audit + abstain when no quorum. (M8) a
+  corruption-robust carrier composing ECC parity + 3-of-3
+  majority repetition over the bits payload; reports detect /
+  partial-correct / abstain / silent-failure rates. (M9) a
+  transcript-vs-shared arbiter V2 with explicit per-turn policy
+  over {transcript, shared, abstain} + 3-arm comparison with
+  oracle-correctness rate. (M10) an uncertainty / confidence
+  layer that composes per-component confidences into a single
+  composite scalar + a calibration check.
+  Composed by ``coordpy.w53_team.W53Team`` over the W52 envelope
+  to produce ``W53HandoffEnvelope`` (closing the chain
+  ``w47 → w48 → w49 → w50 → w51 → w52 → w53``).
+  Carries forward W52's full verifier surface plus 30 new
+  disjoint W53 envelope failure modes —
+  **cumulative trust boundary across W22..W53 = 423
+  enumerated failure modes** (393 from W22..W52 + 30 at W53).
+  Verified by R-104 (12 cell families) + R-105 (10 cell
+  families) + R-106 (12 cell families) at 3 seeds each
+  (H1..H34 success criterion). Zero changes to released
+  CoordPy SDK 0.5.20 surface, smoke driver, or runtime.
+  W52-C-CROSS-TOKENIZER-QUAD-TRANSITIVITY sharpened to
+  W53-C-CROSS-TOKENIZER-QUINT-CAP. The
+  W47-C-DEEP-TRANSFORMER-COUPLING ..
+  W52-C-DEEP-TRANSFORMER-COUPLING line is *further-bounded*
+  by W53 (chain length 4, persistent skip-link, MLSC
+  abstraction, ECC parity) but remains substrate-blocked. See
+  `docs/SUCCESS_CRITERION_W53_PMCRLOS.md`,
+  `docs/RESULTS_W53_PMCRLOS.md`,
+  `docs/RESEARCH_STATUS.md` for empirical results and the
+  capsule-layer storyline; `docs/THEOREM_REGISTRY.md` for the
+  theorem table; `docs/HOW_NOT_TO_OVERSTATE.md` for the
+  do-not-overstate rules.
+
 - **W52 Quantised Persistent Multi-Hop Latent Coordination**
   (post-W51, 2026-05-11) — `coordpy.persistent_latent_v4`,
   `coordpy.multi_hop_translator`,

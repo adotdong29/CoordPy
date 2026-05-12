@@ -5,9 +5,123 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W51 W52
-> milestone (Quantised Persistent Multi-Hop Latent Coordination
-> research line), 2026-05-11.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W52 W53
+> milestone (Persistent Mergeable Corruption-Robust Latent
+> Operating System research line), 2026-05-12.
+
+## TL;DR — W53 Persistent Mergeable Corruption-Robust Latent Operating System (post-W52 research milestone)
+
+The programme now has **fifty** coupled research axes.
+W53 mints axis 50: **ten orthogonal capsule-native
+advances** layered on top of W52 Quantised Persistent
+Multi-Hop Latent Coordination —
+(M1) a **3-layer persistent latent state V5** with a
+*persistent* identity-init signal skip-link applied at
+every step (not just turn 0) plus a state-merge head;
+chain walks past 32 turns;
+(M2) a **5-backend (A,B,C,D,E) multi-hop translator V3**
+over 20 directed edges with chain-length-4 transitivity
+scoring and **uncertainty-aware arbitration** that
+returns per-dim 1-sigma confidence intervals;
+(M3) the **Mergeable Latent State Capsule (MLSC)**
+load-bearing new abstraction — content-addressed
+mergeable capsules with an explicit ``MergeOperator``
++ content-addressed ``MergeAuditTrail``; supports
+K-of-N consensus quorum with explicit abstain semantics;
+(M4) a **depth-10 deep proxy stack V4** wrapping V3 with
+*merge-aware head* (pairwise output blend) + a
+*corruption-aware head* (per-layer L2-pathology
+detection emits a confidence scalar);
+(M5) a **four-level ECC codebook V5** with K1=32 × K2=16
+× K3=8 × K4=4 = 16384 codes plus **XOR parity bits per
+segment** (4 parity bits/visible-token) — achieves
+**≥ 14.5 bits/visible-token at full emit** (empirically
+17.67 on the R-105 probe) AND enables single-bit
+corruption detection;
+(M6) a **four-headed long-horizon reconstruction V5**
+(causal + branch + cycle + merged-branch) at ``max_k=16``
+(vs W52's ``max_k=12``) with a degradation-curve probe
+across ``k ∈ {1..32}``;
+(M7) a **branch merge memory V3** with consensus pages
+populated by K-of-N quorum + content-addressed consensus
+audit + abstain semantics when no quorum;
+(M8) a **corruption-robust carrier** that composes ECC
+parity + 3-of-3 majority repetition over the bits payload;
+reports detect / partial-correct / abstain / silent-failure
+rates; honest 2-bit graceful-degrade behaviour;
+(M9) a **transcript-vs-shared arbiter V2** with explicit
+per-turn policy over {transcript, shared, abstain}; reports
+3-arm comparison with oracle-correctness rate;
+(M10) an **uncertainty / confidence layer** that composes
+per-component confidences into a single composite scalar
++ a calibration check that high-confidence is strictly
+more accurate than low-confidence.
+
+W53 is the strongest *executable proxy* line we can write
+today at the capsule layer; it does NOT touch real KV bytes,
+hidden states, attention weights, embeddings, or real
+tokenizers. The MLSC capsule abstraction is content-
+addressed regardless of the merge operator's parameters
+(the operator is a learned/fixed weighted blend; the
+capsule abstraction is **abstraction**, not training).
+The H12 realism probe is best-effort: when Ollama is
+unreachable, the witness records ``anchor_status:
+"synthetic_only"`` and the
+``W52-C-CROSS-TOKENIZER-QUAD-TRANSITIVITY`` conjecture
+carries forward sharpened as
+``W53-C-CROSS-TOKENIZER-QUINT-CAP``.
+
+W53 ships at ``coordpy.persistent_latent_v5``,
+``coordpy.multi_hop_translator_v3``,
+``coordpy.mergeable_latent_capsule``,
+``coordpy.deep_proxy_stack_v4``,
+``coordpy.ecc_codebook_v5``,
+``coordpy.long_horizon_retention_v5``,
+``coordpy.branch_merge_memory_v3``,
+``coordpy.corruption_robust_carrier``,
+``coordpy.transcript_vs_shared_arbiter_v2``,
+``coordpy.uncertainty_layer``, and
+``coordpy.w53_team`` — reachable only through explicit
+imports. ``coordpy.__version__`` remains ``0.5.20``; SDK
+contract is byte-for-byte unchanged. R-104 (12 cell
+families), R-105 (10 cell families), R-106 (12 cell
+families) at 3 seeds each verify the H1..H34 success
+criterion. Cumulative trust boundary across W22..W53 =
+**423 enumerated failure modes** (393 from W22..W52 + 30
+new at W53).
+
+W53 headline results (3 seeds, mean):
+
+* persistent V5 24-turn cosine recall (corrupted regime): **0.971** (V4 baseline 0.994, ties)
+* 28-turn V5 stretch recall: empirical (R-105 family_persistent_v5_28turn)
+* 32-turn V5 stretch recall: empirical (R-105 family_persistent_v5_32turn_stretch)
+* quint chain-length-4 fidelity: **0.965** (R-104 family_quint_chain_len4_transitivity)
+* uncertainty-aware vs naive arbitration delta: **+0.20** under perturbed edge
+* MLSC consensus correctness: **1.0** (correct on consistent + abstains on random)
+* Deep V4 corruption flag: **1.0** (no false positives on normal input)
+* W53 envelope verifier: **1.0**
+* W53 replay determinism: **1.0**
+* MLSC merge replay determinism: **1.0**
+* MLSC audit trail walks-to-roots: **1.0**
+* uncertainty layer calibration gap: **≥ 0.10** mean
+* ECC bits/visible-token: **17.67** (vs W52 15.67; ≥ 14.5 target)
+* ECC rate-floor falsifier (40-bit): **1.0** missed (cap reproduces)
+* arbiter V2 oracle-correctness: **1.0** (perfect oracle behaviour with abstain)
+* single-bit detect rate: **1.0** (parity catches every flip)
+* single-bit correction rate: **1.0** (partial recovery on every flip)
+* 2-bit graceful degrade score: **1.0** (abstain ≥ 0.50 AND silent ≤ 0.30)
+* BMM V3 K=2-of-N consensus recall: **1.0**
+* consensus abstain when K too high: **1.0**
+* CRC silent failure rate (single-bit): **0.0** (parity catches all)
+* persistent V5 chain walk depth (20-turn run): **20** (≥ 16 floor)
+* W53 integration envelope completeness: **1.0**
+* W53 distribution cap (V5 forge): protect rate ~0.85-0.92 mean
+
+W53 directly attacks the post-W52 question of **how to
+build a capsule-native latent operating system that is
+persistent, mergeable across branches, corruption-robust
+under hostile channels, budget-aware, and auditable —
+without touching transformer-internal substrate**.
 
 ## TL;DR — W52 Quantised Persistent Multi-Hop Latent Coordination (post-W51 research milestone)
 

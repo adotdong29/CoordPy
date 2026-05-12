@@ -13001,6 +13001,89 @@ See
 `docs/SUCCESS_CRITERION_W52_QUANTISED_PERSISTENT_MULTI_HOP.md`
 for the pre-committed H1..H22 thresholds.
 
+## Axis 50 — W53 Persistent Mergeable Corruption-Robust Latent Operating System (PMCRLOS)
+
+**W53 PMCRLOS**: ten orthogonal capsule-native advances on top
+of W52, building a **capsule-native latent operating system**
+for multi-agent teams. Layered onto the W52 envelope chain:
+
+1. **M1 Persistent Latent State V5** — 3-layer GRU stack
+   with *persistent skip-link* (every step) + a state-merge
+   head; chain walks past 32 turns
+2. **M2 Multi-Hop Translator V3** — 5-backend (A,B,C,D,E)
+   over 20 directed edges with chain-length-4 transitivity +
+   uncertainty-aware arbitration with per-dim 1-sigma
+   confidence intervals
+3. **M3 Mergeable Latent State Capsule (MLSC)** — the
+   load-bearing new abstraction: content-addressed
+   mergeable capsules with explicit ``MergeOperator`` +
+   content-addressed ``MergeAuditTrail``; supports K-of-N
+   consensus quorum with abstain semantics
+4. **M4 Deep Proxy Stack V4** — depth-10 wrapping V3 with
+   merge-aware head + corruption-aware head (per-layer
+   L2-pathology detection)
+5. **M5 ECC Codebook V5** — K1=32 × K2=16 × K3=8 × K4=4 =
+   16384 codes with XOR parity bits per segment (4 parity
+   bits/visible-token); ≥ 14.5 bits/visible-token at full
+   emit (empirically 17.67)
+6. **M6 Long-Horizon Reconstruction V5** — 4 heads (causal +
+   branch + cycle + merged-branch); ``max_k=16``;
+   degradation-curve probe across ``k ∈ {1..32}``
+7. **M7 Branch Merge Memory V3** — consensus pages with
+   K-of-N quorum + content-addressed consensus audit +
+   abstain when no quorum
+8. **M8 Corruption-Robust Carrier** — composes ECC parity +
+   3-of-3 majority repetition over the bits payload;
+   reports detect / partial-correct / abstain /
+   silent-failure rates; honest 2-bit graceful-degrade
+9. **M9 Transcript-vs-Shared Arbiter V2** — explicit per-turn
+   policy over {transcript, shared, abstain} with
+   confidence-triggered fallback; 3-arm comparison with
+   oracle-correctness rate
+10. **M10 Uncertainty / Confidence Layer** — composite
+    confidence over all 5 component signals + a calibration
+    check (high-conf strictly more accurate than low-conf)
+
+W53 is the strongest *executable proxy* line we can write
+today at the capsule layer. It does NOT touch real KV bytes,
+hidden states, attention weights, embeddings, or real
+tokenizers. The W52-C-DEEP-TRANSFORMER-COUPLING conjecture
+is *further-bounded* (sharper than W52) but not closed.
+
+W53 ships at ``coordpy.persistent_latent_v5``,
+``coordpy.multi_hop_translator_v3``,
+``coordpy.mergeable_latent_capsule``,
+``coordpy.deep_proxy_stack_v4``,
+``coordpy.ecc_codebook_v5``,
+``coordpy.long_horizon_retention_v5``,
+``coordpy.branch_merge_memory_v3``,
+``coordpy.corruption_robust_carrier``,
+``coordpy.transcript_vs_shared_arbiter_v2``,
+``coordpy.uncertainty_layer``, and
+``coordpy.w53_team`` — explicit-import paths only.
+``coordpy.__version__`` remains ``0.5.20``; SDK contract
+byte-for-byte unchanged.
+
+R-104 (12 cell families) + R-105 (10 cell families) +
+R-106 (12 cell families) at 3 seeds each verify the
+H1..H34 success criterion; cumulative trust boundary across
+W22..W53 = **423 enumerated failure modes** (393 from
+W22..W52 + 30 new at W53).
+
+Released SDK contract preserved byte-for-byte. The honest
+programme storyline is now: **W43**..**W52** as above, plus
+**W53**: persistent mergeable corruption-robust latent
+operating system — **the strongest honest capsule-layer
+mergeable-capsule + multi-hop-quint-transitive +
+uncertainty-aware-arbitrated + ECC-parity-detected + 4-headed-
+reconstructed + K-of-N-consensus-merged + corruption-robust-
+carrier + uncertainty-calibrated executable proxy we can
+write today.**
+
+See `docs/SUCCESS_CRITERION_W53_PMCRLOS.md` for the
+pre-committed H1..H34 thresholds and
+`docs/RESULTS_W53_PMCRLOS.md` for the empirical results.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

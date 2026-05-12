@@ -2,10 +2,125 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W51
-> W52 milestone (Quantised Persistent Multi-Hop Latent Coordination research line), 2026-05-11.
+> README-of-README must satisfy these rules. Last touched: post-W52
+> W53 milestone (Persistent Mergeable Corruption-Robust Latent
+> Operating System research line), 2026-05-12.
+> Earlier: post-W51 W52 (Quantised Persistent Multi-Hop Latent Coordination), 2026-05-11.
 > Earlier: post-W50 W51 (Persistent Cross-Backend Latent Coordination), 2026-05-11.
 > Earlier: post-W49 W50 milestone (Cross-Backend Latent Coordination research line), 2026-05-11. Earlier: post-W48 W49 milestone (Multi-Block Cross-Bank Coordination research line), 2026-05-11. Earlier: post-W47 W48 milestone (Shared-State Transformer-Proxy) 2026-05-11. Earlier: post-W46 W47 milestone (Autograd Manifold Stack) 2026-05-10. Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03.
+
+## W53 (Persistent Mergeable Corruption-Robust Latent Operating System) — explicit do-not-overstate rules
+
+W53 stacks ten orthogonal advances on top of W52: 3-layer
+persistent latent state V5 with persistent skip-link + merge
+head (M1), 5-backend multi-hop translator V3 with chain-
+length-4 transitivity + uncertainty-aware arbitration with
+per-dim 1-sigma intervals (M2), Mergeable Latent State
+Capsule (MLSC) abstraction with merge operator + audit trail +
+K-of-N consensus quorum with abstain (M3), L=10 deep proxy
+stack V4 with merge-aware + corruption-aware heads (M4), ECC
+codebook V5 K1×K2×K3×K4 with XOR parity bits (M5), four-
+headed long-horizon reconstruction V5 max_k=16 + degradation
+curve to k=32 (M6), branch merge memory V3 with consensus
+pages + abstain (M7), corruption-robust carrier with parity +
+3-of-3 majority repetition (M8), transcript-vs-shared
+arbiter V2 with explicit abstain (M9), and uncertainty /
+confidence layer with calibration check (M10). It is the
+strongest *executable proxy* available at the capsule layer
+with one **best-effort** real-LLM realism anchor (quint).
+
+* *"W53 is a true latent operating system for transformers"* —
+  **forbidden**. W53 is a **capsule-native latent operating
+  system proxy**. It does NOT touch transformer-internal
+  hidden states, KV cache bytes, attention weights, or
+  embeddings. The MLSC, V5 persistent state, and deep proxy
+  V4 all operate at the capsule layer.
+
+* *"W53 closes ``W52-C-CROSS-TOKENIZER-QUAD-TRANSITIVITY``"* —
+  **forbidden**. The conjecture is *sharpened* to
+  ``W53-C-CROSS-TOKENIZER-QUINT-CAP``: the quint translator +
+  length-4 transitivity scoring + uncertainty-aware
+  arbitration are now trained and auditable, but
+  behavioural transitivity across **genuinely different
+  tokenizers** still requires backend-side adapters out of
+  W53 scope.
+
+* *"W53 closes ``W47-C-DEEP-TRANSFORMER-COUPLING`` ..
+  ``W52-C-DEEP-TRANSFORMER-COUPLING``"* — **forbidden**.
+  These remain substrate-blocked. W53 *further-bounds* W52
+  by adding depth (L=10 V4), 5-backend transitivity, the
+  MLSC abstraction, ECC parity, and the corruption-robust
+  carrier, but does not close them.
+
+* *"W53 is GPU-accelerated"* — **forbidden**. The
+  pure-Python ``Variable`` + ``AdamOptimizer`` autograd
+  engine from W47 carries forward; per-module training
+  cost grows as ``O(n_params × n_examples)``. The
+  ``W53-L-PURE-PYTHON-TRAINING-COST-CAP`` is a
+  load-bearing honest constraint.
+
+* *"W53 fully recovers signal at 32+ turns"* —
+  **forbidden** in unqualified form. The H14 honest bar
+  is cosine ≥ 0.25 at turn 32 on corrupted regimes;
+  V5's persistent skip-link gives it more juice at
+  long horizons than V4, but 32-turn recall on
+  arbitrary regimes is not guaranteed.
+
+* *"W53 fully recovers prior-turn features at k > 16"* —
+  **forbidden**. The H16 honest bar is MSE ≤ 0.80 at
+  k=16; the V5 head's design-maximum lookback is k=16.
+  Tighter convergence past k=16 requires NumPy/JAX/PyTorch
+  and larger training budgets. Past k=16 the V5
+  degradation curve probe explicitly marks
+  ``is_degraded=True`` and reports the deterministic
+  baseline MSE.
+
+* *"W53 hits 32+ bits/visible-token"* — **forbidden**. The
+  K1=32 × K2=16 × K3=8 × K4=4 codebook has a structural
+  capacity of ~14 bits per (coarse, fine, ultra, ultra2)
+  quadruple plus 4 parity bits = ~18 bits/visible-token
+  ceiling. The ``W53-L-ECC-RATE-FLOOR`` falsifier
+  reproduces the 40-bit miss honestly.
+
+* *"W53 detects every corruption"* — **forbidden**. The
+  ECC parity scheme detects single-bit flips at near-100%
+  rate but cannot detect all 2-bit flips: a 2-bit flip
+  that lands in a parity bit + a single segment bit can
+  produce an undetected silent failure. The H25 honest
+  bar is silent_failure_rate ≤ 0.30 under 2-bit
+  corruption; the H31 bar is silent_failure_rate ≤ 0.10
+  under single-bit corruption.
+
+* *"W53 corrects every detectable corruption"* —
+  **forbidden**. With 1-bit detection but no Hamming-style
+  syndrome, partial correction recovers via the surviving
+  segments — the corrupted segment is dropped from the
+  decode rather than algebraically reconstructed. The H24
+  bar is correction_rate ≥ 0.30, not 1.0.
+
+* *"W53 makes real LLMs condition on the ECC control"* —
+  **forbidden**. The H17 task-correct anchor is
+  synthetic. On real LLMs the claim is bounded to "the
+  W53 ECC control block is in the model's context".
+
+* *"W53 generalises across distributions"* — **forbidden**.
+  The H19 ``W53-L-V5-DISTRIBUTION-CAP`` reproduces honestly
+  when an adversary controls the V5 training distribution;
+  protect rate caps around 0.85-0.92 mean across 3 seeds.
+
+* *"The MLSC merge operator is a learned algorithm with
+  performance guarantees"* — **forbidden**. The MLSC
+  ``MergeOperator`` is a deterministic, content-addressed
+  function of (parents, weights, fact_tags). The
+  *abstraction* has guarantees (replay determinism,
+  audit-walks-to-roots, sum-to-one weights, confidence
+  bounded in [0,1]); the *content* of the merge is a
+  weighted blend whose semantic correctness depends on the
+  parents' semantic content.
+
+* *"W53 bumps the version"* — **forbidden**.
+  ``coordpy.__version__`` remains ``0.5.20``; no PyPI
+  release; W53 modules ship at explicit-import paths only.
 
 ## W52 (Quantised Persistent Multi-Hop Latent Coordination) — explicit do-not-overstate rules
 

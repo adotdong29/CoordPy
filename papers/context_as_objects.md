@@ -3343,6 +3343,78 @@ capsule layer with one **best-effort** real-LLM quad-backend
 realism anchor. Released SDK contract preserved
 byte-for-byte; ``coordpy.__version__`` remains ``0.5.20``.
 
+## W53 Persistent Mergeable Corruption-Robust Latent Operating System (post-W52, 2026-05-12)
+
+The W53 milestone composes ten orthogonal mechanism advances
+on top of W52 into a **capsule-native latent operating system
+proxy** for multi-agent teams.
+
+* **M1 Persistent Latent State V5** — 3-layer GRU with
+  *persistent* skip-link applied at every step + a state-
+  merge head; chain walks past 32 turns
+* **M2 Multi-Hop Translator V3** — 5-backend (A,B,C,D,E)
+  with chain-length-4 transitivity + uncertainty-aware
+  arbitration that returns per-dim 1-sigma confidence
+* **M3 Mergeable Latent State Capsule (MLSC)** — content-
+  addressed mergeable capsules with explicit
+  ``MergeOperator`` + content-addressed ``MergeAuditTrail``;
+  K-of-N consensus quorum with abstain semantics. *The
+  load-bearing new abstraction at W53.*
+* **M4 Deep Proxy Stack V4** — depth-10 wrapping V3 with
+  merge-aware + corruption-aware heads
+* **M5 ECC Codebook V5** — K1×K2×K3×K4 = 16384 codes plus
+  XOR parity bits per segment (4 parity bits/visible-token);
+  ≥ 14.5 bits/visible-token target (empirically 17.67) +
+  single-bit corruption detection
+* **M6 Long-Horizon Reconstruction V5** — 4 heads (causal +
+  branch + cycle + merged-branch), ``max_k=16``, degradation
+  curve to ``k=32``
+* **M7 Branch Merge Memory V3** — consensus pages with
+  K-of-N quorum + content-addressed audit + abstain
+* **M8 Corruption-Robust Carrier** — composes ECC parity +
+  3-of-3 majority repetition; reports detect / partial-correct
+  / abstain / silent-failure rates; honest 2-bit
+  graceful-degrade
+* **M9 Transcript-vs-Shared Arbiter V2** — explicit per-turn
+  policy over {transcript, shared, abstain}; oracle-
+  correctness comparison
+* **M10 Uncertainty / Confidence Layer** — composite
+  per-component confidence + calibration check
+  (high-conf strictly more accurate than low-conf)
+
+W53 ships at ``coordpy.persistent_latent_v5``,
+``coordpy.multi_hop_translator_v3``,
+``coordpy.mergeable_latent_capsule``,
+``coordpy.deep_proxy_stack_v4``,
+``coordpy.ecc_codebook_v5``,
+``coordpy.long_horizon_retention_v5``,
+``coordpy.branch_merge_memory_v3``,
+``coordpy.corruption_robust_carrier``,
+``coordpy.transcript_vs_shared_arbiter_v2``,
+``coordpy.uncertainty_layer``,
+``coordpy.w53_team`` — explicit-import paths only.
+``coordpy.__version__`` remains ``0.5.20``; SDK contract
+byte-for-byte unchanged.
+
+W53 is verified by R-104 (12 cell families) + R-105
+(10 cell families) + R-106 (12 cell families) at 3 seeds
+each (H1..H34 success criterion). The ``W53-T-MLSC-CAPSULE-
+CID-STABILITY``, ``W53-T-ECC-PARITY-DETECT-SINGLE-BIT``,
+and ``W53-T-MLSC-CONSENSUS-QUORUM-K-OF-N`` theorems are
+proved by inspection plus empirical witnesses; the
+``W53-L-OVERDEPTH-V4-CAP``, ``W53-L-ECC-RATE-FLOOR-CAP``,
+``W53-L-CRC-TWO-BIT-PATHOLOGY-CAP`` falsifiers reproduce
+honestly. The ``W53-C-CROSS-TOKENIZER-QUINT-CAP``
+conjecture sharpens W52's cross-tokenizer line.
+
+W53 does NOT touch real KV bytes, hidden states, attention
+weights, embeddings, or real tokenizers. It is the strongest
+*executable proxy* line we can write today at the capsule
+layer with one **best-effort** real-LLM quint-backend
+realism anchor (reusing the W52 quad scaffold + a synthetic
+5th tag E). Released SDK contract preserved byte-for-byte;
+``coordpy.__version__`` remains ``0.5.20``.
+
 ## References
 
 Bibliography intentionally omitted from this Markdown draft.
