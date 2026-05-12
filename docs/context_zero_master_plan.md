@@ -12910,6 +12910,97 @@ can write today**.
 See `docs/SUCCESS_CRITERION_W51_PERSISTENT_LATENT_COORDINATION.md`
 for the pre-committed H1..H18 thresholds.
 
+## Axis 49 — W52 Quantised Persistent Multi-Hop Latent Coordination
+## (post-W51, 2026-05-11)
+
+After W51 ships, the next post-release research milestone is
+**W52 QPMHLC**: eight orthogonal capsule-native advances on
+top of W51's six.
+
+1. **M1 ``V4StackedCell`` + skip-link** — a two-layer stacked
+   GRU persistent latent state with a learned identity-init
+   signal skip-link that projects the turn-0 carrier into the
+   upper layer's input at every step. Content-addressed
+   ``PersistentLatentStateV4Chain`` walks up to depth 24.
+
+2. **M2 ``MultiHopBackendTranslator``** — N=4 backend tags
+   `(A, B, C, D)` with 12 directed edges, trained jointly
+   with length-2 and length-3 transitivity losses. Adds a
+   **disagreement-weighted arbitration** where per-edge
+   confidence is calibrated from training residuals; under
+   a single-edge perturbation, weighted arbitration strictly
+   beats naive. Best-effort quad-Ollama realism anchor when
+   ``COORDPY_W52_OLLAMA_REACHABLE=1``.
+
+3. **M3 ``DeepProxyStackV3``** — depth-eight (vs W51's L=6)
+   capsule-layer proxy transformer stack with
+   **role-conditioned KV banks** (per-layer per-role residual
+   subspace) and **per-layer residual gate** (sigmoid).
+
+4. **M4 ``QuantisedCodebookV4`` + ``QuantisedBudgetGate``** —
+   three-level codebook (K1=32 coarse + K2=16 fine + K3=8
+   ultra-fine = 4096 codes ≈ 12 bits/triple) plus an adaptive
+   budget gate (3 level gates + 16-bit emit mask). ≥ 14
+   bits per visible-token at full emit. Degradation-curve
+   probe across decreasing token budgets `{16, 8, 4, 2, 1}`.
+
+5. **M5 ``LongHorizonReconstructionV4Head``** — three-headed
+   reconstruction head (causal + branch + cycle) at
+   ``max_k=12``. MSE-curve probe across ``k ∈ {1..24}``.
+
+6. **M6 ``BranchCycleMemoryV2Head``** — extends W51 BCM with
+   joint `(branch, cycle)` pages + trainable merge head +
+   importance-weighted eviction. Content-addressed merge
+   audit trail.
+
+7. **M7 ``RoleGraphMixer``** — a new module: DAG of per-edge
+   `(src_role, dst_role)` linear projections; direction-
+   dependent transfer that strictly beats equal-weight
+   cross-role mixers under direction-dependent regimes.
+
+8. **M8 ``TranscriptVsSharedStateComparator``** — explicit
+   matched-budget ablation: transcript truncation vs
+   shared-latent quantised encoding under a fixed visible-
+   token budget `B`. Reports the strict retention gap +
+   bit-density gap.
+
+Envelope chain
+``w47_outer → w48_proxy_outer → w49_multi_block_outer →
+w50_outer → w51_outer → w52_outer`` verified by 26 new
+disjoint failure modes (cumulative W22..W52 = **393
+modes**). R-102 (12 cell families) and R-103 (10 cell
+families) at 3 seeds each verify H1..H22 — **22/22 H bars
+pass**.
+
+W43..W51 substrate-blocked conjectures carry forward
+unchanged. ``W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY`` is
+*sharpened* to ``W52-C-CROSS-TOKENIZER-QUAD-TRANSITIVITY``:
+capsule-layer length-3 transitivity is now trained and
+auditable; only tokenizer-level transitivity remains carried
+forward.
+
+Honest non-claims at W52: the L=8 deep stack V3 does NOT
+strictly improve over L=6 V3 on shallow regimes under pure-
+Python autograd (H21: -0.056). The multi-hop translator under
+identity-friendly init preserves ~0.55 of clean signal even
+when trained on forged labels — protect rate caps at 0.43
+(H11). The quantised codebook cannot reach 32 bits/token
+(structural ceiling ~12 bits/triple — H22 falsifier
+reproduces).
+
+Released SDK contract preserved byte-for-byte. The honest
+programme storyline is now: **W43**..**W51** as above, plus
+**W52**: quantised persistent multi-hop latent coordination
+— **the strongest honest capsule-layer stacked-persistent +
+multi-hop-transitive + role-graph-conditioned + quantised-
+compressed + long-horizon-reconstructed + merge-evict-
+audited + transcript-comparator-ablated shared-state
+transfer we can write today**.
+
+See
+`docs/SUCCESS_CRITERION_W52_QUANTISED_PERSISTENT_MULTI_HOP.md`
+for the pre-committed H1..H22 thresholds.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

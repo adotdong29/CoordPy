@@ -13,6 +13,84 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W52 Quantised Persistent Multi-Hop Latent Coordination**
+  (post-W51, 2026-05-11) — `coordpy.persistent_latent_v4`,
+  `coordpy.multi_hop_translator`,
+  `coordpy.deep_proxy_stack_v3`,
+  `coordpy.quantised_compression`,
+  `coordpy.long_horizon_retention_v4`,
+  `coordpy.branch_cycle_memory_v2`,
+  `coordpy.role_graph_transfer`,
+  `coordpy.transcript_vs_shared_state`,
+  `coordpy.w52_team`, `coordpy.r102_benchmark`,
+  `coordpy.r103_benchmark`. Eight orthogonal capsule-native
+  advances layered on top of W51:
+  (M1) a **stacked two-layer persistent latent state V4**
+  with identity-init signal skip-link that carries the
+  turn-0 signal through mid-sequence distractors; chain
+  walks up to depth 24;
+  (M2) a **multi-hop quad-backend translator** over four
+  backend tags ``(A, B, C, D)`` with 12 directed edges,
+  trained with length-2 and length-3 transitivity losses,
+  plus a **disagreement-weighted arbitration** mechanism
+  with per-edge confidence calibrated from training
+  residuals (strictly beats naive equal-weight arbitration
+  on perturbed-edge regimes);
+  (M3) a depth-eight **deep proxy transformer stack V3**
+  (vs W51's ``L=6``) with **role-conditioned KV banks**
+  and **per-layer residual gate**;
+  (M4) a **three-level quantised codebook V4** with
+  coarse ``K1=32`` + fine ``K2=16`` + ultra-fine ``K3=8``
+  (= 4096 codes ≈ 12 bits/triple) plus a learned adaptive
+  budget allocator — achieves ≥ 14 bits/visible-token at
+  full emit (vs W51's 12.0);
+  (M5) a **three-headed long-horizon reconstruction V4**
+  (causal + branch + cycle) at ``max_k=12`` (vs W51's
+  ``max_k=8``) with a degradation-curve probe across
+  ``k ∈ {1..24}``;
+  (M6) a **branch/cycle memory V2** with trainable merge +
+  importance-weighted evict heads + joint
+  ``(branch, cycle)`` pages and a content-addressed merge
+  audit trail;
+  (M7) a new **role-graph conditioned cross-role transfer**
+  module with per-edge ``(src_role, dst_role)`` linear
+  projections that strictly beats equal-weight cross-role
+  averaging on direction-dependent regimes;
+  (M8) a **transcript-vs-shared-state matched-budget
+  comparator** — the first capsule-native ablation that
+  compares transcript truncation against shared-latent
+  quantised encoding under a fixed visible-token budget;
+  reports the strict retention gap and bit-density gap.
+  Carries forward W51's full verifier surface plus 26 new
+  disjoint W52 envelope failure modes —
+  **cumulative trust boundary across W22..W52 = 393
+  enumerated modes**. R-102 (12 cell families, 3 seeds) +
+  R-103 (10 cell families, 3 seeds) verify the H1..H22
+  success criterion — **22/22 H bars pass**. Headline
+  results: 24-turn corrupted V4 retention 0.995 vs trained
+  V3 0.757 (Δ +0.238); length-3 transitive fidelity 0.924,
+  transitivity gap 0.058; disagreement-weighted
+  arbitration 0.724 vs naive 0.375 (Δ +0.348); L=8 V3
+  accuracy 0.764 vs L=6 V2 0.681 (Δ +0.083); role-graph
+  transfer 0.806 vs equal-weight 0.080 (Δ +0.727);
+  transcript-vs-shared retention gap +0.253 at matched
+  B=3 budget; quantised 15.67 bits/visible-token; BCM V2
+  joint recall 0.991 vs V1 0.657 (Δ +0.334); reconstruction
+  V4 MSE at k=8 = 0.417, at k=12 = 0.369; verifier 1.000;
+  replay determinism 1.000. Honest non-claims: L=8 does
+  NOT strictly improve over L=6 V3 on shallow regimes
+  (H21: -0.056); multi-hop translator under
+  identity-friendly init preserves ~0.55 of clean signal
+  even under forged training (H11 protect rate 0.43);
+  ``W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY`` sharpened
+  forward as ``W52-C-CROSS-TOKENIZER-QUAD-TRANSITIVITY``.
+  W52 ships at the explicit-import paths above; the
+  released v0.5.20 wheel's public surface is byte-for-byte
+  unchanged. See
+  `docs/RESULTS_W52_QUANTISED_PERSISTENT_MULTI_HOP.md` and
+  `docs/SUCCESS_CRITERION_W52_QUANTISED_PERSISTENT_MULTI_HOP.md`
+  for the full result + pre-committed H bars.
+
 - **W51 Persistent Cross-Backend Latent Coordination** (post-W50,
   2026-05-11) — `coordpy.persistent_shared_latent`,
   `coordpy.cross_backend_translator`,

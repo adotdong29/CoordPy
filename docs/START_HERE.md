@@ -248,6 +248,50 @@ is byte-for-byte unchanged. See
 [`RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md`](RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md)
 for the full result note.
 
+**Post-W51 research milestone — W52 Quantised Persistent Multi-Hop Latent Coordination**
+
+The next research step after W51 (W52) introduces the
+**Quantised Persistent Multi-Hop Latent Coordination
+(QPMHLC)** layer: eight orthogonal capsule-native advances
+on top of W51's six. (i) A two-layer **stacked persistent
+latent state V4** with a learned signal skip-link that
+preserves the turn-0 signal through mid-sequence
+distractors. (ii) A **multi-hop quad-backend translator**
+with chain-length-3 transitivity loss and a learned
+disagreement-weighted arbitration that beats naive
+equal-weight arbitration under per-edge confidence
+calibration. (iii) An `L=8` **deep proxy stack V3** with
+**role-conditioned KV banks** + **per-layer residual gate**.
+(iv) A **three-level quantised codebook V4**
+(`K1=32 × K2=16 × K3=8 = 4096` codes) + learned adaptive
+budget gate — achieves ≥ 14 bits/visible-token at full emit.
+(v) A **three-headed long-horizon reconstruction V4**
+(causal + branch + cycle) at `max_k=12` with a degradation
+curve probe across `k ∈ {1..24}`. (vi) A **branch/cycle
+memory V2** with trainable merge + evict heads and joint
+`(branch, cycle)` pages. (vii) A new **role-graph
+conditioned cross-role transfer** module with per-edge
+direction-dependent projections. (viii) A
+**transcript-vs-shared-state matched-budget comparator** —
+the first capsule-native ablation that compares transcript
+truncation against shared-latent encoding under a fixed
+visible-token budget. 26 new disjoint envelope failure modes
+(cumulative trust boundary = **393 modes across W22..W52**).
+W52 is held outside the stable SDK contract — it ships at
+`coordpy.persistent_latent_v4`,
+`coordpy.multi_hop_translator`,
+`coordpy.deep_proxy_stack_v3`,
+`coordpy.quantised_compression`,
+`coordpy.long_horizon_retention_v4`,
+`coordpy.branch_cycle_memory_v2`,
+`coordpy.role_graph_transfer`,
+`coordpy.transcript_vs_shared_state`, and the composition
+module at `coordpy.w52_team`, reachable only via explicit
+import; the released v0.5.20 wheel's public surface is
+byte-for-byte unchanged. See
+[`RESULTS_W52_QUANTISED_PERSISTENT_MULTI_HOP.md`](RESULTS_W52_QUANTISED_PERSISTENT_MULTI_HOP.md)
+for the full result note.
+
 **Post-W50 research milestone — W51 Persistent Cross-Backend Latent Coordination**
 
 The next research step after W50 (W51) introduces the
@@ -425,6 +469,8 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Post-W51 research milestone (W52)    | [`RESULTS_W52_QUANTISED_PERSISTENT_MULTI_HOP.md`](RESULTS_W52_QUANTISED_PERSISTENT_MULTI_HOP.md) |
+> | Pre-committed success bar (W52)      | [`SUCCESS_CRITERION_W52_QUANTISED_PERSISTENT_MULTI_HOP.md`](SUCCESS_CRITERION_W52_QUANTISED_PERSISTENT_MULTI_HOP.md) |
 > | Post-W50 research milestone (W51)    | [`RESULTS_W51_PERSISTENT_LATENT_COORDINATION.md`](RESULTS_W51_PERSISTENT_LATENT_COORDINATION.md) |
 > | Pre-committed success bar (W51)      | [`SUCCESS_CRITERION_W51_PERSISTENT_LATENT_COORDINATION.md`](SUCCESS_CRITERION_W51_PERSISTENT_LATENT_COORDINATION.md) |
 > | Post-W49 research milestone (W50)    | [`RESULTS_W50_CROSS_BACKEND_LATENT_COORDINATION.md`](RESULTS_W50_CROSS_BACKEND_LATENT_COORDINATION.md) |

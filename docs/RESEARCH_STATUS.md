@@ -5,9 +5,110 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W50 W51
-> milestone (Persistent Cross-Backend Latent Coordination
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W51 W52
+> milestone (Quantised Persistent Multi-Hop Latent Coordination
 > research line), 2026-05-11.
+
+## TL;DR — W52 Quantised Persistent Multi-Hop Latent Coordination (post-W51 research milestone)
+
+The programme now has **forty-nine** coupled research axes.
+W52 mints axis 49: **eight orthogonal capsule-native
+advances** layered on top of W51 Persistent Cross-Backend
+Latent Coordination —
+(M1) a **stacked two-layer persistent latent state V4**
+with an identity-init signal skip-link that carries the
+turn-0 signal through mid-sequence distractors; chain
+walks up to depth 24;
+(M2) a **multi-hop quad-backend translator** over four
+backend tags `(A, B, C, D)` with 12 directed edges, trained
+with length-2 and length-3 transitivity losses, plus a
+**disagreement-weighted arbitration** mechanism with
+per-edge confidence calibrated from training residuals
+(strictly beats naive equal-weight arbitration under
+perturbed edges);
+(M3) a depth-eight **deep proxy transformer stack V3**
+(vs W51's `L=6`) with **role-conditioned KV banks** and
+**per-layer residual gate**;
+(M4) a **three-level quantised codebook V4** with coarse
+`K1=32` + fine `K2=16` + ultra-fine `K3=8` (= 4096 codes
+≈ 12 bits/triple) plus a learned adaptive budget gate —
+achieves **≥ 14 bits/visible-token at full emit**;
+(M5) a **three-headed long-horizon reconstruction V4**
+(causal + branch + cycle) at `max_k=12` (vs W51's `max_k=8`)
+with a degradation-curve probe across `k ∈ {1..24}`;
+(M6) a **branch/cycle memory V2** with trainable merge +
+importance-weighted evict heads + joint `(branch, cycle)`
+pages and a content-addressed merge audit trail;
+(M7) a new **role-graph conditioned cross-role transfer**
+module with per-edge `(src_role, dst_role)` linear
+projections that strictly beats equal-weight cross-role
+averaging on direction-dependent regimes;
+(M8) a **transcript-vs-shared-state matched-budget
+comparator** — the first capsule-native ablation that
+compares transcript truncation against shared-latent
+quantised encoding under a fixed visible-token budget;
+reports the strict retention gap and bit-density gap.
+
+W52 is the strongest *executable proxy* line we can write
+today at the capsule layer; it does NOT touch real KV bytes,
+hidden states, attention weights, embeddings, or real
+tokenizers. The multi-hop translator operates over the
+capsule-layer carrier exclusively. The H8 realism probe is
+best-effort: when Ollama is unreachable, the witness records
+`anchor_status: "synthetic_only"` and the
+`W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY` conjecture
+carries forward sharpened as
+`W52-C-CROSS-TOKENIZER-QUAD-TRANSITIVITY`.
+
+W52 ships at `coordpy.persistent_latent_v4`,
+`coordpy.multi_hop_translator`,
+`coordpy.deep_proxy_stack_v3`,
+`coordpy.quantised_compression`,
+`coordpy.long_horizon_retention_v4`,
+`coordpy.branch_cycle_memory_v2`,
+`coordpy.role_graph_transfer`,
+`coordpy.transcript_vs_shared_state`, and
+`coordpy.w52_team` — reachable only through explicit
+imports. `coordpy.__version__` remains `0.5.20`; SDK
+contract is byte-for-byte unchanged. R-102 (12 cell
+families) and R-103 (10 cell families) at 3 seeds each
+verify the H1..H22 success criterion — **22/22 H bars
+pass**. Cumulative trust boundary across W22..W52 =
+**393 enumerated failure modes** (367 from W22..W51 + 26
+new at W52).
+
+W52 headline results (3 seeds, mean):
+
+* 24-turn corrupted V4 retention: **0.995** (trained V3 0.757; Δ **+0.238**)
+* length-3 transitive fidelity: **0.924**; gap **0.058** (≤ 0.15)
+* disagreement-weighted arbitration: **0.724** vs naive 0.375 (Δ **+0.348**)
+* L=8 deep stack V3 acc: **0.764** vs L=6 V2 0.681 (Δ **+0.083**)
+* role-graph transfer: **0.806** vs equal-weight 0.080 (Δ **+0.727**)
+* transcript-vs-shared retention gap at B=3: **+0.253**
+* quantised compression bits/visible-token: **15.667** (vs W51 13.0)
+* quantised degradation curve min bits: **8.0** (≥ 5.0)
+* BCM V2 joint recall: **0.991** vs V1 0.657 (Δ **+0.334**)
+* reconstruction V4 MSE at k=8: **0.417** (≤ 0.55)
+* reconstruction V4 MSE at k=12: **0.369** (≤ 0.70)
+* W52 envelope verifier: **1.0**
+* W52 replay determinism: **1.0**
+* W52 distribution cap protect_rate: **0.854** (≥ 0.70)
+* W52 multi-hop translator compromise cap: **0.431** (≥ 0.40 honest cap)
+* W52 role-graph distribution cap: **0.969** (≥ 0.60)
+* W52 overdepth cap: L=8 − L=6 V3 = **-0.056** on shallow regime (cap reproduces)
+* W52 quantised rate-floor falsifier: **1.0** (32-bit target missed structurally)
+
+W52 directly attacks the post-W51 question of **how to push
+shared-state persistence to longer horizons under distractor
+load, generalise cross-backend transitivity to multi-hop
+chains with disagreement-weighted arbitration, deepen the
+proxy with role-conditioned KV banks, quantise the latent
+carrier with a three-level codebook, reconstruct deeper
+horizons with a three-headed head, audit memory merges
+explicitly, condition cross-role transfer on a learned role
+graph, and explicitly compare transcript truncation against
+shared-latent encoding under a matched visible-token
+budget**.
 
 ## TL;DR — W51 Persistent Cross-Backend Latent Coordination (post-W50 research milestone)
 

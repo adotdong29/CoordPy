@@ -2,9 +2,115 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W49
-> W50 milestone (Cross-Backend Latent Coordination research line), 2026-05-11.
-> Earlier: post-W48 W49 milestone (Multi-Block Cross-Bank Coordination research line), 2026-05-11. Earlier: post-W47 W48 milestone (Shared-State Transformer-Proxy) 2026-05-11. Earlier: post-W46 W47 milestone (Autograd Manifold Stack) 2026-05-10. Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03.
+> README-of-README must satisfy these rules. Last touched: post-W51
+> W52 milestone (Quantised Persistent Multi-Hop Latent Coordination research line), 2026-05-11.
+> Earlier: post-W50 W51 (Persistent Cross-Backend Latent Coordination), 2026-05-11.
+> Earlier: post-W49 W50 milestone (Cross-Backend Latent Coordination research line), 2026-05-11. Earlier: post-W48 W49 milestone (Multi-Block Cross-Bank Coordination research line), 2026-05-11. Earlier: post-W47 W48 milestone (Shared-State Transformer-Proxy) 2026-05-11. Earlier: post-W46 W47 milestone (Autograd Manifold Stack) 2026-05-10. Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03.
+
+## W52 (Quantised Persistent Multi-Hop Latent Coordination) — explicit do-not-overstate rules
+
+W52 stacks eight orthogonal advances on top of W51: stacked
+persistent latent state V4 with skip-link (M1), multi-hop
+quad-backend translator with chain-length-3 transitivity
+and disagreement-weighted arbitration (M2), `L=8` deep
+proxy stack V3 with role-conditioned banks (M3), three-level
+quantised codebook V4 K1×K2×K3 (M4), three-headed long-
+horizon reconstruction V4 max_k=12 (M5), branch/cycle memory
+V2 with trainable merge + evict + joint pages (M6),
+role-graph conditioned cross-role transfer (M7), and a
+transcript-vs-shared-state matched-budget comparator (M8).
+It is the strongest *executable proxy* available at the
+capsule layer with one **best-effort** real-LLM realism
+anchor (quad-backend).
+
+* *"W52 is real cross-model behaviourally transitive"* —
+  **forbidden** unless qualified as "chain-length-3
+  capsule-layer transitivity across four synthetic
+  backends, with a best-effort real-LLM anchor". The
+  multi-hop translator operates over capsule-layer carriers
+  only.
+
+* *"W52 closes ``W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY``"* —
+  **forbidden**. The conjecture is *sharpened* to
+  ``W52-C-CROSS-TOKENIZER-QUAD-TRANSITIVITY``: the quad
+  translator + length-3 transitivity loss is now trained
+  and auditable, but behavioural transitivity across
+  **genuinely different tokenizers** still requires
+  backend-side adapters out of W52 scope.
+
+* *"W52 is transformer-internal coupling"* — **forbidden**.
+  W52 does NOT touch transformer-internal hidden states,
+  KV cache bytes, attention weights, or embeddings.
+
+* *"W52 closes ``W47-C-DEEP-TRANSFORMER-COUPLING`` ..
+  ``W51-C-DEEP-TRANSFORMER-COUPLING``"* — **forbidden**.
+  These remain substrate-blocked. W52 *further-bounds*
+  W51 by adding depth (L=8), N-backend transitivity,
+  quantised K1×K2×K3 compression, and the
+  transcript-vs-shared-state ablation, but does not close
+  them.
+
+* *"W52 is GPU-accelerated"* — **forbidden**. The
+  pure-Python ``Variable`` + ``AdamOptimizer`` autograd
+  engine from W47 carries forward; per-module training
+  cost grows as ``O(n_params × n_examples)``. The
+  ``W52-L-PURE-PYTHON-TRAINING-COST-CAP`` is a load-bearing
+  honest constraint.
+
+* *"W52 fully recovers signal at 24 turns"* —
+  **forbidden** in unqualified form. The H14 honest
+  bar is cosine ≥ 0.25 at turn 23 on corrupted regimes;
+  the empirical value is 0.995 on the specific corrupted
+  regime in `family_long_horizon_v4_retention_24turn_stretch`.
+  Other regimes may drop off harder.
+
+* *"W52 fully recovers prior-turn features at k > 12"* —
+  **forbidden**. The H16 honest bar is MSE ≤ 0.70 at k=12;
+  the V4 head's design-maximum lookback is k=12. Tighter
+  convergence past k=12 requires NumPy/JAX/PyTorch and
+  larger training budgets.
+
+* *"W52 hits 32 bits/visible-token"* — **forbidden**. The
+  K1=32 × K2=16 × K3=8 codebook has a structural capacity
+  of ~12 bits per (coarse, fine, ultra) triple; the
+  ``W52-L-QUANTISED-RATE-FLOOR-CAP`` falsifier reproduces
+  the 32-bit miss honestly.
+
+* *"W52 makes real LLMs condition on the quantised
+  control"* — **forbidden**. The H7 / H8 task-correct
+  anchor is synthetic. On real LLMs the claim is bounded to
+  "the W52 quantised control block is in the model's
+  context".
+
+* *"W52 generalises across distributions"* — **forbidden**.
+  The H20 ``W52-L-QPMHLC-DISTRIBUTION-CAP`` reproduces
+  honestly when an adversary controls the training
+  distribution across V4 + role-graph; combined protect
+  rate caps around 0.85 mean across 3 seeds.
+
+* *"The multi-hop translator is robust against any
+  training-distribution forgery"* — **forbidden**. The H11
+  ``W52-L-MULTI-HOP-TRANSLATOR-COMPROMISE-CAP`` is honestly
+  partial — identity-friendly init means the translator
+  preserves ~0.55 of the clean signal even when trained on
+  forged labels. The empirical protect rate caps at 0.43.
+
+* *"W52 bumps the version"* — **forbidden**.
+  ``coordpy.__version__`` remains ``0.5.20``; no PyPI
+  release; W52 modules ship at explicit-import paths only.
+
+## W51 (Persistent Cross-Backend Latent Coordination) — explicit do-not-overstate rules
+
+W51 stacks six orthogonal advances on top of W50: GRU
+persistent shared latent state V3 (M1), triple-backend
+translator with transitivity loss (M2), `L=6` deep proxy
+stack V2 with branch/cycle-specialised heads (M3),
+hierarchical compression V3 K1×K2 (M4), two-headed long-
+horizon reconstruction V3 max_k=8 (M5), branch/cycle
+memory head V1 (M6). It is the strongest *executable proxy*
+at the capsule layer with one **best-effort** real-LLM
+triple anchor. All of its claims remain unchanged at W52
+and are sharpened-forward in the W52 section above.
 
 ## W50 (Cross-Backend Latent Coordination) — explicit do-not-overstate rules
 

@@ -3283,6 +3283,66 @@ capsule layer with one **best-effort** real-LLM triple-backend
 realism anchor. Released SDK contract preserved
 byte-for-byte; ``coordpy.__version__`` remains ``0.5.20``.
 
+## W52 Quantised Persistent Multi-Hop Latent Coordination (post-W51, 2026-05-11)
+
+The next post-release research milestone, **W52 QPMHLC**, adds
+**eight orthogonal capsule-native advances** on top of W51:
+
+1. **M1 stacked persistent latent V4** with identity-init
+   skip-link that carries the turn-0 signal through
+   mid-sequence distractors;
+2. **M2 multi-hop quad-backend translator** with
+   chain-length-3 transitivity loss and
+   disagreement-weighted arbitration calibrated from
+   training residuals;
+3. **M3 `L=8` deep proxy stack V3** with role-conditioned
+   KV banks and per-layer residual gate;
+4. **M4 three-level quantised codebook V4** (`K1=32 × K2=16
+   × K3=8`) with adaptive budget allocation, achieving
+   ≥ 14 bits per visible token at full emit;
+5. **M5 three-headed reconstruction V4** (causal + branch +
+   cycle) at `max_k=12`;
+6. **M6 branch/cycle memory V2** with trainable merge +
+   importance-weighted evict + joint `(branch, cycle)`
+   pages and a content-addressed merge audit trail;
+7. **M7 role-graph conditioned cross-role transfer** —
+   a new module with per-edge `(src, dst)` linear
+   projections that strictly beats equal-weight cross-role
+   averaging on direction-dependent regimes;
+8. **M8 transcript-vs-shared-state matched-budget
+   comparator** — explicit ablation between transcript
+   truncation and shared-latent quantised encoding under a
+   fixed visible-token budget; reports the strict retention
+   gap and bit-density gap.
+
+The W52 envelope chain ``w47_outer → w48_proxy_outer →
+w49_multi_block_outer → w50_outer → w51_outer → w52_outer``
+is verified by 26 disjoint failure modes (cumulative W22..W52
+= **393 enumerated modes**). R-102 (12 cell families) and
+R-103 (10 cell families) at 3 seeds each verify H1..H22 —
+**22/22 H bars pass**.
+
+**Honest non-claims at W52**: the `L=8` deep stack V3 does
+NOT strictly improve over `L=6` V3 on shallow regimes (H21:
+-0.056). The multi-hop translator under identity-friendly
+init preserves ~0.55 of the clean signal even when trained
+on forged labels — protect rate caps at 0.43 (H11). The
+quantised codebook cannot reach 32 bits/visible-token
+(structural ceiling ~12 bits/triple — H22 falsifier
+reproduces). The
+``W51-C-CROSS-TOKENIZER-TRIPLE-TRANSITIVITY`` conjecture
+carries forward sharpened as
+``W52-C-CROSS-TOKENIZER-QUAD-TRANSITIVITY``: capsule-layer
+length-3 transitivity is now trained and auditable; only
+tokenizer-level transitivity remains carried forward.
+
+W52 does NOT touch transformer-internal state, KV bytes,
+attention weights, embeddings, or real tokenizers. It is the
+strongest *executable proxy* line we can write today at the
+capsule layer with one **best-effort** real-LLM quad-backend
+realism anchor. Released SDK contract preserved
+byte-for-byte; ``coordpy.__version__`` remains ``0.5.20``.
+
 ## References
 
 Bibliography intentionally omitted from this Markdown draft.
