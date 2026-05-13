@@ -2,8 +2,77 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W55 research-line update (W56 Substrate-Coupled Latent
-> Operating System, 2026-05-13).** *First substrate-attack
+> **Post-W56 research-line update (W57 Deep Substrate-Coupled
+> Latent Operating System, 2026-05-13).** *Second substrate-
+> attack milestone in the programme; first **bidirectional**
+> substrate breach.* W56 proved that a real in-repo transformer
+> substrate (``coordpy.tiny_substrate``) is enough to
+> demonstrate one-way KV / hidden-state coupling. W57 deepens
+> this on three axes: (a) the substrate gets richer
+> (``coordpy.tiny_substrate_v2`` — 4 layers, 8 heads,
+> ``d_model=64``, RoPE rotary embeddings, per-layer logit lens,
+> KV cache eviction (LRU + importance-weighted), prefix-state
+> extraction as a first-class content-addressed object, per-
+> head pre-softmax attention bias hook); (b) three new
+> substrate bridges are added on top of W56's KV bridge —
+> ``coordpy.hidden_state_bridge`` (additive residual-stream
+> injection at any layer; the substrate's logits change
+> measurably with cross-entropy delta ≈ 0.10 on the H52
+> probe), ``coordpy.prefix_state_bridge`` (save / load /
+> detect-corruption: reuse-vs-recompute byte-identical to
+> ≤ 5e-16 max-abs diff on the H47 probe), and
+> ``coordpy.attention_steering_bridge`` (per-(layer, head,
+> query, key) bias tensor producing measurable mean-KL ≈ 5.59
+> nats per layer × 4 layers on the H53 probe, with the causal
+> mask still strict); (c) **going bidirectional**:
+> ``coordpy.deep_substrate_hybrid_v2`` lets the substrate's
+> intermediate hidden state project back into the capsule
+> layer's V6 residual stream BEFORE the V6 forward, in
+> addition to W56's V6 → substrate KV path. The
+> ``W57HandoffEnvelope.bidirectional_used`` flag is True in
+> end-to-end runs. Plus the V8 stack is promoted to V9 with
+> substrate / hidden-state awareness throughout: V9 persistent
+> latent state (``coordpy.persistent_latent_v9`` — 7 layers,
+> **quintuple** persistent skip-link {anchor + fast EMA + slow
+> EMA + substrate-conditioned EMA + hidden-state-conditioned
+> EMA}, ``max_chain_walk_depth = 384``, substrate-fidelity
+> damping); 10-backend chain-length-9 multi-hop V7
+> (``coordpy.multi_hop_translator_v7``); MLSC V5 with
+> ``hidden_state_witness_chain``, ``attention_witness_cid``,
+> per-head trust, two new algebra signatures
+> {``substrate_project``, ``hidden_inject``}; consensus V3 with
+> a 7-stage chain (adds ``logit_lens_conditioned`` between
+> ``substrate`` and ``best_parent``); CRC V5 with 3-D
+> interleaving (4×4×4 = 64-bit blocks), 9-of-13 majority, and
+> KV cache fingerprinting (Reed-Solomon-style 32-bucket XOR
+> fingerprints — H75 KV-corruption detect rate = 1.0); 8-head
+> LHR V9 (``max_k = 64``, hidden-state-conditioned head); ECC
+> V9 (262144 codes, **20.333 bits/visible-token** at full
+> emit); 7-arm TVS V6 (adds ``substrate_hidden_inject``);
+> hidden-state-fidelity 4-axis uncertainty V5 with adversarial
+> pessimistic / optimistic brackets; disagreement algebra V3
+> with hidden-projection identity. Substrate adapter V2
+> (``coordpy.substrate_adapter_v2``) adds four new capability
+> axes (``attention_bias_write``, ``prefix_state_reuse``,
+> ``cache_eviction``, ``logit_lens``) and a new ``substrate_v2_full``
+> tier reached only by the V2 in-repo runtime; hosted backends
+> remain text-only. R-116 (14 cell families) + R-117 (14 cell
+> families) + R-118 (15 cell families) at 3 seeds verify
+> **43/43 H-bars (H43..H85) pass 3/3 seeds** — strong success
+> per the W57 pre-committed criterion. Cumulative trust
+> boundary across W22..W57 = **568 enumerated failure modes**.
+> ``coordpy.__version__`` remains ``0.5.20``; SDK contract is
+> byte-for-byte unchanged. ``W57-L-NO-THIRD-PARTY-SUBSTRATE-
+> COUPLING-CAP`` records that hosted backends remain text-only
+> at the HTTP surface; ``W57-C-DEEP-TRANSFORMER-COUPLING`` is
+> a sharper restatement of the open question on frontier-scale
+> models; ``W57-C-FRONTIER-SCALE-SUBSTRATE-LIFT`` conjectures
+> that the W57 bridges (KV V2 + hidden-state + prefix-state +
+> attention-steering) would scale-monotonically improve
+> usefulness if frontier runtimes exposed compatible hooks.
+>
+> **Earlier post-W55 research-line update (W56 Substrate-Coupled
+> Latent Operating System, 2026-05-13).** *First substrate-attack
 > milestone in the programme.* The post-W55 question — *how do
 > we actually breach the substrate layer instead of carrying it
 > forward as a permanent conjecture?* — is answered by W56 with

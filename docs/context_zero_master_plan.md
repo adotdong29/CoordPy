@@ -1,6 +1,90 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W55 / W56, 2026-05-13 —
+> **Latest milestone marker (post-W56 / W57, 2026-05-13 —
+> Deep Substrate-Coupled Latent Operating System, fifteenth
+> post-release research milestone — second substrate-attack
+> milestone, the first **bidirectional** substrate breach).**
+> *Sixteen orthogonal substrate-coupling and capsule-native
+> advances on top of W56 Substrate-Coupled Latent OS:
+> M1 ``coordpy.tiny_substrate_v2`` (richer 4-layer / 8-head /
+> d_model=64 / RoPE / per-layer logit lens / KV cache eviction /
+> prefix-state extraction / per-head pre-softmax attention bias
+> hook); M2 ``coordpy.kv_bridge_v2`` (per-(layer, head)
+> projection, calibrated per-head inject scales, replay-
+> deterministic readback CID, max-abs / L2 / cross-entropy
+> witnesses); M3 ``coordpy.hidden_state_bridge`` (residual-
+> stream injection at any layer; H52 L2 perturbation 1.43 mean);
+> M4 ``coordpy.prefix_state_bridge`` (save / load / detect-
+> corruption; H47 reuse-vs-recompute max-abs ≤ 5e-16); M5
+> ``coordpy.attention_steering_bridge`` (per-(layer, head,
+> query, key) bias tensor; H53 mean-KL 5.59 nats/layer × 4
+> layers; causal mask still strict); M6
+> ``coordpy.persistent_latent_v9`` (7 layers, **quintuple
+> persistent skip-link**, max_chain_walk_depth = 384,
+> substrate-fidelity damping); M7
+> ``coordpy.multi_hop_translator_v7`` (10 backends, 90 directed
+> edges, chain-length-9, substrate-hidden-trust composite
+> arbitration); M8 ``coordpy.mergeable_latent_capsule_v5``
+> (hidden-state-witness-chain, attention-witness-cid, per-head
+> trust, two new algebra signatures
+> {``substrate_project``, ``hidden_inject``}); M9
+> ``coordpy.consensus_fallback_controller_v3`` (**7-stage
+> chain** — adds ``logit_lens_conditioned`` between ``substrate``
+> and ``best_parent``); M10
+> ``coordpy.corruption_robust_carrier_v5`` (3-D interleaving
+> 4×4×4 = 64-bit blocks, 9-of-13 majority repetition, KV cache
+> Reed-Solomon-style 32-bucket fingerprint); M11
+> ``coordpy.long_horizon_retention_v9`` (8 heads, max_k=64,
+> hidden-state-conditioned head); M12
+> ``coordpy.ecc_codebook_v9`` (K1..K8 codebook = 262144 codes,
+> **20.333 bits/visible-token**); M13
+> ``coordpy.transcript_vs_shared_arbiter_v6`` (**7-arm policy**
+> — adds ``substrate_hidden_inject``); M14
+> ``coordpy.uncertainty_layer_v5`` (hidden-state-fidelity 4th
+> axis, adversarial pessimistic/optimistic brackets); M15
+> ``coordpy.disagreement_algebra_v3`` (hidden-projection
+> identity + attention-steering compatibility); M16
+> ``coordpy.deep_substrate_hybrid_v2`` (**bidirectional
+> substrate ↔ V6 hybrid stack** — substrate intermediate hidden
+> projects back into V6 input AND V6 residual injects into
+> substrate KV via bridge V2 plus optional attention-steering;
+> ``W57HandoffEnvelope.bidirectional_used`` is True in real
+> runs). Plus ``coordpy.substrate_adapter_v2`` (4 new capability
+> axes, new ``substrate_v2_full`` tier). R-116 (14 cell
+> families) + R-117 (14 cell families) + R-118 (15 cell
+> families) at 3 seeds verify H43..H85; **43/43 H-bars pass
+> 3/3 seeds (strong success)**. Cumulative trust boundary
+> across W22..W57 = **568 enumerated failure modes**.
+> W57 modules ship at ``coordpy.tiny_substrate_v2``,
+> ``coordpy.kv_bridge_v2``, ``coordpy.hidden_state_bridge``,
+> ``coordpy.prefix_state_bridge``,
+> ``coordpy.attention_steering_bridge``,
+> ``coordpy.persistent_latent_v9``,
+> ``coordpy.multi_hop_translator_v7``,
+> ``coordpy.mergeable_latent_capsule_v5``,
+> ``coordpy.consensus_fallback_controller_v3``,
+> ``coordpy.corruption_robust_carrier_v5``,
+> ``coordpy.long_horizon_retention_v9``,
+> ``coordpy.ecc_codebook_v9``,
+> ``coordpy.transcript_vs_shared_arbiter_v6``,
+> ``coordpy.uncertainty_layer_v5``,
+> ``coordpy.disagreement_algebra_v3``,
+> ``coordpy.deep_substrate_hybrid_v2``,
+> ``coordpy.substrate_adapter_v2``, ``coordpy.w57_team``, and
+> ``coordpy.r116_benchmark`` /
+> ``coordpy.r117_benchmark`` /
+> ``coordpy.r118_benchmark`` — reachable only via explicit
+> import. ``coordpy.__version__`` remains ``0.5.20``; SDK
+> contract is byte-for-byte unchanged. No PyPI release.
+> ``W57-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` records
+> hosted backends remain text-only;
+> ``W57-C-DEEP-TRANSFORMER-COUPLING`` is a sharper restatement
+> of the open question on frontier-scale models;
+> ``W57-C-FRONTIER-SCALE-SUBSTRATE-LIFT`` is new and conjectures
+> the W57 bridges would scale-monotonically improve usefulness
+> if frontier runtimes exposed compatible hooks.
+>
+> **Earlier milestone marker (post-W55 / W56, 2026-05-13 —
 > Substrate-Coupled Latent Operating System, fourteenth post-
 > release research milestone — first substrate-attack milestone).**
 > *Twelve orthogonal capsule-native + substrate-coupling advances

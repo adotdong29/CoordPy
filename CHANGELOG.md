@@ -13,6 +13,55 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W57 Deep Substrate-Coupled Latent Operating System**
+  (post-W56, 2026-05-13) — *second substrate-attack milestone;
+  first **bidirectional** substrate breach.* Ships at
+  `coordpy.tiny_substrate_v2` (richer 4-layer / 8-head /
+  d_model=64 / RoPE / per-layer logit lens / KV cache eviction
+  / prefix-state extraction / per-head pre-softmax attention
+  bias hook), `coordpy.kv_bridge_v2` (per-(layer, head)
+  projection + readback CID), `coordpy.hidden_state_bridge`
+  (residual injection at any layer), `coordpy.prefix_state_bridge`
+  (save / load / detect-corruption; reuse-vs-recompute
+  byte-identical to ≤ 5e-16), `coordpy.attention_steering_bridge`
+  (per-(layer, head, query, key) bias tensor; mean-KL ≈ 5.59
+  nats/layer), `coordpy.persistent_latent_v9` (7 layers,
+  quintuple persistent skip-link, max_chain_walk_depth = 384,
+  substrate-fidelity damping), `coordpy.multi_hop_translator_v7`
+  (10 backends, chain-length-9, substrate-hidden-trust composite
+  arbitration), `coordpy.mergeable_latent_capsule_v5`
+  (hidden-state-witness-chain, per-head trust, two new algebra
+  signatures), `coordpy.consensus_fallback_controller_v3`
+  (7-stage chain — adds logit-lens-conditioned tiebreaker),
+  `coordpy.corruption_robust_carrier_v5` (3-D interleave 4×4×4,
+  9-of-13 majority, 32-bucket KV cache fingerprint),
+  `coordpy.long_horizon_retention_v9` (8 heads, max_k=64),
+  `coordpy.ecc_codebook_v9` (262144 codes, **20.333
+  bits/visible-token**), `coordpy.transcript_vs_shared_arbiter_v6`
+  (7-arm policy — adds substrate_hidden_inject),
+  `coordpy.uncertainty_layer_v5` (hidden-state-fidelity 4th
+  axis, adversarial brackets), `coordpy.disagreement_algebra_v3`
+  (hidden-projection identity), `coordpy.deep_substrate_hybrid_v2`
+  (**bidirectional substrate ↔ V6 hybrid stack**),
+  `coordpy.substrate_adapter_v2` (4 new capability axes,
+  substrate_v2_full tier), `coordpy.w57_team`,
+  `coordpy.r116_benchmark`, `coordpy.r117_benchmark`,
+  `coordpy.r118_benchmark`. R-116 (14 cell families) + R-117
+  (14 cell families) + R-118 (15 cell families) at 3 seeds verify
+  **43/43 H-bars (H43..H85) pass 3/3 seeds** — strong success
+  per the W57 success criterion. Cumulative trust boundary
+  across W22..W57 = **568 enumerated failure modes**.
+  W57 modules are reachable only through explicit imports;
+  `coordpy.__version__` remains `0.5.20`; SDK contract
+  byte-for-byte unchanged. No PyPI release.
+  `W57-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP` records that
+  hosted backends remain text-only at the HTTP surface;
+  `W57-C-DEEP-TRANSFORMER-COUPLING` is a sharper restatement of
+  the open question on frontier-scale models;
+  `W57-C-FRONTIER-SCALE-SUBSTRATE-LIFT` is a new conjecture
+  that the W57 bridges would scale-monotonically improve
+  usefulness if frontier runtimes exposed compatible hooks.
+
 - **W56 Substrate-Coupled Latent Operating System** (post-W55,
   2026-05-13) — *first substrate-attack milestone in the
   programme.* Ships at `coordpy.tiny_substrate`,

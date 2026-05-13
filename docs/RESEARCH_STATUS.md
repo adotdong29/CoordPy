@@ -5,11 +5,236 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W55 W56
-> milestone (Substrate-Coupled Latent Operating System research
-> line), 2026-05-13.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W56 W57
+> milestone (Deep Substrate-Coupled Latent Operating System
+> research line), 2026-05-13.
 
-## TL;DR — W56 Substrate-Coupled Latent Operating System (post-W55 research milestone)
+## TL;DR — W57 Deep Substrate-Coupled Latent Operating System (post-W56 research milestone)
+
+The programme now has **fifty-four** coupled research axes. W57
+mints axis 54: the **second substrate-attack milestone** that
+turns W56's partial breach into a deeper substrate program.
+Sixteen orthogonal substrate-coupling and capsule-native advances
+layered on top of W56 Substrate-Coupled Latent Operating System —
+(M1) a **Tiny Transformer Runtime V2**
+(``coordpy.tiny_substrate_v2``): a richer, deeper executable
+substrate with **4 layers / 8 heads / ``d_model=64`` / byte-vocab
+259 / max_len=96**, real RoPE rotary positional embeddings,
+real per-layer + per-head causal self-attention, real per-layer
+KV cache **with LRU and importance-weighted eviction**, real
+**prefix-state extraction** (a first-class content-addressed
+``TinyV2PrefixState`` object), real **per-head pre-softmax
+attention bias hook**, real **per-layer logit lens**, all in
+pure NumPy on CPU;
+(M2) a **KV Bridge V2** (``coordpy.kv_bridge_v2``): per-(layer,
+head) projection from the capsule carrier, calibrated per-head
+inject scales, replay-deterministic readback CID for the
+injected slot bytes, and a content-addressed witness with both
+max-abs/L2 logit perturbation and last-position cross-entropy
+delta;
+(M3) a **Hidden-State Bridge** (``coordpy.hidden_state_bridge``):
+projects a capsule carrier to a per-layer ``(n_tokens, d_model)``
+perturbation and additively injects it into the residual stream
+*between* layer ``l-1``'s FF output and layer ``l``'s LN1; the
+substrate's logits change measurably and content-addressed
+(witnessed by ``HiddenStateBridgeWitness``);
+(M4) a **Prefix-State Bridge**
+(``coordpy.prefix_state_bridge``): saves a substrate KV cache as
+a content-addressed prefix state, reuses it across turns
+**byte-identical** to a full recompute (within float64
+precision; max-abs diff ≤ 5e-16 on the H47 probe), and
+**detects deliberate prefix corruption** by CID change;
+(M5) an **Attention-Steering Bridge**
+(``coordpy.attention_steering_bridge``): writes a per-(layer,
+head, query, key) bias tensor pre-softmax into the substrate's
+attention; mean-KL > 0 on every layer (≈ 5.7 nats per layer on
+the H53 probe), causal mask still strict, attention pattern
+demonstrably shifted;
+(M6) a **7-layer V9 persistent latent state**
+(``coordpy.persistent_latent_v9``) with a **quintuple persistent
+skip-link** (turn-0 anchor + fast EMA + slow EMA + substrate-
+conditioned EMA + **hidden-state-conditioned EMA**),
+``max_chain_walk_depth = 384``, and **substrate-fidelity
+weighting** that damps both substrate and hidden skips when
+fidelity is low;
+(M7) a **10-backend multi-hop translator V7**
+(``coordpy.multi_hop_translator_v7``) over **90 directed edges**
+with chain-length-9 transitivity and **substrate-hidden-trust
+arbitration** (composite trust = substrate_trust ×
+hidden_trust); the adversary now needs to corrupt both axes;
+(M8) a **Mergeable Latent State Capsule V5 (MLSC V5)**
+(``coordpy.mergeable_latent_capsule_v5``) with
+``hidden_state_witness_chain`` (union-inherited from parents),
+``attention_witness_cid``, ``per_head_trust`` weighting, and
+two new algebra signatures (``substrate_project``,
+``hidden_inject``);
+(M9) a **Consensus Fallback Controller V3**
+(``coordpy.consensus_fallback_controller_v3``) with a **7-stage
+decision chain** {K-of-N → trust-weighted → substrate → **logit-
+lens** → best-parent → transcript → abstain}, the new logit-lens
+stage uses substrate V2's per-layer unembed at an intermediate
+layer as a secondary tiebreaker;
+(M10) a **Corruption-Robust Carrier V5**
+(``coordpy.corruption_robust_carrier_v5``) with **3-D
+interleaving** (4×4×4 = 64-bit blocks), **9-of-13 majority
+repetition**, and **KV cache fingerprint-based corruption
+detection** (Reed-Solomon-style 32-bucket XOR fingerprints);
+the H75 KV-corruption detect rate is **1.0** in the R-118
+sweep;
+(M11) an **8-head Long-Horizon Reconstruction V9**
+(``coordpy.long_horizon_retention_v9``) at ``max_k=64`` with
+the new **hidden-state-conditioned** head; the
+``evaluate_lhr_v9_three_way`` helper reports per-head MSE for
+proxy / substrate / hidden;
+(M12) an **8-level ECC Codebook V9**
+(``coordpy.ecc_codebook_v9``): K1=32 × K2=16 × K3=8 × K4=4 ×
+K5=2 × K6=2 × K7=2 × K8=2 = **262144 codes** (≈ 18 raw data
+bits per segment-tuple), achieves **20.333 bits/visible-token
+at full emit** (exceeds the ≥ 20.0 W57 target);
+(M13) a **7-arm Transcript-vs-Shared-vs-Substrate Arbiter V6**
+(``coordpy.transcript_vs_shared_arbiter_v6``) over {transcript,
+shared, merge_consensus, trust_weighted_merge,
+substrate_replay, **substrate_hidden_inject**, abstain} — the
+first substrate-final-vs-substrate-intermediate head-to-head;
+(M14) a **Hidden-State-Weighted Uncertainty Composite**
+(``coordpy.uncertainty_layer_v5``) — fourth weighting axis on
+top of (confidence, trust, substrate_fidelity), plus
+**adversarial pessimistic / optimistic brackets** and a
+**per-axis sensitivity** Jacobian magnitude;
+(M15) a **Disagreement Algebra V3**
+(``coordpy.disagreement_algebra_v3``) — extends V2 with a
+**hidden-projection identity** and an **attention-steering
+compatibility** check;
+(M16) a **Deep Substrate Hybrid V2**
+(``coordpy.deep_substrate_hybrid_v2``) — the first
+**bidirectional substrate bridge** in the programme:
+*substrate → V6* (substrate's intermediate hidden state
+projects back into V6's residual stream) AND
+*V6 → substrate* (V6 residual injected into substrate KV via
+KV bridge V2, with optional attention-steering bias on top).
+``W57HandoffEnvelope.bidirectional_used`` is **True** in
+end-to-end runs.
+
+Plus a **Substrate Adapter V2**
+(``coordpy.substrate_adapter_v2``) with four new capability
+axes (``attention_bias_write``, ``prefix_state_reuse``,
+``cache_eviction``, ``logit_lens``) and a new top tier
+``substrate_v2_full`` reached only by the V2 in-repo runtime;
+hosted backends remain text-only.
+
+W57 is the **second executable substrate-coupling milestone** in
+the programme; it is NOT a claim of third-party transformer-
+internal access. ``W57-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``
+documents that Ollama / OpenAI-compatible / hosted backends
+remain text-only on the HTTP surface (carries forward unchanged
+from W56). ``W57-C-DEEP-TRANSFORMER-COUPLING`` is a sharper
+restatement of the open question on frontier-scale models;
+``W57-C-FRONTIER-SCALE-SUBSTRATE-LIFT`` is a new conjecture
+that the W57 bridges (KV V2 + hidden-state + prefix-state +
+attention-steering) would, if exposed by a frontier model's
+runtime, scale-monotonically improve usefulness — open until a
+frontier runtime exposes the corresponding hooks.
+
+W57 ships at ``coordpy.tiny_substrate_v2``,
+``coordpy.kv_bridge_v2``, ``coordpy.hidden_state_bridge``,
+``coordpy.prefix_state_bridge``,
+``coordpy.attention_steering_bridge``,
+``coordpy.persistent_latent_v9``,
+``coordpy.multi_hop_translator_v7``,
+``coordpy.mergeable_latent_capsule_v5``,
+``coordpy.consensus_fallback_controller_v3``,
+``coordpy.corruption_robust_carrier_v5``,
+``coordpy.long_horizon_retention_v9``,
+``coordpy.ecc_codebook_v9``,
+``coordpy.transcript_vs_shared_arbiter_v6``,
+``coordpy.uncertainty_layer_v5``,
+``coordpy.disagreement_algebra_v3``,
+``coordpy.deep_substrate_hybrid_v2``,
+``coordpy.substrate_adapter_v2``, ``coordpy.w57_team``,
+``coordpy.r116_benchmark``, ``coordpy.r117_benchmark``,
+``coordpy.r118_benchmark`` — reachable only through explicit
+imports. ``coordpy.__version__`` remains ``0.5.20``; SDK
+contract is byte-for-byte unchanged. No PyPI release.
+
+R-116 (14 cell families, real-substrate / latent-bridge /
+multi-hop) + R-117 (14 cell families, long-horizon retention /
+reconstruction / cramming) + R-118 (15 cell families,
+corruption / disagreement / consensus / fallback) at 3 seeds
+verify H43..H85. **43 of 43 H-bars pass 3/3 seeds (strong
+success per the W57 success criterion)**. The V9 outer GRU is
+initialised but not trained — ``W57-L-V9-OUTER-NOT-TRAINED-CAP``
+documents this. The ECC V9 256-bit/token target is above the
+structural ceiling — ``W57-L-ECC-V9-RATE-FLOOR-CAP`` — and
+reproduces honestly as the H65 falsifier. Cumulative trust
+boundary across W22..W57 = **568 enumerated failure modes**
+(524 from W22..W56 + 44 new W57 envelope verifier modes).
+
+W57 headline results (3 seeds, mean):
+
+* tiny substrate V2 forward determinism: **3/3 byte-identical**
+* substrate V2 KV cache reuse max abs diff: **≤ 1e-15**
+* substrate V2 causal mask max upper-triangle weight: **0.0** (strict)
+* substrate V2 logit lens determinism: **3/3 byte-identical**
+* substrate adapter V2 tier classification: **3/3 correct**
+* KV bridge V2 last-position L2 perturbation: **5.31** mean (vs W56 KV bridge L2 mean 0.86)
+* KV bridge V2 carrier-perturbation robustness: **≥ 16/16** non-zero across random carriers
+* hidden-state bridge L2 perturbation: **1.43** mean
+* hidden-state bridge cross-entropy delta: **0.10** mean
+* prefix-state bridge reuse-vs-recompute max abs diff: **≤ 5e-16**
+* prefix-state corruption detection: **3/3 detected**
+* attention-steering mean KL per layer: **5.59** mean across 4 layers
+* attention-steering causal mask preserved: **3/3**
+* V9 96-turn chain walk: **96** mean
+* V9 256-turn stretch chain walk: **256** mean
+* V9 384-turn deep stretch chain walk: **384** mean
+* V9 fidelity damping (substrate_fidelity=0): **3/3 distinct top-layer state**
+* multi-hop V7 chain-length-9 fidelity probe: **chain_length=9** in all seeds
+* MLSC V5 hidden-state-witness-chain inheritance: **3/3** (h1, h2, h3 in chain)
+* MLSC V5 per-head-trust weighting: **3/3** (zero-trust head down-weighted)
+* MLSC V5 algebra signature ``substrate_project``: **3/3** carried
+* consensus V3 7-stage chain: **7** stages enumerated
+* consensus V3 logit-lens stage fires when other stages fail: **3/3**
+* CRC V5 BCH(31,16) triple-bit correct rate: **0.92** mean (≥ 0.80 floor)
+* CRC V5 5-bit burst dispersion (max-run ≤ 2): **1.0** mean (≥ 0.90 floor)
+* CRC V5 9-of-13 majority silent failure rate: **0.0** mean (≤ 0.05 floor)
+* CRC V5 3-D interleave round trip OK: **3/3**
+* CRC V5 KV cache corruption detect rate: **1.0** mean (≥ 0.95 floor)
+* LHR V9 three-way comparison runs: **3/3**
+* LHR V9 substrate head beats proxy on substrate-aligned: **3/3**
+* LHR V9 hidden head beats substrate on hidden-aligned: **3/3**
+* ECC V9 bits/visible-token at full emit: **20.333** (≥ 20.0 target)
+* ECC V9 K8 1-bit boundary correct: **3/3**
+* ECC V9 256-bit/token rate-floor falsifier: **3/3 reproduces** (above info bound)
+* TVS V6 7-arm pick rates sum to 1.0: **3/3**
+* TVS V6 ``substrate_hidden_inject`` arm preferred when hf >> sf: **3/3** (rate = 1.0)
+* TVS V6 ``substrate_replay`` preferred when sf >> hf: **3/3** (rate = 1.0)
+* uncertainty V5 hidden-aware composite differs when hf differs: **3/3**
+* uncertainty V5 pessimistic ≤ weighted ≤ optimistic: **3/3**
+* disagreement algebra V3 hidden-projection identity (identity projector): **3/3**
+* W57 envelope verifier failure modes: **44** disjoint
+* W57 envelope verifier OK on clean run: **all seeds**
+* W57 envelope outer CID stable across runs: **3/3 stable**
+* W57 envelope substrate_v2_used flag True in real run: **3/3**
+* W57 envelope bidirectional_used flag True in real run: **3/3**
+* deep substrate hybrid V2 substrate-back L2: **0.02** mean
+* deep substrate hybrid V2 ablation perturbation L2: **2.50** mean
+* deep substrate hybrid V2 bidirectional flag: **3/3 True**
+
+W57 directly attacks the post-W56 question of **how to deepen
+the substrate breach beyond the partial W56 breach**, with
+explicit honest bounds on what remains: third-party hosted-
+model substrate (``W57-C-DEEP-TRANSFORMER-COUPLING``), end-to-
+end autograd training of the substrate
+(``W57-L-NUMPY-CPU-V2-SUBSTRATE-CAP``), the V9 outer head being
+initialised but not trained
+(``W57-L-V9-OUTER-NOT-TRAINED-CAP``), the ECC V9 structural
+ceiling (``W57-L-ECC-V9-RATE-FLOOR-CAP``), and frontier-scale
+substrate lift remaining a conjecture
+(``W57-C-FRONTIER-SCALE-SUBSTRATE-LIFT``).
+
+---
+
+## Prior milestone: W56 Substrate-Coupled Latent Operating System (post-W55 research milestone)
 
 The programme now has **fifty-three** coupled research axes. W56
 mints axis 53: the **first substrate-attack milestone**.

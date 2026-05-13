@@ -2,9 +2,11 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W55
-> W56 milestone (Substrate-Coupled Latent Operating System research
-> line), 2026-05-13.
+> README-of-README must satisfy these rules. Last touched: post-W56
+> W57 milestone (Deep Substrate-Coupled Latent Operating System
+> research line), 2026-05-13.
+> Earlier: post-W55 W56 (Substrate-Coupled Latent Operating
+> System), 2026-05-13.
 > Earlier: post-W54 W55 (Deep Trust-Weighted Disagreement-
 > Algebraic Latent Operating System), 2026-05-12.
 > Earlier: post-W52 W53 (Persistent Mergeable Corruption-Robust
@@ -12,6 +14,101 @@
 > Earlier: post-W51 W52 (Quantised Persistent Multi-Hop Latent Coordination), 2026-05-11.
 > Earlier: post-W50 W51 (Persistent Cross-Backend Latent Coordination), 2026-05-11.
 > Earlier: post-W49 W50 milestone (Cross-Backend Latent Coordination research line), 2026-05-11. Earlier: post-W48 W49 milestone (Multi-Block Cross-Bank Coordination research line), 2026-05-11. Earlier: post-W47 W48 milestone (Shared-State Transformer-Proxy) 2026-05-11. Earlier: post-W46 W47 milestone (Autograd Manifold Stack) 2026-05-10. Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03.
+
+## W57 (Deep Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
+
+W57 deepens the W56 substrate breach: a richer in-repo runtime
+(``coordpy.tiny_substrate_v2``: 4 layers / 8 heads / d_model=64
+/ RoPE / per-layer logit lens / cache eviction / prefix-state
+extraction / per-head attention bias hook), four substrate
+bridges (``kv_bridge_v2``, ``hidden_state_bridge``,
+``prefix_state_bridge``, ``attention_steering_bridge``), a
+**bidirectional hybrid stack**
+(``coordpy.deep_substrate_hybrid_v2``), and 11 V9-style
+mechanism advances (V9 persistent state, MLSC V5, consensus V3,
+CRC V5, LHR V9, ECC V9, TVS V6, uncertainty V5, disagreement
+algebra V3, multi-hop V7, substrate adapter V2).
+
+* *"W57 breached transformer-internal coupling on Ollama /
+  OpenAI / hosted models"* — **forbidden**. The substrate is
+  still a tiny in-repo NumPy runtime. Substrate adapter V2
+  records ``tier=text_only`` for every hosted backend.
+  ``W57-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` is
+  load-bearing (carries forward W56's cap unchanged).
+
+* *"W57 closes any prior `*-DEEP-TRANSFORMER-COUPLING`
+  conjecture"* — **forbidden**. The W57 mechanisms run only
+  inside the in-repo V2 runtime. ``W57-C-DEEP-TRANSFORMER-
+  COUPLING`` is a sharper restatement of the open question on
+  frontier-scale models, NOT a closure.
+
+* *"The W57 substrate is a frontier transformer"* —
+  **forbidden**. Default config is 4 layers / 8 heads /
+  d_model=64 / byte-vocab / max_len=96 / untrained. It is a
+  research runtime, not a production model.
+
+* *"W57 trains the substrate end-to-end"* — **forbidden**.
+  ``W57-L-NUMPY-CPU-V2-SUBSTRATE-CAP`` documents the per-step
+  cost as ``O(L·H·n_tokens·d_head)`` in pure NumPy; no
+  PyTorch/JAX, no GPU, no end-to-end backprop.
+
+* *"The KV bridge V2 / hidden-state bridge / attention-steering
+  bridge prove a capsule carrier helpfully steers the
+  substrate"* — **forbidden**. Each bridge proves the carrier
+  *measurably perturbs* the substrate's logits / attention
+  distribution / hidden state. Whether the perturbation is
+  *useful* depends on training; the substrate is not trained.
+
+* *"V9 quint-skip strictly improves over V8 quad-skip"* —
+  **forbidden**. ``W57-L-V9-OUTER-NOT-TRAINED-CAP`` documents
+  the cap: the V9 outer GRU + hidden-state-skip linear are
+  initialised but not trained. The H56-style "quad-skip gain"
+  reproducing as a partial result carries forward from W56.
+
+* *"V9 detects every adversarial sequence forgery"* —
+  **forbidden**. EMA carriers smooth out sequence order; the
+  W56 ``W56-L-V8-PERMUTATION-INVARIANCE-CAP`` carries forward
+  to V9.
+
+* *"ECC V9 delivers 256 bits/visible-token"* — **forbidden**.
+  V9 delivers **20.333 bits/visible-token** at full emit,
+  which exceeds the W57 ≥ 20.0 target. The 256-bit/token
+  target reproduces as the H65 falsifier:
+  ``W57-L-ECC-V9-RATE-FLOOR-CAP`` says the target is above
+  the structural ceiling implied by the V9 codebook (info
+  bound ≈ 18 bits/segment).
+
+* *"BCH(31,16) detects every 4+ bit pattern"* — **forbidden**.
+  W56's ``W56-L-BCH-31-16-FOUR-BIT-PATHOLOGY-CAP`` carries
+  forward unchanged.
+
+* *"CRC V5 fully recovers any 5-bit burst"* — **forbidden**.
+  V5 *disperses* a 5-bit burst over 3-D interleave so no
+  contiguous run > 2 errors remains in the de-interleaved
+  stream (H72 dispersion rate = 1.0 across seeds), but the
+  underlying BCH(31,16) decoder still has triple-bit
+  correction limits. The combined dispersion + BCH chain is
+  what lifts effective burst tolerance, not interleaving
+  alone.
+
+* *"The deep substrate hybrid V2 proves frontier substrates
+  can be coupled this way"* — **forbidden**. V2 demonstrates
+  bidirectional coupling on the in-repo V2 runtime. Whether a
+  frontier model exposes hooks compatible with this design
+  remains a conjecture (``W57-C-FRONTIER-SCALE-SUBSTRATE-LIFT``).
+
+* *"W57 has no honest caps"* — **forbidden**. W57 carries
+  forward every W56/W55/.../W22 cap and adds ``W57-L-NUMPY-
+  CPU-V2-SUBSTRATE-CAP``, ``W57-L-V9-OUTER-NOT-TRAINED-CAP``,
+  ``W57-L-ECC-V9-RATE-FLOOR-CAP``, ``W57-L-NO-THIRD-PARTY-
+  SUBSTRATE-COUPLING-CAP``. Two new conjectures:
+  ``W57-C-DEEP-TRANSFORMER-COUPLING`` (sharper restatement of
+  the W56 conjecture) and ``W57-C-FRONTIER-SCALE-SUBSTRATE-
+  LIFT`` (new).
+
+* *"W57 is a CoordPy SDK release"* — **forbidden**.
+  ``coordpy.__version__`` remains ``0.5.20``. SDK contract
+  byte-for-byte unchanged. No PyPI release.
 
 ## W56 (Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
 

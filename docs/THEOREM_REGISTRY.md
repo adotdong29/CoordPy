@@ -14,7 +14,63 @@
 > - **conjectural** — stated, falsifiable; not yet proved or systematically tested.
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
-> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11.
+> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13.
+
+## W57 Deep Substrate-Coupled Latent Operating System (W57-T-* and W57-L-* / W57-C-*)
+
+| Claim | One-line description | Status | Code/proof anchor |
+| ----- | -------------------- | ------ | ------------------ |
+| W57-T-SUBSTRATE-V2-FORWARD-DETERMINISM | Identical params + token_ids + cache → byte-identical logits / hidden / attention / cache | mechanically-checked | `tiny_substrate_v2.forward_tiny_substrate_v2`; test `test_tiny_substrate_v2_forward_determinism`; H43 |
+| W57-T-SUBSTRATE-V2-KV-REUSE | Splitting a forward at any prefix and reusing the KV cache reproduces the full forward's last-position logits within float64 precision | mechanically-checked | `tiny_substrate_v2._attention_layer_forward_v2`; test `test_tiny_substrate_v2_kv_cache_reuse`; H44 |
+| W57-T-SUBSTRATE-V2-CAUSAL-MASK-STRICT | Upper-triangle attention weights are exactly 0 (modulo softmax denominator) for all heads / layers / queries | mechanically-checked | `_attention_layer_forward_v2` mask construction; test `test_tiny_substrate_v2_causal_mask`; H45 |
+| W57-T-SUBSTRATE-V2-LOGIT-LENS-DETERMINISTIC | Per-layer logit lens is byte-deterministic | mechanically-checked | `forward_tiny_substrate_v2.per_layer_logit_lens`; test `test_tiny_substrate_v2_logit_lens`; H46 |
+| W57-T-PREFIX-STATE-REUSE-MATCHES-RECOMPUTE | Substrate prefix-state save+reuse yields byte-identical logits to a full recompute | empirical (≤ 5e-16 max-abs diff) | `prefix_state_bridge.bridge_prefix_state_and_measure`; test `test_prefix_state_bridge_reuse_matches_recompute`; H47 |
+| W57-T-PREFIX-STATE-CORRUPTION-DETECTED | Deliberate prefix-state corruption changes its CID; the bridge reports `corruption_detected=True` | mechanically-checked | `prefix_state_bridge.corrupt_prefix_state`; test `test_prefix_state_bridge_corruption_detected`; H84 |
+| W57-T-CACHE-EVICTION-LRU | `evict_lru(k)` reduces n_tokens by exactly k | mechanically-checked | `tiny_substrate_v2.TinyV2KVCache.evict_lru`; test `test_tiny_substrate_v2_cache_eviction_lru`; H48 |
+| W57-T-CACHE-EVICTION-WEIGHTED | `evict_weighted(weights, keep)` keeps exactly `keep` tokens, top-by-weight | mechanically-checked | `TinyV2KVCache.evict_weighted`; test `test_tiny_substrate_v2_cache_eviction_weighted`; H49 |
+| W57-T-KV-BRIDGE-V2-PERTURBATION | KV bridge V2 produces non-zero last-position L2 perturbation on random carriers | empirical (≥ 0.90 non-zero rate) | `kv_bridge_v2.bridge_carrier_and_measure_v2`; test `test_kv_bridge_v2_perturbation`; H50, H51 |
+| W57-T-HIDDEN-STATE-BRIDGE-PERTURBATION | Hidden-state bridge produces non-zero L2 logit perturbation | empirical (1.43 mean) | `hidden_state_bridge.bridge_hidden_state_and_measure`; test `test_hidden_state_bridge_perturbation`; H52 |
+| W57-T-ATTENTION-STEERING-KL-POSITIVE | Attention-steering bridge produces mean KL > 0 on every layer; causal mask preserved | empirical (≈ 5.59 mean nats/layer) | `attention_steering_bridge.steer_attention_and_measure`; test `test_attention_steering_kl_positive`; H53 |
+| W57-T-MULTI-HOP-V7-CHAIN-LEN-9 | 10-backend chain-length-9 fidelity probe runs with chain_length = 9 | mechanically-checked | `multi_hop_translator_v7.evaluate_dec_chain_len9_fidelity`; test `test_multi_hop_v7_chain_len9_fidelity_runs`; H54 |
+| W57-T-SUBSTRATE-ADAPTER-V2-TIERS | tiny V2 adapter classifies as `substrate_v2_full`; synthetic as `text_only` | mechanically-checked | `substrate_adapter_v2._decide_tier_v2`; test `test_substrate_adapter_v2_tiers`; H55 |
+| W57-T-DEEP-HYBRID-V2-BIDIRECTIONAL | Hybrid V2 forward sets `bidirectional=True` and produces non-zero `substrate_back_l2` AND `ablation_perturbation_l2` | mechanically-checked | `deep_substrate_hybrid_v2.deep_substrate_hybrid_v2_forward`; test `test_deep_substrate_hybrid_v2_bidirectional`; H56 |
+| W57-T-V9-CHAIN-WALK-96 | V9 96-turn chain walk depth = 96 | mechanically-checked | `persistent_latent_v9.PersistentLatentStateV9Chain.walk_from`; test `test_v9_chain_walk_depth`; H57 |
+| W57-T-V9-CHAIN-WALK-256 | V9 256-turn stretch chain walk depth = 256 | mechanically-checked | as above; H58 |
+| W57-T-V9-CHAIN-WALK-384 | V9 384-turn deep stretch chain walk depth = 384 (= `W57_DEFAULT_V9_MAX_CHAIN_WALK_DEPTH`) | mechanically-checked | as above; H59 |
+| W57-T-V9-CARRIER-ROUND-TRIP-DETERMINISTIC | Identical inputs to `step_persistent_state_v9` produce byte-identical CIDs | mechanically-checked | `persistent_latent_v9.step_persistent_state_v9`; test `test_v9_carrier_round_trip_deterministic`; H70 |
+| W57-T-V9-FIDELITY-DAMPS-SUBSTRATE | substrate_fidelity = 0 produces a different top-layer state than substrate_fidelity = 1 (skip-link contribution honestly damped) | mechanically-checked | `V9StackedCell.step_value`; H69 |
+| W57-T-MLSC-V5-HIDDEN-CHAIN-INHERITANCE | MLSC V5 merge inherits the union of parents' hidden_state_witness_chain | mechanically-checked | `mergeable_latent_capsule_v5.MergeOperatorV5.merge`; test `test_mlsc_v5_merge_chain_inheritance`; H78 |
+| W57-T-MLSC-V5-PER-HEAD-TRUST-WEIGHTING | A capsule with per-head trust ≈ 0 is down-weighted in the merge (sign of merged payload reflects high-trust parent) | mechanically-checked | `MergeOperatorV5.merge`; H79 |
+| W57-T-MLSC-V5-ALGEBRA-SIGNATURE-SUBSTRATE-PROJECT | The `substrate_project` algebra signature is preserved through merge into the V5 capsule | mechanically-checked | `MergeOperatorV5.merge`; H80 |
+| W57-T-CONSENSUS-V3-SEVEN-STAGE | Decision chain has exactly 7 named stages (k_of_n, trust_weighted, substrate, **logit_lens**, best_parent, transcript, abstain) | proved (by construction) | `consensus_fallback_controller_v3.W57_CONSENSUS_V3_STAGES`; test `test_consensus_v3_seven_stages`; H76 |
+| W57-T-CONSENSUS-V3-LOGIT-LENS-FIRES | When earlier stages fail and a logit-lens oracle is wired, the controller picks the logit-lens stage | mechanically-checked | `ConsensusFallbackControllerV3.decide`; test `test_consensus_v3_logit_lens_fires`; H77 |
+| W57-T-CRC-V5-TRIPLE-BIT-CORRECT | BCH(31,16) triple-bit correct rate ≥ 0.80 across random codewords | empirical (0.92 mean) | `corruption_robust_carrier_v5.emit_corruption_robustness_v5_witness`; H71 |
+| W57-T-CRC-V5-3D-INTERLEAVE-DISPERSES-5-BIT-BURST | After 3-D de-interleave of a 5-bit burst, the longest contiguous error run ≤ 2 | empirical (1.0 dispersion rate) | `interleave_3d` / `deinterleave_3d`; H72 |
+| W57-T-CRC-V5-MAJORITY-9-OF-13-SILENT-FLOOR | 9-of-13 majority silent failure rate ≤ 0.05 | empirical (0.0 mean) | `majority_9_of_13_decode`; H73 |
+| W57-T-CRC-V5-3D-INTERLEAVE-ROUND-TRIP | 3-D interleave + de-interleave is the identity on full blocks | mechanically-checked | `test_crc_v5_3d_interleave_round_trip`; H74 |
+| W57-T-CRC-V5-KV-CORRUPTION-DETECT | 32-bucket XOR fingerprints detect a single-byte change in the underlying KV bytes ≥ 95% of the time | empirical (1.0 mean) | `kv_cache_fingerprint` / `detect_kv_corruption`; H75 |
+| W57-T-LHR-V9-THREE-WAY-RUNS | `evaluate_lhr_v9_three_way` returns proxy / substrate / hidden MSEs without crashing | mechanically-checked | `long_horizon_retention_v9.evaluate_lhr_v9_three_way`; test `test_lhr_v9_three_way_runs`; H60 |
+| W57-T-LHR-V9-SUBSTRATE-HELPS-SUBSTRATE-ALIGNED | When targets are explicitly substrate-projected, the substrate head beats the proxy head | mechanically-checked (constructive) | `evaluate_lhr_v9_three_way`; H61 |
+| W57-T-LHR-V9-HIDDEN-HELPS-HIDDEN-ALIGNED | When targets are explicitly hidden-state-projected, the hidden head beats the substrate-only head | mechanically-checked (constructive) | `evaluate_lhr_v9_three_way`; H62 |
+| W57-T-ECC-V9-20-BITS-PER-VISIBLE-TOKEN | ECC V9 delivers ≥ 20.0 structured bits per visible token at full emit | empirical (20.333) | `compress_carrier_ecc_v9`; test `test_ecc_v9_20_bits_per_token`; H63 |
+| W57-T-ECC-V9-K8-1-BIT-BOUNDARY | K8 ultra-fine bit is 1 iff carrier has sq-sum > 1, else 0 | mechanically-checked | `compress_carrier_ecc_v9`; H64 |
+| W57-T-ECC-V9-RATE-FLOOR-FALSIFIER | The 256-bit/visible-token target is provably above the structural ceiling implied by the codebook size | proved (info bound = log2(262144) = 18) | `probe_ecc_v9_rate_floor_falsifier`; H65 |
+| W57-T-TVS-V6-PICK-RATES-SUM-TO-1 | The 7-arm pick-rate distribution always sums to 1 (or 0 if no turns) | mechanically-checked | `transcript_vs_shared_arbiter_v6.seven_arm_compare`; test `test_tvs_v6_pick_rates_sum_to_1`; H66 |
+| W57-T-TVS-V6-HIDDEN-INJECT-DOMINATES | When `hidden_fidelity` is the strict highest score, `substrate_hidden_inject` is picked at rate 1.0 | mechanically-checked | `seven_arm_compare`; test `test_tvs_v6_hidden_inject_preferred_when_hf_high`; H67 |
+| W57-T-TVS-V6-SUBSTRATE-REPLAY-DOMINATES | When `substrate_fidelity` is the strict highest score, `substrate_replay` is picked at rate 1.0 | mechanically-checked | `seven_arm_compare`; H68 |
+| W57-T-UNCERTAINTY-V5-HIDDEN-AWARE | Differing hidden_state_fidelities produces a `hidden_aware=True` composite | mechanically-checked | `compose_uncertainty_report_v5`; H82 |
+| W57-T-UNCERTAINTY-V5-BRACKET | pessimistic ≤ weighted ≤ optimistic for any non-empty composite | proved-conditional (on non-negative perturbation radius) | `compose_uncertainty_report_v5`; test `test_uncertainty_v5_bracket`; H83 |
+| W57-T-DA-V3-HIDDEN-PROJECTION-IDENTITY | For an identity hidden-state projector, the V3 hidden-projection identity holds (cosine = 1) | proved-conditional (on identity projector) | `disagreement_algebra_v3.check_hidden_state_projection_identity`; test `test_disagreement_algebra_v3_witness_runs`; H81 |
+| W57-T-W57-ENVELOPE-VERIFIER-FAILURE-MODE-COUNT | `W57_ENVELOPE_VERIFIER_FAILURE_MODES` enumerates ≥ 40 disjoint failure modes | proved (by enumeration: 44 entries) | `w57_team.W57_ENVELOPE_VERIFIER_FAILURE_MODES`; H85 |
+| W57-T-W57-ENVELOPE-VERIFIER-OK-CLEAN | A clean W57 team run passes `verify_w57_handoff` with `failures == []` | mechanically-checked | `verify_w57_handoff`; test `test_w57_envelope_clean_verify_ok`; H85 |
+| W57-T-W57-ENVELOPE-OUTER-CID-STABLE | Two identical-config team runs produce identical `w57_outer_cid` | mechanically-checked | end-to-end determinism; test `test_w57_envelope_outer_cid_stable_across_runs` |
+| W57-T-W57-TRIVIAL-PASSTHROUGH-W56-CID | Trivial W57 wraps trivial W56 such that `envelope.w56_outer_cid` equals the explicit W56 envelope CID | mechanically-checked | `build_trivial_w57_registry`; test `test_w57_trivial_passthrough_w56_outer_cid_match` |
+| W57-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP | Hosted backends remain text-only at the HTTP surface; W57 cannot bridge into them | mechanically-checked (carries forward W56) | `substrate_adapter_v2.probe_w56_substrate_adapter_as_v2` |
+| W57-L-NUMPY-CPU-V2-SUBSTRATE-CAP | The V2 substrate runs in NumPy on CPU; per-step cost is O(L · H · n_tokens · d_head); no PyTorch / JAX / GPU | proved (by inspection of `tiny_substrate_v2`) | `tiny_substrate_v2.forward_tiny_substrate_v2` |
+| W57-L-V9-OUTER-NOT-TRAINED-CAP | The V9 outer GRU + hidden-state-skip linear are initialised but not trained end-to-end | proved (by inspection of `V9StackedCell.init`) | `persistent_latent_v9.V9StackedCell` |
+| W57-L-ECC-V9-RATE-FLOOR-CAP | The 256-bit/token target exceeds the structural ceiling (info bound = 18 bits/segment); ECC V9's honest rate is 20.333 bits/visible-token | proved (info bound) | `probe_ecc_v9_rate_floor_falsifier` |
+| W57-C-DEEP-TRANSFORMER-COUPLING | The W57 substrate bridges (KV V2 + hidden-state + prefix-state + attention-steering) generalise to a frontier transformer if its runtime exposes compatible hooks | conjectural | open until a frontier runtime exposes substrate hooks |
+| W57-C-FRONTIER-SCALE-SUBSTRATE-LIFT | If frontier runtimes exposed the W57 hooks, the bridges would scale-monotonically improve usefulness on multi-agent context-zero coordination | conjectural | open; depends on third-party access |
 
 ## Capsule algebra (W3-7 .. W3-16)
 
