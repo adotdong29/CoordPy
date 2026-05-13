@@ -5,11 +5,156 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W53 W54
-> milestone (Deep Mergeable Disagreement-aware Latent Operating
-> System research line), 2026-05-12.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W54 W55
+> milestone (Deep Trust-Weighted Disagreement-Algebraic Latent
+> Operating System research line), 2026-05-12.
 
-## TL;DR — W54 Deep Mergeable Disagreement-aware Latent Operating System (post-W53 research milestone)
+## TL;DR — W55 Deep Trust-Weighted Disagreement-Algebraic Latent Operating System (post-W54 research milestone)
+
+The programme now has **fifty-two** coupled research axes. W55
+mints axis 52: **eleven orthogonal capsule-native advances**
+layered on top of W54 Deep Mergeable Disagreement-aware Latent
+Operating System —
+(M1) a **5-layer persistent latent state V7** with a *triple*
+persistent skip-link (turn-0 anchor + fast EMA + slow EMA),
+chain walks past **128 turns**, and a disagreement-algebraic
+merge head that emits ⟨merged, low-bound, high-bound,
+disagreement⟩ per dimension;
+(M2) a **7-backend (A,B,C,D,E,F,G) multi-hop translator V5**
+over 42 directed edges with chain-length-6 transitivity scoring
+and **trust-weighted compromise arbitration** (per-backend trust
+× pairwise agreement; selects max-trust agreeing subset, else
+highest-(confidence × trust) single path, else abstains);
+(M3) the **Mergeable Latent State Capsule V3 (MLSC V3)** —
+extends MLSC V2 with (a) **disagreement algebra primitives**
+⊕/⊖/⊗ operating on capsule payloads, (b) **per-fact confirmation
+count** in the fact-graph DAG, and (c) **trust signature decay**
+each turn unless reinforced by a merge;
+(M4) a **Trust-Weighted Consensus Controller (TWCC)** — extends
+W54 controller with continuous trust-weighted quorum
+(`Σ trust_i ≥ trust_threshold`) and an explicit **5-stage
+decision chain** {K-of-N → trust-weighted → best-parent →
+transcript → abstain} with per-stage content-addressed audit;
+(M5) a **Corruption-Robust Carrier V3** — composes BCH(15,7)
+**double-bit correction** per segment (in addition to V2's
+Hamming(7,4) single-bit correction), **5-of-7 majority
+repetition** (vs V2's 3-of-5), and **bit-interleaving** so burst
+errors disperse across segment boundaries; achieves single-bit
+correct rate **1.0**, double-bit correct rate **1.0**, 3-bit
+burst recovery **1.0**, and bounds silent failure ≤ **0.03**;
+(M6) a **depth-14 Deep Proxy Stack V6** wrapping V5 with
+**trust-projected residual gating** (per-layer scaling by a
+composite trust scalar), a **disagreement-algebra head** that
+emits ⊕/⊖/⊗ triplets alongside the merged output, and an
+**adaptive abstain threshold** that scales with the input's L2
+norm (pathological inputs get tighter thresholds);
+(M7) a **6-head Long-Horizon Reconstruction V7** (causal +
+branch + cycle + merged-branch + cross-role + cross-cycle) at
+``max_k=36`` with a degradation curve probe across ``k ∈ {1..72}``;
+(M8) a **six-level ECC Codebook V7** with K1=32 × K2=16 × K3=8
+× K4=4 × K5=2 × K6=2 = 65536 codes plus **BCH(15,7) per-segment
+double-bit correction** (8 parity bits × 6 segments = 48 parity
+bits on top of 16 data bits) — achieves **18.333 bits/visible-
+token** at full emit (vs W54's 18.0; ≥ 18.0 target);
+(M9) a **5-arm Transcript-vs-Shared Arbiter V4** over
+{transcript, shared, merge_consensus, trust_weighted_merge,
+abstain-with-fallback} with **per-arm budget allocator**
+(visible-token fraction per arm) and the **allocator decision
+rationale** recorded for audit;
+(M10) an **Uncertainty Layer V3** that adds (a) **per-fact-tag
+uncertainty propagation** (weighted geometric mean over
+contributors), (b) an **adversarial calibration check** (worst-
+case bounded-perturbation calibration), and (c) a **trust-
+weighted composite confidence** (each component's confidence is
+scaled by its trust scalar);
+(M11) a new **Disagreement Algebra** first-class capsule-native
+module exposing ⊕/⊖/⊗ as content-addressed primitives over
+latent state capsule payloads, with algebraic identities by
+inspection (idempotent ⊕ on `a==b`; ⊖ self-cancellation; ⊗
+distributivity `(a ⊕ b) ⊗ c = (a ⊗ c) ⊕ (b ⊗ c)` on the
+agreement subspace).
+
+W55 is the strongest *executable proxy* line we can write today
+at the capsule layer; it does NOT touch real KV bytes, hidden
+states, attention weights, embeddings, or real tokenizers. The
+MLSC V3 capsule abstraction is content-addressed regardless of
+the merge operator's parameters; the algebra trace is
+content-addressed and replay-deterministic. The hept realism
+probe is best-effort: it inherits the W54 hex anchor and adds
+a synthetic 7th backend tag G.
+
+W55 ships at ``coordpy.persistent_latent_v7``,
+``coordpy.multi_hop_translator_v5``,
+``coordpy.mergeable_latent_capsule_v3``,
+``coordpy.trust_weighted_consensus_controller``,
+``coordpy.corruption_robust_carrier_v3``,
+``coordpy.deep_proxy_stack_v6``, ``coordpy.ecc_codebook_v7``,
+``coordpy.long_horizon_retention_v7``,
+``coordpy.transcript_vs_shared_arbiter_v4``,
+``coordpy.uncertainty_layer_v3``,
+``coordpy.disagreement_algebra``, and ``coordpy.w55_team`` —
+reachable only through explicit imports. ``coordpy.__version__``
+remains ``0.5.20``; SDK contract is byte-for-byte unchanged.
+R-110 (12 cell families), R-111 (10 cell families), R-112 (16
+cell families) at 3 seeds each verify the H1..H38 success
+criterion. Cumulative trust boundary across W22..W55 =
+**486 enumerated failure modes** (453 from W22..W54 + 33 new at
+W55).
+
+W55 headline results (3 seeds, mean):
+
+* persistent V7 triple-skip 32-turn gain (vs no-skip): **0.667** mean
+* hept chain-length-6 fidelity: **0.832** (R-110 family_hept_chain_len6_transitivity)
+* trust-weighted compromise arbiter soundness: **1.0**
+* MLSC V3 disagreement algebra identity checks (3/3): **1.0**
+* Deep V6 trust-projected gating monotone: **1.0**
+* W55 envelope verifier: **1.0**
+* W55 replay determinism: **1.0**
+* trained V7 48-turn soundness (finite recall): **1.0**
+* trained V7 64-turn stretch soundness: **1.0**
+* ECC V7 bits/visible-token: **18.333** (vs W54 18.0; ≥ 18.0 target)
+* ECC V7 rate-floor falsifier (96-bit): **1.0** missed (cap reproduces)
+* TVS arbiter V4 oracle correctness: **1.0**
+* TVS arbiter V4 5-arm pick-rate-sums-to-1: **1.0**
+* TVS arbiter V4 per-arm budget allocator: **1.0**
+* BCH(15,7) double-bit correct rate: **1.0** (was W54 Hamming-1 only)
+* BCH(15,7) three-bit detect rate: **≥ 0.55** (W55-L-BCH-FIVE-BIT-PATHOLOGY honest cap)
+* CRC V3 silent failure rate: **0.0** (tighter than W54's ≤ 0.05)
+* CRC V3 3-bit burst recovery (interleaving): **1.0**
+* TWCC K-of-N recall: **1.0**
+* TWCC 5-stage fallback completes: **1.0**
+* MLSC V3 trust decay + reinforce correct: **1.0**
+* MLSC V3 per-fact confirmation count correct: **1.0**
+* disagreement algebra soundness on adversarial inputs: **1.0**
+* Uncertainty V3 trust-weighted composite penalises low-trust: **1.0**
+* Uncertainty V3 adversarial calibration: **1.0**
+* Uncertainty V3 per-fact uncertainty propagation: **1.0**
+* V7 chain walk depth (36-turn run): **36** (≥ 32 floor)
+* W55 integration envelope completeness: **1.0**
+* W55 distribution cap (V7 forge protect rate): **0.94** mean
+* Hept translator compromise cap (forged G-backend protect rate): **0.29** mean (honest, weaker than hex due to capacity)
+* Deep V6 adaptive abstain threshold monotone: **1.0**
+* Deep V6 overdepth cap (L=14 vs L=12): **0.667** (cap reproduces)
+
+W55 directly attacks the post-W54 question of **how to make the
+latent operating system trust-weighted, disagreement-algebraic,
+double-bit-correcting, fact-graph-aware, and adversarially
+calibrated**, with explicit honest bounds on what remains:
+V7 outer head is not trained end-to-end (W55-L-V7-OUTER-NOT-
+TRAINED-CAP), the trust-weighted quorum is a safety net not a
+strict improvement over uniform K-of-N (W55-L-TRUST-WEIGHTED-NOT-
+STRICT-DOMINANCE), 5-bit pathologies inside a single BCH segment
+can mis-correct (W55-L-BCH-FIVE-BIT-PATHOLOGY), ⊗ distributivity
+holds exactly only on the agreement subspace (W55-L-ALGEBRA-
+IDENTITIES-ARE-EXACT-ONLY-ON-AGREEMENT), trust decay below the
+floor is not recoverable without reinforcement (W55-L-TRUST-
+DECAY-NOT-RECOVERABLE-WITHOUT-REINFORCEMENT), and real
+transformer-internal coupling remains substrate-blocked
+(W55-C-DEEP-TRANSFORMER-COUPLING).
+
+---
+
+## Prior milestone: W54 Deep Mergeable Disagreement-aware Latent Operating System (post-W53 research milestone)
 
 The programme now has **fifty-one** coupled research axes. W54
 mints axis 51: **ten orthogonal capsule-native advances** layered

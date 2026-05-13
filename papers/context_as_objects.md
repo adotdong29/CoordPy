@@ -2,6 +2,54 @@
 
 > Main paper draft for the Context Zero programme.
 >
+> **Post-W54 research-line update (W55 Deep Trust-Weighted
+> Disagreement-Algebraic Latent Operating System, 2026-05-12).**
+> The post-W54 question — *how do we make the latent operating
+> system trust-weighted, disagreement-algebraic, double-bit-
+> correcting, fact-graph-aware, and adversarially calibrated?*
+> — is answered by W55 with eleven orthogonal mechanism advances:
+> (i) 5-layer V7 persistent latent state with triple skip-link
+> (turn-0 anchor + fast EMA + slow EMA) and chain walk depth 128;
+> (ii) 7-backend hept multi-hop V5 translator with chain-length-6
+> transitivity and trust-weighted compromise arbitration; (iii)
+> Mergeable Latent State Capsule V3 carrying disagreement algebra
+> primitives ⊕/⊖/⊗, per-fact confirmation count in the fact-graph
+> DAG, and an explicit trust signature that *decays* each turn
+> unless reinforced by a merge — anti-stale-trust hygiene; (iv) a
+> trust-weighted consensus controller with continuous quorum
+> (`Σ trust_i ≥ threshold`) plus a 5-stage decision chain
+> {K-of-N → trust-weighted → best-parent → transcript → abstain},
+> each stage content-addressed in the audit; (v) BCH(15,7) double-
+> bit correction + 5-of-7 repetition + bit-interleaving for burst
+> recovery; (vi) L=14 deep proxy stack V6 with trust-projected
+> residual gating, a disagreement-algebra output head, and an
+> adaptive abstain threshold that scales with the input's L2
+> norm; (vii) a 6-head long-horizon reconstruction V7 with a
+> cross-cycle head at `max_k=36`; (viii) a 6-level ECC codebook
+> V7 (K1=32 × K2=16 × K3=8 × K4=4 × K5=2 × K6=2) plus BCH(15,7)
+> per-segment achieving **18.333 bits/visible-token** at full
+> emit; (ix) a 5-arm transcript-vs-shared arbiter V4 with a
+> per-arm budget allocator (retention × trust softmax); (x) an
+> uncertainty layer V3 with per-fact uncertainty propagation
+> through the fact-graph DAG, adversarial calibration under
+> bounded perturbation, and a trust-weighted composite that
+> down-weights low-trust components; and (xi) a first-class
+> Disagreement Algebra module exposing ⊕/⊖/⊗ as content-
+> addressed primitives with algebraic identities — idempotent
+> ⊕, ⊖ self-cancellation, and ⊗ distributivity on the agreement
+> subspace — all proved by inspection and empirically verified.
+> The cumulative envelope chain is
+> `w47 → w48 → w49 → w50 → w51 → w52 → w53 → w54 → w55`. R-110
+> (12 cell families) + R-111 (10 cell families) + R-112 (16
+> cell families) at 3 seeds verify H1..H38; cumulative trust
+> boundary across W22..W55 = **486 enumerated failure modes**.
+> The W54-C-DEEP-TRANSFORMER-COUPLING conjecture is further-
+> bounded as W55-C-DEEP-TRANSFORMER-COUPLING but unchanged in
+> spirit: real KV bytes, hidden states, attention weights,
+> embeddings, and real tokenizers remain substrate-blocked. W55
+> is the strongest *executable proxy* for transformer-internal
+> coupling we can write today at the capsule layer.
+>
 > **Post-W48 research-line update (W49 Multi-Block Cross-Bank
 > Coordination, 2026-05-11).** After W48 introduced a shared
 > base state + single pseudo-KV bank + single-block multi-head

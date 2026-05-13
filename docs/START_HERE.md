@@ -248,6 +248,60 @@ is byte-for-byte unchanged. See
 [`RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md`](RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md)
 for the full result note.
 
+**Post-W54 research milestone — W55 Deep Trust-Weighted Disagreement-Algebraic Latent Operating System**
+
+The next research step after W54 (W55) introduces the **Deep
+Trust-Weighted Disagreement-Algebraic Latent Operating System
+(DTDA-LOS)** layer: eleven orthogonal capsule-native advances
+on top of W54 Deep Mergeable Disagreement-aware LOS — (M1) a
+5-layer **persistent latent state V7** with a *triple*
+persistent skip-link (turn-0 anchor + fast EMA + slow EMA),
+chain walks past **128 turns**, and a disagreement-algebraic
+merge head; (M2) a **7-backend (A,B,C,D,E,F,G) hept multi-hop
+translator V5** over 42 directed edges with chain-length-6
+transitivity and **trust-weighted compromise arbitration**;
+(M3) the **Mergeable Latent State Capsule V3 (MLSC V3)** —
+extends MLSC V2 with **disagreement algebra primitives**
+⊕/⊖/⊗, **per-fact confirmation count**, and **trust signature
+decay**; (M4) a **Trust-Weighted Consensus Controller (TWCC)**
+with continuous trust-weighted quorum and **5-stage decision
+chain** {K-of-N → trust-weighted → best-parent → transcript →
+abstain}; (M5) a **Corruption-Robust Carrier V3** — BCH(15,7)
+**double-bit correction** + **5-of-7 majority repetition** +
+**bit-interleaving**; (M6) a **depth-14 Deep Proxy Stack V6**
+with **trust-projected residual gating**, **disagreement-
+algebra head**, and **adaptive abstain threshold**; (M7) a
+**6-head Long-Horizon Reconstruction V7** (causal + branch +
+cycle + merged-branch + cross-role + cross-cycle) at
+``max_k=36``; (M8) a **six-level ECC Codebook V7**
+(K1=32 × K2=16 × K3=8 × K4=4 × K5=2 × K6=2 = 65536 codes)
+plus BCH(15,7) per-segment; **18.333 bits/visible-token**;
+(M9) a **5-arm Transcript-vs-Shared Arbiter V4** with per-arm
+budget allocator; (M10) an **Uncertainty Layer V3** with
+per-fact uncertainty propagation, **adversarial calibration
+check**, and **trust-weighted composite**; (M11) a
+first-class **Disagreement Algebra** module exposing ⊕/⊖/⊗
+as content-addressed primitives with algebraic identities by
+inspection. 33 new disjoint envelope failure modes
+(cumulative trust boundary = **486 modes across W22..W55**).
+W55 is held outside the stable SDK contract — it ships at
+``coordpy.persistent_latent_v7``,
+``coordpy.multi_hop_translator_v5``,
+``coordpy.mergeable_latent_capsule_v3``,
+``coordpy.trust_weighted_consensus_controller``,
+``coordpy.corruption_robust_carrier_v3``,
+``coordpy.deep_proxy_stack_v6``,
+``coordpy.long_horizon_retention_v7``,
+``coordpy.ecc_codebook_v7``,
+``coordpy.transcript_vs_shared_arbiter_v4``,
+``coordpy.uncertainty_layer_v3``,
+``coordpy.disagreement_algebra``, and the composition
+module at ``coordpy.w55_team``, reachable only via explicit
+import; the released v0.5.20 wheel's public surface is
+byte-for-byte unchanged. See
+[`RESULTS_W55_DTDA_LOS.md`](RESULTS_W55_DTDA_LOS.md) for the
+full result note.
+
 **Post-W52 research milestone — W53 Persistent Mergeable Corruption-Robust Latent Operating System**
 
 The next research step after W52 (W53) introduces the
@@ -521,6 +575,12 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Post-W54 research milestone (W55)    | [`RESULTS_W55_DTDA_LOS.md`](RESULTS_W55_DTDA_LOS.md) |
+> | Pre-committed success bar (W55)      | [`SUCCESS_CRITERION_W55_DEEP_TRUST_LATENT_OS.md`](SUCCESS_CRITERION_W55_DEEP_TRUST_LATENT_OS.md) |
+> | Post-W53 research milestone (W54)    | [`RESULTS_W54_DMD_LOS.md`](RESULTS_W54_DMD_LOS.md) |
+> | Pre-committed success bar (W54)      | [`SUCCESS_CRITERION_W54_DEEP_MERGE_LATENT_OS.md`](SUCCESS_CRITERION_W54_DEEP_MERGE_LATENT_OS.md) |
+> | Post-W52 research milestone (W53)    | [`RESULTS_W53_PMCRLOS.md`](RESULTS_W53_PMCRLOS.md) |
+> | Pre-committed success bar (W53)      | [`SUCCESS_CRITERION_W53_PMCRLOS.md`](SUCCESS_CRITERION_W53_PMCRLOS.md) |
 > | Post-W51 research milestone (W52)    | [`RESULTS_W52_QUANTISED_PERSISTENT_MULTI_HOP.md`](RESULTS_W52_QUANTISED_PERSISTENT_MULTI_HOP.md) |
 > | Pre-committed success bar (W52)      | [`SUCCESS_CRITERION_W52_QUANTISED_PERSISTENT_MULTI_HOP.md`](SUCCESS_CRITERION_W52_QUANTISED_PERSISTENT_MULTI_HOP.md) |
 > | Post-W50 research milestone (W51)    | [`RESULTS_W51_PERSISTENT_LATENT_COORDINATION.md`](RESULTS_W51_PERSISTENT_LATENT_COORDINATION.md) |

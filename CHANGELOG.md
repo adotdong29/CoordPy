@@ -13,6 +13,76 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W55 Deep Trust-Weighted Disagreement-Algebraic Latent
+  Operating System** (post-W54, 2026-05-12) —
+  `coordpy.persistent_latent_v7`,
+  `coordpy.multi_hop_translator_v5`,
+  `coordpy.mergeable_latent_capsule_v3`,
+  `coordpy.trust_weighted_consensus_controller`,
+  `coordpy.corruption_robust_carrier_v3`,
+  `coordpy.deep_proxy_stack_v6`,
+  `coordpy.long_horizon_retention_v7`,
+  `coordpy.ecc_codebook_v7`,
+  `coordpy.transcript_vs_shared_arbiter_v4`,
+  `coordpy.uncertainty_layer_v3`,
+  `coordpy.disagreement_algebra`,
+  `coordpy.w55_team`, and `coordpy.r110_benchmark` /
+  `coordpy.r111_benchmark` / `coordpy.r112_benchmark`.
+  Eleven orthogonal capsule-native advances over W54: M1 5-layer
+  V7 stacked GRU with *triple* persistent skip-link (turn-0
+  anchor + fast EMA + slow EMA carriers) + disagreement-
+  algebraic merge head (merged + low-bound + high-bound +
+  disagreement) + max chain walk depth 128;
+  M2 7-backend (A,B,C,D,E,F,G) hept translator V5 with chain-
+  length-6 transitivity + trust-weighted compromise arbitration
+  (per-backend trust × pairwise agreement);
+  M3 Mergeable Latent State Capsule V3 (MLSC V3) with
+  disagreement algebra primitives ⊕/⊖/⊗ + per-fact confirmation
+  count + trust signature decay (`trust ← decay × trust` each
+  turn unless reinforced);
+  M4 Trust-Weighted Consensus Controller with continuous trust-
+  weighted quorum (`Σ trust_i ≥ trust_threshold`) and 5-stage
+  decision chain {K-of-N → trust-weighted → best-parent →
+  transcript → abstain};
+  M5 Corruption-Robust Carrier V3 with BCH(15,7) double-bit
+  correction + 5-of-7 majority repetition + bit-interleaving
+  (3-bit burst recovery rate 1.0);
+  M6 depth-14 Deep Proxy Stack V6 with trust-projected residual
+  gating + disagreement-algebra head + adaptive abstain
+  threshold (scales monotonically with input L2 norm);
+  M7 6-head Long-Horizon Reconstruction V7 (causal + branch +
+  cycle + merged-branch + cross-role + cross-cycle) at
+  `max_k=36` + degradation curve probe to `k=72`;
+  M8 six-level ECC Codebook V7 (K1=32 × K2=16 × K3=8 × K4=4 ×
+  K5=2 × K6=2 = 65536 codes) + BCH(15,7) per-segment double-bit
+  correction → **18.333 bits/visible-token** at full emit;
+  M9 5-arm Transcript-vs-Shared Arbiter V4 over {transcript,
+  shared, merge_consensus, trust_weighted_merge, abstain-with-
+  fallback} with per-arm budget allocator (retention × trust
+  softmax);
+  M10 Uncertainty Layer V3 with per-fact-tag uncertainty
+  propagation (geometric mean over contributors) + adversarial
+  calibration check (worst-case bounded perturbation) + trust-
+  weighted composite (each component's confidence scaled by its
+  trust scalar);
+  M11 Disagreement Algebra first-class capsule-native module
+  exposing ⊕/⊖/⊗ as content-addressed primitives with algebraic
+  identities by inspection (idempotent ⊕ on a==b; ⊖ self-
+  cancellation; ⊗ distributivity on agreement subspace).
+  R-110 (12 cell families) + R-111 (10 cell families) + R-112
+  (16 cell families) at 3 seeds verify H1..H38; cumulative trust
+  boundary across W22..W55 = **486 enumerated failure modes**.
+  W55-L-OVERDEPTH-V6-CAP, W55-L-ECC-V7-RATE-FLOOR-CAP, W55-L-
+  BCH-FIVE-BIT-PATHOLOGY, W55-L-HEPT-TRANSLATOR-COMPROMISE-CAP,
+  W55-L-V7-DISTRIBUTION-CAP, W55-L-V7-OUTER-NOT-TRAINED-CAP,
+  W55-L-TRUST-WEIGHTED-NOT-STRICT-DOMINANCE, W55-L-ALGEBRA-
+  IDENTITIES-ARE-EXACT-ONLY-ON-AGREEMENT, W55-L-TRUST-DECAY-NOT-
+  RECOVERABLE-WITHOUT-REINFORCEMENT all reproduce honestly.
+  The W54-C-DEEP-TRANSFORMER-COUPLING conjecture is further-
+  bounded (now W55-C-DEEP-TRANSFORMER-COUPLING) but not closed.
+  Reachable via explicit `from coordpy.w55_team import
+  W55Team`. No version bump; no PyPI release.
+
 - **W54 Deep Mergeable Disagreement-aware Latent Operating System**
   (post-W53, 2026-05-12) — `coordpy.persistent_latent_v6`,
   `coordpy.multi_hop_translator_v4`,
