@@ -1,6 +1,69 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W54 / W55, 2026-05-12 —
+> **Latest milestone marker (post-W55 / W56, 2026-05-13 —
+> Substrate-Coupled Latent Operating System, fourteenth post-
+> release research milestone — first substrate-attack milestone).**
+> *Twelve orthogonal capsule-native + substrate-coupling advances
+> on top of W55 Deep Trust-Weighted Disagreement-Algebraic Latent
+> OS: M1 a tiny in-repo NumPy transformer substrate
+> (``coordpy.tiny_substrate``) with REAL multi-head causal self-
+> attention, REAL per-layer KV cache, REAL hidden states, REAL
+> logits, REAL layer norm + GeLU FF, REAL byte-vocab embedding
+> + unembedding head — all deterministic and content-addressed;
+> M2 substrate adapter (``coordpy.substrate_adapter``) honestly
+> classifying each backend across 8 capability axes into one of
+> {substrate_full, embeddings_only, logits_only, text_only,
+> unreachable}; M3 KV bridge (``coordpy.kv_bridge``) projecting
+> capsule-layer latent carriers into per-layer (K,V) slot pairs
+> and injecting them into the substrate's KV cache — replay-
+> deterministic, content-addressed, measurable logit
+> perturbation (max abs ≈ 0.86 mean across 3 seeds); M4 6-layer
+> V8 persistent state with quad persistent skip-link (anchor +
+> fast EMA + slow EMA + substrate-conditioned EMA) and
+> ``max_chain_walk_depth=256``; M5 8-backend multi-hop V6 with
+> chain-length-7 + substrate-trust arbitration; M6 MLSC V4 with
+> substrate-witness + algebra signature + per-fact provenance
+> chains; M7 6-stage consensus fallback controller V2 with a
+> substrate-conditioned tiebreaker stage; M8 BCH(31,16) triple-
+> bit correction + 7-of-9 majority + 2-D row-column interleave;
+> M9 deep substrate hybrid stack (``coordpy.deep_substrate_hybrid``)
+> putting REAL tiny-substrate attention IN THE LOOP — reads/
+> writes the REAL KV cache; M10 7-head LHR V8 (substrate-
+> conditioned) at ``max_k=48``; M11 7-level ECC V8 codebook —
+> **19.333 bits/visible-token at full emit**; M12 6-arm TVS V5
+> with substrate_replay arm — the first capsule-vs-substrate
+> head-to-head. Plus uncertainty layer V4 (substrate-fidelity-
+> weighted composite) and disagreement algebra V2 (substrate-
+> projection identity). R-113 (12 cell families) + R-114 (11
+> cell families) + R-115 (19 cell families) at 3 seeds verify
+> H1..H42; **38/42 H-bars pass 3/3 seeds (strong success)**;
+> **4 H-bars reproduce as honest caps** (H8 V8 outer untrained,
+> H26 BCH 4-bit pathology on small probes, H31 V8 permutation
+> invariance, H32 5-bit burst silent failure). Cumulative trust
+> boundary across W22..W56 = **524 enumerated failure modes**.
+> W56 modules ship at ``coordpy.tiny_substrate``,
+> ``coordpy.substrate_adapter``, ``coordpy.kv_bridge``,
+> ``coordpy.persistent_latent_v8``,
+> ``coordpy.multi_hop_translator_v6``,
+> ``coordpy.mergeable_latent_capsule_v4``,
+> ``coordpy.consensus_fallback_controller_v2``,
+> ``coordpy.corruption_robust_carrier_v4``,
+> ``coordpy.deep_substrate_hybrid``,
+> ``coordpy.long_horizon_retention_v8``,
+> ``coordpy.ecc_codebook_v8``,
+> ``coordpy.transcript_vs_shared_arbiter_v5``,
+> ``coordpy.uncertainty_layer_v4``,
+> ``coordpy.disagreement_algebra_v2``, ``coordpy.w56_team``, and
+> ``coordpy.r113_benchmark`` / ``coordpy.r114_benchmark`` /
+> ``coordpy.r115_benchmark`` — reachable only via explicit
+> import. ``coordpy.__version__`` remains ``0.5.20``; SDK
+> contract is byte-for-byte unchanged. No PyPI release.
+> ``W56-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` records that
+> hosted backends remain text-only; ``W56-C-DEEP-TRANSFORMER-
+> COUPLING`` carries forward the frontier-model substrate-
+> blocked conjecture unchanged.
+>
+> **Earlier milestone marker (post-W54 / W55, 2026-05-12 —
 > Deep Trust-Weighted Disagreement-Algebraic Latent Operating
 > System, thirteenth post-release research milestone).** *Eleven
 > orthogonal capsule-native advances on top of W54 Deep

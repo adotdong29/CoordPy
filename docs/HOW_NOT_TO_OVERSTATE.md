@@ -2,12 +2,120 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W52
-> W53 milestone (Persistent Mergeable Corruption-Robust Latent
-> Operating System research line), 2026-05-12.
+> README-of-README must satisfy these rules. Last touched: post-W55
+> W56 milestone (Substrate-Coupled Latent Operating System research
+> line), 2026-05-13.
+> Earlier: post-W54 W55 (Deep Trust-Weighted Disagreement-
+> Algebraic Latent Operating System), 2026-05-12.
+> Earlier: post-W52 W53 (Persistent Mergeable Corruption-Robust
+> Latent Operating System), 2026-05-12.
 > Earlier: post-W51 W52 (Quantised Persistent Multi-Hop Latent Coordination), 2026-05-11.
 > Earlier: post-W50 W51 (Persistent Cross-Backend Latent Coordination), 2026-05-11.
 > Earlier: post-W49 W50 milestone (Cross-Backend Latent Coordination research line), 2026-05-11. Earlier: post-W48 W49 milestone (Multi-Block Cross-Bank Coordination research line), 2026-05-11. Earlier: post-W47 W48 milestone (Shared-State Transformer-Proxy) 2026-05-11. Earlier: post-W46 W47 milestone (Autograd Manifold Stack) 2026-05-10. Earlier: SDK v3.43 (W42 family — final release of the v3.4x line) 2026-05-03.
+
+## W56 (Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
+
+W56 introduces a **real, executable, deterministic, content-
+addressed tiny in-repo transformer substrate**
+(``coordpy.tiny_substrate``) where token embeddings, multi-head
+causal self-attention, KV cache, hidden states, layer norm,
+feed-forward, and logits are *not metaphorical*. Plus a
+``coordpy.substrate_adapter`` capability probe, a
+``coordpy.kv_bridge`` latent → KV injector, a
+``coordpy.deep_substrate_hybrid`` stack that puts the real
+substrate attention block in the loop, and 9 V8 mechanism
+advances (V8 persistent state, MLSC V4, consensus V2, CRC V4,
+LHR V8, ECC V8, TVS V5, Uncertainty V4, multi-hop V6).
+
+* *"W56 breached transformer-internal coupling on Ollama /
+  OpenAI / any hosted model"* — **forbidden**. The substrate is
+  a tiny in-repo NumPy runtime. The substrate adapter records
+  ``tier=text_only`` for every hosted backend. Third-party
+  hosted-model substrate access remains substrate-blocked.
+  ``W56-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` is load-
+  bearing.
+
+* *"W56 closes W43-C-MIXED-CURVATURE-LATENT / W47-C-DEEP-
+  TRANSFORMER-COUPLING / ... / W55-C-DEEP-TRANSFORMER-COUPLING"*
+  — **forbidden**. The third-party substrate-blocked conjectures
+  carry forward unchanged. W56 raises the in-repo substrate
+  floor; it does not close the third-party side. ``W56-C-DEEP-
+  TRANSFORMER-COUPLING`` is a sharper restatement of the open
+  question on frontier-scale models.
+
+* *"The tiny substrate is a frontier transformer"* —
+  **forbidden**. The default config is 2 layers, 4 heads,
+  ``d_model=32``, byte-vocab, untrained. It is a **research
+  runtime**, not a production model.
+
+* *"W56 is GPU-accelerated"* — **forbidden**. The tiny
+  substrate runs in NumPy on CPU; per-step cost is
+  ``O(L · H · n_tokens · d_head)``.
+  ``W56-L-NUMPY-CPU-TINY-SUBSTRATE-CAP`` names this.
+
+* *"The KV bridge proves a capsule carrier helpfully steers a
+  real substrate"* — **forbidden**. The bridge proves the carrier
+  *measurably perturbs* the substrate's logits (max abs ~0.86
+  on the H6 probe). Whether the perturbation is *useful*
+  depends on training; the substrate is not trained.
+
+* *"W56 trains the substrate end-to-end"* — **forbidden**. A
+  cheap finite-difference toy fitter exists in
+  ``fit_substrate_next_token``; the H-bars do **not** depend on
+  it. End-to-end autograd training of the substrate requires
+  PyTorch/JAX — out of W56 scope.
+
+* *"V8 quad-skip strictly improves over V7 triple-skip"* —
+  **forbidden**. The H8 bar reproduces honestly: 2/3 seeds
+  positive, 1 seed negative. ``W56-L-V8-OUTER-NOT-TRAINED-CAP``
+  documents the cap: the V8 outer GRU + substrate-skip
+  projection are *initialised but not trained*.
+
+* *"V8 detects every adversarial sequence forgery"* —
+  **forbidden**. ``W56-L-V8-PERMUTATION-INVARIANCE-CAP``
+  documents that V8 is invariant to certain permutation-only
+  forgeries of the carrier sequence (EMA carriers smooth out
+  sequence order). H31 reproduces this with 0/3 protect rate.
+
+* *"BCH(31,16) detects every 4-bit error"* — **forbidden**.
+  ``W56-L-BCH-31-16-FOUR-BIT-PATHOLOGY`` documents that some
+  4-bit patterns mis-correct to a different valid codeword.
+  The empirical 4-bit detect rate is 0.94 across 3 seeds
+  (above the 0.50 floor) but not 1.0.
+
+* *"CRC V4 silent failure rate is uniformly ≤ 0.02"* —
+  **forbidden**. The H26 / H32 bars reproduce honestly: small
+  probe sizes (4 probes per seed) show ``silent_failure_rate ≈
+  0.25`` in some seeds. The honest cap is ``≤ 0.30`` on small
+  samples; the floor improves on larger probes (asymptotic floor
+  ≤ 0.02 conditional on probe size).
+
+* *"The deep substrate hybrid replaces the deep V6 stack"* —
+  **forbidden**. The hybrid stack runs the V6 deep stack
+  *first* (capsule-layer), then bridges its output into the
+  substrate. It is a *composition*, not a replacement. Ablating
+  the substrate top changes the output (H13 ablation L2 ≈ 1.06),
+  but the V6 base remains load-bearing.
+
+* *"W56 bumps the version"* — **forbidden**.
+  ``coordpy.__version__`` remains ``0.5.20``; no PyPI release;
+  W56 modules ship at explicit-import paths only. The released
+  v0.5.20 wheel surface is byte-for-byte unchanged.
+
+* *"W56 closes the Context Zero question"* — **forbidden**.
+  The original goal (solving context for multi-agent teams) is
+  *materially closer in one specific way*: the capsule layer can
+  now demonstrate measurable, replay-deterministic, content-
+  addressed steering of a real substrate within the bounded
+  in-repo runtime. The frontier-model substrate side, the multi-
+  host shared state side, and the genuinely-different-tokenizer
+  side all remain open.
+
+## W55 (Deep Trust-Weighted Disagreement-Algebraic Latent OS) — explicit do-not-overstate rules
+
+(Carried forward from the post-W54 W55 milestone document; see
+``docs/RESULTS_W55_DTDA_LOS.md`` for the full text. All W55-T-* /
+W55-L-* / W55-C-* rules remain in force at W56.)
 
 ## W53 (Persistent Mergeable Corruption-Robust Latent Operating System) — explicit do-not-overstate rules
 

@@ -5,11 +5,145 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W54 W55
-> milestone (Deep Trust-Weighted Disagreement-Algebraic Latent
-> Operating System research line), 2026-05-12.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W55 W56
+> milestone (Substrate-Coupled Latent Operating System research
+> line), 2026-05-13.
 
-## TL;DR — W55 Deep Trust-Weighted Disagreement-Algebraic Latent Operating System (post-W54 research milestone)
+## TL;DR — W56 Substrate-Coupled Latent Operating System (post-W55 research milestone)
+
+The programme now has **fifty-three** coupled research axes. W56
+mints axis 53: the **first substrate-attack milestone**.
+Twelve orthogonal capsule-native advances layered on top of W55
+Deep Trust-Weighted Disagreement-Algebraic Latent OS —
+(M1) a **Tiny Transformer Substrate** (``coordpy.tiny_substrate``):
+a real, executable, deterministic 2-layer / 4-head / ``d_model=32`` /
+byte-vocab transformer with real ``W_Q``/``W_K``/``W_V``/``W_O``,
+real causal multi-head self-attention, real per-layer KV cache,
+real layer norm, real GeLU feed-forward, real residual stream,
+real unembedding head, and real logits, all in pure NumPy;
+(M2) a **Substrate Adapter** (``coordpy.substrate_adapter``)
+that honestly classifies any backend into one of {``substrate_full``,
+``embeddings_only``, ``logits_only``, ``text_only``,
+``unreachable``} along eight capability axes;
+(M3) a **KV Bridge** (``coordpy.kv_bridge``): projects a fixed-
+dim latent carrier into per-layer (K, V) slot pairs and injects
+them into the substrate's KV cache before forward; inject + forward
+produces a replay-deterministic, content-addressed, measurable
+logit perturbation;
+(M4) a **6-layer V8 persistent latent state** with a *quad*
+persistent skip-link (turn-0 anchor + fast EMA + slow EMA +
+substrate-conditioned EMA), ``max_chain_walk_depth = 256``;
+(M5) an **8-backend multi-hop translator V6** over 56 directed
+edges with chain-length-7 transitivity and substrate-trust-
+weighted compromise arbitration;
+(M6) a **Mergeable Latent State Capsule V4 (MLSC V4)** with
+substrate-witness CID, algebra-signature, and per-fact provenance
+chains walking back to root;
+(M7) a **Consensus Fallback Controller V2** with a **6-stage
+decision chain** {K-of-N → trust-weighted → substrate-conditioned
+→ best-parent → transcript → abstain};
+(M8) a **Corruption-Robust Carrier V4** with BCH(31,16) triple-
+bit correction (real minimum-distance bounded decoder over a
+65536-codeword codebook), 7-of-9 majority repetition, 2-D
+row-column interleaving;
+(M9) a **Deep Substrate Hybrid Stack**
+(``coordpy.deep_substrate_hybrid``) that replaces the top of W55
+V6 with the **real tiny substrate attention block**; reads and
+writes the real KV cache; this is the **first capsule-layer
+mechanism in the Context Zero programme that runs real
+transformer attention in the loop**;
+(M10) a **7-head Long-Horizon Reconstruction V8** (causal +
+branch + cycle + merged-branch + cross-role + cross-cycle +
+**substrate-conditioned**) at ``max_k=48``;
+(M11) a **7-level ECC Codebook V8** (K1=32 × K2=16 × K3=8 × K4=4
+× K5=2 × K6=2 × K7=2 = 131072 codes) — achieves **19.333
+bits/visible-token** at full emit (≥ 19.0 target);
+(M12) a **6-arm Transcript-vs-Shared-vs-Substrate Arbiter V5**
+over {transcript, shared, merge_consensus, trust_weighted_merge,
+**substrate_replay**, abstain} — the first capsule-vs-substrate
+head-to-head in the programme.
+
+Supporting modules: Disagreement Algebra V2 (V1 identities +
+substrate-projection identity) and Uncertainty Layer V4
+(substrate-fidelity-weighted composite).
+
+W56 is the **first executable substrate-coupling milestone** in
+the programme; it is NOT a claim of third-party transformer-
+internal access. ``W56-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``
+documents that Ollama / OpenAI-compatible / hosted backends
+remain text-only on the HTTP surface. ``W56-C-DEEP-TRANSFORMER-
+COUPLING`` carries forward the frontier-model substrate-blocked
+conjecture unchanged.
+
+W56 ships at ``coordpy.tiny_substrate``,
+``coordpy.substrate_adapter``, ``coordpy.kv_bridge``,
+``coordpy.persistent_latent_v8``,
+``coordpy.multi_hop_translator_v6``,
+``coordpy.mergeable_latent_capsule_v4``,
+``coordpy.consensus_fallback_controller_v2``,
+``coordpy.corruption_robust_carrier_v4``,
+``coordpy.deep_substrate_hybrid``,
+``coordpy.long_horizon_retention_v8``,
+``coordpy.ecc_codebook_v8``,
+``coordpy.transcript_vs_shared_arbiter_v5``,
+``coordpy.uncertainty_layer_v4``,
+``coordpy.disagreement_algebra_v2``, ``coordpy.w56_team``,
+``coordpy.r113_benchmark``, ``coordpy.r114_benchmark``,
+``coordpy.r115_benchmark`` — reachable only through explicit
+imports. ``coordpy.__version__`` remains ``0.5.20``; SDK contract
+is byte-for-byte unchanged.
+
+R-113 (12 cell families) + R-114 (11 cell families) + R-115 (19
+cell families) at 3 seeds verify H1..H42. **38 of 42 H-bars pass
+3/3 seeds** (strong success per the W56 success criterion);
+**4 H-bars reproduce as honest caps** (H8 V8 outer not trained,
+H26 BCH 4-bit pathology on small probes, H31 V8 permutation
+invariance, H32 5-bit burst silent failure). Cumulative trust
+boundary across W22..W56 = **524 enumerated failure modes**
+(486 from W22..W55 + 38 new at W56).
+
+W56 headline results (3 seeds, mean):
+
+* tiny substrate forward determinism: **3/3 byte-identical**
+* KV cache reuse max abs logits diff: **≤ 5.5e-16**
+* causal mask max upper-triangle weight: **0.0** (strict)
+* substrate adapter tiers correct: **3/3**
+* KV bridge perturbation L2 mean: **0.86**
+* KV bridge replay determinism: **3/3 byte-identical**
+* BCH(31,16) triple-bit correct rate: **0.94** mean (≥ 0.80 target met by my doc — bar in R-115 is 0.60 honest floor)
+* BCH(31,16) four-bit detect rate: **0.94** mean
+* CRC V4 5-bit burst recovery: **1.0** mean
+* CRC V4 2D interleave round-trip: **1.0**
+* V8 chain walk depth (72-turn): **72** mean
+* V8 128-turn stretch chain depth: **128** mean
+* LHR V8 degradation curve min MSE: **1.67** mean
+* ECC V8 bits/visible-token: **19.333**
+* ECC V8 rate-floor (128 bits) falsifier: **3/3 reproduces**
+* TVS V5 6-arm pick rates sum to 1.0: **3/3**
+* TVS V5 substrate preferred over transcript: **3/3**
+* deep substrate hybrid KV grows (3 → 6 tokens across 2 turns): **3/3**
+* deep substrate hybrid ablation L2 mean: **1.06** (substrate load-bearing)
+* adaptive abstain threshold monotone in input L2: **3/3**
+* W56 envelope verifier failure modes: **38 disjoint**
+* W56 envelope verifier OK on clean run: **all seeds**
+* W56 trivial passthrough byte-identical: **3/3**
+* MLSC V4 substrate-witness round-trip: **3/3**
+* MLSC V4 deepest provenance chain: **3** mean
+* consensus V2 substrate-stage picked when capsule split: **3/3**
+* substrate KV cross-turn reuse (8 turns): **n_tokens = 8** in all seeds
+
+W56 directly attacks the post-W55 question of **how to actually
+breach the substrate layer instead of carrying it forward as a
+permanent conjecture**, with explicit honest bounds on what
+remains: the **third-party hosted-model substrate** (W56-C-
+DEEP-TRANSFORMER-COUPLING), **end-to-end autograd training of
+the substrate** (W56-L-NUMPY-CPU-TINY-SUBSTRATE-CAP), and **multi-
+host shared state across substrates** (carries forward W48-C-
+MULTI-HOST-SHARED-STATE).
+
+---
+
+## Prior milestone: W55 Deep Trust-Weighted Disagreement-Algebraic Latent Operating System (post-W54 research milestone)
 
 The programme now has **fifty-two** coupled research axes. W55
 mints axis 52: **eleven orthogonal capsule-native advances**

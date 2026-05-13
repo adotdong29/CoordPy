@@ -2,7 +2,64 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W54 research-line update (W55 Deep Trust-Weighted
+> **Post-W55 research-line update (W56 Substrate-Coupled Latent
+> Operating System, 2026-05-13).** *First substrate-attack
+> milestone in the programme.* The post-W55 question — *how do
+> we actually breach the substrate layer instead of carrying it
+> forward as a permanent conjecture?* — is answered by W56 with
+> twelve orthogonal advances. The load-bearing move: build a
+> **tiny in-repo executable transformer substrate**
+> (``coordpy.tiny_substrate``) where multi-head causal self-
+> attention, per-layer KV cache, hidden states, layer norm,
+> position-wise feed-forward, and logits are *not metaphorical*.
+> The substrate is small (2 layers, 4 heads, ``d_model=32``,
+> byte-vocab, pure NumPy) and untrained, but it is real and
+> deterministic, and it is something the capsule layer can
+> compose with. (i) ``coordpy.substrate_adapter`` honestly probes
+> each backend's capability surface and classifies into one of
+> {``substrate_full``, ``embeddings_only``, ``logits_only``,
+> ``text_only``, ``unreachable``}; only the in-repo runtime
+> reaches ``substrate_full``. (ii) ``coordpy.kv_bridge`` projects
+> capsule-layer latent carriers into per-layer (K, V) slot pairs
+> and injects them into the substrate's KV cache; the inject +
+> forward step produces a replay-deterministic, content-
+> addressed, measurable logit perturbation. (iii) The capsule-
+> layer V8 persistent state, MLSC V4, multi-hop V6, consensus
+> V2, CRC V4, LHR V8, ECC V8, TVS V5, uncertainty V4, and
+> disagreement algebra V2 all extend their W55 predecessors
+> with one new substrate-aware affordance: V8 has a substrate-
+> conditioned EMA skip; MLSC V4 carries a substrate-witness CID;
+> the consensus controller picks a substrate-conditioned stage
+> when capsule consensus is split; the TVS V5 arbiter has a
+> ``substrate_replay`` arm; the LHR V8 has a substrate-
+> conditioned head; uncertainty V4 down-weights low-substrate-
+> fidelity components; disagreement algebra V2 adds a
+> substrate-projection identity. (iv) The most load-bearing
+> piece is ``coordpy.deep_substrate_hybrid``, which replaces
+> the top of the W55 V6 deep proxy stack with the **real tiny
+> substrate attention block** — reading and writing the **real**
+> per-layer KV cache. Across R-113 + R-114 + R-115 at 3 seeds:
+> **38 of 42 H-bars pass 3/3 seeds** (strong success per the
+> pre-committed criterion); **4 H-bars reproduce as honest
+> caps** that document genuine limitations (untrained V8 outer,
+> BCH 4-bit pathology on small probes, V8 permutation invariance,
+> 5-bit burst silent failure). The cumulative envelope chain is
+> ``w47 → w48 → ... → w55 → w56``. Cumulative trust boundary
+> across W22..W56 = **524 enumerated failure modes**. The
+> ``W55-C-DEEP-TRANSFORMER-COUPLING`` conjecture is sharpened to
+> ``W56-C-DEEP-TRANSFORMER-COUPLING``: the **frontier-model
+> third-party hosted substrate** remains substrate-blocked.
+> ``W56-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` makes this
+> explicit. The original Context Zero goal — solving context
+> for multi-agent teams — is materially closer in one specific
+> way: we now have a code-backed answer to "can a capsule
+> carrier measurably steer a real substrate forward?" — *yes,
+> within the bounded universe of the tiny in-repo substrate*,
+> with the apparatus to repeat the experiment on any future
+> substrate that exposes the same hooks. The frontier-model
+> side remains the open conjecture.
+>
+> **Earlier research-line update (W55 Deep Trust-Weighted
 > Disagreement-Algebraic Latent Operating System, 2026-05-12).**
 > The post-W54 question — *how do we make the latent operating
 > system trust-weighted, disagreement-algebraic, double-bit-

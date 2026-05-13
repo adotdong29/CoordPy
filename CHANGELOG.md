@@ -13,6 +13,81 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W56 Substrate-Coupled Latent Operating System** (post-W55,
+  2026-05-13) — *first substrate-attack milestone in the
+  programme.* Ships at `coordpy.tiny_substrate`,
+  `coordpy.substrate_adapter`, `coordpy.kv_bridge`,
+  `coordpy.persistent_latent_v8`,
+  `coordpy.multi_hop_translator_v6`,
+  `coordpy.mergeable_latent_capsule_v4`,
+  `coordpy.consensus_fallback_controller_v2`,
+  `coordpy.corruption_robust_carrier_v4`,
+  `coordpy.deep_substrate_hybrid`,
+  `coordpy.long_horizon_retention_v8`,
+  `coordpy.ecc_codebook_v8`,
+  `coordpy.transcript_vs_shared_arbiter_v5`,
+  `coordpy.uncertainty_layer_v4`,
+  `coordpy.disagreement_algebra_v2`, `coordpy.w56_team`,
+  `coordpy.r113_benchmark`, `coordpy.r114_benchmark`, and
+  `coordpy.r115_benchmark`. Twelve orthogonal advances over
+  W55: M1 a tiny in-repo executable NumPy transformer substrate
+  with REAL multi-head causal self-attention, REAL per-layer KV
+  cache, REAL hidden states, REAL logits, REAL layer norm, REAL
+  GeLU FF, REAL byte-vocab embedding + unembedding; M2
+  substrate adapter honestly classifying each backend across 8
+  capability axes into one of {substrate_full, embeddings_only,
+  logits_only, text_only, unreachable}; M3 KV bridge projecting
+  capsule-layer latent carriers into per-layer (K,V) slot pairs
+  and injecting them into the substrate's KV cache —
+  replay-deterministic, content-addressed, measurable logit
+  perturbation (max abs ≈ 0.86 mean across 3 seeds); M4 6-layer
+  persistent latent state V8 with *quad* persistent skip-link
+  (turn-0 anchor + fast EMA + slow EMA + substrate-conditioned
+  EMA) and `max_chain_walk_depth=256`; M5 8-backend
+  (A,B,C,D,E,F,G,H) oct multi-hop translator V6 over 56 directed
+  edges with chain-length-7 transitivity and
+  substrate-trust-weighted arbitration; M6 Mergeable Latent
+  State Capsule V4 (MLSC V4) extending V3 with
+  `substrate_witness` field, `algebra_signature`, and per-fact
+  provenance chain walking back to root capsule; M7 Consensus
+  Fallback Controller V2 with **6-stage decision chain**
+  {K-of-N → trust-weighted → substrate-conditioned →
+  best-parent → transcript → abstain}; M8 Corruption-Robust
+  Carrier V4 with BCH(31,16) **triple-bit correction** (real
+  minimum-distance bounded decoder over a 65536-codeword
+  codebook), **7-of-9 majority repetition**, and **2-D row-column
+  interleaving**; M9 Deep Substrate Hybrid Stack replacing the
+  top of W55 V6 with the **real tiny-substrate attention block**
+  — reads / writes the real KV cache, adaptive abstain
+  threshold; M10 7-head Long-Horizon Reconstruction V8 (causal +
+  branch + cycle + merged-branch + cross-role + cross-cycle +
+  substrate-conditioned) at `max_k=48`; M11 7-level ECC Codebook
+  V8 (K1=32 × K2=16 × K3=8 × K4=4 × K5=2 × K6=2 × K7=2 = 131072
+  codes) — achieves **19.333 bits/visible-token at full emit**
+  (≥ 19.0 target); M12 6-arm Transcript-vs-Shared-vs-Substrate
+  Arbiter V5 over {transcript, shared, merge_consensus,
+  trust_weighted_merge, **substrate_replay**, abstain} with
+  per-arm budget allocator — the **first capsule-vs-substrate
+  head-to-head** in the programme. Plus Uncertainty Layer V4
+  (substrate-fidelity-weighted composite) and Disagreement
+  Algebra V2 (V1 identities + substrate-projection identity).
+  R-113 (12 cell families) + R-114 (11 cell families) + R-115
+  (19 cell families) at 3 seeds verify H1..H42; **38/42 H-bars
+  pass 3/3 seeds (strong success)**; **4 H-bars reproduce as
+  honest caps** (H8 V8 outer untrained, H26 BCH 4-bit pathology
+  on small probes, H31 V8 permutation invariance, H32 5-bit
+  burst silent failure). 38 new disjoint envelope failure modes
+  at W56; cumulative trust boundary across W22..W56 =
+  **524 enumerated failure modes**.
+  ``W56-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` documents that
+  hosted backends (Ollama, OpenAI-compatible) remain text-only
+  on their HTTP surface; ``W56-C-DEEP-TRANSFORMER-COUPLING``
+  carries forward the frontier-model substrate-blocked
+  conjecture unchanged.
+  W56 is the **first executable substrate-coupling milestone**
+  in the Context Zero programme; it does NOT claim third-party
+  transformer-internal access.
+
 - **W55 Deep Trust-Weighted Disagreement-Algebraic Latent
   Operating System** (post-W54, 2026-05-12) —
   `coordpy.persistent_latent_v7`,

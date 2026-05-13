@@ -248,6 +248,75 @@ is byte-for-byte unchanged. See
 [`RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md`](RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md)
 for the full result note.
 
+**Post-W55 research milestone — W56 Substrate-Coupled Latent Operating System**
+
+The next research step after W55 (W56) introduces the
+**Substrate-Coupled Latent Operating System (SCLOS)** layer:
+the **first milestone in the programme where a real, executable,
+deterministic transformer substrate runs in the loop**.
+``coordpy.tiny_substrate`` ships a small 2-layer / 4-head /
+``d_model=32`` / byte-vocab transformer with **real**
+``W_Q``/``W_K``/``W_V``/``W_O``, **real** causal multi-head
+self-attention, **real** per-layer KV cache, **real** layer norm,
+**real** GeLU feed-forward, **real** residual stream, **real**
+unembedding head, and **real** logits — all in pure NumPy.
+``coordpy.substrate_adapter`` honestly probes each backend's
+capability surface (8 axes); only the tiny in-repo runtime reaches
+``substrate_full``; Ollama / OpenAI-compatible / hosted backends
+are recorded as ``text_only``. ``coordpy.kv_bridge`` projects
+capsule-layer latent carriers into per-layer (K, V) slot pairs and
+injects them into the substrate's KV cache; inject + forward
+produces a replay-deterministic, content-addressed, measurable
+logit perturbation. ``coordpy.deep_substrate_hybrid`` replaces the
+top of the W55 V6 deep stack with the real tiny substrate
+attention block — the first capsule-layer mechanism in the
+programme that runs **real transformer attention in the loop**.
+Plus nine V8 mechanism advances:
+(M4) ``coordpy.persistent_latent_v8`` (6-layer V8 + quad
+persistent skip-link + ``max_chain_walk_depth=256``);
+(M5) ``coordpy.multi_hop_translator_v6`` (8-backend +
+chain-length-7 + substrate-trust arbitration);
+(M6) ``coordpy.mergeable_latent_capsule_v4`` (MLSC V4 with
+substrate-witness + algebra signature + per-fact provenance
+chain);
+(M7) ``coordpy.consensus_fallback_controller_v2`` (6-stage chain
+with substrate-conditioned tiebreaker);
+(M8) ``coordpy.corruption_robust_carrier_v4`` (BCH(31,16) +
+7-of-9 majority + 2-D interleave);
+(M10) ``coordpy.long_horizon_retention_v8`` (7-head LHR V8 at
+``max_k=48``);
+(M11) ``coordpy.ecc_codebook_v8`` (7-level codebook;
+**19.333 bits/visible-token**);
+(M12) ``coordpy.transcript_vs_shared_arbiter_v5`` (6-arm with
+``substrate_replay`` arm).
+Plus ``coordpy.uncertainty_layer_v4`` (substrate-fidelity-
+weighted composite) and ``coordpy.disagreement_algebra_v2``
+(V1 identities + substrate-projection identity). 38 new
+disjoint envelope failure modes (cumulative trust boundary =
+**524 modes across W22..W56**). W56 is held outside the stable
+SDK contract — it ships at ``coordpy.tiny_substrate``,
+``coordpy.substrate_adapter``, ``coordpy.kv_bridge``,
+``coordpy.persistent_latent_v8``,
+``coordpy.multi_hop_translator_v6``,
+``coordpy.mergeable_latent_capsule_v4``,
+``coordpy.consensus_fallback_controller_v2``,
+``coordpy.corruption_robust_carrier_v4``,
+``coordpy.deep_substrate_hybrid``,
+``coordpy.long_horizon_retention_v8``,
+``coordpy.ecc_codebook_v8``,
+``coordpy.transcript_vs_shared_arbiter_v5``,
+``coordpy.uncertainty_layer_v4``,
+``coordpy.disagreement_algebra_v2``, ``coordpy.w56_team``, and
+``coordpy.r113_benchmark`` / ``coordpy.r114_benchmark`` /
+``coordpy.r115_benchmark``, reachable only via explicit import;
+the released v0.5.20 wheel's public surface is byte-for-byte
+unchanged. ``W56-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``
+explicitly records that hosted backends remain text-only;
+``W56-C-DEEP-TRANSFORMER-COUPLING`` carries forward the frontier-
+model substrate-blocked conjecture. See
+[`RESULTS_W56_SUBSTRATE_ATTACK.md`](RESULTS_W56_SUBSTRATE_ATTACK.md)
+for the full result note.
+
 **Post-W54 research milestone — W55 Deep Trust-Weighted Disagreement-Algebraic Latent Operating System**
 
 The next research step after W54 (W55) introduces the **Deep
@@ -575,6 +644,8 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Post-W55 research milestone (W56)    | [`RESULTS_W56_SUBSTRATE_ATTACK.md`](RESULTS_W56_SUBSTRATE_ATTACK.md) |
+> | Pre-committed success bar (W56)      | [`SUCCESS_CRITERION_W56_SUBSTRATE_ATTACK.md`](SUCCESS_CRITERION_W56_SUBSTRATE_ATTACK.md) |
 > | Post-W54 research milestone (W55)    | [`RESULTS_W55_DTDA_LOS.md`](RESULTS_W55_DTDA_LOS.md) |
 > | Pre-committed success bar (W55)      | [`SUCCESS_CRITERION_W55_DEEP_TRUST_LATENT_OS.md`](SUCCESS_CRITERION_W55_DEEP_TRUST_LATENT_OS.md) |
 > | Post-W53 research milestone (W54)    | [`RESULTS_W54_DMD_LOS.md`](RESULTS_W54_DMD_LOS.md) |
