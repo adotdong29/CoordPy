@@ -13084,6 +13084,117 @@ See `docs/SUCCESS_CRITERION_W53_PMCRLOS.md` for the
 pre-committed H1..H34 thresholds and
 `docs/RESULTS_W53_PMCRLOS.md` for the empirical results.
 
+## W54 — Deep Mergeable Disagreement-aware Latent Operating System (DMD-LOS) — post-W53 milestone
+
+W54 lifts the W53 PMCRLOS line into a **deeper, more
+disagreement-aware, single-bit-correcting, abstain-with-
+fallback** capsule-layer operating system. Ten orthogonal
+mechanism advances over W53:
+
+- **M1 Persistent Latent State V6** — 4-layer GRU stack (vs
+  V5's 3) with *dual persistent skip-link* (turn-0 anchor +
+  running EMA of past carriers) applied at every step.
+  `max_chain_walk_depth = 64` (vs V5's 32). Disagreement-
+  tagged state-merge head emits per-dim disagreement
+  alongside the merged state.
+- **M2 Multi-Hop Translator V4** — 6-backend (A,B,C,D,E,F)
+  translator over 30 directed edges with chain-length-5
+  transitivity scoring and *disagreement-aware compromise
+  arbitration* (largest pairwise-agreeing subset; abstains
+  when no agreement).
+- **M3 Mergeable Latent State Capsule V2 (MLSC V2)** — adds
+  per-dim *disagreement metadata* on every merge, a
+  *provenance fact graph* (DAG of which parent contributed
+  which fact_tag), and per-parent *trust signatures* that
+  scale merge weights independently of confidence.
+- **M4 Consensus / Quorum Controller** — first-class K-of-N
+  controller with explicit abstain-with-fallback policy
+  (quorum_merged | fallback_best_parent | abstain) plus
+  content-addressed K-of-N audit trail.
+- **M5 Corruption-Robust Carrier V2** — composes Hamming(7,4)
+  single-bit *correction* per segment on top of W53's XOR
+  parity detection + 3-of-5 majority repetition (vs W53's
+  3-of-3); silent failure ≤ 0.05 (tighter than W53's 0.10).
+- **M6 Deep Proxy Stack V5** — depth-12 with disagreement-
+  aware head, uncertainty-projected residual gating, and
+  abstain short-circuit when corruption confidence falls
+  below threshold.
+- **M7 Long-Horizon Reconstruction V6** — 5 heads (causal +
+  branch + cycle + merged-branch + *cross-role*) at
+  `max_k = 24` (vs V5's 16); per-dim degradation scores;
+  curve probe to k=48.
+- **M8 ECC Codebook V6** — 5-level codebook (K1=32 × K2=16 ×
+  K3=8 × K4=4 × K5=2 = 32768 codes) plus *Hamming(7,4) per-
+  segment* for single-bit correction; ≥ 16 bits/visible-token
+  target (achieved 18.0).
+- **M9 Transcript-vs-Shared Arbiter V3** — 4-arm policy over
+  {transcript, shared, merge_consensus, abstain-with-
+  transcript-fallback}; per-arm budget + abstain-with-
+  fallback semantics; 4-arm comparison reporting.
+- **M10 Uncertainty Layer V2** — per-component noise
+  injection + calibration-under-noise check + per-decision
+  rationale tag + disagreement-weighted composite that down-
+  weights components reporting high disagreement.
+
+Composes into the `W54Team` orchestrator that emits a
+sealed envelope `W54HandoffEnvelope` whose `w54_outer_cid`
+binds: the W53 outer CID, the W54 params CID, every per-
+turn witness bundle CID, the persistent V6 chain CID, the
+MLSC V2 audit trail CID, and the consensus controller audit
+CID. The envelope chain becomes:
+`w47_outer → w48_proxy_outer → w49_multi_block_outer →
+w50_outer → w51_outer → w52_outer → w53_outer → w54_outer`.
+
+Trivial passthrough preserved byte-for-byte: when
+`W54Params.build_trivial()` is used and all flags are
+disabled, the W54 envelope's internal `w53_outer_cid`
+equals the W53 outer CID exactly. **30 new enumerated
+failure modes** disjoint from W22..W53's 423; cumulative
+trust boundary across W22..W54 = **453 enumerated failure
+modes**.
+
+W54 ships at `coordpy.persistent_latent_v6`,
+`coordpy.multi_hop_translator_v4`,
+`coordpy.mergeable_latent_capsule_v2`,
+`coordpy.consensus_quorum_controller`,
+`coordpy.corruption_robust_carrier_v2`,
+`coordpy.deep_proxy_stack_v5`,
+`coordpy.long_horizon_retention_v6`,
+`coordpy.ecc_codebook_v6`,
+`coordpy.transcript_vs_shared_arbiter_v3`,
+`coordpy.uncertainty_layer_v2`, and `coordpy.w54_team` —
+explicit-import paths only. `coordpy.__version__` remains
+`0.5.20`; SDK contract byte-for-byte unchanged.
+
+R-107 (12 cell families) + R-108 (10 cell families) +
+R-109 (14 cell families) at 3 seeds each verify the
+H1..H36 success criterion.
+
+The honest programme storyline now reads:
+- **W43** executable product-manifold capsules
+- **W44** live manifold behaviour
+- **W45** learned control
+- **W46** manifold memory controller
+- **W47** autograd manifold stack
+- **W48** shared-state transformer-proxy
+- **W49** multi-block cross-bank coordination
+- **W50** cross-backend latent coordination
+- **W51** persistent cross-backend latent coordination
+- **W52** quantised persistent multi-hop latent coordination
+- **W53** persistent mergeable corruption-robust latent operating system
+- **W54** deep mergeable disagreement-aware latent operating
+  system — **the strongest honest capsule-layer 4-layer-
+  V6-persistent + hex-translator-V4-compromise-arbitrated +
+  MLSC-V2-disagreement-trust + K-of-N-consensus-controller +
+  Hamming-7-4-single-bit-correcting + L=12-deep-V5-abstain +
+  5-head-LHR-V6-cross-role + ECC-V6-Hamming-encoded + 4-arm-
+  TVS-V3-abstain-fallback + uncertainty-V2-noise-calibrated
+  executable proxy we can write today.**
+
+See `docs/SUCCESS_CRITERION_W54_DEEP_MERGE_LATENT_OS.md`
+for the pre-committed H1..H36 thresholds and
+`docs/RESULTS_W54_DMD_LOS.md` for the empirical results.
+
 ---
 
 *End of master plan. Changelog lives in the results notes, not

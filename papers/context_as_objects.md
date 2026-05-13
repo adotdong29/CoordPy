@@ -3415,6 +3415,108 @@ realism anchor (reusing the W52 quad scaffold + a synthetic
 5th tag E). Released SDK contract preserved byte-for-byte;
 ``coordpy.__version__`` remains ``0.5.20``.
 
+### Deep Mergeable Disagreement-aware Latent Operating System
+(DMD-LOS) — post-W53 W54 milestone
+
+W54 lifts the W53 PMCRLOS line into a deeper, more
+disagreement-aware, single-bit-correcting,
+abstain-with-fallback capsule-layer operating system by
+composing **ten orthogonal mechanism advances** on top of W53:
+
+* (M1) a **4-layer persistent latent state V6** with *dual
+  persistent skip-link* (turn-0 anchor + running EMA carrier)
+  applied at every step, chain walks past 64 turns, and a
+  disagreement-tagged state-merge head that emits per-dim
+  disagreement alongside the merged state;
+* (M2) a **6-backend (A,B,C,D,E,F) multi-hop translator V4**
+  over 30 directed edges with chain-length-5 transitivity
+  and *disagreement-aware compromise arbitration* (largest
+  pairwise-agreeing subset; abstains when no agreement);
+* (M3) the **Mergeable Latent State Capsule V2 (MLSC V2)**
+  — extends W53's MLSC with per-dim *disagreement metadata*
+  on every merge, a *provenance fact graph* DAG, and per-
+  parent *trust signatures* that scale merge weights
+  independently of confidence;
+* (M4) a **Consensus / Quorum Controller** — first-class K-of-
+  N controller with explicit abstain-with-fallback policy
+  (quorum_merged | fallback_best_parent | abstain) plus a
+  content-addressed K-of-N audit trail;
+* (M5) a **Corruption-Robust Carrier V2** — composes
+  Hamming(7,4) single-bit *correction* per segment with
+  W53's XOR parity detection + a 3-of-5 majority repetition;
+  silent failure tightened to ≤ 0.05 (vs W53's ≤ 0.10);
+* (M6) a **depth-12 Deep Proxy Stack V5** with
+  *disagreement-aware head*, *uncertainty-projected residual
+  gating*, and *abstain short-circuit* when corruption
+  confidence falls below threshold;
+* (M7) a **5-head Long-Horizon Reconstruction V6** (causal +
+  branch + cycle + merged-branch + *cross-role*) at max_k=24
+  (vs V5's 16) with per-dim *degradation scores*;
+* (M8) a **5-level ECC Codebook V6** (K1=32 × K2=16 × K3=8 ×
+  K4=4 × K5=2 = 32768 codes) plus Hamming(7,4) on every
+  segment for single-bit correction; achieves 18.0
+  bits/visible-token at full emit (vs W53's 17.67;
+  ≥ 16.0 target);
+* (M9) a **4-arm Transcript-vs-Shared Arbiter V3** over
+  {transcript, shared, merge_consensus, abstain-with-
+  transcript-fallback} with per-arm budget allocation;
+* (M10) an **Uncertainty Layer V2** that adds *per-component
+  noise injection*, *calibration-under-noise* check,
+  per-decision *rationale tags*, and a *disagreement-
+  weighted composite* that down-weights components reporting
+  high disagreement.
+
+The orchestrating ``W54Team`` produces a sealed
+``W54HandoffEnvelope`` whose ``w54_outer_cid`` binds: the W53
+outer CID, the W54 params CID, every per-turn W54 witness
+bundle CID, the persistent V6 chain CID, the MLSC V2 audit
+trail CID, and the consensus controller audit CID. The W54
+envelope chain runs end-to-end:
+``w47_outer → w48_proxy_outer → w49_multi_block_outer →
+w50_outer → w51_outer → w52_outer → w53_outer → w54_outer``.
+
+Trivial W54 collapses to W53 byte-for-byte (the
+``W54-L-TRIVIAL-W54-PASSTHROUGH`` falsifier). Verifier
+soundness: 30 new disjoint enumerated failure modes;
+cumulative trust boundary W22..W54 = **453 failure modes**.
+
+W54 ships at ``coordpy.persistent_latent_v6``,
+``coordpy.multi_hop_translator_v4``,
+``coordpy.mergeable_latent_capsule_v2``,
+``coordpy.consensus_quorum_controller``,
+``coordpy.corruption_robust_carrier_v2``,
+``coordpy.deep_proxy_stack_v5``,
+``coordpy.long_horizon_retention_v6``,
+``coordpy.ecc_codebook_v6``,
+``coordpy.transcript_vs_shared_arbiter_v3``,
+``coordpy.uncertainty_layer_v2``, and ``coordpy.w54_team`` —
+explicit-import paths only. ``coordpy.__version__`` remains
+``0.5.20``; SDK contract byte-for-byte unchanged.
+
+W54 is verified by R-107 (12 cell families) + R-108 (10 cell
+families) + R-109 (14 cell families) at 3 seeds each
+(H1..H36 success criterion). The
+``W54-T-HAMMING-7-4-SINGLE-BIT-CORRECTION``,
+``W54-T-MLSC-V2-TRUST-WEIGHTS-MONOTONICITY``,
+``W54-T-CONSENSUS-CONTROLLER-FALLBACK-SOUNDNESS``,
+``W54-T-CRC-V2-SILENT-FAILURE-FLOOR``, and
+``W54-T-DEEP-V5-DISAGREEMENT-HEAD-SOUNDNESS`` theorems are
+proved by inspection plus empirical witnesses. The
+``W54-L-OVERDEPTH-V5-CAP``, ``W54-L-ECC-V6-RATE-FLOOR-CAP``,
+``W54-L-V6-OUTER-NOT-TRAINED-CAP``, and
+``W54-L-COMPROMISE-NOT-STRICT-DOMINANCE`` limitation
+theorems reproduce honestly. The
+``W54-C-CROSS-TOKENIZER-HEX-CAP`` conjecture sharpens W53's
+cross-tokenizer line to 6 backends.
+
+W54 does NOT touch real KV bytes, hidden states, attention
+weights, embeddings, or real tokenizers. It is the strongest
+*executable proxy* line we can write today at the capsule
+layer with one best-effort real-LLM hex-backend realism
+anchor (reusing the W53 quint scaffold + a synthetic 6th
+tag F). Released SDK contract preserved byte-for-byte;
+``coordpy.__version__`` remains ``0.5.20``.
+
 ## References
 
 Bibliography intentionally omitted from this Markdown draft.

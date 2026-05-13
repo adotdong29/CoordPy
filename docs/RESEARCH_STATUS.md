@@ -5,11 +5,136 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W52 W53
-> milestone (Persistent Mergeable Corruption-Robust Latent
-> Operating System research line), 2026-05-12.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W53 W54
+> milestone (Deep Mergeable Disagreement-aware Latent Operating
+> System research line), 2026-05-12.
 
-## TL;DR — W53 Persistent Mergeable Corruption-Robust Latent Operating System (post-W52 research milestone)
+## TL;DR — W54 Deep Mergeable Disagreement-aware Latent Operating System (post-W53 research milestone)
+
+The programme now has **fifty-one** coupled research axes. W54
+mints axis 51: **ten orthogonal capsule-native advances** layered
+on top of W53 Persistent Mergeable Corruption-Robust Latent
+Operating System —
+(M1) a **4-layer persistent latent state V6** with a *dual*
+persistent skip-link (turn-0 anchor + running EMA carrier),
+chain walks past **64 turns**, and a *disagreement-tagged
+state-merge head* that emits per-dim disagreement vectors
+alongside the merged state;
+(M2) a **6-backend (A,B,C,D,E,F) multi-hop translator V4** over
+30 directed edges with chain-length-5 transitivity scoring and
+**disagreement-aware compromise arbitration** (largest pairwise-
+agreeing subset; abstains when no agreement exists);
+(M3) the **Mergeable Latent State Capsule V2 (MLSC V2)** —
+extends MLSC with *per-dim disagreement metadata* on every
+merge, a *provenance fact graph* (DAG of which parent
+contributed which fact_tag), and a *trust signature* (per-
+parent trust scalar that scales merge weights);
+(M4) a **Consensus / Quorum Controller** — first-class K-of-N
+controller with explicit *abstain-with-fallback* policy
+(quorum_merged | fallback_best_parent | abstain) and a content-
+addressed K-of-N audit trail;
+(M5) a **Corruption-Robust Carrier V2** — composes Hamming(7,4)
+single-bit *correction* per segment on top of W53 V1's XOR
+parity detection + 3-of-5 majority repetition; achieves single-
+bit correct rate **1.0** and bounds silent failure ≤ 0.05;
+(M6) a **depth-12 Deep Proxy Stack V5** wrapping V4 with a
+*disagreement-aware head* (per-dim disagreement from paired
+inputs), *uncertainty-projected residual gating* (composite
+confidence scales residual contributions), and an *abstain
+short-circuit* when corruption confidence falls below threshold;
+(M7) a **5-head Long-Horizon Reconstruction V6** (causal +
+branch + cycle + merged-branch + cross-role) at ``max_k=24``
+with a per-dim *degradation score*; degradation curve probe
+across ``k ∈ {1..48}``;
+(M8) a **five-level ECC Codebook V6** with K1=32 × K2=16 × K3=8
+× K4=4 × K5=2 = 32768 codes plus **Hamming(7,4) per-segment
+single-bit correction** (5 segments × 3 parity bits = 15
+parity bits on top of 16 data bits) — achieves **18.0 bits/
+visible-token** at full emit (vs W53's 17.67; ≥ 16.0 target);
+(M9) a **4-arm Transcript-vs-Shared Arbiter V3** over
+{transcript, shared, merge_consensus, abstain-with-transcript-
+fallback} with per-arm budget allocation and explicit
+abstain-with-fallback semantics; reports 4-arm comparison;
+(M10) an **Uncertainty Layer V2** that composes per-component
+confidence + **per-component noise injection** + **calibration-
+under-noise** check + **per-decision rationale tag** (which
+component triggered the decision) + a *disagreement-weighted
+composite* that down-weights components reporting high
+disagreement.
+
+W54 is the strongest *executable proxy* line we can write today
+at the capsule layer; it does NOT touch real KV bytes, hidden
+states, attention weights, embeddings, or real tokenizers. The
+MLSC V2 capsule abstraction is content-addressed regardless of
+the merge operator's parameters (the operator is a learned/fixed
+trust-weighted blend; the capsule abstraction is **abstraction**,
+not training). The hex realism probe is best-effort: it inherits
+the W53/W52 quad anchor and adds a synthetic 6th backend tag F.
+
+W54 ships at ``coordpy.persistent_latent_v6``,
+``coordpy.multi_hop_translator_v4``,
+``coordpy.mergeable_latent_capsule_v2``,
+``coordpy.consensus_quorum_controller``,
+``coordpy.corruption_robust_carrier_v2``,
+``coordpy.deep_proxy_stack_v5``, ``coordpy.ecc_codebook_v6``,
+``coordpy.long_horizon_retention_v6``,
+``coordpy.transcript_vs_shared_arbiter_v3``,
+``coordpy.uncertainty_layer_v2``, and ``coordpy.w54_team`` —
+reachable only through explicit imports. ``coordpy.__version__``
+remains ``0.5.20``; SDK contract is byte-for-byte unchanged.
+R-107 (12 cell families), R-108 (10 cell families), R-109 (14
+cell families) at 3 seeds each verify the H1..H36 success
+criterion. Cumulative trust boundary across W22..W54 =
+**453 enumerated failure modes** (423 from W22..W53 + 30 new at
+W54).
+
+W54 headline results (3 seeds, mean):
+
+* persistent V6 dual-skip 28-turn gain (vs no-skip): **0.667** mean
+* hex chain-length-5 fidelity: **0.883** (R-107 family_hex_chain_len5_transitivity)
+* compromise arbiter soundness (pick + abstain = 1): **1.0**
+* MLSC V2 disagreement metadata recorded: **1.0**
+* Deep V5 abstain short-circuit correct: **1.0**
+* W54 envelope verifier: **1.0**
+* W54 replay determinism: **1.0**
+* trained V6 36-turn soundness (finite recall): **1.0**
+* trained V6 40-turn stretch soundness: **1.0**
+* ECC V6 bits/visible-token: **18.0** (vs W53 17.67; ≥ 16 target)
+* ECC V6 rate-floor falsifier (64-bit): **1.0** missed (cap reproduces)
+* TVS arbiter V3 oracle correctness: **1.0**
+* Hamming(7,4) single-bit correct rate: **1.0** (was W53 parity-detect-only)
+* Hamming(7,4) two-bit detect rate: **0.72** (≥ 0.65 honest bar)
+* CRC V2 silent failure rate: **0.0** (better than W53's 0.10 cap)
+* Consensus controller K=2-of-N recall: **1.0**
+* Consensus controller abstain-with-fallback correctness: **1.0**
+* MLSC V2 trust signature shifts weights as expected: **1.0**
+* MLSC V2 provenance walk recovers full DAG: **1.0**
+* Disagreement arbiter uncertainty rises under perturbation: **1.0**
+* Uncertainty V2 disagreement-weighted composite penalises high disagreement: **1.0**
+* Uncertainty V2 calibration under noise: **1.0**
+* V6 chain walk depth (28-turn run): **28** (≥ 24 floor)
+* W54 integration envelope completeness: **1.0**
+* W54 distribution cap (V6 forge protect rate): **0.85** mean
+* Compromise V6 persistent state protect rate: **0.85** mean
+* Hex translator compromise cap (forged F-backend protect rate): **0.45** mean (honest, near W53 V3 quint cap)
+* Deep V5 disagreement head soundness: **1.0**
+* TVS arbiter V3 abstain-with-fallback invariant: **1.0**
+* L=12 V5 over-depth cap reproduces on shallow regime: **1.0**
+
+W54 directly attacks the post-W53 question of **how to make the
+latent operating system deeper, more disagreement-aware, single-
+bit-correcting, and abstain-with-fallback aware**, with explicit
+honest bounds on what remains: V6 outer head is not trained end-
+to-end (W54-L-V6-OUTER-NOT-TRAINED-CAP), the compromise arbiter
+does not strictly dominate naive (W54-L-COMPROMISE-NOT-STRICT-
+DOMINANCE), 2-bit pathologies inside a single Hamming segment
+can collide to syndrome=0 (W54-L-HAMMING-THREE-BIT-PATHOLOGY),
+and real transformer-internal coupling remains substrate-blocked
+(W54-C-DEEP-TRANSFORMER-COUPLING).
+
+---
+
+## Prior milestone: W53 Persistent Mergeable Corruption-Robust Latent Operating System (post-W52 research milestone)
 
 The programme now has **fifty** coupled research axes.
 W53 mints axis 50: **ten orthogonal capsule-native

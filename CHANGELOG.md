@@ -13,6 +13,56 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W54 Deep Mergeable Disagreement-aware Latent Operating System**
+  (post-W53, 2026-05-12) — `coordpy.persistent_latent_v6`,
+  `coordpy.multi_hop_translator_v4`,
+  `coordpy.mergeable_latent_capsule_v2`,
+  `coordpy.consensus_quorum_controller`,
+  `coordpy.corruption_robust_carrier_v2`,
+  `coordpy.deep_proxy_stack_v5`,
+  `coordpy.long_horizon_retention_v6`,
+  `coordpy.ecc_codebook_v6`,
+  `coordpy.transcript_vs_shared_arbiter_v3`,
+  `coordpy.uncertainty_layer_v2`,
+  `coordpy.w54_team`, and `coordpy.r107_benchmark` /
+  `coordpy.r108_benchmark` / `coordpy.r109_benchmark`.
+  Ten orthogonal capsule-native advances over W53: M1 4-layer
+  V6 stacked GRU with *dual* persistent skip-link
+  (turn-0 anchor + running EMA carrier) + disagreement-tagged
+  merge head + max chain walk depth 64;
+  M2 6-backend (A,B,C,D,E,F) hex translator V4 with chain-
+  length-5 transitivity + disagreement-aware compromise
+  arbitration;
+  M3 MLSC V2 with per-dim disagreement metadata + provenance
+  fact graph + per-parent trust signatures;
+  M4 first-class K-of-N consensus quorum controller with
+  explicit abstain-with-fallback policy + content-addressed
+  audit trail;
+  M5 corruption-robust carrier V2 with Hamming(7,4) single-bit
+  *correction* per segment + 3-of-5 majority repetition (vs
+  W53 V1's detect-only parity + 3-of-3 majority);
+  M6 depth-12 deep proxy stack V5 with disagreement-aware
+  head + uncertainty-projected residual gating + abstain
+  short-circuit;
+  M7 5-head long-horizon reconstruction V6 (causal + branch +
+  cycle + merged-branch + cross-role) at max_k=24 (vs V5's 16)
+  with per-dim degradation score; curve probe to k=48;
+  M8 5-level ECC V6 codebook (K1×K2×K3×K4×K5 = 32768) +
+  Hamming(7,4) on all 5 segments; ≥ 16 bits/visible-token
+  target (achieved 18.0);
+  M9 4-arm transcript-vs-shared arbiter V3 over {transcript,
+  shared, merge_consensus, abstain-with-transcript-fallback};
+  M10 uncertainty layer V2 with per-component noise injection +
+  calibration-under-noise check + per-decision rationale +
+  disagreement-weighted composite. Composes into the
+  `W54Team` orchestrator that produces a content-addressed
+  envelope chain `w47 → w48 → w49 → w50 → w51 → w52 → w53 →
+  w54`. Trivial passthrough preserved byte-for-byte. 30 new
+  enumerated failure modes (cumulative W22..W54 = 453).
+  R-107 (12 families) × R-108 (10 families) × R-109 (14
+  families) at 3 seeds each verify H1..H36. **No version
+  bump; no PyPI release.**
+
 - **W53 Persistent Mergeable Corruption-Robust Latent Operating System**
   (post-W52, 2026-05-12) — `coordpy.persistent_latent_v5`,
   `coordpy.multi_hop_translator_v3`,
