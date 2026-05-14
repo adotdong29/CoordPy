@@ -2,10 +2,80 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W56 research-line update (W57 Deep Substrate-Coupled
-> Latent Operating System, 2026-05-13).** *Second substrate-
-> attack milestone in the programme; first **bidirectional**
-> substrate breach.* W56 proved that a real in-repo transformer
+> **Post-W57 research-line update (W58 Deep Cache-Reuse
+> Substrate-Coupled Latent Operating System, 2026-05-13).**
+> *Third substrate-attack milestone in the programme; first
+> **three-way** substrate breach with **real fp64 flop savings**
+> as a benchmark-load-bearing axis.* The post-W57 question —
+> *can the in-repo substrate be made not just real but
+> economically real, with measurable cache-reuse-vs-recompute
+> savings and trainable bridge scales fit against substrate-side
+> targets?* — is answered by W58 with eighteen orthogonal
+> advances. The substrate gets richer
+> (``coordpy.tiny_substrate_v3``: 5 layers, 8 query heads,
+> 4 KV heads with **GQA**, ``d_model=64``, RMSNorm, SwiGLU FF,
+> per-token KV importance tracking, real fp64 flop counter,
+> partial-forward, 64-bucket Reed-Solomon KV cache fingerprint).
+> Five W58 substrate-facing bridges sit on top, all with
+> *fitted* parameters: ``coordpy.kv_bridge_v3`` fits per-(layer,
+> head) inject scales by coordinate descent against an explicit
+> L2-perturbation target and exposes role-conditioned KV banks
+> ``bank_a``/``bank_b``; ``coordpy.hidden_state_bridge_v2``
+> multi-layer fits to a logit-shift target;
+> ``coordpy.prefix_state_bridge_v2`` ships a **real fp64 flop-
+> saved counter** — the H100b probe shows **66.7% flop savings**
+> at byte-identical logits (≤ 4.4e-16 max-abs diff vs full
+> recompute), the first benchmark in the programme where the
+> substrate's *own* flop count is materially load-bearing;
+> ``coordpy.attention_steering_bridge_v2`` enforces a KL budget
+> by coordinate descent on a global bias clip and exposes per-
+> head ablation; ``coordpy.cache_controller`` ships three
+> retention policies — uniform / importance / **learned** — the
+> learned head being a single closed-form-ridge scoring vector
+> fit against a leave-one-out drop oracle (no autograd, no
+> backprop). The **three-way** ``coordpy.deep_substrate_hybrid_v3``
+> couples V6 ↔ substrate V3 ↔ cache controller; its forward
+> witness reports ``three_way=True``, ``substrate_back_l2 > 0``,
+> ``ablation_perturbation_l2 > 0``, and
+> ``cache_eviction_perturbation_l2 > 0`` simultaneously.
+> The persistent latent state advances to V10 (8 layers,
+> **sextuple** skip-link adding an attention-pattern-conditioned
+> EMA, ``max_chain_walk_depth = 512``), multi-hop translator V8
+> spans 12 backends with 132 directed edges and chain-length-11
+> with a three-axis substrate × hidden × attention trust
+> composite, MLSC V6 propagates ``attention_witness_chain`` and
+> ``cache_reuse_witness_cid``, consensus V4 has an **8-stage**
+> chain adding ``cache_reuse_replay`` between ``logit_lens`` and
+> ``best_parent``, CRC V6 doubles the KV fingerprint bucket count
+> to 64 and adds prefix-state corruption detection (1.0 detect
+> rate on the H92/H92b probes), LHR V10 adds a 9th
+> attention-conditioned reconstruction head at ``max_k=72``, ECC
+> V10 layers a K9 stage on top of V9 (524 288 codes; **21.333
+> bits/visible-token** at full emit), TVS V7 grows to **8 arms**
+> adding ``cache_reuse_replay``, uncertainty V6 grows to **5
+> axes** adding ``cache_reuse_fidelity``, disagreement algebra
+> V4 adds a cache-reuse-equivalence identity, and substrate
+> adapter V3 introduces five new capability axes plus a new top
+> tier ``substrate_v3_full`` reached only by the V3 in-repo
+> runtime. R-119 (16 cell families) + R-120 (12 cell families)
+> + R-121 (12 cell families) at 3 seeds verify **40/40 H-bars
+> (H86..H106) pass 3/3 seeds** — strong success per the W58
+> pre-committed criterion. Cumulative trust boundary across
+> W22..W58 = **614 enumerated failure modes** (46 new W58
+> envelope verifier modes). ``coordpy.__version__`` remains
+> ``0.5.20``; SDK contract is byte-for-byte unchanged.
+> ``W58-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` carries
+> forward; ``W58-L-V3-NO-BACKPROP-CAP`` is the load-bearing new
+> honest cap — W58 fits only inject-scale and a single linear
+> scoring head, with no end-to-end backprop;
+> ``W58-C-DEEP-TRANSFORMER-COUPLING`` and
+> ``W58-C-FRONTIER-SCALE-SUBSTRATE-LIFT`` carry forward as
+> conjectures on frontier-scale model substrate access.
+>
+> **Earlier post-W56 research-line update (W57 Deep
+> Substrate-Coupled Latent Operating System, 2026-05-13).**
+> *Second substrate-attack milestone in the programme; first
+> **bidirectional** substrate breach.* W56 proved that a real in-repo transformer
 > substrate (``coordpy.tiny_substrate``) is enough to
 > demonstrate one-way KV / hidden-state coupling. W57 deepens
 > this on three axes: (a) the substrate gets richer

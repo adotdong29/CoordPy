@@ -2,9 +2,95 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W56
-> W57 milestone (Deep Substrate-Coupled Latent Operating System
-> research line), 2026-05-13.
+> README-of-README must satisfy these rules. Last touched: post-W57
+> W58 milestone (Deep Cache-Reuse Substrate-Coupled Latent
+> Operating System research line), 2026-05-13.
+
+## W58 (Deep Cache-Reuse Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
+
+W58 extends W57 with a richer in-repo runtime
+(``coordpy.tiny_substrate_v3``: 5 layers / 8 query heads /
+4 KV heads with GQA / d_model=64 / RMSNorm + SwiGLU / KV
+importance tracking / real flop counter / partial-forward),
+five W58 substrate-facing bridges (KV V3 with **fitted inject
+scales**, HSB V2 with **multi-layer fitted projection**,
+prefix-state V2 with **flop-saved counter**, attention V2 with
+**KL-budget enforcement**, cache controller with three policies
+including a closed-form-ridge **learned scoring head**), a
+**three-way deep hybrid V3** (V6 ↔ substrate V3 ↔ cache
+controller), and 12 V-bumps for the rest of the W57 stack.
+
+* *"W58 trained the substrate end-to-end"* — **forbidden**.
+  ``W58-L-V3-NO-BACKPROP-CAP`` is load-bearing: the only fits
+  are (a) KV bridge V3 / HSB V2 inject scales via coordinate
+  descent and (b) a single linear cache-controller scoring
+  head via closed-form ridge regression. No autograd, no
+  PyTorch/JAX, no GPU.
+
+* *"W58 breached transformer-internal coupling on Ollama /
+  OpenAI / hosted models"* — **forbidden**. The substrate is
+  still a tiny in-repo NumPy runtime.
+  ``W58-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` carries
+  forward unchanged. ``W58-C-DEEP-TRANSFORMER-COUPLING`` is a
+  sharper restatement of the open question on frontier-scale
+  models, NOT a closure.
+
+* *"The W58 substrate is a frontier transformer"* —
+  **forbidden**. Default config is 5 layers / 8 query heads /
+  4 KV heads / d_model=64 / byte-vocab / max_len=120 /
+  untrained.
+
+* *"V10 quintuple-skip + attention-skip strictly improves over
+  V9 quintuple-skip"* — **forbidden**.
+  ``W58-L-V10-OUTER-NOT-TRAINED-CAP`` documents the cap.
+  The qualitative "more skips means more capacity" claim is
+  conjectural.
+
+* *"ECC V10 delivers 1024 bits/visible-token"* — **forbidden**.
+  V10 delivers **21.333 bits/visible-token** at full emit,
+  exceeding the W58 ≥ 21.0 target. The 1024-bit/token target
+  reproduces as the H95 falsifier:
+  ``W58-L-ECC-V10-RATE-FLOOR-CAP`` says the target is above
+  the structural ceiling implied by the V10 codebook
+  (info bound = log2(524 288) = 19 bits/segment-tuple).
+
+* *"The cache controller learned policy beats LRU on every
+  seed"* — **forbidden**. The H89 bar is the honest reading:
+  the importance policy is **competitive** (≤ 1.25 × uniform
+  L1 drift) with positive flop savings on all 3 seeds.
+  ``W58-L-CACHE-CONTROLLER-LINEAR-CAP`` documents that the
+  learned head is a single linear scoring head.
+
+* *"The prefix-state V2 flop savings ratio of 0.667 is
+  universal"* — **forbidden**. 0.667 is the savings *on a
+  specific probe* (20-token prompt + 9-token follow-up). The
+  ratio scales as ``1 − (n_fu / (n_prompt + n_fu))``-style
+  geometry. The claim is that flop savings are real, positive,
+  and quantified — not that any particular ratio is universal.
+
+* *"The KV bridge V3 fitted scale proves the carrier helpfully
+  steers the substrate"* — **forbidden**. The fit matches a
+  *magnitude target* for the L2 logit perturbation. Whether the
+  perturbation improves downstream quality depends on training;
+  the substrate is not trained.
+
+* *"The deep substrate hybrid V3 three_way=True proves frontier
+  substrates can be coupled this way"* — **forbidden**. V3
+  demonstrates three-way coupling on the in-repo V3 runtime.
+  Whether a frontier model exposes hooks compatible with this
+  design remains a conjecture
+  (``W58-C-FRONTIER-SCALE-SUBSTRATE-LIFT``).
+
+* *"Multi-hop V8's 132 edges are real backend deployments"* —
+  **forbidden**. ``W58-L-MULTI-HOP-V8-SYNTHETIC-BACKENDS-CAP``
+  documents that the 12 backends are named, not executed.
+
+* *"W58 has no honest caps"* — **forbidden**. W58 carries the
+  full W57 cap stack forward and adds at least seven new ones
+  (V3-no-backprop, V10-outer-not-trained, ECC-V10-rate-floor,
+  cache-controller-linear, multi-hop-v8-synthetic-backends,
+  V10-permutation-invariance, no-third-party-substrate). All
+  appear in `docs/THEOREM_REGISTRY.md` under the W58 section.
 > Earlier: post-W55 W56 (Substrate-Coupled Latent Operating
 > System), 2026-05-13.
 > Earlier: post-W54 W55 (Deep Trust-Weighted Disagreement-

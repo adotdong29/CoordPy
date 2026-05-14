@@ -13,6 +13,73 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W58 Deep Cache-Reuse Substrate-Coupled Latent Operating
+  System** (post-W57, 2026-05-13) — *third substrate-attack
+  milestone; first **three-way** substrate breach with **real
+  fp64 flop savings** as a benchmark-load-bearing axis.* Ships
+  at `coordpy.tiny_substrate_v3` (5-layer / 8-query-head / 4-KV-
+  head GQA / d_model=64 / RMSNorm / SwiGLU / per-token KV
+  importance tracking / real fp64 flop counter / partial-forward
+  / 64-bucket KV fingerprint), `coordpy.kv_bridge_v3` (fitted
+  per-(layer, head) inject scales via coordinate descent, role-
+  conditioned KV banks bank_a/bank_b, 64-bucket readback
+  fingerprint), `coordpy.hidden_state_bridge_v2` (multi-layer
+  fitted injection), `coordpy.prefix_state_bridge_v2` (real
+  flop-saved counter — **66.7% savings** on H100b; redundant
+  copy CID; cross-seed drift L2),
+  `coordpy.attention_steering_bridge_v2` (KL-budget enforcement
+  by coordinate descent on global bias clip; per-head ablation),
+  `coordpy.cache_controller` (uniform / importance / **learned**
+  closed-form ridge over a leave-one-out drop oracle, with real
+  flop savings ratio in the witness),
+  `coordpy.persistent_latent_v10` (8-layer, **sextuple** skip
+  with attention-pattern EMA, max_chain_walk_depth=512),
+  `coordpy.deep_substrate_hybrid_v3` (**three-way** V6 ↔
+  substrate V3 ↔ cache controller; `three_way=True` in real
+  runs), `coordpy.multi_hop_translator_v8` (12 backends, 132
+  directed edges, chain-length-11, substrate × hidden ×
+  attention three-axis trust composite),
+  `coordpy.mergeable_latent_capsule_v6` (attention_witness_chain
+  inheritance, cache_reuse_witness_cid propagation, two new
+  algebra signatures {cache_reuse_replay, attention_steer}),
+  `coordpy.consensus_fallback_controller_v4` (**8-stage** chain
+  adding `cache_reuse_replay` between `logit_lens` and
+  `best_parent`), `coordpy.corruption_robust_carrier_v6`
+  (64-bucket Reed-Solomon fingerprint + prefix-state corruption
+  detection + adversarial 7-bit burst detection),
+  `coordpy.long_horizon_retention_v10` (9 heads, max_k=72,
+  attention-conditioned head), `coordpy.ecc_codebook_v10`
+  (K1..K9 = 524 288 codes, **21.333 bits/visible-token** at full
+  emit), `coordpy.transcript_vs_shared_arbiter_v7` (**8-arm**
+  policy adding `cache_reuse_replay`),
+  `coordpy.uncertainty_layer_v6` (5th axis cache_reuse_fidelity),
+  `coordpy.disagreement_algebra_v4` (cache-reuse equivalence
+  identity), `coordpy.substrate_adapter_v3` (five new capability
+  axes — kv_importance_track / flop_counter / partial_forward /
+  fitted_inject_scale / cache_controller — and new top tier
+  `substrate_v3_full`), `coordpy.w58_team` (W58Team orchestrator,
+  W58HandoffEnvelope with 46 disjoint verifier failure modes),
+  `coordpy.r119_benchmark`, `coordpy.r120_benchmark`,
+  `coordpy.r121_benchmark`. R-119 (16 cell families) + R-120 (12
+  cell families) + R-121 (12 cell families) at 3 seeds verify
+  **40/40 H-bars (H86..H106) pass 3/3 seeds** — strong success
+  per the W58 success criterion. Cumulative trust boundary
+  across W22..W58 = **614 enumerated failure modes**. W58
+  modules are reachable only through explicit imports;
+  `coordpy.__version__` remains `0.5.20`; SDK contract byte-for-
+  byte unchanged. No PyPI release.
+  `W58-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP` carries forward
+  unchanged; `W58-L-V3-NO-BACKPROP-CAP` documents that W58 fits
+  only KV-bridge / HSB inject scales (coordinate descent) and a
+  single linear cache-controller scoring head (closed-form
+  ridge), with no end-to-end backprop; `W58-L-V10-OUTER-NOT-
+  TRAINED-CAP`, `W58-L-ECC-V10-RATE-FLOOR-CAP`, `W58-L-CACHE-
+  CONTROLLER-LINEAR-CAP`, `W58-L-MULTI-HOP-V8-SYNTHETIC-
+  BACKENDS-CAP`, and `W58-L-V10-PERMUTATION-INVARIANCE-CAP` are
+  the additional honest caps; `W58-C-DEEP-TRANSFORMER-COUPLING`
+  and `W58-C-FRONTIER-SCALE-SUBSTRATE-LIFT` carry forward as
+  conjectures on frontier-scale model substrate access.
+
 - **W57 Deep Substrate-Coupled Latent Operating System**
   (post-W56, 2026-05-13) — *second substrate-attack milestone;
   first **bidirectional** substrate breach.* Ships at

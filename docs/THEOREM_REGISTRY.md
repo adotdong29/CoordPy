@@ -14,7 +14,66 @@
 > - **conjectural** — stated, falsifiable; not yet proved or systematically tested.
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
-> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13.
+> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13.
+
+## W58 Deep Cache-Reuse Substrate-Coupled Latent Operating System (W58-T-* and W58-L-* / W58-C-*)
+
+| Claim | One-line description | Status | Code/proof anchor |
+| ----- | -------------------- | ------ | ------------------ |
+| W58-T-SUBSTRATE-V3-FORWARD-DETERMINISM | Identical params + token_ids + cache → byte-identical logits / hidden / attention / cache | mechanically-checked | `tiny_substrate_v3.forward_tiny_substrate_v3`; test `test_tiny_substrate_v3_forward_determinism`; H86 |
+| W58-T-SUBSTRATE-V3-KV-REUSE | Splitting a V3 forward at any prefix and reusing the KV cache reproduces the full forward's last-position logits within float64 precision | mechanically-checked | `_attention_layer_forward_v3`; test `test_tiny_substrate_v3_kv_cache_reuse` |
+| W58-T-SUBSTRATE-V3-CAUSAL-MASK-STRICT | Upper-triangle attention weights are exactly 0 for all heads / layers / queries | mechanically-checked | mask construction in `_attention_layer_forward_v3`; test `test_tiny_substrate_v3_causal_mask`; H86c |
+| W58-T-SUBSTRATE-V3-GQA-CACHE-SMALLER | The V3 KV cache stores n_kv_heads × d_head per layer (< d_model) when n_kv_heads < n_heads | proved (by inspection) | `_split_heads_kv`; test `test_tiny_substrate_v3_gqa_cache_smaller`; H86b |
+| W58-T-SUBSTRATE-V3-LOGIT-LENS | Per-layer logit lens length = n_layers + 1 | mechanically-checked | `forward_tiny_substrate_v3.per_layer_logit_lens`; test `test_tiny_substrate_v3_logit_lens`; H86d |
+| W58-T-SUBSTRATE-V3-FLOP-COUNTER | Real fp64 flop counter > 0; sum of per-layer ≤ total | mechanically-checked | `forward_tiny_substrate_v3`; test `test_tiny_substrate_v3_flop_count` |
+| W58-T-SUBSTRATE-V3-IMPORTANCE-VECTORS | Per-layer KV importance vectors exist, length = n_new tokens | mechanically-checked | `forward_tiny_substrate_v3.kv_importance_per_layer`; test `test_tiny_substrate_v3_importance_vectors_per_layer` |
+| W58-T-SUBSTRATE-V3-PARTIAL-FORWARD | `partial_forward_layers_l_to_end_v3` runs only the suffix and returns logits of the same shape as the full forward | mechanically-checked | `partial_forward_layers_l_to_end_v3`; test `test_tiny_substrate_v3_partial_forward` |
+| W58-T-KV-BRIDGE-V3-PERTURBATION | KV bridge V3 produces a measurable last-position L2 perturbation > 0.01 on random carriers | empirical | `bridge_carrier_and_measure_v3`; test `test_kv_bridge_v3_perturbs`; H87a |
+| W58-T-KV-BRIDGE-V3-FITTED-SCALE | Fitted KV bridge V3 inject scale produces \|L2 − target\| ≤ unfitted residual on the same probe | empirical (residual ≤ 0.05 × target at target=5.0) | `fit_inject_scale_v3`; test `test_kv_bridge_v3_fits_target`; H87b |
+| W58-T-KV-BRIDGE-V3-BANKS-DISTINCT | Role banks A and B produce different L2 perturbations on the same carrier (Δ > 1e-3) | empirical | `KVBridgeV3Projection.project(role=...)`; test `test_kv_bridge_v3_banks_distinct`; H87c |
+| W58-T-HSB-V2-MULTI-LAYER-PERTURBS | HSB V2 multi-layer injection produces non-zero last-position L2 perturbation | empirical (6.3 mean L2 on the H88 probe) | `bridge_hidden_state_and_measure_v2`; test `test_hsb_v2_multi_layer_perturbs`; H88 |
+| W58-T-PREFIX-STATE-V2-BYTE-IDENTICAL | Prefix-state V2 reuse matches full recompute (max-abs diff < 1e-9) | empirical (≤ 5e-16 max-abs diff) | `bridge_prefix_state_and_measure_v2`; test `test_prefix_state_v2_reuse_byte_identical`; H100a |
+| W58-T-PREFIX-STATE-V2-FLOP-SAVED | Prefix-state V2 reuse saves measurable fp64 flops vs full recompute | empirical (0.667 mean savings ratio on the H100b probe) | `bridge_prefix_state_and_measure_v2`; test `test_prefix_state_v2_flop_saved_positive`; H100b |
+| W58-T-PREFIX-STATE-V2-CORRUPTION-DETECTED | Deliberate prefix-state corruption is detected via post-CID mismatch | mechanically-checked | `corrupt_prefix_state_v3` + bridge; test `test_prefix_state_v2_corruption_detected` |
+| W58-T-PREFIX-STATE-V2-CROSS-SEED-DRIFT | Replaying a prefix-state on a different-seed substrate produces measurable L2 drift > 0.1 | empirical (7.1 mean L2 drift on the H100c probe) | `bridge_prefix_state_and_measure_v2` `cross_seed_params` path; H100c |
+| W58-T-ATTN-V2-KL-BUDGET-ENFORCED | A coordinate-descent global clip enforces max-KL ≤ budget × (1 + 1e-6) | mechanically-checked | `steer_attention_and_measure_v2`; test `test_attn_v2_kl_budget_enforced`; H105 |
+| W58-T-CACHE-CONTROLLER-COMPETITIVE | Importance policy L1 drift ≤ 1.25 × uniform L1 drift at retention=0.5 across seeds | empirical (3/3 seeds on the H89 probe) | `apply_cache_controller_and_measure`; test `test_cache_controller_uniform_argmax_at_full_retention`; H89 |
+| W58-T-CACHE-CONTROLLER-FULL-RETENTION-NO-OP | At retention=1.0, the controller is a no-op (argmax preserved) | mechanically-checked | `apply_cache_controller_and_measure`; test `test_cache_controller_uniform_argmax_at_full_retention`; H89b |
+| W58-T-CACHE-CONTROLLER-LEARNED-FIT | `fit_learned_cache_controller` closed-form ridge solves and returns a (d_model,) scoring head | mechanically-checked | `fit_learned_cache_controller`; test `test_cache_controller_learned_fit_completes` |
+| W58-T-DEEP-HYBRID-V3-THREE-WAY | Deep hybrid V3 forward sets `three_way=True` and produces non-zero `substrate_back_l2` AND `ablation_perturbation_l2` AND `cache_eviction_perturbation_l2` | mechanically-checked | `deep_substrate_hybrid_v3_forward`; test `test_deep_hybrid_v3_three_way`; H99 |
+| W58-T-V10-CHAIN-WALK-512 | V10 chain walk depth = 512; cell has 8 layers | mechanically-checked | `PersistentLatentStateV10Chain.walk_from`; test `test_persistent_v10_512_chain_walk`; H101 |
+| W58-T-V10-CARRIER-ROUND-TRIP-DETERMINISTIC | Identical inputs to `step_persistent_state_v10` produce byte-identical CIDs | mechanically-checked | `step_persistent_state_v10`; test `test_persistent_v10_round_trip_deterministic`; H101d |
+| W58-T-MULTI-HOP-V8-CHAIN-LEN-11 | 12-backend chain-length-11 fidelity probe runs with chain_length = 11, n_edges = 132 | mechanically-checked | `evaluate_dec_chain_len11_fidelity`; test `test_multi_hop_v8_chain_len_11`; H102 |
+| W58-T-MLSC-V6-ATTENTION-CHAIN-INHERITANCE | MLSC V6 merge inherits the union of parents' attention_witness_chain | mechanically-checked | `MergeOperatorV6.merge`; test `test_mlsc_v6_attention_chain_inheritance`; H91 |
+| W58-T-MLSC-V6-CACHE-REUSE-WITNESS | MLSC V6 merge carries the cache_reuse_witness_cid through | mechanically-checked | `MergeOperatorV6.merge`; H91b |
+| W58-T-CONSENSUS-V4-EIGHT-STAGE | Decision chain has exactly 8 named stages | proved (by construction) | `W58_CONSENSUS_V4_STAGES`; test `test_consensus_v4_8_stages`; H94 |
+| W58-T-CONSENSUS-V4-CACHE-REUSE-FIRES | When earlier stages fail and a cache_reuse_oracle is wired, the controller picks the cache_reuse_replay stage | mechanically-checked | `ConsensusFallbackControllerV4.decide`; test `test_consensus_v4_cache_reuse_fires`; H94b |
+| W58-T-CRC-V6-KV64-DETECT | 64-bucket fingerprint detects a single-byte change in the underlying KV bytes ≥ 95% | empirical (1.0 mean) | `kv_cache_fingerprint_64`; test `test_crc_v6_kv64_detect_rate_high`; H92 |
+| W58-T-CRC-V6-PREFIX-STATE-DETECT | Prefix-state corruption is detected via 64-bucket fingerprint divergence ≥ 95% | empirical (1.0 mean) | `detect_prefix_state_corruption`; H92b |
+| W58-T-LHR-V10-FOUR-WAY-RUNS | `evaluate_lhr_v10_four_way` returns proxy / substrate / hidden / attention MSEs without crashing | mechanically-checked | `evaluate_lhr_v10_four_way`; test `test_lhr_v10_four_way_runs`; H90 |
+| W58-T-LHR-V10-ATTENTION-HEAD-WINS-ON-ALIGNED | When targets are explicitly attention-projected, the attention head MSE ≤ substrate head MSE | mechanically-checked (constructive) | `evaluate_lhr_v10_four_way`; H90b |
+| W58-T-ECC-V10-21-BITS-PER-VISIBLE-TOKEN | ECC V10 delivers ≥ 21.0 structured bits per visible token at full emit | empirical (21.333) | `compress_carrier_ecc_v10`; test `test_ecc_v10_bits_per_token_meets_target`; H97a |
+| W58-T-ECC-V10-TOTAL-CODES | ECC V10 codebook has exactly 524 288 codes | proved (by construction) | `ECCCodebookV10.total_codes`; test `test_ecc_v10_total_codes`; H97b |
+| W58-T-ECC-V10-RATE-FLOOR-FALSIFIER | The 1024-bit/visible-token target is provably above the structural ceiling implied by the codebook size | proved (info bound = log2(524288) = 19) | `probe_ecc_v10_rate_floor_falsifier`; test `test_ecc_v10_rate_floor_falsifier`; H95 |
+| W58-T-TVS-V7-EIGHT-ARMS | The TVS V7 arm list has exactly 8 entries | proved (by construction) | `W58_TVS_V7_ARMS`; test `test_tvs_v7_eight_arms`; H93 |
+| W58-T-TVS-V7-CACHE-REUSE-DOMINATES | When `cache_fidelity` is the strict highest score, `cache_reuse_replay` is picked at rate 1.0 | mechanically-checked | `eight_arm_compare`; test `test_tvs_v7_cache_reuse_dominates_when_high`; H93b |
+| W58-T-UNCERTAINTY-V6-CACHE-AWARE | Differing cache_reuse_fidelities produces a `cache_aware=True` composite | mechanically-checked | `compose_uncertainty_report_v6`; test `test_uncertainty_v6_cache_aware`; H103 |
+| W58-T-UNCERTAINTY-V6-BRACKET | pessimistic ≤ weighted ≤ optimistic for any non-empty composite | proved-conditional (on non-negative adversarial radius) | `compose_uncertainty_report_v6`; test `test_uncertainty_v6_bracket_holds`; H103b |
+| W58-T-DA-V4-CACHE-IDENTITY | For a cache-reuse oracle that returns `matches=True`, the V4 cache-reuse-equivalence identity holds | mechanically-checked | `disagreement_algebra_v4.check_cache_reuse_equivalence_identity`; test `test_disagreement_algebra_v4_cache_identity`; H104 |
+| W58-T-SUBSTRATE-ADAPTER-V3-TIERS | The V3 in-repo runtime probes as `substrate_v3_full`; synthetic as `text_only` | mechanically-checked | `_decide_tier_v3`; test `test_substrate_adapter_v3_tiers`; H98 |
+| W58-T-W58-ENVELOPE-VERIFIER-FAILURE-MODE-COUNT | `W58_ENVELOPE_VERIFIER_FAILURE_MODES` enumerates ≥ 45 disjoint modes | proved (by enumeration: 46 entries) | `W58_ENVELOPE_VERIFIER_FAILURE_MODES`; test `test_w58_envelope_failure_modes_disjoint_and_at_least_45` |
+| W58-T-W58-ENVELOPE-VERIFIER-OK-CLEAN | A clean W58 team run passes `verify_w58_handoff` with `failures == []` | mechanically-checked | `verify_w58_handoff`; test `test_w58_envelope_clean_verify_ok` |
+| W58-T-W58-ENVELOPE-OUTER-CID-STABLE | Two identical-config team runs produce identical envelope CIDs | mechanically-checked | end-to-end determinism; test `test_w58_envelope_outer_cid_stable_across_runs` |
+| W58-T-W58-TRIVIAL-PASSTHROUGH-W57-CID | Trivial W58 wraps a W57 outer CID such that the W58 envelope's `w57_outer_cid` equals it verbatim | mechanically-checked | `build_trivial_w58_envelope`; test `test_w58_trivial_passthrough_w57_outer_cid_carries` |
+| W58-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP | Hosted backends remain text-only at the HTTP surface; W58 cannot bridge into them | mechanically-checked (carries forward W57) | `substrate_adapter_v3` |
+| W58-L-V3-NO-BACKPROP-CAP | The V3 substrate, KV bridge V3 fit, HSB V2 fit, and cache controller all use no end-to-end backprop; only finite-difference / closed-form / coordinate-descent fits over a small inject-scale or scoring-head subspace | proved (by inspection) | `fit_inject_scale_v3`; `fit_hsb_v2_inject_scale`; `fit_learned_cache_controller` |
+| W58-L-V10-OUTER-NOT-TRAINED-CAP | The V10 outer GRU + attention-skip linear are initialised but not trained end-to-end | proved (by inspection of `V10StackedCell.init`) | `persistent_latent_v10.V10StackedCell` |
+| W58-L-ECC-V10-RATE-FLOOR-CAP | The 1024-bit/token target exceeds the V10 structural ceiling (info bound = log2(524288) = 19); ECC V10's honest rate is 21.333 bits/visible-token | proved (info bound) | `probe_ecc_v10_rate_floor_falsifier` |
+| W58-L-CACHE-CONTROLLER-LINEAR-CAP | The learned cache controller is a single linear scoring head, not a deep network | proved (by inspection) | `fit_learned_cache_controller` |
+| W58-L-MULTI-HOP-V8-SYNTHETIC-BACKENDS-CAP | The 12 backends are named and simulated, not executed | proved (by inspection) | `evaluate_dec_chain_len11_fidelity` |
+| W58-L-V10-PERMUTATION-INVARIANCE-CAP | Carries forward V9 EMA-smoothing permutation-invariance cap | proved (by inspection of V10 EMA logic) | `step_persistent_state_v10` EMA paths |
+| W58-C-DEEP-TRANSFORMER-COUPLING | The W58 substrate bridges (KV V3 fitted + HSB V2 + prefix-state V2 + attention V2 + cache controller) generalise to a frontier transformer if its runtime exposes compatible hooks | conjectural | open until a frontier runtime exposes substrate hooks |
+| W58-C-FRONTIER-SCALE-SUBSTRATE-LIFT | If frontier runtimes exposed the W58 hooks, the bridges would scale-monotonically improve usefulness on multi-agent context-zero coordination | conjectural | open; depends on third-party access |
 
 ## W57 Deep Substrate-Coupled Latent Operating System (W57-T-* and W57-L-* / W57-C-*)
 

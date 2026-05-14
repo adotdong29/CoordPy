@@ -1,6 +1,81 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W56 / W57, 2026-05-13 —
+> **Latest milestone marker (post-W57 / W58, 2026-05-13 —
+> Deep Cache-Reuse Substrate-Coupled Latent Operating System,
+> sixteenth post-release research milestone — third substrate-
+> attack milestone, the first **three-way** substrate breach
+> with **real flop-saved counters** as a benchmark-load-bearing
+> axis).**
+> *Eighteen orthogonal substrate-coupling and capsule-native
+> advances on top of W57: M1 ``coordpy.tiny_substrate_v3``
+> (richer 5-layer / 8-query-head / 4-KV-head GQA / d_model=64 /
+> RMSNorm / SwiGLU / KV importance tracking / real fp64 flop
+> counter / partial-forward / 64-bucket KV fingerprint); M2
+> ``coordpy.kv_bridge_v3`` (fitted per-(layer, head) inject
+> scales via coordinate descent, role-conditioned KV banks
+> bank_a/bank_b, 64-bucket readback fingerprint); M3
+> ``coordpy.hidden_state_bridge_v2`` (multi-layer fitted
+> injection); M4 ``coordpy.prefix_state_bridge_v2`` (real
+> flop-saved counter — 66.7% savings on H100b — redundant copy
+> CID, cross-seed drift L2); M5
+> ``coordpy.attention_steering_bridge_v2`` (KL-budget
+> enforcement, per-head ablation); M6 ``coordpy.cache_controller``
+> (uniform / importance / **learned** closed-form ridge over a
+> leave-one-out drop oracle); M7 ``coordpy.persistent_latent_v10``
+> (8-layer, **sextuple** skip with attention-pattern EMA,
+> max_chain_walk_depth=512); M8 ``coordpy.deep_substrate_hybrid_v3``
+> (**three-way** V6 ↔ substrate V3 ↔ cache controller); M9
+> ``coordpy.multi_hop_translator_v8`` (12 backends, 132 directed
+> edges, chain-length-11, substrate × hidden × attention three-
+> axis trust composite); M10
+> ``coordpy.mergeable_latent_capsule_v6`` (attention_witness_chain,
+> cache_reuse_witness_cid, two new algebra signatures
+> {cache_reuse_replay, attention_steer}); M11
+> ``coordpy.consensus_fallback_controller_v4`` (**8-stage** chain
+> adding `cache_reuse_replay` between `logit_lens` and
+> `best_parent`); M12 ``coordpy.corruption_robust_carrier_v6``
+> (64-bucket Reed-Solomon fingerprint + prefix-state corruption
+> detect + adversarial 7-bit burst detect); M13
+> ``coordpy.long_horizon_retention_v10`` (9 heads, max_k=72,
+> attention-conditioned head); M14 ``coordpy.ecc_codebook_v10``
+> (K1..K9 = 524 288 codes, **21.333 bits/visible-token**); M15
+> ``coordpy.transcript_vs_shared_arbiter_v7`` (**8-arm** policy
+> adding `cache_reuse_replay`); M16 ``coordpy.uncertainty_layer_v6``
+> (5th axis cache_reuse_fidelity); M17
+> ``coordpy.disagreement_algebra_v4`` (cache-reuse equivalence
+> identity); M18 ``coordpy.substrate_adapter_v3`` (five new
+> capability axes + new top tier `substrate_v3_full`).
+> R-119 (16 cell families) + R-120 (12 cell families) + R-121
+> (12 cell families) at 3 seeds verify H86..H106; **40/40
+> H-bars pass 3/3 seeds (strong success)**. Cumulative trust
+> boundary across W22..W58 = **614 enumerated failure modes**.
+> W58 modules ship at ``coordpy.tiny_substrate_v3``,
+> ``coordpy.kv_bridge_v3``, ``coordpy.hidden_state_bridge_v2``,
+> ``coordpy.prefix_state_bridge_v2``,
+> ``coordpy.attention_steering_bridge_v2``,
+> ``coordpy.cache_controller``,
+> ``coordpy.persistent_latent_v10``,
+> ``coordpy.deep_substrate_hybrid_v3``,
+> ``coordpy.multi_hop_translator_v8``,
+> ``coordpy.mergeable_latent_capsule_v6``,
+> ``coordpy.consensus_fallback_controller_v4``,
+> ``coordpy.corruption_robust_carrier_v6``,
+> ``coordpy.long_horizon_retention_v10``,
+> ``coordpy.ecc_codebook_v10``,
+> ``coordpy.transcript_vs_shared_arbiter_v7``,
+> ``coordpy.uncertainty_layer_v6``,
+> ``coordpy.disagreement_algebra_v4``,
+> ``coordpy.substrate_adapter_v3``, ``coordpy.w58_team``,
+> ``coordpy.r119_benchmark``, ``coordpy.r120_benchmark``,
+> ``coordpy.r121_benchmark`` — reachable only via explicit
+> import. ``coordpy.__version__`` remains ``0.5.20``; SDK
+> contract is byte-for-byte unchanged. No PyPI release.
+> ``W58-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` carries
+> forward; ``W58-L-V3-NO-BACKPROP-CAP`` is the new honest cap;
+> ``W58-C-DEEP-TRANSFORMER-COUPLING`` and
+> ``W58-C-FRONTIER-SCALE-SUBSTRATE-LIFT`` carry forward.
+>
+> **Earlier milestone marker (post-W56 / W57, 2026-05-13 —
 > Deep Substrate-Coupled Latent Operating System, fifteenth
 > post-release research milestone — second substrate-attack
 > milestone, the first **bidirectional** substrate breach).**
