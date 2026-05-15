@@ -2,6 +2,117 @@
 
 > Main paper draft for the Context Zero programme.
 >
+> **Post-W59 research-line update (W60 Trainable Cache-Control
+> Substrate-Coupled Latent Operating System, 2026-05-14).**
+> *Fifth substrate-attack milestone in the programme; first
+> **multi-direction multi-target closed-form ridge fits** across
+> several substrate-facing surfaces simultaneously (KV bridge V5
+> over `n_directions` orthogonal correction directions; HSB V4
+> per-(layer, head) δ tensor; cache controller V3
+> ``trained_eviction`` + ``composite_v3`` mixture); first first-
+> class **state-reuse-vs-recompute-vs-fallback-vs-abstain
+> ReplayController**; first **five-way substrate ↔ V6 ↔ cache
+> controller V3 ↔ replay controller ↔ retrieval head** hybrid
+> loop; first **hidden-vs-KV head-to-head** harness on a fixed
+> target logit direction (falsifiable: at least one arm wins or
+> it's a tie). The post-W59 question — *can the in-repo
+> substrate carry trained controllers across multiple substrate-
+> facing features in concert (not just one head at a time), and
+> can a first-class replay-vs-recompute policy be wired into the
+> substrate without losing the ridge-only honest-scope
+> boundary?* — is answered by W60 with eighteen orthogonal
+> advances. The substrate gets richer
+> (``coordpy.tiny_substrate_v5``: 7 layers, 8 query heads, 4 KV
+> heads with GQA, ``d_model=64``, RMSNorm, SwiGLU FF, **per-
+> (layer, head, position) cumulative attention-receive matrix**
+> that survives evictions, **per-(layer, head) linearised logit
+> Jacobian table**, **per-(layer, position) corruption flag
+> channel**, **multi-segment partial-prefix reuse** with reuse +
+> recompute + drop kinds and per-segment flop accounting). Six
+> W60 substrate-facing controllers sit on top, all with closed-
+> form ridge-fitted parameters: ``coordpy.kv_bridge_v5`` solves a
+> real ``(n_directions × n_directions)`` ridge linear system over
+> substrate-side Jacobian estimates from finite differences and
+> exposes a separate logit-direction fit, two correction layers,
+> all-bank fingerprint over {bank_a, bank_b, bank_c, bank_d}, and
+> a ``extract_carrier_from_v5_kv_cache`` reverse-extract that
+> returns the carrier estimate via least-squares against the V5
+> projection matrix (residual L2 < 1e-3 on uncorrupted banks);
+> ``coordpy.hidden_state_bridge_v4`` solves a 16-dim ridge
+> problem for the per-(layer, head) inject-scale δ tensor that
+> brings the projected last-position logit shift closest to a
+> caller-supplied ``Δlogit`` direction, ships a recovery path
+> against adversarial per-(layer, head) attacks, and a KV-vs-
+> Hidden head-to-head harness on the same target;
+> ``coordpy.prefix_state_bridge_v4`` ships multi-segment partial
+> reuse on the V5 substrate with chain forward over a follow-up
+> sequence reporting per-step drift L2 + cumulative envelope (~46%
+> flop saving on the standard split);
+> ``coordpy.attention_steering_bridge_v4`` enforces per-(layer,
+> head, query) 3-D KL budgets and reports L1 attention-mass shift
+> alongside KL plus a negative-budget falsifier (budget=0 ⇒
+> post-KL < 1e-6); ``coordpy.cache_controller_v3`` keeps V2's
+> five policies and adds four new — ``learned_attention_receive``
+> (closed-form ridge over the per-(layer, head) cumulative
+> attention-receive feature), ``learned_corruption_aware`` (V2 +
+> hard ``-inf`` floor on flagged slots), ``trained_eviction``
+> (closed-form ridge over a `[hidden, importance,
+> attention_receive_l1, retrieval]` feature against the V1 leave-
+> one-out drop oracle, reducing residual from 28.4 → 0.39 on
+> R-125), and ``composite_v3`` (4-feature ridge mixture);
+> ``coordpy.replay_controller`` is the programme's first first-
+> class state-reuse-vs-recompute-vs-fallback-vs-abstain policy
+> with audit log + flop-vs-drift trade-off curve. The five-way
+> ``coordpy.deep_substrate_hybrid_v5`` couples V6 ↔ substrate V5
+> ↔ cache controller V3 ↔ replay controller ↔ retrieval head;
+> its forward witness reports ``five_way=True`` end-to-end. The
+> persistent latent state advances to V12 (10 layers, octuple
+> skip-link adding a replay-controller-decision EMA,
+> ``max_chain_walk_depth = 1024``, distractor-resistant projection
+> against a Gram-Schmidt-fitted random orthonormal basis), multi-
+> hop translator V10 spans 16 backends with 240 directed edges
+> and chain-length-15 with a five-axis substrate × hidden ×
+> attention × retrieval × replay trust composite + a compromise-
+> threshold detector, MLSC V8 propagates `replay_witness_chain` +
+> `substrate_witness_chain` + `provenance_trust_table`, consensus
+> V6 has a 10-stage chain adding `replay_controller_choice`
+> between `retrieval_replay` and `best_parent`, CRC V8 doubles
+> the KV fingerprint bucket count to 256 with wrap-around-XOR so
+> single-byte flips are *always* detectable, ships a
+> `recover_v8_kv_cache` operator that writes per-(layer, position)
+> corruption flags into the V5 cache, an adversarial 11-bit burst
+> family, and a post-replay top-K agreement floor ≥ pre-replay,
+> LHR V12 adds an 11th replay-conditioned reconstruction head at
+> ``max_k=96`` and a two-layer scorer (random projection +
+> frozen ReLU + closed-form ridge over the post-ReLU features),
+> ECC V12 layers a K11 stage on top of V11 (2 097 152 codes =
+> 2^21; 23.333 bits/visible-token at full emit), TVS V9 grows to
+> 10 arms adding `replay_controller_choice`, uncertainty V8 grows
+> to 7 axes adding `replay_fidelity`, disagreement algebra V6
+> adds a replay-controller equivalence identity with falsifier,
+> and substrate adapter V5 introduces seven new capability axes
+> plus a new top tier `substrate_v5_full` reached only by the V5
+> in-repo runtime. R-125 (20 cell families) + R-126 (13 cell
+> families) + R-127 (12 cell families) at 3 seeds verify **45/45
+> H-bars (H125..H143b) pass 3/3 seeds (135/135 cells)**.
+> Cumulative trust boundary across W22..W60 = **715 enumerated
+> failure modes**. ``W60-L-V5-NO-AUTOGRAD-CAP`` documents that
+> every fit is a single-step closed-form linear ridge over a
+> small subspace (no SGD, no autograd, no GPU); ``W60-L-NO-THIRD-
+> PARTY-SUBSTRATE-COUPLING-CAP`` carries forward unchanged;
+> ``W60-L-V12-OUTER-NOT-TRAINED-CAP``, ``W60-L-ECC-V12-RATE-
+> FLOOR-CAP``, ``W60-L-LHR-V12-SCORER-FIT-CAP``,
+> ``W60-L-CORRUPTION-FLAG-CHANNEL-CAP``, ``W60-L-MULTI-HOP-V10-
+> SYNTHETIC-BACKENDS-CAP``, and ``W60-L-V12-PERMUTATION-
+> INVARIANCE-CAP`` are the additional honest caps;
+> ``W60-C-DEEP-TRANSFORMER-COUPLING``, ``W60-C-AUTOGRAD-OUTER-
+> LEARNED-OS``, and ``W60-C-HIDDEN-DOMINATES-KV-AT-SCALE`` carry
+> forward as conjectures on frontier-scale substrate access and
+> autograd-trained controllers. W60 is reachable only through
+> explicit imports; ``coordpy.__version__`` remains ``0.5.20``;
+> the released v0.5.20 wheel's public surface is byte-for-byte
+> unchanged; no PyPI release.
+>
 > **Post-W58 research-line update (W59 Trainable Substrate-
 > Conditioned Latent Operating System, 2026-05-14).**
 > *Fourth substrate-attack milestone in the programme; first

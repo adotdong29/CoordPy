@@ -1,6 +1,44 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W58 / W59, 2026-05-14 —
+> **Latest milestone marker (post-W59 / W60, 2026-05-14 —
+> Trainable Cache-Control Substrate-Coupled Latent Operating
+> System, eighteenth post-release research milestone — fifth
+> substrate-attack milestone, first **multi-direction multi-
+> target closed-form ridge fits**, first first-class **state-
+> reuse-vs-recompute-vs-fallback-vs-abstain ReplayController**,
+> first **five-way substrate ↔ V6 ↔ cache controller V3 ↔
+> replay controller ↔ retrieval head** hybrid loop, and first
+> **hidden-vs-KV head-to-head** harness on a fixed target logit
+> direction. R-125 (20 cell families) + R-126 (13) + R-127 (12)
+> deliver **45/45 H-bars (H125..H143b) pass 3/3 seeds (135/135
+> cells)**. ``W60-L-V5-NO-AUTOGRAD-CAP`` documents that all
+> "training" remains single-step closed-form linear ridge over a
+> small subspace; no SGD / autograd / GPU. Cumulative trust
+> boundary across W22..W60 = **715 enumerated failure modes**
+> (663 from W22..W59 + 52 new W60 envelope verifier modes). W60
+> ships at ``coordpy.tiny_substrate_v5``,
+> ``coordpy.kv_bridge_v5``, ``coordpy.hidden_state_bridge_v4``,
+> ``coordpy.prefix_state_bridge_v4``,
+> ``coordpy.attention_steering_bridge_v4``,
+> ``coordpy.cache_controller_v3``, ``coordpy.replay_controller``,
+> ``coordpy.persistent_latent_v12``,
+> ``coordpy.deep_substrate_hybrid_v5``,
+> ``coordpy.multi_hop_translator_v10``,
+> ``coordpy.mergeable_latent_capsule_v8``,
+> ``coordpy.consensus_fallback_controller_v6``,
+> ``coordpy.corruption_robust_carrier_v8``,
+> ``coordpy.long_horizon_retention_v12``,
+> ``coordpy.ecc_codebook_v12``,
+> ``coordpy.transcript_vs_shared_arbiter_v9``,
+> ``coordpy.uncertainty_layer_v8``,
+> ``coordpy.disagreement_algebra_v6``,
+> ``coordpy.substrate_adapter_v5``, ``coordpy.w60_team``,
+> ``coordpy.r125_benchmark`` / ``coordpy.r126_benchmark`` /
+> ``coordpy.r127_benchmark`` — reachable only through explicit
+> imports; the released v0.5.20 wheel's public surface is byte-
+> for-byte unchanged; no PyPI release.*
+>
+> **Preceding milestone marker (post-W58 / W59, 2026-05-14 —
 > Trainable Substrate-Conditioned Latent Operating System,
 > seventeenth post-release research milestone — fourth substrate-
 > attack milestone, the first **closed-form ridge fit of a real

@@ -13,6 +13,93 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W60 Trainable Cache-Control Substrate-Coupled Latent
+  Operating System** (post-W59, 2026-05-14) — *fifth substrate-
+  attack milestone; first **multi-direction multi-target closed-
+  form ridge fits** (KV bridge V5 over `n_directions` orthogonal
+  correction directions; HSB V4 per-(layer, head) δ tensor;
+  cache controller V3 `trained_eviction` + `composite_v3`
+  mixture); first **first-class state-reuse-vs-recompute-vs-
+  fallback-vs-abstain ReplayController**; first **five-way
+  substrate ↔ V6 ↔ cache controller V3 ↔ replay controller ↔
+  retrieval head** hybrid loop; first **hidden-vs-KV head-to-
+  head** harness on a fixed target logit direction (falsifiable:
+  at least one arm wins or it's a tie).* Ships at
+  `coordpy.tiny_substrate_v5` (7-layer / 8-query-head / 4-KV-head
+  GQA / d_model=64 / RMSNorm / SwiGLU / per-(layer, head,
+  position) cumulative attention-receive matrix / per-(layer,
+  head) linearised logit Jacobian table / per-(layer, position)
+  corruption flag channel / multi-segment partial-prefix reuse
+  with reuse + recompute + drop kinds), `coordpy.kv_bridge_v5`
+  (multi-direction closed-form ridge fit, logit-direction fit,
+  two correction layers, all-bank fingerprint, reverse-extract
+  via least-squares with residual L2 ≤ 2.4e-7 typical),
+  `coordpy.hidden_state_bridge_v4` (per-(layer, head) closed-
+  form ridge fit of inject-scale tensor, recovery from
+  adversarial per-head perturbation, KV-vs-Hidden head-to-head
+  harness), `coordpy.prefix_state_bridge_v4` (multi-segment
+  partial reuse on V5; chain forward with per-step drift L2 +
+  cumulative envelope; ~46% flop saving on standard split),
+  `coordpy.attention_steering_bridge_v4` (per-(layer, head,
+  query) 3-D budget tensor; measurable attention-map L1 mass
+  shift; negative-budget falsifier),
+  `coordpy.cache_controller_v3` (four new policies:
+  `learned_attention_receive`, `learned_corruption_aware`,
+  `trained_eviction`, `composite_v3`; trained_eviction reduces
+  residual against the V1 leave-one-out drop oracle from 28.4
+  → 0.39, ≈73x improvement), `coordpy.replay_controller` (first
+  first-class state-reuse-vs-recompute-vs-fallback-vs-abstain
+  policy with audit log + flop-vs-drift trade-off),
+  `coordpy.persistent_latent_v12` (**10-layer**, **octuple**
+  skip-link with replay-EMA, max_chain_walk_depth=1024,
+  distractor-resistant projection),
+  `coordpy.deep_substrate_hybrid_v5` (**five-way** V6 ↔
+  substrate V5 ↔ cache controller V3 ↔ replay controller ↔
+  retrieval head; `five_way=True` in real runs),
+  `coordpy.multi_hop_translator_v10` (16 backends, 240 directed
+  edges, chain-length-15, substrate × hidden × attention ×
+  retrieval × replay **five-axis** trust composite + compromise-
+  threshold detector), `coordpy.mergeable_latent_capsule_v8`
+  (`replay_witness_chain` + `substrate_witness_chain` +
+  `provenance_trust_table` all union-inherited; two new algebra
+  signatures {`replay_choice`, `substrate_state_inject`}),
+  `coordpy.consensus_fallback_controller_v6` (**10-stage** chain
+  adding `replay_controller_choice` between `retrieval_replay`
+  and `best_parent`), `coordpy.corruption_robust_carrier_v8`
+  (**256-bucket** wrap-around-XOR fingerprint with guaranteed
+  single-byte detection at any blob length, `recover_v8_kv_cache`
+  operator, adversarial 11-bit burst, post-replay top-K
+  agreement floor ≥ pre-replay),
+  `coordpy.long_horizon_retention_v12` (11-head V12 with
+  replay-conditioned head, max_k=96, two-layer scorer:
+  random projection + frozen ReLU + closed-form ridge over the
+  post-ReLU features), `coordpy.ecc_codebook_v12` (**11-level**;
+  K1..K11 = 2 097 152 codes = 2^21; 23.333 bits/visible-token
+  at full emit; 2048 bits/token falsifier reproduces honestly),
+  `coordpy.transcript_vs_shared_arbiter_v9` (10-arm: adds
+  `replay_controller_choice`),
+  `coordpy.uncertainty_layer_v8` (**7th** weighting axis
+  `replay_fidelity`), `coordpy.disagreement_algebra_v6` (adds
+  replay-controller-equivalence identity with falsifier),
+  `coordpy.substrate_adapter_v5` (7 new capability axes,
+  `substrate_v5_full` tier on V5 only), `coordpy.w60_team`
+  (W60 envelope with `w59_outer_cid` chain forward; verifier
+  enumerates 52 disjoint failure modes; trivial passthrough
+  preserved). R-125 + R-126 + R-127 at 3 seeds verify
+  H125..H143b — 45 of 45 H-bars pass 3/3 seeds (135/135 cells).
+  W60 envelope chain end-to-end: `W59 envelope CID ==
+  W60.w59_outer_cid` (verified live). Honest scope:
+  `W60-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP` documents that
+  hosted backends remain text-only at the HTTP surface
+  unchanged; `W60-L-V5-NO-AUTOGRAD-CAP` is the new ridge-only
+  cap (no SGD, no autograd, no GPU);
+  `W60-L-V12-OUTER-NOT-TRAINED-CAP`,
+  `W60-L-ECC-V12-RATE-FLOOR-CAP`,
+  `W60-L-LHR-V12-SCORER-FIT-CAP`, and
+  `W60-L-CORRUPTION-FLAG-CHANNEL-CAP` document the new honest
+  caps. SDK contract byte-for-byte unchanged. NOT a release;
+  `coordpy.__version__` remains `"0.5.20"`. NO PyPI release.
+
 - **W59 Trainable Substrate-Conditioned Latent Operating
   System** (post-W58, 2026-05-14) — *fourth substrate-attack
   milestone; first **closed-form ridge fit of a real substrate-

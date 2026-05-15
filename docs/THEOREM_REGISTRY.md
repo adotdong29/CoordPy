@@ -14,7 +14,69 @@
 > - **conjectural** — stated, falsifiable; not yet proved or systematically tested.
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
-> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14.
+> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14; post-W59 W60 Trainable Cache-Control Substrate-Coupled Latent OS milestone added 2026-05-14.
+
+## W60 Trainable Cache-Control Substrate-Coupled Latent Operating System (W60-T-* and W60-L-* / W60-C-*)
+
+| Claim | One-line description | Status | Code/proof anchor |
+| ----- | -------------------- | ------ | ------------------ |
+| W60-T-SUBSTRATE-V5-FORWARD-DETERMINISM | Identical params + token_ids → byte-identical V5 trace CID | mechanically-checked | `tiny_substrate_v5.forward_tiny_substrate_v5`; test `test_tiny_substrate_v5_determinism_and_multi_segment_reuse`; H125 |
+| W60-T-SUBSTRATE-V5-ATTENTION-RECEIVE | Per-(layer, head, position) cumulative EMA of attention received survives evictions and is non-zero on real forwards | mechanically-checked | `TinyV5KVCache.update_attention_receive`; H125b |
+| W60-T-SUBSTRATE-V5-LOGIT-JACOBIAN-TABLE | Per-(layer, head) linearised Jacobian table at the last position has shape `(n_layers, n_heads)` | mechanically-checked | `logit_jacobian_v5`; H125c |
+| W60-T-SUBSTRATE-V5-CORRUPTION-FLAG-CHANNEL | Per-(layer, position) corruption flag table is read/writeable; CRC V8 writes, controller V3 reads | mechanically-checked | `TinyV5KVCache.set_corruption_flag` + `recover_v8_kv_cache`; H125d |
+| W60-T-SUBSTRATE-V5-MULTI-SEGMENT-REUSE | Forward through `forward_with_multi_segment_reuse_v5` honours per-segment reuse / recompute / drop kinds with measurable per-segment flop split | mechanically-checked | `forward_with_multi_segment_reuse_v5`; H129 |
+| W60-T-KV-BRIDGE-V5-MULTI-DIR-RIDGE | Closed-form ridge fit on the V5 correction over `n_directions` orthogonal directions reduces mean residual (post ≤ pre + 1e-9) | mechanically-checked (closed-form solve) | `fit_kv_bridge_v5_correction`; H126 |
+| W60-T-KV-BRIDGE-V5-LOGIT-DIR-FIT | Closed-form ridge fit against a target logit-shift direction reduces mean residual (post ≤ pre + 1e-9) | mechanically-checked | `fit_kv_bridge_v5_logit_direction`; H126b |
+| W60-T-KV-BRIDGE-V5-REVERSE-EXTRACT | Reverse-extract from a V5 cache via least-squares against the projection returns carrier estimate with residual L2 < 1e-3 on uncorrupted banks | empirical (≤ 2.4e-7 typical) | `extract_carrier_from_v5_kv_cache`; H126c |
+| W60-T-HSB-V4-PER-HEAD-RIDGE-FIT | Per-(layer, head) closed-form ridge fit (16-dim feature) reduces mean residual (post ≤ pre + 1e-9) | mechanically-checked | `fit_hsb_v4_per_head_target`; H127 |
+| W60-T-HSB-V4-RECOVERY | Counter-perturbation against an adversarial per-(layer, head) attack reduces residual to within 1e-9 of pre-attack | mechanically-checked | `recover_hsb_v4_inject`; H127b |
+| W60-T-HIDDEN-VS-KV-COMPARE | Hidden-V4-vs-KV-V4 head-to-head returns one of {hidden_beats_kv, kv_beats_hidden, tie} on each carrier | mechanically-checked | `compare_hidden_vs_kv_injection_v4`; H132 |
+| W60-T-ATTN-V4-PER-QUERY-BUDGET | Per-(layer, head, query) KL clip enforces max-KL ≤ budget + 1e-3 for every (l,h,q) under iterative shrink | mechanically-checked | `steer_attention_and_measure_v4`; H128 |
+| W60-T-ATTN-V4-NEGATIVE-BUDGET-FALSIFIER | Setting per-query budget to all-zero forces the post-KL to < 1e-6 and no attention shift | mechanically-checked | `steer_attention_and_measure_v4(negative_budget=True)`; H128b |
+| W60-T-PREFIX-V4-MULTI-SEGMENT-FLOP-SAVING | Multi-segment partial reuse on the V5 substrate saves > 0 flops vs full recompute on standard splits | empirical (~46% saving) | `bridge_prefix_state_and_measure_v4`; H129 |
+| W60-T-PREFIX-V4-CHAIN-DRIFT-RECORDED | Chain forward over a follow-up sequence reports per-step drift L2 and cumulative drift envelope | mechanically-checked | `bridge_prefix_state_and_measure_v4`; H129b |
+| W60-T-CACHE-V3-TRAINED-EVICTION | Closed-form ridge fit on the trained-eviction feature reduces mean residual against the V1 leave-one-out drop oracle (post ≤ pre + 1e-9) | mechanically-checked | `fit_trained_eviction_controller`; H130 |
+| W60-T-CACHE-V3-COMPOSITE-WEIGHTS | 4-feature ridge mixture weights are fit by closed-form ridge against the drop oracle (post ≤ pre + 1e-9) | mechanically-checked | `fit_composite_v3_controller`; H130b |
+| W60-T-REPLAY-CTRL-CHOOSES-REUSE | ReplayController chooses REUSE on CRC-passed candidate with saving above floor and drift below ceiling | mechanically-checked | `ReplayController.decide`; H131 |
+| W60-T-REPLAY-CTRL-CHOOSES-RECOMPUTE | ReplayController chooses RECOMPUTE on CRC-failed candidate when recompute is under flop ceiling | mechanically-checked | `ReplayController.decide`; H131b |
+| W60-T-DEEP-HYBRID-V5-FIVE-WAY | Five-way bidirectional bridge V6 ↔ substrate V5 ↔ cache V3 ↔ replay controller ↔ retrieval head sets `five_way=True` under default config | mechanically-checked | `deep_substrate_hybrid_v5_forward`; H132b |
+| W60-T-PERSISTENT-V12-OCTUPLE-SKIP | Persistent V12 carries 8 skip carriers (V11's 7 + replay decision EMA) through 64+ turns | mechanically-checked | `step_persistent_state_v12`; H134 / H134b |
+| W60-T-PERSISTENT-V12-DISTRACTOR-BASIS | Distractor basis at init has rank == 4 (Gram-Schmidt over random) | mechanically-checked | `V12StackedCell.__init__`; H134c |
+| W60-T-MULTI-HOP-V10-FIVE-AXIS | 5-axis composite trust (substrate × hidden × attention × retrieval × replay) at chain-length 15 over 16 backends and 240 edges | mechanically-checked | `five_axis_trust_arbitration` + `evaluate_dec_chain_len15_fidelity`; H137 |
+| W60-T-MULTI-HOP-V10-COMPROMISE-THRESHOLD | Compromise threshold ≥ 1 (adversary needs to drive at least 1 axis to zero on dominant path to flip outcome) | empirical | `estimate_compromise_threshold`; H137b |
+| W60-T-MLSC-V8-REPLAY-CHAIN-INHERITANCE | Replay witness chain inherits as union of parent chains plus merge addition | mechanically-checked | `MergeOperatorV8.merge`; H143 |
+| W60-T-MLSC-V8-SUBSTRATE-CHAIN-INHERITANCE | Substrate witness chain + provenance trust table inherit as union of parents plus merge addition | mechanically-checked | `MergeOperatorV8.merge`; H143b |
+| W60-T-CONSENSUS-V6-TEN-STAGES | Consensus chain has exactly 10 disjoint stages | mechanically-checked | `W60_CONSENSUS_V6_STAGES`; H140 |
+| W60-T-CONSENSUS-V6-REPLAY-STAGE-FIRES | Replay-controller-conditioned stage fires when only the replay oracle resolves the tie | mechanically-checked | `ConsensusFallbackControllerV6.decide`; H140b |
+| W60-T-CRC-V8-256-BUCKET-DETECT | 256-bucket fingerprint detect rate for single-byte flips ≥ 0.99 | empirical (1.0 observed) | `kv_cache_fingerprint_256`; H139 |
+| W60-T-CRC-V8-POST-REPLAY-AGREEMENT | Post-replay top-K agreement rate is ≥ pre-replay top-K agreement rate (replay restores corrupted slot) | empirical | `emit_corruption_robustness_v8_witness`; H139b |
+| W60-T-CRC-V8-ADVERSARIAL-11BIT-BURST | 11-bit adversarial burst detect rate ≥ 0.95 | empirical | `emit_corruption_robustness_v8_witness`; H139c |
+| W60-T-LHR-V12-SIX-WAY | Six-way reconstruction (proxy / substrate / hidden / attention / retrieval / replay) reports finite MSEs without crashing | mechanically-checked | `evaluate_lhr_v12_six_way`; H135 |
+| W60-T-LHR-V12-TWO-LAYER-SCORER-FIT | Two-layer scorer (frozen ReLU + ridge) reduces residual on synthetic supervised set (post ≤ pre + 1e-9) | mechanically-checked | `fit_lhr_v12_two_layer_retention_scorer`; H135b |
+| W60-T-ECC-V12-BITS-PER-TOKEN | ≥ 23.0 bits/visible-token at full emit | empirical (23.333) | `compress_carrier_ecc_v12`; H136 |
+| W60-T-ECC-V12-TOTAL-CODES | Total codebook size = 2^21 = 2 097 152 | mechanically-checked | `ECCCodebookV12.total_codes`; H136b |
+| W60-T-ECC-V12-RATE-FLOOR-FALSIFIER | 2048-bit/token target reproduces the structural ceiling (above log2(2 097 152) = 21) | mechanically-checked | `probe_ecc_v12_rate_floor_falsifier`; H136c |
+| W60-T-TVS-V9-TEN-ARMS-SUM-TO-ONE | Pick-rates over 10 arms sum to 1.0 within 1e-9 tolerance | mechanically-checked | `ten_arm_compare`; H138 |
+| W60-T-TVS-V9-REPLAY-DOMINATES | Replay arm pick-rate ≥ 0.9 when replay fidelity is strict highest among all axes | empirical | `ten_arm_compare`; H138b |
+| W60-T-UNCERTAINTY-V8-BRACKETS | pessimistic ≤ weighted ≤ optimistic for every input | mechanically-checked | `compose_uncertainty_report_v8`; H141 |
+| W60-T-UNCERTAINTY-V8-REPLAY-AWARE | replay_aware = True when replay fidelities are distinct or not all 1.0 | mechanically-checked | `compose_uncertainty_report_v8`; H141b |
+| W60-T-DA-V6-REPLAY-EQUIV-IDENTITY | Replay-controller equivalence identity holds under valid oracle (argmax_preserved AND l2_drift ≤ tol) | mechanically-checked | `check_replay_controller_equivalence_identity`; H142 |
+| W60-T-DA-V6-REPLAY-FALSIFIER | Replay-controller equivalence identity fails under flipped/oracle-disagreement | mechanically-checked | `check_replay_controller_equivalence_identity`; H142b |
+| W60-T-W60-ENVELOPE-VERIFIER | Envelope verifier enumerates ≥ 50 disjoint failure modes; rejects each by name | mechanically-checked (52 modes) | `verify_w60_handoff` + `W60_ENVELOPE_VERIFIER_FAILURE_MODES`; module test |
+| W60-T-W60-TRIVIAL-PASSTHROUGH | Trivial W60 envelope's `w59_outer_cid` carries the supplied W59 outer CID byte-for-byte | mechanically-checked | `build_trivial_w60_envelope`; module test |
+| W60-T-SUBSTRATE-ADAPTER-V5-TIER | `tiny_substrate_v5` is the only backend on which the adapter matrix returns `substrate_v5_full` tier | mechanically-checked | `probe_tiny_substrate_v5_adapter`; H133 |
+| W60-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP | Hosted backends (Ollama / OpenAI-compatible) remain text-only at the HTTP surface | empirical (carries forward unchanged from W57/W58/W59) | `substrate_adapter_v5` |
+| W60-L-V5-NO-AUTOGRAD-CAP | All W60 fits are single closed-form linear ridge solves; no SGD, no autograd, no GPU | empirical | `kv_bridge_v5`, `hidden_state_bridge_v4`, `cache_controller_v3`, `long_horizon_retention_v12` |
+| W60-L-NUMPY-CPU-V5-SUBSTRATE-CAP | V5 substrate is 7 layers / 8 query heads / 4 KV heads / d_model=64 / vocab=259 / pure NumPy on CPU | empirical | `tiny_substrate_v5` |
+| W60-L-V12-OUTER-NOT-TRAINED-CAP | Persistent V12's outer GRU + replay-skip projection are initialised but not trained end-to-end | empirical (carries forward V11's cap) | `persistent_latent_v12` |
+| W60-L-V12-PERMUTATION-INVARIANCE-CAP | V12 EMA carriers are permutation-invariant by construction; sequence ordering smooths out | empirical | `step_persistent_state_v12` |
+| W60-L-ECC-V12-RATE-FLOOR-CAP | V12 codebook supports log2(2 097 152) = 21 raw data bits per segment-tuple; targets above this are unattainable | proved | `ECCCodebookV12.total_codes` |
+| W60-L-LHR-V12-SCORER-FIT-CAP | LHR V12 two-layer scorer's first layer is *random + frozen*; only the second layer is fit by ridge | empirical | `fit_lhr_v12_two_layer_retention_scorer` |
+| W60-L-CORRUPTION-FLAG-CHANNEL-CAP | V5 corruption flag channel is a *channel*, not a detector; flags must be written by external CRC V8 to be observable to the controller | empirical | `TinyV5KVCache.set_corruption_flag` |
+| W60-L-MULTI-HOP-V10-SYNTHETIC-BACKENDS-CAP | The 16 multi-hop "backends" are *named*, not *executed*; this is a graph + trust arbiter, not a multi-machine harness | empirical | `multi_hop_translator_v10` |
+| W60-C-DEEP-TRANSFORMER-COUPLING | Substrate coupling at the level of W60 (KV bridge V5 + HSB V4 + cache controller V3 + replay controller) is reproducible on a hosted third-party model with substrate access | conjectural (open) | currently blocked by W60-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP |
+| W60-C-AUTOGRAD-OUTER-LEARNED-OS | An end-to-end autograd-trained outer GRU + ReplayController + cache controller V3 outperforms the closed-form ridge baseline on R-125+R-126 by ≥ 5% on bits/visible-token AND ≥ 5% on retention MSE | conjectural (open) | future W6x line |
+| W60-C-HIDDEN-DOMINATES-KV-AT-SCALE | At a frontier-scale substrate, hidden-state V4 per-(layer, head) ridge fit dominates KV-V4 single-α fit on the target logit shift | conjectural (currently observed only on tiny V5) | `compare_hidden_vs_kv_injection_v4` |
 
 ## W59 Trainable Substrate-Conditioned Latent Operating System (W59-T-* and W59-L-* / W59-C-*)
 
