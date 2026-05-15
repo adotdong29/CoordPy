@@ -3960,6 +3960,102 @@ anchor (reusing the W53 quint scaffold + a synthetic 6th
 tag F). Released SDK contract preserved byte-for-byte;
 ``coordpy.__version__`` remains ``0.5.20``.
 
+## W55..W62 Substrate-Attack Programme (post-W54, 2026-05-12 → 2026-05-15)
+
+The W55..W62 programme is a seven-milestone substrate-attack
+that turns the capsule-layer operating system from W43..W54 into
+a substrate-coupled latent operating system. Each milestone adds
+in-repo substrate axes, closed-form ridge fits, and a
+bidirectional hybrid loop. W56 cracked the in-repo substrate
+open with a 5-layer NumPy transformer. W57 added hidden-state
+injection, prefix-state reuse, and attention steering. W58 made
+cache reuse load-bearing. W59 introduced single-α ridge
+corrections. W60 expanded to multi-direction multi-target ridge
+fits + a first-class ReplayController. W61 added a content-
+addressable cache-key axis, a bilinear retrieval head, a trained
+replay-threshold head, a 4-D attention-budget tensor, a multi-
+target stacked HSB fit, an attention-pattern-target KV fit, and
+a six-way bidirectional loop.
+
+W62 is the **seventh substrate-attack milestone**. It adds a
+**per-(layer, head, slot) cache-write ledger axis** inside the
+in-repo V7 NumPy substrate (9 layers), a **per-layer logit-lens
+probe**, a **per-(layer, head, position) attention-receive
+delta** channel, a **per-(layer, head) replay-trust ledger**, a
+**trained per-regime replay head** (replay controller V3 with 4
+regime heads + nearest-centroid regime gate), a **trained
+hidden-vs-KV regime classifier** (5×3 ridge with ≥ 0.8 training
+accuracy on synthetic supervision), a **trained corruption-
+repair head** (cache controller V5 with 4-dim ridge), a
+**two-objective stacked ridge fit** (drop-oracle + retrieval-
+relevance simultaneously), a **drift-curve predictor** (prefix V6
+with stacked 4×K ridge), a **two-stage attention clamp**
+(attention V6 with coarse L1-mass + fine per-(L,H,Q,K) KL), and
+a **seven-way bidirectional substrate ↔ V7 ↔ cache controller V5
+↔ replay controller V3 ↔ retrieval head ↔ attention-steering V6
+↔ hidden-vs-KV classifier** hybrid loop (deep substrate hybrid
+V7).
+
+Across W56..W62 the released SDK contract is preserved byte-for-
+byte; ``coordpy.__version__`` remains ``0.5.20``; no PyPI
+release. The seven-milestone envelope chain is verified live:
+``W55 envelope CID == W56.w55_outer_cid``,
+``W56 envelope CID == W57.w56_outer_cid``, …,
+``W61 envelope CID == W62.w61_outer_cid``.
+
+W62 fits twelve closed-form linear ridge solves (seven from W61
++ five new):
+
+1. KV bridge V6 multi-target — (n_directions × m) matrix.
+2. KV bridge V6 attention-pattern — (n_directions × 1) against
+   last-row attention L1 target.
+3. HSB V5 multi-target stack — worst-residual column reduction.
+4. Cache controller V4 bilinear retrieval — (d_model × d_key) M
+   matrix.
+5. Cache controller V4 trained corruption floor — 3-dim quadratic.
+6. Replay controller V2 threshold head — 6×4 against label one-hot.
+7. LHR V13 third-layer scorer — random+ReLU → random+tanh →
+   ridge.
+
+W62 adds:
+
+8. Cache controller V5 two-objective stacked — n_features × 2
+   matrix.
+9. Cache controller V5 trained-repair — 4-dim vector against
+   repair amount target.
+10. Cache controller V5 composite_v5 — 6-vector mixture against
+    drop oracle.
+11. Replay controller V3 per-regime head — 6×4 per regime, 4
+    regimes total.
+12. Replay controller V3 hidden-vs-KV classifier — 5×3 against
+    3-class label.
+
+R-131 (13 cell families) + R-132 (12 cell families) + R-133 (20
+cell families) at 3 seeds verify H163..H180 — 45 of 45 H-bars
+pass 3/3 seeds (135/135 cells, strong success per the W62
+success criterion). Cumulative trust boundary across W22..W62 =
+**844 enumerated failure modes**.
+
+W62's honest scope is unchanged. The in-repo V7 substrate is
+``W62-L-NUMPY-CPU-V7-SUBSTRATE-CAP`` (9 layers / d_model=64 /
+byte-vocab / max_len=128 / untrained NumPy on CPU, NOT a
+frontier model). Hosted backends remain text-only at the HTTP
+surface (``W62-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``). The
+12-ridge-solve closed-form fit is ``W62-L-V7-NO-AUTOGRAD-CAP``
+(no SGD, no autograd, no GPU). The persistent V14 outer GRU
+remains untrained (``W62-L-V14-OUTER-NOT-TRAINED-CAP``). The
+multi-hop V12 backends remain NAMED, not EXECUTED
+(``W62-L-MULTI-HOP-V12-SYNTHETIC-BACKENDS-CAP``). The trained
+corruption-repair head outputs an *additive* correction; it does
+NOT un-corrupt the raw cached state
+(``W62-L-CONSENSUS-V8-REPAIR-STAGE-SYNTHETIC-CAP``). The
+hidden-vs-KV classifier achieves ≥ 0.8 training accuracy on
+**synthetic** supervision; it does NOT itself prove hidden-state
+injection beats KV injection on real models or real workloads.
+
+W62 is the strongest honest substrate-coupling milestone the
+programme has shipped to date.
+
 ## References
 
 Bibliography intentionally omitted from this Markdown draft.

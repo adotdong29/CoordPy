@@ -13,6 +13,134 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W62 Trainable Replay-Dominance Hidden-vs-KV Substrate-
+  Coupled Latent Operating System** (post-W61, 2026-05-15) —
+  *seventh substrate-attack milestone; first **per-(layer,
+  head, slot) cache-write ledger axis** inside an in-repo NumPy
+  substrate (V7), first **per-layer logit-lens probe**, first
+  **per-(layer, head, position) attention-receive delta**, first
+  **per-(layer, head) replay-trust ledger**, first **trained
+  hidden-vs-KV regime classifier** (closed-form ridge over a
+  5-dim regime feature against a 3-class label), first
+  **trained per-regime replay head** (replay controller V3,
+  4 regimes × 6×4 ridge per-regime softmax head + nearest-
+  centroid regime gate), first **trained corruption-repair head**
+  (cache controller V5, 4-dim ridge over [flag_count,
+  hidden_write, replay_age, attention_receive_l1] against
+  repair amount), first **two-objective stacked ridge fit**
+  (cache controller V5, drop-oracle + retrieval-relevance
+  simultaneously), first **drift-curve predictor** (prefix V6,
+  stacked 4×K ridge over [reuse_len, recompute_len, drop_len, 1]
+  against K-step drift curve target), first **two-stage
+  attention clamp** (attention V6, coarse L1-mass clamp + fine
+  per-(L,H,Q,K) KL clamp), and first **seven-way bidirectional
+  substrate ↔ V7 ↔ cache controller V5 ↔ replay controller V3
+  ↔ retrieval head ↔ attention-steering V6 ↔ hidden-vs-KV
+  classifier** hybrid loop.* Ships at
+  `coordpy.tiny_substrate_v7` (9-layer / 8-query-head / 4-KV-head
+  GQA / d_model=64 / RMSNorm / SwiGLU / per-(layer, head, slot)
+  cache-write ledger / per-layer logit-lens probe / per-(layer,
+  head, position) attention-receive delta / per-(layer, head)
+  replay-trust ledger),
+  `coordpy.kv_bridge_v7` (V7 layer-d correction additive on
+  top of V6 layer-c; three-target stacked ridge fit; ledger
+  write into V7 cache; hidden-vs-KV decision tap),
+  `coordpy.hidden_state_bridge_v6` (three-target stacked ridge
+  fit; V7 ledger write; V2 recovery audit with post-recovery
+  margin),
+  `coordpy.prefix_state_bridge_v6` (drift-curve predictor:
+  stacked 4×K closed-form ridge over [reuse_len, recompute_len,
+  drop_len, 1] against K-step drift curve target),
+  `coordpy.attention_steering_bridge_v6` (two-stage clamp;
+  per-bucket signed-coefficient falsifier),
+  `coordpy.cache_controller_v5` (three new policies:
+  `two_objective_v5` / `trained_repair_v5` / `composite_v5`;
+  two-objective stacked ridge over drop-oracle + retrieval-
+  relevance; trained-repair head 4-dim ridge; composite_v5
+  6-head mixture ridge),
+  `coordpy.replay_controller_v3` (per-regime 6×4 ridge head
+  trained per regime ∈ {synthetic_corruption,
+  crc_passed_low_drift, hidden_write_heavy, transcript_only};
+  nearest-centroid regime gate; hidden-vs-KV 5×3 ridge
+  classifier with synthetic supervision target accuracy ≥ 0.8;
+  replay-dominance scalar = softmax margin),
+  `coordpy.deep_substrate_hybrid_v7` (seven-way V7 bidirectional
+  loop), `coordpy.substrate_adapter_v7` (4 new axes —
+  `cache_write_ledger` / `logit_lens_probe` /
+  `attention_receive_delta` / `replay_trust_ledger` — and a new
+  top tier `substrate_v7_full` satisfied only by the V7 runtime),
+  `coordpy.persistent_latent_v14` (**12-layer** outer skin over
+  V13, **decuple** persistent skip-link with replay-dominance-
+  EMA, max_chain_walk_depth=2048, distractor rank=8),
+  `coordpy.multi_hop_translator_v12` (**20 backends**, 380
+  directed edges, chain-length-17, **seven-axis** trust
+  composite adding `replay_dominance_trust`, 1 ≤ threshold ≤ 7
+  detector),
+  `coordpy.mergeable_latent_capsule_v10` (adds
+  `replay_dominance_witness_chain`,
+  `disagreement_wasserstein_distance`; two new algebra
+  signatures {`replay_dominance_propagation`,
+  `wasserstein_disagreement`}),
+  `coordpy.consensus_fallback_controller_v8` (**12-stage**
+  chain; inserts `trained_repair` between
+  `attention_pattern_consensus` and `best_parent`),
+  `coordpy.corruption_robust_carrier_v10` (**1024-bucket**
+  wrap-around-XOR fingerprint; **17-bit** adversarial burst
+  family; post-repair top-K Jaccard floor),
+  `coordpy.long_horizon_retention_v14` (**13 heads**, max_k=128,
+  replay-dominance-conditioned head, **four-layer** scorer:
+  random+ReLU → random+tanh → random+tanh-2 → closed-form ridge),
+  `coordpy.ecc_codebook_v14` (**13-level**; K1..K13 = 2^23 =
+  8 388 608 codes; **25.333 bits/visible-token** at full emit;
+  4096-bit/token falsifier reproduces honestly),
+  `coordpy.transcript_vs_shared_arbiter_v11` (**12-arm**
+  adding `replay_dominance`),
+  `coordpy.uncertainty_layer_v10` (**9th** weighting axis
+  `replay_dominance_fidelity`),
+  `coordpy.disagreement_algebra_v8` (adds Wasserstein-1
+  equivalence identity with falsifier),
+  `coordpy.w62_team` (W62 envelope with `w61_outer_cid` chain
+  forward; verifier enumerates **68 disjoint failure modes**;
+  trivial passthrough preserved byte-for-byte),
+  `coordpy.r131_benchmark` (13 cell families — substrate V7 /
+  latent bridge V7 / cache controller V5 / replay controller V3
+  / attention V6), `coordpy.r132_benchmark` (12 cell families —
+  long-horizon retention / persistent V14 / ECC V14 / multi-hop
+  V12), `coordpy.r133_benchmark` (20 cell families — corruption
+  V10 / consensus V8 / uncertainty V10 / disagreement V8 / TVS
+  V11 / capsule V10 / substrate V7 axes / hybrid V7 / adapter
+  V7). R-131 + R-132 + R-133 at 3 seeds verify
+  **H163..H180 — 45 of 45 H-bars pass 3/3 seeds (135/135 cells,
+  strong success per the W62 success criterion)**. W62 envelope
+  chain end-to-end: `W61 envelope CID == W62.w61_outer_cid`
+  (verified live; the test_w62_team_envelope_chain test
+  preserves the supplied W61 outer CID byte-for-byte). Honest
+  scope: `W62-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP` carries
+  forward the W56..W61 cap unchanged on hosted backends;
+  `W62-L-V7-NO-AUTOGRAD-CAP` is the new ridge-only cap (W62
+  fits closed-form ridge parameters in **five new places** on
+  top of W61's seven, totalling **twelve closed-form ridge
+  solves**: cache controller V5 two-objective stacked head;
+  cache controller V5 trained-repair head; cache controller V5
+  composite_v5 mixture; replay controller V3 per-regime head ×
+  4 regimes; replay controller V3 hidden-vs-KV 3-class
+  classifier; HSB V6 three-target stack delegates to V5;
+  prefix V6 drift-curve predictor — no SGD, no autograd, no
+  GPU); `W62-L-V14-OUTER-NOT-TRAINED-CAP`,
+  `W62-L-ECC-V14-RATE-FLOOR-CAP`,
+  `W62-L-V14-LHR-SCORER-FIT-CAP`,
+  `W62-L-NUMPY-CPU-V7-SUBSTRATE-CAP`,
+  `W62-L-V6-PREFIX-DRIFT-CURVE-LINEAR-CAP`,
+  `W62-L-V6-CACHE-CONTROLLER-NO-AUTOGRAD-CAP`,
+  `W62-L-V3-REPLAY-NO-AUTOGRAD-CAP`,
+  `W62-L-V6-HSB-NO-AUTOGRAD-CAP`,
+  `W62-L-V6-ATTN-NO-AUTOGRAD-CAP`,
+  `W62-L-MULTI-HOP-V12-SYNTHETIC-BACKENDS-CAP`,
+  `W62-L-CRC-V10-FINGERPRINT-SYNTHETIC-CAP`,
+  `W62-L-CONSENSUS-V8-REPAIR-STAGE-SYNTHETIC-CAP` document the
+  new honest caps. SDK contract byte-for-byte unchanged.
+  `coordpy.__version__` remains `"0.5.20"`. NO PyPI release.
+
 - **W61 Trainable Hidden-State Substrate-Coupled Latent
   Operating System** (post-W60, 2026-05-15) — *sixth substrate-
   attack milestone; first **content-addressable cache-key axis**

@@ -13526,6 +13526,66 @@ for the pre-committed H1..H36 thresholds and
 
 ---
 
+## W55..W62 — substrate-attack milestones (post-W54, 2026-05-12 → 2026-05-15)
+
+The W55..W62 line is the **seven-milestone substrate-attack
+programme** that turns the W54 capsule-layer operating system
+into a substrate-coupled latent operating system. Each milestone
+adds in-repo substrate axes, closed-form ridge fits, and a
+bidirectional hybrid loop:
+
+- **W55** Deep Trust-Weighted Disagreement-Algebraic Latent OS.
+- **W56** Substrate-Coupled Latent OS — first in-repo tiny
+  transformer runtime (V1, 5 layers).
+- **W57** Deep Substrate-Coupled Latent OS — hidden-state
+  injection, prefix-state reuse, attention steering.
+- **W58** Deep Cache-Reuse Substrate-Coupled Latent OS — V3
+  substrate, cache controller V2, prefix-state V3.
+- **W59** Trainable Substrate-Conditioned Latent OS — V4
+  substrate, single-α ridge correction, single-policy cache
+  controller.
+- **W60** Trainable Cache-Control Substrate-Coupled Latent OS —
+  V5 substrate (7 layers, GQA, per-(layer, head, position)
+  attention-receive matrix, Jacobian table, multi-segment
+  partial reuse); multi-direction multi-target ridge fits;
+  ReplayController.
+- **W61** Trainable Hidden-State Substrate-Coupled Latent OS —
+  V6 substrate (8 layers, content-addressable cache_keys axis,
+  hidden-write trace, replay-age channel, cross-layer
+  coupling); bilinear retrieval head; trained replay-threshold
+  head; 4-D attention-budget tensor; multi-target stacked HSB
+  fit; attention-pattern-target KV fit; six-way bidirectional
+  loop.
+- **W62** Trainable Replay-Dominance Hidden-vs-KV Substrate-
+  Coupled Latent OS — V7 substrate (9 layers, per-(layer, head,
+  slot) cache-write ledger, per-layer logit-lens probe,
+  per-(layer, head, position) attention-receive delta,
+  per-(layer, head) replay-trust ledger); per-regime replay
+  controller V3 with hidden-vs-KV classifier; trained corruption-
+  repair head; two-objective stacked ridge fit; drift-curve
+  predictor; two-stage attention clamp; seven-way bidirectional
+  loop.
+
+The W56..W62 envelope chain end-to-end:
+`w43_pmc_outer → ... → w55_outer → w56_outer → w57_outer →
+w58_outer → w59_outer → w60_outer → w61_outer → w62_outer`.
+
+W56..W62 ship at explicit-import paths only.
+`coordpy.__version__` remains `0.5.20`. The released SDK contract
+is byte-for-byte unchanged. NO PyPI release.
+
+Honest scope: `W62-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP` carries
+forward the W56..W61 cap unchanged on hosted backends. The
+in-repo V7 NumPy substrate is `W62-L-NUMPY-CPU-V7-SUBSTRATE-CAP`
+(9 layers / d_model=64 / byte-vocab / max_len=128 / untrained,
+NOT a frontier model). W62 fits ONLY twelve closed-form linear
+ridge solves (seven from W61 + five new); no SGD, no autograd,
+no GPU. See `docs/SUCCESS_CRITERION_W62_REPLAY_DOMINANCE.md` and
+`docs/THEOREM_REGISTRY.md` (W62-T-* and W62-L-* rows) for the
+pre-committed H163..H180 thresholds and the empirical results.
+
+---
+
 *End of master plan. Changelog lives in the results notes, not
 here. If this document ever becomes a changelog, delete the
 changelog and restore the plan.*

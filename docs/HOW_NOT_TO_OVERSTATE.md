@@ -2,9 +2,121 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W58
-> W59 milestone (Trainable Substrate-Conditioned Latent Operating
-> System research line), 2026-05-14.
+> README-of-README must satisfy these rules. Last touched: post-W61
+> W62 milestone (Trainable Replay-Dominance Hidden-vs-KV Substrate-
+> Coupled Latent Operating System research line), 2026-05-15.
+
+## W62 (Trainable Replay-Dominance Hidden-vs-KV Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
+
+W62 extends W61 with a richer in-repo V7 runtime
+(``coordpy.tiny_substrate_v7``: 9 layers, GQA, four new internal
+axes — per-(layer, head, slot) cache-write ledger, per-layer
+logit-lens probe, per-(layer, head, position) attention-receive
+delta, per-(layer, head) replay-trust ledger), nineteen W62
+mechanism advances (V7 KV bridge, V6 HSB, V6 prefix, V6
+attention, V5 cache controller, V3 replay controller, V7 hybrid,
+V7 adapter, V14 persistent, V12 multi-hop, V10 capsule, V8
+consensus, V10 corruption, V14 LHR, V14 ECC, V11 TVS, V10
+uncertainty, V8 disagreement), and three benchmark families
+(R-131..R-133 with 45 H-bars).
+
+* *"W62 trained the substrate end-to-end"* — **forbidden**.
+  ``W62-L-V7-NO-AUTOGRAD-CAP`` is load-bearing: every W62 fit is
+  a **single-step closed-form linear ridge solve** over a small
+  subspace. Cache controller V5: two-objective stacked head
+  (n_features × 2 matrix), trained-repair head (4-dim vector),
+  composite_v5 mixture (6-vector). Replay controller V3: per-
+  regime 6×4 head × 4 regimes + nearest-centroid regime gate +
+  hidden-vs-KV 5×3 classifier. Plus W61's seven ridge solves
+  carries forward. Total **twelve closed-form linear ridge
+  solves**. No SGD, no autograd, no GPU.
+
+* *"W62 coupled CoordPy to third-party transformer internals"* —
+  **forbidden**. ``W62-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``
+  is load-bearing: hosted backends (Ollama, OpenAI-compatible)
+  remain text-only at the HTTP surface. W62 makes the **in-repo
+  V7 NumPy substrate** more load-bearing, not the third-party
+  hosted-model substrate.
+
+* *"W62's logit-lens probe is the standard research logit lens"* —
+  **forbidden**. The V7 logit-lens probe is a *deterministic
+  linear projection* of each layer's last-position hidden state
+  through a fixed random projection matrix. It is a diagnostic,
+  not a calibrated intermediate-residual-stream interpretation
+  through the unembedding.
+
+* *"W62's hidden-vs-KV classifier proves which arm wins"* —
+  **forbidden**. The 5×3 ridge classifier achieves ≥ 0.8
+  training accuracy on **synthetic supervision** where the
+  labels are constructed from the regime feature. It is a
+  *fitted version of a deterministic decision rule* on a
+  bounded feature space; it does NOT itself prove hidden-state
+  injection beats KV injection on real models or real workloads.
+
+* *"W62's trained corruption-repair head undoes corruption"* —
+  **forbidden**. ``W62-L-CONSENSUS-V8-REPAIR-STAGE-SYNTHETIC-CAP``
+  documents: the repair head outputs an **additive correction**
+  to the eviction score; it does NOT un-corrupt the raw cached
+  state. The corrupted bytes remain corrupted; the controller
+  just decides differently about them.
+
+* *"W62's drift-curve predictor predicts real drift"* —
+  **forbidden**. ``W62-L-V6-PREFIX-DRIFT-CURVE-LINEAR-CAP``:
+  the predictor is a linear ridge on a 3-d
+  ``[reuse_len, recompute_len, drop_len]`` feature stacked
+  across K target steps. It does NOT model token-content-
+  conditional drift; it predicts only the configuration-level
+  drift envelope.
+
+* *"W62's per-regime replay heads are deeply trained"* —
+  **forbidden**. Each per-regime head is a single 6×4 closed-
+  form ridge solve over ≤ 2 candidates per regime in the
+  default config. The regime gate is a nearest-centroid
+  classifier over 5-dim regime features.
+
+* *"W62's two-stage attention clamp uses information theory"* —
+  **forbidden**. ``W62-L-V6-ATTN-NO-AUTOGRAD-CAP``: the V6
+  two-stage clamp is a coarse-then-fine clip-and-rescale loop
+  over a shrunken effective KL budget. Not a calibrated
+  information-theoretic bound.
+
+* *"W62's seven-way bidirectional loop is autonomous"* —
+  **forbidden**. The seven-way loop fires only when all seven
+  axes (V6 hybrid six-way, V5 cache controller fitted heads,
+  V3 replay controller per-regime decisions, hidden-vs-KV
+  classifier fit, V7 cache-write ledger active, V6 attention
+  two-stage clamp active, V6 prefix drift-curve predictor
+  trained) ALL contribute on the same step. This is a
+  *measurable* diagnostic, not a self-driving system.
+
+* *"W62's persistent V14 retains 2048 turns end-to-end"* —
+  **forbidden**. ``W62-L-V14-OUTER-NOT-TRAINED-CAP``: the V14
+  outer wrapper only adds one EMA carrier (replay-dominance)
+  on top of V13's nine carriers; V13's outer GRU stack is
+  unchanged and untrained.
+
+* *"W62's ECC V14 hits 4096 bits/visible-token"* — **forbidden**.
+  ``W62-L-ECC-V14-RATE-FLOOR-CAP``: the structural rate ceiling
+  is log2(2^23) = 23 raw data bits per segment-tuple. The
+  4096-bit target reproduces this cap as the H170c falsifier;
+  the actual emit is 25.333 bits/token.
+
+* *"W62 obsoletes W61"* — **forbidden**. W62 strictly extends
+  W61 byte-for-byte. The W61 envelope CID is preserved as the
+  ``w61_outer_cid`` field in the W62 envelope; the W61 verifier
+  still enumerates 61 disjoint failure modes; W61 modules
+  remain reachable and tested. W62 adds layers on top, not
+  replaces.
+
+* *"W62's multi-hop V12 executes 20 backends"* — **forbidden**.
+  ``W62-L-MULTI-HOP-V12-SYNTHETIC-BACKENDS-CAP``: the 20
+  backends are NAMED, not EXECUTED. V12 is a graph + trust
+  arbiter, not a real multi-machine harness.
+
+* *"W62's CRC V10 is cryptographically secure"* — **forbidden**.
+  ``W62-L-CRC-V10-FINGERPRINT-SYNTHETIC-CAP``: the 1024-bucket
+  fingerprint is wrap-around XOR; the 17-bit adversarial burst
+  is a stress test, not a real adversarial cipher attack.
 
 ## W59 (Trainable Substrate-Conditioned Latent Operating System) — explicit do-not-overstate rules
 

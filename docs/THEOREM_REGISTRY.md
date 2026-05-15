@@ -16,6 +16,74 @@
 >
 > Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14; post-W59 W60 Trainable Cache-Control Substrate-Coupled Latent OS milestone added 2026-05-14; post-W60 W61 Trainable Hidden-State Substrate-Coupled Latent OS milestone added 2026-05-15.
 
+## W62 Trainable Replay-Dominance Hidden-vs-KV Substrate-Coupled Latent Operating System (W62-T-* and W62-L-* / W62-C-*)
+
+| Claim | One-line description | Status | Code/proof anchor |
+| ----- | -------------------- | ------ | ------------------ |
+| W62-T-SUBSTRATE-V7-FORWARD-DETERMINISM | Identical V7 params + token_ids → byte-identical V7 trace CID | mechanically-checked | `tiny_substrate_v7.forward_tiny_substrate_v7`; test `test_tiny_substrate_v7_determinism_and_axes`; H178 |
+| W62-T-SUBSTRATE-V7-CACHE-WRITE-LEDGER | Per-(layer, head, slot) cache-write ledger has shape `(L, H, T)` | mechanically-checked | `TinyV7KVCache.cache_write_ledger`; H178 |
+| W62-T-SUBSTRATE-V7-LOGIT-LENS | Per-layer logit-lens probe returns `(L, V)` | mechanically-checked | `_compute_logit_lens`; H178b |
+| W62-T-SUBSTRATE-V7-ATTENTION-RECEIVE-DELTA | Per-(layer, head, position) attention-receive forward-to-forward delta recorded | mechanically-checked | `_compute_attention_receive_delta`; H178c |
+| W62-T-SUBSTRATE-V7-REPLAY-TRUST-LEDGER | Per-(layer, head) EMA of replay decisions updated via `record_replay_decision_v7` | mechanically-checked | `record_replay_decision_v7`; H178d |
+| W62-T-KV-BRIDGE-V7-THREE-TARGET-RIDGE | Three-target stacked ridge fit on V7 layer-d correction reduces worst-residual target | mechanically-checked | `fit_kv_bridge_v7_three_target`; H165 (V7 layer-d additive) |
+| W62-T-KV-BRIDGE-V7-LEDGER-WRITE | V7 KV bridge writes per-(layer, head, slot) L2 into V7 cache-write ledger | mechanically-checked | `write_kv_bridge_v7_into_v7_cache_ledger`; H178 |
+| W62-T-HIDDEN-VS-KV-V7-DECISION | Three-way hidden_beats_kv ∨ kv_beats_hidden ∨ tie comparison | mechanically-checked | `compare_hidden_vs_kv_v7`; H165 |
+| W62-T-HSB-V6-THREE-TARGET-STACK | Three-target stacked ridge fit on HSB (L, H, P) δ tensor converges (post ≤ pre + 1e-9) | mechanically-checked | `fit_hsb_v6_three_target`; H165b |
+| W62-T-HSB-V6-INTO-V7-LEDGER | HSB V6 writes propagate into V7 substrate cache-write ledger with positive L2 | mechanically-checked | `write_hsb_v6_into_v7_cache_ledger`; H165c |
+| W62-T-HSB-V6-RECOVERY-V2 | Recovery audit with post-recovery margin (pre - post) recorded | mechanically-checked | `recover_hsb_v6_inject_v2`; H165b |
+| W62-T-PREFIX-V6-DRIFT-CURVE | Stacked 4×K closed-form ridge predicts K-step drift curve; per-step pre/post residuals reported | mechanically-checked | `fit_prefix_drift_curve_predictor`; H166 |
+| W62-T-PREFIX-V6-FLOP-SAVING | Multi-segment partial reuse on V5 substrate saves ≥ 25% flops vs full recompute on standard split | empirical | `bridge_prefix_state_and_measure_v4`; H166b |
+| W62-T-ATTN-V6-TWO-STAGE-CLAMP | Two-stage clamp (coarse L1-mass + fine per-(L,H,Q,K) KL) keeps max-KL within budget; negative-budget falsifier returns 0 exactly | mechanically-checked | `steer_attention_and_measure_v6`; H167 |
+| W62-T-ATTN-V6-PER-BUCKET-FALSIFIER | Signed falsifier with per-coarse-bucket signs produces non-zero correlation | mechanically-checked | `steer_attention_and_measure_v6(per_bucket_signs=True)`; H167b |
+| W62-T-CACHE-V5-TWO-OBJECTIVE | Stacked drop-oracle + retrieval-relevance two-objective ridge converges (per-objective post ≤ pre + 1e-9) | mechanically-checked | `fit_two_objective_ridge_v5`; H164 |
+| W62-T-CACHE-V5-TRAINED-REPAIR | 4-dim ridge head over [flag_count, hidden_write, replay_age, attention_receive_l1] against repair amount converges | mechanically-checked | `fit_corruption_repair_head_v5`; H164b |
+| W62-T-CACHE-V5-COMPOSITE-V5 | 6-head ridge mixture against drop oracle converges (post ≤ pre + 1e-9) | mechanically-checked | `fit_composite_v5`; H164c |
+| W62-T-REPLAY-V3-PER-REGIME-RIDGE | Per-regime 6×4 ridge head fit converges on all 4 regimes (per-regime post ≤ pre + 1e-9) | mechanically-checked | `fit_replay_controller_v3_per_regime`; H163c |
+| W62-T-REPLAY-V3-DOMINANCE-VS-TRANSCRIPT | V3 chosen-drift ≤ transcript-fallback-drift on synthetic-corruption regime | empirical | `ReplayControllerV3.decide`; H163 |
+| W62-T-REPLAY-V3-REUSE-DOMINANCE | V3 picks REUSE ≥ V2 picks REUSE on CRC-passed-low-drift regime | empirical | `ReplayControllerV3.decide`; H163b |
+| W62-T-REPLAY-V3-HIDDEN-VS-KV-CLASSIFIER | 5×3 ridge classifier reaches ≥ 0.8 training accuracy on synthetic supervision | mechanically-checked | `fit_hidden_vs_kv_regime_classifier`; H165 |
+| W62-T-DEEP-HYBRID-V7-SEVEN-WAY | Seven-way bidirectional bridge sets `seven_way=True` when all seven axes fire | mechanically-checked | `deep_substrate_hybrid_v7_forward`; H179 |
+| W62-T-SUBSTRATE-V7-ADAPTER-TIER | `substrate_v7_full` tier satisfied only by the V7 in-repo runtime | mechanically-checked | `probe_tiny_substrate_v7_adapter` + `_decide_tier_v7`; H180 |
+| W62-T-PERSISTENT-V14-DECUPLE-SKIP | Persistent V14 carries 10 skip carriers (V13's 9 + replay-dominance EMA) through 2048+ turns | mechanically-checked | `step_persistent_state_v14`; H168 / H168b |
+| W62-T-PERSISTENT-V14-DISTRACTOR-RANK | Distractor basis rank ≥ 8 (V13 was 6, V12 was 4) | mechanically-checked | `W62_DEFAULT_V14_DISTRACTOR_RANK`; H168c |
+| W62-T-MULTI-HOP-V12-SEVEN-AXIS | 7-axis composite trust at chain-length 17 over 20 backends and 380 directed edges | mechanically-checked | `seven_axis_trust_arbitration` + `evaluate_dec_chain_len17_fidelity`; H171 |
+| W62-T-MULTI-HOP-V12-COMPROMISE-THRESHOLD | Compromise threshold in [1, 7] | empirical | `estimate_compromise_threshold_v12`; H171c |
+| W62-T-LHR-V14-THIRTEEN-WAY | 13-head reconstruction (V13's 12 + replay-dominance) runs without crashing | mechanically-checked | `LongHorizonReconstructionV14Head.thirteen_way_value`; H169 |
+| W62-T-LHR-V14-FOUR-LAYER-SCORER | Closed-form ridge fit on the post-tanh-2 feature converges | mechanically-checked | `fit_lhr_v14_four_layer_scorer`; H169c |
+| W62-T-ECC-V14-BITS-PER-TOKEN | ≥ 25.0 bits/visible-token at full emit | empirical (25.333) | `compress_carrier_ecc_v14`; H170 |
+| W62-T-ECC-V14-TOTAL-CODES | Total codebook size = 2^23 = 8 388 608 | mechanically-checked | `ECCCodebookV14.total_codes`; H170b |
+| W62-T-ECC-V14-RATE-FLOOR-FALSIFIER | 4096-bit/token target reproduces structural ceiling (above log2(2^23) = 23) | mechanically-checked | `probe_ecc_v14_rate_floor_falsifier`; H170c |
+| W62-T-MLSC-V10-REPLAY-DOMINANCE-CHAIN | Replay-dominance witness chain inherits as union at merge | mechanically-checked | `MergeOperatorV10.merge`; H177 |
+| W62-T-MLSC-V10-WASSERSTEIN-DISTANCE | Disagreement Wasserstein-1 distance computed at merge time | mechanically-checked | `MergeOperatorV10.merge`; H177b |
+| W62-T-CRC-V10-1024-BUCKET-DETECT | 1024-bucket fingerprint single-byte detect rate ≥ 0.95 | empirical (1.0) | `kv_cache_fingerprint_1024`; H172 |
+| W62-T-CRC-V10-17BIT-BURST | 17-bit adversarial burst detect rate ≥ 0.95 | empirical | `emit_corruption_robustness_v10_witness`; H172b |
+| W62-T-CRC-V10-POST-REPAIR-JACCARD | Post-repair top-K Jaccard floor ≥ 0.5 | empirical (1.0) | `post_repair_topk_jaccard`; H172c |
+| W62-T-CONSENSUS-V8-TWELVE-STAGES | Consensus chain has exactly 12 disjoint stages (V7's 11 + trained_repair) | mechanically-checked | `W62_CONSENSUS_V8_STAGES`; H173 |
+| W62-T-CONSENSUS-V8-REPAIR-STAGE-FIRES | trained_repair stage fires under detected corruption + repair amount above threshold | mechanically-checked | `ConsensusFallbackControllerV8.decide_v8`; H173b |
+| W62-T-UNCERTAINTY-V10-NINE-AXIS | 9-axis weighted composite returns value in [0, 1] | mechanically-checked | `compose_uncertainty_report_v10`; H174 |
+| W62-T-UNCERTAINTY-V10-RD-AWARE | `replay_dominance_aware` flips True when any fidelity < 1.0 | mechanically-checked | `compose_uncertainty_report_v10`; H174b |
+| W62-T-DA-V8-WASSERSTEIN-IDENTITY | Wasserstein-1 equivalence identity holds iff argmax preserved AND Wasserstein-1 ≤ floor | mechanically-checked | `check_wasserstein_equivalence_identity`; H175 |
+| W62-T-DA-V8-WASSERSTEIN-FALSIFIER | Falsifier triggers when argmax not preserved OR Wasserstein-1 > floor | mechanically-checked | `wasserstein_equivalence_falsifier`; H175b |
+| W62-T-TVS-V11-TWELVE-ARMS-SUM-TO-ONE | Pick-rates over 12 arms sum to 1.0 within 1e-6 | mechanically-checked | `twelve_arm_compare`; H176 |
+| W62-T-TVS-V11-REPLAY-DOMINANCE-ARM-FIRES | Replay-dominance arm fires when fidelity is strict highest score | mechanically-checked | `twelve_arm_compare`; H176b |
+| W62-T-TVS-V11-REDUCES-TO-V10 | When replay_dominance_fidelity = 0, V11 reduces to V10 (no replay-dominance arm) | mechanically-checked | `twelve_arm_compare`; H176c |
+| **W62-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP (limitation theorem)** | **Hosted backends (Ollama, OpenAI-compatible) remain text-only on the HTTP surface; W62 makes no claim of third-party transformer-internal access.** | **proved-conditional limitation theorem (W56..W62 carry forward unchanged)** | `coordpy.substrate_adapter.probe_ollama_adapter` returns `text_only` tier on every observable Ollama backend; `probe_openai_compatible_adapter` ditto. |
+| **W62-L-V7-NO-AUTOGRAD-CAP (limitation theorem)** | **W62 fits ONLY twelve closed-form linear ridge solves (seven from W61 + five new): cache controller V5 two-objective stacked; cache controller V5 trained-repair; cache controller V5 composite_v5; replay controller V3 per-regime head × 4 regimes; replay controller V3 hidden-vs-KV 3-class classifier. NO end-to-end backprop, NO autograd, NO GPU.** | **proved-by-inspection limitation theorem** | `fit_two_objective_ridge_v5`, `fit_corruption_repair_head_v5`, `fit_composite_v5`, `fit_replay_controller_v3_per_regime`, `fit_hidden_vs_kv_regime_classifier`. |
+| **W62-L-NUMPY-CPU-V7-SUBSTRATE-CAP (limitation theorem)** | **The V7 substrate is 9 layers / d_model=64 / byte-vocab / max_len=128 / untrained NumPy on CPU. NOT a frontier model.** | **proved-by-inspection** | `coordpy.tiny_substrate_v7.TinyV7SubstrateConfig` defaults. |
+| **W62-L-V14-OUTER-NOT-TRAINED-CAP (limitation theorem)** | **The V14 outer wrapper adds one carrier (replay-dominance EMA) but does NOT train the V13 outer GRU end-to-end.** | **proved-by-inspection** | `step_persistent_state_v14` only EMAs the new carrier. |
+| **W62-L-ECC-V14-RATE-FLOOR-CAP (limitation theorem)** | **Structural rate ceiling log2(2^23) = 23 raw data bits per segment-tuple. 4096-bit/token target reproduces this cap as H170c.** | **mechanically-checked** | `probe_ecc_v14_rate_floor_falsifier`. |
+| **W62-L-V14-LHR-SCORER-FIT-CAP (limitation theorem)** | **The V14 four-layer scorer's first three layers (random+ReLU, random+tanh, random+tanh-2) are FROZEN; only the final ridge head is fit.** | **proved-by-inspection** | `fit_lhr_v14_four_layer_scorer`. |
+| **W62-L-V6-PREFIX-DRIFT-CURVE-LINEAR-CAP (limitation theorem)** | **The prefix V6 drift-curve predictor is a linear ridge on a 3-d segment-configuration feature stacked across K target steps; it does NOT model token-content-conditional drift.** | **proved-by-inspection** | `fit_prefix_drift_curve_predictor`. |
+| **W62-L-V6-CACHE-CONTROLLER-NO-AUTOGRAD-CAP (limitation theorem)** | **Cache controller V5 fits three new heads via closed-form ridge: two-objective (n_features × 2), trained-repair (4-dim), composite_v5 (6-vector mixture). No autograd.** | **proved-by-inspection** | `fit_two_objective_ridge_v5` + `fit_corruption_repair_head_v5` + `fit_composite_v5`. |
+| **W62-L-V3-REPLAY-NO-AUTOGRAD-CAP (limitation theorem)** | **Replay controller V3 fits 4 closed-form 6×4 ridge heads (one per regime) + a nearest-centroid regime gate + a 5×3 ridge hidden-vs-KV classifier. No autograd.** | **proved-by-inspection** | `fit_replay_controller_v3_per_regime` + `fit_hidden_vs_kv_regime_classifier`. |
+| **W62-L-V6-HSB-NO-AUTOGRAD-CAP (limitation theorem)** | **HSB V6 three-target stack fit delegates to V5's worst-residual column reduction. No new gradient descent.** | **proved-by-inspection** | `fit_hsb_v6_three_target`. |
+| **W62-L-V6-ATTN-NO-AUTOGRAD-CAP (limitation theorem)** | **V6 attention-steering is a two-stage clip (coarse L1-mass + fine per-(L,H,Q,K) KL); no autograd.** | **proved-by-inspection** | `steer_attention_and_measure_v6`. |
+| **W62-L-MULTI-HOP-V12-SYNTHETIC-BACKENDS-CAP (limitation theorem)** | **The 20 multi-hop backends are NAMED, not EXECUTED. V12 is a graph + trust arbiter, not a real multi-machine harness.** | **proved-by-inspection (carries forward from W61-L-MULTI-HOP-V11-CAP)** | `evaluate_dec_chain_len17_fidelity` body. |
+| **W62-L-CRC-V10-FINGERPRINT-SYNTHETIC-CAP (limitation theorem)** | **The 1024-bucket fingerprint is wrap-around XOR over the in-repo substrate cache, not third-party hosted cache state.** | **proved-by-inspection** | `kv_cache_fingerprint_1024`. |
+| **W62-L-CONSENSUS-V8-REPAIR-STAGE-SYNTHETIC-CAP (limitation theorem)** | **The trained_repair stage applies an additive repair correction; it does NOT un-corrupt the raw cached state.** | **proved-by-inspection** | `ConsensusFallbackControllerV8.decide_v8`. |
+| W62-C-FRONTIER-SCALE-V7-SUBSTRATE-LIFT (conjecture) | If frontier-scale runtimes exposed compatible hooks (per-(layer, head, slot) cache-write ledger; per-layer logit-lens; per-(layer, head, position) attention-receive delta; per-(layer, head) replay-trust EMA) the W62 mechanism stack would scale-monotonically improve usefulness | conjectural | open question; W62 ships only the in-repo V7 runtime. |
+| W62-C-PER-REGIME-REPLAY-DOMINANCE-GENERALISES (conjecture) | The per-regime ridge + nearest-centroid pattern generalises to richer regimes (transcript-replay, hidden-state corruption, attention-pattern compromise, multi-hop substrate transfer) | conjectural | W62 implements 4 regimes; the framework extends to more. |
+
 ## W61 Trainable Hidden-State Substrate-Coupled Latent Operating System (W61-T-* and W61-L-* / W61-C-*)
 
 | Claim | One-line description | Status | Code/proof anchor |
