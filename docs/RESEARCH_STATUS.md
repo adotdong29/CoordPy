@@ -5,9 +5,168 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W59 W60
-> milestone (Trainable Cache-Control Substrate-Coupled Latent
-> Operating System research line), 2026-05-14.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W60 W61
+> milestone (Trainable Hidden-State Substrate-Coupled Latent
+> Operating System research line), 2026-05-15.
+
+## TL;DR — W61 Trainable Hidden-State Substrate-Coupled Latent Operating System (post-W60 research milestone)
+
+The programme now has **fifty-eight** coupled research axes. W61
+mints axis 58: the **sixth substrate-attack milestone** that
+introduces a **content-addressable cache-key axis** inside the
+in-repo NumPy substrate, a **bilinear retrieval head** fit by
+closed-form ridge over the (query ⊗ cache_key) outer-product
+feature (cache controller V4), a **trained ridge replay-threshold
+head** (replay controller V2) with softmax decision-confidence and
+an abstain-on-confidence gate, a **per-(layer, head, query, key)
+4-D attention-budget tensor** with a signed-coefficient falsifier
+(attention steering V5), **multi-target stacked HSB fit** (HSB V5
+3-D δ tensor against m stacked target logit directions),
+**attention-pattern-target KV fit** (KV bridge V6 steers the
+substrate's last-row attention map toward a reference via ridge),
+and a **six-way bidirectional substrate ↔ V6 ↔ cache controller
+V4 ↔ replay controller V2 ↔ retrieval head ↔ attention-steering
+V5** hybrid loop (deep substrate hybrid V6).
+
+Nineteen orthogonal substrate-coupling and capsule-native advances
+layered on top of W60 — (M1) **Tiny Transformer Runtime V6**
+(``coordpy.tiny_substrate_v6``): 8 layers, GQA 8/4, five new
+internal axes — per-(layer, position, d_key=8) content-
+addressable **cache_keys** tensor derived from a fixed projection
+of V3 layer keys, per-(layer, head) cumulative **hidden_write_trace**
+populated by HSB V5 writes, per-(layer, position) **replay_age**
+channel auto-incrementing every forward, **forward_count**
+integer, per-(layer_i, layer_j) **cross_layer_coupling** diagnostic;
+(M2) **KV Bridge V6** (``coordpy.kv_bridge_v6``): matrix-valued
+multi-target closed-form ridge fit; attention-pattern target fit
+on the substrate's last-row attention L1 mass; V6 cache-key
+128-bucket fingerprint; (M3) **HSB V5** (``coordpy.hidden_state_bridge_v5``):
+per-(layer, head, position) 3-D δ tensor with multi-target stack
+fit; HSB→V6-cache hidden-write coupling; V4-recovery delegation;
+(M4) **Prefix-State Bridge V5** (``coordpy.prefix_state_bridge_v5``):
+chain-of-chains over V6 substrates; trained 3-feature ridge drift
+predictor (predicts step-1 drift L2 from reuse / recompute / drop
+segment lengths); V6 cache-key fingerprint in the witness;
+(M5) **Attention-Steering Bridge V5**
+(``coordpy.attention_steering_bridge_v5``): per-(layer, head,
+query, key) 4-D budget tensor; signed-coefficient falsifier;
+attention-map L1 + L2 + top-K Jaccard observables; negative-
+budget falsifier returns post-KL exactly 0; (M6) **Cache
+Controller V4** (``coordpy.cache_controller_v4``): four new
+policies on top of V3's seven — ``bilinear_retrieval_v6`` (matrix
+ridge over (query ⊗ cache_key) outer-product feature),
+``trained_corruption_floor`` (quadratic ridge), ``two_stage_v4``
+(coarse + fine), ``composite_v4`` (5-head fitted mixture);
+(M7) **Replay Controller V2** (``coordpy.replay_controller_v2``):
+closed-form linear ridge over 6-dim feature against 4-class label
+one-hot; softmax decision-confidence; abstain-on-confidence
+threshold; hidden-write-cap gate; (M8) **Deep Substrate Hybrid V6**
+(``coordpy.deep_substrate_hybrid_v6``): six-way bidirectional
+loop with ``six_way=True`` only when all six axes contribute;
+(M9) **Substrate Adapter V6** (``coordpy.substrate_adapter_v6``):
+7 new capability axes; new ``substrate_v6_full`` tier;
+(M10) **Persistent Latent V13** (``coordpy.persistent_latent_v13``):
+11 outer layers, nonuple skip with replay-confidence EMA,
+max_chain_walk_depth=1536, distractor rank 6;
+(M11) **Multi-Hop Translator V11** (``coordpy.multi_hop_translator_v11``):
+18 backends, 306 directed edges, chain-length-16, six-axis trust
+composite adding ``attention_pattern_fidelity``, 1..6 compromise
+threshold; (M12) **Mergeable Latent State Capsule V9**
+(``coordpy.mergeable_latent_capsule_v9``): adds
+``attention_pattern_witness_chain``,
+``cache_retrieval_witness_chain``, per-(layer, head) trust
+matrix; two new algebra signatures; (M13) **Consensus Fallback
+Controller V7** (``coordpy.consensus_fallback_controller_v7``):
+11-stage chain inserting ``attention_pattern_consensus``;
+(M14) **Corruption-Robust Carrier V9**
+(``coordpy.corruption_robust_carrier_v9``): 512-bucket wrap-
+around-XOR fingerprint; 13-bit adversarial burst; post-replay
+top-K Jaccard; (M15) **Long-Horizon Retention V13**
+(``coordpy.long_horizon_retention_v13``): 12 heads, max_k=128,
+attention-pattern-conditioned head, three-layer scorer (random+ReLU
+→ random+tanh → ridge); (M16) **ECC Codebook V13**
+(``coordpy.ecc_codebook_v13``): K1..K12 = 2^22 = 4 194 304 codes;
+24.333 bits/visible-token at full emit (≥ 24.0 target);
+(M17) **Uncertainty Layer V9** (``coordpy.uncertainty_layer_v9``):
+8th weighting axis ``attention_pattern_fidelity``;
+(M18) **Disagreement Algebra V7** (``coordpy.disagreement_algebra_v7``):
+attention-pattern-equivalence identity + falsifier;
+(M19) **Eleven-arm TVS Arbiter V10**
+(``coordpy.transcript_vs_shared_arbiter_v10``): adds
+``attention_pattern_steer`` arm.
+
+The W61 ``W61Team`` orchestrator composes all nineteen modules,
+emits per-turn 20 module witness CIDs, and seals them into a
+``W61HandoffEnvelope`` whose ``w60_outer_cid`` carries forward the
+W60 envelope byte-for-byte. The W61 envelope verifier enumerates
+**61 disjoint failure modes** (≥ 55 target met).
+
+W61 is the **sixth executable substrate-coupling milestone** in
+the programme; it is NOT a claim of third-party transformer-
+internal access. ``W61-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``
+carries forward unchanged. ``W61-L-V6-NO-AUTOGRAD-CAP`` is the
+new ridge-only cap: W61 fits **only** seven closed-form linear
+ridge solves — (a) KV bridge V6 multi-target; (b) KV bridge V6
+attention-pattern; (c) HSB V5 multi-target stack; (d) cache
+controller V4 bilinear retrieval matrix; (e) cache controller V4
+trained corruption floor; (f) replay controller V2 threshold head;
+(g) LHR V13 third-layer scorer — no SGD, no autograd, no GPU.
+
+W61 ships at ``coordpy.tiny_substrate_v6``, ``coordpy.kv_bridge_v6``,
+``coordpy.hidden_state_bridge_v5``,
+``coordpy.prefix_state_bridge_v5``,
+``coordpy.attention_steering_bridge_v5``,
+``coordpy.cache_controller_v4``, ``coordpy.replay_controller_v2``,
+``coordpy.persistent_latent_v13``,
+``coordpy.multi_hop_translator_v11``,
+``coordpy.mergeable_latent_capsule_v9``,
+``coordpy.consensus_fallback_controller_v7``,
+``coordpy.corruption_robust_carrier_v9``,
+``coordpy.long_horizon_retention_v13``,
+``coordpy.ecc_codebook_v13``,
+``coordpy.transcript_vs_shared_arbiter_v10``,
+``coordpy.uncertainty_layer_v9``,
+``coordpy.disagreement_algebra_v7``,
+``coordpy.deep_substrate_hybrid_v6``,
+``coordpy.substrate_adapter_v6``, ``coordpy.w61_team``,
+``coordpy.r128_benchmark``, ``coordpy.r129_benchmark``,
+``coordpy.r130_benchmark`` — reachable only through explicit
+imports. ``coordpy.__version__`` remains ``0.5.20``; SDK contract
+is byte-for-byte unchanged. **No PyPI release**.
+
+R-128 (25 cell families) + R-129 (15 cell families) + R-130 (12
+cell families) at 3 seeds verify H144..H162c. **52 of 52 H-bars
+pass 3/3 seeds (156/156 cells, strong success per the W61
+success criterion)**. Cumulative trust boundary across W22..W61 =
+**776 enumerated failure modes** (715 from W22..W60 + 61 new W61
+envelope verifier modes).
+
+W61 envelope chain end-to-end: ``W60 envelope CID ==
+W61.w60_outer_cid`` (verified live by
+``test_w61_team_envelope_chain``). Trivial passthrough preserved
+byte-for-byte (``test_w61_trivial_passthrough_byte_identical``).
+
+W61 is the strongest honest substrate-coupling milestone the
+programme has shipped. The **bilinear retrieval head** in cache
+controller V4 is the first time the controller fits a matrix-
+valued substrate-internal parameter (vs W60's V3 retrieval
+matrix, which was a d² outer-product feature vector). The
+**trained replay threshold head** in replay controller V2 is the
+first time the REUSE/RECOMPUTE/FALLBACK/ABSTAIN policy is derived
+from a closed-form ridge fit on labelled data rather than from
+hard-coded thresholds. The **content-addressable cache key axis**
+in tiny_substrate_v6 is the first substrate-internal axis whose
+purpose is retrieval rather than retention. The **attention-
+pattern target fit** in KV bridge V6 is the first time the W6x
+programme fits to an attention-map distance rather than only to a
+logit-shift direction.
+
+The honest scope is unchanged: W61 makes the **in-repo V6
+substrate** much more load-bearing — five new internal axes,
+seven new closed-form-ridge-trained controllers/heads, a six-way
+bidirectional hybrid loop — but the **third-party hosted-model
+substrate remains blocked** at the HTTP surface
+(``W61-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``).
 
 ## TL;DR — W60 Trainable Cache-Control Substrate-Coupled Latent Operating System (post-W59 research milestone)
 
