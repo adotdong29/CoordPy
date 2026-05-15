@@ -1,6 +1,40 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W57 / W58, 2026-05-13 —
+> **Latest milestone marker (post-W58 / W59, 2026-05-14 —
+> Trainable Substrate-Conditioned Latent Operating System,
+> seventeenth post-release research milestone — fourth substrate-
+> attack milestone, the first **closed-form ridge fit of a real
+> ``d × d`` substrate-facing matrix** (the cache-controller-V2
+> bilinear retrieval matrix) and first **four-way substrate ↔ V6
+> ↔ cache-controller ↔ retrieval-head** hybrid loop. R-122
+> (15 cell families) + R-123 (12) + R-124 (11) deliver **38/38
+> H-bars (H107..H124) pass 3/3 seeds**. ``W59-L-V4-NO-AUTOGRAD-
+> CAP`` documents that all "training" is single-step closed-form
+> linear ridge over a small subspace; no SGD / autograd / GPU.
+> Cumulative trust boundary across W22..W59 = **663 enumerated
+> failure modes**. W59 ships at ``coordpy.tiny_substrate_v4``,
+> ``coordpy.kv_bridge_v4``, ``coordpy.hidden_state_bridge_v3``,
+> ``coordpy.prefix_state_bridge_v3``,
+> ``coordpy.attention_steering_bridge_v3``,
+> ``coordpy.cache_controller_v2``,
+> ``coordpy.persistent_latent_v11``,
+> ``coordpy.deep_substrate_hybrid_v4``,
+> ``coordpy.multi_hop_translator_v9``,
+> ``coordpy.mergeable_latent_capsule_v7``,
+> ``coordpy.consensus_fallback_controller_v5``,
+> ``coordpy.corruption_robust_carrier_v7``,
+> ``coordpy.long_horizon_retention_v11``,
+> ``coordpy.ecc_codebook_v11``,
+> ``coordpy.transcript_vs_shared_arbiter_v8``,
+> ``coordpy.uncertainty_layer_v7``,
+> ``coordpy.disagreement_algebra_v5``,
+> ``coordpy.substrate_adapter_v4``, ``coordpy.w59_team``,
+> ``coordpy.r122_benchmark`` / ``coordpy.r123_benchmark`` /
+> ``coordpy.r124_benchmark`` — reachable only through explicit
+> imports; the released v0.5.20 wheel's public surface is byte-
+> for-byte unchanged; no PyPI release.*
+>
+> **Preceding milestone marker (post-W57 / W58, 2026-05-13 —
 > Deep Cache-Reuse Substrate-Coupled Latent Operating System,
 > sixteenth post-release research milestone — third substrate-
 > attack milestone, the first **three-way** substrate breach

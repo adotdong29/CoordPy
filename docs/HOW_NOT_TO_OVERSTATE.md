@@ -2,9 +2,92 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W57
-> W58 milestone (Deep Cache-Reuse Substrate-Coupled Latent
-> Operating System research line), 2026-05-13.
+> README-of-README must satisfy these rules. Last touched: post-W58
+> W59 milestone (Trainable Substrate-Conditioned Latent Operating
+> System research line), 2026-05-14.
+
+## W59 (Trainable Substrate-Conditioned Latent Operating System) — explicit do-not-overstate rules
+
+W59 extends W58 with a richer in-repo runtime
+(``coordpy.tiny_substrate_v4``: 6 layers / 8 query heads /
+4 KV heads with GQA / d_model=64 / RMSNorm + SwiGLU /
+cumulative-EMA KV importance / partial-prefix split-and-replay
+/ per-(layer, head) hidden-state tap / 128-bucket fingerprint /
+logit-Jacobian probe), five W59 substrate-facing bridges (KV V4
+with **closed-form ridge fit of a 1-D correction α**, HSB V3
+with **target-logit-shift ridge fit**, prefix-state V3 with
+**partial-prefix reuse + K-seed drift spectrum**, attention V3
+with **per-(layer, head) KL-budget clip fit**, cache controller
+V2 with two new closed-form ridge policies — ``learned_hidden``
+and ``learned_retrieval`` — the second of which fits a real
+``d × d`` bilinear retrieval matrix), a **four-way deep hybrid
+V4** (V6 ↔ substrate V4 ↔ cache-controller V2 ↔ retrieval
+head), and 12 V-bumps for the rest of the W58 stack.
+
+* *"W59 trained the substrate end-to-end"* — **forbidden**.
+  ``W59-L-V4-NO-AUTOGRAD-CAP`` is load-bearing: every fit is a
+  **single-step closed-form linear ridge solve** over a small
+  subspace — 1-D α for the KV-V4 correction along a fixed
+  random direction; 1-D α for the HSB-V3 target-fit; a
+  ``d``-dim linear head for ``learned_hidden`` cache controller
+  V2; a ``d²``-dim flattened bilinear M-matrix for
+  ``learned_retrieval`` cache controller V2; a ``d``-dim head
+  for the LHR-V11 retention scorer. No SGD, no autograd, no
+  PyTorch/JAX, no GPU.
+
+* *"The W59 cache controller V2 retrieval policy beats every
+  other policy at retention=0.5"* — **forbidden**. R-122 H111
+  is honest: at retention=0.5 on a tiny untrained substrate,
+  argmax preservation is not guaranteed by any policy; the bar
+  is that the learned-retrieval controller *runs* and produces
+  a finite drift signal. The closed-form ridge fit is what is
+  load-bearing; whether the resulting controller beats LRU /
+  importance on a given task is empirical.
+
+* *"W59 breached transformer-internal coupling on Ollama /
+  OpenAI / hosted models"* — **forbidden**. The substrate is
+  still a tiny in-repo NumPy runtime.
+  ``W59-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` carries
+  forward unchanged. ``W59-C-DEEP-TRANSFORMER-COUPLING`` is a
+  restatement of the open question on frontier-scale models,
+  NOT a closure.
+
+* *"The W59 substrate is a frontier transformer"* —
+  **forbidden**. Default config is 6 layers / 8 query heads /
+  4 KV heads / d_model=64 / byte-vocab / max_len=128 /
+  untrained.
+
+* *"V11 septuple-skip + retrieval-skip strictly improves over
+  V10 sextuple-skip"* — **forbidden**.
+  ``W59-L-V11-OUTER-NOT-TRAINED-CAP`` documents the cap.
+  The qualitative "more skips means more capacity" claim is
+  conjectural.
+
+* *"ECC V11 delivers 1024 bits/visible-token"* — **forbidden**.
+  V11 delivers **22.333 bits/visible-token** at full emit; the
+  1024-bit/token target is above the V11 structural ceiling
+  (info bound = log2(2^20) = 20 bits/segment-tuple) and
+  reproduces honestly as the R-123 H117c falsifier.
+
+* *"The W59 14-backend multi-hop translator V9 talks to 14 real
+  hosted models"* — **forbidden**. The 14 backends are *named*,
+  not *executed*. The multi-hop graph + four-axis
+  (substrate × hidden × attention × retrieval) trust composite
+  is the load-bearing claim; the backends themselves are
+  simulated. ``W59-L-MULTI-HOP-V9-SYNTHETIC-BACKENDS-CAP``
+  documents this.
+
+* *"The LHR V11 retention scorer is a trained deep network"* —
+  **forbidden**. ``W59-L-LHR-V11-SCORER-FIT-CAP`` documents
+  that it is a single linear ridge head, fit by closed-form
+  linear ridge on a small synthetic supervised set.
+
+* *"W59's prefix-state V3 partial-reuse path is bit-for-bit
+  identical to a full recompute on the **full** prefix"* —
+  **forbidden**. The byte-identical claim is on the *reusable
+  head* span (positions ``[0, prefix_reuse_len)``); the
+  recompute tail is, by construction, the same forward as a
+  full recompute on those tokens.
 
 ## W58 (Deep Cache-Reuse Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
 

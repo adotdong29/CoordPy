@@ -13,6 +13,85 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W59 Trainable Substrate-Conditioned Latent Operating
+  System** (post-W58, 2026-05-14) — *fourth substrate-attack
+  milestone; first **closed-form ridge fit of a real substrate-
+  facing matrix** (the cache-controller V2 bilinear retrieval
+  matrix, fit by closed-form ridge over a d²-dim outer-product
+  feature against the substrate's leave-one-out drop oracle) and
+  first **four-way substrate ↔ V6 ↔ cache-controller ↔
+  retrieval-head** hybrid loop.* Ships at
+  `coordpy.tiny_substrate_v4` (6-layer / 8-query-head / 4-KV-head
+  GQA / d_model=64 / RMSNorm / SwiGLU / cumulative-EMA KV
+  importance / partial-prefix split-and-replay / per-(layer,
+  head) hidden-state tap / 128-bucket fingerprint / logit-
+  Jacobian probe), `coordpy.kv_bridge_v4` (four role banks
+  bank_a/bank_b/bank_c/bank_d, closed-form ridge fit of a 1-D
+  correction α along a fixed random direction over an N-point
+  carrier/target set, 128-bucket readback fingerprint),
+  `coordpy.hidden_state_bridge_v3` (target-logit-shift fit by
+  closed-form ridge on a 1-D inject-scale α, per-(layer, head)
+  scale tensor), `coordpy.prefix_state_bridge_v3` (partial-prefix
+  reuse byte-identical to full recompute on the matched span ≤
+  4.4e-16; K-seed drift spectrum mean/max/min/var; empirical
+  Lipschitz certificate ratio; 128-bucket fingerprint),
+  `coordpy.attention_steering_bridge_v3` (per-(layer, head)
+  KL-budget clip fit by iterative shrink; per-head dominance
+  ablation), `coordpy.cache_controller_v2` (keeps W58's three
+  policies, adds **learned_hidden** closed-form ridge on a cross-
+  layer hidden-state feature and **learned_retrieval** bilinear
+  M-matrix closed-form ridge over a d² outer-product feature,
+  pre/post fit residual >4 OOM reduction routinely on R-122),
+  `coordpy.persistent_latent_v11` (**9-layer**, **septuple**
+  skip-link with retrieval-EMA, max_chain_walk_depth=768),
+  `coordpy.deep_substrate_hybrid_v4` (**four-way** V6 ↔
+  substrate V4 ↔ cache-controller V2 ↔ retrieval head;
+  `four_way=True` and `retrieval_used=True` in real runs),
+  `coordpy.multi_hop_translator_v9` (14 backends, 182 directed
+  edges, chain-length-13, substrate × hidden × attention ×
+  retrieval **four-axis** trust composite),
+  `coordpy.mergeable_latent_capsule_v7`
+  (retrieval_witness_chain inheritance,
+  controller_witness_cid propagation, two new algebra signatures
+  {retrieval_replay, partial_prefix_reuse}),
+  `coordpy.consensus_fallback_controller_v5` (**9-stage** chain
+  adding `retrieval_replay` between `cache_reuse_replay` and
+  `best_parent`), `coordpy.corruption_robust_carrier_v7`
+  (**128-bucket** Reed-Solomon fingerprint + cache-retrieval
+  top-K agreement under non-target corruption + **9-bit
+  adversarial burst** detection), `coordpy.long_horizon_retention_v11`
+  (**10 heads**, max_k=80, retrieval-conditioned head,
+  closed-form ridge retention scorer), `coordpy.ecc_codebook_v11`
+  (K1..K10 = 1 048 576 codes = 2^20, **22.333 bits/visible-token**
+  at full emit), `coordpy.transcript_vs_shared_arbiter_v8`
+  (**9-arm** policy adding `retrieval_replay`),
+  `coordpy.uncertainty_layer_v7` (6th axis retrieval_fidelity),
+  `coordpy.disagreement_algebra_v5` (retrieval-equivalence
+  identity), `coordpy.substrate_adapter_v4` (five new capability
+  axes — partial_prefix_reuse / cache_retrieval /
+  closed_form_ridge / per_head_kl_fit / hidden_target_fit — and
+  new top tier `substrate_v4_full`), `coordpy.w59_team` (W59Team
+  orchestrator, W59HandoffEnvelope with 49 disjoint verifier
+  failure modes), `coordpy.r122_benchmark`, `coordpy.r123_benchmark`,
+  `coordpy.r124_benchmark`. R-122 (15 cell families) + R-123 (12
+  cell families) + R-124 (11 cell families) at 3 seeds verify
+  **38/38 H-bars (H107..H124) pass 3/3 seeds** — strong success
+  per the W59 success criterion. Cumulative trust boundary
+  across W22..W59 = **663 enumerated failure modes**. W59
+  modules are reachable only through explicit imports;
+  `coordpy.__version__` remains `0.5.20`; SDK contract byte-for-
+  byte unchanged. No PyPI release.
+  `W59-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP` carries forward
+  unchanged; `W59-L-V4-NO-AUTOGRAD-CAP` documents that all W59
+  "training" is single-step closed-form linear ridge over a
+  small subspace (no SGD / autograd / GPU); `W59-L-V11-OUTER-
+  NOT-TRAINED-CAP`, `W59-L-ECC-V11-RATE-FLOOR-CAP`, `W59-L-LHR-
+  V11-SCORER-FIT-CAP`, `W59-L-MULTI-HOP-V9-SYNTHETIC-BACKENDS-
+  CAP`, and `W59-L-V11-PERMUTATION-INVARIANCE-CAP` are the
+  additional honest caps; `W59-C-DEEP-TRANSFORMER-COUPLING` and
+  `W59-C-FRONTIER-SCALE-SUBSTRATE-LIFT` carry forward as
+  conjectures on frontier-scale model substrate access.
+
 - **W58 Deep Cache-Reuse Substrate-Coupled Latent Operating
   System** (post-W57, 2026-05-13) — *third substrate-attack
   milestone; first **three-way** substrate breach with **real

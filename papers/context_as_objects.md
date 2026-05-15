@@ -2,6 +2,94 @@
 
 > Main paper draft for the Context Zero programme.
 >
+> **Post-W58 research-line update (W59 Trainable Substrate-
+> Conditioned Latent Operating System, 2026-05-14).**
+> *Fourth substrate-attack milestone in the programme; first
+> **closed-form ridge fit of a real ``d × d`` substrate-facing
+> matrix** (the cache-controller V2 bilinear retrieval matrix,
+> fit by closed-form ridge over a ``d² = 4096``-dim outer-product
+> feature against the substrate's leave-one-out drop oracle) and
+> first **four-way substrate ↔ V6 ↔ cache-controller ↔
+> retrieval-head** hybrid loop.* The post-W58 question — *can
+> the in-repo substrate carry **real** trained parameters (not
+> just inject-scale hyperparameters) and route real per-(layer,
+> head) KL budgets, all by closed-form linear algebra?* — is
+> answered by W59 with eighteen orthogonal advances. The
+> substrate gets richer (``coordpy.tiny_substrate_v4``: 6 layers,
+> 8 query heads, 4 KV heads with **GQA**, ``d_model=64``,
+> RMSNorm, SwiGLU FF, cumulative-EMA KV importance, real fp64
+> flop counter, **partial-prefix split-and-replay** with dual-
+> stage flop accounting, **per-(layer, head) hidden-state tap**
+> of shape ``(n_heads, n_tokens, d_head)``, **128-bucket**
+> Reed-Solomon-style KV cache fingerprint, exact-under-
+> linearised-head **logit-Jacobian probe**). Five W59
+> substrate-facing bridges sit on top, all with *closed-form
+> ridge-fitted* parameters: ``coordpy.kv_bridge_v4`` fits a 1-D
+> correction α along a fixed random direction by central FD +
+> ridge solve and exposes **four** role banks
+> ``bank_a``/``bank_b``/``bank_c``/``bank_d``;
+> ``coordpy.hidden_state_bridge_v3`` solves a 1-D ridge for the
+> inject-scale α that brings the projected last-position logit
+> shift closest to a caller-supplied ``Δlogit`` direction;
+> ``coordpy.prefix_state_bridge_v3`` ships **partial-prefix
+> reuse** that is byte-identical to a full recompute on the
+> reusable head span (≤ 4.4e-16 max-abs diff on the R-122 H112
+> probe), records a **K-seed drift spectrum** (mean / max / min /
+> var) and an empirical Lipschitz certificate ratio, and uses a
+> 128-bucket fingerprint; ``coordpy.attention_steering_bridge_v3``
+> fits per-(layer, head) KL clips iteratively (vs W58 V2's
+> global clip) so every head is individually honoured at
+> ``budget=0.6`` on the H110 probe; ``coordpy.cache_controller_v2``
+> keeps W58's three policies and adds two new closed-form ridge
+> policies — ``learned_hidden`` on a cross-layer hidden-state
+> feature and ``learned_retrieval`` whose bilinear ``M`` matrix
+> is the programme's first real ``d × d`` substrate-facing
+> matrix fit end-to-end by closed-form ridge against the
+> substrate's leave-one-out drop oracle (>4 OOM residual
+> reduction routinely on the R-122 probe). The **four-way**
+> ``coordpy.deep_substrate_hybrid_v4`` couples V6 ↔ substrate V4
+> ↔ cache-controller V2 ↔ retrieval head; its forward witness
+> reports ``four_way=True`` and ``retrieval_used=True``
+> simultaneously. The persistent latent state advances to V11
+> (9 layers, **septuple** skip-link adding a retrieval-EMA,
+> ``max_chain_walk_depth = 768``), multi-hop translator V9 spans
+> 14 backends with 182 directed edges and chain-length-13 with a
+> **four-axis** substrate × hidden × attention × retrieval trust
+> composite, MLSC V7 propagates ``retrieval_witness_chain`` and
+> ``controller_witness_cid``, consensus V5 has a **9-stage**
+> chain adding ``retrieval_replay`` between ``cache_reuse_replay``
+> and ``best_parent``, CRC V7 doubles the KV fingerprint bucket
+> count to **128** and adds cache-retrieval top-K agreement
+> under non-target corruption (>= 70%) plus a **9-bit**
+> adversarial burst family, LHR V11 adds a 10th retrieval-
+> conditioned reconstruction head at ``max_k=80`` and a
+> closed-form ridge **retention scorer**, ECC V11 layers a K10
+> stage on top of V10 (**1 048 576** codes = 2^20; **22.333
+> bits/visible-token** at full emit), TVS V8 grows to **9 arms**
+> adding ``retrieval_replay``, uncertainty V7 grows to **6
+> axes** adding ``retrieval_fidelity``, disagreement algebra V5
+> adds a retrieval-equivalence identity, and substrate adapter
+> V4 introduces five new capability axes plus a new top tier
+> ``substrate_v4_full`` reached only by the V4 in-repo runtime.
+> R-122 (15 cell families) + R-123 (12 cell families) + R-124
+> (11 cell families) at 3 seeds verify **38/38 H-bars (H107..
+> H124) pass 3/3 seeds**. Cumulative trust boundary across
+> W22..W59 = **663 enumerated failure modes**.
+> ``W59-L-V4-NO-AUTOGRAD-CAP`` documents that every fit is a
+> single-step closed-form linear ridge over a small subspace
+> (no SGD, no autograd, no GPU); ``W59-L-NO-THIRD-PARTY-
+> SUBSTRATE-COUPLING-CAP`` carries forward unchanged;
+> ``W59-L-V11-OUTER-NOT-TRAINED-CAP``, ``W59-L-ECC-V11-RATE-
+> FLOOR-CAP``, ``W59-L-LHR-V11-SCORER-FIT-CAP``,
+> ``W59-L-MULTI-HOP-V9-SYNTHETIC-BACKENDS-CAP``, and ``W59-L-V11-
+> PERMUTATION-INVARIANCE-CAP`` are the additional honest caps;
+> ``W59-C-DEEP-TRANSFORMER-COUPLING`` and
+> ``W59-C-FRONTIER-SCALE-SUBSTRATE-LIFT`` carry forward as
+> conjectures on frontier-scale model substrate access. W59 is
+> reachable only through explicit imports; ``coordpy.__version__``
+> remains ``0.5.20``; the released v0.5.20 wheel's public surface
+> is byte-for-byte unchanged; no PyPI release.
+>
 > **Post-W57 research-line update (W58 Deep Cache-Reuse
 > Substrate-Coupled Latent Operating System, 2026-05-13).**
 > *Third substrate-attack milestone in the programme; first

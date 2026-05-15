@@ -14,7 +14,59 @@
 > - **conjectural** — stated, falsifiable; not yet proved or systematically tested.
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
-> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13.
+> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14.
+
+## W59 Trainable Substrate-Conditioned Latent Operating System (W59-T-* and W59-L-* / W59-C-*)
+
+| Claim | One-line description | Status | Code/proof anchor |
+| ----- | -------------------- | ------ | ------------------ |
+| W59-T-SUBSTRATE-V4-FORWARD-DETERMINISM | Identical params + token_ids → byte-identical V4 trace CID | mechanically-checked | `tiny_substrate_v4.forward_tiny_substrate_v4`; test `test_tiny_substrate_v4_determinism_and_partial_reuse`; H107 |
+| W59-T-SUBSTRATE-V4-PARTIAL-PREFIX-BYTE-IDENTICAL | Forwarding through `forward_with_partial_prefix_reuse_v4` matches a full recompute (max-abs diff < 1e-9) | empirical (≤ 4.4e-16 max-abs diff) | `forward_with_partial_prefix_reuse_v4`; H112 |
+| W59-T-SUBSTRATE-V4-IMPORTANCE-EMA | `TinyV4KVCache.cumulative_importance` is an EMA blend that propagates across calls | mechanically-checked | `TinyV4KVCache.update_cumulative_importance`; H107b |
+| W59-T-SUBSTRATE-V4-HEAD-HIDDEN-TAP | Per-(layer, head) hidden-state tap of shape `(n_heads, n_tokens, d_head)` exposed | mechanically-checked | `forward_tiny_substrate_v4`; H107c |
+| W59-T-KV-BRIDGE-V4-FOUR-BANKS-DISTINCT | Role banks A, B, C, D produce mutually distinct L2 perturbations on the same carrier (all pairs > 1e-3) | empirical | `KVBridgeV4Projection.project`; H108 |
+| W59-T-KV-BRIDGE-V4-RIDGE-CONVERGES | Closed-form ridge fit on the V4 correction reduces mean residual (post ≤ pre + 1e-12) | mechanically-checked (closed-form solve) | `fit_kv_bridge_v4_correction`; H108b |
+| W59-T-HSB-V3-TARGET-FIT | HSB V3 fits a 1-D inject-scale α against a target logit-shift direction by closed-form ridge | mechanically-checked | `fit_hsb_v3_target_logit_shift`; H109 |
+| W59-T-ATTN-V3-PER-HEAD-KL-CLIP | Iterative per-(layer, head) KL clip enforces max-KL ≤ budget + tol for every head | mechanically-checked | `steer_attention_and_measure_v3`; H110 |
+| W59-T-CACHE-CONTROLLER-V2-RETRIEVAL-RUNS | Learned-retrieval policy at retention=0.5 with a fitted query matrix produces a finite L1 drift | empirical | `apply_cache_controller_v2_and_measure`; H111 |
+| W59-T-CACHE-CONTROLLER-V2-RIDGE-FITS | Closed-form ridge on the bilinear retrieval matrix reduces residual orders-of-magnitude | empirical (>4 OOM on the R-122 probe) | `fit_learned_retrieval_cache_controller`; H111b |
+| W59-T-PREFIX-V3-PARTIAL-FLOP-SAVED | Partial-prefix reuse saves measurable fp64 flops vs full recompute | empirical | `bridge_prefix_state_and_measure_v3`; H112b |
+| W59-T-PREFIX-V3-K-SEED-DRIFT-SPECTRUM | K-seed drift spectrum (mean / max / min / var) computed without crashing; max ≥ min | mechanically-checked | `bridge_prefix_state_and_measure_v3`; H112c |
+| W59-T-DEEP-HYBRID-V4-FOUR-WAY | V4 hybrid sets `four_way=True` and `retrieval_used=True` when controller is `learned_retrieval` | mechanically-checked | `deep_substrate_hybrid_v4_forward`; H113 |
+| W59-T-SUBSTRATE-ADAPTER-V4-TIERS | The V4 in-repo runtime probes as `substrate_v4_full`; synthetic as `text_only` | mechanically-checked | `_decide_tier_v4`; H114 |
+| W59-T-PERSISTENT-V11-CHAIN-WALK-32 | V11 chain walks ≥ 32 turns; cell has 9 layers | mechanically-checked | `PersistentLatentStateV11Chain.walk_from`; H115b |
+| W59-T-PERSISTENT-V11-RETRIEVAL-EMA | The retrieval-EMA carrier survives 32 turns and damps under `retrieval_fidelity < 1.0` | mechanically-checked | `step_persistent_state_v11`; H115 |
+| W59-T-MULTI-HOP-V9-CHAIN-LEN-13 | 14-backend chain-length-13 fidelity probe runs with chain_length = 13, n_edges = 182 | mechanically-checked | `evaluate_dec_chain_len13_fidelity`; H118 |
+| W59-T-MULTI-HOP-V9-FOUR-AXIS-TRUST | The composite trust is `substrate × hidden × attention × retrieval` (four axes) | proved (by construction) | `DecBackendChainPathV9.composite_trust`; H118b |
+| W59-T-MLSC-V7-RETRIEVAL-CHAIN-INHERITANCE | V7 merge inherits the union of parents' retrieval_witness_chain plus the new entries | mechanically-checked | `MergeOperatorV7.merge`; H124 |
+| W59-T-CONSENSUS-V5-NINE-STAGES | Decision chain has exactly 9 named stages | proved (by construction) | `W59_CONSENSUS_V5_STAGES`; H121 |
+| W59-T-CONSENSUS-V5-RETRIEVAL-FIRES | When all prior stages fail and a retrieval-replay oracle is wired, the controller picks the retrieval_replay stage | mechanically-checked | `ConsensusFallbackControllerV5.decide`; H121b |
+| W59-T-CRC-V7-KV128-DETECT | 128-bucket fingerprint detects a single-byte change in the underlying KV bytes ≥ 99% | empirical | `kv_cache_fingerprint_128`; H120 |
+| W59-T-CRC-V7-RETRIEVAL-TOPK-AGREEMENT | Cache-retrieval top-K is stable under non-target corruption ≥ 70% of probes | empirical | `compare_retrieval_topk`; H120b |
+| W59-T-CRC-V7-ADV-9BIT-BURST | The 9-bit adversarial burst is detected by the 128-bucket fingerprint ≥ 95% | empirical | `emit_corruption_robustness_v7_witness`; H120c |
+| W59-T-LHR-V11-FIVE-WAY-RUNS | `evaluate_lhr_v11_five_way` returns proxy / substrate / hidden / attention / retrieval MSEs without crashing | mechanically-checked | `evaluate_lhr_v11_five_way`; H116 |
+| W59-T-LHR-V11-RETENTION-SCORER-FIT | Closed-form ridge fits the LHR V11 retention scorer reducing mean abs residual | mechanically-checked | `fit_lhr_v11_retention_scorer`; H116b |
+| W59-T-ECC-V11-22-BITS-PER-VISIBLE-TOKEN | ECC V11 delivers ≥ 22.0 structured bits per visible token at full emit | empirical (22.333) | `compress_carrier_ecc_v11`; H117 |
+| W59-T-ECC-V11-TOTAL-CODES | ECC V11 codebook has exactly 1 048 576 codes | proved (by construction: ∏ K_i = 2^20) | `ECCCodebookV11.total_codes`; H117b |
+| W59-T-ECC-V11-RATE-FLOOR-FALSIFIER | The 1024-bit/visible-token target is provably above the structural ceiling | proved (info bound = log2(2^20) = 20) | `probe_ecc_v11_rate_floor_falsifier`; H117c |
+| W59-T-TVS-V8-NINE-ARMS | The TVS V8 arm list has exactly 9 entries | proved (by construction) | `W59_TVS_V8_ARMS`; H119 |
+| W59-T-TVS-V8-RETRIEVAL-DOMINATES | When `retrieval_fidelity` is the strict highest score, `retrieval_replay` is picked at rate ≥ 0.9 | mechanically-checked | `nine_arm_compare`; H119b |
+| W59-T-UNCERTAINTY-V7-BRACKET | pessimistic ≤ weighted ≤ optimistic for any non-empty 6-axis composite | proved-conditional (on non-negative adversarial radius) | `compose_uncertainty_report_v7`; H122 |
+| W59-T-UNCERTAINTY-V7-RETRIEVAL-AWARE | Differing retrieval_fidelities produces a `retrieval_aware=True` composite | mechanically-checked | `compose_uncertainty_report_v7`; H122b |
+| W59-T-DA-V5-RETRIEVAL-IDENTITY | A retrieval-replay oracle returning `(argmax_preserved=True, l2 ≤ tol)` ⇒ identity holds | mechanically-checked | `disagreement_algebra_v5.check_retrieval_equivalence_identity`; H123 |
+| W59-T-DA-V5-RETRIEVAL-FALSIFIER | When the oracle reports a non-equivalence, the identity must fail | mechanically-checked | `check_retrieval_equivalence_identity`; H123b |
+| W59-T-W59-ENVELOPE-VERIFIER-FAILURE-MODE-COUNT | `W59_ENVELOPE_VERIFIER_FAILURE_MODES` enumerates ≥ 48 disjoint modes | proved (by enumeration: 49 entries) | `W59_ENVELOPE_VERIFIER_FAILURE_MODES` |
+| W59-T-W59-ENVELOPE-VERIFIER-OK-CLEAN | A clean W59 team run passes `verify_w59_handoff` with `failures == []` | mechanically-checked | `verify_w59_handoff` |
+| W59-T-W59-TRIVIAL-PASSTHROUGH-W58-CID | Trivial W59 wraps a W58 outer CID such that the W59 envelope's `w58_outer_cid` equals it verbatim | mechanically-checked | `build_trivial_w59_envelope` |
+| W59-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP | Hosted backends remain text-only at the HTTP surface; W59 cannot bridge into them | mechanically-checked (carries forward W57/W58) | `substrate_adapter_v4` |
+| W59-L-V4-NO-AUTOGRAD-CAP | All W59 "training" is single-step closed-form linear ridge over a small subspace (1-D α for KV V4 correction; 1-D α for HSB V3 target fit; d-dim head for cache V2 learned_hidden; d²-dim outer-product feature for cache V2 learned_retrieval; d-dim head for LHR V11 retention scorer). No SGD / autograd / GPU. | proved (by inspection) | `fit_kv_bridge_v4_correction`; `fit_hsb_v3_target_logit_shift`; `fit_learned_hidden_cache_controller`; `fit_learned_retrieval_cache_controller`; `fit_lhr_v11_retention_scorer` |
+| W59-L-V11-OUTER-NOT-TRAINED-CAP | The V11 outer GRU + retrieval-skip linear are initialised but not trained end-to-end | proved (by inspection of `V11StackedCell.init`) | `persistent_latent_v11.V11StackedCell` |
+| W59-L-ECC-V11-RATE-FLOOR-CAP | The 1024-bit/token target exceeds the V11 structural ceiling (info bound = log2(2^20) = 20); ECC V11's honest rate is 22.333 bits/visible-token | proved (info bound) | `probe_ecc_v11_rate_floor_falsifier` |
+| W59-L-LHR-V11-SCORER-FIT-CAP | The LHR V11 retention scorer is a single linear ridge head, not a deep network | proved (by inspection) | `fit_lhr_v11_retention_scorer` |
+| W59-L-MULTI-HOP-V9-SYNTHETIC-BACKENDS-CAP | The 14 backends are named and simulated, not executed | proved (by inspection) | `evaluate_dec_chain_len13_fidelity` |
+| W59-L-V11-PERMUTATION-INVARIANCE-CAP | Carries forward V10 EMA-smoothing permutation-invariance cap | proved (by inspection of V11 EMA logic) | `step_persistent_state_v11` EMA paths |
+| W59-C-DEEP-TRANSFORMER-COUPLING | The W59 substrate bridges (KV V4 ridge + HSB V3 target-fit + prefix V3 partial + attention V3 per-head + cache V2 retrieval) generalise to a frontier transformer if its runtime exposes compatible hooks | conjectural | open until a frontier runtime exposes substrate hooks |
+| W59-C-FRONTIER-SCALE-SUBSTRATE-LIFT | If frontier runtimes exposed the W59 hooks, the bridges would scale-monotonically improve usefulness on multi-agent context-zero coordination | conjectural | open; depends on third-party access |
 
 ## W58 Deep Cache-Reuse Substrate-Coupled Latent Operating System (W58-T-* and W58-L-* / W58-C-*)
 
