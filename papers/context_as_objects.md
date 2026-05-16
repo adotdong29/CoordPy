@@ -2,7 +2,58 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W64 research-line update (W65 Team-Substrate-Coordination
+> **Post-W65 research-line update (W66 Stronger Solving-Context
+> Substrate-Coupled Latent Operating System, 2026-05-16).**
+> *Eleventh substrate-attack milestone, and the **second** multi-
+> agent task-success-bearing substrate milestone in the programme —
+> the first to produce wins across **three** failure-mode regimes
+> (baseline + team-consensus-under-budget + team-failure-recovery),
+> not just one. ``MultiAgentSubstrateCoordinatorV2`` runs **six**
+> matched-budget policies (``transcript_only`` /
+> ``shared_state_proxy`` / ``substrate_routed_v9`` /
+> ``substrate_routed_v10`` / ``substrate_routed_v11`` /
+> ``team_substrate_coordination_v11``) under three regimes; the V11
+> policy **strictly beats V10 on ≥ 93 %** of seeds at baseline and
+> at team_consensus_under_budget; the
+> team_substrate_coordination_v11 policy **strictly beats V11 on
+> ≥ 73 %** of seeds in each regime; in the team_failure_recovery
+> regime (where one agent silently produces zero output mid-task),
+> the team_substrate_coordination_v11 policy reaches **80 % team
+> success** while every other policy is stuck at 40 %. The in-repo
+> NumPy substrate grows to V11 (13 layers + four new V11 axes:
+> per-(layer, head, slot) replay-trust ledger, per-role team-
+> failure-recovery flag, substrate snapshot-diff primitive, per-
+> layer V11 composite gate score). The substrate snapshot-diff
+> primitive saves **92 %** of recompute flops at 128 tokens, vs
+> V10's 90 %. Six new closed-form ridge solves on top of
+> W61..W65's twenty-nine (thirty-five total). The deep substrate
+> hybrid is now eleven-way (V10 hybrid + cache controller V9 +
+> replay controller V7 + replay-trust ledger + team-failure-
+> recovery flag + substrate snapshot-diff + team-consensus
+> controller). The persistent latent state is V18 (17 layers, 15
+> skip carriers, ``max_chain_walk_depth=8192``, distractor rank 16).
+> Multi-hop chain length grows to 26 over 36 backends (1260
+> directed edges); 11-axis composite trust. ECC reaches **31.333
+> bits/visible-token** at full emit (2^29 = 536 870 912 codes).
+> Long-horizon reconstruction reaches 17 heads at max_k=320.
+> Consensus has 18 disjoint stages including
+> ``team_failure_recovery_arbiter`` and
+> ``team_consensus_under_budget_arbiter``. The first capsule-
+> native team-consensus controller composes regime-aware weighted
+> quorum + abstain + substrate-replay fallback + transcript
+> fallback. R-146 + R-147 + R-148 deliver **56/56 H-bars × 3 seeds
+> (168/168 cells)**. The honest scope is unchanged: hosted backends
+> remain text-only at the HTTP surface
+> (``W66-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``); the substrate
+> is a small in-repo NumPy runtime, not a frontier model
+> (``W66-L-NUMPY-CPU-V11-SUBSTRATE-CAP``); "training" is closed-
+> form linear ridge throughout (``W66-L-V11-NO-AUTOGRAD-CAP``); and
+> the multi-agent task-success wins are measured **inside the W66
+> synthetic harness**
+> (``W66-L-MULTI-AGENT-COORDINATOR-SYNTHETIC-CAP``), not on real
+> hosted multi-agent backends.*
+>
+> **Preceding research-line update (W65 Team-Substrate-Coordination
 > Substrate-Coupled Latent Operating System, 2026-05-16).**
 > *Tenth substrate-attack milestone, and the first **multi-agent
 > task-success-bearing** substrate milestone in the programme.

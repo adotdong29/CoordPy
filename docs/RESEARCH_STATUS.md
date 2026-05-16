@@ -5,9 +5,142 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W64 W65
-> milestone (Team-Substrate-Coordination Substrate-Coupled Latent
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W65 W66
+> milestone (Stronger Solving-Context Substrate-Coupled Latent
 > Operating System research line), 2026-05-16.
+
+## TL;DR — W66 Stronger Solving-Context Substrate-Coupled Latent Operating System (post-W65 research milestone)
+
+The programme now has **sixty-three** coupled research axes. W66 mints
+axis 63: the **eleventh substrate-attack milestone** and the **second
+multi-agent task-success-bearing** substrate milestone (the first to
+produce wins across *three* regimes, not just one). W66 extends the
+in-repo V11 substrate into a multi-regime multi-agent coordination
+engine: a **MultiAgentSubstrateCoordinatorV2** runs N role-typed agents
+through the V11 substrate under **six matched-budget policies** and
+**three regimes** (baseline + team-consensus-under-budget + team-
+failure-recovery); the V11 policy *strictly beats* V10 on ≥ 93 % of
+seeds in each of the first two regimes, and the team_substrate_
+coordination_v11 policy *strictly beats* V11 on ≥ 73 % of seeds in
+each of the three regimes (load-bearing in failure recovery: TSC_V11
+hits 80 % team success while every other policy is stuck at 40 %).
+
+Twenty-one orthogonal substrate-coupling, capsule-native, and multi-
+agent-coordination advances on top of W65 — (M1) **Tiny Transformer
+Runtime V11** (13 layers; four new V11 axes: per-(L, H, T) replay-
+trust ledger, per-role team-failure-recovery flag, substrate snapshot-
+diff primitive, per-layer V11 composite gate score); (M2) **KV Bridge
+V11** (seven-target stacked ridge; team-coordination margin probe;
+multi-agent task fingerprint; team-failure-recovery falsifier); (M3)
+**HSB V10** (seven-target stacked ridge; per-(L, H) hidden-wins-vs-
+team-success probe; team-consensus margin); (M4) **Prefix V10** (K=96
+drift curve; role+task+team 30-dim fingerprint; five-way prefix/hidden/
+replay/team/recover comparator); (M5) **Attention V10** (six-stage
+clamp: V9 + attention-trust ledger; team-conditioned fingerprint); (M6)
+**Cache Controller V9** (six-objective ridge adding team-failure-
+recovery; per-role 7-dim eviction head); (M7) **Replay Controller V7**
+(10 regimes adding `team_failure_recovery_regime` and
+`team_consensus_under_budget_regime`; per-role per-regime ridge;
+trained team-substrate-routing head); (M8) **Deep Substrate Hybrid
+V11** (eleven-way bidirectional loop with the four new V11 axes + team-
+consensus-controller axis); (M9) **Substrate Adapter V11** (4 new V11
+capability axes; new `substrate_v11_full` tier); (M10) **Persistent
+Latent V18** (17 layers; fifteenth skip carrier `team_failure_recovery_
+carrier`; max_chain_walk_depth=8192 carried forward; distractor rank
+16); (M11) **Multi-Hop Translator V16** (36 backends; 1260 directed
+edges; chain-length 26; 11-axis composite adding `team_substrate_
+coordination_trust`); (M12) **Mergeable Latent Capsule V14**
+(`team_failure_recovery_witness_chain` and `team_consensus_under_
+budget_witness_chain`); (M13) **Consensus Fallback Controller V12**
+(18-stage chain inserting `team_failure_recovery_arbiter` and
+`team_consensus_under_budget_arbiter`); (M14) **Corruption-Robust
+Carrier V14** (16384-bucket fingerprint; 33-bit adversarial burst;
+team-failure-recovery probe); (M15) **Long-Horizon Retention V18**
+(17 heads, max_k=320, eight-layer scorer adding random+swish); (M16)
+**ECC Codebook V18** (K1..K17 = 2^29 = 536 870 912 codes; **31.333
+bits/visible-token** at full emit); (M17) **Uncertainty Layer V14**
+(13-axis composite adding `team_failure_recovery_fidelity`); (M18)
+**Disagreement Algebra V12** (Jensen-Shannon-equivalence identity +
+falsifier); (M19) **Fifteen-arm TVS Arbiter V14 + V15** (16 arms with
+`team_failure_recovery` arm); (M20) **Multi-Agent Substrate
+Coordinator V2** (the load-bearing W66 mechanism — six matched-budget
+policies across three regimes; V11 strictly beats V10 on majority of
+seeds; TSC_V11 strictly beats V11 on majority of seeds); (M21)
+**Team-Consensus Controller** (first capsule-native team-consensus
+controller — regime-aware weighted quorum + abstain + substrate-replay
+fallback + transcript fallback).
+
+The W66 `W66Team` orchestrator composes all twenty-one modules, emits
+per-turn 28 module witness CIDs (one for the team-failure-recovery
+falsifier, one for the MASC V2 aggregate, one for the team-consensus
+controller), and seals them into a `W66HandoffEnvelope` whose
+`w65_outer_cid` carries forward the W65 envelope byte-for-byte. The
+W66 envelope verifier enumerates **123 disjoint failure modes**
+(≥ 120 target met).
+
+W66 is the **eleventh executable substrate-coupling milestone** in the
+programme; it is NOT a claim of third-party transformer-internal
+access. `W66-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP` carries forward
+unchanged. `W66-L-V11-NO-AUTOGRAD-CAP` is the new ridge-only cap: W66
+fits **only** thirty-five closed-form linear ridge solves (twenty-nine
+from W61..W65 + six new) — (a) cache controller V9 six-objective; (b)
+cache controller V9 per-role eviction (planner); (c) replay V7 per-
+role per-regime (planner) × 10 regimes; (d) replay V7 team-substrate-
+routing head; (e) HSB V10 seven-target inner V6; (f) KV V11 seven-
+target inner V6 — no SGD, no autograd, no GPU.
+
+W66 ships at `coordpy.tiny_substrate_v11`, `coordpy.kv_bridge_v11`,
+`coordpy.hidden_state_bridge_v10`,
+`coordpy.prefix_state_bridge_v10`,
+`coordpy.attention_steering_bridge_v10`,
+`coordpy.cache_controller_v9`,
+`coordpy.replay_controller_v7`,
+`coordpy.persistent_latent_v18`,
+`coordpy.multi_hop_translator_v16`,
+`coordpy.mergeable_latent_capsule_v14`,
+`coordpy.consensus_fallback_controller_v12`,
+`coordpy.corruption_robust_carrier_v14`,
+`coordpy.long_horizon_retention_v18`,
+`coordpy.ecc_codebook_v18`,
+`coordpy.transcript_vs_shared_arbiter_v15`,
+`coordpy.uncertainty_layer_v14`,
+`coordpy.disagreement_algebra_v12`,
+`coordpy.deep_substrate_hybrid_v11`,
+`coordpy.substrate_adapter_v11`,
+`coordpy.multi_agent_substrate_coordinator_v2`,
+`coordpy.team_consensus_controller`,
+`coordpy.w66_team`, `coordpy.r146_benchmark`,
+`coordpy.r147_benchmark`, `coordpy.r148_benchmark` — reachable only
+through explicit imports. `coordpy.__version__` remains `0.5.20`; SDK
+contract is byte-for-byte unchanged. **No PyPI release**.
+
+R-146 (24 cell families) + R-147 (14 cell families) + R-148 (18 cell
+families) at 3 seeds verify H245..H268. **56 of 56 H-bars pass 3/3
+seeds (168/168 cells, strong success per the W66 success criterion)**.
+Cumulative trust boundary across W22..W66 = **1228 enumerated failure
+modes** (1105 from W22..W65 + 123 new W66 envelope verifier modes).
+
+W66 envelope chain end-to-end: `W65 envelope CID ==
+W66.w65_outer_cid` (verified live by
+`test_w66_team_envelope_chain`). Trivial passthrough preserved
+byte-for-byte (`test_w66_trivial_passthrough_byte_identical`).
+
+W66 is the **second** programme milestone where substrate control
+produces a **measurable multi-agent task-level win**, and the **first**
+to produce wins under multiple failure-mode regimes (baseline +
+team-consensus-under-budget + team-failure-recovery), not only under
+the baseline regime. The team-failure-recovery regime is the sharpest
+evidence: when one agent silently produces zero output mid-task, the
+team-consensus controller running on the V11 substrate doubles the
+team success rate over every baseline policy (80 % vs 40 %).
+
+The honest scope is unchanged: W66 makes the **in-repo V11 substrate**
+more load-bearing — four new internal axes, six new closed-form-ridge-
+trained controllers/heads (thirty-five total across W61..W66), an
+eleven-way bidirectional hybrid loop, three multi-agent task-success
+regimes — but the **third-party hosted-model substrate remains
+blocked** at the HTTP surface (`W66-L-NO-THIRD-PARTY-SUBSTRATE-
+COUPLING-CAP`).
 
 ## TL;DR — W65 Team-Substrate-Coordination Substrate-Coupled Latent Operating System (post-W64 research milestone)
 

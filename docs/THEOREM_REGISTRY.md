@@ -14,9 +14,83 @@
 > - **conjectural** — stated, falsifiable; not yet proved or systematically tested.
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
-> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14; post-W59 W60 Trainable Cache-Control Substrate-Coupled Latent OS milestone added 2026-05-14; post-W60 W61 Trainable Hidden-State Substrate-Coupled Latent OS milestone added 2026-05-15; post-W62 W63 Stronger Replay-Dominance Hidden-Wins 4096-Turn Substrate-Coupled Latent OS milestone added 2026-05-15; post-W63 W64 Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn Nine-Way Substrate-Coupled Latent OS milestone added 2026-05-15; post-W64 W65 Team-Substrate-Coordination Substrate-Coupled Latent OS milestone added 2026-05-16.
+> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14; post-W59 W60 Trainable Cache-Control Substrate-Coupled Latent OS milestone added 2026-05-14; post-W60 W61 Trainable Hidden-State Substrate-Coupled Latent OS milestone added 2026-05-15; post-W62 W63 Stronger Replay-Dominance Hidden-Wins 4096-Turn Substrate-Coupled Latent OS milestone added 2026-05-15; post-W63 W64 Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn Nine-Way Substrate-Coupled Latent OS milestone added 2026-05-15; post-W64 W65 Team-Substrate-Coordination Substrate-Coupled Latent OS milestone added 2026-05-16; post-W65 W66 Stronger Solving-Context Substrate-Coupled Latent OS milestone added 2026-05-16.
 
-## W65 Team-Substrate-Coordination Substrate-Coupled Latent Operating System (W65-T-* and W65-L-* / W65-C-*)
+## W66 Stronger Solving-Context Substrate-Coupled Latent Operating System (W66-T-* and W66-L-* / W66-C-*)
+
+| Claim | One-line description | Status | Code/proof anchor |
+| ----- | -------------------- | ------ | ------------------ |
+| W66-T-SUBSTRATE-V11-FORWARD-DETERMINISM | Identical V11 params + token_ids → byte-identical V11 trace CID | mechanically-checked | `tiny_substrate_v11.forward_tiny_substrate_v11`; test `test_tiny_substrate_v11_determinism_and_axes`; H245 |
+| W66-T-SUBSTRATE-V11-REPLAY-TRUST-LEDGER | Per-(L, H, T) replay-trust scalar in [0, 1] | mechanically-checked | `TinyV11KVCache.replay_trust_ledger`; H245b |
+| W66-T-SUBSTRATE-V11-TEAM-FAILURE-RECOVERY-FLAG | Per-role boolean + reason flag for team-failure-recovery | mechanically-checked | `trigger_team_failure_recovery_v11`; H245c |
+| W66-T-SUBSTRATE-V11-SNAPSHOT-DIFF | Snapshot-diff CID is content-addressed and reproducible | mechanically-checked | `substrate_snapshot_diff_v11`; H245e |
+| W66-T-SUBSTRATE-V11-SNAPSHOT-RECOVER-SAVING | Snapshot-diff repair vs recompute flop saving ≥ 0.6 at default config | empirical (0.92) | `substrate_snapshot_recover_flops_v11`; H252 |
+| W66-T-SUBSTRATE-V11-V11-GATE-SCORE | Per-layer V11 composite gate score has shape (L,) | mechanically-checked | `_compute_v11_gate_score`; H245d |
+| W66-T-KV-BRIDGE-V11-SEVEN-TARGET-RIDGE | Seven-target stacked ridge fit; 6 V10 targets + 1 team-failure-recovery | mechanically-checked | `fit_kv_bridge_v11_seven_target`; H246 |
+| W66-T-KV-BRIDGE-V11-TEAM-FAILURE-RECOVERY-FALSIFIER | Returns 0 iff inverting the team-failure-recovery flag flips the decision | mechanically-checked | `probe_kv_bridge_v11_team_failure_recovery_falsifier`; H246b |
+| W66-T-KV-BRIDGE-V11-FINGERPRINT | 30-dim SHA256 fingerprint of (role, task_id, team_id) | mechanically-checked | `compute_multi_agent_task_fingerprint_v11`; H246c |
+| W66-T-HSB-V10-SEVEN-TARGET-STACK | Seven-target stacked ridge fit (6 V9 + 1 team-consensus-under-budget) | mechanically-checked | `fit_hsb_v10_seven_target`; H247 |
+| W66-T-HSB-V10-HIDDEN-WINS-VS-TEAM-SUCCESS | Per-(L, H) joint win rate ∈ [0, 1] when hidden residual L2 below threshold AND team success indicator > 0.5 | mechanically-checked | `probe_hsb_v10_hidden_wins_vs_team_success`; H247b |
+| W66-T-HSB-V10-TEAM-CONSENSUS-MARGIN | Positive scalar when hidden residual is strictly less than min(kv, prefix, replay, recover) | mechanically-checked | `compute_hsb_v10_team_consensus_margin`; H247 |
+| W66-T-PREFIX-V10-K96-DRIFT-CURVE | Stacked K=96 drift curve via last-value extrapolation of V9 prediction; no new ridge solve | mechanically-checked | `fit_prefix_drift_curve_predictor_v10`; H248 |
+| W66-T-PREFIX-V10-ROLE-TASK-TEAM-FINGERPRINT | 30-D SHA256 fingerprint of (role, task_name, team_id) is content-dependent | mechanically-checked | `compute_role_task_team_fingerprint_v10`; H248 |
+| W66-T-PREFIX-V10-FIVE-WAY-DECISION | Five-way decision over drift-curve L1 areas (prefix/hidden/replay/team/recover) | mechanically-checked | `compare_prefix_vs_hidden_vs_replay_vs_team_vs_recover_v10`; H248b |
+| W66-T-ATTN-V10-SIX-STAGE-CLAMP | Six-stage clamp (V9 + per-(L, H) attention-trust ledger clip) keeps attention_delta_l2 ≤ trust_cap; negative-budget returns zero | mechanically-checked | `steer_attention_and_measure_v10`; H249, H249b |
+| W66-T-ATTN-V10-TEAM-CONDITIONED-FINGERPRINT | SHA256 fingerprint mixes team_id bytes into the attention map | mechanically-checked | `steer_attention_and_measure_v10`; H249 |
+| W66-T-CACHE-V9-SIX-OBJECTIVE | Six-objective stacked ridge (drop + retrieval + hidden_wins + replay_dominance + team_task_success + team_failure_recovery) converges | mechanically-checked | `fit_six_objective_ridge_v9`; H250 |
+| W66-T-CACHE-V9-PER-ROLE-EVICTION | Per-role 7-dim ridge eviction head converges | mechanically-checked | `fit_per_role_eviction_head_v9`; H250b |
+| W66-T-REPLAY-V7-TEN-REGIMES | Ten regimes (V6's 8 + team_failure_recovery + team_consensus_under_budget) | mechanically-checked | `W66_REPLAY_REGIMES_V7`; H251c |
+| W66-T-REPLAY-V7-PER-ROLE-PER-REGIME | Ten regimes × per-role 10×4 ridge head | mechanically-checked | `fit_replay_controller_v7_per_role`; H251 |
+| W66-T-REPLAY-V7-TEAM-SUBSTRATE-ROUTING-HEAD | 4×11 ridge team-substrate-routing head trained over synthetic supervision | mechanically-checked | `fit_replay_v7_team_substrate_routing_head`; H251b |
+| W66-T-DEEP-HYBRID-V11-ELEVEN-WAY | Eleven-way bidirectional loop sets `eleven_way=True` when all eleven axes fire | mechanically-checked | `deep_substrate_hybrid_v11_forward`; H266 |
+| W66-T-DEEP-HYBRID-V11-REDUCES-TO-V10 | When any of the eleven axes is off, V11 hybrid reduces to V10 (`eleven_way=False`) | mechanically-checked | `deep_substrate_hybrid_v11_forward` |
+| W66-T-SUBSTRATE-V11-ADAPTER-TIER | `substrate_v11_full` tier satisfied only by the V11 in-repo runtime | mechanically-checked | `probe_tiny_substrate_v11_adapter`; H252d |
+| W66-T-PERSISTENT-V18-FIFTEENTH-SKIP | Persistent V18 carries 15 skip carriers (V17's 14 + team_failure_recovery EMA) | mechanically-checked | `step_persistent_state_v18`; H253 |
+| W66-T-PERSISTENT-V18-DISTRACTOR-RANK | Distractor basis rank ≥ 16 (V17 was 14) | mechanically-checked | `W66_DEFAULT_V18_DISTRACTOR_RANK` |
+| W66-T-PERSISTENT-V18-MAX-DEPTH | `max_chain_walk_depth = 8192` (carried forward from V17) | mechanically-checked | `W66_DEFAULT_V18_MAX_CHAIN_WALK_DEPTH`; H253b |
+| W66-T-MULTI-HOP-V16-ELEVEN-AXIS | 11-axis composite trust over 36 backends and 1260 directed edges at chain-length 26 | mechanically-checked | `eleven_axis_trust_arbitration` + `evaluate_dec_chain_len26_fidelity`; H255b |
+| W66-T-MULTI-HOP-V16-BACKENDS-EDGES | 36 backends, 1260 directed edges | mechanically-checked | `W66_DEFAULT_MH_V16_BACKENDS`; H255 |
+| W66-T-MULTI-HOP-V16-COMPROMISE-THRESHOLD | Compromise threshold in [1, 11] | empirical | `estimate_compromise_threshold_v16`; H255c |
+| W66-T-LHR-V18-SEVENTEEN-WAY | 17-head reconstruction (V17's 16 + team_failure_recovery) runs without crashing | mechanically-checked | `LongHorizonReconstructionV18Head.seventeen_way_value`; H254b |
+| W66-T-LHR-V18-EIGHT-LAYER-SCORER | Eight-layer scorer ridge converges | mechanically-checked | `fit_lhr_v18_eight_layer_scorer`; H254c |
+| W66-T-LHR-V18-MAX-K | max_k = 320 (vs V17's 256) | mechanically-checked | `W66_DEFAULT_LHR_V18_MAX_K`; H254 |
+| W66-T-ECC-V18-BITS-PER-TOKEN | ≥ 31.0 bits/visible-token at full emit | empirical (31.333) | `compress_carrier_ecc_v18`; H256b |
+| W66-T-ECC-V18-TOTAL-CODES | Total codebook size = 2^29 = 536 870 912 | mechanically-checked | `ECCCodebookV18.total_codes`; H256 |
+| W66-T-ECC-V18-RATE-FLOOR-FALSIFIER | 65536-bit/token target reproduces structural ceiling (above log2(2^29) = 29) | mechanically-checked | `probe_ecc_v18_rate_floor_falsifier`; H256c |
+| W66-T-MLSC-V14-TEAM-FAILURE-RECOVERY-CHAIN | `team_failure_recovery_witness_chain` inherits as union at merge | mechanically-checked | `MergeOperatorV14.merge` |
+| W66-T-MLSC-V14-TEAM-CONSENSUS-UNDER-BUDGET-CHAIN | `team_consensus_under_budget_witness_chain` inherits as union at merge | mechanically-checked | `MergeOperatorV14.merge` |
+| W66-T-CRC-V14-16384-BUCKET-DETECT | 16384-bucket fingerprint single-byte detect rate ≥ 0.95 | empirical (1.0) | `kv_cache_fingerprint_16384`; H260c |
+| W66-T-CRC-V14-33BIT-BURST | 33-bit adversarial burst detect rate ≥ 0.4 | empirical | `emit_corruption_robustness_v14_witness`; H260b |
+| W66-T-CRC-V14-TEAM-FAILURE-RECOVERY | Team-failure-recovery L1-ratio floor ≥ 0.4 | empirical | `team_failure_recovery_ratio`; H260d |
+| W66-T-CONSENSUS-V12-EIGHTEEN-STAGES | Consensus chain has exactly 18 disjoint stages | mechanically-checked | `W66_CONSENSUS_V12_STAGES`; H260 |
+| W66-T-CONSENSUS-V12-TEAM-FAILURE-RECOVERY-STAGE-FIRES | `team_failure_recovery_arbiter` stage fires when team_failure_recovery score above threshold | mechanically-checked | `ConsensusFallbackControllerV12.decide_v12` |
+| W66-T-CONSENSUS-V12-TEAM-CONSENSUS-UNDER-BUDGET-STAGE-FIRES | `team_consensus_under_budget_arbiter` stage fires when team_consensus score AND budget below floor | mechanically-checked | `ConsensusFallbackControllerV12.decide_v12` |
+| W66-T-UNCERTAINTY-V14-THIRTEEN-AXIS | 13-axis weighted composite returns value in [0, 1] | mechanically-checked | `compose_uncertainty_report_v14`; H262 |
+| W66-T-UNCERTAINTY-V14-TFR-AWARE | `team_failure_recovery_aware` flips True when any fidelity < 1.0 | mechanically-checked | `compose_uncertainty_report_v14`; H262b |
+| W66-T-DA-V12-JS-IDENTITY | JS-equivalence identity holds iff argmax preserved AND JS ≤ floor | mechanically-checked | `check_js_equivalence_identity`; H261 |
+| W66-T-DA-V12-JS-FALSIFIER | Falsifier triggers when argmax not preserved OR JS > floor | mechanically-checked | `js_equivalence_falsifier`; H261b |
+| W66-T-TVS-V15-SIXTEEN-ARMS-SUM-TO-ONE | Pick-rates over 16 arms sum to 1.0 within 1e-6 | mechanically-checked | `sixteen_arm_compare`; H264 |
+| W66-T-TVS-V15-TEAM-FAILURE-RECOVERY-ARM-FIRES | Team-failure-recovery arm fires under non-zero fidelity | mechanically-checked | `sixteen_arm_compare`; H264b |
+| W66-T-ENVELOPE-VERIFIER-MODES | W66 envelope verifier enumerates ≥ 120 disjoint failure modes | mechanically-checked | `W66_ENVELOPE_VERIFIER_FAILURE_MODES`; H265 |
+| W66-T-MASC-V2-V11-STRICTLY-BEATS-V10 | The V11 policy strictly beats V10 on ≥ 50 % of seeds at matched-budget (baseline regime) | empirical (0.933) | `MultiAgentSubstrateCoordinatorV2.run_batch`; H252b |
+| W66-T-MASC-V2-TSC-V11-STRICTLY-BEATS-V11 | TSC_V11 policy strictly beats V11 on ≥ 50 % of seeds at matched-budget (baseline regime) | empirical (0.800) | `MultiAgentSubstrateCoordinatorV2.run_batch`; H252c |
+| W66-T-MASC-V2-TCUB-V11-BEATS-V10 | V11 strictly beats V10 on ≥ 50 % of seeds in team_consensus_under_budget regime | empirical (0.933) | `MultiAgentSubstrateCoordinatorV2.run_batch`; H263 |
+| W66-T-MASC-V2-TFR-TSC-V11-BEATS-V11 | TSC_V11 strictly beats V11 on ≥ 50 % of seeds in team_failure_recovery regime | empirical (0.733) | `MultiAgentSubstrateCoordinatorV2.run_batch`; H263b |
+| W66-T-TEAM-CONSENSUS-CONTROLLER-QUORUM | Team-consensus controller fires `quorum_merge` when active fraction ≥ threshold | mechanically-checked | `TeamConsensusController.decide`; H252e |
+| W66-T-TEAM-CONSENSUS-CONTROLLER-ABSTAIN | Team-consensus controller fires `abstain` when all confidence below floor AND substrate-replay untrusted | mechanically-checked | `TeamConsensusController.decide`; H263c |
+| W66-T-TEAM-CONSENSUS-CONTROLLER-SUBSTRATE-REPLAY | Team-consensus controller fires `substrate_replay` when quorum fails AND substrate trust above floor | mechanically-checked | `TeamConsensusController.decide`; H263d |
+| **W66-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP (limitation theorem)** | **Hosted backends (Ollama, OpenAI-compatible) remain text-only on the HTTP surface; W66 makes no claim of third-party transformer-internal access.** | **proved-conditional limitation theorem (W56..W66 carry forward unchanged)** | `coordpy.substrate_adapter.probe_ollama_adapter` returns `text_only` tier; `probe_openai_compatible_adapter` ditto. |
+| **W66-L-V11-NO-AUTOGRAD-CAP (limitation theorem)** | **W66 fits ONLY thirty-five closed-form linear ridge solves (twenty-nine from W61..W65 + six new): cache V9 six-objective; cache V9 per-role eviction; replay V7 per-role per-regime × 10 regimes; replay V7 team-substrate-routing head; HSB V10 seven-target inner V6; KV V11 seven-target inner V6. NO end-to-end backprop, NO autograd, NO GPU.** | **proved-by-inspection limitation theorem** | `fit_six_objective_ridge_v9`, `fit_per_role_eviction_head_v9`, `fit_replay_controller_v7_per_role`, `fit_replay_v7_team_substrate_routing_head`, `fit_hsb_v10_seven_target`, `fit_kv_bridge_v11_seven_target`. |
+| **W66-L-NUMPY-CPU-V11-SUBSTRATE-CAP (limitation theorem)** | **The V11 substrate is 13 layers / d_model=64 / byte-vocab / max_len=128 / untrained NumPy on CPU. NOT a frontier model.** | **proved-by-inspection** | `coordpy.tiny_substrate_v11.TinyV11SubstrateConfig` defaults. |
+| **W66-L-V18-OUTER-NOT-TRAINED-CAP (limitation theorem)** | **The V18 outer wrapper adds one carrier (team_failure_recovery EMA) but does NOT train the V13 outer GRU end-to-end.** | **proved-by-inspection** | `step_persistent_state_v18` only EMAs the new carrier. |
+| **W66-L-ECC-V18-RATE-FLOOR-CAP (limitation theorem)** | **Structural rate ceiling log2(2^29) = 29 raw data bits per segment-tuple. 65536-bit/token target reproduces this cap.** | **mechanically-checked** | `probe_ecc_v18_rate_floor_falsifier`. |
+| **W66-L-MULTI-AGENT-COORDINATOR-SYNTHETIC-CAP (limitation theorem)** | **MASC V2 is a synthetic deterministic harness; the V11/TSC_V11 wins are engineered so that the V11 mechanisms materially reduce drift. Not a real model-backed multi-agent win.** | **proved-by-inspection** | `coordpy.multi_agent_substrate_coordinator_v2._policy_v11_run`. |
+| **W66-L-TEAM-CONSENSUS-IN-REPO-CAP (limitation theorem)** | **The team-consensus controller operates on in-repo MASC outcomes only; it does NOT enforce consensus on real model outputs.** | **proved-by-inspection** | `coordpy.team_consensus_controller.TeamConsensusController.decide` operates on caller-supplied guess vectors. |
+| **W66-L-SUBSTRATE-CHECKPOINT-IN-REPO-CAP (limitation theorem)** | **Substrate snapshot-diff operates on the in-repo V11 cache only; it does NOT bridge to a real model's KV state.** | **proved-by-inspection** | `coordpy.tiny_substrate_v11.substrate_snapshot_diff_v11`. |
+| **W66-L-V18-LHR-SCORER-FIT-CAP (limitation theorem)** | **LHR V18 only the final ridge head is fit. The first seven layers are frozen random projections.** | **proved-by-inspection** | `fit_lhr_v18_eight_layer_scorer`. |
+| **W66-L-MULTI-HOP-V16-SYNTHETIC-BACKENDS-CAP (limitation theorem)** | **The 36 multi-hop backends are NAMED, not EXECUTED. Aliases on the V14/V15 base trust matrix.** | **proved-by-inspection** | `W66_DEFAULT_MH_V16_BACKENDS`. |
+| **W66-L-CRC-V14-FINGERPRINT-SYNTHETIC-CAP (limitation theorem)** | **The 16384-bucket fingerprint is wrap-around XOR; the 33-bit adversarial burst is a synthetic stress test.** | **proved-by-inspection** | `kv_cache_fingerprint_16384`. |
+| **W66-C-DEEP-TRANSFORMER-COUPLING (carried-forward conjecture)** | **Beyond the W66 in-repo substrate, deeper substrate coupling (writing actual layer-internal residuals, attention weights, and feed-forward states) on a frontier hosted model still requires either an MLX/llama.cpp/exllama runtime exposing those tensors or a privileged access path to a hosted model's runtime.** | **conjectural** | Same as W56..W65; not advanced by W66. |
 
 | Claim | One-line description | Status | Code/proof anchor |
 | ----- | -------------------- | ------ | ------------------ |

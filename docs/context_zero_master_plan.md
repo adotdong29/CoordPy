@@ -1,6 +1,75 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W64 / W65, 2026-05-16 —
+> **Latest milestone marker (post-W65 / W66, 2026-05-16 —
+> Stronger Solving-Context Substrate-Coupled Latent Operating
+> System, twenty-fourth post-release research milestone —
+> eleventh substrate-attack milestone and **second** multi-agent
+> task-success-bearing substrate milestone (the first to win
+> across three regimes — baseline + team-consensus-under-budget +
+> team-failure-recovery — not just one).**
+> ``coordpy.tiny_substrate_v11`` ships 13 layers + four new V11
+> axes (per-(L, H, T) replay-trust ledger, per-role team-failure-
+> recovery flag, substrate snapshot-diff primitive, per-layer V11
+> composite gate score).
+> ``coordpy.multi_agent_substrate_coordinator_v2`` ships the
+> load-bearing W66 mechanism: a real N-agent harness running
+> **six** matched-budget policies (``transcript_only`` /
+> ``shared_state_proxy`` / ``substrate_routed_v9`` /
+> ``substrate_routed_v10`` / ``substrate_routed_v11`` /
+> ``team_substrate_coordination_v11``) under **three** regimes
+> (baseline / team_consensus_under_budget / team_failure_recovery);
+> the V11 policy strictly beats V10 on ≥ 93 % of seeds at baseline
+> and at team_consensus_under_budget; the
+> team_substrate_coordination_v11 policy strictly beats V11 on
+> ≥ 73 % of seeds in each regime, and hits **80 % team success on
+> team_failure_recovery** while every other policy is stuck at 40 %.
+> Plus twenty more orthogonal mechanism advances (KV V11 seven-
+> target ridge; HSB V10 seven-target ridge; prefix V10 K=96;
+> attention V10 six-stage clamp; cache V9 six-objective; replay V7
+> ten-regime + team-substrate-routing head; deep substrate hybrid
+> V11 eleven-way; substrate adapter V11; persistent V18 (17
+> layers, max_chain_walk_depth=8192); multi-hop V16 (36 backends,
+> 1260 directed edges, chain-len 26, 11-axis); MLSC V14; consensus
+> V12 (18 stages); CRC V14 (16384-bucket, 33-bit burst); LHR V18
+> (17 heads, max_k=320); ECC V18 (2^29 codes, 31.333 bits/visible-
+> token); uncertainty V14 (13-axis); disagreement V12 (JS identity);
+> TVS V15 (16 arms); team-consensus controller (regime-aware
+> weighted quorum + abstain + substrate-replay fallback)).
+> R-146 (24 cell families) + R-147 (14) + R-148 (18) deliver
+> **56/56 H-bars (H245..H268) pass 3/3 seeds (168/168 cells)**.
+> ``W66-L-V11-NO-AUTOGRAD-CAP`` documents that all "training"
+> remains single-step closed-form linear ridge (35 ridge solves
+> total across W61..W66); no SGD / autograd / GPU. Cumulative
+> trust boundary across W22..W66 = **1228 enumerated failure
+> modes** (1105 from W22..W65 + 123 new W66 envelope verifier
+> modes). W66 ships at ``coordpy.tiny_substrate_v11``,
+> ``coordpy.kv_bridge_v11``,
+> ``coordpy.hidden_state_bridge_v10``,
+> ``coordpy.prefix_state_bridge_v10``,
+> ``coordpy.attention_steering_bridge_v10``,
+> ``coordpy.cache_controller_v9``,
+> ``coordpy.replay_controller_v7``,
+> ``coordpy.persistent_latent_v18``,
+> ``coordpy.multi_hop_translator_v16``,
+> ``coordpy.mergeable_latent_capsule_v14``,
+> ``coordpy.consensus_fallback_controller_v12``,
+> ``coordpy.corruption_robust_carrier_v14``,
+> ``coordpy.long_horizon_retention_v18``,
+> ``coordpy.ecc_codebook_v18``,
+> ``coordpy.transcript_vs_shared_arbiter_v15``,
+> ``coordpy.uncertainty_layer_v14``,
+> ``coordpy.disagreement_algebra_v12``,
+> ``coordpy.deep_substrate_hybrid_v11``,
+> ``coordpy.substrate_adapter_v11``,
+> ``coordpy.multi_agent_substrate_coordinator_v2``,
+> ``coordpy.team_consensus_controller``,
+> ``coordpy.w66_team``, ``coordpy.r146_benchmark`` /
+> ``coordpy.r147_benchmark`` / ``coordpy.r148_benchmark``,
+> reachable only via explicit import.
+> ``coordpy.__version__`` remains ``0.5.20``; SDK contract is
+> byte-for-byte unchanged; no PyPI release.
+>
+> **Previous milestone marker (post-W64 / W65, 2026-05-16 —
 > Team-Substrate-Coordination Substrate-Coupled Latent Operating
 > System, twenty-third post-release research milestone — tenth
 > substrate-attack milestone and first **multi-agent task-

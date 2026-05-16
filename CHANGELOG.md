@@ -13,6 +13,84 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W66 Stronger Solving-Context Substrate-Coupled Latent
+  Operating System** (post-W65, 2026-05-16) — *eleventh substrate-
+  attack milestone; second **multi-agent task-success-bearing**
+  substrate milestone (first to win across multiple regimes)*.
+  Twenty-one orthogonal advances on top of W65: (M1) **Tiny
+  Substrate V11** (13 layers; four new V11 axes — per-(L, H, T)
+  replay-trust ledger, per-role team-failure-recovery flag,
+  substrate snapshot-diff primitive, per-layer V11 composite gate
+  score); (M2) **KV Bridge V11** (seven-target stacked ridge;
+  team-coordination margin probe; multi-agent task fingerprint;
+  team-failure-recovery falsifier); (M3) **HSB V10** (seven-target
+  stacked ridge; per-(L, H) hidden-wins-vs-team-success probe;
+  team-consensus margin); (M4) **Prefix V10** (K=96 drift curve;
+  role+task+team 30-dim fingerprint; five-way prefix/hidden/replay/
+  team/recover comparator); (M5) **Attention V10** (six-stage clamp
+  adding per-(L, H) attention-trust ledger; team-conditioned
+  fingerprint); (M6) **Cache Controller V9** (six-objective stacked
+  ridge adding team-failure-recovery; per-role 7-dim eviction
+  head); (M7) **Replay Controller V7** (10 regimes adding
+  `team_failure_recovery_regime` and `team_consensus_under_budget_regime`;
+  per-role per-regime ridge; **trained team-substrate-routing
+  head**); (M8) **Deep Substrate Hybrid V11** (eleven-way
+  bidirectional loop); (M9) **Substrate Adapter V11** (new
+  `substrate_v11_full` tier); (M10) **Persistent V18** (17 layers;
+  fifteenth skip carrier `team_failure_recovery_carrier`;
+  max_chain_walk_depth=8192; distractor rank 16); (M11)
+  **Multi-Hop V16** (36 backends; 1260 directed edges; chain-len
+  26; 11-axis composite); (M12) **Mergeable Latent Capsule V14**
+  (team-failure-recovery + team-consensus-under-budget witness
+  chains); (M13) **Consensus V12** (18 stages: adds
+  `team_failure_recovery_arbiter` and
+  `team_consensus_under_budget_arbiter`); (M14) **CRC V14**
+  (16384-bucket fingerprint; 33-bit adversarial burst; team-
+  failure-recovery probe); (M15) **LHR V18** (17 heads; max_k=320;
+  eight-layer scorer); (M16) **ECC V18** (2^29 = 536 870 912 codes;
+  **31.0 bits/visible-token**); (M17) **Uncertainty V14** (13-axis
+  composite); (M18) **Disagreement Algebra V12** (Jensen-Shannon
+  equivalence identity); (M19) **TVS V15** (16 arms); (M20)
+  **Multi-Agent Substrate Coordinator V2** (the load-bearing W66
+  multi-agent mechanism — six matched-budget policies and three
+  regimes; V11 policy strictly beats V10 on ≥ 93 % of seeds at
+  baseline regime; TSC_V11 policy strictly beats V11 on ≥ 80 % of
+  baseline seeds and ≥ 73 % of failure-recovery seeds); (M21)
+  **Team-Consensus Controller** (weighted quorum + abstain +
+  substrate-replay fallback + transcript fallback, regime-aware).
+  W66 fits **six new closed-form ridge solves** on top of W65's 29
+  (35 total across W61..W66). 123 new W66 envelope verifier
+  failure modes (cumulative trust boundary across W22..W66 =
+  **1228 enumerated failure modes**). R-146 (24 H-bars) + R-147
+  (14 H-bars) + R-148 (18 H-bars) at 3 seeds = **168/168 cells
+  pass** (strong success). Ships at `coordpy.tiny_substrate_v11`,
+  `coordpy.kv_bridge_v11`, `coordpy.hidden_state_bridge_v10`,
+  `coordpy.prefix_state_bridge_v10`,
+  `coordpy.attention_steering_bridge_v10`,
+  `coordpy.cache_controller_v9`,
+  `coordpy.replay_controller_v7`,
+  `coordpy.deep_substrate_hybrid_v11`,
+  `coordpy.substrate_adapter_v11`,
+  `coordpy.persistent_latent_v18`,
+  `coordpy.multi_hop_translator_v16`,
+  `coordpy.mergeable_latent_capsule_v14`,
+  `coordpy.consensus_fallback_controller_v12`,
+  `coordpy.corruption_robust_carrier_v14`,
+  `coordpy.long_horizon_retention_v18`,
+  `coordpy.ecc_codebook_v18`,
+  `coordpy.uncertainty_layer_v14`,
+  `coordpy.disagreement_algebra_v12`,
+  `coordpy.transcript_vs_shared_arbiter_v15`,
+  `coordpy.multi_agent_substrate_coordinator_v2`,
+  `coordpy.team_consensus_controller`,
+  `coordpy.w66_team`, `coordpy.r146_benchmark`,
+  `coordpy.r147_benchmark`, `coordpy.r148_benchmark` — reachable
+  only through explicit imports. `coordpy.__version__` remains
+  `0.5.20`. Pre-committed bar:
+  [`docs/SUCCESS_CRITERION_W66_STRONGER_TEAM_SUBSTRATE_OS.md`](docs/SUCCESS_CRITERION_W66_STRONGER_TEAM_SUBSTRATE_OS.md).
+  Result note:
+  [`docs/RESULTS_W66_STRONGER_TEAM_SUBSTRATE_OS.md`](docs/RESULTS_W66_STRONGER_TEAM_SUBSTRATE_OS.md).
+
 - **W65 Team-Substrate-Coordination Substrate-Coupled Latent
   Operating System** (post-W64, 2026-05-16) — *tenth substrate-
   attack milestone; first **multi-agent task-success-bearing**
