@@ -2,6 +2,91 @@
 
 > Main paper draft for the Context Zero programme.
 >
+> **Post-W70 research-line update (W71 Stronger Delayed-Repair-
+> After-Restart / Repair-Trajectory-Primary Two-Plane Multi-Agent
+> Substrate Programme, 2026-05-16).** *Sixteenth substrate-attack
+> milestone, and the **seventh** multi-agent task-success-bearing
+> substrate milestone in the programme — the first to produce wins
+> across **eleven** failure-mode regimes (W70's ten plus
+> **delayed_repair_after_restart**), the **first milestone to
+> operationalise restart-aware Plane A↔B handoff promotion**, and
+> the **first milestone to expose a content-addressed per-turn
+> delayed-repair-trajectory CID** that unifies all seven repair-
+> and-restart primitives (multi-branch-rejoin, silent-corruption,
+> partial-contradiction, agent-replacement, role-dropout-recovery,
+> branch-merge, **restart-dominance**) into a single dominant
+> signal back into the substrate-routed policy.
+> ``MultiAgentSubstrateCoordinatorV7`` runs **sixteen** matched-
+> budget policies (the fourteen W70 policies plus
+> ``substrate_routed_v16`` and ``team_substrate_coordination_v16``)
+> under eleven regimes; the V16 policy strictly beats V15 across
+> all eleven regimes (≥ 86.7 % at the ten baseline-class regimes,
+> ≥ 50 % at the new compound regime, with TSC_V16 strictly beating
+> TSC_V15 100 % of seeds in every regime). In the new
+> ``delayed_repair_after_restart`` regime (where at ~25 % of turns
+> one role's substrate is wiped clean and replaced with a fresh
+> member, then a coordinated repair must arrive after a **delay
+> window** (~3 turns later) under a tight visible-token budget),
+> the V16 substrate's delayed-repair-trajectory CID + per-layer
+> restart-dominance label + per-layer delayed-repair gate give the
+> substrate-routed policy a coordinated recovery arc that V15
+> cannot follow. The in-repo NumPy substrate grows to V16 (18
+> layers + three new V16 axes: per-turn delayed-repair-trajectory
+> CID, per-layer restart-dominance label in [0..7], per-layer
+> delayed-repair gate). The substrate repair-dominance primitive
+> saves **94 %** of recompute flops over seven-primitive repair
+> work at 128 tokens. The delayed-repair throttle saves
+> **100 %** visible tokens at visible_token_budget=64 / baseline=
+> 512 / delay=3. Three new closed-form ridge solves on top of
+> W61..W70's 58 (61 total). The deep substrate hybrid is now
+> sixteen-way (V15 hybrid + cache V14 + replay V12 + delayed-
+> repair-trajectory + restart-dominance + team-consensus
+> controller V6). The persistent latent state is V23 (22 layers,
+> 20 skip carriers, ``max_chain_walk_depth=262144``, distractor
+> rank 22). Long-horizon reconstruction reaches 22 heads at
+> max_k=640. Consensus has 28 disjoint stages including
+> ``restart_aware_arbiter`` and
+> ``delayed_repair_after_restart_arbiter``. The first capsule-
+> native team-consensus controller V6 composes regime-aware
+> weighted quorum + repair-dominance arbiter + budget-primary
+> arbiter + contradiction-then-rejoin arbiter + restart-aware
+> arbiter + delayed-repair-after-restart arbiter + substrate-
+> replay fallback + transcript fallback. Plane A V4 ships seven
+> hosted control-plane modules (router V4 with restart-pressure
+> weighting + delayed-repair match table, logprob router V4 with
+> restart-aware abstain floor + per-budget+restart tiebreak,
+> cache-aware planner V4 with ≥ 72 % savings on 10×8 two-layer-
+> rotated prefixes, cost planner V4 with cost-per-repair-success-
+> under-budget + abstain-when-restart-pressure-violated, boundary
+> V4 with 25 blocked axes + the W70 frontier-blocked axes
+> unchanged, provider filter V3 with restart-aware drop). And —
+> the load-bearing operational W71 advance — the new
+> ``hosted_real_handoff_coordinator_v3`` records per-turn content-
+> addressed V3 envelopes that promote any turn with
+> ``restart_pressure ≥ 0.5`` and substrate_trust ≥ floor to Plane B
+> with ``restart_alignment = 1.0`` and add a sixth
+> ``delayed_repair_fallback`` decision on top of V2's five,
+> exposing a delayed-repair falsifier and saving ≥ 70 % cross-
+> plane visible tokens at the default 55/15/10/15/5 % workload
+> (≥ 84 % at default config). R-165 + R-166 + R-167 + R-168
+> deliver **64 H-bars × 3 seeds (192 cells)**, all pass. The
+> honest scope is unchanged: hosted backends remain text-only at
+> the HTTP surface (``W71-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-
+> CAP``); the substrate is an 18-layer in-repo NumPy runtime, not
+> a frontier model (``W71-L-NUMPY-CPU-V16-SUBSTRATE-CAP``);
+> "training" is closed-form linear ridge throughout
+> (``W71-L-V16-NO-AUTOGRAD-CAP``); the multi-agent task-success
+> wins are measured **inside the W71 synthetic harness**
+> (``W71-L-MASC-V7-SYNTHETIC-CAP``), not on real hosted multi-
+> agent backends; the delayed-repair-trajectory CID is computed
+> from byte-stable substrate state only and does NOT prove
+> delayed-repair integrity at the hosted surface (``W71-L-DELAYED-
+> REPAIR-IN-REPO-CAP``); budgets and restart pressure are caller-
+> declared (``W71-L-DELAYED-REPAIR-DECLARED-CAP``,
+> ``W71-L-HOSTED-V4-DECLARED-CAP``); and the V3 handoff
+> coordinator preserves the wall — it does NOT cross the substrate
+> boundary (``W71-L-HANDOFF-V3-NOT-CROSSING-WALL-CAP``).*
+>
 > **Post-W69 research-line update (W70 Stronger Repair-Dominance /
 > Budget-Primary Two-Plane Multi-Agent Substrate Programme,
 > 2026-05-16).** *Fifteenth substrate-attack milestone, and the

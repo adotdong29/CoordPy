@@ -13,6 +13,77 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W71 Stronger Delayed-Repair-After-Restart / Repair-Trajectory-
+  Primary Two-Plane Multi-Agent Substrate Programme** (post-W70,
+  2026-05-16) — *sixteenth substrate-attack milestone; seventh
+  **multi-agent task-success-bearing** substrate milestone (first
+  to win across **eleven** regimes: W70's ten plus
+  ``delayed_repair_after_restart``); first milestone to
+  **operationalise restart-aware Plane A↔B handoff promotion** and
+  the **first milestone to expose a content-addressed per-turn
+  delayed-repair-trajectory CID** that unifies all seven repair-
+  and-restart primitives into a single dominant signal back into
+  the substrate-routed policy*. Nineteen orthogonal advances on
+  top of W70 (12 Plane B v-bumps + 5 Plane A V4 + 1 new restart-
+  aware handoff coordinator V3 + 1 new restart-aware provider
+  filter V3 + 1 new MASC V7 / TCC V6 line). Plane B: (M1) **Tiny
+  Substrate V16** (18 layers; three new V16 axes — per-turn
+  delayed-repair-trajectory CID, per-layer restart-dominance
+  label in [0..7], per-layer delayed-repair gate); (M2) **KV
+  Bridge V16** (twelve-target stacked ridge + 84-dim delayed-
+  repair fingerprint + restart-dominance falsifier); (M3) **Cache
+  Controller V14** (eleven-objective stacked ridge + per-role
+  12-dim restart-priority head); (M4) **Replay Controller V12**
+  (nineteen regimes + nine-way restart-aware routing head);
+  (M5) **Deep Substrate Hybrid V16** (sixteen-way bidirectional
+  loop); (M6) **Substrate Adapter V16** with new
+  ``substrate_v16_full`` tier; (M7) **Persistent V23** (22
+  layers, twentieth carrier, ``max_chain_walk_depth=262144``,
+  rank-22); (M8) **LHR V23** (22 heads, ``max_k=640``); (M9)
+  **MLSC V19** (delayed-repair-trajectory + restart-dominance
+  chains); (M10) **Consensus V17** (28 stages); (M11) **MASC
+  V7** (sixteen policies, eleven regimes); (M12) **TCC V6**
+  (restart-aware + delayed-repair-after-restart arbiters).
+  Plane A V4: (H1) **Hosted Router V4** (restart-pressure
+  weighting + delayed-repair match); (H2) **Hosted Logprob
+  Router V4** (restart-aware abstain floor + per-budget+restart
+  tiebreak); (H3) **Hosted Cache-Aware Planner V4** (two-layer
+  rotated; ≥ 72 % savings on 10×8 hit=1); (H4) **Hosted Cost
+  Planner V4** (cost-per-repair-success-under-budget +
+  abstain-when-restart-pressure-violated); (H5) **Hosted Real
+  Substrate Boundary V4** (25 blocked axes); (H6) **Hosted Real
+  Handoff Coordinator V3** (restart-aware promotion + delayed-
+  repair fallback + cross-plane saving ≥ 70 %); (H7) **Hosted
+  Provider Filter V3** (restart-aware drop). R-165 + R-166 +
+  R-167 + R-168 deliver **64 H-bars × 3 seeds (192 cells)**, all
+  pass. Three new closed-form ridge solves on top of W70's 58
+  (61 total across W61..W71). The cumulative trust boundary
+  across W22..W71 is **≥ 1567 enumerated failure modes**. Ships
+  at ``coordpy.tiny_substrate_v16``, ``coordpy.kv_bridge_v16``,
+  ``coordpy.cache_controller_v14``,
+  ``coordpy.replay_controller_v12``,
+  ``coordpy.deep_substrate_hybrid_v16``,
+  ``coordpy.substrate_adapter_v16``,
+  ``coordpy.persistent_latent_v23``,
+  ``coordpy.long_horizon_retention_v23``,
+  ``coordpy.mergeable_latent_capsule_v19``,
+  ``coordpy.consensus_fallback_controller_v17``,
+  ``coordpy.multi_agent_substrate_coordinator_v7``,
+  ``coordpy.team_consensus_controller_v6``,
+  ``coordpy.hosted_router_controller_v4``,
+  ``coordpy.hosted_logprob_router_v4``,
+  ``coordpy.hosted_cache_aware_planner_v4``,
+  ``coordpy.hosted_cost_planner_v4``,
+  ``coordpy.hosted_real_substrate_boundary_v4``,
+  ``coordpy.hosted_real_handoff_coordinator_v3``,
+  ``coordpy.hosted_provider_filter_v3``, ``coordpy.w71_team``,
+  ``coordpy.r165_benchmark``, ``coordpy.r166_benchmark``,
+  ``coordpy.r167_benchmark``, ``coordpy.r168_benchmark``.
+  Released SDK contract is byte-for-byte unchanged
+  (``coordpy.__version__ == "0.5.20"``,
+  ``coordpy.SDK_VERSION == "coordpy.sdk.v3.43"``); no PyPI
+  release.
+
 - **W70 Stronger Repair-Dominance / Budget-Primary Two-Plane
   Multi-Agent Substrate Programme** (post-W69, 2026-05-16) —
   *fifteenth substrate-attack milestone; sixth **multi-agent task-

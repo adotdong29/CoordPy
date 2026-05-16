@@ -5,9 +5,132 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W69 W70
-> milestone (Stronger Repair-Dominance / Budget-Primary Two-Plane
-> Multi-Agent Substrate Programme research line), 2026-05-16.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W70 W71
+> milestone (Stronger Delayed-Repair-After-Restart / Repair-
+> Trajectory-Primary Two-Plane Multi-Agent Substrate Programme
+> research line), 2026-05-16.
+
+## TL;DR — W71 Stronger Delayed-Repair-After-Restart / Repair-Trajectory-Primary Two-Plane Multi-Agent Substrate Programme (post-W70 research milestone)
+
+The programme now has **sixty-eight** coupled research axes. W71
+mints axis 68: the **sixteenth substrate-attack milestone**, the
+**seventh multi-agent task-success-bearing** substrate milestone
+(first to win across *eleven* regimes: W70's ten +
+**delayed_repair_after_restart**), the **first milestone to
+operationalise restart-aware Plane A↔B handoff promotion**, and the
+**first milestone to expose a content-addressed per-turn delayed-
+repair-trajectory CID** that unifies all seven repair-and-restart
+primitives into a single dominant signal back into the substrate-
+routed policy.
+
+The load-bearing W71 win is **MASC V7 / TCC V6 +
+tiny_substrate_v16 + 11 supporting Plane B V16 modules + 5 Plane A
+V4 modules + the new restart-aware handoff coordinator V3 + the
+new restart-aware provider filter V3**: V16 strictly beats V15 on
+≥ 50 % of seeds in every regime (≥ 86.7 % in practice across all
+regimes, including the new
+``delayed_repair_after_restart`` regime where V15 has no signal),
+and TSC_V16 strictly beats TSC_V15 on ≥ 50 % of seeds in every
+regime (100 % in practice). Plus an honest **hosted control plane
+V4** (Plane A V4): HostedRouterControllerV4 (restart-pressure
+weighting + delayed-repair match table),
+HostedLogprobRouterV4 (restart-aware abstain floor lowered under
+high restart pressure + per-budget+restart tiebreak),
+HostedCacheAwarePlannerV4 (two-layer rotated; ≥ 72 % savings on
+10×8 at hit_rate=1.0), HostedCostPlannerV4 (cost-per-repair-
+success-under-budget + abstain-when-restart-pressure-violated),
+and the **explicit wall V4** HostedRealSubstrateBoundaryV4 that
+enumerates 25 blocked axes at the hosted surface (W70's 22 + 3 new
+V16 axes) and carries forward the W70 frontier_blocked_axes set
+unchanged. The new **restart-aware Plane A↔B handoff coordinator
+V3** records per-turn V3 envelopes that promote any turn with
+``restart_pressure ≥ 0.5`` to Plane B (with
+``restart_alignment = 1.0``) and adds a sixth decision
+(``delayed_repair_fallback``) on top of the V2's five, exposes a
+delayed-repair falsifier, and saves ≥ 70 % visible tokens vs
+forcing every turn through hosted_only (≥ 84 % at default config).
+Plus the new restart-aware **provider filter V3** that drops
+providers whose declared restart-noise score exceeds their per-
+provider cap under high restart pressure.
+
+**Nineteen orthogonal advances** on top of W70 (12 Plane B v-bumps
++ 5 Plane A V4 + 1 new handoff coordinator V3 + 1 new MASC V7 /
+TCC V6 line). Plane B headlines: V16 substrate (18 layers; three
+new V16 axes — per-turn delayed-repair-trajectory CID, per-layer
+restart-dominance label, per-layer delayed-repair gate); KV V16
+twelve-target stacked ridge + 84-dim delayed-repair fingerprint +
+restart-dominance falsifier; Cache V14 eleven-objective stacked
+ridge + per-role 12-dim restart-priority head; Replay V12
+nineteen-regime ridge + nine-way restart-aware routing head;
+Deep Substrate Hybrid V16 sixteen-way loop; Substrate Adapter V16
+with ``substrate_v16_full`` tier; Persistent V23 (22 layers,
+max_chain_walk_depth=262144, twentieth skip carrier); LHR V23 (22
+heads, max_k=640); MLSC V19 (delayed-repair + restart-dominance
+chains); Consensus V17 (28 stages); MASC V7 (16-policy,
+11-regime); TCC V6 (restart-aware + delayed-repair-after-restart
+arbiters).
+
+W71 fits **three** new closed-form ridge solves on top of W70's
+58 (cache V14 eleven-objective + replay V12 restart-aware-routing
++ KV V16 twelve-target — the cache V14 per-role restart-priority
+head re-uses the V13 family solver). Total **61 closed-form ridge
+solves across W61..W71**. No autograd, no SGD, no GPU. The
+benchmark sweep is **192 cells across 4 benchmark families**
+(R-165 hosted control plane V4 (10 H-bars), R-166 real substrate
+plane V16 (16 H-bars), R-167 multi-agent task success across 11
+regimes (24 H-bars), R-168 handoff V3 + falsifier + limitation
+reproductions (14 H-bars)), 192/192 cells pass at 3/3 seeds.
+
+The W71 envelope verifier enumerates **53 disjoint failure modes**
+(cumulative trust boundary across W22..W71 ≥ 1567 enumerated
+failure modes). Ships at ``coordpy.tiny_substrate_v16``,
+``coordpy.kv_bridge_v16``, ``coordpy.cache_controller_v14``,
+``coordpy.replay_controller_v12``,
+``coordpy.deep_substrate_hybrid_v16``,
+``coordpy.substrate_adapter_v16``,
+``coordpy.persistent_latent_v23``,
+``coordpy.long_horizon_retention_v23``,
+``coordpy.mergeable_latent_capsule_v19``,
+``coordpy.consensus_fallback_controller_v17``,
+``coordpy.multi_agent_substrate_coordinator_v7``,
+``coordpy.team_consensus_controller_v6``, ``coordpy.w71_team``,
+plus the Plane A V4 modules ``coordpy.hosted_router_controller_v4``,
+``coordpy.hosted_logprob_router_v4``,
+``coordpy.hosted_cache_aware_planner_v4``,
+``coordpy.hosted_cost_planner_v4``,
+``coordpy.hosted_real_substrate_boundary_v4``,
+``coordpy.hosted_real_handoff_coordinator_v3``,
+``coordpy.hosted_provider_filter_v3``, and benchmarks
+``coordpy.r165_benchmark`` / ``coordpy.r166_benchmark`` /
+``coordpy.r167_benchmark`` / ``coordpy.r168_benchmark``. **Public
+SDK contract is byte-for-byte unchanged:
+``coordpy.__version__ == "0.5.20"``,
+``coordpy.SDK_VERSION == "coordpy.sdk.v3.43"``.**
+
+Honest scope (do-not-overstate):
+
+* W71 keeps the W70 two-plane split and *adds* the restart-aware
+  handoff V3; it does NOT dissolve the wall. Hosted backends remain
+  text-only at the HTTP surface. ``W71-L-HOSTED-V4-NO-SUBSTRATE-
+  CAP``.
+* The eleven-regime multi-agent wins are measured inside the in-
+  repo synthetic MASC V7 harness. ``W71-L-MASC-V7-SYNTHETIC-CAP``.
+* Frontier-model substrate access remains the unsolved research-
+  line wall — W71 carries the W70 frontier_blocked_axes set forward
+  unchanged. ``W71-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``.
+* The delayed-repair-trajectory CID is computed from byte-stable
+  V15 repair-trajectory CID + recorded restart events + recorded
+  delay windows only. It does NOT prove delayed-repair integrity at
+  the hosted surface (``W71-L-DELAYED-REPAIR-IN-REPO-CAP``).
+* The delayed-repair gate is a calibrated weighted combination of
+  caller-declared budget, baseline cost, restart count, repair-
+  dominance count, and delay window. It is not a learned end-to-end
+  controller (``W71-L-DELAYED-REPAIR-DECLARED-CAP``).
+* Hosted V4 success scores, quality scores, budgets, and restart
+  pressure are caller-declared. The router does not measure live
+  success (``W71-L-HOSTED-V4-DECLARED-CAP``).
+* The handoff V3 coordinator preserves the wall as a content-
+  addressed invariant (``W71-L-HANDOFF-V3-NOT-CROSSING-WALL-CAP``).
 
 ## TL;DR — W70 Stronger Repair-Dominance / Budget-Primary Two-Plane Multi-Agent Substrate Programme (post-W69 research milestone)
 

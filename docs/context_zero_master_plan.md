@@ -1,6 +1,82 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W69 / W70, 2026-05-16 —
+> **Latest milestone marker (post-W70 / W71, 2026-05-16 —
+> Stronger Delayed-Repair-After-Restart / Repair-Trajectory-Primary
+> Two-Plane Multi-Agent Substrate Programme, twenty-ninth post-
+> release research milestone — sixteenth substrate-attack milestone
+> and **seventh** multi-agent task-success-bearing substrate
+> milestone (the first to win across **eleven** regimes — W70's ten
+> plus ``delayed_repair_after_restart``), the **first milestone to
+> operationalise restart-aware Plane A↔B handoff promotion**, and
+> the **first milestone to expose a content-addressed per-turn
+> delayed-repair-trajectory CID** unifying all seven repair-and-
+> restart primitives into a single dominant signal.**
+> ``coordpy.tiny_substrate_v16`` ships 18 layers + three new V16
+> axes (per-turn delayed-repair-trajectory CID, per-layer restart-
+> dominance label, per-layer delayed-repair gate).
+> ``coordpy.multi_agent_substrate_coordinator_v7`` ships the
+> load-bearing W71 mechanism: a real N-agent harness running
+> **sixteen** matched-budget policies under **eleven** regimes; the
+> V16 policy strictly beats V15 across every regime
+> (≥ 86.7 % of seeds in baseline-class regimes; ≥ 50 % in the
+> ``delayed_repair_after_restart`` regime; TSC_V16 strictly beats
+> TSC_V15 100 % of seeds in every regime).
+> ``coordpy.hosted_real_handoff_coordinator_v3`` (NEW) ships the
+> **restart-aware Plane A↔B bridge** — content-addressed V3
+> envelopes that promote any turn with
+> ``restart_pressure ≥ 0.5`` to Plane B with
+> ``restart_alignment = 1.0`` and add a sixth decision
+> (``delayed_repair_fallback``) on top of the V2's five, expose a
+> delayed-repair falsifier, and save ≥ 70 % cross-plane visible
+> tokens (≥ 84 % at the default workload).
+> Plus seventeen more orthogonal mechanism advances (KV V16 twelve-
+> target ridge + 84-dim delayed-repair fingerprint; cache V14
+> eleven-objective + per-role 12-dim restart-priority head; replay
+> V12 nineteen-regime + nine-way restart-aware routing head; deep
+> substrate hybrid V16 sixteen-way; substrate adapter V16;
+> persistent V23 (22 layers, max_chain_walk_depth=262144,
+> twentieth carrier, rank-22); LHR V23 (22 heads, max_k=640); MLSC
+> V19; consensus V17 (28 stages); team-consensus controller V6
+> (restart-aware + delayed-repair-after-restart arbiters); hosted
+> router V4 (restart-pressure weighting + delayed-repair match);
+> hosted logprob router V4 (restart-aware abstain floor + per-
+> budget+restart tiebreak); hosted cache-aware planner V4 (two-
+> layer rotated); hosted cost planner V4 (cost-per-repair-success-
+> under-budget + abstain-when-restart-pressure-violated); boundary
+> V4 (25 blocked axes); provider filter V3 (restart-aware drop);
+> handoff V3.
+> R-165 (10 H-bars) + R-166 (16) + R-167 (24) + R-168 (14) deliver
+> **64 H-bars × 3 seeds (192 cells)**, all pass.
+> ``W71-L-V16-NO-AUTOGRAD-CAP`` documents that all "training"
+> remains single-step closed-form linear ridge (61 ridge solves
+> total across W61..W71); no SGD / autograd / GPU. Cumulative
+> trust boundary across W22..W71 = **≥ 1567 enumerated failure
+> modes** (1514 from W22..W70 + 53 new W71 envelope verifier
+> modes). W71 ships at ``coordpy.tiny_substrate_v16``,
+> ``coordpy.kv_bridge_v16``, ``coordpy.cache_controller_v14``,
+> ``coordpy.replay_controller_v12``,
+> ``coordpy.deep_substrate_hybrid_v16``,
+> ``coordpy.substrate_adapter_v16``,
+> ``coordpy.persistent_latent_v23``,
+> ``coordpy.long_horizon_retention_v23``,
+> ``coordpy.mergeable_latent_capsule_v19``,
+> ``coordpy.consensus_fallback_controller_v17``,
+> ``coordpy.multi_agent_substrate_coordinator_v7``,
+> ``coordpy.team_consensus_controller_v6``,
+> ``coordpy.w71_team``, ``coordpy.hosted_router_controller_v4``,
+> ``coordpy.hosted_logprob_router_v4``,
+> ``coordpy.hosted_cache_aware_planner_v4``,
+> ``coordpy.hosted_cost_planner_v4``,
+> ``coordpy.hosted_real_substrate_boundary_v4``,
+> ``coordpy.hosted_real_handoff_coordinator_v3``,
+> ``coordpy.hosted_provider_filter_v3``,
+> ``coordpy.r165_benchmark`` / ``coordpy.r166_benchmark`` /
+> ``coordpy.r167_benchmark`` / ``coordpy.r168_benchmark``,
+> reachable only via explicit import.
+> ``coordpy.__version__`` remains ``0.5.20``; SDK contract is
+> byte-for-byte unchanged; no PyPI release.
+>
+> **Previous milestone marker (post-W69 / W70, 2026-05-16 —
 > Stronger Repair-Dominance / Budget-Primary Two-Plane Multi-Agent
 > Substrate Programme, twenty-eighth post-release research
 > milestone — fifteenth substrate-attack milestone and **sixth**

@@ -2,9 +2,56 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W69
-> W70 milestone (Stronger Repair-Dominance / Budget-Primary Two-
-> Plane Multi-Agent Substrate Programme research line), 2026-05-16.
+> README-of-README must satisfy these rules. Last touched: post-W70
+> W71 milestone (Stronger Delayed-Repair-After-Restart / Repair-
+> Trajectory-Primary Two-Plane Multi-Agent Substrate Programme
+> research line), 2026-05-16.
+
+## W71 (Stronger Delayed-Repair-After-Restart / Repair-Trajectory-Primary Two-Plane Multi-Agent Substrate Programme) — explicit do-not-overstate rules
+
+The W71 milestone introduces the V16 substrate (18 layers + three
+new V16 axes), the sixteen-policy MASC V7 across eleven regimes,
+the TCC V6, the hosted control plane V4 modules, the new
+**restart-aware hosted-real handoff coordinator V3** that promotes
+turns with restart pressure above the floor to Plane B and adds a
+``delayed_repair_fallback`` decision, and the restart-aware provider
+filter V3. The substrate now produces multi-agent task-success wins
+under **eleven** named failure-mode regimes (W70's ten plus
+``delayed_repair_after_restart``). The honest scope:
+
+1. **Sixteenth substrate-attack milestone — still in-repo NumPy.**
+   The V16 substrate adds 18 layers, GQA 8q/4kv, RMSNorm, SwiGLU,
+   d_model=64, vocab=259 — *still NOT a frontier model*. Hosted
+   backends remain text-only at the HTTP surface
+   (``W71-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``).
+2. **Multi-agent task wins are synthetic-harness-load-bearing.**
+   MASC V7 runs sixteen policies on a synthetic deterministic
+   coordination task; the V16 policy beats V15 because the V16
+   mechanisms (delayed-repair-trajectory CID + restart-dominance-
+   per-layer + delayed-repair gate) are engineered to materially
+   help in the eleven regimes, particularly the new compound
+   regime. **This is not a real hosted multi-agent win**
+   (``W71-L-MASC-V7-SYNTHETIC-CAP``).
+3. **All "training" remains closed-form linear ridge.** Three new
+   ridge solves on top of W70's 58 (61 total across W61..W71); no
+   SGD, no autograd, no GPU (``W71-L-V16-NO-AUTOGRAD-CAP``).
+4. **The handoff coordinator V3 preserves the wall.** The restart-
+   aware handoff V3 does NOT cross the substrate boundary. It
+   records *which plane handled each turn* under a restart-aware
+   score and exposes a delayed-repair falsifier
+   (``W71-L-HANDOFF-V3-NOT-CROSSING-WALL-CAP``). When V3 returns
+   ``delayed_repair_fallback``, the envelope still records Plane A
+   handled the turn (with the substrate signalling that the team
+   needs Plane B); the boundary stays content-addressed.
+5. **Hosted V4 is caller-declared.** Budgets, restart pressure, and
+   provider quality scores are caller-declared; V4 does not measure
+   live success (``W71-L-HOSTED-V4-DECLARED-CAP``,
+   ``W71-L-HOSTED-V4-NO-SUBSTRATE-CAP``).
+6. **Frontier substrate access is still blocked.** W71 carries the
+   W70 ``frontier_blocked_axes`` set forward unchanged at boundary
+   V4. The transformer-internal bridge to a frontier-quality
+   runtime remains conjectural (``W71-C-FRONTIER-HOSTED-BRIDGE-
+   NEEDED``).
 
 ## W70 (Stronger Repair-Dominance / Budget-Primary Two-Plane Multi-Agent Substrate Programme) — explicit do-not-overstate rules
 
