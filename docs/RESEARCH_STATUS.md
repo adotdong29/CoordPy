@@ -5,9 +5,124 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W68 W69
-> milestone (Stronger Solving-Context Two-Plane Multi-Agent
-> Substrate research line), 2026-05-16.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W69 W70
+> milestone (Stronger Repair-Dominance / Budget-Primary Two-Plane
+> Multi-Agent Substrate Programme research line), 2026-05-16.
+
+## TL;DR — W70 Stronger Repair-Dominance / Budget-Primary Two-Plane Multi-Agent Substrate Programme (post-W69 research milestone)
+
+The programme now has **sixty-seven** coupled research axes. W70
+mints axis 67: the **fifteenth substrate-attack milestone**, the
+**sixth multi-agent task-success-bearing** substrate milestone
+(first to win across *ten* regimes: W69's nine +
+**contradiction_then_rejoin_under_budget**), the **first milestone
+to operationalise budget-primary handoff scoring**, and the
+**first milestone to expose a content-addressed per-turn repair-
+trajectory CID** that unifies all six W67–W69 repair primitives
+into a single dominant-repair signal back into the substrate-routed
+policy.
+
+The load-bearing W70 win is **MASC V6 / TCC V5 + tiny_substrate_v15
++ 11 supporting Plane B V15 modules + 5 Plane A V3 modules + the
+new budget-primary handoff coordinator V2**: V15 strictly beats V14
+on ≥ 50 % of seeds in every regime (baseline 100 %, team_consensus
+_under_budget 100 %, team_failure_recovery 100 %, role_dropout
+100 %, branch_merge_reconciliation 100 %, partial_contradiction
+100 %, agent_replacement 100 %, **multi_branch_rejoin 87.5 %**,
+**silent_corruption 87.5 %**, **contradiction_then_rejoin_under_
+budget 87.5 %**), and TSC_V15 strictly beats TSC_V14 on ≥ 50 % of
+seeds in every regime (75.0–87.5 % depending on regime). Plus an
+honest **hosted control plane V3** (Plane A V3):
+HostedRouterControllerV3 (budget-aware multi-objective + repair-
+dominance match score), HostedLogprobRouterV3 (abstain-when-
+disagree + per-budget tiebreak), HostedCacheAwarePlannerV3 (per-
+role staggered + rotated prefix + ≥ 65 % savings on 8×8 at
+hit_rate=1.0), HostedCostPlannerV3 (cost-per-team-success-under-
+budget + abstain-when-budget-violated), and the **explicit wall V3**
+HostedRealSubstrateBoundaryV3 that enumerates 22 blocked axes at
+the hosted surface (W69's 19 + 3 new V15 axes) and carries forward
+the W69 frontier_blocked_axes set unchanged. The new **budget-
+primary Plane A↔B handoff coordinator V2** records per-turn V2
+envelopes that score `team_success_per_visible_token` and add a
+fifth decision (`budget_primary_fallback`) on top of the V1's four,
+exposes a repair-dominance falsifier, and saves ≥ 65 % visible
+tokens vs forcing every turn through hosted_only.
+
+**Eighteen orthogonal advances** on top of W69 (11 Plane B v-bumps
++ 5 Plane A V3 + 1 new handoff coordinator V2 + 1 new MASC V6 / TCC
+V5 line). Plane B headlines: V15 substrate (17 layers; three new
+V15 axes — per-turn repair-trajectory CID, per-layer dominant-
+repair label, per-layer budget-primary gate); KV V15 eleven-target
+stacked ridge + 70-dim repair-trajectory fingerprint + repair-
+dominance falsifier; Cache V13 ten-objective stacked ridge + per-
+role 11-dim budget-primary head; Replay V11 eighteen-regime ridge +
+eight-way budget-primary routing head; Deep Substrate Hybrid V15
+fifteen-way loop; Substrate Adapter V15 with `substrate_v15_full`
+tier; Persistent V22 (21 layers, max_chain_walk_depth=131072,
+nineteenth skip carrier); LHR V22 (21 heads, max_k=576); MLSC V18
+(repair-trajectory + budget-primary chains); Consensus V16 (26
+stages); MASC V6 (14-policy, 10-regime); TCC V5 (repair-dominance
++ budget-primary + contradiction-then-rejoin arbiters).
+
+W70 fits **five** new closed-form ridge solves on top of W69's 53
+(cache V13 ten-objective + cache V13 per-role budget-primary +
+replay V11 per-role per-regime + replay V11 budget-primary-routing
++ KV V15 eleven-target). Total **58 closed-form ridge solves
+across W61..W70**. No autograd, no SGD, no GPU. The benchmark
+sweep is **180 cells across 4 benchmark families** (R-161 hosted
+control plane V3 (10 H-bars), R-162 real substrate plane V15 (16
+H-bars), R-163 multi-agent task success across 10 regimes (22 H-
+bars), R-164 handoff V2 + falsifier + limitation reproductions (12
+H-bars)), 180/180 cells pass at 3/3 seeds.
+
+The W70 envelope verifier enumerates **53 disjoint failure modes**
+(cumulative trust boundary across W22..W70 ≥ 1514 enumerated
+failure modes). Ships at `coordpy.tiny_substrate_v15`,
+`coordpy.kv_bridge_v15`, `coordpy.cache_controller_v13`,
+`coordpy.replay_controller_v11`,
+`coordpy.deep_substrate_hybrid_v15`,
+`coordpy.substrate_adapter_v15`,
+`coordpy.persistent_latent_v22`,
+`coordpy.long_horizon_retention_v22`,
+`coordpy.mergeable_latent_capsule_v18`,
+`coordpy.consensus_fallback_controller_v16`,
+`coordpy.multi_agent_substrate_coordinator_v6`,
+`coordpy.team_consensus_controller_v5`, `coordpy.w70_team`, plus
+the Plane A V3 modules `coordpy.hosted_router_controller_v3`,
+`coordpy.hosted_logprob_router_v3`,
+`coordpy.hosted_cache_aware_planner_v3`,
+`coordpy.hosted_cost_planner_v3`,
+`coordpy.hosted_real_substrate_boundary_v3`,
+`coordpy.hosted_real_handoff_coordinator_v2`, and benchmarks
+`coordpy.r161_benchmark` / `coordpy.r162_benchmark` /
+`coordpy.r163_benchmark` / `coordpy.r164_benchmark`. **Public SDK
+contract is byte-for-byte unchanged: `coordpy.__version__ ==
+"0.5.20"`, `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`.**
+
+Honest scope (do-not-overstate):
+
+* W70 keeps the W69 two-plane split and *adds* the budget-primary
+  handoff V2; it does NOT dissolve the wall. Hosted backends remain
+  text-only at the HTTP surface. ``W70-L-HOSTED-V3-NO-SUBSTRATE-
+  CAP``.
+* The ten-regime multi-agent wins are measured inside the in-repo
+  synthetic MASC V6 harness. ``W70-L-MASC-V6-SYNTHETIC-CAP``.
+* Frontier-model substrate access remains the unsolved research-
+  line wall — W70 carries the W69 frontier_blocked_axes set forward
+  unchanged. ``W70-L-FRONTIER-SUBSTRATE-STILL-BLOCKED-CAP``.
+* The repair-trajectory CID is computed from byte-stable repair-
+  primitive witness contents (numpy arrays + sorted role dicts +
+  repair events) only. It does NOT prove repair integrity at the
+  hosted surface (``W70-L-REPAIR-TRAJECTORY-IN-REPO-CAP``).
+* The budget-primary gate is a calibrated weighted combination of
+  caller-declared budget and substrate-measured features. It is
+  not a learned end-to-end controller and the budgets are caller-
+  supplied (``W70-L-BUDGET-PRIMARY-DECLARED-CAP``).
+* Hosted V3 success scores, quality scores, and budgets are caller-
+  declared. The router does not measure live success
+  (``W70-L-HOSTED-V3-DECLARED-CAP``).
+* The handoff V2 coordinator preserves the wall as a content-
+  addressed invariant (``W70-L-HANDOFF-V2-NOT-CROSSING-WALL-CAP``).
 
 ## TL;DR — W69 Stronger Solving-Context Two-Plane Multi-Agent Substrate (post-W68 research milestone)
 

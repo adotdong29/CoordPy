@@ -2,7 +2,86 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W68 research-line update (W69 Stronger Solving-Context
+> **Post-W69 research-line update (W70 Stronger Repair-Dominance /
+> Budget-Primary Two-Plane Multi-Agent Substrate Programme,
+> 2026-05-16).** *Fifteenth substrate-attack milestone, and the
+> **sixth** multi-agent task-success-bearing substrate milestone in
+> the programme — the first to produce wins across **ten** failure-
+> mode regimes (W69's nine plus
+> **contradiction_then_rejoin_under_budget**), the **first milestone
+> to operationalise budget-primary handoff scoring**, and the
+> **first milestone to expose a content-addressed per-turn repair-
+> trajectory CID** that unifies all six W67–W69 repair primitives
+> (multi-branch-rejoin, silent-corruption, partial-contradiction,
+> agent-replacement, role-dropout-recovery, branch-merge) into a
+> single dominant-repair signal back into the substrate-routed
+> policy. ``MultiAgentSubstrateCoordinatorV6`` runs **fourteen**
+> matched-budget policies (the twelve W69 policies plus
+> ``substrate_routed_v15`` and ``team_substrate_coordination_v15``)
+> under ten regimes; the V15 policy strictly beats V14 across all
+> ten regimes (100 % at baseline / team_consensus_under_budget /
+> team_failure_recovery / role_dropout / branch_merge_reconciliation
+> / partial_contradiction / agent_replacement_warm_restart; 87.5 %
+> at multi_branch_rejoin / silent_corruption / contradiction_then_
+> rejoin_under_budget). The ``team_substrate_coordination_v15``
+> policy strictly beats ``team_substrate_coordination_v14`` on
+> ≥ 75 % of seeds in every regime (up to 87.5 % across the baseline
+> class). In the new contradiction-then-rejoin-under-budget regime
+> (where agents at ~30 % of turns contradict each other AND at
+> ~60 % of turns fork into branches AND the visible-token budget
+> is tight throughout), the V15 substrate's repair-trajectory CID +
+> per-layer dominant-repair label + budget-primary gate give the
+> substrate-routed policy a coordinated repair arc that V14 cannot
+> follow. The in-repo NumPy substrate grows to V15 (17 layers +
+> three new V15 axes: per-turn repair-trajectory CID, per-layer
+> dominant-repair label in [0..6], per-layer budget-primary gate).
+> The substrate repair-dominance primitive saves **93 %** of
+> recompute flops over six-primitive repair work at 128 tokens.
+> The budget-primary throttle saves **87.5 %** visible tokens at
+> visible_token_budget=64 / baseline_cost=512. Five new closed-form
+> ridge solves on top of W61..W69's 53 (58 total). The deep
+> substrate hybrid is now fifteen-way (V14 hybrid + cache V13 +
+> replay V11 + repair-trajectory + budget-primary + team-consensus
+> controller V5). The persistent latent state is V22 (21 layers, 19
+> skip carriers, ``max_chain_walk_depth=131072``, distractor rank
+> 21). Long-horizon reconstruction reaches 21 heads at max_k=576.
+> Consensus has 26 disjoint stages including ``repair_dominance_
+> arbiter`` and ``budget_primary_arbiter``. The first capsule-native
+> team-consensus controller V5 composes regime-aware weighted quorum
+> + repair-dominance arbiter (confidence-weighted mean across
+> matching agents) + budget-primary arbiter (top-confidence agent
+> under tight budget) + contradiction-then-rejoin arbiter +
+> substrate-replay fallback + transcript fallback. Plane A V3 ships
+> five new hosted control-plane modules (router V3 with budget-aware
+> weighted scoring + repair-dominance match, logprob router V3 with
+> abstain-when-disagree + per-budget tiebreak, cache-aware planner
+> V3 with ≥ 65 % savings on 8×8 staggered + rotated prefixes, cost
+> planner V3 with cost-per-team-success-under-budget + abstain-
+> when-budget-violated, boundary V3 with 22 blocked axes + 3
+> frontier-blocked axes). And — the load-bearing operational W70
+> advance — the new ``hosted_real_handoff_coordinator_v2`` records
+> per-turn content-addressed V2 envelopes that score ``team_success
+> _per_visible_token`` and add a fifth ``budget_primary_fallback``
+> decision on top of V1's four, exposing a repair-dominance
+> falsifier and saving ≥ 75 % cross-plane visible tokens at the
+> default 55/20/15/10 % workload. R-161 + R-162 + R-163 + R-164
+> deliver **60 H-bars × 3 seeds (180 cells)**, all pass. The honest
+> scope is unchanged: hosted backends remain text-only at the HTTP
+> surface (``W70-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``); the
+> substrate is a 17-layer in-repo NumPy runtime, not a frontier
+> model (``W70-L-NUMPY-CPU-V15-SUBSTRATE-CAP``); "training" is
+> closed-form linear ridge throughout (``W70-L-V15-NO-AUTOGRAD-
+> CAP``); the multi-agent task-success wins are measured **inside
+> the W70 synthetic harness** (``W70-L-MASC-V6-SYNTHETIC-CAP``),
+> not on real hosted multi-agent backends; the repair-trajectory
+> CID is computed from byte-stable substrate state only and does
+> NOT prove repair integrity at the hosted surface (``W70-L-REPAIR-
+> TRAJECTORY-IN-REPO-CAP``); budgets are caller-declared (``W70-L-
+> BUDGET-PRIMARY-DECLARED-CAP``); and the V2 handoff coordinator
+> preserves the wall — it does NOT cross the substrate boundary
+> (``W70-L-HANDOFF-V2-NOT-CROSSING-WALL-CAP``).*
+>
+> **Preceding research-line update (W69 Stronger Solving-Context
 > Two-Plane Multi-Agent Substrate, 2026-05-16).** *Fourteenth
 > substrate-attack milestone, and the **fifth** multi-agent
 > task-success-bearing substrate milestone in the programme — the

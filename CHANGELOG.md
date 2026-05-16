@@ -13,6 +13,83 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W70 Stronger Repair-Dominance / Budget-Primary Two-Plane
+  Multi-Agent Substrate Programme** (post-W69, 2026-05-16) —
+  *fifteenth substrate-attack milestone; sixth **multi-agent task-
+  success-bearing** substrate milestone (first to win across **ten**
+  regimes: W69's nine plus
+  ``contradiction_then_rejoin_under_budget``); first milestone to
+  **operationalise budget-primary handoff scoring** and the **first
+  milestone to expose a content-addressed per-turn repair-
+  trajectory CID** that unifies all six W67–W69 repair primitives
+  into a single dominant-repair signal back into the substrate-
+  routed policy*. Eighteen orthogonal advances on top of W69 (11
+  Plane B v-bumps + 5 Plane A V3 + 1 new budget-primary handoff
+  coordinator V2 + 1 new MASC V6 / TCC V5 line). Plane B: (M1)
+  **Tiny Substrate V15** (17 layers; three new V15 axes — per-turn
+  repair-trajectory CID, per-layer dominant-repair label in [0..6],
+  per-layer budget-primary gate); (M2) **KV Bridge V15** (eleven-
+  target stacked ridge + 70-dim repair-trajectory fingerprint +
+  repair-dominance falsifier); (M3) **Cache Controller V13** (ten-
+  objective stacked ridge + per-role 11-dim budget-primary head);
+  (M4) **Replay Controller V11** (eighteen regimes + per-role
+  per-regime ridge + eight-way budget-primary routing head); (M5)
+  **Deep Substrate Hybrid V15** (fifteen-way bidirectional loop);
+  (M6) **Substrate Adapter V15** (``substrate_v15_full`` tier; only
+  the V15 in-repo runtime satisfies every axis); (M7) **Persistent
+  Latent V22** (21 layers, max_chain_walk_depth=131072, nineteenth
+  skip carrier ``repair_dominance_carrier``, rank-21 distractor
+  basis); (M8) **Long-Horizon Retention V22** (21 reconstruction
+  heads, max_k=576, twelve-layer scorer); (M9) **MLSC V18** (repair-
+  trajectory chain + budget-primary chain); (M10) **Consensus V16**
+  (26 stages including ``repair_dominance_arbiter`` and
+  ``budget_primary_arbiter``); (M11) **MASC V6** (fourteen-policy,
+  ten-regime — V15 strictly beats V14 across all ten regimes;
+  87.5–100 % strict-beat at default config); (M12) **TCC V5**
+  (repair-dominance + budget-primary + contradiction-then-rejoin
+  arbiters). Plane A V3: (H1) **Hosted Router V3** (budget-aware
+  multi-objective + repair-dominance match score + per-budget
+  routing CID); (H2) **Hosted Logprob V3** (abstain-when-disagree +
+  per-budget tiebreak); (H3) **Hosted Cache-Aware Planner V3** (per-
+  role staggered + rotated prefix; ≥ 65 % savings on 8×8 at
+  hit_rate=1.0); (H4) **Hosted Cost Planner V3** (cost-per-team-
+  success-under-budget + abstain-when-budget-violated); (H5)
+  **Hosted Real-Substrate Boundary V3** (wall V3, 22 blocked axes
+  at hosted surface — W69's 19 + 3 new V15 axes); plus the **new
+  Handoff Coordinator V2** that scores by ``team_success_per_visible
+  _token``, adds a fifth ``budget_primary_fallback`` decision, and
+  saves ≥ 75 % cross-plane visible tokens at default config; with a
+  repair-dominance falsifier returning 0 on honest claims and 1 on
+  dishonest hosted-satisfies-repair-dominance claims. R-161 (10 H-
+  bars) + R-162 (16) + R-163 (22) + R-164 (12) deliver 60 H-bars ×
+  3 seeds (180 cells), all pass. ``W70-L-V15-NO-AUTOGRAD-CAP``
+  documents that all "training" remains single-step closed-form
+  linear ridge (58 ridge solves total across W61..W70); no SGD,
+  autograd, or GPU. Cumulative trust boundary across W22..W70 =
+  ≥ 1514 enumerated failure modes (1461 from W22..W69 + 53 new W70
+  envelope verifier modes). Ships at ``coordpy.tiny_substrate_v15``
+  / ``coordpy.kv_bridge_v15`` / ``coordpy.cache_controller_v13`` /
+  ``coordpy.replay_controller_v11`` /
+  ``coordpy.deep_substrate_hybrid_v15`` /
+  ``coordpy.substrate_adapter_v15`` /
+  ``coordpy.persistent_latent_v22`` /
+  ``coordpy.long_horizon_retention_v22`` /
+  ``coordpy.mergeable_latent_capsule_v18`` /
+  ``coordpy.consensus_fallback_controller_v16`` /
+  ``coordpy.multi_agent_substrate_coordinator_v6`` /
+  ``coordpy.team_consensus_controller_v5`` / ``coordpy.w70_team`` /
+  ``coordpy.hosted_router_controller_v3`` /
+  ``coordpy.hosted_logprob_router_v3`` /
+  ``coordpy.hosted_cache_aware_planner_v3`` /
+  ``coordpy.hosted_cost_planner_v3`` /
+  ``coordpy.hosted_real_substrate_boundary_v3`` /
+  ``coordpy.hosted_real_handoff_coordinator_v2`` /
+  ``coordpy.r161_benchmark`` / ``coordpy.r162_benchmark`` /
+  ``coordpy.r163_benchmark`` / ``coordpy.r164_benchmark`` —
+  reachable only via explicit import; the released
+  ``coordpy.__version__ == "0.5.20"`` SDK contract is byte-for-byte
+  unchanged.
+
 - **W69 Stronger Solving-Context Two-Plane Multi-Agent Substrate**
   (post-W68, 2026-05-16) — *fourteenth substrate-attack milestone;
   fifth **multi-agent task-success-bearing** substrate milestone

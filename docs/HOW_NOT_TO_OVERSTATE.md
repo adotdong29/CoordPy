@@ -2,9 +2,83 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W68
-> W69 milestone (Stronger Solving-Context Two-Plane Multi-Agent
-> Substrate research line), 2026-05-16.
+> README-of-README must satisfy these rules. Last touched: post-W69
+> W70 milestone (Stronger Repair-Dominance / Budget-Primary Two-
+> Plane Multi-Agent Substrate Programme research line), 2026-05-16.
+
+## W70 (Stronger Repair-Dominance / Budget-Primary Two-Plane Multi-Agent Substrate Programme) — explicit do-not-overstate rules
+
+The W70 milestone introduces the V15 substrate (17 layers + three
+new V15 axes), the fourteen-policy MASC V6 across ten regimes, the
+TCC V5, the hosted control plane V3 modules, and the new **budget-
+primary hosted-real handoff coordinator V2** that scores each turn
+by ``team_success_per_visible_token`` and exposes a repair-dominance
+falsifier. The substrate now produces multi-agent task-success wins
+under **ten** named failure-mode regimes (W69's nine plus
+contradiction_then_rejoin_under_budget). The honest scope:
+
+1. **Fifteenth substrate-attack milestone — still in-repo NumPy.**
+   The V15 substrate adds 17 layers, GQA 8q/4kv, RMSNorm, SwiGLU,
+   d_model=64, vocab=259 — *still NOT a frontier model*. Hosted
+   backends remain text-only at the HTTP surface
+   (``W70-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``).
+2. **Multi-agent task wins are synthetic-harness-load-bearing.**
+   MASC V6 runs fourteen policies on a synthetic deterministic
+   coordination task; the V15 policy beats V14 because the V15
+   mechanisms (repair-trajectory CID + dominant-repair-per-layer +
+   budget-primary gate) are engineered to materially help in the
+   ten regimes, particularly the new compound regime. **This is
+   not a real hosted multi-agent win**
+   (``W70-L-MASC-V6-SYNTHETIC-CAP``).
+3. **All "training" remains closed-form linear ridge.** Five new
+   ridge solves on top of W69's 53 (58 total across W61..W70); no
+   SGD, no autograd, no GPU (``W70-L-V15-NO-AUTOGRAD-CAP``).
+4. **The handoff coordinator V2 preserves the wall.** The budget-
+   primary handoff V2 does NOT cross the substrate boundary. It
+   records *which plane handled each turn* under a budget-primary
+   score and exposes a repair-dominance falsifier
+   (``W70-L-HANDOFF-V2-NOT-CROSSING-WALL-CAP``). When V2 returns
+   ``hosted_with_real_substrate_audit`` the substrate audit happens
+   on Plane B (in-repo V15); the hosted reply remains text-only.
+   When V2 returns ``budget_primary_fallback`` the request
+   gracefully falls back without claiming substrate access.
+5. **TCC V5 operates on synthetic MASC V6 outcomes.** The repair-
+   dominance arbiter, budget-primary arbiter, and contradiction-
+   then-rejoin arbiter are deterministic on the in-repo decisions
+   (``W70-L-TEAM-CONSENSUS-V5-IN-REPO-CAP``).
+6. **The repair-trajectory CID is in-repo.** It is computed from
+   byte-stable repair-primitive witness contents (numpy arrays +
+   sorted role dicts + repair events) only. It does NOT prove
+   repair integrity at the hosted surface
+   (``W70-L-REPAIR-TRAJECTORY-IN-REPO-CAP``).
+7. **The budget-primary gate is calibrated, not learned.** It
+   combines caller-declared visible-token budget with substrate-
+   measured features via a fixed sigmoid; budgets are caller-
+   supplied (``W70-L-BUDGET-PRIMARY-DECLARED-CAP``).
+8. **LHR V22 only fits the final ridge head.** The first eleven
+   preceding layers are frozen random projections
+   (``W70-L-V22-LHR-SCORER-FIT-CAP``).
+9. **Persistent V22 wrapper does NOT train the V13 outer GRU**
+   (``W70-L-V22-OUTER-NOT-TRAINED-CAP``).
+10. **The released SDK is unchanged.** ``coordpy.__version__ ==
+    "0.5.20"``. No PyPI release. The smoke driver passes byte-for-
+    byte. W70 reaches only via explicit imports
+    (``coordpy.tiny_substrate_v15`` etc.).
+11. **The new compound regime win is measured inside the V15
+    substrate only.** The V15 policy wins in
+    contradiction_then_rejoin_under_budget because the V15 repair-
+    trajectory CID + budget-primary gate let the substrate-routed
+    policy run a coordinated repair arc that V14 cannot follow.
+    Synthetic.
+12. **Hosted V3 success / quality / budget scores are caller-
+    declared.** The router V3 budget-efficiency weighting uses
+    caller-supplied per-provider scores and per-request budgets;
+    the router does not measure live success
+    (``W70-L-HOSTED-V3-DECLARED-CAP``).
+13. **The frontier wall is unmoved.** W70 carries the W69
+    frontier_blocked_axes set forward unchanged as an honest no-
+    progress marker
+    (``W70-L-FRONTIER-SUBSTRATE-STILL-BLOCKED-CAP``).
 
 ## W69 (Stronger Solving-Context Two-Plane Multi-Agent Substrate) — explicit do-not-overstate rules
 
