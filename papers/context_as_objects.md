@@ -2,7 +2,46 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W63 research-line update (W64 Replay-Dominance-Primary
+> **Post-W64 research-line update (W65 Team-Substrate-Coordination
+> Substrate-Coupled Latent Operating System, 2026-05-16).**
+> *Tenth substrate-attack milestone, and the first **multi-agent
+> task-success-bearing** substrate milestone in the programme.
+> ``MultiAgentSubstrateCoordinator`` runs four matched-budget
+> policies (``transcript_only`` / ``shared_state_proxy`` /
+> ``substrate_routed_v9`` / ``substrate_routed_v10``) on the same
+> synthetic deterministic task; the V10 policy **strictly beats
+> each baseline on ≥ 50 % of seeds** while using ≤ 17 % of the
+> transcript-only visible-token budget. The in-repo NumPy
+> substrate grows to V10 (12 layers + four new V10 axes:
+> per-(layer, head, slot) hidden-write-merit, per-role KV bank,
+> substrate checkpoint/restore primitive, per-layer V10 composite
+> gate score). Six new closed-form ridge solves on top of
+> W61+W62+W63+W64's twenty-three (twenty-nine total). The deep
+> substrate hybrid is now ten-way (V9 hybrid + cache controller
+> V8 + replay controller V6 + hidden-write-merit +
+> attention-fingerprint + prefix V9 + HSB V9 hidden-wins-rate +
+> role KV bank + multi-agent coordinator). The persistent latent
+> state is V17 (16 layers, 14 skip carriers,
+> ``max_chain_walk_depth=8192``, distractor rank 14). Multi-hop
+> chain length grows to 25 over 35 backends (1190 directed
+> edges); 10-axis composite trust. ECC reaches 29.333
+> bits/visible-token at full emit (2^27 = 134 217 728 codes).
+> Long-horizon reconstruction reaches 16 heads at max_k=256.
+> Consensus has 16 disjoint stages including
+> ``team_substrate_coordination_arbiter`` and
+> ``multi_agent_abstain_arbiter``. R-143 + R-144 + R-145 deliver
+> 50/50 H-bars × 3 seeds (150/150 cells). The honest scope is
+> unchanged: hosted backends remain text-only at the HTTP surface
+> (``W65-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``); the substrate
+> is a small in-repo NumPy runtime, not a frontier model
+> (``W65-L-NUMPY-CPU-V10-SUBSTRATE-CAP``); "training" is
+> closed-form linear ridge throughout
+> (``W65-L-V10-NO-AUTOGRAD-CAP``); and the multi-agent
+> task-success win is measured **inside the W65 synthetic harness**
+> (``W65-L-MULTI-AGENT-COORDINATOR-SYNTHETIC-CAP``), not on real
+> hosted multi-agent backends.*
+>
+> **Preceding research-line update (W64 Replay-Dominance-Primary
 > Hidden-Wins-Primary 6144-Turn Nine-Way Substrate-Coupled Latent
 > Operating System, 2026-05-15).**
 > *Ninth substrate-attack milestone. The in-repo NumPy substrate

@@ -248,6 +248,79 @@ is byte-for-byte unchanged. See
 [`RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md`](RESULTS_COORDPY_W48_SHARED_STATE_PROXY.md)
 for the full result note.
 
+**Post-W64 research milestone — W65 Team-Substrate-Coordination Substrate-Coupled Latent Operating System**
+
+The next research step after W64 (W65) introduces the **Team-
+Substrate-Coordination Substrate-Coupled Latent Operating System
+(TSC-SCLOS)** layer: the **tenth substrate-attack milestone and
+the first multi-agent-task-success-bearing substrate milestone**
+in the programme. ``coordpy.tiny_substrate_v10`` ships a 12-layer
+V10 substrate with four new substrate-load-bearing axes —
+per-(layer, head, slot) **hidden-write-merit** channel; per-role
+**KV bank** with FIFO eviction; a **substrate checkpoint/restore**
+primitive; per-layer **V10 composite gate score**. ``coordpy.
+multi_agent_substrate_coordinator`` ships the **load-bearing W65
+mechanism**: a real N-agent multi-agent harness that runs four
+matched-budget policies (``transcript_only`` /
+``shared_state_proxy`` / ``substrate_routed_v9`` /
+``substrate_routed_v10``) on the same synthetic deterministic
+task. The V10 policy **strictly beats** each baseline (lower
+final-guess error than transcript-only, shared-proxy, and
+substrate-routed-V9) on ≥ 50 % of seeds and saves ≥ 50 % of
+visible tokens versus transcript-only at matched team-success.
+Plus nineteen more orthogonal advances: KV V10 six-target stacked
+ridge; HSB V9 six-target stacked ridge + per-(L, H) hidden-wins-
+rate probe; prefix V9 K=64 drift curve + role+task 20-dim
+fingerprint + four-way prefix/hidden/replay/team comparator;
+attention V9 five-stage clamp + substrate-measured fingerprint;
+cache V8 five-objective stacked ridge + per-role eviction head;
+replay V6 8 regimes + per-role per-regime + multi-agent abstain
+head; deep substrate hybrid V10 ten-way bidirectional loop;
+substrate adapter V10 ``substrate_v10_full`` tier; persistent
+V17 (16 layers, ``max_chain_walk_depth=8192``, fourteenth skip
+carrier); multi-hop V15 (35 backends, 1190 directed edges, chain-
+length 25, 10-axis composite); MLSC V13 (team-substrate +
+role-conditioned witness chains); consensus V11 (16 stages with
+``team_substrate_coordination_arbiter`` and
+``multi_agent_abstain_arbiter``); CRC V13 (8192-bucket
+fingerprint, 31-bit adversarial burst, team-coordination recovery
+probe); LHR V17 (16 heads, ``max_k=256``, seven-layer scorer);
+ECC V17 (2^27 = 134 217 728 codes; **29.333 bits/visible-token**
+at full emit); uncertainty V13 (12-axis composite); disagreement
+V11 (Wasserstein-equivalence identity + falsifier); TVS V14
+(15 arms). W65 fits **only twenty-nine closed-form ridge solves**
+total across W61..W65 (23 from W61..W64 + 6 new). 103 new
+W65 envelope verifier failure modes; cumulative trust boundary
+across W22..W65 = **1105 enumerated failure modes**. W65 is held
+outside the stable SDK contract — it ships at
+``coordpy.tiny_substrate_v10``, ``coordpy.kv_bridge_v10``,
+``coordpy.hidden_state_bridge_v9``,
+``coordpy.prefix_state_bridge_v9``,
+``coordpy.attention_steering_bridge_v9``,
+``coordpy.cache_controller_v8``,
+``coordpy.replay_controller_v6``,
+``coordpy.persistent_latent_v17``,
+``coordpy.multi_hop_translator_v15``,
+``coordpy.mergeable_latent_capsule_v13``,
+``coordpy.consensus_fallback_controller_v11``,
+``coordpy.corruption_robust_carrier_v13``,
+``coordpy.long_horizon_retention_v17``,
+``coordpy.ecc_codebook_v17``,
+``coordpy.transcript_vs_shared_arbiter_v14``,
+``coordpy.uncertainty_layer_v13``,
+``coordpy.disagreement_algebra_v11``,
+``coordpy.deep_substrate_hybrid_v10``,
+``coordpy.substrate_adapter_v10``,
+``coordpy.multi_agent_substrate_coordinator``,
+``coordpy.w65_team``, ``coordpy.r143_benchmark``,
+``coordpy.r144_benchmark``, ``coordpy.r145_benchmark`` —
+reachable only via explicit import; the released v0.5.20 wheel's
+public surface is byte-for-byte unchanged.
+``W65-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` carries forward
+the W56..W64 cap unchanged. See
+[`RESULTS_W65_TEAM_SUBSTRATE_COORDINATION.md`](RESULTS_W65_TEAM_SUBSTRATE_COORDINATION.md)
+for the full result note.
+
 **Post-W55 research milestone — W56 Substrate-Coupled Latent Operating System**
 
 The next research step after W55 (W56) introduces the
@@ -644,6 +717,8 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Post-W64 research milestone (W65)    | [`RESULTS_W65_TEAM_SUBSTRATE_COORDINATION.md`](RESULTS_W65_TEAM_SUBSTRATE_COORDINATION.md) |
+> | Pre-committed success bar (W65)      | [`SUCCESS_CRITERION_W65_TEAM_SUBSTRATE_COORDINATION.md`](SUCCESS_CRITERION_W65_TEAM_SUBSTRATE_COORDINATION.md) |
 > | Post-W55 research milestone (W56)    | [`RESULTS_W56_SUBSTRATE_ATTACK.md`](RESULTS_W56_SUBSTRATE_ATTACK.md) |
 > | Pre-committed success bar (W56)      | [`SUCCESS_CRITERION_W56_SUBSTRATE_ATTACK.md`](SUCCESS_CRITERION_W56_SUBSTRATE_ATTACK.md) |
 > | Post-W54 research milestone (W55)    | [`RESULTS_W55_DTDA_LOS.md`](RESULTS_W55_DTDA_LOS.md) |

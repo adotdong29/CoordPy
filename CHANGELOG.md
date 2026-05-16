@@ -13,6 +13,74 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W65 Team-Substrate-Coordination Substrate-Coupled Latent
+  Operating System** (post-W64, 2026-05-16) — *tenth substrate-
+  attack milestone; first **multi-agent task-success-bearing**
+  substrate milestone in the programme*. Twenty orthogonal
+  advances on top of W64: (M1) **Tiny Substrate V10** (12 layers;
+  four new V10 axes — per-(L, H, T) hidden-write-merit, per-role
+  KV bank with FIFO eviction, substrate checkpoint/restore
+  primitive, per-layer V10 composite gate score); (M2) **KV
+  Bridge V10** (six-target stacked ridge fit; substrate-measured
+  per-target margin probe; team-task falsifier); (M3) **HSB V9**
+  (six-target stacked ridge; per-(L, H) hidden-wins-rate probe;
+  team-coordination margin); (M4) **Prefix V9** (K=64 drift curve;
+  role+task 20-dim fingerprint; four-way prefix/hidden/replay/team
+  comparator); (M5) **Attention V9** (five-stage clamp: Hellinger
+  + JS + coarse L1 + fine KL + max-position cap; substrate-measured
+  attention-map fingerprint); (M6) **Cache Controller V8**
+  (five-objective stacked ridge adding team-task-success; per-role
+  eviction head); (M7) **Replay Controller V6** (8 regimes; per-
+  role per-regime ridge; **multi-agent abstain head**); (M8)
+  **Deep Substrate Hybrid V10** (ten-way bidirectional loop);
+  (M9) **Substrate Adapter V10** (new `substrate_v10_full` tier);
+  (M10) **Persistent V17** (16 layers; fourteenth skip carrier;
+  max_chain_walk_depth=8192; distractor rank 14); (M11) **Multi-Hop
+  Translator V15** (35 backends; 1190 directed edges; chain-len
+  25; 10-axis composite); (M12) **Mergeable Latent Capsule V13**
+  (team-substrate + role-conditioned witness chains); (M13)
+  **Consensus V11** (16 stages: adds `team_substrate_coordination_arbiter`
+  and `multi_agent_abstain_arbiter`); (M14) **CRC V13** (8192-bucket
+  fingerprint; 31-bit adversarial burst); (M15) **LHR V17** (16
+  heads; max_k=256; seven-layer scorer); (M16) **ECC V17** (2^27 =
+  134 217 728 codes; **29.333 bits/visible-token**); (M17)
+  **Uncertainty V13** (12-axis composite); (M18) **Disagreement
+  Algebra V11** (Wasserstein-equivalence identity); (M19) **TVS
+  V14** (15 arms); (M20) **Multi-Agent Substrate Coordinator**
+  (the load-bearing W65 mechanism — real N-agent multi-agent
+  harness with four matched-budget policies; V10 policy strictly
+  beats `transcript_only`, `shared_state_proxy`, and
+  `substrate_routed_v9` on ≥ 50 % of seeds at ≤ 17 % of the
+  transcript-only token budget). 103 new W65 envelope verifier
+  failure modes (cumulative trust boundary across W22..W65 =
+  **1105 enumerated failure modes**). Ships at
+  `coordpy.tiny_substrate_v10`, `coordpy.kv_bridge_v10`,
+  `coordpy.hidden_state_bridge_v9`,
+  `coordpy.prefix_state_bridge_v9`,
+  `coordpy.attention_steering_bridge_v9`,
+  `coordpy.cache_controller_v8`,
+  `coordpy.replay_controller_v6`,
+  `coordpy.deep_substrate_hybrid_v10`,
+  `coordpy.substrate_adapter_v10`,
+  `coordpy.persistent_latent_v17`,
+  `coordpy.multi_hop_translator_v15`,
+  `coordpy.mergeable_latent_capsule_v13`,
+  `coordpy.consensus_fallback_controller_v11`,
+  `coordpy.corruption_robust_carrier_v13`,
+  `coordpy.long_horizon_retention_v17`,
+  `coordpy.ecc_codebook_v17`,
+  `coordpy.uncertainty_layer_v13`,
+  `coordpy.disagreement_algebra_v11`,
+  `coordpy.transcript_vs_shared_arbiter_v14`,
+  `coordpy.multi_agent_substrate_coordinator`,
+  `coordpy.w65_team`, `coordpy.r143_benchmark`,
+  `coordpy.r144_benchmark`, `coordpy.r145_benchmark` — reachable
+  only through explicit imports. `coordpy.__version__` remains
+  `0.5.20`. Pre-committed bar:
+  [`docs/SUCCESS_CRITERION_W65_TEAM_SUBSTRATE_COORDINATION.md`](docs/SUCCESS_CRITERION_W65_TEAM_SUBSTRATE_COORDINATION.md).
+  Result note:
+  [`docs/RESULTS_W65_TEAM_SUBSTRATE_COORDINATION.md`](docs/RESULTS_W65_TEAM_SUBSTRATE_COORDINATION.md).
+
 - **W64 Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn
   Nine-Way Substrate-Coupled Latent Operating System** (post-W63,
   2026-05-15) — *ninth substrate-attack milestone; first

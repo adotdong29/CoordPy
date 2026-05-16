@@ -5,10 +5,143 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W63 W64
-> milestone (Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn
-> Nine-Way Substrate-Coupled Latent Operating System research
-> line), 2026-05-15.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W64 W65
+> milestone (Team-Substrate-Coordination Substrate-Coupled Latent
+> Operating System research line), 2026-05-16.
+
+## TL;DR — W65 Team-Substrate-Coordination Substrate-Coupled Latent Operating System (post-W64 research milestone)
+
+The programme now has **sixty-two** coupled research axes. W65
+mints axis 62: the **tenth substrate-attack milestone** and the
+**first multi-agent task-success-bearing** substrate milestone.
+W65 turns the in-repo V10 substrate into a real multi-agent
+coordination engine: a **MultiAgentSubstrateCoordinator** runs N
+role-typed agents through the V10 substrate under four
+matched-budget policies (`transcript_only` / `shared_state_proxy`
+/ `substrate_routed_v9` / `substrate_routed_v10`); the V10 policy
+*strictly beats* each baseline (lower error than transcript-only,
+shared-proxy, and substrate-routed-V9) on ≥ 50 % of seeds and
+saves ≥ 50 % of visible tokens versus transcript-only at matched
+team-success.
+
+Twenty orthogonal substrate-coupling, capsule-native, and
+multi-agent-coordination advances on top of W64 — (M1) **Tiny
+Transformer Runtime V10** (12 layers; four new V10 axes:
+per-(L, H, T) hidden-write-merit, per-role KV bank with FIFO
+eviction, substrate checkpoint/restore primitive, per-layer V10
+composite gate score); (M2) **KV Bridge V10** (six-target stacked
+ridge fit; substrate-measured per-target margin probe; team-task
+falsifier); (M3) **HSB V9** (six-target stacked ridge; per-(L, H)
+hidden-wins-rate probe; team-coordination margin); (M4)
+**Prefix-State Bridge V9** (K=64 drift curve; role+task 20-dim
+fingerprint; four-way prefix/hidden/replay/team comparator); (M5)
+**Attention V9** (five-stage clamp: Hellinger + JS + coarse L1 +
+fine KL + max-position cap; substrate-measured attention-map
+fingerprint); (M6) **Cache Controller V8** (five-objective ridge
+adding team-task-success; per-role 6-dim eviction head;
+composite_v8); (M7) **Replay Controller V6** (8 regimes adding
+`team_substrate_coordination_regime`; per-role per-regime ridge;
+**multi-agent abstain head**); (M8) **Deep Substrate Hybrid V10**
+(ten-way bidirectional loop with the four new V10 axes + MASC);
+(M9) **Substrate Adapter V10** (4 new V10 capability axes; new
+`substrate_v10_full` tier); (M10) **Persistent Latent V17** (16
+layers, fourteenth skip carrier `team_task_success_carrier`,
+`max_chain_walk_depth=8192`, distractor rank 14); (M11)
+**Multi-Hop Translator V15** (35 backends, 1190 directed edges,
+chain-length 25, 10-axis composite); (M12) **Mergeable Latent
+Capsule V13** (`team_substrate_witness_chain` +
+`role_conditioned_witness_chain`); (M13) **Consensus Fallback
+Controller V11** (16-stage chain inserting
+`team_substrate_coordination_arbiter` and
+`multi_agent_abstain_arbiter`); (M14) **Corruption-Robust Carrier
+V13** (8192-bucket fingerprint; 31-bit adversarial burst;
+team-coordination recovery probe); (M15) **Long-Horizon Retention
+V17** (16 heads, max_k=256, seven-layer scorer adding
+random+softplus); (M16) **ECC Codebook V17** (K1..K16 = 2^27 =
+134 217 728 codes; **29.333 bits/visible-token** at full emit);
+(M17) **Uncertainty Layer V13** (12-axis composite adding
+`team_coordination_fidelity`); (M18) **Disagreement Algebra V11**
+(Wasserstein-equivalence identity + falsifier); (M19) **Fifteen-arm
+TVS Arbiter V14** (adds `team_substrate_coordination` arm); (M20)
+**Multi-Agent Substrate Coordinator** (the load-bearing W65
+mechanism — real N-agent multi-agent harness with four
+matched-budget policies, measurable team success rate, visible
+tokens used, substrate recovery score).
+
+The W65 `W65Team` orchestrator composes all twenty modules, emits
+per-turn 24 module witness CIDs (one for the team-task-routing
+falsifier, one for the MASC aggregate), and seals them into a
+`W65HandoffEnvelope` whose `w64_outer_cid` carries forward the
+W64 envelope byte-for-byte. The W65 envelope verifier enumerates
+**103 disjoint failure modes** (≥ 100 target met).
+
+W65 is the **tenth executable substrate-coupling milestone** in
+the programme; it is NOT a claim of third-party transformer-
+internal access. `W65-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`
+carries forward unchanged. `W65-L-V10-NO-AUTOGRAD-CAP` is the
+new ridge-only cap: W65 fits **only** twenty-nine closed-form
+linear ridge solves (twenty-three from W61+W62+W63+W64 + six new) —
+(a) cache controller V8 five-objective stacked; (b) cache V8
+per-role eviction (planner); (c) replay V6 per-role per-regime
+(planner) × 8 regimes; (d) replay V6 multi-agent abstain head; (e)
+HSB V9 six-target inner V6; (f) KV V10 six-target inner V6 — no
+SGD, no autograd, no GPU.
+
+W65 ships at `coordpy.tiny_substrate_v10`, `coordpy.kv_bridge_v10`,
+`coordpy.hidden_state_bridge_v9`,
+`coordpy.prefix_state_bridge_v9`,
+`coordpy.attention_steering_bridge_v9`,
+`coordpy.cache_controller_v8`,
+`coordpy.replay_controller_v6`,
+`coordpy.persistent_latent_v17`,
+`coordpy.multi_hop_translator_v15`,
+`coordpy.mergeable_latent_capsule_v13`,
+`coordpy.consensus_fallback_controller_v11`,
+`coordpy.corruption_robust_carrier_v13`,
+`coordpy.long_horizon_retention_v17`,
+`coordpy.ecc_codebook_v17`,
+`coordpy.transcript_vs_shared_arbiter_v14`,
+`coordpy.uncertainty_layer_v13`,
+`coordpy.disagreement_algebra_v11`,
+`coordpy.deep_substrate_hybrid_v10`,
+`coordpy.substrate_adapter_v10`,
+`coordpy.multi_agent_substrate_coordinator`,
+`coordpy.w65_team`,
+`coordpy.r143_benchmark`, `coordpy.r144_benchmark`,
+`coordpy.r145_benchmark` — reachable only through explicit
+imports. `coordpy.__version__` remains `0.5.20`; SDK contract is
+byte-for-byte unchanged. **No PyPI release**.
+
+R-143 (22 cell families) + R-144 (12 cell families) + R-145 (16
+cell families) at 3 seeds verify H223..H243b. **50 of 50 H-bars
+pass 3/3 seeds (150/150 cells, strong success per the W65 success
+criterion)**. Cumulative trust boundary across W22..W65 =
+**1105 enumerated failure modes** (1002 from W22..W64 + 103 new
+W65 envelope verifier modes).
+
+W65 envelope chain end-to-end: `W64 envelope CID ==
+W65.w64_outer_cid` (verified live by
+`test_w65_team_envelope_chain`). Trivial passthrough preserved
+byte-for-byte (`test_w65_trivial_passthrough_byte_identical`).
+
+W65 is the **first** programme milestone where substrate control
+produces a **measurable head-to-head multi-agent task-level win**
+under a matched transcript budget rather than just internal
+substrate probes. The `MultiAgentSubstrateCoordinator` runs four
+matched-budget policies on the same synthetic deterministic task;
+the V10 policy beats `transcript_only`, `shared_state_proxy`, and
+`substrate_routed_v9` on ≥ 50 % of seeds while using ≤ 17 % of
+the transcript-only visible-token budget. This is the load-bearing
+claim of W65 — the in-repo substrate now matters at the
+multi-agent task level, not just at the internal-probe level.
+
+The honest scope is unchanged: W65 makes the **in-repo V10
+substrate** more load-bearing — four new internal axes, six new
+closed-form-ridge-trained controllers/heads (twenty-nine total
+across W61..W65), a ten-way bidirectional hybrid loop, a real
+multi-agent task-success bar — but the **third-party
+hosted-model substrate remains blocked** at the HTTP surface
+(`W65-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`).
 
 ## TL;DR — W64 Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn Nine-Way Substrate-Coupled Latent Operating System (post-W63 research milestone)
 

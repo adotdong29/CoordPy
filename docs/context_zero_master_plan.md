@@ -1,6 +1,71 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W63 / W64, 2026-05-15 —
+> **Latest milestone marker (post-W64 / W65, 2026-05-16 —
+> Team-Substrate-Coordination Substrate-Coupled Latent Operating
+> System, twenty-third post-release research milestone — tenth
+> substrate-attack milestone and first **multi-agent task-
+> success-bearing** substrate milestone in the programme.**
+> ``coordpy.tiny_substrate_v10`` ships 12 layers + four new V10
+> axes (per-(L, H, T) hidden-write-merit, per-role KV bank with
+> FIFO eviction, substrate checkpoint/restore primitive,
+> per-layer V10 composite gate score).
+> ``coordpy.multi_agent_substrate_coordinator`` ships the
+> load-bearing W65 mechanism: a real N-agent harness running
+> four matched-budget policies (``transcript_only`` /
+> ``shared_state_proxy`` / ``substrate_routed_v9`` /
+> ``substrate_routed_v10``); the V10 policy strictly beats each
+> baseline on ≥ 50 % of seeds and saves ≥ 50 % of visible tokens
+> versus transcript-only. Plus nineteen orthogonal mechanism
+> advances (KV V10 six-target ridge; HSB V9 six-target ridge;
+> prefix V9 K=64; attention V9 five-stage clamp; cache V8
+> five-objective; replay V6 eight-regime + multi-agent abstain;
+> deep substrate hybrid V10 ten-way; substrate adapter V10;
+> persistent V17 (16 layers, max_chain_walk_depth=8192); multi-hop
+> V15 (35 backends, 1190 directed edges, chain-len 25, 10-axis);
+> MLSC V13; consensus V11 (16 stages); CRC V13 (8192-bucket,
+> 31-bit burst); LHR V17 (16 heads, max_k=256); ECC V17 (2^27
+> codes, 29.333 bits/visible-token); uncertainty V13 (12-axis);
+> disagreement V11 (Wasserstein identity); TVS V14 (15 arms)).
+> R-143 (22 cell families) + R-144 (12) + R-145 (16) deliver
+> **50/50 H-bars (H223..H243b) pass 3/3 seeds (150/150 cells)**.
+> ``W65-L-V10-NO-AUTOGRAD-CAP`` documents that all "training"
+> remains single-step closed-form linear ridge (29 ridge solves
+> total across W61..W65); no SGD / autograd / GPU. Cumulative
+> trust boundary across W22..W65 = **1105 enumerated failure
+> modes** (1002 from W22..W64 + 103 new W65 envelope verifier
+> modes). W65 ships at ``coordpy.tiny_substrate_v10``,
+> ``coordpy.kv_bridge_v10``,
+> ``coordpy.hidden_state_bridge_v9``,
+> ``coordpy.prefix_state_bridge_v9``,
+> ``coordpy.attention_steering_bridge_v9``,
+> ``coordpy.cache_controller_v8``,
+> ``coordpy.replay_controller_v6``,
+> ``coordpy.persistent_latent_v17``,
+> ``coordpy.multi_hop_translator_v15``,
+> ``coordpy.mergeable_latent_capsule_v13``,
+> ``coordpy.consensus_fallback_controller_v11``,
+> ``coordpy.corruption_robust_carrier_v13``,
+> ``coordpy.long_horizon_retention_v17``,
+> ``coordpy.ecc_codebook_v17``,
+> ``coordpy.transcript_vs_shared_arbiter_v14``,
+> ``coordpy.uncertainty_layer_v13``,
+> ``coordpy.disagreement_algebra_v11``,
+> ``coordpy.deep_substrate_hybrid_v10``,
+> ``coordpy.substrate_adapter_v10``,
+> ``coordpy.multi_agent_substrate_coordinator``,
+> ``coordpy.w65_team``, ``coordpy.r143_benchmark`` /
+> ``coordpy.r144_benchmark`` / ``coordpy.r145_benchmark``,
+> reachable only via explicit import.
+> ``coordpy.__version__`` remains ``0.5.20``; SDK contract is
+> byte-for-byte unchanged; no PyPI release.
+> ``W65-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` continues to
+> document that hosted backends remain text-only at the HTTP
+> surface. The story progresses from W64's "the substrate has
+> deeper internal probes" to W65's "substrate control now
+> measurably wins multi-agent coordination outcomes inside the
+> in-repo harness."**
+
+> **Previous milestone marker (post-W63 / W64, 2026-05-15 —
 > Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn Nine-Way
 > Substrate-Coupled Latent Operating System, twenty-second post-
 > release research milestone — ninth substrate-attack milestone,

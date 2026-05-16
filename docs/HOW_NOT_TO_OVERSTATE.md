@@ -2,10 +2,83 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W62
-> W63 milestone (Stronger Replay-Dominance Hidden-Wins 4096-Turn
-> Substrate-Coupled Latent Operating System research line),
-> 2026-05-15.
+> README-of-README must satisfy these rules. Last touched: post-W64
+> W65 milestone (Team-Substrate-Coordination Substrate-Coupled
+> Latent Operating System research line), 2026-05-16.
+
+## W65 (Team-Substrate-Coordination Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
+
+W65 extends W64 with twenty mechanism advances on top of W64's
+nineteen (M1..M19 substrate + capsule-OS + M20 the load-bearing
+**Multi-Agent Substrate Coordinator**). Honest scope:
+
+* *"W65 proves real multi-agent task-success wins on hosted
+  models"* — **forbidden**. `W65-L-MULTI-AGENT-COORDINATOR-
+  SYNTHETIC-CAP` is load-bearing: the V10 head-to-head win is
+  measured on a *synthetic deterministic harness*, not on a real
+  model-backed multi-agent backend. The deltas (V10 success rate;
+  V10-strictly-beats-each-baseline rate; visible-token savings) are
+  reproducible *inside* the W65 harness and are exactly what the
+  W65 mechanisms (per-role KV bank, multi-agent abstain head,
+  substrate checkpoint) reduce drift on by construction.
+
+* *"W65 trained the substrate end-to-end"* — **forbidden**.
+  `W65-L-V10-NO-AUTOGRAD-CAP` is load-bearing: every W65 fit is a
+  **single-step closed-form linear ridge solve** over a small
+  subspace. Cache V8 five-objective; cache V8 per-role eviction;
+  replay V6 per-role per-regime (8 regimes); replay V6 multi-agent
+  abstain head; HSB V9 six-target inner V6; KV V10 six-target
+  inner V6. Plus W61+W62+W63+W64's 23 ridge solves carry forward.
+  Total **twenty-nine closed-form linear ridge solves**.
+  No SGD, no autograd, no GPU.
+
+* *"W65 coupled CoordPy to third-party transformer internals"* —
+  **forbidden**. `W65-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`
+  carries forward: hosted backends (Ollama, OpenAI-compatible)
+  remain text-only at the HTTP surface.
+
+* *"W65's multi-agent abstain head proves abstain semantics
+  generalise"* — **forbidden**. The 4×10 ridge head is fit on
+  *synthetic supervision* where the abstain label is constructed
+  from the first feature. The head is a *fitted version of a
+  deterministic decision rule* on a bounded feature space.
+
+* *"W65's KV V10 team-task target is in-the-wild"* — **forbidden**.
+  `W65-L-TEAM-TASK-TARGET-CONSTRUCTED-CAP`: the sixth (team-task-
+  routing) target is *constructed* such that the KV bridge alone
+  cannot reach it without help from the multi-agent coordinator.
+  It is a synthetic demonstration, not an in-the-wild measurement.
+
+* *"W65's substrate checkpoint primitive operates on real hosted
+  cache bytes"* — **forbidden**. `W65-L-SUBSTRATE-CHECKPOINT-IN-
+  REPO-CAP`: the primitive operates on the in-repo V10 cache only.
+  The reuse-vs-recompute flop saving is a *bookkeeping ratio*
+  inside the W65 substrate, not a measurement on real models.
+
+* *"W65's 35-backend multi-hop translator was executed across 35
+  hosts"* — **forbidden**. `W65-L-MULTI-HOP-V15-SYNTHETIC-
+  BACKENDS-CAP`: the backends are NAMED, not EXECUTED. V15 is a
+  graph + trust arbiter, not a multi-machine harness.
+
+* *"W65's V11 consensus stages prove team-substrate coordination
+  generalises"* — **forbidden**. `W65-L-CONSENSUS-V11-SYNTHETIC-
+  CAP`: the team-substrate-coordination and multi-agent abstain
+  stages rely on caller-provided scores.
+
+* *"W65's prefix V9 K=64 drift curve was fit at K=64"* —
+  **forbidden**. `W65-L-V9-PREFIX-K64-STRUCTURAL-CAP`: the K=64
+  extension reuses the V8 K=32 fit and zero/last-value
+  extrapolates to K=64. No new ridge solve.
+
+* *"W65 ships a frontier-scale substrate"* — **forbidden**.
+  `W65-L-NUMPY-CPU-V10-SUBSTRATE-CAP`: 12 layers / d_model=64 /
+  byte-vocab / max_len=128 / untrained NumPy on CPU. NOT a
+  frontier model.
+
+* *"W65's ECC V17 produces 16384 bits per visible token"* —
+  **forbidden**. `W65-L-ECC-V17-RATE-FLOOR-CAP`: structural rate
+  ceiling log2(2^27) = 27 raw data bits per segment-tuple. The
+  16384-bit target reproduces the ceiling as a falsifier.
 
 ## W63 (Stronger Replay-Dominance Hidden-Wins 4096-Turn Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
 
