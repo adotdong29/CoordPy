@@ -5,9 +5,160 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W65 W66
-> milestone (Stronger Solving-Context Substrate-Coupled Latent
-> Operating System research line), 2026-05-16.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W66 W67
+> milestone (Stronger Branch-Merge / Role-Dropout
+> Substrate-Coupled Latent Operating System research line),
+> 2026-05-16.
+
+## TL;DR — W67 Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent Operating System (post-W66 research milestone)
+
+The programme now has **sixty-four** coupled research axes. W67
+mints axis 64: the **twelfth substrate-attack milestone** and the
+**third multi-agent task-success-bearing** substrate milestone
+(the first to produce wins under *five* failure-mode regimes:
+baseline + team-consensus-under-budget + team-failure-recovery +
+**role-dropout** + **branch-merge-reconciliation**). W67 extends
+the in-repo V12 substrate into a multi-regime multi-agent
+coordination engine across five regimes: a
+**MultiAgentSubstrateCoordinatorV3** runs N role-typed agents
+through the V12 substrate under **eight matched-budget policies**
+and **five regimes** (baseline + team-consensus-under-budget +
+team-failure-recovery + role-dropout +
+branch-merge-reconciliation); the V12 policy *strictly beats* V11
+on ≥ 73 % of seeds in every regime (load-bearing wins: 80 %
+role-dropout, 100 % branch-merge-reconciliation), and the
+team_substrate_coordination_v12 policy *strictly beats*
+team_substrate_coordination_v11 on ≥ 47 % of seeds (with 91.7 % at
+baseline and 80 % at team-failure-recovery and
+branch-merge-reconciliation).
+
+Twenty-one orthogonal substrate-coupling, capsule-native, and
+multi-agent-coordination advances on top of W66 — (M1) **Tiny
+Transformer Runtime V12** (14 layers; four new V12 axes: per-(L,
+H, T) branch-merge witness tensor, per-role-pair
+role-dropout-recovery flag, substrate snapshot-fork primitive,
+per-layer V12 composite gate score); (M2) **KV Bridge V12**
+(eight-target stacked ridge; branch-merge margin probe; role-pair
+40-dim fingerprint; branch-merge-reconciliation falsifier); (M3)
+**HSB V11** (eight-target stacked ridge; per-(L, H)
+hidden-vs-branch-merge probe; branch-merge margin); (M4) **Prefix
+V11** (K=128 drift curve; role+task+team+branch 40-dim
+fingerprint; six-way prefix/hidden/replay/team/recover/branch
+comparator); (M5) **Attention V11** (seven-stage clamp: V10 +
+branch-merge attention bias; branch-conditioned attention
+fingerprint); (M6) **Cache Controller V10** (seven-objective
+ridge adding branch-merge; per-role 8-dim eviction head); (M7)
+**Replay Controller V8** (12 regimes adding `role_dropout_regime`
+and `branch_merge_reconciliation_regime`; per-role per-regime
+ridge; trained branch-merge-routing head); (M8) **Deep Substrate
+Hybrid V12** (twelve-way bidirectional loop with the four new V12
+axes + team-consensus-controller-V2 axis); (M9) **Substrate
+Adapter V12** (4 new V12 capability axes; new `substrate_v12_full`
+tier); (M10) **Persistent Latent V19** (18 layers; sixteenth skip
+carrier `role_dropout_recovery_carrier`;
+max_chain_walk_depth=16384; distractor rank 18); (M11) **Multi-Hop
+Translator V17** (40 backends; 1560 directed edges; chain-length
+30; 12-axis composite adding
+`branch_merge_reconciliation_trust`); (M12) **Mergeable Latent
+Capsule V15** (`role_dropout_recovery_witness_chain` and
+`branch_merge_reconciliation_witness_chain`); (M13) **Consensus
+Fallback Controller V13** (20-stage chain inserting
+`role_dropout_arbiter` and
+`branch_merge_reconciliation_arbiter`); (M14) **Corruption-Robust
+Carrier V15** (32768-bucket fingerprint; 35-bit adversarial burst;
+branch-merge reconciliation probe); (M15) **Long-Horizon Retention
+V19** (18 heads, max_k=384, nine-layer scorer adding random+mish);
+(M16) **ECC Codebook V19** (K1..K18 = 2^31 = 2 147 483 648 codes;
+**33.333 bits/visible-token** at full emit); (M17) **Uncertainty
+Layer V15** (14-axis composite adding
+`branch_merge_reconciliation_fidelity`); (M18) **Disagreement
+Algebra V13** (Bregman-equivalence identity + falsifier); (M19)
+**Seventeen-arm TVS Arbiter V16** (17 arms with
+`branch_merge_reconciliation` arm); (M20) **Multi-Agent Substrate
+Coordinator V3** (the load-bearing W67 mechanism — eight
+matched-budget policies across five regimes; V12 strictly beats
+V11 across all five regimes); (M21) **Team-Consensus Controller
+V2** (regime-aware weighted quorum + branch-merge arbiter +
+role-dropout repair + substrate-replay fallback + transcript
+fallback).
+
+The W67 `W67Team` orchestrator composes all twenty-one modules,
+emits per-turn 30 module witness CIDs (one for the branch-merge
+falsifier, one for the MASC V3 aggregate, one for the
+team-consensus controller V2), and seals them into a
+`W67HandoffEnvelope` whose `w66_outer_cid` carries forward the
+W66 envelope byte-for-byte. The W67 envelope verifier enumerates
+**147 disjoint failure modes** (≥ 140 target met).
+
+W67 is the **twelfth executable substrate-coupling milestone** in
+the programme; it is NOT a claim of third-party transformer-
+internal access. `W67-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`
+carries forward unchanged. `W67-L-V12-NO-AUTOGRAD-CAP` is the new
+ridge-only cap: W67 fits **only** forty-one closed-form linear
+ridge solves (thirty-five from W61..W66 + six new) — (a) cache
+controller V10 seven-objective; (b) cache controller V10 per-role
+eviction (planner); (c) replay V8 per-role per-regime (planner) ×
+12 regimes; (d) replay V8 branch-merge-routing head; (e) HSB V11
+eight-target inner V5; (f) KV V12 eight-target inner V6 — no SGD,
+no autograd, no GPU.
+
+W67 ships at `coordpy.tiny_substrate_v12`,
+`coordpy.kv_bridge_v12`, `coordpy.hidden_state_bridge_v11`,
+`coordpy.prefix_state_bridge_v11`,
+`coordpy.attention_steering_bridge_v11`,
+`coordpy.cache_controller_v10`, `coordpy.replay_controller_v8`,
+`coordpy.persistent_latent_v19`,
+`coordpy.multi_hop_translator_v17`,
+`coordpy.mergeable_latent_capsule_v15`,
+`coordpy.consensus_fallback_controller_v13`,
+`coordpy.corruption_robust_carrier_v15`,
+`coordpy.long_horizon_retention_v19`,
+`coordpy.ecc_codebook_v19`,
+`coordpy.transcript_vs_shared_arbiter_v16`,
+`coordpy.uncertainty_layer_v15`,
+`coordpy.disagreement_algebra_v13`,
+`coordpy.deep_substrate_hybrid_v12`,
+`coordpy.substrate_adapter_v12`,
+`coordpy.multi_agent_substrate_coordinator_v3`,
+`coordpy.team_consensus_controller_v2`, `coordpy.w67_team`,
+`coordpy.r149_benchmark`, `coordpy.r150_benchmark`,
+`coordpy.r151_benchmark` — reachable only through explicit
+imports. `coordpy.__version__` remains `0.5.20`; SDK contract is
+byte-for-byte unchanged. **No PyPI release**.
+
+R-149 (24 cell families) + R-150 (14 cell families) + R-151 (18
+cell families) at 3 seeds verify H285..H304. **56 of 56 H-bars
+pass 3/3 seeds (168/168 cells, strong success per the W67 success
+criterion)**. Cumulative trust boundary across W22..W67 =
+**1375 enumerated failure modes** (1228 from W22..W66 + 147 new
+W67 envelope verifier modes).
+
+W67 envelope chain end-to-end: `W66 envelope CID ==
+W67.w66_outer_cid` (verified live by
+`test_w67_team_envelope_chain`). Trivial passthrough preserved
+byte-for-byte (`test_w67_trivial_passthrough_byte_identical`).
+
+W67 is the **third** programme milestone where substrate control
+produces a **measurable multi-agent task-level win** and the
+**first** to produce wins under all **five** failure-mode regimes
+(baseline + team-consensus-under-budget + team-failure-recovery +
+role-dropout + branch-merge-reconciliation). The most decisive
+new evidence comes from the **branch-merge-reconciliation regime**
+(where V12 strictly beats V11 on 100 % of seeds: the V12
+snapshot-fork + branch-merge primitive lets the substrate
+reconcile conflicting branch payloads that V11 cannot) and the
+**role-dropout regime** (where V12 strictly beats V11 on 80 % of
+seeds: the V12 role-dropout-recovery flag lets even
+`substrate_routed_v12` alone — without `team_consensus_active` —
+infer a recovery payload that V11 cannot).
+
+The honest scope is unchanged: W67 makes the **in-repo V12
+substrate** more load-bearing — four new internal axes, six new
+closed-form-ridge-trained controllers/heads (forty-one total
+across W61..W67), a twelve-way bidirectional hybrid loop, five
+multi-agent task-success regimes — but the **third-party
+hosted-model substrate remains blocked** at the HTTP surface
+(`W67-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`).
 
 ## TL;DR — W66 Stronger Solving-Context Substrate-Coupled Latent Operating System (post-W65 research milestone)
 

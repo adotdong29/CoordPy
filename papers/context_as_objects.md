@@ -2,7 +2,67 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W65 research-line update (W66 Stronger Solving-Context
+> **Post-W66 research-line update (W67 Stronger Branch-Merge /
+> Role-Dropout Substrate-Coupled Latent Operating System,
+> 2026-05-16).** *Twelfth substrate-attack milestone, and the
+> **third** multi-agent task-success-bearing substrate milestone
+> in the programme — the first to produce wins across **five**
+> failure-mode regimes (baseline + team-consensus-under-budget +
+> team-failure-recovery + **role-dropout** +
+> **branch-merge-reconciliation**), not just three.
+> ``MultiAgentSubstrateCoordinatorV3`` runs **eight** matched-
+> budget policies (the six W66 policies plus
+> ``substrate_routed_v12`` and
+> ``team_substrate_coordination_v12``) under five regimes; the V12
+> policy **strictly beats V11 across all five regimes** (≥ 73 %
+> of seeds per regime: 93 % at baseline; 93 % at
+> team_consensus_under_budget; 73 % at team_failure_recovery; 80 %
+> at role_dropout; **100 %** at branch_merge_reconciliation). The
+> ``team_substrate_coordination_v12`` policy strictly beats
+> ``team_substrate_coordination_v11`` on ≥ 47 % of seeds — with
+> 91.7 % at baseline. In the role-dropout regime (where one role
+> drops out across multiple windows mid-task), the
+> ``substrate_routed_v12`` policy alone (no team-consensus
+> arbitration active) doubles team success over V11 by leaning on
+> the V12 role-dropout-recovery flag. In the branch-merge
+> reconciliation regime (where agents fork into branches and
+> produce conflicting payloads), the V12 substrate's snapshot-fork
+> + branch-merge primitive provides the path V11 cannot. The
+> in-repo NumPy substrate grows to V12 (14 layers + four new V12
+> axes: per-(layer, head, slot) branch-merge witness tensor,
+> per-role-pair role-dropout-recovery flag, substrate snapshot-
+> fork primitive, per-layer V12 composite gate score). The
+> substrate branch-merge primitive saves **91 %** of recompute
+> flops at 128 tokens over a 4-branch reconciliation. Six new
+> closed-form ridge solves on top of W61..W66's thirty-five
+> (forty-one total). The deep substrate hybrid is now twelve-way
+> (V11 hybrid + cache controller V10 + replay controller V8 +
+> branch-merge witness + role-dropout recovery + snapshot-fork +
+> team-consensus controller V2). The persistent latent state is
+> V19 (18 layers, 16 skip carriers,
+> ``max_chain_walk_depth=16384``, distractor rank 18). Multi-hop
+> chain length grows to 30 over 40 backends (1560 directed edges);
+> 12-axis composite trust. ECC reaches **33.333 bits/visible-
+> token** at full emit (2^31 = 2 147 483 648 codes). Long-horizon
+> reconstruction reaches 18 heads at max_k=384. Consensus has 20
+> disjoint stages including ``role_dropout_arbiter`` and
+> ``branch_merge_reconciliation_arbiter``. The first capsule-
+> native team-consensus controller V2 composes regime-aware
+> weighted quorum + branch-merge arbiter (substrate-fork-and-
+> merge) + role-dropout-repair head + substrate-replay fallback +
+> transcript fallback. R-149 + R-150 + R-151 deliver **56/56
+> H-bars × 3 seeds (168/168 cells)**. The honest scope is
+> unchanged: hosted backends remain text-only at the HTTP surface
+> (``W67-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``); the substrate
+> is a small in-repo NumPy runtime, not a frontier model
+> (``W67-L-NUMPY-CPU-V12-SUBSTRATE-CAP``); "training" is closed-
+> form linear ridge throughout (``W67-L-V12-NO-AUTOGRAD-CAP``);
+> and the multi-agent task-success wins are measured **inside the
+> W67 synthetic harness**
+> (``W67-L-MULTI-AGENT-COORDINATOR-V3-SYNTHETIC-CAP``), not on
+> real hosted multi-agent backends.*
+>
+> **Preceding research-line update (W66 Stronger Solving-Context
 > Substrate-Coupled Latent Operating System, 2026-05-16).**
 > *Eleventh substrate-attack milestone, and the **second** multi-
 > agent task-success-bearing substrate milestone in the programme —

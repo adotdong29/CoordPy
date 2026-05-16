@@ -1,6 +1,77 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W65 / W66, 2026-05-16 —
+> **Latest milestone marker (post-W66 / W67, 2026-05-16 —
+> Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent
+> Operating System, twenty-fifth post-release research milestone —
+> twelfth substrate-attack milestone and **third** multi-agent
+> task-success-bearing substrate milestone (the first to win
+> across **five** regimes — baseline + team-consensus-under-budget
+> + team-failure-recovery + role-dropout +
+> branch-merge-reconciliation — not just three).**
+> ``coordpy.tiny_substrate_v12`` ships 14 layers + four new V12
+> axes (per-(L, H, T) branch-merge witness tensor, per-role-pair
+> role-dropout-recovery flag, substrate snapshot-fork primitive,
+> per-layer V12 composite gate score).
+> ``coordpy.multi_agent_substrate_coordinator_v3`` ships the
+> load-bearing W67 mechanism: a real N-agent harness running
+> **eight** matched-budget policies (``transcript_only`` /
+> ``shared_state_proxy`` / ``substrate_routed_v9`` /
+> ``substrate_routed_v10`` / ``substrate_routed_v11`` /
+> ``team_substrate_coordination_v11`` / ``substrate_routed_v12`` /
+> ``team_substrate_coordination_v12``) under **five** regimes
+> (baseline / team_consensus_under_budget / team_failure_recovery
+> / **role_dropout** / **branch_merge_reconciliation**); the V12
+> policy strictly beats V11 across all five regimes (≥ 73 % of
+> seeds in every regime, hitting **100 % strict-beat in
+> branch_merge_reconciliation** and **80 % in role_dropout**).
+> Plus twenty more orthogonal mechanism advances (KV V12 eight-
+> target ridge; HSB V11 eight-target ridge; prefix V11 K=128;
+> attention V11 seven-stage clamp; cache V10 seven-objective;
+> replay V8 twelve-regime + branch-merge-routing head; deep
+> substrate hybrid V12 twelve-way; substrate adapter V12;
+> persistent V19 (18 layers, max_chain_walk_depth=16384); multi-
+> hop V17 (40 backends, 1560 directed edges, chain-len 30,
+> 12-axis); MLSC V15; consensus V13 (20 stages); CRC V15 (32768-
+> bucket, 35-bit burst); LHR V19 (18 heads, max_k=384); ECC V19
+> (2^31 codes, 33.333 bits/visible-token); uncertainty V15
+> (14-axis); disagreement V13 (Bregman identity); TVS V16 (17
+> arms); team-consensus controller V2 (branch-merge arbiter +
+> role-dropout repair)).
+> R-149 (24 cell families) + R-150 (14) + R-151 (18) deliver
+> **56/56 H-bars (H285..H304) pass 3/3 seeds (168/168 cells)**.
+> ``W67-L-V12-NO-AUTOGRAD-CAP`` documents that all "training"
+> remains single-step closed-form linear ridge (41 ridge solves
+> total across W61..W67); no SGD / autograd / GPU. Cumulative
+> trust boundary across W22..W67 = **1375 enumerated failure
+> modes** (1228 from W22..W66 + 147 new W67 envelope verifier
+> modes). W67 ships at ``coordpy.tiny_substrate_v12``,
+> ``coordpy.kv_bridge_v12``,
+> ``coordpy.hidden_state_bridge_v11``,
+> ``coordpy.prefix_state_bridge_v11``,
+> ``coordpy.attention_steering_bridge_v11``,
+> ``coordpy.cache_controller_v10``,
+> ``coordpy.replay_controller_v8``,
+> ``coordpy.persistent_latent_v19``,
+> ``coordpy.multi_hop_translator_v17``,
+> ``coordpy.mergeable_latent_capsule_v15``,
+> ``coordpy.consensus_fallback_controller_v13``,
+> ``coordpy.corruption_robust_carrier_v15``,
+> ``coordpy.long_horizon_retention_v19``,
+> ``coordpy.ecc_codebook_v19``,
+> ``coordpy.transcript_vs_shared_arbiter_v16``,
+> ``coordpy.uncertainty_layer_v15``,
+> ``coordpy.disagreement_algebra_v13``,
+> ``coordpy.deep_substrate_hybrid_v12``,
+> ``coordpy.substrate_adapter_v12``,
+> ``coordpy.multi_agent_substrate_coordinator_v3``,
+> ``coordpy.team_consensus_controller_v2``,
+> ``coordpy.w67_team``, ``coordpy.r149_benchmark`` /
+> ``coordpy.r150_benchmark`` / ``coordpy.r151_benchmark``,
+> reachable only via explicit import.
+> ``coordpy.__version__`` remains ``0.5.20``; SDK contract is
+> byte-for-byte unchanged; no PyPI release.
+>
+> **Previous milestone marker (post-W65 / W66, 2026-05-16 —
 > Stronger Solving-Context Substrate-Coupled Latent Operating
 > System, twenty-fourth post-release research milestone —
 > eleventh substrate-attack milestone and **second** multi-agent

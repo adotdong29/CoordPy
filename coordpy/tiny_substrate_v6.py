@@ -476,10 +476,15 @@ def _cross_layer_coupling(
                 continue
             out[i, j] = float(
                 _np.dot(flats[i][:n], flats[j][:n]))
-    # Round to 12 decimals to neutralise BLAS-level ULP jitter so
+    # Round to 10 decimals to neutralise BLAS-level ULP jitter so
     # the coupling CID is byte-deterministic across forwards on the
-    # same inputs.
-    return _np.round(out, decimals=12)
+    # same inputs. (12 decimals was sufficient through W66 but the
+    # W67 V12 substrate runs 14 layers, where the L^2 accumulator
+    # chain crosses an ULP boundary at 12 decimals after enough
+    # upstream BLAS state mutations; 10 decimals leaves >10 digits
+    # of precision and is byte-stable across all observed BLAS
+    # accumulator histories.)
+    return _np.round(out, decimals=10)
 
 
 def forward_tiny_substrate_v6(

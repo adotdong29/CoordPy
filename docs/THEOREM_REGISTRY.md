@@ -14,7 +14,82 @@
 > - **conjectural** — stated, falsifiable; not yet proved or systematically tested.
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
-> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14; post-W59 W60 Trainable Cache-Control Substrate-Coupled Latent OS milestone added 2026-05-14; post-W60 W61 Trainable Hidden-State Substrate-Coupled Latent OS milestone added 2026-05-15; post-W62 W63 Stronger Replay-Dominance Hidden-Wins 4096-Turn Substrate-Coupled Latent OS milestone added 2026-05-15; post-W63 W64 Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn Nine-Way Substrate-Coupled Latent OS milestone added 2026-05-15; post-W64 W65 Team-Substrate-Coordination Substrate-Coupled Latent OS milestone added 2026-05-16; post-W65 W66 Stronger Solving-Context Substrate-Coupled Latent OS milestone added 2026-05-16.
+> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14; post-W59 W60 Trainable Cache-Control Substrate-Coupled Latent OS milestone added 2026-05-14; post-W60 W61 Trainable Hidden-State Substrate-Coupled Latent OS milestone added 2026-05-15; post-W62 W63 Stronger Replay-Dominance Hidden-Wins 4096-Turn Substrate-Coupled Latent OS milestone added 2026-05-15; post-W63 W64 Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn Nine-Way Substrate-Coupled Latent OS milestone added 2026-05-15; post-W64 W65 Team-Substrate-Coordination Substrate-Coupled Latent OS milestone added 2026-05-16; post-W65 W66 Stronger Solving-Context Substrate-Coupled Latent OS milestone added 2026-05-16; post-W66 W67 Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent OS milestone added 2026-05-16.
+
+## W67 Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent Operating System (W67-T-* and W67-L-* / W67-C-*)
+
+| Claim | One-line description | Status | Code/proof anchor |
+| ----- | -------------------- | ------ | ------------------ |
+| W67-T-SUBSTRATE-V12-FORWARD-DETERMINISM | Identical V12 params + token_ids → byte-identical V12 trace CID | mechanically-checked | `tiny_substrate_v12.forward_tiny_substrate_v12`; test `test_tiny_substrate_v12_determinism_and_axes`; H285 |
+| W67-T-SUBSTRATE-V12-BRANCH-MERGE-WITNESS | Per-(L, H, T) branch-merge witness scalar in [0, 1] | mechanically-checked | `TinyV12KVCache.branch_merge_witness`; H285b |
+| W67-T-SUBSTRATE-V12-ROLE-DROPOUT-RECOVERY-FLAG | Per-role-pair triggered boolean + window int flag | mechanically-checked | `trigger_role_dropout_recovery_v12`; H285c |
+| W67-T-SUBSTRATE-V12-SNAPSHOT-FORK | Snapshot-fork CID is content-addressed and reproducible | mechanically-checked | `substrate_snapshot_fork_v12`; H285e |
+| W67-T-SUBSTRATE-V12-BRANCH-MERGE-PRIMITIVE | Branch-merge primitive reconciles N branches into one merged CID with deterministic delta-l1 | mechanically-checked | `substrate_branch_merge_v12`; H285f |
+| W67-T-SUBSTRATE-V12-BRANCH-MERGE-SAVING | Branch-merge flop saving vs recompute ≥ 0.6 at default config | empirical (0.91) | `substrate_branch_merge_flops_v12`; H291 |
+| W67-T-SUBSTRATE-V12-V12-GATE-SCORE | Per-layer V12 composite gate score has shape (L,) | mechanically-checked | `_compute_v12_gate_score`; H285d |
+| W67-T-KV-BRIDGE-V12-EIGHT-TARGET-RIDGE | Eight-target stacked ridge fit; 7 V11 targets + 1 branch-merge | mechanically-checked | `fit_kv_bridge_v12_eight_target`; H285g |
+| W67-T-KV-BRIDGE-V12-BRANCH-MERGE-FALSIFIER | Returns 0 iff inverting the branch-merge flag flips the decision | mechanically-checked | `probe_kv_bridge_v12_branch_merge_falsifier`; H286 |
+| W67-T-KV-BRIDGE-V12-ROLE-PAIR-FINGERPRINT | 40-dim SHA256 fingerprint of (role_a, role_b, task_id, team_id, branch_id) | mechanically-checked | `compute_role_pair_fingerprint_v12`; H286b |
+| W67-T-HSB-V11-EIGHT-TARGET-STACK | Eight-target stacked ridge fit (7 V10 + 1 role-dropout) | mechanically-checked | `fit_hsb_v11_eight_target`; H287 |
+| W67-T-HSB-V11-HIDDEN-VS-BRANCH-MERGE | Per-(L, H) joint win rate ∈ [0, 1] when hidden residual L2 below threshold AND branch-merge residual greater | mechanically-checked | `probe_hsb_v11_hidden_vs_branch_merge`; H287b |
+| W67-T-HSB-V11-BRANCH-MERGE-MARGIN | Positive scalar when hidden residual is strictly less than min(kv, prefix, replay, recover, branch_merge) | mechanically-checked | `compute_hsb_v11_branch_merge_margin`; H287 |
+| W67-T-PREFIX-V11-K128-DRIFT-CURVE | Stacked K=128 drift curve via last-value extrapolation of V10 prediction; no new ridge solve | mechanically-checked | `fit_prefix_drift_curve_predictor_v11`; H288 |
+| W67-T-PREFIX-V11-ROLE-TASK-TEAM-BRANCH-FINGERPRINT | 40-D SHA256 fingerprint of (role, task_name, team_id, branch_id) is content-dependent | mechanically-checked | `compute_role_task_team_branch_fingerprint_v11`; H288 |
+| W67-T-PREFIX-V11-SIX-WAY-DECISION | Six-way decision over drift-curve L1 areas (prefix/hidden/replay/team/recover/branch) | mechanically-checked | `compare_prefix_vs_hidden_vs_replay_vs_team_vs_recover_vs_branch_v11`; H288b |
+| W67-T-ATTN-V11-SEVEN-STAGE-CLAMP | Seven-stage clamp (V10 + branch-merge attention-bias clip) keeps attention_delta_l2 ≤ branch_merge_cap | mechanically-checked | `steer_attention_and_measure_v11`; H289 |
+| W67-T-CACHE-V10-SEVEN-OBJECTIVE | Seven-objective stacked ridge (drop + retrieval + hidden_wins + replay_dominance + team_task_success + team_failure_recovery + branch_merge) converges | mechanically-checked | `fit_seven_objective_ridge_v10`; H289b |
+| W67-T-CACHE-V10-PER-ROLE-EVICTION | Per-role 8-dim ridge eviction head converges | mechanically-checked | `fit_per_role_eviction_head_v10`; H289c |
+| W67-T-REPLAY-V8-PER-ROLE-PER-REGIME | Twelve regimes × per-role 10×4 ridge head | mechanically-checked | `fit_replay_controller_v8_per_role`; H290 |
+| W67-T-REPLAY-V8-BRANCH-MERGE-ROUTING | 4×11 ridge head over team features predicts branch-merge routing label | mechanically-checked | `fit_replay_v8_branch_merge_routing_head`; H290b |
+| W67-T-REPLAY-V8-TWELVE-REGIMES | V8 introduces `role_dropout_regime` and `branch_merge_reconciliation_regime` on top of V7's ten regimes | mechanically-checked | `W67_REPLAY_REGIMES_V8`; H290c |
+| W67-T-DEEP-HYBRID-V12-TWELVE-WAY | Twelve-way bidirectional loop sets `twelve_way=True` when all twelve axes fire | mechanically-checked | `deep_substrate_hybrid_v12_forward`; H285 (orchestrated via W67Team) |
+| W67-T-SUBSTRATE-ADAPTER-V12-V12-FULL-TIER | New `substrate_v12_full` tier; only the W67 V12 in-repo runtime satisfies every axis | mechanically-checked | `probe_all_v12_adapters`; H291d |
+| W67-T-PERSISTENT-V19-CHAIN-WALK-16384 | V19 chain-walk depth ≥ 16384 | mechanically-checked | `W67_DEFAULT_V19_MAX_CHAIN_WALK_DEPTH`; H293 |
+| W67-T-PERSISTENT-V19-SIXTEENTH-SKIP | Sixteenth skip carrier (`role_dropout_recovery_carrier`) is populated and persists across chain steps | mechanically-checked | `step_persistent_state_v19`; H293b |
+| W67-T-PERSISTENT-V19-CHAIN-CID-CONTENT-ADDRESSED | Identical chain state sequence → byte-identical chain CID | mechanically-checked | `PersistentLatentStateV19Chain.cid`; H293c |
+| W67-T-MULTI-HOP-V17-40-BACKENDS | 40 backends, 1560 directed edges, chain-length 30 | mechanically-checked | `W67_DEFAULT_MH_V17_BACKENDS`, `W67_DEFAULT_MH_V17_CHAIN_LEN`; H296, H296b |
+| W67-T-MULTI-HOP-V17-COMPROMISE-THRESHOLD | Compromise threshold bounded in [1, 12] | mechanically-checked | `estimate_compromise_threshold_v17`; H296c |
+| W67-T-MLSC-V15-CHAINS | V15 capsules carry both `role_dropout_recovery_witness_chain` and `branch_merge_reconciliation_witness_chain` | mechanically-checked | `wrap_v14_as_v15`; H304 |
+| W67-T-CONSENSUS-V13-TWENTY-STAGES | Consensus chain has exactly 20 disjoint stages | mechanically-checked | `W67_CONSENSUS_V13_STAGES`; H299 |
+| W67-T-CONSENSUS-V13-ROLE-DROPOUT-ARBITER | Fires when at least one parent has role-dropout score ≥ threshold AND v12 terminal stage is reached | mechanically-checked | `ConsensusFallbackControllerV13.decide_v13`; H299b |
+| W67-T-CONSENSUS-V13-BRANCH-MERGE-ARBITER | Fires when at least two conflicting branches AND branch-merge score ≥ threshold AND v12 terminal stage is reached | mechanically-checked | `ConsensusFallbackControllerV13.decide_v13`; H299c |
+| W67-T-CRC-V15-32768-BUCKET-DETECT | 32768-bucket fingerprint single-byte detect rate ≥ 0.95 | empirical (1.0) | `kv_cache_fingerprint_32768`; H298 |
+| W67-T-CRC-V15-35BIT-BURST | 35-bit adversarial burst detect rate ≥ 0.4 | empirical | `emit_corruption_robustness_v15_witness`; H298b |
+| W67-T-CRC-V15-BRANCH-MERGE-RECONCILIATION | Branch-merge reconciliation ratio floor ≥ 0.4 | empirical | `branch_merge_reconciliation_ratio`; H298c |
+| W67-T-LHR-V19-MAX-K-384 | V19 max_k = 384 (≥ 320 floor) | mechanically-checked | `W67_DEFAULT_LHR_V19_MAX_K`; H294 |
+| W67-T-LHR-V19-EIGHTEEN-HEADS | V19 has 18 reconstruction heads | mechanically-checked | `LongHorizonReconstructionV19Head.eighteen_way_value`; H294b |
+| W67-T-LHR-V19-NINE-LAYER-SCORER | V19 nine-layer scorer ridge fits non-trivially | mechanically-checked | `fit_lhr_v19_nine_layer_scorer`; H294c |
+| W67-T-ECC-V19-RATE-FLOOR | ECC V19 achieves ≥ 33.0 bits/visible-token at full emit | empirical (33.333) | `compress_carrier_ecc_v19`; H295c |
+| W67-T-ECC-V19-TOTAL-CODES | K1..K18 = 2^31 = 2 147 483 648 codes | mechanically-checked | `ECCCodebookV19.total_codes`; H295b |
+| W67-T-ECC-V19-RATE-FLOOR-FALSIFIER | 65536-bit/token target exceeds log2(2^31) = 31-bit ceiling | mechanically-checked | `probe_ecc_v19_rate_floor_falsifier`; H295d |
+| W67-T-UNCERTAINTY-V15-FOURTEEN-AXIS | 14-axis weighted composite returns value in [0, 1] | mechanically-checked | `compose_uncertainty_report_v15`; H303 |
+| W67-T-UNCERTAINTY-V15-BRANCH-MERGE-AWARE | `branch_merge_aware` flips True when any branch-merge fidelity < 1.0 | mechanically-checked | `compose_uncertainty_report_v15`; H303b |
+| W67-T-DA-V13-BREGMAN-IDENTITY | Bregman-equivalence identity holds iff argmax preserved AND Bregman ≤ floor | mechanically-checked | `check_bregman_equivalence_identity`; H300 |
+| W67-T-DA-V13-BREGMAN-FALSIFIER | Falsifier triggers when argmax not preserved OR Bregman > floor | mechanically-checked | `bregman_equivalence_falsifier`; H300b |
+| W67-T-DA-V13-BREGMAN-SELF-ZERO | Bregman(a, a) = 0 for squared-L2 generator (proper Bregman divergence) | mechanically-checked | `bregman_divergence_squared_l2`; H300c |
+| W67-T-TVS-V16-SEVENTEEN-ARMS-SUM-TO-ONE | Pick-rates over 17 arms sum to 1.0 within 1e-6 | mechanically-checked | `seventeen_arm_compare`; H302 |
+| W67-T-TVS-V16-BRANCH-MERGE-ARM-FIRES | Branch-merge-reconciliation arm fires under non-zero fidelity | mechanically-checked | `seventeen_arm_compare`; H302b |
+| W67-T-ENVELOPE-VERIFIER-MODES | W67 envelope verifier enumerates ≥ 140 disjoint failure modes (147) | mechanically-checked | `W67_ENVELOPE_VERIFIER_FAILURE_MODES`; H304 (envelope) |
+| W67-T-MASC-V3-BASELINE-V12-BEATS-V11 | V12 strictly beats V11 on ≥ 50 % of seeds in baseline regime | empirical (0.933) | `MultiAgentSubstrateCoordinatorV3.run_batch`; H291b |
+| W67-T-MASC-V3-BASELINE-TSC-V12-BEATS-TSC-V11 | TSC_V12 strictly beats TSC_V11 on ≥ 50 % of seeds in baseline regime | empirical (0.933) | `MultiAgentSubstrateCoordinatorV3.run_batch`; H291c |
+| W67-T-MASC-V3-TCUB-V12-BEATS-V11 | V12 strictly beats V11 on ≥ 50 % of seeds in team_consensus_under_budget regime | empirical (0.933) | `MultiAgentSubstrateCoordinatorV3.run_batch`; H301 |
+| W67-T-MASC-V3-TFR-V12-BEATS-V11 | V12 strictly beats V11 on ≥ 50 % of seeds in team_failure_recovery regime | empirical (0.733) | `MultiAgentSubstrateCoordinatorV3.run_batch`; H301b |
+| W67-T-MASC-V3-ROLE-DROPOUT-V12-BEATS-V11 | V12 strictly beats V11 on ≥ 50 % of seeds in role_dropout regime | empirical (0.800) | `MultiAgentSubstrateCoordinatorV3.run_batch`; H301c |
+| W67-T-MASC-V3-BRANCH-MERGE-V12-BEATS-V11 | V12 strictly beats V11 on ≥ 50 % of seeds in branch_merge_reconciliation regime | empirical (1.000) | `MultiAgentSubstrateCoordinatorV3.run_batch`; H301d |
+| W67-T-TEAM-CONSENSUS-V2-BRANCH-MERGE-MERGE | TCC V2 fires `branch_merge_reconciliation_merge` when conflicting payloads + substrate trust ≥ floor | mechanically-checked | `TeamConsensusControllerV2.decide_v2`; H291e |
+| W67-T-TEAM-CONSENSUS-V2-ROLE-DROPOUT-REPAIR | TCC V2 fires `role_dropout_repair` when at least one missing role + substrate trust ≥ floor | mechanically-checked | `TeamConsensusControllerV2.decide_v2`; (test_w67_modules) |
+| W67-L-NUMPY-CPU-V12-SUBSTRATE-CAP | V12 substrate is a 14-layer NumPy CPU runtime, NOT a frontier model | limitation | `tiny_substrate_v12.TinyV12SubstrateConfig.default` |
+| W67-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP | W67 does NOT bridge to third-party hosted models | limitation | `substrate_adapter_v12.probe_all_v12_adapters` (probe_ollama=False, probe_openai=False) |
+| W67-L-V12-NO-AUTOGRAD-CAP | W67 fits only closed-form linear ridge solves; no SGD/autograd/GPU. Total 41 across W61..W67. | limitation | (no autograd anywhere in W61..W67 ridge fits) |
+| W67-L-SUBSTRATE-BRANCH-MERGE-IN-REPO-CAP | Branch-merge primitive operates on the in-repo V12 cache only | limitation | `substrate_branch_merge_v12` |
+| W67-L-TEAM-CONSENSUS-V2-IN-REPO-CAP | TCC V2 operates on in-repo MASC V3 outcomes only | limitation | `team_consensus_controller_v2.TeamConsensusControllerV2` |
+| W67-L-MULTI-AGENT-COORDINATOR-V3-SYNTHETIC-CAP | MASC V3 is a synthetic deterministic harness | limitation | `multi_agent_substrate_coordinator_v3.run_v3_multi_agent_task` |
+| W67-L-MULTI-HOP-V17-SYNTHETIC-BACKENDS-CAP | V17 backends are named (40), not executed | limitation | `multi_hop_translator_v17.W67_DEFAULT_MH_V17_BACKENDS` |
+| W67-L-CRC-V15-FINGERPRINT-SYNTHETIC-CAP | CRC V15 32768-bucket fingerprint is wrap-around XOR over byte vectors | limitation | `kv_cache_fingerprint_32768` |
+| W67-L-ECC-V19-RATE-FLOOR-CAP | Structural ceiling log2(2^31) = 31 raw data bits per segment-tuple | limitation | `probe_ecc_v19_rate_floor_falsifier` |
+| W67-L-V19-LHR-SCORER-FIT-CAP | Only the final ridge head is fit in LHR V19; first eight layers are frozen random projections | limitation | `fit_lhr_v19_nine_layer_scorer` |
+| W67-L-V19-OUTER-NOT-TRAINED-CAP | V19 outer wrapper does NOT train the V13 outer GRU | limitation | `step_persistent_state_v19` |
+| W67-L-V11-PREFIX-K128-STRUCTURAL-CAP | K=128 extension uses V10's prediction extended with last-value extrapolation; no new ridge fit | limitation | `PrefixDriftCurvePredictorV11.predict_curve_v11` |
 
 ## W66 Stronger Solving-Context Substrate-Coupled Latent Operating System (W66-T-* and W66-L-* / W66-C-*)
 

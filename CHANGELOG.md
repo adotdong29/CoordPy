@@ -13,6 +13,88 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W67 Stronger Branch-Merge / Role-Dropout Substrate-Coupled
+  Latent Operating System** (post-W66, 2026-05-16) — *twelfth
+  substrate-attack milestone; third **multi-agent task-success-
+  bearing** substrate milestone (first to win across **five**
+  regimes: baseline + team-consensus-under-budget +
+  team-failure-recovery + role-dropout +
+  branch-merge-reconciliation)*. Twenty-one orthogonal advances
+  on top of W66: (M1) **Tiny Substrate V12** (14 layers; four new
+  V12 axes — per-(L, H, T) branch-merge witness tensor,
+  per-role-pair role-dropout-recovery flag, substrate snapshot-
+  fork primitive, per-layer V12 composite gate score); (M2)
+  **KV Bridge V12** (eight-target stacked ridge; branch-merge
+  margin probe; role-pair 40-dim fingerprint;
+  branch-merge-reconciliation falsifier); (M3) **HSB V11**
+  (eight-target stacked ridge; per-(L, H) hidden-vs-branch-merge
+  probe; branch-merge margin); (M4) **Prefix V11** (K=128 drift
+  curve; role+task+team+branch 40-dim fingerprint; six-way
+  prefix/hidden/replay/team/recover/branch comparator); (M5)
+  **Attention V11** (seven-stage clamp adding branch-merge
+  attention bias; branch-conditioned fingerprint); (M6) **Cache
+  Controller V10** (seven-objective stacked ridge adding
+  branch-merge; per-role 8-dim eviction head); (M7) **Replay
+  Controller V8** (12 regimes adding `role_dropout_regime` and
+  `branch_merge_reconciliation_regime`; per-role per-regime
+  ridge; **trained branch-merge-routing head**); (M8) **Deep
+  Substrate Hybrid V12** (twelve-way bidirectional loop); (M9)
+  **Substrate Adapter V12** (new `substrate_v12_full` tier);
+  (M10) **Persistent V19** (18 layers; sixteenth skip carrier
+  `role_dropout_recovery_carrier`; max_chain_walk_depth=16384;
+  distractor rank 18); (M11) **Multi-Hop V17** (40 backends; 1560
+  directed edges; chain-len 30; 12-axis composite); (M12)
+  **Mergeable Latent Capsule V15** (role-dropout-recovery +
+  branch-merge-reconciliation witness chains); (M13) **Consensus
+  V13** (20 stages: adds `role_dropout_arbiter` and
+  `branch_merge_reconciliation_arbiter`); (M14) **CRC V15**
+  (32768-bucket fingerprint; 35-bit adversarial burst; branch-
+  merge reconciliation probe); (M15) **LHR V19** (18 heads;
+  max_k=384; nine-layer scorer); (M16) **ECC V19** (2^31 = 2 147
+  483 648 codes; **33.333 bits/visible-token** at full emit);
+  (M17) **Uncertainty V15** (14-axis composite adding
+  `branch_merge_reconciliation_fidelity`); (M18) **Disagreement
+  V13** (Bregman-equivalence identity + falsifier); (M19)
+  **TVS V16** (17 arms with `branch_merge_reconciliation`); (M20)
+  **MASC V3** (eight-policy harness across **five** regimes; V12
+  strictly beats V11 across all five); (M21) **Team-Consensus
+  Controller V2** (branch-merge arbiter + role-dropout repair).
+  W67 fits **six** new closed-form ridge solves on top of W66's
+  35 (cache V10 seven-objective; cache V10 per-role eviction;
+  replay V8 per-role per-regime; replay V8 branch-merge-routing;
+  HSB V11 eight-target; KV V12 eight-target). Total **41 ridge
+  solves across W61..W67**. No SGD / autograd / GPU. **R-149**
+  (24 cell families) + **R-150** (14) + **R-151** (18) deliver
+  56/56 H-bars at 3/3 seeds (168/168 cells). Cumulative trust
+  boundary across W22..W67 = **1375 enumerated failure modes**.
+  Ships at `coordpy.tiny_substrate_v12`, `coordpy.kv_bridge_v12`,
+  `coordpy.hidden_state_bridge_v11`,
+  `coordpy.prefix_state_bridge_v11`,
+  `coordpy.attention_steering_bridge_v11`,
+  `coordpy.cache_controller_v10`,
+  `coordpy.replay_controller_v8`,
+  `coordpy.persistent_latent_v19`,
+  `coordpy.multi_hop_translator_v17`,
+  `coordpy.mergeable_latent_capsule_v15`,
+  `coordpy.consensus_fallback_controller_v13`,
+  `coordpy.corruption_robust_carrier_v15`,
+  `coordpy.long_horizon_retention_v19`,
+  `coordpy.ecc_codebook_v19`,
+  `coordpy.transcript_vs_shared_arbiter_v16`,
+  `coordpy.uncertainty_layer_v15`,
+  `coordpy.disagreement_algebra_v13`,
+  `coordpy.deep_substrate_hybrid_v12`,
+  `coordpy.substrate_adapter_v12`,
+  `coordpy.multi_agent_substrate_coordinator_v3`,
+  `coordpy.team_consensus_controller_v2`, `coordpy.w67_team`,
+  `coordpy.r149_benchmark` / `coordpy.r150_benchmark` /
+  `coordpy.r151_benchmark`. Limitations: `W67-L-NO-THIRD-PARTY-
+  SUBSTRATE-COUPLING-CAP`, `W67-L-V12-NO-AUTOGRAD-CAP`,
+  `W67-L-SUBSTRATE-BRANCH-MERGE-IN-REPO-CAP`,
+  `W67-L-TEAM-CONSENSUS-V2-IN-REPO-CAP`,
+  `W67-L-MULTI-AGENT-COORDINATOR-V3-SYNTHETIC-CAP`. Public SDK
+  unchanged: `coordpy.__version__ == "0.5.20"`. No PyPI release.
+
 - **W66 Stronger Solving-Context Substrate-Coupled Latent
   Operating System** (post-W65, 2026-05-16) — *eleventh substrate-
   attack milestone; second **multi-agent task-success-bearing**

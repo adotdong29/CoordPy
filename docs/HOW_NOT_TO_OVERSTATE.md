@@ -2,9 +2,71 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W64
-> W65 milestone (Team-Substrate-Coordination Substrate-Coupled
-> Latent Operating System research line), 2026-05-16.
+> README-of-README must satisfy these rules. Last touched: post-W66
+> W67 milestone (Stronger Branch-Merge / Role-Dropout Substrate-
+> Coupled Latent Operating System research line), 2026-05-16.
+
+## W67 (Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
+
+The W67 milestone introduces the V12 substrate (14 layers + four
+new V12 axes), the eight-policy MASC V3 across five regimes, and
+the TCC V2. The substrate now produces multi-agent task-success
+wins under **five** named failure-mode regimes (the three from W66
+plus role-dropout and branch-merge-reconciliation). The honest
+scope:
+
+1. **Twelfth substrate-attack milestone — still in-repo NumPy.**
+   The V12 substrate adds 14 layers, GQA 8q/4kv, RMSNorm, SwiGLU,
+   d_model=64, vocab=259 — *still NOT a frontier model*. Hosted
+   backends remain text-only at the HTTP surface
+   (`W67-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`).
+2. **Multi-agent task wins are synthetic-harness-load-bearing.**
+   MASC V3 runs eight policies on a synthetic deterministic
+   coordination task; the V12 policy beats V11 because the V12
+   mechanisms (snapshot-fork + branch-merge primitive +
+   role-dropout-recovery flag) are engineered to materially help
+   in the new regimes. **This is not a real hosted multi-agent
+   win** (`W67-L-MULTI-AGENT-COORDINATOR-V3-SYNTHETIC-CAP`).
+3. **All "training" remains closed-form linear ridge.** Six new
+   ridge solves on top of W66's 35 (41 total across W61..W67); no
+   SGD, no autograd, no GPU (`W67-L-V12-NO-AUTOGRAD-CAP`).
+4. **Branch-merge primitive is in-repo.** The
+   `substrate_snapshot_fork_v12` / `substrate_branch_merge_v12`
+   pair operates on the V12 cache only
+   (`W67-L-SUBSTRATE-BRANCH-MERGE-IN-REPO-CAP`).
+5. **TCC V2 operates on synthetic MASC V3 outcomes.** The branch-
+   merge arbiter / role-dropout-repair head are deterministic on
+   the in-repo decisions
+   (`W67-L-TEAM-CONSENSUS-V2-IN-REPO-CAP`).
+6. **Multi-hop V17 backends are named, not executed.** 40
+   backends and 1560 directed edges
+   (`W67-L-MULTI-HOP-V17-SYNTHETIC-BACKENDS-CAP`).
+7. **CRC V15 32768-bucket fingerprint is wrap-around XOR.** The
+   35-bit adversarial burst is a stress test, not a real
+   adversarial attack (`W67-L-CRC-V15-FINGERPRINT-SYNTHETIC-CAP`).
+8. **ECC V19 rate ceiling is structural.** log2(2^31) = 31 raw
+   data bits per segment-tuple
+   (`W67-L-ECC-V19-RATE-FLOOR-CAP`); the 65536-bit/token target
+   trivially exceeds this and the falsifier reproduces it.
+9. **LHR V19 only fits the final ridge head.** The eight
+   preceding layers are frozen random projections
+   (`W67-L-V19-LHR-SCORER-FIT-CAP`).
+10. **Persistent V19 wrapper does NOT train the V13 outer GRU**
+    (`W67-L-V19-OUTER-NOT-TRAINED-CAP`).
+11. **Prefix V11 K=128 extension is structural.** It uses V10's
+    prediction with last-value extrapolation; no new ridge fit
+    (`W67-L-V11-PREFIX-K128-STRUCTURAL-CAP`).
+12. **The released SDK is unchanged.** `coordpy.__version__ ==
+    "0.5.20"`. No PyPI release. The smoke driver passes byte-for-
+    byte. W67 reaches only via explicit imports
+    (`coordpy.tiny_substrate_v12` etc.).
+13. **The new regime wins are measured inside the V12 substrate
+    only.** The V12 policy wins in role-dropout because the V12
+    role-dropout-recovery flag lets even `substrate_routed_v12`
+    alone reason about absent roles; the V12 policy wins in
+    branch-merge-reconciliation because the V12 snapshot-fork
+    lets the substrate carry two branches in parallel and the
+    branch-merge primitive reconciles them. Both are synthetic.
 
 ## W65 (Team-Substrate-Coordination Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
 
