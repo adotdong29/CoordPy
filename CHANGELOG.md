@@ -13,6 +13,93 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W63 Stronger Replay-Dominance Hidden-Wins 4096-Turn
+  Substrate-Coupled Latent Operating System** (post-W62,
+  2026-05-15) — *eighth substrate-attack milestone; first
+  **per-(layer, head, slot) hidden-vs-KV contention tensor**
+  inside an in-repo NumPy substrate (V8), first **per-layer
+  hidden-state confidence probe**, first **per-(layer, head,
+  slot) replay-determinism channel**, first **per-(layer, head)
+  prefix-reuse trust ledger**, first **per-(L, H, L, H) cross-
+  layer-head coupling matrix**, first **trained three-way
+  bridge classifier** (closed-form ridge over 7-dim regime
+  features against `kv_wins` / `hidden_wins` / `prefix_wins`),
+  first **trained six-regime per-regime replay head** (replay
+  controller V4, six regimes × 8×4 ridge head + 7-dim regime
+  gate), first **trained retrieval-repair head** (cache
+  controller V6, 5-dim ridge over [flag_count, hidden_write,
+  replay_age, attention_receive_l1, cache_key_norm]), first
+  **three-objective stacked ridge fit** (cache controller V6,
+  drop-oracle + retrieval-relevance + hidden-wins
+  simultaneously), first **token-content-conditional drift-
+  curve predictor** (prefix V7, stacked 8×K ridge over
+  [reuse_len, recompute_len, drop_len, 4-D SHA256 token
+  fingerprint, 1] against K-step drift curve target), first
+  **three-stage attention clamp** (attention V7, JS budget +
+  coarse L1-mass clamp + fine per-(L,H,Q,K) KL clamp), first
+  **eight-way bidirectional substrate ↔ V8 ↔ cache controller
+  V6 ↔ replay controller V4 ↔ retrieval head ↔ attention-
+  steering V7 ↔ three-way bridge classifier ↔ prefix-state-
+  bridge V7** hybrid loop, and first **hidden-wins falsifier**
+  that returns 0 exactly when inverting residual roles flips
+  the decision.* Ships at `coordpy.tiny_substrate_v8` (10-layer
+  / 8-query-head / 4-KV-head GQA / d_model=64 / RMSNorm /
+  SwiGLU / per-(layer, head, slot) hidden-vs-KV contention
+  tensor / per-layer hidden-state confidence probe / per-(layer,
+  head, slot) replay-determinism channel / per-(layer, head)
+  prefix-reuse trust ledger / per-(L, H, L, H) cross-layer-head
+  coupling matrix), `coordpy.kv_bridge_v8` (V8 layer-e
+  correction additive on top of V7 layer-d; four-target stacked
+  ridge fit with explicit hidden-wins target; contention
+  coupling into V8 substrate; hidden-wins falsifier),
+  `coordpy.hidden_state_bridge_v7` (four-target stacked ridge
+  fit; V8 contention coupling; V3 recovery audit with two-stage
+  basin width), `coordpy.prefix_state_bridge_v7` (token-content-
+  conditional drift-curve predictor; prefix-vs-hidden three-way
+  comparator; V8 reuse-trust coupling),
+  `coordpy.attention_steering_bridge_v7` (three-stage clamp;
+  per-bucket cosine-aligned falsifier),
+  `coordpy.cache_controller_v6` (three-objective ridge head;
+  retrieval-repair head; composite_v6 7-head ridge mixture),
+  `coordpy.replay_controller_v4` (six-regime per-regime ridge
+  head; 7-dim regime gate; three-way bridge classifier; replay-
+  determinism bonus on REUSE),
+  `coordpy.deep_substrate_hybrid_v8` (eight-way bidirectional
+  loop), `coordpy.persistent_latent_v15` (14 layers; twelfth-
+  and-thirteenth skip carriers; max_chain_walk_depth=4096;
+  distractor rank 10), `coordpy.multi_hop_translator_v13`
+  (24 backends, 552 directed edges, chain-length-19, 8-axis
+  composite trust adding `hidden_wins_trust`),
+  `coordpy.mergeable_latent_capsule_v11` (hidden_wins +
+  prefix_reuse witness chains; Jensen-Shannon disagreement
+  distance; two new algebra signatures),
+  `coordpy.consensus_fallback_controller_v9` (13-stage chain
+  inserting `hidden_wins_arbiter`),
+  `coordpy.corruption_robust_carrier_v11` (2048-bucket wrap-
+  around-XOR fingerprint; 19-bit adversarial burst; hidden-state
+  recovery L2-ratio probe), `coordpy.long_horizon_retention_v15`
+  (14 heads; max_k=160; five-layer scorer; hidden-wins head),
+  `coordpy.ecc_codebook_v15` (K1..K14 = 2^24 = 16 777 216 codes;
+  26.333 bits/visible-token at full emit ≥ 26.0 target),
+  `coordpy.uncertainty_layer_v11` (10-axis composite with
+  `hidden_wins_fidelity`), `coordpy.disagreement_algebra_v9`
+  (JS-equivalence identity + falsifier),
+  `coordpy.transcript_vs_shared_arbiter_v12` (13-arm pick rates
+  summing to 1.0 within 1e-6 with `hidden_wins` arm),
+  `coordpy.substrate_adapter_v8` (`substrate_v8_full` tier),
+  and `coordpy.w63_team` (22 module witness CIDs sealed into a
+  `W63HandoffEnvelope` whose `w62_outer_cid` carries forward
+  the W62 envelope byte-for-byte; verifier enumerates 72
+  disjoint failure modes; trivial passthrough preserved byte-
+  for-byte). R-134 + R-135 + R-136 at 3 seeds verify
+  H181..H202b. All **49 H-bars pass 3/3 seeds (147/147 cells)**.
+  ``W63-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` carries
+  forward unchanged; ``W63-L-V8-NO-AUTOGRAD-CAP`` (only
+  seventeen closed-form linear ridge solves across W61+W62+W63;
+  no SGD, no autograd, no GPU). ``coordpy.__version__`` remains
+  ``0.5.20``; SDK contract is byte-for-byte unchanged. No PyPI
+  release.
+
 - **W62 Trainable Replay-Dominance Hidden-vs-KV Substrate-
   Coupled Latent Operating System** (post-W61, 2026-05-15) —
   *seventh substrate-attack milestone; first **per-(layer,

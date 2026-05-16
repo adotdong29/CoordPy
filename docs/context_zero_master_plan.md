@@ -13526,9 +13526,9 @@ for the pre-committed H1..H36 thresholds and
 
 ---
 
-## W55..W62 — substrate-attack milestones (post-W54, 2026-05-12 → 2026-05-15)
+## W55..W63 — substrate-attack milestones (post-W54, 2026-05-12 → 2026-05-15)
 
-The W55..W62 line is the **seven-milestone substrate-attack
+The W55..W63 line is the **eight-milestone substrate-attack
 programme** that turns the W54 capsule-layer operating system
 into a substrate-coupled latent operating system. Each milestone
 adds in-repo substrate axes, closed-form ridge fits, and a
@@ -13565,24 +13565,36 @@ bidirectional hybrid loop:
   repair head; two-objective stacked ridge fit; drift-curve
   predictor; two-stage attention clamp; seven-way bidirectional
   loop.
+- **W63** Stronger Replay-Dominance Hidden-Wins 4096-Turn
+  Substrate-Coupled Latent OS — V8 substrate (10 layers,
+  per-(layer, head, slot) hidden-vs-KV contention tensor,
+  per-layer hidden-state confidence probe, per-(layer, head,
+  slot) replay-determinism channel, per-(layer, head) prefix-
+  reuse trust ledger, per-(L, H, L, H) cross-layer-head coupling
+  matrix); six-regime replay controller V4 with three-way bridge
+  classifier; trained retrieval-repair head; three-objective
+  stacked ridge fit; token-content-conditional drift-curve
+  predictor; three-stage JS+L1+KL attention clamp; eight-way
+  bidirectional loop; hidden-wins falsifier.
 
-The W56..W62 envelope chain end-to-end:
+The W56..W63 envelope chain end-to-end:
 `w43_pmc_outer → ... → w55_outer → w56_outer → w57_outer →
-w58_outer → w59_outer → w60_outer → w61_outer → w62_outer`.
+w58_outer → w59_outer → w60_outer → w61_outer → w62_outer →
+w63_outer`.
 
-W56..W62 ship at explicit-import paths only.
+W56..W63 ship at explicit-import paths only.
 `coordpy.__version__` remains `0.5.20`. The released SDK contract
 is byte-for-byte unchanged. NO PyPI release.
 
-Honest scope: `W62-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP` carries
-forward the W56..W61 cap unchanged on hosted backends. The
-in-repo V7 NumPy substrate is `W62-L-NUMPY-CPU-V7-SUBSTRATE-CAP`
-(9 layers / d_model=64 / byte-vocab / max_len=128 / untrained,
-NOT a frontier model). W62 fits ONLY twelve closed-form linear
-ridge solves (seven from W61 + five new); no SGD, no autograd,
-no GPU. See `docs/SUCCESS_CRITERION_W62_REPLAY_DOMINANCE.md` and
-`docs/THEOREM_REGISTRY.md` (W62-T-* and W62-L-* rows) for the
-pre-committed H163..H180 thresholds and the empirical results.
+Honest scope: `W63-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP` carries
+forward the W56..W62 cap unchanged on hosted backends. The
+in-repo V8 NumPy substrate is `W63-L-NUMPY-CPU-V8-SUBSTRATE-CAP`
+(10 layers / d_model=64 / byte-vocab / max_len=128 / untrained,
+NOT a frontier model). W63 fits ONLY seventeen closed-form
+linear ridge solves (twelve from W61+W62 + five new); no SGD,
+no autograd, no GPU. See `docs/THEOREM_REGISTRY.md` (W63-T-*
+and W63-L-* rows) for the pre-committed H181..H202b thresholds
+and the empirical results.
 
 ---
 

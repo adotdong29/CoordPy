@@ -2,9 +2,89 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W61
-> W62 milestone (Trainable Replay-Dominance Hidden-vs-KV Substrate-
-> Coupled Latent Operating System research line), 2026-05-15.
+> README-of-README must satisfy these rules. Last touched: post-W62
+> W63 milestone (Stronger Replay-Dominance Hidden-Wins 4096-Turn
+> Substrate-Coupled Latent Operating System research line),
+> 2026-05-15.
+
+## W63 (Stronger Replay-Dominance Hidden-Wins 4096-Turn Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
+
+W63 extends W62 with a richer in-repo V8 runtime
+(``coordpy.tiny_substrate_v8``: 10 layers, GQA, five new internal
+axes — per-(layer, head, slot) hidden-vs-KV contention tensor,
+per-layer hidden-state confidence probe, per-(layer, head, slot)
+replay-determinism channel, per-(layer, head) prefix-reuse trust
+ledger, per-(L, H, L, H) cross-layer-head coupling matrix),
+nineteen W63 mechanism advances (V8 KV bridge, V7 HSB, V7 prefix,
+V7 attention, V6 cache controller, V4 replay controller, V8
+hybrid, V8 adapter, V15 persistent, V13 multi-hop, V11 capsule,
+V9 consensus, V11 corruption, V15 LHR, V15 ECC, V12 TVS, V11
+uncertainty, V9 disagreement), and three benchmark families
+(R-134..R-136 with 49 H-bars).
+
+* *"W63 trained the substrate end-to-end"* — **forbidden**.
+  ``W63-L-V8-NO-AUTOGRAD-CAP`` is load-bearing: every W63 fit is
+  a **single-step closed-form linear ridge solve** over a small
+  subspace. Cache controller V6: three-objective stacked head
+  (n_features × 3 matrix), retrieval-repair head (5-dim vector),
+  composite_v6 mixture (7-vector). Replay controller V4: per-
+  regime 8×4 head × 6 regimes + 7-dim regime gate + three-way
+  bridge 7×3 classifier. Plus W61+W62's twelve ridge solves
+  carry forward. Total **seventeen closed-form linear ridge
+  solves**. No SGD, no autograd, no GPU.
+
+* *"W63 coupled CoordPy to third-party transformer internals"* —
+  **forbidden**. ``W63-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``
+  is load-bearing: hosted backends (Ollama, OpenAI-compatible)
+  remain text-only at the HTTP surface. W63 makes the **in-repo
+  V8 NumPy substrate** more load-bearing, not the third-party
+  hosted-model substrate.
+
+* *"W63's three-way bridge classifier proves which bridge wins"* —
+  **forbidden**. The 7×3 ridge classifier achieves ≥ 0.8 training
+  accuracy on **synthetic supervision** where the labels are
+  constructed from the regime feature. It is a *fitted version of
+  a deterministic decision rule* on a bounded feature space; it
+  does NOT itself prove hidden-state injection beats KV injection
+  or prefix-state injection on real models or real workloads.
+
+* *"W63's hidden-wins falsifier shows hidden bridges win"* —
+  **forbidden**. The falsifier checks that inverting the residual
+  roles *flips* the decision, returning 0 exactly when this
+  invariant holds. It is a structural invariant check, not a
+  measurement that hidden bridges beat KV bridges in the wild.
+
+* *"W63's trained retrieval-repair head undoes corruption"* —
+  **forbidden**. ``W63-L-CONSENSUS-V9-HIDDEN-WINS-STAGE-SYNTHETIC-
+  CAP`` documents: the V9 hidden_wins_arbiter stage and the V6
+  cache controller retrieval-repair head output **additive
+  corrections**; they do NOT un-corrupt the raw cached state.
+
+* *"W63's drift-curve predictor predicts real token-content
+  drift"* — **forbidden**. ``W63-L-V7-PREFIX-TOKEN-FINGERPRINT-CAP``:
+  the predictor's token fingerprint is a fixed SHA256 projection;
+  it captures *some* token-content sensitivity, but it is not a
+  learned representation of all token-content dependencies.
+
+* *"W63's per-regime replay heads are deeply trained"* —
+  **forbidden**. Each per-regime head is a single 8×4 closed-form
+  ridge solve over ≤ 2 candidates per regime in the default
+  config. The regime gate is a nearest-centroid classifier over
+  7-dim regime features.
+
+* *"W63's three-stage attention clamp uses information theory"* —
+  **forbidden**. ``W63-L-V7-ATTN-NO-AUTOGRAD-CAP``: the V7
+  three-stage clamp is a clip-and-rescale loop over a shrunken
+  effective KL budget, with the JS upper bound estimated as
+  L1^2/2. Not a calibrated information-theoretic divergence
+  budget on the underlying model attention.
+
+* *"W63's hidden-wins target in the KV bridge is in-the-wild"* —
+  **forbidden**. ``W63-L-KV-BRIDGE-V8-HIDDEN-WINS-TARGET-
+  CONSTRUCTED-CAP``: the fourth (hidden-wins) target in the four-
+  target stack is *constructed* such that the KV bridge cannot
+  reach it without help from the HSB. It is a synthetic
+  demonstration of the regime, not an in-the-wild measurement.
 
 ## W62 (Trainable Replay-Dominance Hidden-vs-KV Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
 
