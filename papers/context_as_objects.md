@@ -2,7 +2,90 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W66 research-line update (W67 Stronger Branch-Merge /
+> **Post-W68 research-line update (W69 Stronger Solving-Context
+> Two-Plane Multi-Agent Substrate, 2026-05-16).** *Fourteenth
+> substrate-attack milestone, and the **fifth** multi-agent
+> task-success-bearing substrate milestone in the programme — the
+> first to produce wins across **nine** failure-mode regimes
+> (baseline + team-consensus-under-budget + team-failure-recovery
+> + role-dropout + branch-merge-reconciliation + partial-
+> contradiction + agent-replacement-warm-restart +
+> **multi-branch-rejoin-after-divergent-work** +
+> **silent-corruption-plus-member-replacement**), not just seven.
+> ``MultiAgentSubstrateCoordinatorV5`` runs **twelve** matched-
+> budget policies (the ten W68 policies plus
+> ``substrate_routed_v14`` and ``team_substrate_coordination_v14``)
+> under nine regimes; the V14 policy strictly beats V13 across
+> all nine regimes (≥ 60 % of seeds per regime: 80 % at baseline;
+> 80 % at team_consensus_under_budget; 80 % at
+> team_failure_recovery; 80 % at role_dropout; 80 % at
+> branch_merge_reconciliation; 86.7 % at partial_contradiction;
+> 86.7 % at agent_replacement_warm_restart; **86.7 %** at
+> multi_branch_rejoin; **60 %** at silent_corruption). The
+> ``team_substrate_coordination_v14`` policy strictly beats
+> ``team_substrate_coordination_v13`` on ≥ 80 % of seeds in every
+> regime (up to 93.3 % at multi-branch-rejoin). In the multi-
+> branch-rejoin regime (where three subgroups of agents fork into
+> divergent branches mid-task and must rejoin), the V14 substrate's
+> multi-branch-rejoin witness tensor + the V14 substrate self-
+> checksum CID provide the path V13 cannot. In the silent-
+> corruption-plus-member-replacement regime (where one role's
+> substrate is silently corrupted AND the role is replaced mid-
+> task), the V14 substrate's silent-corruption witness + member-
+> replacement flag + self-checksum CID let the V14 substrate
+> detect the corruption and warm-restart the replacement from the
+> surviving-agents weighted-mean. The in-repo NumPy substrate
+> grows to V14 (16 layers + four new V14 axes: per-(layer, head,
+> slot) multi-branch-rejoin witness tensor, per-role silent-
+> corruption witness with member-replacement flag, substrate self-
+> checksum CID, per-layer V14 composite gate score). The substrate
+> multi-branch-rejoin primitive saves **92 %** of recompute flops
+> at 128 tokens over a 4-branch rejoin. The substrate self-
+> checksum 1-byte detect rate is structurally 1 − 1/2^256 by SHA-
+> 256. Six new closed-form ridge solves on top of W61..W68's 47
+> (53 total). The deep substrate hybrid is now fourteen-way (V13
+> hybrid + cache V12 + replay V10 + multi-branch-rejoin witness +
+> silent-corruption witness + substrate self-checksum +
+> team-consensus controller V4). The persistent latent state is
+> V21 (20 layers, 18 skip carriers,
+> ``max_chain_walk_depth=65536``, distractor rank 20). Multi-hop
+> chain length grows to 38 over 48 backends (2256 directed edges);
+> 14-axis composite trust. ECC reaches **37+ bits/visible-token**
+> at full emit (2^35 = 34 359 738 368 codes). Long-horizon
+> reconstruction reaches 20 heads at max_k=512. Consensus has 24
+> disjoint stages including ``multi_branch_rejoin_arbiter`` and
+> ``silent_corruption_plus_member_replacement_arbiter``. The first
+> capsule-native team-consensus controller V4 composes regime-
+> aware weighted quorum + multi-branch-rejoin arbiter (surviving-
+> branch weighted mean) + silent-corruption-plus-replacement
+> arbiter (surviving-agents weighted mean) + substrate-replay
+> fallback + transcript fallback. Plane A V2 ships six new hosted
+> control-plane modules (router V2, logprob router V2, cache-aware
+> planner V2 with ≥ 60 % savings on 6×8 staggered prefixes,
+> provider filter V2 with ALL/ANY combinators, cost planner V2
+> with rotation, boundary V2 with 19 blocked axes + 3 frontier-
+> blocked axes). And — the load-bearing operational W69 advance —
+> the new ``hosted_real_handoff_coordinator`` records per-turn
+> content-addressed handoff envelopes that route turns to
+> ``hosted_only`` / ``real_substrate_only`` /
+> ``hosted_with_real_substrate_audit`` / ``abstain`` while
+> preserving the W68 wall as an invariant, with a falsifier and ≥
+> 60 % cross-plane token savings at the default workload. R-156 +
+> R-157 + R-158 + R-159 + R-160 deliver **62 H-bars × 3 seeds
+> (186 cells)**, all pass. The honest scope is unchanged: hosted
+> backends remain text-only at the HTTP surface
+> (``W69-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``); the substrate
+> is a 16-layer in-repo NumPy runtime, not a frontier model
+> (``W69-L-NUMPY-CPU-V14-SUBSTRATE-CAP``); "training" is closed-
+> form linear ridge throughout (``W69-L-V14-NO-AUTOGRAD-CAP``);
+> the multi-agent task-success wins are measured **inside the W69
+> synthetic harness** (``W69-L-MULTI-AGENT-COORDINATOR-V5-
+> SYNTHETIC-CAP``), not on real hosted multi-agent backends; and
+> the handoff coordinator preserves the wall — it does NOT cross
+> the substrate boundary (``W69-L-HANDOFF-NOT-CROSSING-WALL-
+> CAP``).*
+>
+> **Preceding research-line update (W67 Stronger Branch-Merge /
 > Role-Dropout Substrate-Coupled Latent Operating System,
 > 2026-05-16).** *Twelfth substrate-attack milestone, and the
 > **third** multi-agent task-success-bearing substrate milestone

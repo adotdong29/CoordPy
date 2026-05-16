@@ -14,7 +14,97 @@
 > - **conjectural** — stated, falsifiable; not yet proved or systematically tested.
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
-> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14; post-W59 W60 Trainable Cache-Control Substrate-Coupled Latent OS milestone added 2026-05-14; post-W60 W61 Trainable Hidden-State Substrate-Coupled Latent OS milestone added 2026-05-15; post-W62 W63 Stronger Replay-Dominance Hidden-Wins 4096-Turn Substrate-Coupled Latent OS milestone added 2026-05-15; post-W63 W64 Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn Nine-Way Substrate-Coupled Latent OS milestone added 2026-05-15; post-W64 W65 Team-Substrate-Coordination Substrate-Coupled Latent OS milestone added 2026-05-16; post-W65 W66 Stronger Solving-Context Substrate-Coupled Latent OS milestone added 2026-05-16; post-W66 W67 Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent OS milestone added 2026-05-16; post-W67 W68 Two-Plane Substrate-Coupled Latent OS milestone added 2026-05-16.
+> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14; post-W59 W60 Trainable Cache-Control Substrate-Coupled Latent OS milestone added 2026-05-14; post-W60 W61 Trainable Hidden-State Substrate-Coupled Latent OS milestone added 2026-05-15; post-W62 W63 Stronger Replay-Dominance Hidden-Wins 4096-Turn Substrate-Coupled Latent OS milestone added 2026-05-15; post-W63 W64 Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn Nine-Way Substrate-Coupled Latent OS milestone added 2026-05-15; post-W64 W65 Team-Substrate-Coordination Substrate-Coupled Latent OS milestone added 2026-05-16; post-W65 W66 Stronger Solving-Context Substrate-Coupled Latent OS milestone added 2026-05-16; post-W66 W67 Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent OS milestone added 2026-05-16; post-W67 W68 Two-Plane Substrate-Coupled Latent OS milestone added 2026-05-16; post-W68 W69 Stronger Solving-Context Two-Plane Multi-Agent Substrate milestone added 2026-05-16.
+
+## W69 Stronger Solving-Context Two-Plane Multi-Agent Substrate (W69-T-* and W69-L-* / W69-C-*)
+
+| Claim | One-line description | Status | Code/proof anchor |
+| ----- | -------------------- | ------ | ------------------ |
+| W69-T-SUBSTRATE-V14-FORWARD-DETERMINISM | Identical V14 params + token_ids → byte-identical V14 trace CID | mechanically-checked | `tiny_substrate_v14.forward_tiny_substrate_v14`; test `test_tiny_substrate_v14_determinism_and_axes`; H410 |
+| W69-T-SUBSTRATE-V14-MULTI-BRANCH-REJOIN-WITNESS | Per-(L, H, T) multi-branch-rejoin witness scalar in [0, 1]; tensor shape (L=16, H=8, T=128) | mechanically-checked | `TinyV14KVCache.multi_branch_rejoin_witness`; H410b |
+| W69-T-SUBSTRATE-V14-SILENT-CORRUPTION-WITNESS | Per-role dict with corrupted_bytes/member_replaced/detect/repair turns | mechanically-checked | `trigger_silent_corruption_v14`/`repair_silent_corruption_v14`; H410c |
+| W69-T-SUBSTRATE-V14-SELF-CHECKSUM-CID | Deterministic SHA-256 over (v13_cache_cid, mbr_witness, silent_corruption_dict) | mechanically-checked | `_compute_substrate_self_checksum_cid`; H410d |
+| W69-T-SUBSTRATE-V14-V14-GATE-SCORE | Per-layer V14 composite gate score has shape (L,) with L=16 | mechanically-checked | `_compute_v14_gate_score`; H410e |
+| W69-T-SUBSTRATE-V14-MULTI-BRANCH-REJOIN-SAVING | Multi-branch-rejoin flop saving vs recompute ≥ 0.8 at default config (92 % at 128 tokens × 4 branches) | empirical (0.92) | `substrate_multi_branch_rejoin_flops_v14`; H410f |
+| W69-T-SUBSTRATE-V14-SELF-CHECKSUM-DETECT | 1-byte corruption detect rate ≥ 0.95 (structurally 1 − 1/2^256) | mechanically-checked | `substrate_silent_corruption_detect_v14`; H410g |
+| W69-T-KV-BRIDGE-V14-TEN-TARGET-RIDGE | Ten-target stacked ridge fit: 9 V13 targets + 1 multi-branch-rejoin | mechanically-checked | `fit_kv_bridge_v14_ten_target`; H411 |
+| W69-T-KV-BRIDGE-V14-SILENT-CORRUPTION-FINGERPRINT | 60-dim SHA256 fingerprint of (role, corrupted_bytes, member_replaced, task_id, team_id, branch_id, detect_turn, repair_turn) | mechanically-checked | `compute_silent_corruption_fingerprint_v14`; H411b |
+| W69-T-KV-BRIDGE-V14-MULTI-BRANCH-REJOIN-FALSIFIER | Returns 0 iff inverting the multi-branch-rejoin flag flips the decision | mechanically-checked | `probe_kv_bridge_v14_multi_branch_rejoin_falsifier`; H411c, H462 |
+| W69-T-HSB-V13-TEN-TARGET-STACK | Ten-target stacked ridge fit (9 V12 + 1 multi-branch-rejoin) | mechanically-checked | `fit_hsb_v13_ten_target` |
+| W69-T-HSB-V13-HIDDEN-VS-MULTI-BRANCH-REJOIN | Per-(L, H) joint win rate ∈ [0, 1] when hidden residual L2 below threshold AND multi-branch-rejoin residual greater | mechanically-checked | `probe_hsb_v13_hidden_vs_multi_branch_rejoin`; H412 |
+| W69-T-PREFIX-V13-K256-DRIFT-CURVE | Stacked K=256 drift curve via last-value extrapolation of V12 K=192 prediction; no new ridge solve | mechanically-checked | `fit_prefix_drift_curve_predictor_v13`; H413 |
+| W69-T-PREFIX-V13-EIGHT-WAY-DECISION | Eight-way decision over drift-curve L1 areas (prefix/hidden/replay/team/recover/branch/contradict/multi_branch_rejoin) | mechanically-checked | `compare_prefix_v13_eight_way`; H413 |
+| W69-T-ATTN-V13-NINE-STAGE-CLAMP | Nine-stage clamp (V12 + multi-branch-rejoin attention-bias clip) keeps attention_delta_l2 ≤ multi_branch_rejoin_cap | mechanically-checked | `steer_attention_and_measure_v13` |
+| W69-T-CACHE-V12-NINE-OBJECTIVE | Nine-objective stacked ridge (V11 eight + multi_branch_rejoin) converges | mechanically-checked | `fit_nine_objective_ridge_v12`; H414 |
+| W69-T-CACHE-V12-PER-ROLE-SILENT-CORRUPTION | Per-role 10-dim ridge silent-corruption priority head converges | mechanically-checked | `fit_per_role_silent_corruption_head_v12` |
+| W69-T-REPLAY-V10-PER-ROLE-PER-REGIME | Sixteen regimes × per-role ridge head | mechanically-checked | `fit_replay_controller_v10_per_role`; H415 |
+| W69-T-REPLAY-V10-MULTI-BRANCH-REJOIN-ROUTING | 7×(F+1) ridge head over team features predicts routing label | mechanically-checked | `fit_replay_v10_multi_branch_rejoin_routing_head` |
+| W69-T-REPLAY-V10-SIXTEEN-REGIMES | V10 introduces `multi_branch_rejoin_after_divergent_work_regime` and `silent_corruption_plus_member_replacement_regime` on top of V9's fourteen | mechanically-checked | `W69_REPLAY_REGIMES_V10`; H415 |
+| W69-T-DEEP-HYBRID-V14-FOURTEEN-WAY | Fourteen-way bidirectional loop sets `fourteen_way=True` when all fourteen axes fire | mechanically-checked | `deep_substrate_hybrid_v14_forward` |
+| W69-T-SUBSTRATE-ADAPTER-V14-V14-FULL-TIER | New `substrate_v14_full` tier; only the W69 V14 in-repo runtime satisfies every axis | mechanically-checked | `probe_all_v14_adapters`; H416 |
+| W69-T-PERSISTENT-V21-CHAIN-WALK-65536 | V21 chain-walk depth ≥ 65536 | mechanically-checked | `W69_DEFAULT_V21_MAX_CHAIN_WALK_DEPTH` |
+| W69-T-PERSISTENT-V21-EIGHTEENTH-SKIP | Eighteenth skip carrier (`multi_branch_rejoin_carrier`) is populated and persists across chain steps | mechanically-checked | `step_persistent_state_v21` |
+| W69-T-MULTI-HOP-V19-48-BACKENDS | 48 backends, 2256 directed edges, chain-length 38 | mechanically-checked | `W69_DEFAULT_MH_V19_BACKENDS`, `W69_DEFAULT_MH_V19_CHAIN_LEN` |
+| W69-T-MULTI-HOP-V19-FOURTEEN-AXIS | Fourteen-axis composite trust arbitration adds `multi_branch_rejoin_reconciliation_trust` | mechanically-checked | `fourteen_axis_trust_arbitration` |
+| W69-T-MLSC-V17-MULTI-BRANCH-REJOIN-CHAIN | Multi-branch-rejoin witness chain is content-addressed | mechanically-checked | `wrap_v16_as_v17` |
+| W69-T-MLSC-V17-SILENT-CORRUPTION-CHAIN | Silent-corruption witness chain is content-addressed | mechanically-checked | `wrap_v16_as_v17` |
+| W69-T-CONSENSUS-V15-TWENTY-FOUR-STAGES | V15 stage chain has ≥ 24 stages including multi-branch-rejoin and silent-corruption arbiters | mechanically-checked | `W69_CONSENSUS_V15_STAGES` |
+| W69-T-CRC-V17-131072-BUCKETS | V17 KV fingerprint uses 131072 buckets | mechanically-checked | `W69_CRC_V17_KV_FINGERPRINT_BUCKETS` |
+| W69-T-CRC-V17-37-BIT-BURST | V17 adversarial-burst length is 37 bits | mechanically-checked | `W69_CRC_V17_ADVERSARIAL_BURST_BITS` |
+| W69-T-CRC-V17-131072-DETECT | 1-byte KV corruption detect rate ≥ 0.95 at 131072 buckets | empirical (1.0) | `kv_cache_fingerprint_131072`; H418 |
+| W69-T-LHR-V21-TWENTY-HEADS | V21 LHR exposes 20 reconstruction heads at max_k=512 | mechanically-checked | `W69_DEFAULT_LHR_V21_MAX_K`, `emit_lhr_v21_witness` |
+| W69-T-ECC-V21-2-TO-35-CODES | V21 codebook has 2^35 = 34 359 738 368 codes | mechanically-checked | `ECCCodebookV21.total_codes`; H417 |
+| W69-T-ECC-V21-RATE-FLOOR-FALSIFIER | The 65 536-bit/token target exceeds log2(total_codes) = 35 bits | mechanically-checked | `probe_ecc_v21_rate_floor_falsifier`; H461 |
+| W69-T-TVS-V18-NINETEEN-ARMS | V18 TVS exposes 19 arms including `multi_branch_rejoin_resolution` | mechanically-checked | `W69_TVS_V18_ARMS` |
+| W69-T-UNCERTAINTY-V17-SIXTEEN-AXES | V17 composite over 16 axes including `multi_branch_rejoin_resolution_fidelity` | mechanically-checked | `compose_uncertainty_report_v17` |
+| W69-T-DISAGREEMENT-V15-MULTI-BRANCH-REJOIN-EQUIV | Multi-branch-rejoin equivalence holds iff argmax preserved AND symmetric-KL ≤ floor AND fingerprint matches | mechanically-checked | `check_multi_branch_rejoin_equivalence_identity`; H463 |
+| W69-T-DISAGREEMENT-V15-MULTI-BRANCH-REJOIN-FALSIFIER | Falsifier triggers when multi-branch-rejoin equivalence fails | mechanically-checked | `multi_branch_rejoin_equivalence_falsifier`; H463 |
+| W69-T-MASC-V5-NINE-REGIMES | MASC V5 runs twelve policies across nine regimes | mechanically-checked | `W69_MASC_V5_REGIMES` |
+| W69-T-MASC-V5-V14-STRICTLY-BEATS-V13-BASELINE | substrate_routed_v14 strictly beats substrate_routed_v13 on ≥ 50 % of seeds in baseline | empirical (0.80 over 15 seeds) | `MultiAgentSubstrateCoordinatorV5`; H430 |
+| W69-T-MASC-V5-V14-STRICTLY-BEATS-V13-MULTI-BRANCH-REJOIN | V14 strictly beats V13 on ≥ 50 % of seeds under multi-branch-rejoin regime | empirical (0.87 over 15 seeds) | H437, H464 |
+| W69-T-MASC-V5-V14-STRICTLY-BEATS-V13-SILENT-CORRUPTION | V14 strictly beats V13 on ≥ 50 % of seeds under silent-corruption-plus-member-replacement regime | empirical (0.60 over 15 seeds) | H438, H465 |
+| W69-T-MASC-V5-TSC-V14-STRICTLY-BEATS-TSC-V13-BASELINE | team_substrate_coordination_v14 strictly beats team_substrate_coordination_v13 on ≥ 50 % of seeds in baseline | empirical (0.87 over 15 seeds) | H430b |
+| W69-T-MASC-V5-VISIBLE-TOKEN-SAVINGS | V14 visible-token savings vs transcript-only ≥ 50 % across all regimes | empirical (≥ 0.83) | H439 |
+| W69-T-TCC-V4-MULTI-BRANCH-REJOIN-ARBITER | TCC V4 fires `multi_branch_rejoin_arbiter` when ≥ 2 branches and substrate-replay trust ≥ floor | mechanically-checked | `decide_v4`; H440 |
+| W69-T-TCC-V4-SILENT-CORRUPTION-ARBITER | TCC V4 fires `silent_corruption_plus_member_replacement_arbiter` when corrupted-role-indices supplied with substrate-replay trust ≥ floor | mechanically-checked | `decide_v4` |
+| W69-T-HOSTED-ROUTER-V2-DETERMINISTIC | HostedRouterControllerV2 decision is deterministic on (registry CID, request V2 CID, success-score CIDs) | mechanically-checked | `HostedRouterControllerV2.decide_v2`; H400 |
+| W69-T-HOSTED-ROUTER-V2-STICKY | Sticky-routing fires when sticky_provider is set and not in blacklist | mechanically-checked | `HostedRouterControllerV2.decide_v2`; H400b |
+| W69-T-HOSTED-LOGPROB-V2-BAYESIAN | Bayesian Dirichlet fusion over top-k shared logprobs with per-provider trust weights | mechanically-checked | `bayesian_fuse_logprobs_v2`; H401 |
+| W69-T-HOSTED-LOGPROB-V2-TIEBREAK | Tiebreak-to-V1-weighted-mean fallback fires when entropy exceeds floor | mechanically-checked | `bayesian_fuse_logprobs_v2`; H401b |
+| W69-T-HOSTED-CACHE-V2-CONTENT-ADDRESSED-PREFIX | Per-role staggered prefix CIDs are content-addressed across invocations | mechanically-checked | `HostedCacheAwarePlannerV2.plan_per_role_staggered`; H402 |
+| W69-T-HOSTED-CACHE-V2-60-PCT-SAVINGS | Hosted cache-aware planning V2 saves ≥ 60 % input tokens on 6-role × 8-turn plans at hit_rate = 1.0 | empirical (0.82) | `hosted_cache_aware_savings_v2_vs_recompute`; H402b |
+| W69-T-HOSTED-FILTER-V2-COMPOSITIONAL-ALL | ALL-combine drops cumulative drops across inner specs | mechanically-checked | `filter_hosted_registry_v2`; H403 |
+| W69-T-HOSTED-FILTER-V2-COMPOSITIONAL-ANY | ANY-combine keeps union across inner specs | mechanically-checked | `filter_hosted_registry_v2`; H403b |
+| W69-T-HOSTED-COST-V2-ROTATION | Cost planner V2 supports per-turn provider rotation when allow_provider_rotation=True | mechanically-checked | `plan_hosted_cost_v2`; H404 |
+| W69-T-HOSTED-COST-V2-COST-PER-SUCCESS | Cost planner V2 returns a finite cost-per-success ratio | mechanically-checked | `plan_hosted_cost_v2`; H404b |
+| W69-T-HOSTED-REAL-SUBSTRATE-BOUNDARY-V2-CONTENT-ADDRESSED | Wall V2 boundary CID is deterministic | mechanically-checked | `build_default_hosted_real_substrate_boundary_v2` |
+| W69-T-HOSTED-REAL-SUBSTRATE-BOUNDARY-V2-19-BLOCKED-AXES | Wall V2 enumerates ≥ 19 blocked axes at the hosted surface (W68's 15 + 4 V14) | mechanically-checked | `W69_HOSTED_PLANE_BLOCKED_AXES_V2`; H456 |
+| W69-T-HOSTED-REAL-SUBSTRATE-BOUNDARY-V2-FRONTIER-BLOCKED | Wall V2 enumerates ≥ 3 frontier-blocked axes that V14 also does not satisfy | mechanically-checked | `W69_FRONTIER_BLOCKED_AXES`; H457 |
+| W69-T-HOSTED-REAL-SUBSTRATE-BOUNDARY-V2-FALSIFIER | Falsifier returns 0 on honest claims; 1 on dishonest hosted hidden-state claims | mechanically-checked | `probe_hosted_real_substrate_boundary_v2_falsifier`; H460 |
+| W69-T-HANDOFF-ENVELOPE-CONTENT-ADDRESSED | Handoff envelope CID is deterministic on (request CID, decision, hosted_routing_cid, substrate_self_checksum_cid) | mechanically-checked | `HostedRealHandoffCoordinator.decide`; H450 |
+| W69-T-HANDOFF-TEXT-ROUTES-TO-PLANE-A | Text-only requests route to `hosted_only` / plane A | mechanically-checked | `HostedRealHandoffCoordinator.decide`; H451 |
+| W69-T-HANDOFF-SUBSTRATE-ROUTES-TO-PLANE-B | Substrate-state-needs requests route to `real_substrate_only` / plane B | mechanically-checked | `HostedRealHandoffCoordinator.decide`; H452 |
+| W69-T-HANDOFF-BOTH-ROUTES-TO-AUDIT | Both-required requests route to `hosted_with_real_substrate_audit` / plane A+B-audit | mechanically-checked | `HostedRealHandoffCoordinator.decide`; H453 |
+| W69-T-HANDOFF-FALSIFIER | Returns 0 on honest claim and 1 on dishonest hosted-provides-substrate-state claim against a `hosted_only` envelope | mechanically-checked | `probe_hosted_real_handoff_falsifier`; H454 |
+| W69-T-HANDOFF-CROSS-PLANE-SAVINGS | Cross-plane handoff token saving ≥ 40 % under default 50/30/20 workload (60 % at default config) | empirical (0.60) | `hosted_real_handoff_cross_plane_savings`; H455 |
+| W69-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP | W69 does not bridge to third-party hosted models at the substrate layer | code-backed limitation | `coordpy.hosted_router_controller_v2` doc + handoff coordinator doc |
+| W69-L-V14-NO-AUTOGRAD-CAP | All V14 ridge solves are closed-form linear; no SGD / autograd / GPU | code-backed limitation | `fit_kv_bridge_v14_ten_target` and siblings |
+| W69-L-HOSTED-V2-NO-SUBSTRATE-CAP | Hosted control plane V2 modules do not claim hidden-state / KV / attention access | code-backed limitation | hosted V2 module docstrings + boundary V2 module |
+| W69-L-HOSTED-V2-SUCCESS-DECLARED-CAP | Hosted V2 success-score-per-provider is caller-declared; not measured against live traffic | code-backed limitation | `HostedRouterControllerV2` doc |
+| W69-L-HANDOFF-NOT-CROSSING-WALL-CAP | Handoff coordinator preserves the wall as a content-addressed invariant; it does NOT cross the substrate boundary | code-backed limitation | `HostedRealHandoffCoordinator` doc + R-160 H467 |
+| W69-L-FRONTIER-SUBSTRATE-STILL-BLOCKED-CAP | Frontier-model substrate access is unsolved; W69 codifies the wall + the frontier_blocked_axes set, not their dissolution | structural limitation | `HostedRealSubstrateBoundaryV2.frontier_blocked_axes` |
+| W69-L-MULTI-AGENT-COORDINATOR-V5-SYNTHETIC-CAP | MASC V5 is a synthetic deterministic harness; nine-regime wins are measured inside the in-repo substrate | code-backed limitation | `multi_agent_substrate_coordinator_v5` doc |
+| W69-L-TEAM-CONSENSUS-V4-IN-REPO-CAP | TCC V4 operates on in-repo MASC V5 outcomes only | code-backed limitation | `team_consensus_controller_v4` doc |
+| W69-L-NUMPY-CPU-V14-SUBSTRATE-CAP | V14 substrate is a 16-layer NumPy byte-tokenised runtime, not a frontier model | code-backed limitation | `tiny_substrate_v14` doc + R-160 H466 |
+| W69-L-SELF-CHECKSUM-IN-REPO-CAP | Substrate self-checksum CID is a deterministic SHA-256 hash; does not prove substrate integrity at the hosted surface | code-backed limitation | `tiny_substrate_v14` doc |
+| W69-L-V13-PREFIX-K256-STRUCTURAL-CAP | Prefix V13 K=256 extension is structural (last-value extrapolation of V12's K=192); no new ridge fit | code-backed limitation | `prefix_state_bridge_v13` doc |
+| W69-L-V21-LHR-SCORER-FIT-CAP | LHR V21 only fits the final ridge head; the first ten layers are frozen random projections | code-backed limitation | `long_horizon_retention_v21` doc |
+| W69-L-V21-OUTER-NOT-TRAINED-CAP | Persistent V21 wrapper does NOT train the V13 outer GRU | code-backed limitation | `persistent_latent_v21` doc |
+| W69-L-CONSENSUS-V15-SYNTHETIC-CAP | Consensus V15 thresholds are caller-supplied; new stages rely on synthetic scores | code-backed limitation | `consensus_fallback_controller_v15` doc |
+| W69-L-CRC-V17-FINGERPRINT-SYNTHETIC-CAP | CRC V17 131072-bucket fingerprint is wrap-around XOR; 37-bit burst is a stress test, not a real adversarial attack | code-backed limitation | `corruption_robust_carrier_v17` doc |
+| W69-L-ECC-V21-RATE-FLOOR-CAP | ECC V21 rate ceiling is structural: log2(2^35) = 35 raw data bits per segment-tuple | code-backed limitation | `ecc_codebook_v21` doc + R-160 H461 |
+| W69-L-MULTI-HOP-V19-SYNTHETIC-BACKENDS-CAP | Multi-hop V19 backends are named, not executed | code-backed limitation | `multi_hop_translator_v19` doc |
+| W69-C-FRONTIER-HOSTED-BRIDGE-NEEDED | The next milestone after W69 will require a transformer-internal bridge to a frontier-quality runtime (local transformers, llama.cpp, vLLM, or MLX with substrate hooks) | conjectural | (programme open question) |
 
 ## W68 Two-Plane Substrate-Coupled Latent Operating System (W68-T-* and W68-L-* / W68-C-*)
 

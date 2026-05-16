@@ -1,6 +1,106 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W66 / W67, 2026-05-16 —
+> **Latest milestone marker (post-W68 / W69, 2026-05-16 —
+> Stronger Solving-Context Two-Plane Multi-Agent Substrate,
+> twenty-seventh post-release research milestone — fourteenth
+> substrate-attack milestone and **fifth** multi-agent task-
+> success-bearing substrate milestone (the first to win across
+> **nine** regimes — W68's seven plus
+> ``multi_branch_rejoin_after_divergent_work`` plus
+> ``silent_corruption_plus_member_replacement`` — not just seven),
+> and the **first milestone to operationalise the two-plane split
+> with a Plane A↔B handoff coordinator** that records content-
+> addressed handoff envelopes per turn while preserving the W68
+> wall as an invariant.**
+> ``coordpy.tiny_substrate_v14`` ships 16 layers + four new V14
+> axes (per-(L, H, T) multi-branch-rejoin witness tensor, per-role
+> silent-corruption witness with member-replacement flag,
+> substrate self-checksum CID, per-layer V14 composite gate score).
+> ``coordpy.multi_agent_substrate_coordinator_v5`` ships the
+> load-bearing W69 mechanism: a real N-agent harness running
+> **twelve** matched-budget policies under **nine** regimes; the
+> V14 policy strictly beats V13 across all nine regimes (≥ 60 %
+> of seeds in every regime, hitting 86.7 % in
+> multi_branch_rejoin_after_divergent_work and 60 % in
+> silent_corruption_plus_member_replacement).
+> ``coordpy.hosted_real_handoff_coordinator`` (NEW) ships the
+> first **operational Plane A↔B bridge** — content-addressed
+> handoff envelopes that route each turn to ``hosted_only`` /
+> ``real_substrate_only`` / ``hosted_with_real_substrate_audit`` /
+> ``abstain``, with a falsifier and ≥ 60 % cross-plane token
+> savings at the default workload.
+> Plus twenty-six more orthogonal mechanism advances (KV V14
+> ten-target ridge; HSB V13 ten-target ridge; prefix V13 K=256;
+> attention V13 nine-stage clamp; cache V12 nine-objective; replay
+> V10 sixteen-regime + multi-branch-rejoin-routing head; deep
+> substrate hybrid V14 fourteen-way; substrate adapter V14;
+> persistent V21 (20 layers, max_chain_walk_depth=65536); multi-
+> hop V19 (48 backends, 2256 directed edges, chain-len 38, 14-axis
+> composite); MLSC V17; consensus V15 (24 stages); CRC V17 (131072-
+> bucket, 37-bit burst); LHR V21 (20 heads, max_k=512); ECC V21
+> (2^35 codes, 37+ bits/visible-token); uncertainty V17 (16-axis);
+> disagreement V15 (multi-branch-rejoin identity); TVS V18 (19
+> arms); team-consensus controller V4 (multi-branch-rejoin +
+> silent-corruption arbiters); hosted router V2 (weighted score +
+> sticky + blacklist); hosted logprob router V2 (Bayesian
+> Dirichlet fusion + per-provider trust + tiebreak fallback);
+> hosted cache-aware planner V2 (per-role staggered prefix);
+> hosted provider filter V2 (compositional ALL/ANY); hosted cost
+> planner V2 (multi-turn schedule + cost-per-success ratio);
+> boundary V2 (19 blocked axes + 3 frontier-blocked axes)).
+> R-156 (10 H-bars) + R-157 (17) + R-158 (18) + R-159 (9) + R-160
+> (8) deliver **62 H-bars × 3 seeds (186 cells)**, all pass.
+> ``W69-L-V14-NO-AUTOGRAD-CAP`` documents that all "training"
+> remains single-step closed-form linear ridge (53 ridge solves
+> total across W61..W69); no SGD / autograd / GPU. Cumulative
+> trust boundary across W22..W69 = **1461 enumerated failure
+> modes** (1417 from W22..W68 + 44 new W69 envelope verifier
+> modes). W69 ships at ``coordpy.tiny_substrate_v14``,
+> ``coordpy.kv_bridge_v14``,
+> ``coordpy.hidden_state_bridge_v13``,
+> ``coordpy.prefix_state_bridge_v13``,
+> ``coordpy.attention_steering_bridge_v13``,
+> ``coordpy.cache_controller_v12``,
+> ``coordpy.replay_controller_v10``,
+> ``coordpy.persistent_latent_v21``,
+> ``coordpy.multi_hop_translator_v19``,
+> ``coordpy.mergeable_latent_capsule_v17``,
+> ``coordpy.consensus_fallback_controller_v15``,
+> ``coordpy.corruption_robust_carrier_v17``,
+> ``coordpy.long_horizon_retention_v21``,
+> ``coordpy.ecc_codebook_v21``,
+> ``coordpy.transcript_vs_shared_arbiter_v18``,
+> ``coordpy.uncertainty_layer_v17``,
+> ``coordpy.disagreement_algebra_v15``,
+> ``coordpy.deep_substrate_hybrid_v14``,
+> ``coordpy.substrate_adapter_v14``,
+> ``coordpy.multi_agent_substrate_coordinator_v5``,
+> ``coordpy.team_consensus_controller_v4``,
+> ``coordpy.w69_team``, ``coordpy.hosted_router_controller_v2``,
+> ``coordpy.hosted_logprob_router_v2``,
+> ``coordpy.hosted_cache_aware_planner_v2``,
+> ``coordpy.hosted_provider_filter_v2``,
+> ``coordpy.hosted_cost_planner_v2``,
+> ``coordpy.hosted_real_substrate_boundary_v2``,
+> ``coordpy.hosted_real_handoff_coordinator``, ``coordpy.r156_benchmark`` /
+> ``coordpy.r157_benchmark`` / ``coordpy.r158_benchmark`` /
+> ``coordpy.r159_benchmark`` / ``coordpy.r160_benchmark``,
+> reachable only via explicit import.
+> ``coordpy.__version__`` remains ``0.5.20``; SDK contract is
+> byte-for-byte unchanged; no PyPI release.
+>
+> **Previous milestone marker (post-W67 / W68, 2026-05-16 — Two-
+> Plane Substrate-Coupled Latent Operating System, twenty-sixth
+> post-release research milestone — thirteenth substrate-attack
+> milestone and **fourth** multi-agent task-success-bearing
+> substrate milestone (the first to win across **seven** regimes —
+> W67's five plus partial-contradiction-under-delayed-reconciliation
+> plus agent-replacement-warm-restart — not just five), and the
+> first milestone to explicitly split the architecture into
+> two planes — Plane A (hosted control plane) vs Plane B (real
+> substrate plane).**
+
+> **Previous milestone marker (post-W66 / W67, 2026-05-16 —
 > Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent
 > Operating System, twenty-fifth post-release research milestone —
 > twelfth substrate-attack milestone and **third** multi-agent

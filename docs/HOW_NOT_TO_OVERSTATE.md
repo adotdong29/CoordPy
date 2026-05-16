@@ -2,9 +2,92 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W66
-> W67 milestone (Stronger Branch-Merge / Role-Dropout Substrate-
-> Coupled Latent Operating System research line), 2026-05-16.
+> README-of-README must satisfy these rules. Last touched: post-W68
+> W69 milestone (Stronger Solving-Context Two-Plane Multi-Agent
+> Substrate research line), 2026-05-16.
+
+## W69 (Stronger Solving-Context Two-Plane Multi-Agent Substrate) — explicit do-not-overstate rules
+
+The W69 milestone introduces the V14 substrate (16 layers + four
+new V14 axes), the twelve-policy MASC V5 across nine regimes, the
+TCC V4, the hosted control plane V2 modules, and the new
+**hosted-real handoff coordinator** that operationalises the
+Plane A↔B split with content-addressed handoff envelopes. The
+substrate now produces multi-agent task-success wins under
+**nine** named failure-mode regimes (W68's seven plus
+multi_branch_rejoin_after_divergent_work and
+silent_corruption_plus_member_replacement). The honest scope:
+
+1. **Fourteenth substrate-attack milestone — still in-repo NumPy.**
+   The V14 substrate adds 16 layers, GQA 8q/4kv, RMSNorm, SwiGLU,
+   d_model=64, vocab=259 — *still NOT a frontier model*. Hosted
+   backends remain text-only at the HTTP surface
+   (``W69-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``).
+2. **Multi-agent task wins are synthetic-harness-load-bearing.**
+   MASC V5 runs twelve policies on a synthetic deterministic
+   coordination task; the V14 policy beats V13 because the V14
+   mechanisms (multi-branch-rejoin witness + silent-corruption
+   primitive + substrate self-checksum) are engineered to
+   materially help in the new regimes. **This is not a real
+   hosted multi-agent win** (``W69-L-MULTI-AGENT-COORDINATOR-V5-
+   SYNTHETIC-CAP``).
+3. **All "training" remains closed-form linear ridge.** Six new
+   ridge solves on top of W68's 47 (53 total across W61..W69); no
+   SGD, no autograd, no GPU (``W69-L-V14-NO-AUTOGRAD-CAP``).
+4. **The handoff coordinator preserves the wall.** The hosted ↔
+   real-substrate handoff coordinator does NOT cross the substrate
+   boundary. It records *which plane handled each turn* and
+   exposes a falsifier (``W69-L-HANDOFF-NOT-CROSSING-WALL-CAP``).
+   When the coordinator returns ``hosted_with_real_substrate_audit``
+   the substrate audit happens on Plane B (in-repo V14); the
+   hosted reply remains text-only.
+5. **TCC V4 operates on synthetic MASC V5 outcomes.** The multi-
+   branch-rejoin arbiter and silent-corruption-plus-replacement
+   arbiter are deterministic on the in-repo decisions
+   (``W69-L-TEAM-CONSENSUS-V4-IN-REPO-CAP``).
+6. **Multi-hop V19 backends are named, not executed.** 48
+   backends and 2256 directed edges
+   (``W69-L-MULTI-HOP-V19-SYNTHETIC-BACKENDS-CAP``).
+7. **CRC V17 131072-bucket fingerprint is wrap-around XOR.** The
+   37-bit adversarial burst is a stress test, not a real
+   adversarial attack (``W69-L-CRC-V17-FINGERPRINT-SYNTHETIC-CAP``).
+8. **ECC V21 rate ceiling is structural.** log2(2^35) = 35 raw
+   data bits per segment-tuple (``W69-L-ECC-V21-RATE-FLOOR-CAP``);
+   the 65536-bit/token target trivially exceeds this and the
+   falsifier reproduces it.
+9. **LHR V21 only fits the final ridge head.** The first ten
+   preceding layers are frozen random projections
+   (``W69-L-V21-LHR-SCORER-FIT-CAP``).
+10. **Persistent V21 wrapper does NOT train the V13 outer GRU**
+    (``W69-L-V21-OUTER-NOT-TRAINED-CAP``).
+11. **Prefix V13 K=256 extension is structural.** It uses V12's
+    K=192 prediction with last-value extrapolation; no new ridge
+    fit (``W69-L-V13-PREFIX-K256-STRUCTURAL-CAP``).
+12. **The released SDK is unchanged.** ``coordpy.__version__ ==
+    "0.5.20"``. No PyPI release. The smoke driver passes byte-for-
+    byte. W69 reaches only via explicit imports
+    (``coordpy.tiny_substrate_v14`` etc.).
+13. **The new regime wins are measured inside the V14 substrate
+    only.** The V14 policy wins in multi-branch-rejoin because the
+    V14 multi-branch-rejoin witness lets even
+    ``substrate_routed_v14`` alone reason about all three branches
+    in parallel; the V14 policy wins in silent-corruption-plus-
+    member-replacement because the V14 substrate self-checksum
+    CID + silent-corruption witness + member-replacement flag give
+    the substrate the structural signal to repair from surviving
+    agents. Both are synthetic.
+14. **Hosted V2 success scores are caller-declared.** The router
+    V2 score-weighting uses caller-supplied per-provider success
+    scores; the router does not measure live success
+    (``W69-L-HOSTED-V2-SUCCESS-DECLARED-CAP``).
+15. **The substrate self-checksum is in-repo.** The 1-byte detect
+    rate is structurally 1 − 1/2^256 by SHA-256; that does NOT
+    prove substrate integrity at the hosted surface
+    (``W69-L-SELF-CHECKSUM-IN-REPO-CAP``).
+16. **The frontier wall is unmoved.** W69 codifies the
+    frontier_blocked_axes set (third-party hosted hidden_state /
+    KV / attention reads) as an honest no-progress marker
+    (``W69-L-FRONTIER-SUBSTRATE-STILL-BLOCKED-CAP``).
 
 ## W67 (Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent Operating System) — explicit do-not-overstate rules
 

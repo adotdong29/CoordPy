@@ -5,9 +5,138 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W67 W68
-> milestone (Two-Plane Substrate-Coupled Latent Operating System
-> research line), 2026-05-16.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W68 W69
+> milestone (Stronger Solving-Context Two-Plane Multi-Agent
+> Substrate research line), 2026-05-16.
+
+## TL;DR — W69 Stronger Solving-Context Two-Plane Multi-Agent Substrate (post-W68 research milestone)
+
+The programme now has **sixty-six** coupled research axes. W69
+mints axis 66: the **fourteenth substrate-attack milestone**, the
+**fifth multi-agent task-success-bearing** substrate milestone
+(first to win across *nine* regimes: W68's seven +
+**multi_branch_rejoin_after_divergent_work** +
+**silent_corruption_plus_member_replacement**), and the **first
+milestone to operationalise the two-plane split with an explicit
+Plane A↔B handoff coordinator** — content-addressed handoff
+envelopes that route each turn to hosted_only / real_substrate_only
+/ hosted_with_real_substrate_audit / abstain while preserving the
+W68 wall as an invariant, with a falsifier and ≥ 60 % cross-plane
+token savings on the default workload.
+
+The load-bearing W69 win is **MASC V5 / TCC V4 + tiny_substrate_v14
++ 22 supporting Plane B modules + 6 Plane A V2 modules + the new
+hosted-real handoff coordinator**: V14 strictly beats V13 on
+≥ 60 % of seeds in every regime (baseline 80 %,
+team_consensus_under_budget 80 %, team_failure_recovery 80 %,
+role_dropout 80 %, branch_merge_reconciliation 80 %,
+partial_contradiction 86.7 %, agent_replacement_warm_restart 86.7 %,
+**multi_branch_rejoin 86.7 %**, **silent_corruption_plus_member_
+replacement 60 %**), and TSC_V14 strictly beats TSC_V13 on
+≥ 80 % of seeds in every regime (80–93.3 % depending on regime).
+Plus an honest **hosted control plane V2** (Plane A V2):
+HostedRouterControllerV2 (weighted score + sticky + blacklist +
+cost-per-success bookkeeping), HostedLogprobRouterV2 (Bayesian
+Dirichlet fusion + per-provider trust + tiebreak fallback),
+HostedCacheAwarePlannerV2 (per-role staggered prefix + ≥ 60 %
+savings on 6×8 at hit_rate=1.0), HostedProviderFilterV2
+(compositional ALL/ANY chaining), HostedCostPlannerV2 (multi-turn
+schedule + cost-per-success ratio), and the **explicit wall V2**
+HostedRealSubstrateBoundaryV2 that enumerates 19 blocked axes at
+the hosted surface (W68's 15 + 4 new V14 axes) and 3 frontier-
+blocked axes that even V14 does not satisfy. The new **Plane A↔B
+handoff coordinator** records per-turn content-addressed handoff
+envelopes whose falsifier returns 0 on honest claims and 1 on
+dishonest claims, and saves ≥ 60 % visible tokens vs forcing every
+turn through hosted_only.
+
+**Twenty-eight orthogonal advances** on top of W68 (22 Plane B
+v-bumps + 5 Plane A V2 + 1 new handoff coordinator). Plane B
+headlines: V14 substrate (16 layers; four new V14 axes — multi-
+branch-rejoin witness tensor, per-role silent-corruption witness
+with member-replacement flag, substrate self-checksum CID,
+per-layer V14 composite gate score); KV V14 ten-target stacked
+ridge + 60-dim silent-corruption fingerprint + multi-branch-rejoin
+falsifier; HSB V13 ten-target stacked ridge + hidden-vs-multi-
+branch-rejoin probe; Prefix V13 K=256 drift curve + eight-way
+comparator; Attention V13 nine-stage clamp; Cache V12 nine-
+objective stacked ridge + per-role 10-dim silent-corruption head;
+Replay V10 sixteen-regime ridge + seven-way multi-branch-rejoin-
+routing head; Deep Substrate Hybrid V14 fourteen-way loop;
+Substrate Adapter V14 with `substrate_v14_full` tier; Persistent
+V21 (20 layers, max_chain_walk_depth=65536, eighteenth skip
+carrier); Multi-Hop V19 (48 backends, 2256 directed edges, chain-
+len 38, 14-axis composite); MLSC V17 (multi-branch-rejoin +
+silent-corruption witness chains); Consensus V15 (24 stages); CRC
+V17 (131072-bucket fingerprint, 37-bit adversarial burst); LHR V21
+(20 heads, max_k=512, eleven-layer scorer); ECC V21 (2^35 codes,
+≥ 37.0 bits/visible-token); Uncertainty V17 (16-axis composite);
+Disagreement V15 (multi-branch-rejoin-equivalence identity +
+falsifier); TVS V18 (19 arms); MASC V5 (12-policy, 9-regime); TCC
+V4 (multi-branch-rejoin + silent-corruption arbiters).
+
+W69 fits **six** new closed-form ridge solves on top of W68's 47
+(cache V12 nine-objective + cache V12 per-role silent-corruption +
+replay V10 per-role per-regime + replay V10 multi-branch-rejoin-
+routing + HSB V13 ten-target + KV V14 ten-target). Total **53
+closed-form ridge solves across W61..W69**. No autograd, no SGD,
+no GPU. The benchmark sweep is **186 cells across 5 benchmark
+families** (R-156 hosted control plane V2 (10 H-bars), R-157 real
+substrate plane V14 (17 H-bars), R-158 multi-agent task success
+across 9 regimes (18 H-bars), R-159 hosted-real handoff (9 H-bars),
+R-160 compound regime + falsifier + limitation reproductions
+(8 H-bars)), 186/186 cells pass at 3/3 seeds.
+
+The W69 envelope verifier enumerates **44 disjoint failure modes**
+(cumulative trust boundary across W22..W69 ≥ 1461 enumerated
+failure modes). Ships at `coordpy.tiny_substrate_v14`,
+`coordpy.kv_bridge_v14`, `coordpy.hidden_state_bridge_v13`,
+`coordpy.prefix_state_bridge_v13`,
+`coordpy.attention_steering_bridge_v13`,
+`coordpy.cache_controller_v12`, `coordpy.replay_controller_v10`,
+`coordpy.persistent_latent_v21`,
+`coordpy.multi_hop_translator_v19`,
+`coordpy.mergeable_latent_capsule_v17`,
+`coordpy.consensus_fallback_controller_v15`,
+`coordpy.corruption_robust_carrier_v17`,
+`coordpy.long_horizon_retention_v21`,
+`coordpy.ecc_codebook_v21`,
+`coordpy.transcript_vs_shared_arbiter_v18`,
+`coordpy.uncertainty_layer_v17`,
+`coordpy.disagreement_algebra_v15`,
+`coordpy.deep_substrate_hybrid_v14`,
+`coordpy.substrate_adapter_v14`,
+`coordpy.multi_agent_substrate_coordinator_v5`,
+`coordpy.team_consensus_controller_v4`, `coordpy.w69_team`, plus
+the Plane A V2 modules `coordpy.hosted_router_controller_v2`,
+`coordpy.hosted_logprob_router_v2`,
+`coordpy.hosted_cache_aware_planner_v2`,
+`coordpy.hosted_provider_filter_v2`,
+`coordpy.hosted_cost_planner_v2`,
+`coordpy.hosted_real_substrate_boundary_v2`,
+`coordpy.hosted_real_handoff_coordinator`, and benchmarks
+`coordpy.r156_benchmark` / `coordpy.r157_benchmark` /
+`coordpy.r158_benchmark` / `coordpy.r159_benchmark` /
+`coordpy.r160_benchmark`. **Public SDK contract is byte-for-byte
+unchanged: `coordpy.__version__ == "0.5.20"`,
+`coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`.**
+
+Honest scope (do-not-overstate):
+
+* W69 operationalises the two-plane split with the handoff
+  coordinator; it does NOT dissolve the wall. Hosted backends
+  remain text-only at the HTTP surface. ``W69-L-HOSTED-V2-NO-
+  SUBSTRATE-CAP``.
+* The nine-regime multi-agent wins are measured inside the
+  in-repo synthetic MASC V5 harness. ``W69-L-MULTI-AGENT-
+  COORDINATOR-V5-SYNTHETIC-CAP``.
+* Frontier-model substrate access remains the unsolved research-
+  line wall — codified as the frontier_blocked_axes set in
+  HostedRealSubstrateBoundaryV2. ``W69-L-FRONTIER-SUBSTRATE-
+  STILL-BLOCKED-CAP``.
+* The handoff coordinator records *which plane handled each turn*;
+  it does NOT cross the substrate boundary. ``W69-L-HANDOFF-NOT-
+  CROSSING-WALL-CAP``.
 
 ## TL;DR — W68 Two-Plane Substrate-Coupled Latent Operating System (post-W67 research milestone)
 

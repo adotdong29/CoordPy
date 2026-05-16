@@ -13,6 +13,131 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W69 Stronger Solving-Context Two-Plane Multi-Agent Substrate**
+  (post-W68, 2026-05-16) — *fourteenth substrate-attack milestone;
+  fifth **multi-agent task-success-bearing** substrate milestone
+  (first to win across **nine** regimes: W68's seven plus
+  ``multi_branch_rejoin_after_divergent_work`` plus
+  ``silent_corruption_plus_member_replacement``); first milestone to
+  **operationalise the two-plane split with a Plane A↔B handoff
+  coordinator** that records content-addressed handoff envelopes
+  per turn while preserving the W68 wall as an invariant*. Twenty-
+  eight orthogonal advances on top of W68 (22 Plane B + 5 Plane A
+  V2 + 1 new handoff coordinator). Plane B: (M1) **Tiny Substrate
+  V14** (16 layers; four new V14 axes — per-(L, H, T) multi-branch-
+  rejoin witness tensor, per-role silent-corruption witness with
+  member-replacement flag, substrate self-checksum CID, per-layer
+  V14 composite gate score); (M2) **KV Bridge V14** (ten-target
+  stacked ridge; multi-branch-rejoin margin probe; 60-dim silent-
+  corruption fingerprint; multi-branch-rejoin falsifier); (M3)
+  **HSB V13** (ten-target stacked ridge with multi-branch-rejoin
+  target; per-(L, H) hidden-vs-multi-branch-rejoin probe); (M4)
+  **Prefix V13** (K=256 drift curve; role+task+team+branch+
+  corruption+rejoin 60-dim fingerprint; eight-way prefix/hidden/
+  replay/team/recover/branch/contradict/multi_branch_rejoin
+  comparator); (M5) **Attention V13** (nine-stage clamp adding
+  multi-branch-rejoin attention bias; multi-branch-conditioned
+  fingerprint); (M6) **Cache Controller V12** (nine-objective
+  stacked ridge adding multi-branch-rejoin; per-role 10-dim
+  silent-corruption priority head); (M7) **Replay Controller V10**
+  (16 regimes adding multi-branch-rejoin and silent-corruption;
+  per-role per-regime ridge; trained multi-branch-rejoin-routing
+  head); (M8) **Deep Substrate Hybrid V14** (fourteen-way
+  bidirectional loop with the four new V14 axes + team-consensus-
+  controller-V4 axis); (M9) **Substrate Adapter V14** (4 new V14
+  capability axes; new ``substrate_v14_full`` tier); (M10)
+  **Persistent Latent V21** (20 layers; eighteenth skip carrier
+  ``multi_branch_rejoin_carrier``; max_chain_walk_depth=65536;
+  distractor rank 20); (M11) **Multi-Hop Translator V19** (48
+  backends; 2256 directed edges; chain-length 38; 14-axis
+  composite adding ``multi_branch_rejoin_reconciliation_trust``);
+  (M12) **Mergeable Latent Capsule V17** (``multi_branch_rejoin_
+  witness_chain`` and ``silent_corruption_witness_chain``); (M13)
+  **Consensus Fallback Controller V15** (24-stage chain inserting
+  ``multi_branch_rejoin_arbiter`` and
+  ``silent_corruption_plus_member_replacement_arbiter``); (M14)
+  **Corruption-Robust Carrier V17** (131072-bucket fingerprint;
+  37-bit adversarial burst; silent-corruption recovery probe);
+  (M15) **Long-Horizon Retention V21** (20 heads, max_k=512,
+  eleven-layer scorer adding random+swish); (M16) **ECC Codebook
+  V21** (K1..K20 = 2^35 = 34 359 738 368 codes; **37+ bits/visible-
+  token** at full emit); (M17) **Uncertainty Layer V17** (16-axis
+  composite adding ``multi_branch_rejoin_resolution_fidelity``);
+  (M18) **Disagreement Algebra V15** (multi-branch-rejoin-
+  equivalence identity + falsifier); (M19) **Nineteen-arm TVS
+  Arbiter V18** (19 arms with ``multi_branch_rejoin_resolution``
+  arm); (M20) **Multi-Agent Substrate Coordinator V5** (the load-
+  bearing W69 mechanism — twelve matched-budget policies across
+  nine regimes; V14 strictly beats V13 across all nine regimes,
+  ≥ 60 % of seeds per regime, peaking at 86.7 % in
+  multi_branch_rejoin); (M21) **Team-Consensus Controller V4**
+  (regime-aware weighted quorum + multi-branch-rejoin arbiter +
+  silent-corruption-plus-replacement arbiter + substrate-replay
+  fallback + transcript fallback). Plane A V2: (H1) **Hosted
+  Router V2** (weighted score + sticky + blacklist + cost-per-
+  success bookkeeping); (H2) **Hosted Logprob Router V2**
+  (Bayesian Dirichlet fusion + per-provider trust + tiebreak
+  fallback); (H3) **Hosted Cache-Aware Planner V2** (per-role
+  staggered prefix; ≥ 60 % savings on 6×8 at hit_rate=1.0);
+  (H4) **Hosted Provider Filter V2** (compositional ALL/ANY
+  chaining); (H5) **Hosted Cost Planner V2** (multi-turn schedule
+  + cost-per-success ratio); (H6) **Hosted/Real Substrate
+  Boundary V2** (19 blocked axes — W68's 15 + 4 V14; 3 frontier-
+  blocked axes; falsifier). And the new (H7) **Hosted-Real Handoff
+  Coordinator** — the load-bearing operational W69 advance — per-
+  turn content-addressed handoff envelopes routing to
+  ``hosted_only`` / ``real_substrate_only`` /
+  ``hosted_with_real_substrate_audit`` / ``abstain``; falsifier;
+  ≥ 60 % cross-plane token savings at default workload. R-156
+  (10 H-bars) + R-157 (17) + R-158 (18) + R-159 (9) + R-160 (8)
+  deliver **62 H-bars × 3 seeds = 186 cells, all pass**.
+  Cumulative trust boundary across W22..W69 = **1461 enumerated
+  failure modes** (1417 from W22..W68 + 44 new W69 envelope
+  verifier modes). Ships at ``coordpy.tiny_substrate_v14``,
+  ``coordpy.kv_bridge_v14``,
+  ``coordpy.hidden_state_bridge_v13``,
+  ``coordpy.prefix_state_bridge_v13``,
+  ``coordpy.attention_steering_bridge_v13``,
+  ``coordpy.cache_controller_v12``,
+  ``coordpy.replay_controller_v10``,
+  ``coordpy.persistent_latent_v21``,
+  ``coordpy.multi_hop_translator_v19``,
+  ``coordpy.mergeable_latent_capsule_v17``,
+  ``coordpy.consensus_fallback_controller_v15``,
+  ``coordpy.corruption_robust_carrier_v17``,
+  ``coordpy.long_horizon_retention_v21``,
+  ``coordpy.ecc_codebook_v21``,
+  ``coordpy.transcript_vs_shared_arbiter_v18``,
+  ``coordpy.uncertainty_layer_v17``,
+  ``coordpy.disagreement_algebra_v15``,
+  ``coordpy.deep_substrate_hybrid_v14``,
+  ``coordpy.substrate_adapter_v14``,
+  ``coordpy.multi_agent_substrate_coordinator_v5``,
+  ``coordpy.team_consensus_controller_v4``,
+  ``coordpy.w69_team``, ``coordpy.hosted_router_controller_v2``,
+  ``coordpy.hosted_logprob_router_v2``,
+  ``coordpy.hosted_cache_aware_planner_v2``,
+  ``coordpy.hosted_provider_filter_v2``,
+  ``coordpy.hosted_cost_planner_v2``,
+  ``coordpy.hosted_real_substrate_boundary_v2``,
+  ``coordpy.hosted_real_handoff_coordinator``,
+  ``coordpy.r156_benchmark`` / ``coordpy.r157_benchmark`` /
+  ``coordpy.r158_benchmark`` / ``coordpy.r159_benchmark`` /
+  ``coordpy.r160_benchmark``, reachable only via explicit import.
+  ``coordpy.__version__`` remains ``0.5.20``; SDK contract is
+  byte-for-byte unchanged; no PyPI release. Honest scope:
+  ``W69-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` (hosted backends
+  still text-only); ``W69-L-NUMPY-CPU-V14-SUBSTRATE-CAP`` (16-
+  layer in-repo NumPy substrate, not a frontier model);
+  ``W69-L-V14-NO-AUTOGRAD-CAP`` (closed-form ridge throughout);
+  ``W69-L-MULTI-AGENT-COORDINATOR-V5-SYNTHETIC-CAP`` (multi-agent
+  wins are synthetic-harness-load-bearing);
+  ``W69-L-HANDOFF-NOT-CROSSING-WALL-CAP`` (handoff coordinator
+  preserves the wall as an invariant — it does NOT cross the
+  substrate boundary); ``W69-L-FRONTIER-SUBSTRATE-STILL-BLOCKED-
+  CAP`` (third-party hosted-model substrate access remains the
+  unsolved research-line wall).
+
 - **W68 Two-Plane Substrate-Coupled Latent Operating System**
   (post-W67, 2026-05-16) — *thirteenth substrate-attack milestone;
   fourth **multi-agent task-success-bearing** substrate milestone
