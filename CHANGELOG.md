@@ -13,6 +13,93 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W64 Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn
+  Nine-Way Substrate-Coupled Latent Operating System** (post-W63,
+  2026-05-15) — *ninth substrate-attack milestone; first
+  **per-(layer, head, slot) hidden-wins-primary tensor** inside
+  an in-repo NumPy substrate (V9), first **per-(layer, head,
+  slot) replay-dominance witness channel**, first **per-layer
+  attention-entropy probe** (sigmoid of attention-distribution
+  Shannon entropy), first **per-(layer, head, slot, slot) cache-
+  similarity matrix** (cosine over cache_keys), first **per-
+  (layer, head) hidden-state-trust ledger** (EMA over HSB V8
+  decisions), first **trained four-way bridge classifier** (4×9
+  closed-form ridge over 9-dim regime features against `kv_wins` /
+  `hidden_wins` / `prefix_wins` / `replay_wins`), first **trained
+  seven-regime per-regime replay head** (replay controller V5,
+  seven regimes × 10×4 ridge head + 9-dim regime gate, includes
+  `replay_dominance_primary_regime`), first **trained replay-
+  dominance-primary head** (replay controller V5, 4×9 ridge head
+  that favours REUSE under high replay-dominance), first **trained
+  similarity-aware eviction head** (cache controller V7, 6-dim
+  ridge over [flag_count, hidden_write, replay_age,
+  attention_receive_l1, cache_key_norm, mean_similarity_to_others]),
+  first **four-objective stacked ridge fit** (cache controller V7,
+  drop-oracle + retrieval-relevance + hidden-wins + replay-
+  dominance simultaneously), first **token+role-conditional
+  drift-curve predictor** (prefix V8, stacked 12×K ridge over
+  [reuse_len, recompute_len, drop_len, 4-D SHA256 token
+  fingerprint, 4-D SHA256 role fingerprint, drift-acceleration,
+  1] against K-step drift curve target), first **four-stage
+  attention clamp** (attention V8, Hellinger budget + JS budget +
+  coarse L1-mass clamp + fine per-(L,H,Q,K) KL clamp), first
+  **nine-way bidirectional substrate ↔ V9 ↔ cache controller V7
+  ↔ replay controller V5 ↔ retrieval head ↔ attention-steering V8
+  ↔ four-way bridge classifier ↔ prefix-state-bridge V8 ↔ hidden-
+  state-bridge V8** hybrid loop (deep substrate hybrid V9), first
+  **hidden-wins-primary falsifier** (`probe_kv_bridge_v9_hidden_
+  wins_primary_falsifier` returns 0 exactly when inverting the
+  flag flips the decision), first **multi-hop nine-axis composite
+  trust** (multi-hop V14, 27 backends × 26 directed edges = 702,
+  chain-length-21, compromise threshold ∈ [1, 9]), first **15-
+  layer LHR** (V16: 15 reconstruction heads + max_k=192 + six-layer
+  scorer with random+silu fifth layer), first **2^25 = 33 554 432
+  ECC codebook** (V16: K1..K15, 27.333 bits/visible-token at full
+  emit ≥ 27.0 target), first **15-layer persistent latent** (V16
+  with thirteenth skip carrier (replay-dominance-witness EMA),
+  max_chain_walk_depth=6144, distractor rank 12), first
+  **fourteen-arm TVS** (V13: V12's thirteen + replay_dominance_
+  primary), first **eleven-axis uncertainty** (V12 adds replay_
+  dominance_primary_fidelity), first **TV-equivalence identity +
+  falsifier** (disagreement V10), first **fourteen-stage consensus
+  chain** (V10: V9's thirteen + `replay_dominance_primary_arbiter`
+  between `hidden_wins_arbiter` and `best_parent`), first
+  **mergeable capsule V12** (adds `replay_dominance_primary_witness_
+  chain`, `hidden_state_trust_witness_chain`, `disagreement_total_
+  variation_distance`, two new algebra signatures), first **CRC
+  V12 4096-bucket fingerprint + 23-bit adversarial burst + replay-
+  dominance recovery probe + substrate-corruption blast-radius
+  probe**, first **substrate adapter V9** with five new capability
+  axes and `substrate_v9_full` tier. R-137 (20 cell families) +
+  R-138 (12) + R-139 (19) deliver **51/51 H-bars (H203..H222b)
+  pass 3/3 seeds (153/153 cells)**. ``W64-L-V9-NO-AUTOGRAD-CAP``
+  documents that all "training" remains single-step closed-form
+  linear ridge over a small subspace; no SGD / autograd / GPU.
+  Cumulative trust boundary across W22..W64 = **1002 enumerated
+  failure modes** (916 from W22..W63 + 86 new W64 envelope verifier
+  modes). W64 ships at ``coordpy.tiny_substrate_v9``,
+  ``coordpy.kv_bridge_v9``, ``coordpy.hidden_state_bridge_v8``,
+  ``coordpy.prefix_state_bridge_v8``,
+  ``coordpy.attention_steering_bridge_v8``,
+  ``coordpy.cache_controller_v7``,
+  ``coordpy.replay_controller_v5``,
+  ``coordpy.persistent_latent_v16``,
+  ``coordpy.multi_hop_translator_v14``,
+  ``coordpy.mergeable_latent_capsule_v12``,
+  ``coordpy.consensus_fallback_controller_v10``,
+  ``coordpy.corruption_robust_carrier_v12``,
+  ``coordpy.long_horizon_retention_v16``,
+  ``coordpy.ecc_codebook_v16``,
+  ``coordpy.transcript_vs_shared_arbiter_v13``,
+  ``coordpy.uncertainty_layer_v12``,
+  ``coordpy.disagreement_algebra_v10``,
+  ``coordpy.deep_substrate_hybrid_v9``,
+  ``coordpy.substrate_adapter_v9``, ``coordpy.w64_team``,
+  ``coordpy.r137_benchmark`` / ``coordpy.r138_benchmark`` /
+  ``coordpy.r139_benchmark`` — reachable only through explicit
+  imports; the released v0.5.20 wheel's public surface is byte-
+  for-byte unchanged; no PyPI release.*
+
 - **W63 Stronger Replay-Dominance Hidden-Wins 4096-Turn
   Substrate-Coupled Latent Operating System** (post-W62,
   2026-05-15) — *eighth substrate-attack milestone; first

@@ -2,7 +2,33 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W59 research-line update (W60 Trainable Cache-Control
+> **Post-W63 research-line update (W64 Replay-Dominance-Primary
+> Hidden-Wins-Primary 6144-Turn Nine-Way Substrate-Coupled Latent
+> Operating System, 2026-05-15).**
+> *Ninth substrate-attack milestone. The in-repo NumPy substrate
+> grows to V9 (11 layers / GQA 8q-4kv / d_model=64 / RMSNorm /
+> SwiGLU). Five new substrate-internal axes: per-(layer, head, slot)
+> hidden-wins-primary tensor, per-(layer, head, slot) replay-
+> dominance-witness channel, per-layer attention-entropy probe,
+> per-(layer, head, slot, slot) cache-similarity matrix, and per-
+> (layer, head) hidden-state-trust ledger. Six new closed-form
+> ridge solves on top of W61+W62+W63's seventeen (twenty-three
+> total). The deep substrate hybrid is now nine-way (V9 substrate
+> + cache controller V7 + replay controller V5 + retrieval head +
+> attention-steering V8 + four-way bridge classifier + prefix-state
+> V8 + HSB V8). The persistent latent state is V16 (15 layers, 13
+> skip carriers, max_chain_walk_depth=6144, distractor rank 12).
+> Multi-hop chain length grows to 21 over 27 backends. ECC reaches
+> 27.333 bits/visible-token at full emit. Long-horizon
+> reconstruction reaches 15 heads at max_k=192. R-137 + R-138 +
+> R-139 deliver 51/51 H-bars × 3 seeds (153/153 cells). The honest
+> scope is unchanged: hosted backends remain text-only at the HTTP
+> surface (``W64-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``); the
+> substrate is a small in-repo NumPy runtime, not a frontier model
+> (``W64-L-NUMPY-CPU-V9-SUBSTRATE-CAP``); and "training" is
+> closed-form linear ridge throughout (``W64-L-V9-NO-AUTOGRAD-CAP``).*
+>
+> **Preceding research-line update (W60 Trainable Cache-Control
 > Substrate-Coupled Latent Operating System, 2026-05-14).**
 > *Fifth substrate-attack milestone in the programme; first
 > **multi-direction multi-target closed-form ridge fits** across

@@ -1,6 +1,58 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W59 / W60, 2026-05-14 —
+> **Latest milestone marker (post-W63 / W64, 2026-05-15 —
+> Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn Nine-Way
+> Substrate-Coupled Latent Operating System, twenty-second post-
+> release research milestone — ninth substrate-attack milestone,
+> first **per-(layer, head, slot) hidden-wins-primary tensor**
+> inside the in-repo NumPy substrate (V9), first **per-(layer,
+> head, slot) replay-dominance witness channel**, first **per-layer
+> attention-entropy probe**, first **per-(layer, head, slot, slot)
+> cache-similarity matrix** over cache_keys, first **per-(layer,
+> head) hidden-state-trust ledger** EMA over HSB V8 decisions, first
+> **trained per-regime replay head with seven regimes** including
+> ``replay_dominance_primary_regime``, first **trained four-way
+> bridge classifier** over kv_wins/hidden_wins/prefix_wins/replay_wins,
+> first **trained replay-dominance-primary head** that favours REUSE
+> under high replay-dominance, first **trained similarity-aware
+> eviction head**, first **four-objective stacked ridge fit** (drop-
+> oracle + retrieval-relevance + hidden-wins + replay-dominance),
+> first **token+role-conditional drift-curve predictor**, first
+> **four-stage attention clamp** (Hellinger + JS + coarse L1 + fine
+> KL), first **nine-way bidirectional substrate ↔ V9 ↔ cache
+> controller V7 ↔ replay controller V5 ↔ retrieval head ↔
+> attention-steering V8 ↔ four-way bridge classifier ↔ prefix-state
+> V8 ↔ HSB V8** hybrid loop, and first **hidden-wins-primary
+> falsifier**. R-137 (20 cell families) + R-138 (12) + R-139 (19)
+> deliver **51/51 H-bars (H203..H222b) pass 3/3 seeds (153/153
+> cells)**. ``W64-L-V9-NO-AUTOGRAD-CAP`` documents that all
+> "training" remains single-step closed-form linear ridge; no SGD /
+> autograd / GPU. Cumulative trust boundary across W22..W64 =
+> **1002 enumerated failure modes** (916 from W22..W63 + 86 new
+> W64 envelope verifier modes). W64 ships at
+> ``coordpy.tiny_substrate_v9``, ``coordpy.kv_bridge_v9``,
+> ``coordpy.hidden_state_bridge_v8``,
+> ``coordpy.prefix_state_bridge_v8``,
+> ``coordpy.attention_steering_bridge_v8``,
+> ``coordpy.cache_controller_v7``, ``coordpy.replay_controller_v5``,
+> ``coordpy.persistent_latent_v16``,
+> ``coordpy.multi_hop_translator_v14``,
+> ``coordpy.mergeable_latent_capsule_v12``,
+> ``coordpy.consensus_fallback_controller_v10``,
+> ``coordpy.corruption_robust_carrier_v12``,
+> ``coordpy.long_horizon_retention_v16``,
+> ``coordpy.ecc_codebook_v16``,
+> ``coordpy.transcript_vs_shared_arbiter_v13``,
+> ``coordpy.uncertainty_layer_v12``,
+> ``coordpy.disagreement_algebra_v10``,
+> ``coordpy.deep_substrate_hybrid_v9``,
+> ``coordpy.substrate_adapter_v9``, ``coordpy.w64_team``,
+> ``coordpy.r137_benchmark`` / ``coordpy.r138_benchmark`` /
+> ``coordpy.r139_benchmark`` — reachable only through explicit
+> imports; the released v0.5.20 wheel's public surface is byte-for-
+> byte unchanged; no PyPI release.*
+>
+> **Preceding milestone marker (post-W59 / W60, 2026-05-14 —
 > Trainable Cache-Control Substrate-Coupled Latent Operating
 > System, eighteenth post-release research milestone — fifth
 > substrate-attack milestone, first **multi-direction multi-
