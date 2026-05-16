@@ -5,10 +5,117 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W66 W67
-> milestone (Stronger Branch-Merge / Role-Dropout
-> Substrate-Coupled Latent Operating System research line),
-> 2026-05-16.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W67 W68
+> milestone (Two-Plane Substrate-Coupled Latent Operating System
+> research line), 2026-05-16.
+
+## TL;DR — W68 Two-Plane Substrate-Coupled Latent Operating System (post-W67 research milestone)
+
+The programme now has **sixty-five** coupled research axes. W68
+mints axis 65: the **thirteenth substrate-attack milestone**, the
+**fourth multi-agent task-success-bearing** substrate milestone
+(first to win across *seven* regimes: W67's five +
+**partial-contradiction-under-delayed-reconciliation** +
+**agent-replacement-warm-restart**), and the **first milestone to
+explicitly split the architecture into two planes** — Plane A
+(hosted control plane) vs Plane B (real substrate plane) — and
+codify the hosted ↔ real-substrate wall as a content-addressed
+artefact with a structural falsifier.
+
+The load-bearing W68 win is **MASC V4 / TCC V3 + tiny_substrate_v13
++ 22 supporting Plane B modules**: V13 strictly beats V12 on
+≥ 50 % of seeds in every regime (baseline 80 %,
+team_consensus_under_budget 80 %, team_failure_recovery 93.3 %,
+role_dropout 60 %, branch_merge_reconciliation 80 %,
+partial_contradiction 60 %, agent_replacement_warm_restart 93.3 %),
+and TSC_V13 strictly beats TSC_V12 on ≥ 50 % of seeds in every
+regime (53.3–93.3 % depending on regime). Plus an honest
+**hosted control plane** (Plane A): HostedRouterController,
+HostedLogprobRouter (top-k logprob fusion + text-only fallback),
+HostedCacheAwarePlanner (prefix-CID + ≥ 50 % token savings at
+hit_rate = 1.0), HostedProviderFilter, HostedCostPlanner, and the
+**explicit architecture wall** HostedRealSubstrateBoundary that
+enumerates 15 blocked axes at the hosted surface, 64 real-
+substrate-only V13 axes, and ships a falsifier returning 0 on
+honest claims and 1 on dishonest claims.
+
+**Twenty-eight orthogonal advances** on top of W67 (22 Plane B + 6
+Plane A). Plane B headlines: V13 substrate (15 layers; four new
+V13 axes — partial-contradiction witness tensor, agent-replacement
+flag with warm-restart window, substrate prefix-reuse counter, V13
+composite gate score); KV V13 nine-target stacked ridge +
+50-dim agent-replacement fingerprint + partial-contradiction
+falsifier; HSB V12 nine-target stacked ridge + hidden-vs-agent-
+replacement probe; Prefix V12 K=192 drift curve + seven-way
+comparator; Attention V12 eight-stage clamp; Cache V11 eight-
+objective stacked ridge + per-role 9-dim agent-replacement head;
+Replay V9 fourteen-regime ridge + six-way agent-replacement-routing
+head; Deep Substrate Hybrid V13 thirteen-way loop; Substrate
+Adapter V13 with `substrate_v13_full` tier; Persistent V20
+(19 layers, max_chain_walk_depth=32768, seventeenth skip carrier);
+Multi-Hop V18 (44 backends, 1892 directed edges, chain-len 34,
+13-axis composite); MLSC V16 (partial-contradiction + agent-
+replacement witness chains); Consensus V14 (22 stages); CRC V16
+(65536-bucket fingerprint, 36-bit adversarial burst); LHR V20
+(19 heads, max_k=448, ten-layer scorer); ECC V20 (2^33 codes,
+≥ 35.0 bits/visible-token); Uncertainty V16 (15-axis composite);
+Disagreement V14 (agent-replacement-equivalence identity +
+falsifier); TVS V17 (18 arms); MASC V4 (10-policy, 7-regime);
+TCC V3 (partial-contradiction + agent-replacement-warm-restart
+arbiters).
+
+W68 fits **six** new closed-form ridge solves on top of W67's 41
+(cache V11 eight-objective + cache V11 per-role agent-replacement
++ replay V9 per-role per-regime + replay V9 agent-replacement-
+routing + HSB V12 nine-target + KV V13 nine-target). Total **47
+closed-form ridge solves across W61..W68**. No autograd, no SGD,
+no GPU. The benchmark sweep is **138 cells across 4 benchmark
+families** (R-152 hosted control plane, R-153 real substrate
+plane, R-154 multi-agent task success across 7 regimes, R-155
+hosted-vs-real wall), 138/138 cells pass at 3/3 seeds.
+
+The W68 envelope verifier enumerates **42 disjoint failure modes**
+(cumulative trust boundary across W22..W68 ≥ 1417 enumerated
+failure modes). Ships at `coordpy.tiny_substrate_v13`,
+`coordpy.kv_bridge_v13`, `coordpy.hidden_state_bridge_v12`,
+`coordpy.prefix_state_bridge_v12`,
+`coordpy.attention_steering_bridge_v12`,
+`coordpy.cache_controller_v11`, `coordpy.replay_controller_v9`,
+`coordpy.persistent_latent_v20`,
+`coordpy.multi_hop_translator_v18`,
+`coordpy.mergeable_latent_capsule_v16`,
+`coordpy.consensus_fallback_controller_v14`,
+`coordpy.corruption_robust_carrier_v16`,
+`coordpy.long_horizon_retention_v20`,
+`coordpy.ecc_codebook_v20`,
+`coordpy.transcript_vs_shared_arbiter_v17`,
+`coordpy.uncertainty_layer_v16`,
+`coordpy.disagreement_algebra_v14`,
+`coordpy.deep_substrate_hybrid_v13`,
+`coordpy.substrate_adapter_v13`,
+`coordpy.multi_agent_substrate_coordinator_v4`,
+`coordpy.team_consensus_controller_v3`, `coordpy.w68_team`, plus
+the Plane A hosted modules `coordpy.hosted_router_controller`,
+`coordpy.hosted_logprob_router`,
+`coordpy.hosted_cache_aware_planner`,
+`coordpy.hosted_provider_filter`,
+`coordpy.hosted_cost_planner`,
+`coordpy.hosted_real_substrate_boundary`, and benchmarks
+`coordpy.r152_benchmark` / `coordpy.r153_benchmark` /
+`coordpy.r154_benchmark` / `coordpy.r155_benchmark`. **Public SDK
+contract is byte-for-byte unchanged: `coordpy.__version__ ==
+"0.5.20"`, `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`.**
+
+Honest scope (do-not-overstate):
+
+* W68 codifies the hosted ↔ real-substrate **architecture wall**;
+  it does NOT dissolve it. Hosted backends remain text-only at the
+  HTTP surface. ``W68-L-HOSTED-NO-SUBSTRATE-CAP``.
+* The seven-regime multi-agent wins are measured inside the
+  in-repo synthetic MASC V4 harness. ``W68-L-MULTI-AGENT-
+  COORDINATOR-V4-SYNTHETIC-CAP``.
+* Frontier-model substrate access remains the unsolved research-
+  line wall. ``W68-L-FRONTIER-SUBSTRATE-STILL-BLOCKED-CAP``.
 
 ## TL;DR — W67 Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent Operating System (post-W66 research milestone)
 

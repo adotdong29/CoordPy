@@ -14,7 +14,79 @@
 > - **conjectural** — stated, falsifiable; not yet proved or systematically tested.
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
-> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14; post-W59 W60 Trainable Cache-Control Substrate-Coupled Latent OS milestone added 2026-05-14; post-W60 W61 Trainable Hidden-State Substrate-Coupled Latent OS milestone added 2026-05-15; post-W62 W63 Stronger Replay-Dominance Hidden-Wins 4096-Turn Substrate-Coupled Latent OS milestone added 2026-05-15; post-W63 W64 Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn Nine-Way Substrate-Coupled Latent OS milestone added 2026-05-15; post-W64 W65 Team-Substrate-Coordination Substrate-Coupled Latent OS milestone added 2026-05-16; post-W65 W66 Stronger Solving-Context Substrate-Coupled Latent OS milestone added 2026-05-16; post-W66 W67 Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent OS milestone added 2026-05-16.
+> Last touched: SDK v3.43 (final release of the v3.4x line), 2026-05-03; post-W48 W49 multi-block cross-bank coordination research milestone added 2026-05-11; post-W56 W57 Deep Substrate-Coupled Latent OS milestone added 2026-05-13; post-W57 W58 Deep Cache-Reuse Substrate-Coupled Latent OS milestone added 2026-05-13; post-W58 W59 Trainable Substrate-Conditioned Latent OS milestone added 2026-05-14; post-W59 W60 Trainable Cache-Control Substrate-Coupled Latent OS milestone added 2026-05-14; post-W60 W61 Trainable Hidden-State Substrate-Coupled Latent OS milestone added 2026-05-15; post-W62 W63 Stronger Replay-Dominance Hidden-Wins 4096-Turn Substrate-Coupled Latent OS milestone added 2026-05-15; post-W63 W64 Replay-Dominance-Primary Hidden-Wins-Primary 6144-Turn Nine-Way Substrate-Coupled Latent OS milestone added 2026-05-15; post-W64 W65 Team-Substrate-Coordination Substrate-Coupled Latent OS milestone added 2026-05-16; post-W65 W66 Stronger Solving-Context Substrate-Coupled Latent OS milestone added 2026-05-16; post-W66 W67 Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent OS milestone added 2026-05-16; post-W67 W68 Two-Plane Substrate-Coupled Latent OS milestone added 2026-05-16.
+
+## W68 Two-Plane Substrate-Coupled Latent Operating System (W68-T-* and W68-L-* / W68-C-*)
+
+| Claim | One-line description | Status | Code/proof anchor |
+| ----- | -------------------- | ------ | ------------------ |
+| W68-T-SUBSTRATE-V13-FORWARD-DETERMINISM | Identical V13 params + token_ids → byte-identical V13 trace CID | mechanically-checked | `tiny_substrate_v13.forward_tiny_substrate_v13`; test `test_tiny_substrate_v13_determinism_and_axes`; H310 |
+| W68-T-SUBSTRATE-V13-PARTIAL-CONTRADICTION-WITNESS | Per-(L, H, T) partial-contradiction witness scalar in [0, 1]; tensor shape (L, H, T) | mechanically-checked | `TinyV13KVCache.partial_contradiction_witness`; H310b |
+| W68-T-SUBSTRATE-V13-AGENT-REPLACEMENT-FLAG | Per-role replaced/window/replacement_index flag | mechanically-checked | `trigger_agent_replacement_v13`; H310c |
+| W68-T-SUBSTRATE-V13-PREFIX-REUSE-COUNTER | Per-prefix-CID hits + last_turn counter is content-addressed | mechanically-checked | `record_prefix_reuse_v13`; H310d |
+| W68-T-SUBSTRATE-V13-V13-GATE-SCORE | Per-layer V13 composite gate score has shape (L,) with L=15 | mechanically-checked | `_compute_v13_gate_score`; H310e |
+| W68-T-SUBSTRATE-V13-PREFIX-REUSE-SAVING | Prefix-reuse flop saving vs recompute ≥ 0.8 at default config (94 % at 128 tokens × 4 reuses) | empirical (0.94) | `substrate_prefix_reuse_flops_v13`; H310f |
+| W68-T-KV-BRIDGE-V13-NINE-TARGET-RIDGE | Nine-target stacked ridge fit: 8 V12 targets + 1 partial-contradiction | mechanically-checked | `fit_kv_bridge_v13_nine_target`; H311 |
+| W68-T-KV-BRIDGE-V13-AGENT-REPLACEMENT-FINGERPRINT | 50-dim SHA256 fingerprint of (role, replacement_index, task_id, team_id, branch_id, warm_restart_window) | mechanically-checked | `compute_agent_replacement_fingerprint_v13`; H311b |
+| W68-T-KV-BRIDGE-V13-PARTIAL-CONTRADICTION-FALSIFIER | Returns 0 iff inverting the partial-contradiction flag flips the decision | mechanically-checked | `probe_kv_bridge_v13_partial_contradiction_falsifier`; H311c |
+| W68-T-HSB-V12-NINE-TARGET-STACK | Nine-target stacked ridge fit (8 V11 + 1 agent-replacement) | mechanically-checked | `fit_hsb_v12_nine_target` |
+| W68-T-HSB-V12-HIDDEN-VS-AGENT-REPLACEMENT | Per-(L, H) joint win rate ∈ [0, 1] when hidden residual L2 below threshold AND agent-replacement residual greater | mechanically-checked | `probe_hsb_v12_hidden_vs_agent_replacement`; H312 |
+| W68-T-PREFIX-V12-K192-DRIFT-CURVE | Stacked K=192 drift curve via last-value extrapolation of V11 prediction; no new ridge solve | mechanically-checked | `fit_prefix_drift_curve_predictor_v12`; H313 |
+| W68-T-PREFIX-V12-SEVEN-WAY-DECISION | Seven-way decision over drift-curve L1 areas (prefix/hidden/replay/team/recover/branch/contradict) | mechanically-checked | `compare_prefix_vs_hidden_vs_replay_vs_team_vs_recover_vs_branch_vs_contradict_v12`; H313 |
+| W68-T-ATTN-V12-EIGHT-STAGE-CLAMP | Eight-stage clamp (V11 + partial-contradiction attention-bias clip) keeps attention_delta_l2 ≤ partial_contradiction_cap | mechanically-checked | `steer_attention_and_measure_v12` |
+| W68-T-CACHE-V11-EIGHT-OBJECTIVE | Eight-objective stacked ridge (V10 seven + partial_contradiction) converges | mechanically-checked | `fit_eight_objective_ridge_v11`; H314 |
+| W68-T-CACHE-V11-PER-ROLE-AGENT-REPLACEMENT | Per-role 9-dim ridge agent-replacement priority head converges | mechanically-checked | `fit_per_role_agent_replacement_head_v11` |
+| W68-T-REPLAY-V9-PER-ROLE-PER-REGIME | Fourteen regimes × per-role ridge head | mechanically-checked | `fit_replay_controller_v9_per_role`; H315 |
+| W68-T-REPLAY-V9-AGENT-REPLACEMENT-ROUTING | 6×11 ridge head over team features predicts agent-replacement routing label | mechanically-checked | `fit_replay_v9_agent_replacement_routing_head` |
+| W68-T-REPLAY-V9-FOURTEEN-REGIMES | V9 introduces `partial_contradiction_under_delayed_reconciliation_regime` and `agent_replacement_warm_restart_regime` on top of V8's twelve | mechanically-checked | `W68_REPLAY_REGIMES_V9`; H315 |
+| W68-T-DEEP-HYBRID-V13-THIRTEEN-WAY | Thirteen-way bidirectional loop sets `thirteen_way=True` when all thirteen axes fire | mechanically-checked | `deep_substrate_hybrid_v13_forward` |
+| W68-T-SUBSTRATE-ADAPTER-V13-V13-FULL-TIER | New `substrate_v13_full` tier; only the W68 V13 in-repo runtime satisfies every axis | mechanically-checked | `probe_all_v13_adapters`; H318 |
+| W68-T-PERSISTENT-V20-CHAIN-WALK-32768 | V20 chain-walk depth ≥ 32768 | mechanically-checked | `W68_DEFAULT_V20_MAX_CHAIN_WALK_DEPTH` |
+| W68-T-PERSISTENT-V20-SEVENTEENTH-SKIP | Seventeenth skip carrier (`partial_contradiction_carrier`) is populated and persists across chain steps | mechanically-checked | `step_persistent_state_v20` |
+| W68-T-MULTI-HOP-V18-44-BACKENDS | 44 backends, 1892 directed edges, chain-length 34 | mechanically-checked | `W68_DEFAULT_MH_V18_BACKENDS`, `W68_DEFAULT_MH_V18_CHAIN_LEN` |
+| W68-T-MULTI-HOP-V18-THIRTEEN-AXIS | Thirteen-axis composite trust arbitration adds `partial_contradiction_reconciliation_trust` | mechanically-checked | `thirteen_axis_trust_arbitration` |
+| W68-T-MLSC-V16-PARTIAL-CONTRADICTION-CHAIN | Partial-contradiction witness chain is content-addressed | mechanically-checked | `wrap_v15_as_v16` |
+| W68-T-MLSC-V16-AGENT-REPLACEMENT-CHAIN | Agent-replacement witness chain is content-addressed | mechanically-checked | `wrap_v15_as_v16` |
+| W68-T-CONSENSUS-V14-TWENTY-TWO-STAGES | V14 stage chain has ≥ 22 stages including partial-contradiction and agent-replacement-warm-restart arbiters | mechanically-checked | `W68_CONSENSUS_V14_STAGES` |
+| W68-T-CRC-V16-65536-BUCKETS | V16 KV fingerprint uses 65536 buckets | mechanically-checked | `W68_CRC_V16_KV_FINGERPRINT_BUCKETS` |
+| W68-T-CRC-V16-36-BIT-BURST | V16 adversarial-burst length is 36 bits | mechanically-checked | `W68_CRC_V16_ADVERSARIAL_BURST_BITS` |
+| W68-T-LHR-V20-NINETEEN-HEADS | V20 LHR exposes 19 reconstruction heads at max_k=448 | mechanically-checked | `W68_DEFAULT_LHR_V20_MAX_K`, `emit_lhr_v20_witness` |
+| W68-T-ECC-V20-2-TO-33-CODES | V20 codebook has 2^33 = 8 589 934 592 codes | mechanically-checked | `ECCCodebookV20.total_codes` |
+| W68-T-ECC-V20-RATE-FLOOR-FALSIFIER | The 65 536-bit/token target exceeds log2(total_codes) = 33 bits | mechanically-checked | `probe_ecc_v20_rate_floor_falsifier` |
+| W68-T-TVS-V17-EIGHTEEN-ARMS | V17 TVS exposes 18 arms including `partial_contradiction_resolution` | mechanically-checked | `W68_TVS_V17_ARMS` |
+| W68-T-UNCERTAINTY-V16-FIFTEEN-AXES | V16 composite over 15 axes including `partial_contradiction_resolution_fidelity` | mechanically-checked | `compose_uncertainty_report_v16` |
+| W68-T-DISAGREEMENT-V14-AGENT-REPLACEMENT-EQUIV | Agent-replacement equivalence holds iff argmax preserved AND symmetric-KL ≤ floor AND fingerprint matches | mechanically-checked | `check_agent_replacement_equivalence_identity` |
+| W68-T-DISAGREEMENT-V14-AGENT-REPLACEMENT-FALSIFIER | Falsifier triggers when agent-replacement equivalence fails | mechanically-checked | `agent_replacement_equivalence_falsifier` |
+| W68-T-MASC-V4-SEVEN-REGIMES | MASC V4 runs ten policies across seven regimes | mechanically-checked | `W68_MASC_V4_REGIMES` |
+| W68-T-MASC-V4-V13-STRICTLY-BEATS-V12-BASELINE | substrate_routed_v13 strictly beats substrate_routed_v11 on ≥ 50 % of seeds in baseline | empirical (0.80 over 15 seeds) | `MultiAgentSubstrateCoordinatorV4`; H330 |
+| W68-T-MASC-V4-V13-STRICTLY-BEATS-V12-PARTIAL-CONTRADICTION | V13 strictly beats V12 on ≥ 50 % of seeds under partial-contradiction regime | empirical (0.60 over 15 seeds) | H335 |
+| W68-T-MASC-V4-V13-STRICTLY-BEATS-V12-AGENT-REPLACEMENT | V13 strictly beats V12 on ≥ 50 % of seeds under agent-replacement-warm-restart regime | empirical (0.93 over 15 seeds) | H336 |
+| W68-T-MASC-V4-TSC-V13-STRICTLY-BEATS-TSC-V12-BASELINE | team_substrate_coordination_v13 strictly beats team_substrate_coordination_v12 on ≥ 50 % of seeds in baseline | empirical (0.87 over 15 seeds) | H330b |
+| W68-T-TCC-V3-PARTIAL-CONTRADICTION-ARBITER | TCC V3 fires `partial_contradiction_arbiter` under contradictory payloads with substrate-replay trust ≥ floor | mechanically-checked | `decide_v3` |
+| W68-T-TCC-V3-AGENT-REPLACEMENT-WARM-RESTART-ARBITER | TCC V3 fires `agent_replacement_warm_restart_arbiter` when replaced-role-indices are supplied with substrate-replay trust ≥ floor | mechanically-checked | `decide_v3` |
+| W68-T-HOSTED-ROUTER-DETERMINISTIC | HostedRouterController decision is deterministic on (registry CID, request CID) | mechanically-checked | `HostedRouterController.decide`; H300 |
+| W68-T-HOSTED-LOGPROB-SHARED-TOPK-FUSION | Top-k logprob fusion fires on shared top-k vocabulary across providers | mechanically-checked | `fuse_logprobs`; H301 |
+| W68-T-HOSTED-LOGPROB-TEXT-ONLY-FALLBACK | Text-only quorum fallback fires when no provider exposes logprobs | mechanically-checked | `text_only_quorum`; H301b |
+| W68-T-HOSTED-CACHE-AWARE-CONTENT-ADDRESSED-PREFIX | Prefix CID is content-addressed across invocations | mechanically-checked | `compute_prefix_cid`; H302 |
+| W68-T-HOSTED-CACHE-AWARE-50-PCT-SAVINGS | Hosted cache-aware planning saves ≥ 50 % input tokens on 4-turn plans at hit_rate = 1.0 | empirical (≥ 0.50) | `hosted_cache_aware_savings_vs_recompute`; H302b, H353 |
+| W68-T-HOSTED-PROVIDER-FILTER-DROPS-TRAIN-POLICY | Filter drops providers whose data_policy violates `require_data_policy="no_log"` | mechanically-checked | `filter_hosted_registry`; H303 |
+| W68-T-HOSTED-COST-PLANNER-PICKS-FREE | Cost planner picks free provider when quality threshold met | mechanically-checked | `plan_hosted_cost`; H304 |
+| W68-T-HOSTED-COST-PLANNER-ABSTAINS | Cost planner abstains when no provider passes quality + budget floors | mechanically-checked | `plan_hosted_cost`; H304b |
+| W68-T-HOSTED-REAL-SUBSTRATE-BOUNDARY-CONTENT-ADDRESSED | Wall boundary CID is deterministic | mechanically-checked | `build_default_hosted_real_substrate_boundary`; H350 |
+| W68-T-HOSTED-REAL-SUBSTRATE-BOUNDARY-15-BLOCKED-AXES | Wall enumerates ≥ 15 blocked axes at the hosted surface | mechanically-checked | `W68_HOSTED_PLANE_BLOCKED_AXES`; H351 |
+| W68-T-HOSTED-REAL-SUBSTRATE-BOUNDARY-60-REAL-ONLY-AXES | Wall enumerates ≥ 60 real-substrate-only V13 axes | mechanically-checked | `build_wall_report`; H352 |
+| W68-T-HOSTED-REAL-SUBSTRATE-BOUNDARY-FALSIFIER | Falsifier returns 0 on honest claims; 1 on dishonest hosted hidden-state claims | mechanically-checked | `probe_hosted_real_substrate_boundary_falsifier`; H305, H355 |
+| W68-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP | W68 does not bridge to third-party hosted models at the substrate layer | code-backed limitation | `coordpy.hosted_router_controller` doc + boundary module |
+| W68-L-V13-NO-AUTOGRAD-CAP | All V13 ridge solves are closed-form linear; no SGD / autograd / GPU | code-backed limitation | `fit_kv_bridge_v13_nine_target` and siblings |
+| W68-L-HOSTED-NO-SUBSTRATE-CAP | Hosted control plane modules do not claim hidden-state / KV / attention access | code-backed limitation | hosted module docstrings + boundary module |
+| W68-L-HOSTED-ESTIMATES-CALLER-CAP | Hosted cost / latency / quality estimates are caller-declared; not measured against live hosted traffic | code-backed limitation | `HostedProvider` doc + cost planner doc |
+| W68-L-FRONTIER-SUBSTRATE-STILL-BLOCKED-CAP | Frontier-model substrate access is unsolved; W68 codifies the wall, not its dissolution | structural limitation | `HostedRealSubstrateBoundary.rationale` |
+| W68-L-MULTI-AGENT-COORDINATOR-V4-SYNTHETIC-CAP | MASC V4 is a synthetic deterministic harness; seven-regime wins are measured inside the in-repo substrate | code-backed limitation | `multi_agent_substrate_coordinator_v4` doc |
+| W68-L-TEAM-CONSENSUS-V3-IN-REPO-CAP | TCC V3 operates on in-repo MASC V4 outcomes only | code-backed limitation | `team_consensus_controller_v3` doc |
+| W68-L-PREFIX-REUSE-CROSS-PLANE-CAP | Cross-plane bridge between hosted prefix-cache and V13 prefix-reuse counter is an approximation; sharing a prefix CID does not prove the hosted provider reused the KV cache | code-backed limitation | `hosted_cache_aware_planner` doc |
+| W68-L-PARTIAL-CONTRADICTION-IN-REPO-CAP | Partial-contradiction primitive operates on the in-repo V13 cache only | code-backed limitation | `tiny_substrate_v13` doc |
+| W68-L-AGENT-REPLACEMENT-IN-REPO-CAP | Agent-replacement-warm-restart primitive operates on the in-repo V13 cache only | code-backed limitation | `tiny_substrate_v13` doc |
+| W68-C-FRONTIER-HOSTED-BRIDGE-NEEDED | The next milestone after W68 will require a transformer-internal bridge to a frontier-quality runtime (local transformers, llama.cpp, vLLM, or MLX with substrate hooks) | conjectural | (programme open question) |
 
 ## W67 Stronger Branch-Merge / Role-Dropout Substrate-Coupled Latent Operating System (W67-T-* and W67-L-* / W67-C-*)
 

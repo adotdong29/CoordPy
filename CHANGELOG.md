@@ -13,6 +13,118 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W68 Two-Plane Substrate-Coupled Latent Operating System**
+  (post-W67, 2026-05-16) — *thirteenth substrate-attack milestone;
+  fourth **multi-agent task-success-bearing** substrate milestone
+  (first to win across **seven** regimes: W67's five +
+  partial-contradiction-under-delayed-reconciliation +
+  agent-replacement-warm-restart); first milestone to **explicitly
+  split the architecture into two planes** (hosted control plane
+  vs real substrate plane) and codify the hosted ↔ real-substrate
+  wall as a first-class artefact*. Twenty-eight orthogonal advances
+  on top of W67 (22 Plane B + 6 Plane A). Plane B: (M1) **Tiny
+  Substrate V13** (15 layers; four new V13 axes — per-(L, H, T)
+  partial-contradiction witness tensor, per-role
+  agent-replacement-flag with warm-restart window, substrate
+  prefix-reuse counter, per-layer V13 composite gate score); (M2)
+  **KV Bridge V13** (nine-target stacked ridge; partial-
+  contradiction margin probe; 50-dim agent-replacement fingerprint;
+  partial-contradiction falsifier); (M3) **HSB V12** (nine-target
+  stacked ridge with agent-replacement target; per-(L, H)
+  hidden-vs-agent-replacement probe); (M4) **Prefix V12** (K=192
+  drift curve; role+task+team+branch+agent 50-dim fingerprint;
+  seven-way prefix/hidden/replay/team/recover/branch/contradict
+  comparator); (M5) **Attention V12** (eight-stage clamp adding
+  partial-contradiction attention bias; agent-conditioned
+  fingerprint); (M6) **Cache Controller V11** (eight-objective
+  stacked ridge adding partial-contradiction; per-role 9-dim
+  agent-replacement priority head); (M7) **Replay Controller V9**
+  (14 regimes adding `partial_contradiction_under_delayed_
+  reconciliation_regime` and `agent_replacement_warm_restart_
+  regime`; per-role per-regime ridge; trained
+  **agent-replacement-routing head** with 6 routing labels × 11
+  features ridge); (M8) **Deep Substrate Hybrid V13** (thirteen-way
+  bidirectional loop adding partial-contradiction-witness axis);
+  (M9) **Substrate Adapter V13** (new `substrate_v13_full` tier;
+  V13 capability axes); (M10) **Persistent V20** (19 layers;
+  seventeenth skip carrier `partial_contradiction_carrier`;
+  max_chain_walk_depth=32768; distractor rank 19); (M11) **Multi-
+  Hop V18** (44 backends; 44×43=1892 directed edges; chain-len 34;
+  13-axis composite adding
+  `partial_contradiction_reconciliation_trust`); (M12) **Mergeable
+  Latent Capsule V16** (partial-contradiction + agent-replacement
+  witness chains); (M13) **Consensus V14** (22 stages: adds
+  `partial_contradiction_arbiter` and
+  `agent_replacement_warm_restart_arbiter`); (M14) **CRC V16**
+  (65536-bucket fingerprint; 36-bit adversarial burst; partial-
+  contradiction recovery probe); (M15) **LHR V20** (19 heads;
+  max_k=448; ten-layer scorer); (M16) **ECC V20** (2^33 = 8 589
+  934 592 codes; **≥ 35.0 bits/visible-token** at full emit);
+  (M17) **Uncertainty V16** (15-axis composite adding
+  `partial_contradiction_resolution_fidelity`); (M18) **Disagreement
+  V14** (agent-replacement-equivalence identity + falsifier);
+  (M19) **TVS V17** (18 arms with `partial_contradiction_
+  resolution`); (M20) **MASC V4** (ten-policy harness across
+  **seven** regimes; V13 strictly beats V12 across all seven);
+  (M21) **Team-Consensus Controller V3** (partial-contradiction
+  arbiter + agent-replacement-warm-restart arbiter); (M22)
+  **W68Team** orchestrator. Plane A: (H1) **HostedRouterController**
+  (content-addressed provider registry + capability-aware routing
+  graph); (H2) **HostedLogprobRouter** (honest top-k logprob fusion
+  on shared top-k + text-only quorum fallback); (H3)
+  **HostedCacheAwarePlanner** (per-turn prefix-CID planner +
+  cross-plane bridge to V13 prefix-reuse counter); (H4)
+  **HostedProviderFilter** (data-policy- and tier-aware registry
+  filter); (H5) **HostedCostPlanner** (cost/latency-aware provider
+  selection under matched-quality constraint); (H6)
+  **HostedRealSubstrateBoundary** (explicit architecture wall +
+  falsifier + wall report). W68 fits **six** new closed-form ridge
+  solves on top of W67's 41 (cache V11 eight-objective; cache V11
+  per-role agent-replacement; replay V9 per-role per-regime;
+  replay V9 agent-replacement-routing; HSB V12 nine-target; KV V13
+  nine-target). Total **47 ridge solves across W61..W68**. No SGD
+  / autograd / GPU. **R-152** (10 H-bars Plane A) + **R-153** (16
+  H-bars Plane B) + **R-154** (14 H-bars seven-regime multi-agent
+  task success) + **R-155** (6 H-bars hosted-vs-real wall) deliver
+  46/46 H-bars at 3/3 seeds (138/138 cells). Cumulative trust
+  boundary across W22..W68 = **1417 enumerated failure modes**.
+  Ships at `coordpy.tiny_substrate_v13`, `coordpy.kv_bridge_v13`,
+  `coordpy.hidden_state_bridge_v12`,
+  `coordpy.prefix_state_bridge_v12`,
+  `coordpy.attention_steering_bridge_v12`,
+  `coordpy.cache_controller_v11`,
+  `coordpy.replay_controller_v9`,
+  `coordpy.persistent_latent_v20`,
+  `coordpy.multi_hop_translator_v18`,
+  `coordpy.mergeable_latent_capsule_v16`,
+  `coordpy.consensus_fallback_controller_v14`,
+  `coordpy.corruption_robust_carrier_v16`,
+  `coordpy.long_horizon_retention_v20`,
+  `coordpy.ecc_codebook_v20`,
+  `coordpy.transcript_vs_shared_arbiter_v17`,
+  `coordpy.uncertainty_layer_v16`,
+  `coordpy.disagreement_algebra_v14`,
+  `coordpy.deep_substrate_hybrid_v13`,
+  `coordpy.substrate_adapter_v13`,
+  `coordpy.multi_agent_substrate_coordinator_v4`,
+  `coordpy.team_consensus_controller_v3`, `coordpy.w68_team`,
+  `coordpy.hosted_router_controller`,
+  `coordpy.hosted_logprob_router`,
+  `coordpy.hosted_cache_aware_planner`,
+  `coordpy.hosted_provider_filter`,
+  `coordpy.hosted_cost_planner`,
+  `coordpy.hosted_real_substrate_boundary`,
+  `coordpy.r152_benchmark` / `coordpy.r153_benchmark` /
+  `coordpy.r154_benchmark` / `coordpy.r155_benchmark`. Limitations:
+  `W68-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`,
+  `W68-L-V13-NO-AUTOGRAD-CAP`,
+  `W68-L-HOSTED-NO-SUBSTRATE-CAP`,
+  `W68-L-HOSTED-ESTIMATES-CALLER-CAP`,
+  `W68-L-FRONTIER-SUBSTRATE-STILL-BLOCKED-CAP`,
+  `W68-L-MULTI-AGENT-COORDINATOR-V4-SYNTHETIC-CAP`,
+  `W68-L-TEAM-CONSENSUS-V3-IN-REPO-CAP`. Public SDK unchanged:
+  `coordpy.__version__ == "0.5.20"`. No PyPI release.
+
 - **W67 Stronger Branch-Merge / Role-Dropout Substrate-Coupled
   Latent Operating System** (post-W66, 2026-05-16) — *twelfth
   substrate-attack milestone; third **multi-agent task-success-
