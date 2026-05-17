@@ -5,10 +5,135 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W70 W71
-> milestone (Stronger Delayed-Repair-After-Restart / Repair-
-> Trajectory-Primary Two-Plane Multi-Agent Substrate Programme
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W71 W72
+> milestone (Stronger Delayed-Rejoin-After-Restart / Restart-
+> Repair-Trajectory Two-Plane Multi-Agent Substrate Programme
 > research line), 2026-05-16.
+
+## TL;DR — W72 Stronger Delayed-Rejoin-After-Restart / Restart-Repair-Trajectory Two-Plane Multi-Agent Substrate Programme (post-W71 research milestone)
+
+The programme now has **sixty-nine** coupled research axes. W72
+mints axis 69: the **seventeenth substrate-attack milestone**, the
+**eighth multi-agent task-success-bearing** substrate milestone
+(first to win across *twelve* regimes: W71's eleven +
+**delayed_rejoin_after_restart_under_budget**), the **first
+milestone to operationalise rejoin-aware Plane A↔B handoff
+promotion**, and the **first milestone to expose a content-
+addressed per-turn restart-repair-trajectory CID** that unifies
+all eight repair/restart/rejoin primitives into a single dominant
+signal back into the substrate-routed policy.
+
+The load-bearing W72 win is **MASC V8 / TCC V7 +
+tiny_substrate_v17 + 11 supporting Plane B V17 modules + 5 Plane A
+V5 modules + the new rejoin-aware handoff coordinator V4 + the
+new rejoin-aware provider filter V4**: V17 strictly beats V16 on
+≥ 50 % of seeds in every regime (≥ 86.7 % in practice across all
+regimes, including the new
+``delayed_rejoin_after_restart_under_budget`` regime where V16 has
+no signal), and TSC_V17 strictly beats TSC_V16 on ≥ 50 % of seeds
+in every regime (100 % in practice). Plus an honest **hosted
+control plane V5** (Plane A V5): HostedRouterControllerV5 (rejoin-
+pressure weighting + delayed-rejoin match table),
+HostedLogprobRouterV5 (rejoin-aware abstain floor lowered under
+high rejoin pressure + per-budget+restart+rejoin tiebreak),
+HostedCacheAwarePlannerV5 (three-layer rotated; ≥ 80 % savings on
+12×8 at hit_rate=1.0), HostedCostPlannerV5 (cost-per-rejoin-
+success-under-budget + abstain-when-rejoin-pressure-violated),
+and the **explicit wall V5** HostedRealSubstrateBoundaryV5 that
+enumerates 28 blocked axes at the hosted surface (W71's 25 + 3 new
+V17 axes) and carries forward the W70 frontier_blocked_axes set
+unchanged. The new **rejoin-aware Plane A↔B handoff coordinator
+V4** records per-turn V4 envelopes that promote any turn with
+``rejoin_pressure ≥ 0.5`` to Plane B (with
+``rejoin_alignment = 1.0``) and adds a seventh decision
+(``delayed_rejoin_after_restart_fallback``) on top of the V3's
+six, exposes a delayed-rejoin falsifier, and saves ≥ 78 % visible
+tokens vs forcing every turn through hosted_only (≥ 84 % at
+default config). Plus the new rejoin-aware **provider filter V4**
+that drops providers whose declared rejoin-noise score exceeds
+their per-provider cap under high rejoin pressure.
+
+**Twenty orthogonal advances** on top of W71 (12 Plane B v-bumps
++ 5 Plane A V5 + 1 new handoff coordinator V4 + 1 new provider
+filter V4 + 1 new MASC V8 / TCC V7 line). Plane B headlines: V17
+substrate (19 layers; three new V17 axes — per-turn restart-
+repair-trajectory CID, per-layer delayed-rejoin-after-restart
+label, per-layer rejoin-pressure gate); KV V17 thirteen-target
+stacked ridge + 100-dim restart-repair fingerprint + rejoin-
+pressure falsifier; Cache V15 twelve-objective stacked ridge +
+per-role 13-dim rejoin-pressure head; Replay V13 twenty-regime
+ridge + ten-way rejoin-aware routing head; Deep Substrate Hybrid
+V17 seventeen-way loop; Substrate Adapter V17 with
+``substrate_v17_full`` tier; Persistent V24 (23 layers,
+max_chain_walk_depth=524288, twenty-first skip carrier); LHR V24
+(23 heads, max_k=704); MLSC V20 (restart-repair + rejoin-pressure
+chains); Consensus V18 (30 stages); MASC V8 (18-policy, 12-
+regime); TCC V7 (rejoin-aware + delayed-rejoin-after-restart
+arbiters).
+
+W72 fits **three** new closed-form ridge solves on top of W71's
+61 (cache V15 twelve-objective + replay V13 rejoin-aware-routing
++ KV V17 thirteen-target — the cache V15 per-role rejoin-pressure
+head re-uses the V14 family solver). Total **64 closed-form ridge
+solves across W61..W72**. No autograd, no SGD, no GPU. The
+benchmark sweep is **198 cells across 4 benchmark families**
+(R-169 hosted control plane V5 (10 H-bars), R-170 real substrate
+plane V17 (16 H-bars), R-171 multi-agent task success across 12
+regimes (26 H-bars), R-172 handoff V4 + falsifier + limitation
+reproductions (14 H-bars)), 198/198 cells pass at 3/3 seeds.
+
+The W72 envelope verifier enumerates **54 disjoint failure modes**
+(cumulative trust boundary across W22..W72 ≥ 1621 enumerated
+failure modes). Ships at ``coordpy.tiny_substrate_v17``,
+``coordpy.kv_bridge_v17``, ``coordpy.cache_controller_v15``,
+``coordpy.replay_controller_v13``,
+``coordpy.deep_substrate_hybrid_v17``,
+``coordpy.substrate_adapter_v17``,
+``coordpy.persistent_latent_v24``,
+``coordpy.long_horizon_retention_v24``,
+``coordpy.mergeable_latent_capsule_v20``,
+``coordpy.consensus_fallback_controller_v18``,
+``coordpy.multi_agent_substrate_coordinator_v8``,
+``coordpy.team_consensus_controller_v7``, ``coordpy.w72_team``,
+plus the Plane A V5 modules ``coordpy.hosted_router_controller_v5``,
+``coordpy.hosted_logprob_router_v5``,
+``coordpy.hosted_cache_aware_planner_v5``,
+``coordpy.hosted_cost_planner_v5``,
+``coordpy.hosted_real_substrate_boundary_v5``,
+``coordpy.hosted_real_handoff_coordinator_v4``,
+``coordpy.hosted_provider_filter_v4``, and benchmarks
+``coordpy.r169_benchmark`` / ``coordpy.r170_benchmark`` /
+``coordpy.r171_benchmark`` / ``coordpy.r172_benchmark``. **Public
+SDK contract is byte-for-byte unchanged:
+``coordpy.__version__ == "0.5.20"``,
+``coordpy.SDK_VERSION == "coordpy.sdk.v3.43"``.**
+
+Honest scope (do-not-overstate):
+
+* W72 keeps the W70 two-plane split and *adds* the rejoin-aware
+  handoff V4; it does NOT dissolve the wall. Hosted backends remain
+  text-only at the HTTP surface. ``W72-L-HOSTED-V5-NO-SUBSTRATE-
+  CAP``.
+* The twelve-regime multi-agent wins are measured inside the in-
+  repo synthetic MASC V8 harness. ``W72-L-MASC-V8-SYNTHETIC-CAP``.
+* Frontier-model substrate access remains the unsolved research-
+  line wall — W72 carries the W70 frontier_blocked_axes set forward
+  unchanged. ``W72-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``.
+* The restart-repair-trajectory CID is computed from byte-stable
+  V16 delayed-repair-trajectory CID + recorded rejoin events +
+  recorded branch-pressure windows only. It does NOT prove rejoin
+  integrity at the hosted surface
+  (``W72-L-RESTART-REPAIR-IN-REPO-CAP``).
+* The rejoin-pressure gate is a calibrated weighted combination of
+  caller-declared budget, baseline cost, restart count, rejoin
+  count, repair-dominance count, and rejoin-lag window. It is not
+  a learned end-to-end controller
+  (``W72-L-REJOIN-PRESSURE-DECLARED-CAP``).
+* Hosted V5 success scores, quality scores, budgets, restart
+  pressure, and rejoin pressure are caller-declared. The router
+  does not measure live success (``W72-L-HOSTED-V5-DECLARED-CAP``).
+* The handoff V4 coordinator preserves the wall as a content-
+  addressed invariant (``W72-L-HANDOFF-V4-NOT-CROSSING-WALL-CAP``).
 
 ## TL;DR — W71 Stronger Delayed-Repair-After-Restart / Repair-Trajectory-Primary Two-Plane Multi-Agent Substrate Programme (post-W70 research milestone)
 

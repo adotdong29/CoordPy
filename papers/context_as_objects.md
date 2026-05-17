@@ -2,6 +2,96 @@
 
 > Main paper draft for the Context Zero programme.
 >
+> **Post-W71 research-line update (W72 Stronger Delayed-Rejoin-
+> After-Restart / Restart-Repair-Trajectory Two-Plane Multi-Agent
+> Substrate Programme, 2026-05-16).** *Seventeenth substrate-attack
+> milestone, and the **eighth** multi-agent task-success-bearing
+> substrate milestone in the programme — the first to produce wins
+> across **twelve** failure-mode regimes (W71's eleven plus
+> **delayed_rejoin_after_restart_under_budget**), the **first
+> milestone to operationalise rejoin-aware Plane A↔B handoff
+> promotion**, and the **first milestone to expose a content-
+> addressed per-turn restart-repair-trajectory CID** that unifies
+> all eight repair/restart/rejoin primitives (multi-branch-rejoin,
+> silent-corruption, partial-contradiction, agent-replacement,
+> role-dropout-recovery, branch-merge, restart-dominance,
+> **delayed-rejoin-after-restart**) into a single dominant signal
+> back into the substrate-routed policy.
+> ``MultiAgentSubstrateCoordinatorV8`` runs **eighteen** matched-
+> budget policies (the sixteen W71 policies plus
+> ``substrate_routed_v17`` and ``team_substrate_coordination_v17``)
+> under twelve regimes; the V17 policy strictly beats V16 across
+> all twelve regimes (≥ 86.7 % at the eleven baseline-class
+> regimes, ≥ 50 % at the new compound regime, with TSC_V17 strictly
+> beating TSC_V16 100 % of seeds in every regime). In the new
+> ``delayed_rejoin_after_restart_under_budget`` regime (where at
+> ~20 % of turns one role's substrate is wiped clean and replaced
+> with a fresh member, then the team must absorb a *delay window*
+> (~3 turns later), then rejoin from divergent branches (~30 % of
+> turns) under a tight visible-token budget), the V17 substrate's
+> restart-repair-trajectory CID + per-layer delayed-rejoin-after-
+> restart label + per-layer rejoin-pressure gate give the
+> substrate-routed policy a coordinated rejoin arc that V16 cannot
+> follow under the additional branch-divergence stressor. The in-
+> repo NumPy substrate grows to V17 (19 layers + three new V17
+> axes: per-turn restart-repair-trajectory CID, per-layer delayed-
+> rejoin-after-restart label in [0..8], per-layer rejoin-pressure
+> gate). The substrate rejoin-dominance primitive saves **94.5 %**
+> of recompute flops over eight-primitive repair work at 128
+> tokens. The rejoin-pressure throttle saves **100 %** visible
+> tokens at visible_token_budget=64 / baseline=512 / rejoin_lag=4.
+> Three new closed-form ridge solves on top of W61..W71's 61
+> (64 total). The deep substrate hybrid is now seventeen-way (V16
+> hybrid + cache V15 + replay V13 + restart-repair-trajectory +
+> delayed-rejoin + team-consensus controller V7). The persistent
+> latent state is V24 (23 layers, 21 skip carriers,
+> ``max_chain_walk_depth=524288``, distractor rank 23). Long-
+> horizon reconstruction reaches 23 heads at max_k=704. Consensus
+> has 30 disjoint stages including ``rejoin_pressure_arbiter`` and
+> ``delayed_rejoin_after_restart_arbiter``. The first capsule-
+> native team-consensus controller V7 composes regime-aware
+> weighted quorum + repair-dominance arbiter + budget-primary
+> arbiter + contradiction-then-rejoin arbiter + restart-aware
+> arbiter + delayed-repair-after-restart arbiter + rejoin-pressure
+> arbiter + delayed-rejoin-after-restart arbiter + substrate-
+> replay fallback + transcript fallback. Plane A V5 ships seven
+> hosted control-plane modules (router V5 with rejoin-pressure
+> weighting + delayed-rejoin match table, logprob router V5 with
+> rejoin-aware abstain floor + per-budget+restart+rejoin tiebreak,
+> cache-aware planner V5 with ≥ 80 % savings on 12×8 three-layer-
+> rotated prefixes, cost planner V5 with cost-per-rejoin-success-
+> under-budget + abstain-when-rejoin-pressure-violated, boundary
+> V5 with 28 blocked axes + the W70 frontier-blocked axes
+> unchanged, provider filter V4 with rejoin-aware drop). And —
+> the load-bearing operational W72 advance — the new
+> ``hosted_real_handoff_coordinator_v4`` records per-turn content-
+> addressed V4 envelopes that promote any turn with
+> ``rejoin_pressure ≥ 0.5`` and substrate_trust ≥ floor to Plane B
+> with ``rejoin_alignment = 1.0`` and add a seventh
+> ``delayed_rejoin_after_restart_fallback`` decision on top of
+> V3's six, exposing a delayed-rejoin falsifier and saving ≥ 78 %
+> cross-plane visible tokens at the default 50/12/8/12/15/3 %
+> workload (≥ 84 % at default config). R-169 + R-170 + R-171 +
+> R-172 deliver **66 H-bars × 3 seeds (198 cells)**, all pass.
+> The honest scope is unchanged: hosted backends remain text-only
+> at the HTTP surface (``W72-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-
+> CAP``); the substrate is a 19-layer in-repo NumPy runtime, not
+> a frontier model (``W72-L-NUMPY-CPU-V17-SUBSTRATE-CAP``);
+> "training" is closed-form linear ridge throughout
+> (``W72-L-V17-NO-AUTOGRAD-CAP``); the multi-agent task-success
+> wins are measured **inside the W72 synthetic harness**
+> (``W72-L-MASC-V8-SYNTHETIC-CAP``), not on real hosted multi-
+> agent backends; the restart-repair-trajectory CID is computed
+> from byte-stable substrate state only and does NOT prove
+> rejoin integrity at the hosted surface
+> (``W72-L-RESTART-REPAIR-IN-REPO-CAP``); budgets and rejoin
+> pressure are caller-declared
+> (``W72-L-REJOIN-PRESSURE-DECLARED-CAP``,
+> ``W72-L-HOSTED-V5-DECLARED-CAP``); and the V4 handoff
+> coordinator preserves the wall — it does NOT cross the
+> substrate boundary
+> (``W72-L-HANDOFF-V4-NOT-CROSSING-WALL-CAP``).*
+>
 > **Post-W70 research-line update (W71 Stronger Delayed-Repair-
 > After-Restart / Repair-Trajectory-Primary Two-Plane Multi-Agent
 > Substrate Programme, 2026-05-16).** *Sixteenth substrate-attack
