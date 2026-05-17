@@ -1,6 +1,88 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W73 / W74, 2026-05-17 —
+> **Latest milestone marker (post-W74 / W75, 2026-05-17 —
+> Stronger Compound-Chain-Repair / Replacement-Then-Delayed-Repair-
+> Then-Rejoin Budget-Primary Two-Plane Multi-Agent Substrate
+> Programme, thirty-third post-release research milestone —
+> twentieth substrate-attack milestone and **eleventh** multi-agent
+> task-success-bearing substrate milestone (the first to win across
+> **fifteen** regimes — W74's fourteen plus
+> ``compound_repair_after_replacement_then_rejoin_under_budget``),
+> the **first milestone to operationalise compound-chain-aware
+> Plane A↔B handoff promotion**, and the **first milestone to
+> expose a content-addressed per-turn compound-chain-repair-
+> trajectory CID** unifying all eleven W74 primitives + the new
+> replacement-then-delayed-repair-then-rejoin chain into a single
+> dominant signal.**
+> ``coordpy.tiny_substrate_v20`` ships 22 layers + three new V20
+> axes (per-turn compound-chain-repair-trajectory CID, per-layer
+> compound-chain-length label, per-layer compound-chain-pressure
+> gate). ``coordpy.multi_agent_substrate_coordinator_v11`` ships
+> the load-bearing W75 mechanism: a real N-agent harness running
+> **twenty-four** matched-budget policies under **fifteen**
+> regimes; the V20 policy strictly beats V19 across every regime
+> (≥ 80 % of seeds in baseline-class regimes; 100 % in the
+> ``compound_repair_after_replacement_then_rejoin_under_budget``
+> regime; TSC_V20 strictly beats TSC_V19 in every regime).
+> ``coordpy.hosted_real_handoff_coordinator_v7`` (NEW) ships the
+> **compound-chain-aware Plane A↔B bridge** — content-addressed
+> V7 envelopes that promote any turn with
+> ``compound_chain_pressure ≥ 0.5`` to Plane B with
+> ``compound_chain_alignment = 1.0`` and add a tenth decision
+> (``compound_repair_after_replacement_then_rejoin_fallback``)
+> on top of V6's nine, expose a compound-chain falsifier, and
+> save ≥ 84 % cross-plane visible tokens (≥ 87 % at the default
+> workload).
+> Plus nineteen more orthogonal mechanism advances (KV V20
+> sixteen-target ridge + 130-dim compound-chain-repair
+> fingerprint; cache V18 fifteen-objective + per-role 16-dim
+> compound-chain-pressure head; replay V16 twenty-three-regime +
+> thirteen-way compound-chain-aware routing head; deep substrate
+> hybrid V20 twenty-way; substrate adapter V20; persistent V27 (26
+> layers, max_chain_walk_depth=4194304, twenty-fourth carrier,
+> rank-26); LHR V27 (26 heads, max_k=896, seventeen-layer scorer);
+> MLSC V23; consensus V21 (36 stages); team-consensus controller
+> V10 (compound-chain-aware + compound-repair-after-RTR
+> arbiters); hosted router V8 (compound-chain-pressure weighting +
+> compound-repair-after-RTR match); hosted logprob router V8
+> (compound-chain-aware abstain floor + per-budget+restart+rejoin+
+> replacement+compound+chain tiebreak); hosted cache-aware planner
+> V8 (six-layer rotated); hosted cost planner V8 (cost-per-
+> compound-chain-success-under-budget + abstain-when-compound-
+> chain-pressure-violated); boundary V8 (37 blocked axes);
+> provider filter V7 (compound-chain-aware drop); handoff V7.
+> R-181 (10 H-bars) + R-182 (16) + R-183 (32) + R-184 (14) deliver
+> **72 H-bars × 4 seed sets (288 cells)**, all pass.
+> ``W75-L-V20-NO-AUTOGRAD-CAP`` documents that all "training"
+> remains single-step closed-form linear ridge (73 ridge solves
+> total across W61..W75); no SGD / autograd / GPU. Cumulative
+> trust boundary across W22..W75 = **≥ 1786 enumerated failure
+> modes** (1730 from W22..W74 + 56 new W75 envelope verifier
+> modes). W75 ships at ``coordpy.tiny_substrate_v20``,
+> ``coordpy.kv_bridge_v20``, ``coordpy.cache_controller_v18``,
+> ``coordpy.replay_controller_v16``,
+> ``coordpy.deep_substrate_hybrid_v20``,
+> ``coordpy.substrate_adapter_v20``,
+> ``coordpy.persistent_latent_v27``,
+> ``coordpy.long_horizon_retention_v27``,
+> ``coordpy.mergeable_latent_capsule_v23``,
+> ``coordpy.consensus_fallback_controller_v21``,
+> ``coordpy.multi_agent_substrate_coordinator_v11``,
+> ``coordpy.team_consensus_controller_v10``,
+> ``coordpy.w75_team``, ``coordpy.hosted_router_controller_v8``,
+> ``coordpy.hosted_logprob_router_v8``,
+> ``coordpy.hosted_cache_aware_planner_v8``,
+> ``coordpy.hosted_cost_planner_v8``,
+> ``coordpy.hosted_real_substrate_boundary_v8``,
+> ``coordpy.hosted_real_handoff_coordinator_v7``,
+> ``coordpy.hosted_provider_filter_v7``,
+> ``coordpy.r181_benchmark`` / ``coordpy.r182_benchmark`` /
+> ``coordpy.r183_benchmark`` / ``coordpy.r184_benchmark``,
+> reachable only via explicit import.
+> ``coordpy.__version__`` remains ``0.5.20``; SDK contract is
+> byte-for-byte unchanged; no PyPI release.
+>
+> **Previous milestone marker (post-W73 / W74, 2026-05-17 —
 > Stronger Compound-Repair / Replacement-After-Delayed-Repair
 > Budget-Primary Two-Plane Multi-Agent Substrate Programme,
 > thirty-second post-release research milestone — nineteenth

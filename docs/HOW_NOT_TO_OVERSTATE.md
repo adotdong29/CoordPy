@@ -2,10 +2,62 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W73
-> W74 milestone (Stronger Compound-Repair / Replacement-After-
-> Delayed-Repair Budget-Primary Two-Plane Multi-Agent Substrate
-> Programme research line), 2026-05-17.
+> README-of-README must satisfy these rules. Last touched: post-W74
+> W75 milestone (Stronger Compound-Chain-Repair / Replacement-Then-
+> Delayed-Repair-Then-Rejoin Budget-Primary Two-Plane Multi-Agent
+> Substrate Programme research line), 2026-05-17.
+
+## W75 (Stronger Compound-Chain-Repair / Replacement-Then-Delayed-Repair-Then-Rejoin Budget-Primary Two-Plane Multi-Agent Substrate Programme) — explicit do-not-overstate rules
+
+The W75 milestone introduces the V20 substrate (22 layers + three
+new V20 axes), the twenty-four-policy MASC V11 across fifteen
+regimes, the TCC V10, the hosted control plane V8 modules, the new
+**compound-chain-aware hosted-real handoff coordinator V7** that
+promotes turns with compound-chain pressure above the floor to
+Plane B and adds a
+``compound_repair_after_replacement_then_rejoin_fallback``
+decision, and the compound-chain-aware provider filter V7. The
+substrate now produces multi-agent task-success wins under
+**fifteen** named failure-mode regimes (W74's fourteen plus
+``compound_repair_after_replacement_then_rejoin_under_budget``).
+The honest scope:
+
+1. **Twentieth substrate-attack milestone — still in-repo NumPy.**
+   The V20 substrate adds 22 layers, GQA 8q/4kv, RMSNorm, SwiGLU,
+   d_model=64, vocab=259 — *still NOT a frontier model*. Hosted
+   backends remain text-only at the HTTP surface
+   (``W75-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``).
+2. **Multi-agent task wins are synthetic-harness-load-bearing.**
+   The fifteen-regime V20-beats-V19 / TSC_V20-beats-TSC_V19 wins
+   are measured *inside* the W75 in-repo MASC V11 harness, not
+   against a frontier model
+   (``W75-L-MASC-V11-SYNTHETIC-CAP``).
+3. **The hosted control plane does not pierce the wall.** Plane A
+   V8 modules (router V8, logprob V8, cache-aware planner V8, cost
+   planner V8, boundary V8, handoff V7, provider filter V7)
+   operate only at the HTTP text-and-logprobs-and-prefix-cache
+   surface (``W75-L-HOSTED-V8-NO-SUBSTRATE-CAP``).
+4. **Compound-chain pressure is caller-declared.** The new
+   ``compound_chain_pressure`` knob on hosted V8 modules and the
+   substrate V20 forward is a *caller-declared* signal, not a
+   live measurement (``W75-L-HOSTED-V8-COMPOUND-CHAIN-DECLARED-
+   CAP``, ``W75-L-COMPOUND-CHAIN-PRESSURE-DECLARED-CAP``).
+5. **The compound-chain-repair-trajectory CID is in-repo only.**
+   It is a deterministic SHA-256 hash over V19 compound-repair-
+   trajectory CID + eleven recorded primitive event chains + V20
+   compound-chain windows. It does NOT prove compound-chain
+   integrity at any third-party hosted surface
+   (``W75-L-COMPOUND-CHAIN-REPAIR-IN-REPO-CAP``).
+6. **The handoff V7 coordinator preserves the wall.** When V7
+   promotes a turn to Plane B it does so under a content-addressed
+   invariant; it does NOT cross the substrate boundary
+   (``W75-L-HANDOFF-V7-NOT-CROSSING-WALL-CAP``).
+7. **Frontier-model substrate access remains unsolved.** W75
+   carries the W70 ``frontier_blocked_axes`` set forward unchanged
+   (``W75-L-FRONTIER-SUBSTRATE-STILL-BLOCKED-CAP``).
+8. **No version bump.** ``coordpy.__version__`` remains
+   ``"0.5.20"`` and ``SDK_VERSION`` remains ``"coordpy.sdk.v3.43"``;
+   nothing in W75 ships to PyPI.
 
 ## W74 (Stronger Compound-Repair / Replacement-After-Delayed-Repair Budget-Primary Two-Plane Multi-Agent Substrate Programme) — explicit do-not-overstate rules
 

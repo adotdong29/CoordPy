@@ -13,6 +13,96 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W75 Stronger Compound-Chain-Repair / Replacement-Then-Delayed-
+  Repair-Then-Rejoin Budget-Primary Two-Plane Multi-Agent Substrate
+  Programme** (post-W74, 2026-05-17) — *twentieth substrate-attack
+  milestone; eleventh **multi-agent task-success-bearing** substrate
+  milestone (first to win across **fifteen** regimes: W74's
+  fourteen plus
+  ``compound_repair_after_replacement_then_rejoin_under_budget``);
+  first milestone to **operationalise compound-chain-aware Plane
+  A↔B handoff promotion** and the **first milestone to expose a
+  content-addressed per-turn compound-chain-repair-trajectory CID**
+  that unifies all eleven W74 primitives + the new replacement-
+  then-delayed-repair-then-rejoin chain into a single dominant
+  signal back into the substrate-routed policy*. Twenty orthogonal
+  advances on top of W74 (12 Plane B v-bumps + 5 Plane A V8 + 1 new
+  compound-chain-aware handoff coordinator V7 + 1 new compound-
+  chain-aware provider filter V7 + 1 new substrate adapter V20).
+  Plane B: (M1) **Tiny Substrate V20** (22 layers; three new V20
+  axes — per-turn compound-chain-repair-trajectory CID, per-layer
+  compound-chain-length label in [0..11], per-layer compound-chain-
+  pressure gate); (M2) **KV Bridge V20** (sixteen-target stacked
+  ridge + 130-dim compound-chain-repair fingerprint + compound-
+  chain-pressure falsifier); (M3) **Cache Controller V18**
+  (fifteen-objective stacked ridge + per-role 16-dim compound-
+  chain-pressure head); (M4) **Replay Controller V16** (twenty-
+  three regimes + thirteen-way compound-chain-aware routing head);
+  (M5) **Deep Substrate Hybrid V20** (twenty-way bidirectional
+  loop); (M6) **Substrate Adapter V20** with new
+  ``substrate_v20_full`` tier; (M7) **Persistent V27** (26 layers,
+  ``max_chain_walk_depth=4194304``, twenty-fourth skip carrier,
+  distractor rank 26); (M8) **Long-Horizon Retention V27** (26
+  heads, max_k=896, seventeen-layer scorer); (M9) **Mergeable
+  Latent State Capsule V23** with compound-chain-repair-trajectory
+  chain + replacement-then-rejoin chain; (M10) **Consensus Fallback
+  Controller V21** (36 disjoint stages); (M11) **Multi-Agent
+  Substrate Coordinator V11** (twenty-four matched-budget policies
+  across fifteen regimes); (M12) **Team-Consensus Controller V10**
+  (compound-chain-pressure + compound-repair-after-RTR arbiters).
+  Plane A V8: (H1) **Hosted Router V8** with compound-chain-
+  pressure weighting + compound-repair-after-RTR match table; (H2)
+  **Hosted Logprob Router V8** with compound-chain-aware abstain
+  floor + per-budget+restart+rejoin+replacement+compound+chain
+  tiebreak; (H3) **Hosted Cache-Aware Planner V8** (six-layer
+  rotated; ≥ 87 % savings on 18×8 at hit_rate=1.0); (H4) **Hosted
+  Cost Planner V8** (cost-per-compound-chain-success-under-budget +
+  abstain-when-compound-chain-pressure-violated); (H5) **Hosted
+  Real Substrate Boundary V8** (37 blocked axes + the W70 frontier-
+  blocked axes set unchanged). New for W75: (H6) **Hosted Real
+  Handoff Coordinator V7** — compound-chain-aware promotion of any
+  turn with ``compound_chain_pressure ≥ 0.5`` to Plane B with
+  ``compound_chain_alignment = 1.0`` + new tenth decision
+  ``compound_repair_after_replacement_then_rejoin_fallback`` +
+  compound-chain falsifier + ≥ 84 % cross-plane visible-token
+  savings; (H7) **Hosted Provider Filter V7** with compound-chain-
+  aware drop. Three new closed-form ridge solves on top of W74's
+  70 (KV V20 sixteen-target + cache V18 fifteen-objective + replay
+  V16 chain-aware routing); total **73 ridge solves across
+  W61..W75**; no autograd, no SGD, no GPU. The benchmark sweep is
+  **288 cells across 4 benchmark families × 4 seed sets** (R-181
+  hosted control plane V8 (10 H-bars), R-182 real substrate plane
+  V20 (16 H-bars), R-183 multi-agent task success across 15 regimes
+  (32 H-bars), R-184 handoff V7 + falsifier + limitation
+  reproductions (14 H-bars) — 72 H-bars × 4 seed sets = 288 cells),
+  all pass. The W75 envelope verifier enumerates **56 disjoint
+  failure modes**. The released SDK contract
+  (``coordpy.__version__ == "0.5.20"``,
+  ``coordpy.SDK_VERSION == "coordpy.sdk.v3.43"``, the public
+  symbols, the smoke driver) is **byte-for-byte unchanged**. Ships
+  at ``coordpy.tiny_substrate_v20``, ``coordpy.kv_bridge_v20``,
+  ``coordpy.cache_controller_v18``,
+  ``coordpy.replay_controller_v16``,
+  ``coordpy.deep_substrate_hybrid_v20``,
+  ``coordpy.substrate_adapter_v20``,
+  ``coordpy.persistent_latent_v27``,
+  ``coordpy.long_horizon_retention_v27``,
+  ``coordpy.mergeable_latent_capsule_v23``,
+  ``coordpy.consensus_fallback_controller_v21``,
+  ``coordpy.multi_agent_substrate_coordinator_v11``,
+  ``coordpy.team_consensus_controller_v10``,
+  ``coordpy.w75_team``,
+  ``coordpy.hosted_router_controller_v8``,
+  ``coordpy.hosted_logprob_router_v8``,
+  ``coordpy.hosted_cache_aware_planner_v8``,
+  ``coordpy.hosted_cost_planner_v8``,
+  ``coordpy.hosted_real_substrate_boundary_v8``,
+  ``coordpy.hosted_real_handoff_coordinator_v7``,
+  ``coordpy.hosted_provider_filter_v7``,
+  ``coordpy.r181_benchmark`` / ``coordpy.r182_benchmark`` /
+  ``coordpy.r183_benchmark`` / ``coordpy.r184_benchmark`` —
+  reachable only via explicit import.
+
 - **W74 Stronger Compound-Repair / Replacement-After-Delayed-
   Repair Budget-Primary Two-Plane Multi-Agent Substrate Programme**
   (post-W73, 2026-05-17) — *nineteenth substrate-attack milestone;

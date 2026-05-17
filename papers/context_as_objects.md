@@ -2,6 +2,100 @@
 
 > Main paper draft for the Context Zero programme.
 >
+> **Post-W74 research-line update (W75 Stronger Compound-Chain-
+> Repair / Replacement-Then-Delayed-Repair-Then-Rejoin Budget-
+> Primary Two-Plane Multi-Agent Substrate Programme, 2026-05-17).**
+> *Twentieth substrate-attack milestone, and the **eleventh**
+> multi-agent task-success-bearing substrate milestone in the
+> programme — the first to produce wins across **fifteen**
+> failure-mode regimes (W74's fourteen plus
+> **compound_repair_after_replacement_then_rejoin_under_budget**),
+> the **first milestone to operationalise compound-chain-aware
+> Plane A↔B handoff promotion**, and the **first milestone to
+> expose a content-addressed per-turn compound-chain-repair-
+> trajectory CID** that unifies all eleven W74 primitives + the
+> new replacement-then-delayed-repair-then-rejoin chain
+> (**compound-repair-after-replacement-then-rejoin**) into a single
+> dominant signal back into the substrate-routed policy.
+> ``MultiAgentSubstrateCoordinatorV11`` runs **twenty-four**
+> matched-budget policies (the twenty-two W74 policies plus
+> ``substrate_routed_v20`` and ``team_substrate_coordination_v20``)
+> under fifteen regimes; the V20 policy strictly beats V19 across
+> all fifteen regimes (≥ 80 % at every regime including the new
+> chain regime, with TSC_V20 strictly beating TSC_V19 ≥ 80 % of
+> seeds in every regime). In the new
+> ``compound_repair_after_replacement_then_rejoin_under_budget``
+> regime — where at ~20 % of turns role 0 is replaced, at ~35 % of
+> turns the replacing role enters a delayed-repair window, then at
+> ~55 % of turns the team must rejoin from the divergent branches
+> under a tight visible-token budget — the V20 substrate's
+> compound-chain-repair-trajectory CID + per-layer compound-chain-
+> length label + per-layer compound-chain-pressure gate give the
+> substrate-routed policy a coordinated replacement-and-delayed-
+> repair-and-rejoin chain arc that V19 cannot follow under the
+> additional replacement-first-then-delayed-repair stressor. The
+> in-repo NumPy substrate grows to V20 (22 layers + three new V20
+> axes: per-turn compound-chain-repair-trajectory CID, per-layer
+> compound-chain-length label in [0..11], per-layer compound-chain-
+> pressure gate). The substrate chain-dominance primitive saves
+> **95.8 %** of recompute flops over eleven-primitive repair work
+> at 128 tokens. Three new closed-form ridge solves on top of
+> W61..W74's 70 (73 total). The deep substrate hybrid is now
+> twenty-way (V19 hybrid + cache V18 + replay V16 + compound-chain-
+> repair-trajectory + compound-chain length + team-consensus
+> controller V10). The persistent latent state is V27 (26 layers,
+> 24 skip carriers, ``max_chain_walk_depth=4194304``, distractor
+> rank 26). Long-horizon reconstruction reaches 26 heads at
+> max_k=896 with a seventeen-layer scorer. Consensus has 36
+> disjoint stages including ``compound_chain_repair_arbiter`` and
+> ``compound_repair_after_replacement_then_rejoin_arbiter``. The
+> first capsule-native team-consensus controller V10 composes
+> regime-aware weighted quorum + repair-dominance arbiter + budget-
+> primary arbiter + contradiction-then-rejoin arbiter + restart-
+> aware arbiter + delayed-repair-after-restart arbiter + rejoin-
+> pressure arbiter + delayed-rejoin-after-restart arbiter +
+> replacement-pressure arbiter + replacement-after-CTR arbiter +
+> compound-pressure arbiter + compound-repair-after-DRTR arbiter +
+> compound-chain-pressure arbiter + compound-repair-after-RTR
+> arbiter + substrate-replay fallback + transcript fallback. Plane
+> A V8 ships seven hosted control-plane modules (router V8 with
+> compound-chain-pressure weighting + compound-repair-after-RTR
+> match table, logprob router V8 with compound-chain-aware abstain
+> floor + per-budget+restart+rejoin+replacement+compound+chain
+> tiebreak, cache-aware planner V8 with ≥ 87 % savings on 18×8
+> six-layer-rotated prefixes, cost planner V8 with cost-per-
+> compound-chain-success-under-budget + abstain-when-compound-
+> chain-pressure-violated, boundary V8 with 37 blocked axes + the
+> W70 frontier-blocked axes unchanged, provider filter V7 with
+> compound-chain-aware drop). And — the load-bearing operational
+> W75 advance — the new ``hosted_real_handoff_coordinator_v7``
+> records per-turn content-addressed V7 envelopes that promote any
+> turn with ``compound_chain_pressure ≥ 0.5`` and substrate_trust
+> ≥ floor to Plane B with ``compound_chain_alignment = 1.0`` and
+> add a tenth
+> ``compound_repair_after_replacement_then_rejoin_fallback``
+> decision on top of V6's nine, exposing a compound-chain
+> falsifier and saving ≥ 84 % cross-plane visible tokens at the
+> default workload (≥ 87 % at default config). R-181 + R-182 +
+> R-183 + R-184 deliver **72 H-bars × 4 seed sets (288 cells)**,
+> all pass. The honest scope is unchanged: hosted backends remain
+> text-only at the HTTP surface (``W75-L-NO-THIRD-PARTY-SUBSTRATE-
+> COUPLING-CAP``); the substrate is a 22-layer in-repo NumPy
+> runtime, not a frontier model
+> (``W75-L-NUMPY-CPU-V20-SUBSTRATE-CAP``); "training" is closed-
+> form linear ridge throughout (``W75-L-V20-NO-AUTOGRAD-CAP``); the
+> multi-agent task-success wins are measured **inside the W75
+> synthetic harness** (``W75-L-MASC-V11-SYNTHETIC-CAP``), not on
+> real hosted multi-agent backends; the compound-chain-repair-
+> trajectory CID is computed from byte-stable substrate state only
+> and does NOT prove compound-chain integrity at the hosted
+> surface (``W75-L-COMPOUND-CHAIN-REPAIR-IN-REPO-CAP``); budgets,
+> compound pressure, and compound-chain pressure are caller-
+> declared (``W75-L-COMPOUND-CHAIN-PRESSURE-DECLARED-CAP``,
+> ``W75-L-HOSTED-V8-DECLARED-CAP``); and the V7 handoff
+> coordinator preserves the wall — it does NOT cross the
+> substrate boundary (``W75-L-HANDOFF-V7-NOT-CROSSING-WALL-CAP``).*
+>
 > **Post-W73 research-line update (W74 Stronger Compound-Repair /
 > Replacement-After-Delayed-Repair Budget-Primary Two-Plane Multi-
 > Agent Substrate Programme, 2026-05-17).** *Nineteenth substrate-
