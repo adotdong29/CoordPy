@@ -2,10 +2,61 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W72
-> W73 milestone (Stronger Contradiction-Rejoin / Replacement /
+> README-of-README must satisfy these rules. Last touched: post-W73
+> W74 milestone (Stronger Compound-Repair / Replacement-After-
 > Delayed-Repair Budget-Primary Two-Plane Multi-Agent Substrate
-> Programme research line), 2026-05-16.
+> Programme research line), 2026-05-17.
+
+## W74 (Stronger Compound-Repair / Replacement-After-Delayed-Repair Budget-Primary Two-Plane Multi-Agent Substrate Programme) — explicit do-not-overstate rules
+
+The W74 milestone introduces the V19 substrate (21 layers + three
+new V19 axes), the twenty-two-policy MASC V10 across fourteen
+regimes, the TCC V9, the hosted control plane V7 modules, the new
+**compound-aware hosted-real handoff coordinator V6** that
+promotes turns with compound pressure above the floor to Plane B
+and adds a
+``compound_repair_after_delayed_repair_then_replacement_fallback``
+decision, and the compound-aware provider filter V6. The substrate
+now produces multi-agent task-success wins under **fourteen**
+named failure-mode regimes (W73's thirteen plus
+``replacement_after_delayed_repair_under_budget``). The honest
+scope:
+
+1. **Nineteenth substrate-attack milestone — still in-repo NumPy.**
+   The V19 substrate adds 21 layers, GQA 8q/4kv, RMSNorm, SwiGLU,
+   d_model=64, vocab=259 — *still NOT a frontier model*. Hosted
+   backends remain text-only at the HTTP surface
+   (``W74-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``).
+2. **Multi-agent task wins are synthetic-harness-load-bearing.**
+   MASC V10 runs twenty-two policies on a synthetic deterministic
+   coordination task; the V19 policy beats V18 because the V19
+   mechanisms (compound-repair-trajectory CID + compound-repair-
+   rate per-layer + compound-pressure gate) are engineered to
+   materially help in the fourteen regimes, particularly the new
+   compound regime. **This is not a real hosted multi-agent win**
+   (``W74-L-MASC-V10-SYNTHETIC-CAP``).
+3. **All "training" remains closed-form linear ridge.** Three new
+   ridge solves on top of W73's 67 (70 total across W61..W74); no
+   SGD, no autograd, no GPU (``W74-L-V19-NO-AUTOGRAD-CAP``).
+4. **The handoff coordinator V6 preserves the wall.** The
+   compound-aware handoff V6 does NOT cross the substrate boundary.
+   It records *which plane handled each turn* under a compound-
+   aware score and exposes a compound falsifier
+   (``W74-L-HANDOFF-V6-NOT-CROSSING-WALL-CAP``). When V6 returns
+   ``compound_repair_after_delayed_repair_then_replacement_fallback``,
+   the envelope still records Plane A handled the turn (with the
+   substrate signalling that the team needs Plane B); the boundary
+   stays content-addressed.
+5. **Hosted V7 is caller-declared.** Budgets, restart pressure,
+   rejoin pressure, replacement pressure, compound pressure, and
+   provider quality scores are caller-declared; V7 does not measure
+   live success (``W74-L-HOSTED-V7-DECLARED-CAP``,
+   ``W74-L-HOSTED-V7-NO-SUBSTRATE-CAP``).
+6. **Frontier substrate access is still blocked.** W74 carries the
+   W70 ``frontier_blocked_axes`` set forward unchanged at boundary
+   V7. The transformer-internal bridge to a frontier-quality
+   runtime remains conjectural (``W74-C-FRONTIER-HOSTED-BRIDGE-
+   NEEDED``).
 
 ## W73 (Stronger Contradiction-Rejoin / Replacement / Delayed-Repair Budget-Primary Two-Plane Multi-Agent Substrate Programme) — explicit do-not-overstate rules
 

@@ -2,6 +2,101 @@
 
 > Main paper draft for the Context Zero programme.
 >
+> **Post-W73 research-line update (W74 Stronger Compound-Repair /
+> Replacement-After-Delayed-Repair Budget-Primary Two-Plane Multi-
+> Agent Substrate Programme, 2026-05-17).** *Nineteenth substrate-
+> attack milestone, and the **tenth** multi-agent task-success-
+> bearing substrate milestone in the programme — the first to
+> produce wins across **fourteen** failure-mode regimes (W73's
+> thirteen plus **replacement_after_delayed_repair_under_budget**),
+> the **first milestone to operationalise compound-aware Plane A↔B
+> handoff promotion**, and the **first milestone to expose a
+> content-addressed per-turn compound-repair-trajectory CID** that
+> unifies all ten repair/restart/rejoin/replacement/compound
+> primitives (multi-branch-rejoin, silent-corruption, partial-
+> contradiction, agent-replacement, role-dropout-recovery, branch-
+> merge, restart-dominance, delayed-rejoin-after-restart,
+> replacement-after-contradiction-then-rejoin,
+> **compound-repair-after-delayed-repair-then-replacement**) into a
+> single dominant signal back into the substrate-routed policy.
+> ``MultiAgentSubstrateCoordinatorV10`` runs **twenty-two** matched-
+> budget policies (the twenty W73 policies plus
+> ``substrate_routed_v19`` and ``team_substrate_coordination_v19``)
+> under fourteen regimes; the V19 policy strictly beats V18 across
+> all fourteen regimes (≥ 86.7 % at every regime including the new
+> compound regime, with TSC_V19 strictly beating TSC_V18 ≥ 93.3 % of
+> seeds in every regime). In the new
+> ``replacement_after_delayed_repair_under_budget`` regime — where
+> at ~15 % of turns role 0 enters a delayed-repair window, at ~30 %
+> of turns the delayed role is wiped and replaced with a fresh
+> member, then at ~50 % of turns the team must rejoin from the
+> divergent branches under a tight visible-token budget — the V19
+> substrate's compound-repair-trajectory CID + per-layer compound-
+> repair-rate label + per-layer compound-pressure gate give the
+> substrate-routed policy a coordinated delayed-repair-and-
+> replacement-and-rejoin arc that V18 cannot follow under the
+> additional delayed-repair-then-replacement stressor. The in-repo
+> NumPy substrate grows to V19 (21 layers + three new V19 axes:
+> per-turn compound-repair-trajectory CID, per-layer compound-
+> repair-rate label in [0..10], per-layer compound-pressure gate).
+> The substrate compound-dominance primitive saves **95.5 %** of
+> recompute flops over ten-primitive repair work at 128 tokens. The
+> compound-pressure throttle saves **100 %** visible tokens at
+> visible_token_budget=64 / baseline=512 / compound_window=8. Three
+> new closed-form ridge solves on top of W61..W73's 67 (70 total).
+> The deep substrate hybrid is now nineteen-way (V18 hybrid + cache
+> V17 + replay V15 + compound-repair-trajectory + compound-repair-
+> rate + team-consensus controller V9). The persistent latent state
+> is V26 (25 layers, 23 skip carriers,
+> ``max_chain_walk_depth=2097152``, distractor rank 25). Long-
+> horizon reconstruction reaches 25 heads at max_k=832. Consensus
+> has 34 disjoint stages including ``compound_repair_arbiter`` and
+> ``compound_repair_after_delayed_repair_then_replacement_arbiter``.
+> The first capsule-native team-consensus controller V9 composes
+> regime-aware weighted quorum + repair-dominance arbiter + budget-
+> primary arbiter + contradiction-then-rejoin arbiter + restart-
+> aware arbiter + delayed-repair-after-restart arbiter + rejoin-
+> pressure arbiter + delayed-rejoin-after-restart arbiter +
+> replacement-pressure arbiter + replacement-after-CTR arbiter +
+> compound-pressure arbiter + compound-repair-after-DRTR arbiter +
+> substrate-replay fallback + transcript fallback. Plane A V7
+> ships seven hosted control-plane modules (router V7 with
+> compound-pressure weighting + compound-repair-after-DRTR match
+> table, logprob router V7 with compound-aware abstain floor +
+> per-budget+restart+rejoin+replacement+compound tiebreak, cache-
+> aware planner V7 with ≥ 85 % savings on 16×8 five-layer-rotated
+> prefixes, cost planner V7 with cost-per-compound-success-under-
+> budget + abstain-when-compound-pressure-violated, boundary V7
+> with 34 blocked axes + the W70 frontier-blocked axes unchanged,
+> provider filter V6 with compound-aware drop). And — the load-
+> bearing operational W74 advance — the new
+> ``hosted_real_handoff_coordinator_v6`` records per-turn content-
+> addressed V6 envelopes that promote any turn with
+> ``compound_pressure ≥ 0.5`` and substrate_trust ≥ floor to Plane
+> B with ``compound_alignment = 1.0`` and add a ninth
+> ``compound_repair_after_delayed_repair_then_replacement_fallback``
+> decision on top of V5's eight, exposing a compound falsifier and
+> saving ≥ 82 % cross-plane visible tokens at the default workload
+> (≥ 83 % at default config). R-177 + R-178 + R-179 + R-180 deliver
+> **70 H-bars × 3 seeds (210 cells)**, all pass. The honest scope
+> is unchanged: hosted backends remain text-only at the HTTP
+> surface (``W74-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``); the
+> substrate is a 21-layer in-repo NumPy runtime, not a frontier
+> model (``W74-L-NUMPY-CPU-V19-SUBSTRATE-CAP``); "training" is
+> closed-form linear ridge throughout
+> (``W74-L-V19-NO-AUTOGRAD-CAP``); the multi-agent task-success
+> wins are measured **inside the W74 synthetic harness**
+> (``W74-L-MASC-V10-SYNTHETIC-CAP``), not on real hosted multi-
+> agent backends; the compound-repair-trajectory CID is computed
+> from byte-stable substrate state only and does NOT prove
+> compound-repair integrity at the hosted surface (``W74-L-
+> COMPOUND-REPAIR-IN-REPO-CAP``); budgets, replacement pressure,
+> and compound pressure are caller-declared
+> (``W74-L-COMPOUND-PRESSURE-DECLARED-CAP``,
+> ``W74-L-HOSTED-V7-DECLARED-CAP``); and the V6 handoff
+> coordinator preserves the wall — it does NOT cross the substrate
+> boundary (``W74-L-HANDOFF-V6-NOT-CROSSING-WALL-CAP``).*
+>
 > **Post-W72 research-line update (W73 Stronger Contradiction-Rejoin
 > / Replacement / Delayed-Repair Budget-Primary Two-Plane Multi-
 > Agent Substrate Programme, 2026-05-16).** *Eighteenth substrate-

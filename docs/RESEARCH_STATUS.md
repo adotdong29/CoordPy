@@ -5,10 +5,139 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W72 W73
-> milestone (Stronger Contradiction-Rejoin / Replacement / Delayed-
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W73 W74
+> milestone (Stronger Compound-Repair / Replacement-After-Delayed-
 > Repair Budget-Primary Two-Plane Multi-Agent Substrate Programme
-> research line), 2026-05-16.
+> research line), 2026-05-17.
+
+## TL;DR — W74 Stronger Compound-Repair / Replacement-After-Delayed-Repair Budget-Primary Two-Plane Multi-Agent Substrate Programme (post-W73 research milestone)
+
+The programme now has **seventy-one** coupled research axes. W74
+mints axis 71: the **nineteenth substrate-attack milestone**, the
+**tenth multi-agent task-success-bearing** substrate milestone
+(first to win across *fourteen* regimes: W73's thirteen +
+**replacement_after_delayed_repair_under_budget**), the **first
+milestone to operationalise compound-aware Plane A↔B handoff
+promotion**, and the **first milestone to expose a content-
+addressed per-turn compound-repair-trajectory CID** that unifies
+all ten repair/restart/rejoin/replacement/compound primitives into
+a single dominant signal back into the substrate-routed policy.
+
+The load-bearing W74 win is **MASC V10 / TCC V9 +
+tiny_substrate_v19 + 11 supporting Plane B V19 modules + 5 Plane A
+V7 modules + the new compound-aware handoff coordinator V6 + the
+new compound-aware provider filter V6**: V19 strictly beats V18 on
+≥ 50 % of seeds in every regime (≥ 86.7 % in practice across all
+regimes, including the new
+``replacement_after_delayed_repair_under_budget`` regime where V18
+has no signal), and TSC_V19 strictly beats TSC_V18 on ≥ 50 % of
+seeds in every regime (≥ 93.3 % in practice). Plus an honest
+**hosted control plane V7** (Plane A V7):
+HostedRouterControllerV7 (compound-pressure weighting +
+compound-repair-after-DRTR match table), HostedLogprobRouterV7
+(compound-aware abstain floor lowered under high compound pressure
++ per-budget+restart+rejoin+replacement+compound tiebreak),
+HostedCacheAwarePlannerV7 (five-layer rotated; ≥ 85 % savings on
+16×8 at hit_rate=1.0), HostedCostPlannerV7 (cost-per-compound-
+success-under-budget + abstain-when-compound-pressure-violated),
+and the **explicit wall V7** HostedRealSubstrateBoundaryV7 that
+enumerates 34 blocked axes at the hosted surface (W73's 31 + 3 new
+V19 axes) and carries forward the W70 frontier_blocked_axes set
+unchanged. The new **compound-aware Plane A↔B handoff coordinator
+V6** records per-turn V6 envelopes that promote any turn with
+``compound_pressure ≥ 0.5`` to Plane B (with
+``compound_alignment = 1.0``) and adds a ninth decision
+(``compound_repair_after_delayed_repair_then_replacement_fallback``)
+on top of V5's eight, exposes a compound falsifier, and saves ≥
+82 % visible tokens vs forcing every turn through hosted_only (≥
+83 % at default config). Plus the new compound-aware **provider
+filter V6** that drops providers whose declared compound-noise
+score exceeds their per-provider cap under high compound pressure.
+
+**Nineteen orthogonal advances** on top of W73 (12 Plane B
+v-bumps + 5 Plane A V7 + 1 new handoff coordinator V6 + 1 new
+provider filter V6). Plane B headlines: V19 substrate (21 layers;
+three new V19 axes — per-turn compound-repair-trajectory CID,
+per-layer compound-repair-rate label, per-layer compound-pressure
+gate); KV V19 fifteen-target stacked ridge + 120-dim compound-
+repair fingerprint + compound-pressure falsifier; Cache V17
+fourteen-objective stacked ridge + per-role 15-dim compound-
+pressure head; Replay V15 twenty-two-regime ridge + twelve-way
+compound-aware routing head; Deep Substrate Hybrid V19 nineteen-
+way loop; Substrate Adapter V19 with ``substrate_v19_full`` tier;
+Persistent V26 (25 layers, max_chain_walk_depth=2097152, twenty-
+third skip carrier); LHR V26 (25 heads, max_k=832); MLSC V22
+(compound-repair + delayed-repair chains); Consensus V20 (34
+stages); MASC V10 (22-policy, 14-regime); TCC V9 (compound-aware
++ compound-repair-after-DRTR arbiters).
+
+W74 fits **three** new closed-form ridge solves on top of W73's
+67 (cache V17 fourteen-objective + replay V15 compound-aware-
+routing + KV V19 fifteen-target — the cache V17 per-role
+compound-pressure head re-uses the V16 family solver). Total
+**70 closed-form ridge solves across W61..W74**. No autograd, no
+SGD, no GPU. The benchmark sweep is **210 cells across 4
+benchmark families** (R-177 hosted control plane V7 (10 H-bars),
+R-178 real substrate plane V19 (16 H-bars), R-179 multi-agent
+task success across 14 regimes (30 H-bars), R-180 handoff V6 +
+falsifier + limitation reproductions (14 H-bars)), 210/210 cells
+pass at 3/3 seeds.
+
+The W74 envelope verifier enumerates **55 disjoint failure modes**
+(cumulative trust boundary across W22..W74 ≥ 1730 enumerated
+failure modes). Ships at ``coordpy.tiny_substrate_v19``,
+``coordpy.kv_bridge_v19``, ``coordpy.cache_controller_v17``,
+``coordpy.replay_controller_v15``,
+``coordpy.deep_substrate_hybrid_v19``,
+``coordpy.substrate_adapter_v19``,
+``coordpy.persistent_latent_v26``,
+``coordpy.long_horizon_retention_v26``,
+``coordpy.mergeable_latent_capsule_v22``,
+``coordpy.consensus_fallback_controller_v20``,
+``coordpy.multi_agent_substrate_coordinator_v10``,
+``coordpy.team_consensus_controller_v9``, ``coordpy.w74_team``,
+plus the Plane A V7 modules ``coordpy.hosted_router_controller_v7``,
+``coordpy.hosted_logprob_router_v7``,
+``coordpy.hosted_cache_aware_planner_v7``,
+``coordpy.hosted_cost_planner_v7``,
+``coordpy.hosted_real_substrate_boundary_v7``,
+``coordpy.hosted_real_handoff_coordinator_v6``,
+``coordpy.hosted_provider_filter_v6``, and benchmarks
+``coordpy.r177_benchmark`` / ``coordpy.r178_benchmark`` /
+``coordpy.r179_benchmark`` / ``coordpy.r180_benchmark``. **Public
+SDK contract is byte-for-byte unchanged:
+``coordpy.__version__ == "0.5.20"``,
+``coordpy.SDK_VERSION == "coordpy.sdk.v3.43"``.**
+
+Honest scope (do-not-overstate):
+
+* W74 keeps the W70 two-plane split and *adds* the compound-aware
+  handoff V6; it does NOT dissolve the wall. Hosted backends remain
+  text-only at the HTTP surface. ``W74-L-HOSTED-V7-NO-SUBSTRATE-
+  CAP``.
+* The fourteen-regime multi-agent wins are measured inside the in-
+  repo synthetic MASC V10 harness. ``W74-L-MASC-V10-SYNTHETIC-
+  CAP``.
+* Frontier-model substrate access remains the unsolved research-
+  line wall — W74 carries the W70 frontier_blocked_axes set forward
+  unchanged. ``W74-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``.
+* The compound-repair-trajectory CID is computed from byte-stable
+  V18 replacement-repair-trajectory CID + recorded delayed-repair
+  events + recorded compound-failure windows only. It does NOT
+  prove compound-repair integrity at the hosted surface
+  (``W74-L-COMPOUND-REPAIR-IN-REPO-CAP``).
+* The compound-pressure gate is a calibrated weighted combination
+  of caller-declared budget, baseline cost, restart count, rejoin
+  count, replacement count, contradiction count, delayed-repair
+  count, repair-dominance count, and compound-window. It is not a
+  learned end-to-end controller
+  (``W74-L-COMPOUND-PRESSURE-DECLARED-CAP``).
+* Hosted V7 success scores, quality scores, budgets, restart
+  pressure, rejoin pressure, replacement pressure, and compound
+  pressure are caller-declared. The router does not measure live
+  success (``W74-L-HOSTED-V7-DECLARED-CAP``).
+* The handoff V6 coordinator preserves the wall as a content-
+  addressed invariant (``W74-L-HANDOFF-V6-NOT-CROSSING-WALL-CAP``).
 
 ## TL;DR — W73 Stronger Contradiction-Rejoin / Replacement / Delayed-Repair Budget-Primary Two-Plane Multi-Agent Substrate Programme (post-W72 research milestone)
 
