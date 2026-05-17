@@ -5,10 +5,140 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W71 W72
-> milestone (Stronger Delayed-Rejoin-After-Restart / Restart-
-> Repair-Trajectory Two-Plane Multi-Agent Substrate Programme
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W72 W73
+> milestone (Stronger Contradiction-Rejoin / Replacement / Delayed-
+> Repair Budget-Primary Two-Plane Multi-Agent Substrate Programme
 > research line), 2026-05-16.
+
+## TL;DR — W73 Stronger Contradiction-Rejoin / Replacement / Delayed-Repair Budget-Primary Two-Plane Multi-Agent Substrate Programme (post-W72 research milestone)
+
+The programme now has **seventy** coupled research axes. W73 mints
+axis 70: the **eighteenth substrate-attack milestone**, the
+**ninth multi-agent task-success-bearing** substrate milestone
+(first to win across *thirteen* regimes: W72's twelve +
+**replacement_after_contradiction_then_rejoin**), the **first
+milestone to operationalise replacement-aware Plane A↔B handoff
+promotion**, and the **first milestone to expose a content-
+addressed per-turn replacement-repair-trajectory CID** that
+unifies all nine repair/restart/rejoin/replacement primitives into
+a single dominant signal back into the substrate-routed policy.
+
+The load-bearing W73 win is **MASC V9 / TCC V8 +
+tiny_substrate_v18 + 11 supporting Plane B V18 modules + 5 Plane A
+V6 modules + the new replacement-aware handoff coordinator V5 +
+the new replacement-aware provider filter V5**: V18 strictly beats
+V17 on ≥ 50 % of seeds in every regime (100 % in practice across
+all regimes, including the new
+``replacement_after_contradiction_then_rejoin`` regime where V17
+has no signal), and TSC_V18 strictly beats TSC_V17 on ≥ 50 % of
+seeds in every regime (100 % in practice). Plus an honest **hosted
+control plane V6** (Plane A V6): HostedRouterControllerV6
+(replacement-pressure weighting + replacement-after-CTR match
+table), HostedLogprobRouterV6 (replacement-aware abstain floor
+lowered under high replacement pressure + per-budget+restart+
+rejoin+replacement tiebreak), HostedCacheAwarePlannerV6 (four-
+layer rotated; ≥ 85 % savings on 14×8 at hit_rate=1.0),
+HostedCostPlannerV6 (cost-per-replacement-rejoin-success-under-
+budget + abstain-when-replacement-pressure-violated), and the
+**explicit wall V6** HostedRealSubstrateBoundaryV6 that enumerates
+31 blocked axes at the hosted surface (W72's 28 + 3 new V18 axes)
+and carries forward the W70 frontier_blocked_axes set unchanged.
+The new **replacement-aware Plane A↔B handoff coordinator V5**
+records per-turn V5 envelopes that promote any turn with
+``replacement_pressure ≥ 0.5`` to Plane B (with
+``replacement_alignment = 1.0``) and adds an eighth decision
+(``replacement_after_contradiction_then_rejoin_fallback``) on top
+of V4's seven, exposes a replacement falsifier, and saves ≥ 80 %
+visible tokens vs forcing every turn through hosted_only (≥ 81 %
+at default config). Plus the new replacement-aware **provider
+filter V5** that drops providers whose declared replacement-noise
+score exceeds their per-provider cap under high replacement
+pressure.
+
+**Nineteen orthogonal advances** on top of W72 (12 Plane B
+v-bumps + 5 Plane A V6 + 1 new handoff coordinator V5 + 1 new
+provider filter V5). Plane B headlines: V18 substrate (20 layers;
+three new V18 axes — per-turn replacement-repair-trajectory CID,
+per-layer replacement-after-contradiction-then-rejoin label,
+per-layer replacement-pressure gate); KV V18 fourteen-target
+stacked ridge + 110-dim replacement-repair fingerprint +
+replacement-pressure falsifier; Cache V16 thirteen-objective
+stacked ridge + per-role 14-dim replacement-pressure head; Replay
+V14 twenty-one-regime ridge + eleven-way replacement-aware routing
+head; Deep Substrate Hybrid V18 eighteen-way loop; Substrate
+Adapter V18 with ``substrate_v18_full`` tier; Persistent V25 (24
+layers, max_chain_walk_depth=1048576, twenty-second skip carrier);
+LHR V25 (24 heads, max_k=768); MLSC V21 (replacement-repair +
+contradiction chains); Consensus V19 (32 stages); MASC V9
+(20-policy, 13-regime); TCC V8 (replacement-aware + replacement-
+after-CTR arbiters).
+
+W73 fits **three** new closed-form ridge solves on top of W72's
+64 (cache V16 thirteen-objective + replay V14 replacement-aware-
+routing + KV V18 fourteen-target — the cache V16 per-role
+replacement-pressure head re-uses the V15 family solver). Total
+**67 closed-form ridge solves across W61..W73**. No autograd, no
+SGD, no GPU. The benchmark sweep is **204 cells across 4 benchmark
+families** (R-173 hosted control plane V6 (10 H-bars), R-174 real
+substrate plane V18 (16 H-bars), R-175 multi-agent task success
+across 13 regimes (28 H-bars), R-176 handoff V5 + falsifier +
+limitation reproductions (14 H-bars)), 204/204 cells pass at 3/3
+seeds.
+
+The W73 envelope verifier enumerates **54 disjoint failure modes**
+(cumulative trust boundary across W22..W73 ≥ 1675 enumerated
+failure modes). Ships at ``coordpy.tiny_substrate_v18``,
+``coordpy.kv_bridge_v18``, ``coordpy.cache_controller_v16``,
+``coordpy.replay_controller_v14``,
+``coordpy.deep_substrate_hybrid_v18``,
+``coordpy.substrate_adapter_v18``,
+``coordpy.persistent_latent_v25``,
+``coordpy.long_horizon_retention_v25``,
+``coordpy.mergeable_latent_capsule_v21``,
+``coordpy.consensus_fallback_controller_v19``,
+``coordpy.multi_agent_substrate_coordinator_v9``,
+``coordpy.team_consensus_controller_v8``, ``coordpy.w73_team``,
+plus the Plane A V6 modules ``coordpy.hosted_router_controller_v6``,
+``coordpy.hosted_logprob_router_v6``,
+``coordpy.hosted_cache_aware_planner_v6``,
+``coordpy.hosted_cost_planner_v6``,
+``coordpy.hosted_real_substrate_boundary_v6``,
+``coordpy.hosted_real_handoff_coordinator_v5``,
+``coordpy.hosted_provider_filter_v5``, and benchmarks
+``coordpy.r173_benchmark`` / ``coordpy.r174_benchmark`` /
+``coordpy.r175_benchmark`` / ``coordpy.r176_benchmark``. **Public
+SDK contract is byte-for-byte unchanged:
+``coordpy.__version__ == "0.5.20"``,
+``coordpy.SDK_VERSION == "coordpy.sdk.v3.43"``.**
+
+Honest scope (do-not-overstate):
+
+* W73 keeps the W70 two-plane split and *adds* the replacement-
+  aware handoff V5; it does NOT dissolve the wall. Hosted backends
+  remain text-only at the HTTP surface. ``W73-L-HOSTED-V6-NO-
+  SUBSTRATE-CAP``.
+* The thirteen-regime multi-agent wins are measured inside the in-
+  repo synthetic MASC V9 harness. ``W73-L-MASC-V9-SYNTHETIC-CAP``.
+* Frontier-model substrate access remains the unsolved research-
+  line wall — W73 carries the W70 frontier_blocked_axes set forward
+  unchanged. ``W73-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``.
+* The replacement-repair-trajectory CID is computed from byte-
+  stable V17 restart-repair-trajectory CID + recorded replacement
+  events + recorded contradiction events + recorded replacement
+  windows only. It does NOT prove replacement integrity at the
+  hosted surface (``W73-L-REPLACEMENT-REPAIR-IN-REPO-CAP``).
+* The replacement-pressure gate is a calibrated weighted
+  combination of caller-declared budget, baseline cost, restart
+  count, rejoin count, replacement count, contradiction count,
+  repair-dominance count, and replacement-lag window. It is not a
+  learned end-to-end controller
+  (``W73-L-REPLACEMENT-PRESSURE-DECLARED-CAP``).
+* Hosted V6 success scores, quality scores, budgets, restart
+  pressure, rejoin pressure, and replacement pressure are caller-
+  declared. The router does not measure live success
+  (``W73-L-HOSTED-V6-DECLARED-CAP``).
+* The handoff V5 coordinator preserves the wall as a content-
+  addressed invariant (``W73-L-HANDOFF-V5-NOT-CROSSING-WALL-CAP``).
 
 ## TL;DR — W72 Stronger Delayed-Rejoin-After-Restart / Restart-Repair-Trajectory Two-Plane Multi-Agent Substrate Programme (post-W71 research milestone)
 

@@ -13,6 +13,89 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W73 Stronger Contradiction-Rejoin / Replacement / Delayed-
+  Repair Budget-Primary Two-Plane Multi-Agent Substrate Programme**
+  (post-W72, 2026-05-16) — *eighteenth substrate-attack milestone;
+  ninth **multi-agent task-success-bearing** substrate milestone
+  (first to win across **thirteen** regimes: W72's twelve plus
+  ``replacement_after_contradiction_then_rejoin``); first milestone
+  to **operationalise replacement-aware Plane A↔B handoff
+  promotion** and the **first milestone to expose a content-
+  addressed per-turn replacement-repair-trajectory CID** that
+  unifies all nine repair/restart/rejoin/replacement primitives
+  into a single dominant signal back into the substrate-routed
+  policy*. Nineteen orthogonal advances on top of W72 (12 Plane B
+  v-bumps + 5 Plane A V6 + 1 new replacement-aware handoff
+  coordinator V5 + 1 new replacement-aware provider filter V5).
+  Plane B: (M1) **Tiny Substrate V18** (20 layers; three new V18
+  axes — per-turn replacement-repair-trajectory CID, per-layer
+  replacement-after-contradiction-then-rejoin label in [0..9],
+  per-layer replacement-pressure gate); (M2) **KV Bridge V18**
+  (fourteen-target stacked ridge + 110-dim replacement-repair
+  fingerprint + replacement-pressure falsifier); (M3) **Cache
+  Controller V16** (thirteen-objective stacked ridge + per-role
+  14-dim replacement-pressure head); (M4) **Replay Controller V14**
+  (twenty-one regimes + eleven-way replacement-aware routing head);
+  (M5) **Deep Substrate Hybrid V18** (eighteen-way bidirectional
+  loop); (M6) **Substrate Adapter V18** with new
+  ``substrate_v18_full`` tier; (M7) **Persistent V25** (24 layers,
+  ``max_chain_walk_depth=1048576``, twenty-second skip carrier,
+  distractor rank 24); (M8) **Long-Horizon Retention V25** (24
+  heads, max_k=768, fifteen-layer scorer); (M9) **Mergeable Latent
+  State Capsule V21** with replacement-repair-trajectory chain +
+  contradiction chain; (M10) **Consensus Fallback Controller V19**
+  (32 disjoint stages); (M11) **Multi-Agent Substrate Coordinator
+  V9** (twenty matched-budget policies across thirteen regimes);
+  (M12) **Team-Consensus Controller V8** (replacement-pressure +
+  replacement-after-CTR arbiters). Plane A V6: (H1) **Hosted Router
+  V6** with replacement-pressure weighting and replacement-after-
+  CTR match table; (H2) **Hosted Logprob Router V6** with
+  replacement-aware abstain floor and per-budget+restart+rejoin+
+  replacement tiebreak; (H3) **Hosted Cache-Aware Planner V6** with
+  four-layer rotated prefix and ≥ 85 % savings on 14×8 at
+  hit_rate=1.0; (H4) **Hosted Cost Planner V6** with cost-per-
+  replacement-rejoin-success-under-budget and abstain-when-
+  replacement-pressure-violated; (H5) **Hosted Real Substrate
+  Boundary V6** with 31 blocked axes (W72's 28 + 3 new V18); (H6)
+  **NEW Hosted Real Handoff Coordinator V5** — the replacement-
+  aware Plane A↔B bridge that promotes any turn with
+  ``replacement_pressure ≥ 0.5`` to Plane B with
+  ``replacement_alignment = 1.0``, adds an eighth decision
+  (``replacement_after_contradiction_then_rejoin_fallback``),
+  exposes a replacement falsifier, and saves ≥ 80 % cross-plane
+  visible tokens (≥ 81 % at default config); (H7) **Hosted Provider
+  Filter V5** with replacement-aware drop. Plus four new benchmark
+  families: **R-173** (10 H-bars, hosted V6 plane), **R-174** (16
+  H-bars, real substrate V18 plane), **R-175** (28 H-bars, MASC V9
+  multi-agent across thirteen regimes), **R-176** (14 H-bars,
+  handoff V5 + falsifier + limitation reproductions). 68 H-bars ×
+  3 seeds = **204 cells, all pass**. Three new closed-form linear
+  ridge solves on top of W61..W72's 64 (**67 total**); no SGD /
+  autograd / GPU. Total **54 enumerated failure modes** in the new
+  W73 envelope verifier (cumulative trust boundary across W22..W73
+  ≥ 1675 enumerated failure modes). The released SDK contract
+  remains byte-for-byte unchanged. Ships at
+  ``coordpy.tiny_substrate_v18``, ``coordpy.kv_bridge_v18``,
+  ``coordpy.cache_controller_v16``,
+  ``coordpy.replay_controller_v14``,
+  ``coordpy.deep_substrate_hybrid_v18``,
+  ``coordpy.substrate_adapter_v18``,
+  ``coordpy.persistent_latent_v25``,
+  ``coordpy.long_horizon_retention_v25``,
+  ``coordpy.mergeable_latent_capsule_v21``,
+  ``coordpy.consensus_fallback_controller_v19``,
+  ``coordpy.multi_agent_substrate_coordinator_v9``,
+  ``coordpy.team_consensus_controller_v8``, ``coordpy.w73_team``,
+  ``coordpy.hosted_router_controller_v6``,
+  ``coordpy.hosted_logprob_router_v6``,
+  ``coordpy.hosted_cache_aware_planner_v6``,
+  ``coordpy.hosted_cost_planner_v6``,
+  ``coordpy.hosted_real_substrate_boundary_v6``,
+  ``coordpy.hosted_real_handoff_coordinator_v5``,
+  ``coordpy.hosted_provider_filter_v5``,
+  ``coordpy.r173_benchmark`` / ``coordpy.r174_benchmark`` /
+  ``coordpy.r175_benchmark`` / ``coordpy.r176_benchmark``.
+
 - **W72 Stronger Delayed-Rejoin-After-Restart / Restart-Repair-
   Trajectory Two-Plane Multi-Agent Substrate Programme** (post-W71,
   2026-05-16) — *seventeenth substrate-attack milestone; eighth

@@ -2,6 +2,97 @@
 
 > Main paper draft for the Context Zero programme.
 >
+> **Post-W72 research-line update (W73 Stronger Contradiction-Rejoin
+> / Replacement / Delayed-Repair Budget-Primary Two-Plane Multi-
+> Agent Substrate Programme, 2026-05-16).** *Eighteenth substrate-
+> attack milestone, and the **ninth** multi-agent task-success-
+> bearing substrate milestone in the programme — the first to
+> produce wins across **thirteen** failure-mode regimes (W72's
+> twelve plus **replacement_after_contradiction_then_rejoin**),
+> the **first milestone to operationalise replacement-aware Plane
+> A↔B handoff promotion**, and the **first milestone to expose a
+> content-addressed per-turn replacement-repair-trajectory CID**
+> that unifies all nine repair/restart/rejoin/replacement primitives
+> (multi-branch-rejoin, silent-corruption, partial-contradiction,
+> agent-replacement, role-dropout-recovery, branch-merge, restart-
+> dominance, delayed-rejoin-after-restart,
+> **replacement-after-contradiction-then-rejoin**) into a single
+> dominant signal back into the substrate-routed policy.
+> ``MultiAgentSubstrateCoordinatorV9`` runs **twenty** matched-
+> budget policies (the eighteen W72 policies plus
+> ``substrate_routed_v18`` and ``team_substrate_coordination_v18``)
+> under thirteen regimes; the V18 policy strictly beats V17 across
+> all thirteen regimes (100 % at every regime including the new
+> compound regime, with TSC_V18 strictly beating TSC_V17 100 % of
+> seeds in every regime). In the new
+> ``replacement_after_contradiction_then_rejoin`` regime — where
+> at ~15 % of turns role 0 produces a hard contradiction, at ~25 %
+> of turns the contradicting role is wiped and replaced with a
+> fresh member, then at ~45 % of turns the team must rejoin from
+> the divergent branches under a tight visible-token budget — the
+> V18 substrate's replacement-repair-trajectory CID + per-layer
+> replacement-after-CTR label + per-layer replacement-pressure gate
+> give the substrate-routed policy a coordinated replacement-and-
+> rejoin arc that V17 cannot follow under the additional
+> contradiction stressor. The in-repo NumPy substrate grows to V18
+> (20 layers + three new V18 axes: per-turn replacement-repair-
+> trajectory CID, per-layer replacement-after-CTR label in [0..9],
+> per-layer replacement-pressure gate). The substrate replacement-
+> dominance primitive saves **95 %** of recompute flops over nine-
+> primitive repair work at 128 tokens. The replacement-pressure
+> throttle saves **100 %** visible tokens at visible_token_budget=64
+> / baseline=512 / replacement_lag=5. Three new closed-form ridge
+> solves on top of W61..W72's 64 (67 total). The deep substrate
+> hybrid is now eighteen-way (V17 hybrid + cache V16 + replay V14 +
+> replacement-repair-trajectory + replacement-after-CTR + team-
+> consensus controller V8). The persistent latent state is V25 (24
+> layers, 22 skip carriers, ``max_chain_walk_depth=1048576``,
+> distractor rank 24). Long-horizon reconstruction reaches 24 heads
+> at max_k=768. Consensus has 32 disjoint stages including
+> ``replacement_pressure_arbiter`` and
+> ``replacement_after_contradiction_then_rejoin_arbiter``. The
+> first capsule-native team-consensus controller V8 composes regime-
+> aware weighted quorum + repair-dominance arbiter + budget-primary
+> arbiter + contradiction-then-rejoin arbiter + restart-aware
+> arbiter + delayed-repair-after-restart arbiter + rejoin-pressure
+> arbiter + delayed-rejoin-after-restart arbiter + replacement-
+> pressure arbiter + replacement-after-CTR arbiter + substrate-
+> replay fallback + transcript fallback. Plane A V6 ships seven
+> hosted control-plane modules (router V6 with replacement-pressure
+> weighting + replacement-after-CTR match table, logprob router V6
+> with replacement-aware abstain floor + per-budget+restart+rejoin+
+> replacement tiebreak, cache-aware planner V6 with ≥ 85 % savings
+> on 14×8 four-layer-rotated prefixes, cost planner V6 with cost-
+> per-replacement-rejoin-success-under-budget + abstain-when-
+> replacement-pressure-violated, boundary V6 with 31 blocked axes +
+> the W70 frontier-blocked axes unchanged, provider filter V5 with
+> replacement-aware drop). And — the load-bearing operational W73
+> advance — the new ``hosted_real_handoff_coordinator_v5`` records
+> per-turn content-addressed V5 envelopes that promote any turn
+> with ``replacement_pressure ≥ 0.5`` and substrate_trust ≥ floor to
+> Plane B with ``replacement_alignment = 1.0`` and add an eighth
+> ``replacement_after_contradiction_then_rejoin_fallback`` decision
+> on top of V4's seven, exposing a replacement falsifier and saving
+> ≥ 80 % cross-plane visible tokens at the default 48/10/7/10/12/
+> 10/3 % workload (≥ 81 % at default config). R-173 + R-174 + R-175
+> + R-176 deliver **68 H-bars × 3 seeds (204 cells)**, all pass.
+> The honest scope is unchanged: hosted backends remain text-only
+> at the HTTP surface (``W73-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-
+> CAP``); the substrate is a 20-layer in-repo NumPy runtime, not a
+> frontier model (``W73-L-NUMPY-CPU-V18-SUBSTRATE-CAP``); "training"
+> is closed-form linear ridge throughout
+> (``W73-L-V18-NO-AUTOGRAD-CAP``); the multi-agent task-success wins
+> are measured **inside the W73 synthetic harness** (``W73-L-MASC-
+> V9-SYNTHETIC-CAP``), not on real hosted multi-agent backends;
+> the replacement-repair-trajectory CID is computed from byte-
+> stable substrate state only and does NOT prove replacement
+> integrity at the hosted surface (``W73-L-REPLACEMENT-REPAIR-IN-
+> REPO-CAP``); budgets, rejoin pressure, and replacement pressure
+> are caller-declared (``W73-L-REPLACEMENT-PRESSURE-DECLARED-CAP``,
+> ``W73-L-HOSTED-V6-DECLARED-CAP``); and the V5 handoff coordinator
+> preserves the wall — it does NOT cross the substrate boundary
+> (``W73-L-HANDOFF-V5-NOT-CROSSING-WALL-CAP``).*
+>
 > **Post-W71 research-line update (W72 Stronger Delayed-Rejoin-
 > After-Restart / Restart-Repair-Trajectory Two-Plane Multi-Agent
 > Substrate Programme, 2026-05-16).** *Seventeenth substrate-attack
