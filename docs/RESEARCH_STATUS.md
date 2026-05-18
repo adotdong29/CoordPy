@@ -85,6 +85,45 @@ Honest W80 scope limitations (carried into the registry):
   controlled backends; additional backends (llama.cpp, vLLM,
   MLX) would slot into the same matrix without schema change.
 
+**Still-unvalidated claims (explicit, post-W80):** the W80
+foundation upgrade is honest about what it does NOT yet prove.
+The following lines are *deliberately* left open for later
+milestones and must not be claimed as W80 wins:
+
+* **Frontier-scale evaluation** — distilgpt2 (~82M params) is
+  not a frontier model. We have NOT validated that the W80
+  contract or the W79 substrate mechanisms transfer to a
+  frontier-scale local model. Claims about frontier-scale
+  behaviour require a frontier-scale run.
+* **GPU / mixed-precision paths** — V1 uses fp32 CPU forcing
+  for byte-identical replay. We have NOT validated replay
+  byte-identity under GPU autocast / bf16 / int8 / int4
+  quantised inference. Claims about quantised replay require
+  separate, explicit measurement.
+* **Multi-token generation tasks** — R-201 includes a 4-token
+  greedy completion bar (H1426 / H1427) but does NOT validate
+  long-horizon generation quality (e.g. 100+ token completions
+  on conditional tasks). Claims about live-runtime generation
+  quality past a handful of tokens require a separate bench.
+* **Long-context (4k+) live runs** — R-201 uses prompts of
+  ~20 tokens. We have NOT validated that the W80 contract
+  behaves correctly past, e.g., 2k tokens on the live HF
+  runtime. Long-context claims require a long-context bench.
+* **Cross-tokenizer state portability** — the in-repo NumPy
+  runtime uses byte-pair tokenisation (260 tokens); the HF
+  runtime uses the distilgpt2 BPE (~50k tokens). We have NOT
+  validated that *the same prompt* maps to *equivalent
+  substrate state* across tokenisers. This is P2 #13's bar,
+  not a W80 bar.
+* **Hosted-API substrate access** — W80 does NOT pierce
+  third-party hosted-model substrate. The W79 frontier-blocked
+  axes set is carried forward unchanged.
+* **Frontier-quality benchmark suite transfer** — we have NOT
+  re-run the W56..W79 benchmark families against the HF
+  runtime. R-201 is the only live-runtime bench in W80; the
+  prior synthetic-substrate wins remain synthetic-substrate
+  wins until separately validated.
+
 ## TL;DR — W79 Stronger Direct-Blocker-Attack / Replacement-Then-Restart-After-Long-Delay / Controlled-Runtime Substrate / OpenAI-Compatible-Façade / Learned-Consolidation Budget-Primary Two-Plane Multi-Agent Substrate Programme (post-W78 research milestone)
 
 ## TL;DR — W79 Stronger Direct-Blocker-Attack / Replacement-Then-Restart-After-Long-Delay / Controlled-Runtime Substrate / OpenAI-Compatible-Façade / Learned-Consolidation Budget-Primary Two-Plane Multi-Agent Substrate Programme (post-W78 research milestone)

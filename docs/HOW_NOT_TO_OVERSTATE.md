@@ -55,6 +55,29 @@ reading:
   capability declarations are the truth-source; the matrix is
   the snapshot.
 
+W80 still-unvalidated claims — these lines are open and must
+not be claimed as W80 wins:
+
+- **Frontier-scale evaluation.** distilgpt2 (~82M params) is
+  the W80 live model. Frontier-scale claims require a
+  frontier-scale run.
+- **GPU / mixed-precision / quantised inference.** V1 is fp32
+  CPU. Replay byte-identity is NOT validated under autocast /
+  bf16 / int8 / int4 paths.
+- **Long-horizon generation quality.** R-201's task-success
+  bar uses 4-token greedy completion. Quality past a handful
+  of tokens is NOT a W80 claim.
+- **Long-context (4k+) live runs.** R-201 uses ~20-token
+  prompts. Long-context behaviour on the live runtime is NOT
+  validated in W80.
+- **Cross-tokenizer state portability.** The NumPy runtime
+  (byte-pair, 260 tokens) and the HF runtime (BPE, ~50k
+  tokens) are NOT shown to produce equivalent substrate state
+  on the same prompt. That is P2 #13's bar.
+- **W56..W79 benchmark transfer.** The prior synthetic-
+  substrate wins are NOT re-validated on the W80 HF runtime.
+  R-201 is the only live-runtime bench shipped in W80.
+
 ## W78 (Stronger Less-Bounded Long-Horizon Reconstruction / Bounded-Window-Falsifier Budget-Primary Two-Plane Multi-Agent Substrate Programme) — explicit do-not-overstate rules
 
 The W78 milestone introduces the V23 substrate (V22 substrate +

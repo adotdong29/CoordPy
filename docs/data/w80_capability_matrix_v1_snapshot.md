@@ -1,8 +1,8 @@
-# W80 capability matrix V1 — sample snapshot
+# W80 capability matrix V1 - sample snapshot
 
 This file is an auto-generated sample of the W80 capability
-matrix V1. The matrix is *living* — the `refreshed_at_ns`
-field and the matrix CID will change on every fresh build.
+matrix V1. The matrix is *living* - the `refreshed_at_ns`
+field and the matrix CID change on every fresh build.
 Regenerate with:
 
 ```python
