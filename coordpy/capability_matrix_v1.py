@@ -408,21 +408,36 @@ class CapabilityMatrixV1:
     def axes_universal_on_local(
             self,
     ) -> tuple[str, ...]:
-        """Axes available on every *local* surface (façade +
-        in-repo numpy + installed transformers backends)."""
-        local_surfaces = tuple(
-            s for s in self.surfaces
-            if s.surface_id in (
-                W80_SURFACE_LOCAL_OPENAI_FACADE,
-                W80_SURFACE_CONTROLLED_RUNTIME_NUMPY,
-                W80_SURFACE_CONTROLLED_RUNTIME_TRANSFORMERS,
-            )
+        """Axes available on every *reachable* local surface
+        (façade + in-repo numpy + installed transformers)."""
+        local_ids = (
+            W80_SURFACE_LOCAL_OPENAI_FACADE,
+            W80_SURFACE_CONTROLLED_RUNTIME_NUMPY,
+            W80_SURFACE_CONTROLLED_RUNTIME_TRANSFORMERS,
+        )
+        # The matrix always carries the full surface set, even when an
+        # optional runtime is unavailable on this machine. "Universal on
+        # local" should quantify over the local runtimes that are
+        # actually reachable in this build, not let an unavailable
+        # optional backend collapse the whole set to zero.
+        active_local_ids = {
+            s.surface_id
+            for s in self.surfaces
+            if s.surface_id in local_ids
             and s.axis_tag("deployment_mode")
-            != CapabilityTag.UNAVAILABLE.value)
+            != CapabilityTag.UNAVAILABLE.value
+        }
         out: list[str] = []
         for ax in W80_INSTRUMENTATION_AXES_ALL:
             ok = True
-            for surface in local_surfaces:
+            for sid in local_ids:
+                if sid not in active_local_ids:
+                    continue
+                surface = next(
+                    (s for s in self.surfaces
+                     if s.surface_id == sid), None)
+                if surface is None:
+                    continue
                 tag = surface.axis_tag(ax)
                 if tag in (
                         CapabilityTag.UNAVAILABLE.value,
