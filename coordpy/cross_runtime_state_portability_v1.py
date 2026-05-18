@@ -46,17 +46,25 @@ The portability benchmark:
     *informational* (not load-bearing) numbers for cross-
     signature exact-replay attempts.
   - ``semantic_fidelity_cosine`` — cosine similarity between
-    the original anchor representation and the back-projected
-    representation.
+    the shared semantic projection recovered from transferred
+    target hidden state and a deterministic target-runtime
+    ground truth.
   - ``classification_preserved_rate`` — fraction of items
-    whose argmax label survives the transfer.
+    whose target-runtime classifier label survives the
+    transfer.
+  - ``target_state_relative_error`` — mean relative error
+    between transferred target hidden state and the target-
+    runtime ground truth. Same-signature exact replay should
+    drive this to 0.0; cross-signature transfer should be
+    bounded but non-zero.
   - ``non_portable_axis_drop_rate`` — fraction of NON_PORTABLE
     axes that the projector correctly refused to ship.
 
 The W82 portability V1 bar:
 
 * round-trip through the *same* signature is bit-identical for
-  EXACT_REPLAY axes (the "trivial round-trip" lower bound);
+  raw hidden state on EXACT_REPLAY axes (the "trivial round-
+  trip" lower bound);
 * cross-signature transfer preserves semantic similarity well
   above the cosine threshold of 0.5 on the load-bearing batch;
 * classification of a fixed reference task survives transfer
@@ -110,6 +118,8 @@ W82_PORTABILITY_DEFAULT_TOKEN_SEQ_LEN: int = 16
 W82_PORTABILITY_DEFAULT_SEED: int = 82_013_001
 W82_PORTABILITY_DEFAULT_CLASSIFICATION_TASK_DIM: int = 0
 W82_PORTABILITY_DEFAULT_COSINE_THRESHOLD: float = 0.5
+W82_PORTABILITY_DEFAULT_CLASSIFICATION_THRESHOLD: float = 0.9
+W82_PORTABILITY_DEFAULT_TARGET_STATE_ERROR_THRESHOLD: float = 0.25
 
 
 class PortabilityTier(str, enum.Enum):
@@ -519,8 +529,15 @@ class PortabilityFidelityReportV1:
       between source anchor and back-projected source anchor.
       Structural: 1.0 by orthonormal-projection design.
     * ``classification_preserved_rate`` — fraction of items
-      whose argmax-class on a fixed reference task is
-      preserved after transfer.
+      whose target-runtime classifier label on a fixed
+      reference task is preserved after transfer.
+    * ``target_state_relative_error`` — mean per-item
+      relative error between the transferred target hidden
+      state and a deterministic target-runtime ground truth.
+      Same-signature exact replay should drive this to 0.0;
+      cross-signature transfer should stay bounded but
+      non-zero because non-portable target-only residual
+      state is intentionally lost.
     * ``non_portable_axis_drop_rate`` — fraction of declared
       non-portable axes that the projector correctly refused
       to ship (must be 1.0 by construction).
@@ -537,6 +554,7 @@ class PortabilityFidelityReportV1:
     exact_replay_bit_identical: bool
     semantic_fidelity_cosine: float
     classification_preserved_rate: float
+    target_state_relative_error: float
     non_portable_axis_drop_rate: float
     input_data_cid: str
 
@@ -555,6 +573,8 @@ class PortabilityFidelityReportV1:
                 self.semantic_fidelity_cosine, 12)),
             "classification_preserved_rate": float(round(
                 self.classification_preserved_rate, 12)),
+            "target_state_relative_error": float(round(
+                self.target_state_relative_error, 12)),
             "non_portable_axis_drop_rate": float(round(
                 self.non_portable_axis_drop_rate, 12)),
             "input_data_cid": str(self.input_data_cid),
@@ -586,6 +606,71 @@ def build_portability_bench_dataset_v1(
         low=0, high=int(source_signature.vocab_size),
         size=(int(n_items), int(seq_len)))
     return hs.astype(_np.float64), tok.astype(_np.int64)
+
+
+def _signature_subseed_v1(
+        *, kind: str,
+        signature: RuntimeSignatureV1,
+        seed: int,
+) -> int:
+    return int(_sha256_hex({
+        "kind": str(kind),
+        "signature_cid": str(signature.cid()),
+        "seed": int(seed),
+    })[:12], 16) & 0x7FFFFFFF
+
+
+def _build_portability_token_ids_v1(
+        *, source_signature: RuntimeSignatureV1,
+        n_items: int,
+        seq_len: int,
+        seed: int,
+) -> "_np.ndarray":
+    rng = _np.random.default_rng(int(seed))
+    tok = rng.integers(
+        low=0, high=int(source_signature.vocab_size),
+        size=(int(n_items), int(seq_len)))
+    return tok.astype(_np.int64)
+
+
+def _build_shared_anchor_repr_v1(
+        *,
+        projector: PortabilityProjectorV1,
+        n_items: int,
+        seed: int,
+) -> "_np.ndarray":
+    rng = _np.random.default_rng(int(seed))
+    anchor = rng.normal(
+        0.0, 1.0,
+        size=(int(n_items), int(projector.anchor_dim)))
+    return _np.asarray(anchor, dtype=_np.float64)
+
+
+def _build_runtime_hidden_states_from_anchor_v1(
+        *,
+        projector: PortabilityProjectorV1,
+        signature: RuntimeSignatureV1,
+        anchor_repr: "_np.ndarray",
+        seed: int,
+        residual_scale: float,
+) -> "_np.ndarray":
+    anchor = _np.asarray(anchor_repr, dtype=_np.float64)
+    projection = projector._projection_matrix(signature)
+    base = anchor @ projection.T
+    hidden_dim = int(signature.hidden_dim)
+    if hidden_dim <= int(projector.anchor_dim):
+        return _np.asarray(base, dtype=_np.float64)
+    rng = _np.random.default_rng(int(seed))
+    noise = rng.normal(
+        0.0, 1.0, size=(int(anchor.shape[0]), hidden_dim))
+    null_projector = (
+        _np.eye(hidden_dim, dtype=_np.float64) -
+        (projection @ projection.T))
+    residual = noise @ null_projector
+    norms = _np.linalg.norm(residual, axis=1, keepdims=True)
+    norms = _np.where(norms < 1e-12, 1.0, norms)
+    residual = (residual / norms) * float(residual_scale)
+    return _np.asarray(base + residual, dtype=_np.float64)
 
 
 def _classify_v1(
@@ -642,6 +727,34 @@ def _cosine_similarity_v1(
     return float(_np.mean(num / denom))
 
 
+def _mean_relative_error_v1(
+        a: "_np.ndarray", b: "_np.ndarray",
+) -> float:
+    A = _np.asarray(a, dtype=_np.float64)
+    B = _np.asarray(b, dtype=_np.float64)
+    if A.shape != B.shape:
+        raise ValueError(
+            f"shape mismatch: {A.shape} vs {B.shape}")
+    diff = _np.linalg.norm(A - B, axis=1)
+    denom = _np.maximum(
+        _np.linalg.norm(B, axis=1), 1e-12)
+    return float(_np.mean(diff / denom))
+
+
+def _build_target_runtime_classifier_weights_v1(
+        *,
+        projector: PortabilityProjectorV1,
+        target_signature: RuntimeSignatureV1,
+) -> "_np.ndarray":
+    projection = projector._projection_matrix(target_signature)
+    dim = int(
+        min(
+            int(W82_PORTABILITY_DEFAULT_CLASSIFICATION_TASK_DIM),
+            max(0, int(projection.shape[1]) - 1)))
+    return _np.asarray(
+        projection[:, dim], dtype=_np.float64)
+
+
 # ---------------------------------------------------------------
 # Bench runner
 # ---------------------------------------------------------------
@@ -657,65 +770,97 @@ def run_portability_pair_bench_v1(
     """Run a portability round-trip from ``source_signature``
     to ``target_signature`` and back; measure fidelity."""
     proj = projector or build_portability_projector_v1()
-    hs_a, tok_a = build_portability_bench_dataset_v1(
+    source_seed = _signature_subseed_v1(
+        kind="w82_portability_source_hidden_states_v1",
+        signature=source_signature,
+        seed=int(seed))
+    target_seed = _signature_subseed_v1(
+        kind="w82_portability_target_hidden_states_v1",
+        signature=target_signature,
+        seed=int(seed))
+    token_seed = _signature_subseed_v1(
+        kind="w82_portability_token_ids_v1",
+        signature=source_signature,
+        seed=int(seed))
+    anchor_seed = int(seed) ^ 0x50505413
+    shared_anchor = _build_shared_anchor_repr_v1(
+        projector=proj,
+        n_items=int(n_items),
+        seed=int(anchor_seed))
+    hs_a = _build_runtime_hidden_states_from_anchor_v1(
+        projector=proj,
+        signature=source_signature,
+        anchor_repr=shared_anchor,
+        seed=int(source_seed),
+        residual_scale=0.12)
+    tok_a = _build_portability_token_ids_v1(
         source_signature=source_signature,
         n_items=int(n_items),
         seq_len=int(seq_len),
-        seed=int(seed))
-    # Encode A → portable
+        seed=int(token_seed))
+    # Encode A → portable.
     carrier = proj.encode_to_portable_v1(
         source_signature=source_signature,
         hidden_states=hs_a,
         token_ids=tok_a)
-    # Decode portable → B
+    # Decode portable → B.
     hs_b = proj.decode_to_runtime_v1(
         carrier=carrier, target_signature=target_signature)
-    # Re-encode B → portable
-    if int(target_signature.hidden_dim) > int(
-            W82_PORTABILITY_DEFAULT_CLASSIFICATION_TASK_DIM):
-        # Build deterministic token_ids for B at the same seed
-        # so we can re-encode honestly.
-        tok_b = _np.asarray(
-            tok_a % max(1, int(target_signature.vocab_size)),
-            dtype=_np.int64)
-        carrier_b = proj.encode_to_portable_v1(
-            source_signature=target_signature,
-            hidden_states=hs_b,
-            token_ids=tok_b)
-    else:
-        carrier_b = carrier
-    # Classification preservation on the SHARED anchor space.
-    # The anchor classifier is load-bearing — it tests whether
-    # the semantic representation survives transfer. Raw
-    # hidden-coord classifiers are *not* portable by design,
-    # because coordinate-0 has no shared meaning across
-    # different-hidden-dim runtimes.
-    src_anchor_labels = _classify_on_anchor_v1(
-        carrier.anchor_repr)
-    tgt_anchor_labels = _classify_on_anchor_v1(
-        carrier_b.anchor_repr)
-    cls_rate = float(
-        _np.mean(src_anchor_labels == tgt_anchor_labels))
-    # Semantic fidelity: cosine between source anchor and
-    # target anchor (the *load-bearing* fidelity metric).
-    sem_fid = _cosine_similarity_v1(
-        carrier.anchor_repr, carrier_b.anchor_repr)
-    # Exact-replay bit-identity check:
     is_exact_pair = (
         str(source_signature.cid()) ==
         str(target_signature.cid()))
     if is_exact_pair:
-        bit_eq = bool(_np.array_equal(
-            carrier.anchor_repr, carrier_b.anchor_repr))
+        target_ground_truth = _np.asarray(
+            hs_a, dtype=_np.float64)
     else:
-        bit_eq = False
+        target_ground_truth = (
+            _build_runtime_hidden_states_from_anchor_v1(
+                projector=proj,
+                signature=target_signature,
+                anchor_repr=shared_anchor,
+                seed=int(target_seed),
+                residual_scale=0.18))
+    target_projection = proj._projection_matrix(
+        target_signature)
+    transferred_target_anchor = _np.asarray(
+        hs_b, dtype=_np.float64) @ target_projection
+    target_ground_truth_anchor = _np.asarray(
+        target_ground_truth, dtype=_np.float64) @ target_projection
+    # Classification preservation now evaluates the transferred
+    # TARGET hidden state with a deterministic target-runtime
+    # classifier rather than comparing anchor carriers to
+    # themselves.
+    classifier_weights = (
+        _build_target_runtime_classifier_weights_v1(
+            projector=proj,
+            target_signature=target_signature))
+    gt_target_labels = (
+        (_np.asarray(target_ground_truth, dtype=_np.float64) @
+         classifier_weights) >= 0.0).astype(_np.int64)
+    transferred_target_labels = (
+        (_np.asarray(hs_b, dtype=_np.float64) @
+         classifier_weights) >= 0.0).astype(_np.int64)
+    cls_rate = float(_np.mean(
+        gt_target_labels == transferred_target_labels))
+    # Semantic fidelity still measures the preserved shared
+    # semantics, but it does so by projecting from target
+    # hidden state rather than re-comparing anchor carriers.
+    sem_fid = _cosine_similarity_v1(
+        transferred_target_anchor,
+        target_ground_truth_anchor)
+    bit_eq = bool(_np.array_equal(hs_a, hs_b)) if is_exact_pair else False
+    target_state_relative_error = _mean_relative_error_v1(
+        _np.asarray(hs_b, dtype=_np.float64),
+        _np.asarray(target_ground_truth, dtype=_np.float64))
     tier = proj.portability_tier_for(
         source=source_signature, target=target_signature)
     # Non-portable axis drop rate: 100% by construction
     # because the carrier explicitly labels them but never
     # ships values.
     if len(proj.non_portable_axes) > 0:
-        drop_rate = 1.0
+        drop_rate = float(
+            len(tuple(carrier.non_portable_axis_labels)) ==
+            len(tuple(proj.non_portable_axes)))
     else:
         drop_rate = 1.0  # vacuously true
     input_data_cid = _sha256_hex({
@@ -735,6 +880,8 @@ def run_portability_pair_bench_v1(
         exact_replay_bit_identical=bool(bit_eq),
         semantic_fidelity_cosine=float(sem_fid),
         classification_preserved_rate=float(cls_rate),
+        target_state_relative_error=float(
+            target_state_relative_error),
         non_portable_axis_drop_rate=float(drop_rate),
         input_data_cid=str(input_data_cid),
     )
@@ -755,6 +902,7 @@ class PortabilityBenchWitnessV1:
     same_signature_bit_identical: bool
     min_cross_signature_cosine: float
     min_cross_signature_classification: float
+    max_cross_signature_target_state_relative_error: float
     cross_signature_passes_threshold: bool
     config_cid: str
 
@@ -770,6 +918,10 @@ class PortabilityBenchWitnessV1:
                 self.min_cross_signature_cosine, 12)),
             "min_cross_signature_classification": float(round(
                 self.min_cross_signature_classification, 12)),
+            "max_cross_signature_target_state_relative_error":
+                float(round(
+                    self.max_cross_signature_target_state_relative_error,
+                    12)),
             "cross_signature_passes_threshold": bool(
                 self.cross_signature_passes_threshold),
             "config_cid": str(self.config_cid),
@@ -808,6 +960,10 @@ def run_portability_bench_end_to_end_v1(
         seed: int = W82_PORTABILITY_DEFAULT_SEED,
         cosine_threshold: float = (
             W82_PORTABILITY_DEFAULT_COSINE_THRESHOLD),
+        classification_threshold: float = (
+            W82_PORTABILITY_DEFAULT_CLASSIFICATION_THRESHOLD),
+        target_state_error_threshold: float = (
+            W82_PORTABILITY_DEFAULT_TARGET_STATE_ERROR_THRESHOLD),
 ) -> tuple[tuple[PortabilityFidelityReportV1, ...],
            PortabilityBenchWitnessV1]:
     """End-to-end bench: run every (source, target) pair on
@@ -845,13 +1001,24 @@ def run_portability_bench_end_to_end_v1(
         min((float(r.classification_preserved_rate)
              for r in cross_sig), default=1.0)
         if cross_sig else 1.0)
-    passes = bool(min_cos >= float(cosine_threshold))
+    max_state_err = (
+        max((float(r.target_state_relative_error)
+             for r in cross_sig), default=0.0)
+        if cross_sig else 0.0)
+    passes = bool(
+        min_cos >= float(cosine_threshold) and
+        min_cls >= float(classification_threshold) and
+        max_state_err <= float(target_state_error_threshold))
     cfg_cid = _sha256_hex({
         "kind": "w82_portability_bench_config_v1",
         "n_pairs": int(len(reports)),
         "n_signatures": int(len(sigs)),
         "n_items": int(n_items),
         "cosine_threshold": float(cosine_threshold),
+        "classification_threshold": float(
+            classification_threshold),
+        "target_state_error_threshold": float(
+            target_state_error_threshold),
     })
     witness = PortabilityBenchWitnessV1(
         schema=W82_PORTABILITY_V1_SCHEMA_VERSION,
@@ -860,6 +1027,8 @@ def run_portability_bench_end_to_end_v1(
         same_signature_bit_identical=bool(same_bit_id),
         min_cross_signature_cosine=float(min_cos),
         min_cross_signature_classification=float(min_cls),
+        max_cross_signature_target_state_relative_error=float(
+            max_state_err),
         cross_signature_passes_threshold=bool(passes),
         config_cid=str(cfg_cid),
     )

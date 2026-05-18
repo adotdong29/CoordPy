@@ -209,6 +209,86 @@ def test_w82_distributed_corrupt_envelope_detected():
     assert v == IntegrityVerdict.CORRUPT.value
 
 
+def test_w82_distributed_envelope_rejects_extra_unauthenticated_events():
+    import dataclasses
+    from coordpy.distributed_substrate_coordination_v1 import (
+        build_simulated_host_v1,
+        build_migration_envelope_v1,
+        verify_migration_envelope_v1,
+        apply_migration_envelope_v1,
+    )
+    from coordpy.cryptographic_state_integrity_v1 import (
+        IntegrityVerdict,
+    )
+    from coordpy.event_sourced_memory_graph_v1 import (
+        build_event_node_v1,
+    )
+    src = build_simulated_host_v1(host_id="src")
+    tgt = build_simulated_host_v1(host_id="tgt")
+    e1 = build_event_node_v1(
+        event_id="e1", kind="x", payload_bytes=b"a",
+        parent_event_ids=(
+            src.event_graph.root_event_id,),
+        branch_label="main", timestamp_ns=1)
+    src = src.append_event(e1)
+    extra = build_event_node_v1(
+        event_id="e2", kind="x", payload_bytes=b"b",
+        parent_event_ids=("e1",),
+        branch_label="main", timestamp_ns=2)
+    env = build_migration_envelope_v1(
+        source=src, target=tgt,
+        event_ids_to_migrate=("e1",))
+    bad_env = dataclasses.replace(
+        env, events=(e1, extra), n_events=2)
+    assert verify_migration_envelope_v1(bad_env) == (
+        IntegrityVerdict.CORRUPT.value)
+    tgt2, verdict = apply_migration_envelope_v1(
+        envelope=bad_env, target=tgt)
+    assert verdict == IntegrityVerdict.CORRUPT.value
+    assert "e1" not in tgt2.event_graph.nodes
+    assert "e2" not in tgt2.event_graph.nodes
+
+
+def test_w82_distributed_extra_events_rejected():
+    import dataclasses
+    from coordpy.distributed_substrate_coordination_v1 import (
+        build_simulated_host_v1,
+        build_migration_envelope_v1,
+        apply_migration_envelope_v1,
+    )
+    from coordpy.cryptographic_state_integrity_v1 import (
+        IntegrityVerdict,
+    )
+    from coordpy.event_sourced_memory_graph_v1 import (
+        build_event_node_v1,
+    )
+    src = build_simulated_host_v1(host_id="src")
+    tgt = build_simulated_host_v1(host_id="tgt")
+    e1 = build_event_node_v1(
+        event_id="e1", kind="x", payload_bytes=b"a",
+        parent_event_ids=(
+            src.event_graph.root_event_id,),
+        branch_label="main", timestamp_ns=1)
+    src = src.append_event(e1)
+    env = build_migration_envelope_v1(
+        source=src, target=tgt,
+        event_ids_to_migrate=("e1",))
+    e_extra = build_event_node_v1(
+        event_id="e_extra", kind="x",
+        payload_bytes=b"EXTRA",
+        parent_event_ids=(
+            src.event_graph.root_event_id,),
+        branch_label="main", timestamp_ns=2)
+    bad_env = dataclasses.replace(
+        env, events=(e1, e_extra), n_events=2)
+    tgt2, verdict = apply_migration_envelope_v1(
+        envelope=bad_env, target=tgt)
+    assert verdict == (
+        IntegrityVerdict.CORRUPT.value)
+    assert "e1" not in tgt2.event_graph.nodes
+    assert "e_extra" not in tgt2.event_graph.nodes
+
+
 def test_w82_distributed_partition_event_content_addressed():
     from coordpy.distributed_substrate_coordination_v1 import (
         PartitionEventV1,

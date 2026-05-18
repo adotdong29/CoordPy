@@ -228,7 +228,12 @@ def test_w82_integrity_branch_merge_witness_clean():
         payload_bytes=b"branch b", timestamp_ns=11)
     merged = build_state_snapshot_v1(
         snapshot_id="m", parent_cid=a_tip.cid(),
-        payload_bytes=b"merged", timestamp_ns=12)
+        additional_parent_cids=(b_tip.cid(),),
+        payload_bytes=(
+            b'{\"merge_parent_cids\":['
+            + f'\"{a_tip.cid()}\",\"{b_tip.cid()}\"'.encode("utf-8")
+            + b'],\"kind\":\"merged\"}'),
+        timestamp_ns=12)
     all_snaps = list(base) + [a_tip, b_tip, merged]
     w = build_branch_merge_witness_v1(
         branch_a_tip=a_tip, branch_b_tip=b_tip,
@@ -238,6 +243,38 @@ def test_w82_integrity_branch_merge_witness_clean():
     rep = verify_branch_merge_witness_v1(
         witness=w, snapshots=all_snaps)
     assert rep.verdict == IntegrityVerdict.OK.value
+
+
+def test_w82_integrity_branch_merge_witness_rejects_single_parent_child():
+    from coordpy.cryptographic_state_integrity_v1 import (
+        build_clean_snapshot_chain_v1,
+        build_state_snapshot_v1,
+        build_branch_merge_witness_v1,
+        verify_branch_merge_witness_v1,
+        IntegrityVerdict,
+    )
+    base = build_clean_snapshot_chain_v1(n=3)
+    common = base[2]
+    a_tip = build_state_snapshot_v1(
+        snapshot_id="a", parent_cid=common.cid(),
+        payload_bytes=b"branch a", timestamp_ns=10)
+    b_tip = build_state_snapshot_v1(
+        snapshot_id="b", parent_cid=common.cid(),
+        payload_bytes=b"branch b", timestamp_ns=11)
+    merged = build_state_snapshot_v1(
+        snapshot_id="m", parent_cid=a_tip.cid(),
+        payload_bytes=b"merged-without-proof", timestamp_ns=12)
+    all_snaps = list(base) + [a_tip, b_tip, merged]
+    w = build_branch_merge_witness_v1(
+        branch_a_tip=a_tip, branch_b_tip=b_tip,
+        common_ancestor=common, merged_snapshot=merged,
+        all_snapshots=all_snaps, n_conflicts_resolved=0)
+    assert w.integrity_verdict == (
+        IntegrityVerdict.PROVENANCE_VIOLATION.value)
+    rep = verify_branch_merge_witness_v1(
+        witness=w, snapshots=all_snaps)
+    assert rep.verdict == (
+        IntegrityVerdict.PROVENANCE_VIOLATION.value)
 
 
 def test_w82_integrity_unsafe_merge_witness_rejected():

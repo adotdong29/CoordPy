@@ -550,6 +550,14 @@ def attribute_primary_failure_factor_v1(
     return "none"
 
 
+def _uses_substrate_recovery_v1(
+        scenario: CompoundFailureScenarioV1,
+) -> bool:
+    return bool(
+        scenario.factor_mask.blackout or
+        scenario.factor_mask.restart)
+
+
 # ---------------------------------------------------------------
 # Strategies
 # ---------------------------------------------------------------
@@ -682,6 +690,7 @@ def _substrate_v2_only_strategy(
     success = bool(err < float(tolerance))
     fidelity = max(
         0.0, 1.0 - err / max(1e-9, 5.0 * float(tolerance)))
+    uses_substrate = _uses_substrate_recovery_v1(scenario)
     factor_breaking = attribute_primary_failure_factor_v1(
         scenario,
         strategy_label=W82_CFB_STRATEGY_SUBSTRATE_V2_ONLY,
@@ -696,8 +705,10 @@ def _substrate_v2_only_strategy(
         fused_value_cid=_ndarray_cid(fused),
         recovery_success=bool(success),
         reconstruction_fidelity=float(fidelity),
-        visible_tokens_used=int(50),
-        replay_flops=int(320),
+        visible_tokens_used=int(
+            50 if uses_substrate
+            else len(scenario.witnesses) * 20),
+        replay_flops=int(320 if uses_substrate else 0),
         primary_failure_factor=str(
             factor_breaking if not success else "none"),
         decision_kind="commit",
@@ -768,6 +779,7 @@ def _w82_compound_repair_strategy(
     success = bool(err < float(tolerance))
     fidelity = max(
         0.0, 1.0 - err / max(1e-9, 5.0 * float(tolerance)))
+    uses_substrate = _uses_substrate_recovery_v1(scenario)
     factor_breaking = attribute_primary_failure_factor_v1(
         scenario,
         strategy_label=W82_CFB_STRATEGY_W82_COMPOUND_REPAIR,
@@ -782,8 +794,10 @@ def _w82_compound_repair_strategy(
         fused_value_cid=_ndarray_cid(fused),
         recovery_success=bool(success),
         reconstruction_fidelity=float(fidelity),
-        visible_tokens_used=int(120),
-        replay_flops=int(960),
+        visible_tokens_used=int(
+            120 if uses_substrate
+            else len(trimmed) * 24),
+        replay_flops=int(960 if uses_substrate else 640),
         primary_failure_factor=str(
             factor_breaking if not success else "none"),
         decision_kind=str(decision.decision_kind),

@@ -5,10 +5,12 @@ Covers:
 - portable carrier is content-addressed
 - same-signature round-trip is bit-identical for the exact-
   replay payload
-- cross-signature transfer preserves the shared anchor
-  representation (anchor cosine ≥ 0.95)
-- cross-signature classification on the anchor space survives
+- cross-signature transfer preserves the shared semantic
+  projection from TARGET hidden state (cosine ≥ 0.95)
+- cross-signature target-runtime classification survives
   ≥ 90% (the load-bearing portability claim)
+- cross-signature target hidden state is approximate rather
+  than exact (relative error > 0)
 - raw hidden-coord-0 classification is NOT portable across
   different-hidden-dim signatures (honest scope: that axis is
   *not* in the EXACT_REPLAY or APPROXIMATE_SEMANTIC tier
@@ -117,8 +119,8 @@ def test_w82_portability_tier_for_diff_sig_is_approximate_semantic():
 
 
 def test_w82_portability_cross_sig_anchor_cosine_high():
-    """Cross-signature transfer preserves anchor cosine ≥ 0.95
-    on the load-bearing bench."""
+    """Cross-signature transfer preserves semantic cosine from
+    transferred TARGET hidden state ≥ 0.95."""
     from coordpy.cross_runtime_state_portability_v1 import (
         run_portability_bench_end_to_end_v1,
     )
@@ -130,8 +132,8 @@ def test_w82_portability_cross_sig_anchor_cosine_high():
 
 
 def test_w82_portability_anchor_classifier_preserved_geq_90pct():
-    """Cross-signature anchor-classifier preserved on ≥ 90% of
-    items (the load-bearing portability claim)."""
+    """Cross-signature target-runtime classifier preserved on
+    ≥ 90% of items (the load-bearing portability claim)."""
     from coordpy.cross_runtime_state_portability_v1 import (
         run_portability_bench_end_to_end_v1,
     )
@@ -156,6 +158,35 @@ def test_w82_portability_witness_passes_threshold():
     _r, w = run_portability_bench_end_to_end_v1()
     assert w.cross_signature_passes_threshold is True
     assert w.same_signature_bit_identical is True
+    assert w.max_cross_signature_target_state_relative_error > 0.0
+
+
+def test_w82_portability_same_sig_report_has_zero_target_state_error():
+    from coordpy.cross_runtime_state_portability_v1 import (
+        build_runtime_signature_v1,
+        run_portability_pair_bench_v1,
+    )
+    s = build_runtime_signature_v1(
+        backend_label="same", vocab_size=16, hidden_dim=8)
+    report = run_portability_pair_bench_v1(
+        source_signature=s, target_signature=s, seed=7)
+    assert report.exact_replay_bit_identical is True
+    assert float(report.target_state_relative_error) == 0.0
+
+
+def test_w82_portability_cross_sig_target_state_error_nonzero():
+    from coordpy.cross_runtime_state_portability_v1 import (
+        build_runtime_signature_v1,
+        run_portability_pair_bench_v1,
+    )
+    sa = build_runtime_signature_v1(
+        backend_label="a", vocab_size=24, hidden_dim=8)
+    sb = build_runtime_signature_v1(
+        backend_label="b", vocab_size=32, hidden_dim=12)
+    report = run_portability_pair_bench_v1(
+        source_signature=sa, target_signature=sb, seed=7)
+    assert report.tier == "approximate_semantic"
+    assert float(report.target_state_relative_error) > 0.0
 
 
 def test_w82_portability_bench_deterministic():

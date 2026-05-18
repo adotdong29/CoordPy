@@ -126,6 +126,32 @@ def test_w82_cfb_outcome_records_all_required_metrics():
         assert k in d
 
 
+def test_w82_cfb_blackout_restart_drive_substrate_path_costs():
+    from coordpy.simultaneous_compound_failure_benchmark_v1 import (
+        CompoundFailureFactorMaskV1,
+        build_compound_failure_scenario_v1,
+        build_compound_failure_strategy_set_v1,
+        W82_CFB_STRATEGY_SUBSTRATE_V2_ONLY,
+        W82_CFB_STRATEGY_W82_COMPOUND_REPAIR,
+    )
+    none_mask = CompoundFailureFactorMaskV1()
+    blackout_restart_mask = CompoundFailureFactorMaskV1(
+        blackout=True, restart=True)
+    sc_none = build_compound_failure_scenario_v1(
+        seed=17, factor_mask=none_mask)
+    sc_br = build_compound_failure_scenario_v1(
+        seed=17, factor_mask=blackout_restart_mask)
+    strategies = build_compound_failure_strategy_set_v1()
+    sub_none = strategies[W82_CFB_STRATEGY_SUBSTRATE_V2_ONLY](sc_none)
+    sub_br = strategies[W82_CFB_STRATEGY_SUBSTRATE_V2_ONLY](sc_br)
+    w82_none = strategies[W82_CFB_STRATEGY_W82_COMPOUND_REPAIR](sc_none)
+    w82_br = strategies[W82_CFB_STRATEGY_W82_COMPOUND_REPAIR](sc_br)
+    assert sub_none.task_success and sub_br.task_success
+    assert w82_none.task_success and w82_br.task_success
+    assert sub_none.replay_flops < sub_br.replay_flops
+    assert w82_none.replay_flops < w82_br.replay_flops
+
+
 def test_w82_cfb_primary_failure_attribution_per_strategy():
     """Bounded-window's primary failure under blackout must
     be `blackout`, not `corruption`."""

@@ -307,6 +307,37 @@ def build_far_horizon_blackout_scenarios_v1(
     return tuple(out)
 
 
+def _scenario_restart_turns_v1(
+        scenario: FarHorizonBlackoutScenarioV1,
+) -> tuple[int, ...]:
+    src = int(scenario.source_turn)
+    last_turn = int(scenario.current_turn)
+    restart_step = max(
+        1,
+        int(scenario.horizon_turns) //
+        max(1, int(scenario.n_restart_cycles) + 1))
+    return tuple(
+        int(src + (i + 1) * restart_step)
+        for i in range(int(scenario.n_restart_cycles))
+        if int(src + (i + 1) * restart_step) < last_turn)
+
+
+def _visible_strategy_restart_erases_source_v1(
+        scenario: FarHorizonBlackoutScenarioV1,
+) -> bool:
+    return bool(any(
+        int(rt) > int(scenario.source_turn)
+        for rt in _scenario_restart_turns_v1(scenario)))
+
+
+def _visible_strategy_branch_conflict_v1(
+        scenario: FarHorizonBlackoutScenarioV1,
+) -> bool:
+    return bool(
+        0 < int(scenario.branch_rejoin_offset) <=
+        int(scenario.horizon_turns))
+
+
 # ---------------------------------------------------------------
 # Carrier construction for a scenario
 # ---------------------------------------------------------------
@@ -339,14 +370,7 @@ def build_carrier_for_scenario_v1(
     entries: list[LongHorizonCarrierEntry] = []
     src = int(scenario.source_turn)
     rejoin = src + int(scenario.branch_rejoin_offset)
-    restart_step = max(
-        1,
-        int(scenario.horizon_turns) //
-        max(1, int(scenario.n_restart_cycles) + 1))
-    restart_turns = {
-        int(src + (i + 1) * restart_step)
-        for i in range(int(scenario.n_restart_cycles))
-        if int(src + (i + 1) * restart_step) < last_turn}
+    restart_turns = set(_scenario_restart_turns_v1(scenario))
     # We include entries from the most-recent ``n`` turns
     # ending at ``last_turn``. This means the carrier may not
     # cover early turns if ``carrier_depth < last_turn + 1``.
@@ -448,7 +472,14 @@ def _transcript_only_strategy(
         scenario.current_turn - max(0, budget_turns - 1))
     can_see_source = bool(
         int(scenario.source_turn) >= earliest_visible)
-    success = bool(can_see_source)
+    restart_erases_source = _visible_strategy_restart_erases_source_v1(
+        scenario)
+    branch_conflict = _visible_strategy_branch_conflict_v1(
+        scenario)
+    success = bool(
+        can_see_source and
+        not restart_erases_source and
+        not branch_conflict)
     recon_cid = (
         str(scenario.source_event_cid) if success else "")
     fidelity = 1.0 if success else 0.0
@@ -484,7 +515,15 @@ def _bounded_window_k_strategy_factory(k: int) -> StrategyCallable:
     def _strategy(
             scenario: FarHorizonBlackoutScenarioV1,
     ) -> FarHorizonBlackoutOutcomeV1:
-        success = bool(int(scenario.horizon_turns) < int(k))
+        restart_erases_source = (
+            _visible_strategy_restart_erases_source_v1(
+                scenario))
+        branch_conflict = _visible_strategy_branch_conflict_v1(
+            scenario)
+        success = bool(
+            int(scenario.horizon_turns) < int(k) and
+            not restart_erases_source and
+            not branch_conflict)
         recon_cid = (
             str(scenario.source_event_cid) if success else "")
         fidelity = 1.0 if success else 0.0
@@ -531,6 +570,10 @@ def _rolling_summary_strategy(
     # In-window: lossy summary fidelity. Out-of-window: 0.
     fidelity = (
         float(summary_fidelity) if in_window else 0.0)
+    if _visible_strategy_restart_erases_source_v1(scenario):
+        fidelity = 0.0
+    if _visible_strategy_branch_conflict_v1(scenario):
+        fidelity = min(float(fidelity), 0.25)
     # Task success only if fidelity > 0.5.
     success = bool(fidelity > 0.5)
     recon_cid = (

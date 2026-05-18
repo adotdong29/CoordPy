@@ -146,6 +146,32 @@ def _hmac_hex(key: bytes, payload_bytes: bytes) -> str:
         hashlib.sha256).hexdigest()
 
 
+def _extract_merge_parent_cids_v1(
+        snapshot: "StateSnapshotV1",
+) -> tuple[str, ...]:
+    """Extract explicit two-parent merge metadata from a
+    snapshot payload.
+
+    A branch-merge witness is only considered load-bearing when
+    the merged snapshot payload names both branch tips. A plain
+    single-parent child is not enough.
+    """
+    try:
+        payload = json.loads(
+            bytes(snapshot.payload_bytes).decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return tuple()
+    parent_cids = payload.get("merge_parent_cids")
+    if not isinstance(parent_cids, list):
+        return tuple()
+    out: list[str] = []
+    for cid in parent_cids:
+        if not isinstance(cid, str):
+            return tuple()
+        out.append(str(cid))
+    return tuple(out)
+
+
 # ---------------------------------------------------------------
 # StateSnapshotV1
 # ---------------------------------------------------------------
@@ -161,12 +187,15 @@ class StateSnapshotV1:
     payload_cid: str
     timestamp_ns: int
     hmac_signature_hex: str  # "" if unsigned
+    additional_parent_cids: tuple[str, ...] = tuple()
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "schema": str(self.schema),
             "snapshot_id": str(self.snapshot_id),
             "parent_cid": str(self.parent_cid),
+            "additional_parent_cids": list(
+                str(cid) for cid in self.additional_parent_cids),
             "payload_cid": str(self.payload_cid),
             "payload_size_bytes": int(
                 len(self.payload_bytes)),
@@ -189,23 +218,30 @@ class StateSnapshotV1:
 def build_state_snapshot_v1(
         *, snapshot_id: str,
         parent_cid: str,
+        additional_parent_cids: Sequence[str] = (),
         payload_bytes: bytes,
         timestamp_ns: int,
         hmac_key: bytes | None = None,
 ) -> StateSnapshotV1:
     """Build a content-addressed snapshot.
 
-    If ``hmac_key`` is provided, the HMAC-SHA256 of
-    (parent_cid || payload_cid || timestamp_ns) is computed
-    and stored on the snapshot. Verification later compares
-    a freshly-computed HMAC against the stored one.
+    If ``hmac_key`` is provided, the HMAC-SHA256 of the
+    parent-set + payload CID + timestamp is computed and
+    stored on the snapshot. Verification later compares a
+    freshly-computed HMAC against the stored one.
     """
     payload_cid = _sha256_bytes_hex(bytes(payload_bytes))
+    normalized_additional_parent_cids = tuple(
+        str(cid) for cid in additional_parent_cids
+        if str(cid))
     if hmac_key is not None:
-        sig_payload = (
-            (str(parent_cid) + "|" + str(payload_cid) +
-             "|" + str(int(timestamp_ns)))
-            .encode("utf-8"))
+        sig_payload = _canonical_bytes({
+            "parent_cid": str(parent_cid),
+            "additional_parent_cids": list(
+                normalized_additional_parent_cids),
+            "payload_cid": str(payload_cid),
+            "timestamp_ns": int(timestamp_ns),
+        })
         sig = _hmac_hex(bytes(hmac_key), sig_payload)
     else:
         sig = ""
@@ -217,7 +253,39 @@ def build_state_snapshot_v1(
         payload_cid=str(payload_cid),
         timestamp_ns=int(timestamp_ns),
         hmac_signature_hex=str(sig),
+        additional_parent_cids=normalized_additional_parent_cids,
     )
+
+
+def _snapshot_parent_cids(
+        snapshot: StateSnapshotV1,
+) -> tuple[str, ...]:
+    return tuple(
+        str(cid) for cid in (
+            (str(snapshot.parent_cid),) +
+            tuple(str(c) for c in snapshot.additional_parent_cids))
+        if str(cid))
+
+
+def _snapshot_ancestor_set(
+        start_cid: str,
+        *,
+        snapshots_by_cid: Mapping[str, StateSnapshotV1],
+) -> set[str]:
+    out: set[str] = set()
+    stack: list[str] = [str(start_cid)]
+    while stack:
+        cur = stack.pop()
+        if cur in out:
+            continue
+        if cur not in snapshots_by_cid:
+            continue
+        out.add(cur)
+        for parent_cid in _snapshot_parent_cids(
+                snapshots_by_cid[cur]):
+            if str(parent_cid) in snapshots_by_cid:
+                stack.append(str(parent_cid))
+    return out
 
 
 # ---------------------------------------------------------------
@@ -445,6 +513,18 @@ def verify_snapshot_integrity_v1(
     """
     recomputed = _sha256_bytes_hex(
         bytes(snapshot.payload_bytes))
+    parent_cids = _snapshot_parent_cids(snapshot)
+    if len(set(parent_cids)) != len(parent_cids):
+        return IntegrityVerificationReportV1(
+            schema=W82_INTEGRITY_V1_SCHEMA_VERSION,
+            snapshot_cid=str(snapshot.cid()),
+            payload_cid=str(snapshot.payload_cid),
+            payload_cid_recomputed=str(recomputed),
+            parent_cid=str(snapshot.parent_cid),
+            chain_root_cid=str(chain_root_cid),
+            verdict=IntegrityVerdict.PROVENANCE_VIOLATION.value,
+            detail="duplicate parent CID entries are not allowed",
+        )
     if str(recomputed) != str(snapshot.payload_cid):
         return IntegrityVerificationReportV1(
             schema=W82_INTEGRITY_V1_SCHEMA_VERSION,
@@ -487,11 +567,13 @@ def verify_snapshot_integrity_v1(
                     "hmac key provided but snapshot is "
                     "unsigned"),
             )
-        sig_payload = (
-            (str(snapshot.parent_cid) + "|" +
-             str(snapshot.payload_cid) + "|" +
-             str(int(snapshot.timestamp_ns)))
-            .encode("utf-8"))
+        sig_payload = _canonical_bytes({
+            "parent_cid": str(snapshot.parent_cid),
+            "additional_parent_cids": list(
+                str(c) for c in snapshot.additional_parent_cids),
+            "payload_cid": str(snapshot.payload_cid),
+            "timestamp_ns": int(snapshot.timestamp_ns),
+        })
         recomputed_sig = _hmac_hex(
             bytes(hmac_key), sig_payload)
         if not _hmac.compare_digest(
@@ -741,7 +823,9 @@ def build_branch_merge_witness_v1(
     branch ancestry is consistent with the supplied
     snapshot set.
     """
-    cid_set = {str(s.cid()) for s in all_snapshots}
+    snapshot_map = {
+        str(s.cid()): s for s in all_snapshots}
+    cid_set = set(snapshot_map.keys())
     verdict = IntegrityVerdict.OK.value
     if str(branch_a_tip.cid()) not in cid_set:
         verdict = IntegrityVerdict.PROVENANCE_VIOLATION.value
@@ -751,11 +835,30 @@ def build_branch_merge_witness_v1(
         verdict = IntegrityVerdict.PROVENANCE_VIOLATION.value
     elif str(merged_snapshot.cid()) not in cid_set:
         verdict = IntegrityVerdict.PROVENANCE_VIOLATION.value
-    # Also check the merged snapshot's parent is one of the
-    # two branch tips.
-    elif str(merged_snapshot.parent_cid) not in {
+    elif str(branch_a_tip.parent_cid) != str(common_ancestor.cid()):
+        verdict = IntegrityVerdict.PROVENANCE_VIOLATION.value
+    elif str(branch_b_tip.parent_cid) != str(common_ancestor.cid()):
+        verdict = IntegrityVerdict.PROVENANCE_VIOLATION.value
+    # A real merge must carry two distinct parent references
+    # in the snapshot structure itself, not only inside the
+    # payload witness.
+    elif set(_snapshot_parent_cids(merged_snapshot)) != {
             str(branch_a_tip.cid()),
             str(branch_b_tip.cid())}:
+        verdict = IntegrityVerdict.PROVENANCE_VIOLATION.value
+    elif len(_snapshot_parent_cids(merged_snapshot)) != 2:
+        verdict = IntegrityVerdict.PROVENANCE_VIOLATION.value
+    elif set(_extract_merge_parent_cids_v1(merged_snapshot)) != {
+            str(branch_a_tip.cid()),
+            str(branch_b_tip.cid())}:
+        verdict = IntegrityVerdict.PROVENANCE_VIOLATION.value
+    elif str(common_ancestor.cid()) not in _snapshot_ancestor_set(
+            str(branch_a_tip.cid()),
+            snapshots_by_cid=snapshot_map):
+        verdict = IntegrityVerdict.PROVENANCE_VIOLATION.value
+    elif str(common_ancestor.cid()) not in _snapshot_ancestor_set(
+            str(branch_b_tip.cid()),
+            snapshots_by_cid=snapshot_map):
         verdict = IntegrityVerdict.PROVENANCE_VIOLATION.value
     tree = MerkleHashTreeV1.from_snapshot_cids(
         [s.cid() for s in all_snapshots])
@@ -815,6 +918,114 @@ def verify_branch_merge_witness_v1(
                     f"witness references snapshot CID {cid} "
                     f"that is not in the supplied snapshot list"),
             )
+    snapshot_map = {str(s.cid()): s for s in snapshots}
+    branch_a = snapshot_map[str(witness.branch_a_tip_cid)]
+    branch_b = snapshot_map[str(witness.branch_b_tip_cid)]
+    common = snapshot_map[str(witness.common_ancestor_cid)]
+    merged = snapshot_map[str(witness.merged_snapshot_cid)]
+    if str(branch_a.parent_cid) != str(common.cid()):
+        return IntegrityVerificationReportV1(
+            schema=W82_INTEGRITY_V1_SCHEMA_VERSION,
+            snapshot_cid=str(branch_a.cid()),
+            payload_cid=str(branch_a.payload_cid),
+            payload_cid_recomputed=str(
+                branch_a.re_hash_payload()),
+            parent_cid=str(branch_a.parent_cid),
+            chain_root_cid=str(witness.merge_tree_root_cid),
+            verdict=IntegrityVerdict.PROVENANCE_VIOLATION.value,
+            detail=(
+                "branch_a_tip does not descend directly from "
+                "the declared common ancestor"),
+        )
+    if str(branch_b.parent_cid) != str(common.cid()):
+        return IntegrityVerificationReportV1(
+            schema=W82_INTEGRITY_V1_SCHEMA_VERSION,
+            snapshot_cid=str(branch_b.cid()),
+            payload_cid=str(branch_b.payload_cid),
+            payload_cid_recomputed=str(
+                branch_b.re_hash_payload()),
+            parent_cid=str(branch_b.parent_cid),
+            chain_root_cid=str(witness.merge_tree_root_cid),
+            verdict=IntegrityVerdict.PROVENANCE_VIOLATION.value,
+            detail=(
+                "branch_b_tip does not descend directly from "
+                "the declared common ancestor"),
+        )
+    if len(_snapshot_parent_cids(merged)) != 2:
+        return IntegrityVerificationReportV1(
+            schema=W82_INTEGRITY_V1_SCHEMA_VERSION,
+            snapshot_cid=str(merged.cid()),
+            payload_cid=str(merged.payload_cid),
+            payload_cid_recomputed=str(
+                merged.re_hash_payload()),
+            parent_cid=str(merged.parent_cid),
+            chain_root_cid=str(witness.merge_tree_root_cid),
+            verdict=IntegrityVerdict.PROVENANCE_VIOLATION.value,
+            detail=(
+                "merged snapshot must reference exactly two "
+                "distinct branch-parent CIDs"),
+        )
+    if set(_snapshot_parent_cids(merged)) != {
+            str(branch_a.cid()), str(branch_b.cid())}:
+        return IntegrityVerificationReportV1(
+            schema=W82_INTEGRITY_V1_SCHEMA_VERSION,
+            snapshot_cid=str(merged.cid()),
+            payload_cid=str(merged.payload_cid),
+            payload_cid_recomputed=str(
+                merged.re_hash_payload()),
+            parent_cid=str(merged.parent_cid),
+            chain_root_cid=str(witness.merge_tree_root_cid),
+            verdict=IntegrityVerdict.PROVENANCE_VIOLATION.value,
+            detail=(
+                "merged snapshot's direct parent is not one of "
+                "the declared branch tips"),
+        )
+    merge_parent_cids = set(_extract_merge_parent_cids_v1(merged))
+    if merge_parent_cids != {
+            str(branch_a.cid()), str(branch_b.cid())}:
+        return IntegrityVerificationReportV1(
+            schema=W82_INTEGRITY_V1_SCHEMA_VERSION,
+            snapshot_cid=str(merged.cid()),
+            payload_cid=str(merged.payload_cid),
+            payload_cid_recomputed=str(
+                merged.re_hash_payload()),
+            parent_cid=str(merged.parent_cid),
+            chain_root_cid=str(witness.merge_tree_root_cid),
+            verdict=IntegrityVerdict.PROVENANCE_VIOLATION.value,
+            detail=(
+                "merged snapshot payload does not prove a true "
+                "two-parent merge"),
+        )
+    if str(common.cid()) not in _snapshot_ancestor_set(
+            str(branch_a.cid()), snapshots_by_cid=snapshot_map):
+        return IntegrityVerificationReportV1(
+            schema=W82_INTEGRITY_V1_SCHEMA_VERSION,
+            snapshot_cid=str(branch_a.cid()),
+            payload_cid=str(branch_a.payload_cid),
+            payload_cid_recomputed=str(
+                branch_a.re_hash_payload()),
+            parent_cid=str(branch_a.parent_cid),
+            chain_root_cid=str(witness.merge_tree_root_cid),
+            verdict=IntegrityVerdict.PROVENANCE_VIOLATION.value,
+            detail=(
+                "branch_a_tip does not descend from the "
+                "declared common ancestor"),
+        )
+    if str(common.cid()) not in _snapshot_ancestor_set(
+            str(branch_b.cid()), snapshots_by_cid=snapshot_map):
+        return IntegrityVerificationReportV1(
+            schema=W82_INTEGRITY_V1_SCHEMA_VERSION,
+            snapshot_cid=str(branch_b.cid()),
+            payload_cid=str(branch_b.payload_cid),
+            payload_cid_recomputed=str(
+                branch_b.re_hash_payload()),
+            parent_cid=str(branch_b.parent_cid),
+            chain_root_cid=str(witness.merge_tree_root_cid),
+            verdict=IntegrityVerdict.PROVENANCE_VIOLATION.value,
+            detail=(
+                "branch_b_tip does not descend from the "
+                "declared common ancestor"),
+        )
     return IntegrityVerificationReportV1(
         schema=W82_INTEGRITY_V1_SCHEMA_VERSION,
         snapshot_cid=str(witness.merged_snapshot_cid),
@@ -857,6 +1068,8 @@ def simulate_silent_corruption_v1(
         timestamp_ns=int(snapshot.timestamp_ns),
         hmac_signature_hex=str(
             snapshot.hmac_signature_hex),
+        additional_parent_cids=tuple(
+            str(cid) for cid in snapshot.additional_parent_cids),
     )
 
 
@@ -997,8 +1210,14 @@ def run_corruption_rollback_merge_bench_v1(
     merged = build_state_snapshot_v1(
         snapshot_id="merged",
         parent_cid=str(branch_a_tip.cid()),
+        additional_parent_cids=(str(branch_b_tip.cid()),),
         payload_bytes=_canonical_bytes({
-            "kind": "merged_v1", "seed": int(seed)}),
+            "kind": "merged_v1",
+            "seed": int(seed),
+            "merge_parent_cids": [
+                str(branch_a_tip.cid()),
+                str(branch_b_tip.cid()),
+            ]}),
         timestamp_ns=int(2_000_000_002),
         hmac_key=hmac_key)
     all_snaps = list(clean) + [
@@ -1015,9 +1234,14 @@ def run_corruption_rollback_merge_bench_v1(
     # Unsafe merge witness (wrong parent_cid).
     unsafe_merged = build_state_snapshot_v1(
         snapshot_id="unsafe_merged",
-        parent_cid="nonexistent_parent_cid",
+        parent_cid=str(branch_a_tip.cid()),
         payload_bytes=_canonical_bytes({
-            "kind": "unsafe_merged_v1"}),
+            "kind": "unsafe_merged_v1",
+            "merge_parent_cids": [
+                str(branch_a_tip.cid()),
+                str(branch_b_tip.cid()),
+            ],
+        }),
         timestamp_ns=int(2_000_000_003),
         hmac_key=hmac_key)
     unsafe_all = list(all_snaps) + [unsafe_merged]

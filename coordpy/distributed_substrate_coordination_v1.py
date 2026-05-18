@@ -308,12 +308,24 @@ def verify_migration_envelope_v1(
 ) -> str:
     """Verify envelope integrity by recomputing the merkle
     root over the shipped event CIDs."""
+    if int(envelope.n_events) != int(len(envelope.event_cids)):
+        return IntegrityVerdict.CORRUPT.value
+    if int(envelope.n_events) != int(len(envelope.events)):
+        return IntegrityVerdict.CORRUPT.value
     recomputed = MerkleHashTreeV1.from_snapshot_cids(
         list(envelope.event_cids)).root_cid
     if str(recomputed) != str(envelope.merkle_root_cid):
         return IntegrityVerdict.PROVENANCE_VIOLATION.value
-    # Verify each shipped event re-hashes to its declared cid.
-    for cid, ev in zip(envelope.event_cids, envelope.events):
+    # Verify the shipped event list matches the authenticated
+    # event_cids tuple exactly; extra envelope events must be
+    # rejected, not silently ignored.
+    recomputed_event_cids = tuple(
+        str(ev.cid()) for ev in envelope.events)
+    if recomputed_event_cids != tuple(
+            str(cid) for cid in envelope.event_cids):
+        return IntegrityVerdict.CORRUPT.value
+    for cid, ev in zip(
+            envelope.event_cids, envelope.events, strict=True):
         if str(ev.cid()) != str(cid):
             return IntegrityVerdict.CORRUPT.value
     return IntegrityVerdict.OK.value

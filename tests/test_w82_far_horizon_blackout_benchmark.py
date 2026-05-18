@@ -175,11 +175,36 @@ def test_w82_bounded_window_k_succeeds_only_below_k():
         assert label in strategies, (
             f"missing bounded_window_k strategy: {label}")
         sc_in = build_far_horizon_blackout_scenario_v1(
-            seed=7, horizon_turns=int(k - 1))
+            seed=7, horizon_turns=int(k - 1),
+            n_restart_cycles=0,
+            branch_rejoin_offset=int(k + 1000))
         sc_out = build_far_horizon_blackout_scenario_v1(
-            seed=7, horizon_turns=int(k))
+            seed=7, horizon_turns=int(k),
+            n_restart_cycles=0,
+            branch_rejoin_offset=int(k + 1000))
         assert strategies[label](sc_in).task_success
         assert not strategies[label](sc_out).task_success
+
+
+def test_w82_visible_baselines_respond_to_restart_and_branch():
+    from coordpy.far_horizon_blackout_benchmark_v1 import (
+        build_far_horizon_blackout_scenario_v1,
+        build_far_horizon_strategy_set_v1,
+        W82_STRATEGY_TRANSCRIPT_ONLY,
+        W82_STRATEGY_LHR_SUBSTRATE_V2,
+    )
+    strategies = build_far_horizon_strategy_set_v1()
+    clear = build_far_horizon_blackout_scenario_v1(
+        seed=7, horizon_turns=16,
+        n_restart_cycles=0,
+        branch_rejoin_offset=10_000)
+    stressed = build_far_horizon_blackout_scenario_v1(
+        seed=7, horizon_turns=16,
+        n_restart_cycles=2,
+        branch_rejoin_offset=4)
+    assert strategies[W82_STRATEGY_TRANSCRIPT_ONLY](clear).task_success
+    assert not strategies[W82_STRATEGY_TRANSCRIPT_ONLY](stressed).task_success
+    assert strategies[W82_STRATEGY_LHR_SUBSTRATE_V2](stressed).task_success
 
 
 def test_w82_failure_curves_present_for_every_strategy():
