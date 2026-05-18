@@ -377,10 +377,24 @@ class CapabilityMatrixV1:
             W80_SURFACE_CONTROLLED_RUNTIME_NUMPY,
             W80_SURFACE_CONTROLLED_RUNTIME_TRANSFORMERS,
         )
+        # The matrix always carries the full surface set, even when an
+        # optional runtime is unavailable on this machine. "Universal on
+        # local" should quantify over the local runtimes that are
+        # actually reachable in this build, not let an unavailable
+        # optional backend collapse the whole set to zero.
+        active_local_ids = {
+            s.surface_id
+            for s in self.surfaces
+            if s.surface_id in local_ids
+            and s.axis_tag("deployment_mode")
+            != CapabilityTag.UNAVAILABLE.value
+        }
         out: list[str] = []
         for ax in W80_INSTRUMENTATION_AXES_ALL:
             ok = True
             for sid in local_ids:
+                if sid not in active_local_ids:
+                    continue
                 surface = next(
                     (s for s in self.surfaces
                      if s.surface_id == sid), None)
