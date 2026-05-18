@@ -5,12 +5,126 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W78 W79
-> milestone (Stronger Direct-Blocker-Attack /
-> Replacement-Then-Restart-After-Long-Delay / Controlled-Runtime
-> Substrate / OpenAI-Compatible-Façade / Learned-Consolidation
-> Budget-Primary Two-Plane Multi-Agent Substrate Programme
-> research line), 2026-05-17.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W79 W80
+> milestone (Frontier-Quality Local Runtime / Runtime
+> Instrumentation Contract / Second-Backend Parity Matrix /
+> Living Capability Matrix / Live Local-Model Evaluation —
+> P0-blocker attack), 2026-05-18.
+
+## TL;DR — W80 P0-Blocker Attack (post-W79 research milestone)
+
+The programme now closes its **five P0-blocker meta-issues**
+(see issue #4) with a single, integrated runtime-truth-surface
+upgrade:
+
+1. **Canonical runtime instrumentation contract V1**
+   (``coordpy.runtime_instrumentation_v1``) — closes #8. A
+   programme-level contract for hidden-state / KV / attention
+   reads and writes, with twelve canonical axes, four
+   capability tags (``available``, ``backend_specific``,
+   ``best_effort``, ``unavailable``), JSON-serialisable
+   content-addressed snapshot / trace / injection / witness
+   schemas, and a backend-agnostic conformance test runner.
+2. **Frontier-quality local runtime V1**
+   (``coordpy.transformers_runtime_v1``) — closes #5. A real
+   pretrained HuggingFace transformers backend (default
+   ``distilbert/distilgpt2``: 6 layers × 12 heads × hidden
+   768, ~82M params), wired into the W80 contract via forward
+   hooks + ``past_key_values`` + ``output_attentions=True``.
+   Byte-identical replay-from-KV holds within fp32 CPU
+   precision (max abs diff < 5e-3, typically < 1e-3).
+3. **Runtime parity matrix V1**
+   (``coordpy.runtime_parity_matrix_v1``) — closes #6. A
+   machine-readable parity matrix across the two controlled
+   backends (NumPy in-repo substrate V1 + HF transformers V1),
+   with explicit ``BACKEND_SPECIFIC`` tagging where the HF
+   surface differs from the NumPy surface and a markdown table
+   renderer for docs.
+4. **Living capability matrix V1**
+   (``coordpy.capability_matrix_v1``) — closes #17. The
+   hosted-vs-local capability picture as a single, refresh-on-
+   every-call dataclass that spans the hosted third-party HTTP
+   surface, the local OpenAI-compatible façade, the in-repo
+   NumPy runtime, and the HF transformers runtime. Cross-links
+   W80 axes to the W79 boundary V12's hosted-blocked axis
+   names; preserves the W79 frontier-blocked set unchanged.
+5. **R-201 live local-model benchmark family**
+   (``coordpy.r201_benchmark``) — closes #12. Twenty-two
+   H-bars (H1400..H1421) covering deterministic forward,
+   replay byte-identity across three split points, hidden-
+   state / prefix-state / attention-bias injection moving the
+   trace CID, conformance pass on both runtimes, and explicit
+   token-work savings (≥ 30 % at default prompt) for
+   substrate-routed completion vs transcript-only completion
+   on a *real pretrained* transformer.
+
+The load-bearing W80 wins are:
+
+* The hosted-blocked / local-universal **asymmetry surface**
+  is now machine-readable: nine axes are blocked at the hosted
+  surface and universally available across the local surfaces.
+* The controlled-runtime story is no longer a single tiny
+  NumPy backend — there are two backends, both pass the W80
+  conformance suite, and the parity matrix surfaces backend
+  asymmetry honestly.
+* The CoordPy substrate mechanisms (KV-cache replay, prefix-
+  state injection, hidden-state injection, attention-bias
+  steering) now have validation on a real pretrained
+  transformer, not only on the W79 in-repo substrate.
+
+Honest W80 scope limitations (carried into the registry):
+
+* ``W80-L-TRANSFORMERS-V1-PRETRAINED-CAP`` — distilgpt2 is a
+  real pretrained transformer but is NOT a frontier model. The
+  load-bearing claim is "the contract works on a real
+  pretrained transformer", not "this is competitive at scale".
+* ``W80-L-CAPABILITY-MATRIX-V1-LIVING-CAP`` — V1 *re-probes* on
+  every build call; it is not a static snapshot. Refreshed-at
+  timestamps make this explicit.
+* ``W80-L-PARITY-MATRIX-V1-TWO-BACKENDS-CAP`` — V1 ships two
+  controlled backends; additional backends (llama.cpp, vLLM,
+  MLX) would slot into the same matrix without schema change.
+
+**Still-unvalidated claims (explicit, post-W80):** the W80
+foundation upgrade is honest about what it does NOT yet prove.
+The following lines are *deliberately* left open for later
+milestones and must not be claimed as W80 wins:
+
+* **Frontier-scale evaluation** — distilgpt2 (~82M params) is
+  not a frontier model. We have NOT validated that the W80
+  contract or the W79 substrate mechanisms transfer to a
+  frontier-scale local model. Claims about frontier-scale
+  behaviour require a frontier-scale run.
+* **GPU / mixed-precision paths** — V1 uses fp32 CPU forcing
+  for byte-identical replay. We have NOT validated replay
+  byte-identity under GPU autocast / bf16 / int8 / int4
+  quantised inference. Claims about quantised replay require
+  separate, explicit measurement.
+* **Multi-token generation tasks** — R-201 includes a 4-token
+  greedy completion bar (H1426 / H1427) but does NOT validate
+  long-horizon generation quality (e.g. 100+ token completions
+  on conditional tasks). Claims about live-runtime generation
+  quality past a handful of tokens require a separate bench.
+* **Long-context (4k+) live runs** — R-201 uses prompts of
+  ~20 tokens. We have NOT validated that the W80 contract
+  behaves correctly past, e.g., 2k tokens on the live HF
+  runtime. Long-context claims require a long-context bench.
+* **Cross-tokenizer state portability** — the in-repo NumPy
+  runtime uses byte-pair tokenisation (260 tokens); the HF
+  runtime uses the distilgpt2 BPE (~50k tokens). We have NOT
+  validated that *the same prompt* maps to *equivalent
+  substrate state* across tokenisers. This is P2 #13's bar,
+  not a W80 bar.
+* **Hosted-API substrate access** — W80 does NOT pierce
+  third-party hosted-model substrate. The W79 frontier-blocked
+  axes set is carried forward unchanged.
+* **Frontier-quality benchmark suite transfer** — we have NOT
+  re-run the W56..W79 benchmark families against the HF
+  runtime. R-201 is the only live-runtime bench in W80; the
+  prior synthetic-substrate wins remain synthetic-substrate
+  wins until separately validated.
+
+## TL;DR — W79 Stronger Direct-Blocker-Attack / Replacement-Then-Restart-After-Long-Delay / Controlled-Runtime Substrate / OpenAI-Compatible-Façade / Learned-Consolidation Budget-Primary Two-Plane Multi-Agent Substrate Programme (post-W78 research milestone)
 
 ## TL;DR — W79 Stronger Direct-Blocker-Attack / Replacement-Then-Restart-After-Long-Delay / Controlled-Runtime Substrate / OpenAI-Compatible-Façade / Learned-Consolidation Budget-Primary Two-Plane Multi-Agent Substrate Programme (post-W78 research milestone)
 

@@ -2,10 +2,81 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W77
-> W78 milestone (Stronger Less-Bounded Long-Horizon Reconstruction
-> / Bounded-Window-Falsifier Budget-Primary Two-Plane Multi-Agent
-> Substrate Programme research line), 2026-05-17.
+> README-of-README must satisfy these rules. Last touched: post-W79
+> W80 milestone (P0-Blocker Attack — Frontier-Quality Local Runtime
+> / Runtime Instrumentation Contract / Second-Backend Parity Matrix
+> / Living Capability Matrix / Live Local-Model Evaluation), 2026-
+> 05-18.
+
+## W80 (P0-Blocker Attack — Frontier-Quality Local Runtime / Runtime Instrumentation Contract / Second-Backend Parity Matrix / Living Capability Matrix / Live Local-Model Evaluation) — explicit do-not-overstate rules
+
+The W80 milestone closes the five P0 blocker meta-issues (#5,
+#6, #8, #12, #17) by adding a canonical runtime instrumentation
+contract V1, a second pretrained-transformer controlled runtime
+V1 (HF transformers, default `distilbert/distilgpt2`), a runtime
+parity matrix V1 across both backends, a living hosted-vs-local
+capability matrix V1, and the R-201 live local-model benchmark
+family (22 H-bars, all pass on distilgpt2 in fp32 CPU). Honest
+reading:
+
+- **W80 does NOT claim a frontier-scale model.** The default
+  live model is distilgpt2 (~82M params). The load-bearing W80
+  claim is that the W80 instrumentation contract works on a
+  *real pretrained* transformer, not that distilgpt2 is
+  competitive at scale.
+- **W80 does NOT pierce third-party hosted-model substrate.**
+  The W79 hosted boundary V12 frontier-blocked axes set is
+  carried forward unchanged. The W80 capability matrix surfaces
+  the hosted-blocked / local-universal asymmetry *honestly*; it
+  does not claim hosted-side wins from local-runtime evidence.
+- **W80 does NOT claim universal parity across backends.** The
+  parity matrix surfaces backend asymmetry explicitly. On the
+  HF runtime, attention-bias steering, attention probs read,
+  per-layer logits read, hidden-state inject, prefix-state
+  inject are tagged `BACKEND_SPECIFIC` to acknowledge that they
+  work via forward-hook / `attention_mask` augmentation /
+  `inputs_embeds` rewiring rather than via a clean universal
+  API.
+- **W80 does NOT claim byte-identical replay outside fp32 on
+  CPU.** Quantised inference, GPU paths, and mixed-precision
+  paths are explicitly outside V1 scope. fp32 CPU replay
+  reaches max abs diff < 5e-3 on the final new-token row;
+  typically < 1e-3 on distilgpt2.
+- **R-201 does NOT claim third-party hosted wins.** It is a
+  *local-runtime* benchmark; its measurements are evidence for
+  the local controlled runtime, not for any hosted API.
+- **R-201's token-work savings are local-runtime savings, not
+  hosted-billing savings.** Substrate-routed KV-cache replay
+  skips re-running old-token forwards on the local backend; it
+  does not reduce hosted-API token billing.
+- **The capability matrix is *living*, not authoritative.**
+  Every refresh probes the local plane fresh; the matrix CID
+  changes on every build (refreshed_at_ns moves). Surface
+  capability declarations are the truth-source; the matrix is
+  the snapshot.
+
+W80 still-unvalidated claims — these lines are open and must
+not be claimed as W80 wins:
+
+- **Frontier-scale evaluation.** distilgpt2 (~82M params) is
+  the W80 live model. Frontier-scale claims require a
+  frontier-scale run.
+- **GPU / mixed-precision / quantised inference.** V1 is fp32
+  CPU. Replay byte-identity is NOT validated under autocast /
+  bf16 / int8 / int4 paths.
+- **Long-horizon generation quality.** R-201's task-success
+  bar uses 4-token greedy completion. Quality past a handful
+  of tokens is NOT a W80 claim.
+- **Long-context (4k+) live runs.** R-201 uses ~20-token
+  prompts. Long-context behaviour on the live runtime is NOT
+  validated in W80.
+- **Cross-tokenizer state portability.** The NumPy runtime
+  (byte-pair, 260 tokens) and the HF runtime (BPE, ~50k
+  tokens) are NOT shown to produce equivalent substrate state
+  on the same prompt. That is P2 #13's bar.
+- **W56..W79 benchmark transfer.** The prior synthetic-
+  substrate wins are NOT re-validated on the W80 HF runtime.
+  R-201 is the only live-runtime bench shipped in W80.
 
 ## W78 (Stronger Less-Bounded Long-Horizon Reconstruction / Bounded-Window-Falsifier Budget-Primary Two-Plane Multi-Agent Substrate Programme) — explicit do-not-overstate rules
 
