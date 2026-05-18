@@ -5,11 +5,141 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W80 W81
-> milestone (Deployable Substrate Gateway / Sequence-Conditioned
-> Learned Consolidation / Learned Multi-Runtime Economics /
-> Differentiable Memory Substrate / Adversarial Consensus &
-> Repair — P1-blocker attack), 2026-05-18.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W81 W82
+> milestone (Far-Horizon Blackout Benchmark / Simultaneous
+> Compound-Failure Benchmark / Cross-Runtime State Portability /
+> Cryptographic State Integrity / Event-Sourced Memory Graph /
+> Distributed Substrate Coordination — P2-blocker attack),
+> 2026-05-18.
+
+## TL;DR — W82 P2-Blocker Attack (post-W81 research milestone)
+
+W80 closed the **five P0-blocker meta-issues** (#5, #6, #8, #12,
+#17). W81 closed the **five P1-blocker meta-issues** (#7, #9,
+#14, #19, #20). W82 now closes the **six P2-blocker meta-issues**
+(#10, #11, #13, #15, #16, #18) from the same meta backlog
+(issue #4), following the recommended Phase 4 → Phase 5
+sequencing:
+
+1. **Far-horizon blackout reconstruction benchmark V1**
+   (``coordpy.far_horizon_blackout_benchmark_v1``) — closes
+   **#10**. A horizon-ladder benchmark family covering
+   horizons {1000, 4000, 16_000, 64_000} plus a stress
+   horizon of 100_000+. Generates synthetic scenarios with
+   interleaved irrelevant traffic, multiple restart cycles,
+   and branch/rejoin offsets. Compares four canonical
+   strategies — ``transcript_only``, ``bounded_window_k{4,
+   32, 64, 128}``, ``rolling_summary``, and the W79
+   ``lhr_substrate_v2`` — and reports failure curves
+   (success-rate as a function of horizon) plus per-cell
+   memory-economics metrics (visible tokens, replay flops,
+   recompute flops, carrier walks, reconstruction fidelity).
+   The W79 long-horizon reconstruction substrate V2 strictly
+   dominates every bounded baseline on the load-bearing
+   ladder; substrate-side failures (when the carrier is
+   truncated below the horizon) are reported honestly.
+2. **Simultaneous compound-failure benchmark V1**
+   (``coordpy.simultaneous_compound_failure_benchmark_v1``)
+   — closes **#15**. Stacks five failure factors —
+   ``CONTRADICTION``, ``CORRUPTION``, ``REPLACEMENT``,
+   ``RESTART``, ``BLACKOUT`` — into a 2^5 = 32-mask sweep,
+   plus a per-strategy primary-failure-factor attribution.
+   The W82 ``compound_repair`` strategy composes the W79
+   substrate (defeats blackout + restart), the W81
+   adversarial consensus repair line (defeats corruption +
+   contradiction), and a trimmed-mean replacement-aware
+   filter. On the load-bearing all-5-active mask, the W82
+   strategy succeeds on 100% of seeds while every prior
+   baseline (naive majority, bounded-window k128, substrate
+   v2 only) succeeds on 0%.
+3. **Cross-runtime / cross-tokenizer state portability V1**
+   (``coordpy.cross_runtime_state_portability_v1``) —
+   closes **#13**. Introduces ``RuntimeSignatureV1``,
+   ``PortableStateCarrierV1``, ``PortabilityProjectorV1``
+   and a three-tier fidelity model (``EXACT_REPLAY``,
+   ``APPROXIMATE_SEMANTIC``, ``NON_PORTABLE``). The V1
+   bench moves state across two intentionally-divergent
+   signatures (different ``hidden_dim`` and ``vocab_size``);
+   same-signature transfer is byte-identical via the
+   carrier's exact-replay payload, cross-signature transfer
+   preserves the shared anchor representation with cosine
+   ≥ 0.95 and anchor-classifier preservation ≥ 90%. The
+   honest-scope caveat — raw hidden-coord 0 has no shared
+   semantic meaning across different-hidden-dim signatures —
+   is explicit and tested.
+4. **Cryptographic state integrity / rollback / branch-merge
+   verification V1**
+   (``coordpy.cryptographic_state_integrity_v1``) — closes
+   **#18**. Unified ``StateSnapshotV1`` (content-addressed,
+   optionally HMAC-SHA256 signed), ``MerkleHashTreeV1`` with
+   O(log n) inclusion proofs, ``RollbackAnchorV1``,
+   ``BranchMergeWitnessV1``, plus an explicit verdict
+   vocabulary (``OK``, ``CORRUPT``, ``PROVENANCE_VIOLATION``,
+   ``BAD_SIGNATURE``, ``UNSIGNED``). The end-to-end bench
+   exercises silent corruption detection (1-byte flip caught),
+   rollback to a pre-corruption anchor (integrity preserved),
+   clean branch-merge (witness verified), and unsafe merge
+   detection (parent-mismatch flagged).
+5. **Event-sourced global memory graph V1**
+   (``coordpy.event_sourced_memory_graph_v1``) — closes
+   **#11**. Append-only, content-addressed ``EventNodeV1`` /
+   ``EventGraphV1`` with first-class branch + merge (events
+   with two or more parents). Declarative ``MemoryQueryV1``
+   over four query kinds (``BY_EVENT_ID``, ``BY_KIND``,
+   ``BY_BRANCH``, ``BY_ANCESTOR_PATH``), a ``QueryPlanV1``
+   with explicit step lists, ``QueryAnswerV1`` with a
+   ``ProvenanceCertificateV1`` listing every contributing
+   event CID, and a ``DerivedSummaryViewV1`` that is
+   *recomputed from the primary store* (not stored). On the
+   load-bearing 100-event bench with 20 by-ancestor-path
+   queries, the graph wins 100% while ``bounded_handoff_
+   k32`` and ``trajectory_slice_k16`` baselines win 0%.
+6. **Distributed multi-host substrate coordination V1**
+   (``coordpy.distributed_substrate_coordination_v1``) —
+   closes **#16**. Simulated 3-host substrate with
+   per-host event graphs and runtime signatures.
+   Content-addressed ``MigrationEnvelopeV1`` carries
+   Merkle-rooted events across hosts; envelope integrity is
+   independently re-verifiable. ``PartitionEventV1`` +
+   ``heal_partition_and_sync_v1`` provide explicit eventual-
+   consistency convergence with both pre- and post-heal
+   Merkle roots recorded. The bench shows partition
+   detection, eventual-consistency sync (all hosts' Merkle
+   roots converge), plus a cross-runtime migration leg
+   (hidden_dim 8 → 12) using the W82 portability projector.
+
+W82 is *strictly additive* against the W81 baseline. All
+existing W56..W81 modules, tests, and theorems are unmodified;
+the W79 baseline (28/28) and W81 P1-attack tests still pass.
+**Test count delta**: +111 new tests (16 far-horizon +
+14 compound-failure + 16 portability + 23 integrity +
+21 event-graph + 21 distributed), all passing on
+Python 3.11 with NumPy.
+
+Beyond the load-bearing definition-of-done bullets, W82 also
+covers several "candidate direction" hardenings called out in
+the meta issue:
+
+* **#11 carrier-fallback query** —
+  ``execute_query_with_carrier_fallback_v1`` bridges the live
+  event graph to a long-horizon-carrier mapping
+  (``event_id → event_cid``); queries that miss the graph
+  can be answered by the carrier with a clean
+  ``carrier_fallback`` detail tag and a content-addressed
+  provenance trail.
+* **#16 budget-aware migration policy** —
+  ``MigrationBudgetPolicyV1`` exposes three explicit budgets
+  (max bytes, max events, freshness floor) and produces a
+  content-addressed ``MigrationBudgetDecisionV1`` with an
+  explicit rejection reason. Migrations that exceed the
+  policy budget are auditably refused, not silently
+  truncated.
+* **#18 integrity-aware fallback decisions** —
+  ``integrity_aware_fallback_decision_v1`` maps each of the
+  five integrity verdicts to a recommended action
+  (``COMMIT``, ``ROLLBACK``, ``ABSTAIN``, ``ESCALATE``).
+  Composes cleanly with the W81 adversarial-consensus
+  ``abstain``/``escalate`` line.
 
 ## TL;DR — W81 P1-Blocker Attack (post-W80 research milestone)
 

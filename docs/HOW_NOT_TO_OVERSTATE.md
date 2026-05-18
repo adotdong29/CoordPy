@@ -2,11 +2,89 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W80
-> W81 milestone (P1-Blocker Attack — Deployable Substrate Gateway
-> / Sequence-Conditioned Learned Consolidation / Learned
-> Multi-Runtime Economics / Differentiable Memory Substrate /
-> Adversarial Consensus & Repair), 2026-05-18.
+> README-of-README must satisfy these rules. Last touched: post-W81
+> W82 milestone (P2-Blocker Attack — Far-Horizon Blackout Benchmark
+> / Simultaneous Compound-Failure Benchmark / Cross-Runtime State
+> Portability / Cryptographic State Integrity / Event-Sourced
+> Memory Graph / Distributed Substrate Coordination), 2026-05-18.
+
+## W82 (P2-Blocker Attack — Far-Horizon Blackout Benchmark / Simultaneous Compound-Failure Benchmark / Cross-Runtime State Portability / Cryptographic State Integrity / Event-Sourced Memory Graph / Distributed Substrate Coordination) — explicit do-not-overstate rules
+
+The W82 milestone closes the six P2 blocker meta-issues (#10,
+#11, #13, #15, #16, #18) by adding a far-horizon blackout
+benchmark V1, a simultaneous compound-failure benchmark V1, a
+cross-runtime state portability projector V1, a cryptographic
+state integrity / rollback / branch-merge subsystem V1, an
+event-sourced global memory graph V1, and a distributed
+multi-host substrate coordination V1. Honest reading:
+
+- **W82 does NOT claim the far-horizon bench validates the
+  programme on live LLM tasks.** Events are deterministic
+  synthetic CIDs. The substrate wins are about *reconstruction
+  fidelity from a content-addressed carrier*, not about
+  semantic correctness on live model outputs. Live-runtime
+  far-horizon evaluation is W83+ follow-on.
+- **W82 does NOT claim the far-horizon substrate beats baselines
+  under unbounded carrier truncation.** When the carrier is
+  truncated below the horizon, the substrate honestly fails;
+  the bench reports the failure rather than hiding it. The
+  load-bearing claim is "substrate dominates baselines on the
+  load-bearing horizon ladder where the carrier is wide enough
+  to cover the source", and the failure mode is explicit and
+  testable.
+- **W82 does NOT claim the compound-failure benchmark covers
+  every adversarial regime.** V1 caps each factor's fraction at
+  ~0.20–0.25 of the witness set. Under unbounded corruption +
+  contradiction, every consensus strategy (including the W82
+  one) is provably broken. The load-bearing claim is "W82
+  compound-repair strictly beats every baseline on the load-
+  bearing all-5-active mask under the V1 factor budget", and
+  that bound is explicit.
+- **W82 does NOT claim raw hidden-coordinate 0 is portable
+  across runtimes.** The portability projector preserves the
+  shared *anchor* representation (cosine ≥ 0.95, classifier
+  preservation ≥ 90%). Raw hidden-coord N is NOT portable
+  across different-hidden-dim signatures by design — the W82
+  honest-scope test explicitly demonstrates this. Callers who
+  need byte-identical hidden state must keep both endpoints on
+  the same signature (the EXACT_REPLAY tier).
+- **W82 does NOT claim cross-signature transfer is bit-identical.**
+  Under hidden-dim or vocab-size mismatch, the round-trip is
+  lossy by construction. V1 reports the loss honestly:
+  EXACT_REPLAY only inside the same signature; cross-signature
+  transfers are explicitly tagged APPROXIMATE_SEMANTIC.
+- **W82 does NOT claim the integrity subsystem is a PKI / CA
+  story.** V1 supports an optional HMAC-SHA256 keyed by an
+  in-memory secret. It catches silent corruption (1-byte flip)
+  and bad-key tampering, but it is NOT a certificate / X.509 /
+  Ed25519 scheme. Production deployments must layer real
+  cryptographic identity on top.
+- **W82 does NOT claim the event-sourced memory graph displaces
+  the W56..W79 substrate scoreboard.** V1 is a *new* memory
+  abstraction (append-only DAG with branch / merge / query
+  planner / provenance certificates). It strictly beats
+  bounded-handoff and trajectory-slice baselines on the load-
+  bearing ancestor-path bench. It does not yet drive the main
+  scoreboard, and it is in-memory only (no on-disk log).
+- **W82 does NOT claim the distributed-substrate line is a real
+  multi-host deployment.** V1 simulates hosts in-process; the
+  transport is a function call. Real TCP / RPC transport, real
+  partition-tolerant networking, and real Byzantine fault
+  tolerance are out of V1 scope.
+- **W82 does NOT claim strong / linearizable consistency under
+  partition.** V1 guarantees *eventual consistency*: after
+  heal+sync, every host's Merkle root is identical. Mid-
+  partition reads on either side are not synchronized. The
+  ``ConsistencyVerdict`` enum (`EXACT`, `EVENTUAL`,
+  `APPROXIMATE`, `BEST_EFFORT`) makes the actual semantics
+  explicit.
+- **W82 modules are explicit-import only.** None of the six
+  W82 modules are added to the `coordpy` top-level namespace.
+  This keeps the stable public surface (W78 / W79 trajectory
+  semantics) unchanged.
+
+These caveats are tracked as `W82-L-*` rows in
+`docs/THEOREM_REGISTRY.md`.
 
 ## W81 (P1-Blocker Attack — Deployable Substrate Gateway / Sequence-Conditioned Learned Consolidation / Learned Multi-Runtime Economics / Differentiable Memory Substrate / Adversarial Consensus & Repair) — explicit do-not-overstate rules
 
