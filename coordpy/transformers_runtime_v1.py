@@ -71,6 +71,7 @@ from __future__ import annotations
 import dataclasses
 import hashlib
 import os
+from functools import lru_cache
 from typing import Any, Mapping, Sequence
 
 try:
@@ -106,14 +107,6 @@ def _torch_modules() -> tuple[Any, Any, Any]:
         AutoModelForCausalLM, AutoTokenizer,
     )
     return torch, AutoModelForCausalLM, AutoTokenizer
-
-
-def _is_transformers_available() -> bool:
-    try:
-        _torch_modules()
-        return True
-    except Exception:  # noqa: BLE001
-        return False
 
 
 @dataclasses.dataclass(frozen=True)
@@ -186,22 +179,20 @@ def probe_transformers_runtime_v1(
         *, model_name: str = (
             W80_TRANSFORMERS_DEFAULT_MODEL_NAME),
 ) -> TransformersCapabilityProbeV1:
-    """Build a capability probe WITHOUT instantiating the model.
+    """Build a capability probe for the HF runtime.
 
     The probe records:
-    - whether the transformers / torch deps are importable
+    - whether the runtime can actually be instantiated
     - the declared axes the runtime promises if it can run
     - honest notes describing the surface
     """
 
-    available = _is_transformers_available()
+    available, availability_note = (
+        _probe_transformers_runtime_instantiable(
+            str(model_name)))
     declared = transformers_v1_declared_axes()
     notes = (
-        ("transformers + torch available; runtime "
-         "instantiable") if available else
-        ("transformers / torch NOT installed; "
-         "install with `pip install transformers torch` "
-         "for the W80 transformers runtime"),
+        availability_note,
         "hidden state + per-layer hidden via forward hooks",
         "KV cache via `past_key_values` (read/write)",
         "attention probs via `output_attentions=True` "
@@ -230,6 +221,43 @@ def _ndarray_from_torch(t: Any) -> "_np.ndarray":
     return _np.asarray(
         t.detach().to("cpu").to(dtype=__import__("torch").float64).numpy(),
         dtype=_np.float64,
+    )
+
+
+@lru_cache(maxsize=4)
+def _probe_transformers_runtime_instantiable(
+        model_name: str,
+) -> tuple[bool, str]:
+    """Return whether the runtime can be *constructed*.
+
+    Importability is not enough. The W80 probe is honest only if
+    the configured runtime can reach a usable instantiated state.
+    The result is cached per model name so callers do not repeat
+    the validation work inside one process.
+    """
+
+    try:
+        _torch_modules()
+    except Exception:  # noqa: BLE001
+        return (
+            False,
+            "transformers / torch NOT installed; install with "
+            "`pip install transformers torch` for the W80 "
+            "transformers runtime",
+        )
+    try:
+        runtime = TransformersRuntimeV1(model_name=model_name)
+    except Exception as exc:  # noqa: BLE001
+        return (
+            False,
+            "transformers + torch importable but runtime "
+            "instantiation failed: "
+            f"{type(exc).__name__}: {str(exc)[:160]}",
+        )
+    del runtime
+    return (
+        True,
+        "transformers + torch available; runtime instantiable",
     )
 
 
@@ -267,7 +295,7 @@ class TransformersRuntimeV1:
             self.model_name)
         # Force fp32 for byte-identical replay.
         self._model = AutoModelForCausalLM.from_pretrained(
-            self.model_name, dtype=torch.float32,
+            self.model_name, torch_dtype=torch.float32,
             output_attentions=True,
             output_hidden_states=True,
             attn_implementation="eager",

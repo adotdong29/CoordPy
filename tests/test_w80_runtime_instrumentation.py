@@ -44,6 +44,14 @@ def test_w80_capability_tags_are_canonical():
     assert actual == expected
 
 
+def test_w80_replay_tolerance_matches_hf_contract():
+    from coordpy.runtime_instrumentation_v1 import (
+        W80_REPLAY_FROM_KV_MAX_ABS_DIFF,
+    )
+    assert float(W80_REPLAY_FROM_KV_MAX_ABS_DIFF) == pytest.approx(
+        5e-3)
+
+
 def test_w80_controlled_runtime_adapter_passes_conformance():
     from coordpy.runtime_instrumentation_v1 import (
         ControlledRuntimeInstrumentationAdapterV1,

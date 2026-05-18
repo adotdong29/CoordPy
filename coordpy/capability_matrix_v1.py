@@ -222,17 +222,42 @@ def _hosted_third_party_surface(
 
 
 def _local_openai_facade_surface() -> SurfaceCapabilityV1:
+    """Build the local façade surface descriptor.
+
+    The façade is not the same thing as the underlying
+    controlled runtime. It exposes an OpenAI-shaped response,
+    optional side-channel CIDs for some reads, and a subset of
+    substrate writes routed through request extensions.
+    """
+
     a = CapabilityTag.AVAILABLE.value
+    b = CapabilityTag.BEST_EFFORT.value
+    u = CapabilityTag.UNAVAILABLE.value
+    facade_axes = {
+        InstrumentationAxis.READ_HIDDEN_STATE.value: b,
+        InstrumentationAxis.READ_KV_CACHE.value: b,
+        InstrumentationAxis.READ_ATTENTION_PROBS.value: b,
+        InstrumentationAxis.READ_PER_LAYER_LOGITS.value: u,
+        InstrumentationAxis.READ_FINAL_LOGITS.value: b,
+        InstrumentationAxis.WRITE_HIDDEN_STATE_INJECT.value: a,
+        InstrumentationAxis.WRITE_KV_RESTORE.value: u,
+        InstrumentationAxis.WRITE_ATTENTION_BIAS.value: a,
+        InstrumentationAxis.INJECT_PREFIX_STATE.value: u,
+        InstrumentationAxis.REPLAY_FROM_KV.value: u,
+        InstrumentationAxis.DETERMINISTIC_REPLAY.value: a,
+        InstrumentationAxis.CONTENT_ADDRESSED_TRACE.value: b,
+    }
     per_axis = []
     for ax in W80_INSTRUMENTATION_AXES_ALL:
-        # The W79 façade reroutes to the in-repo controlled
-        # runtime, so it exposes every substrate axis in-process.
-        per_axis.append((ax, a))
+        per_axis.append((
+            ax, facade_axes.get(ax, u)))
     per_axis.append(("transport_text_completion", a))
-    per_axis.append(("transport_logprobs_optional", a))
+    per_axis.append((
+        "transport_logprobs_optional",
+        b))
     per_axis.append((
         "transport_prefix_cache_optional",
-        CapabilityTag.BACKEND_SPECIFIC.value))
+        u))
     per_axis.append(("side_channel_available", a))
     per_axis.append(("deployment_mode", a))
     return SurfaceCapabilityV1(
@@ -247,8 +272,11 @@ def _local_openai_facade_surface() -> SurfaceCapabilityV1:
         notes=(
             "OpenAI-shaped HTTP surface; in-process façade "
             "reroutes calls to the in-repo controlled runtime",
-            "exposes a substrate side-channel that hosted "
-            "APIs cannot carry",
+            "side-channel exposes content-addressed hidden/KV/"
+            "attention handles, not raw canonical snapshots",
+            "supports hidden-state inject + attention-bias "
+            "inject request extensions; no KV-restore, "
+            "prefix-state inject, or replay-from-KV API",
         ),
         refreshed_at_ns=int(time.time_ns()),
     )
@@ -274,13 +302,23 @@ def _surface_from_parity_descriptor(
                 ax, CapabilityTag.UNAVAILABLE.value)))
     a = CapabilityTag.AVAILABLE.value
     u = CapabilityTag.UNAVAILABLE.value
-    per_axis.append(("transport_text_completion", a))
+    transport_tag = a if available else u
+    prefix_cache_tag = (
+        CapabilityTag.BACKEND_SPECIFIC.value
+        if available else u)
+    side_channel_tag = a if available else u
     per_axis.append((
-        "transport_logprobs_optional", a))
+        "transport_text_completion",
+        transport_tag))
+    per_axis.append((
+        "transport_logprobs_optional",
+        transport_tag))
     per_axis.append((
         "transport_prefix_cache_optional",
-        CapabilityTag.BACKEND_SPECIFIC.value))
-    per_axis.append(("side_channel_available", a))
+        prefix_cache_tag))
+    per_axis.append((
+        "side_channel_available",
+        side_channel_tag))
     per_axis.append(("deployment_mode", a if available else u))
     return SurfaceCapabilityV1(
         schema=W80_CAPABILITY_MATRIX_V1_SCHEMA_VERSION,
@@ -371,21 +409,20 @@ class CapabilityMatrixV1:
             self,
     ) -> tuple[str, ...]:
         """Axes available on every *local* surface (façade +
-        in-repo numpy + transformers)."""
-        local_ids = (
-            W80_SURFACE_LOCAL_OPENAI_FACADE,
-            W80_SURFACE_CONTROLLED_RUNTIME_NUMPY,
-            W80_SURFACE_CONTROLLED_RUNTIME_TRANSFORMERS,
-        )
+        in-repo numpy + installed transformers backends)."""
+        local_surfaces = tuple(
+            s for s in self.surfaces
+            if s.surface_id in (
+                W80_SURFACE_LOCAL_OPENAI_FACADE,
+                W80_SURFACE_CONTROLLED_RUNTIME_NUMPY,
+                W80_SURFACE_CONTROLLED_RUNTIME_TRANSFORMERS,
+            )
+            and s.axis_tag("deployment_mode")
+            != CapabilityTag.UNAVAILABLE.value)
         out: list[str] = []
         for ax in W80_INSTRUMENTATION_AXES_ALL:
             ok = True
-            for sid in local_ids:
-                surface = next(
-                    (s for s in self.surfaces
-                     if s.surface_id == sid), None)
-                if surface is None:
-                    continue
+            for surface in local_surfaces:
                 tag = surface.axis_tag(ax)
                 if tag in (
                         CapabilityTag.UNAVAILABLE.value,

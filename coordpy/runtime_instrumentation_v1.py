@@ -70,6 +70,11 @@ except ImportError as exc:  # pragma: no cover
 W80_RUNTIME_INSTRUMENTATION_V1_SCHEMA_VERSION: str = (
     "coordpy.runtime_instrumentation_v1.v1")
 
+# Cross-backend replay is exact on the in-repo NumPy runtime but
+# only fp32-close on the HF runtime. Conformance must therefore
+# use the same honest tolerance as the W80 HF tests/benchmarks.
+W80_REPLAY_FROM_KV_MAX_ABS_DIFF: float = 5e-3
+
 
 # ---------------------------------------------------------------
 # Canonical axis names
@@ -683,7 +688,9 @@ def _check_axis_pass(
         if full_last.shape != replay_last.shape:
             return "fail"
         diff = float(_np.max(_np.abs(full_last - replay_last)))
-        return "pass" if diff < 1e-4 else "fail"
+        return "pass" if (
+            diff < float(W80_REPLAY_FROM_KV_MAX_ABS_DIFF)
+        ) else "fail"
     if axis == InstrumentationAxis.DETERMINISTIC_REPLAY.value:
         try:
             a = backend.forward(input_token_ids=ids)
@@ -932,6 +939,7 @@ __all__ = [
     "W80_INSTRUMENTATION_AXES_READ",
     "W80_INSTRUMENTATION_AXES_WRITE",
     "W80_INSTRUMENTATION_AXES_WITNESS",
+    "W80_REPLAY_FROM_KV_MAX_ABS_DIFF",
     "InstrumentationAxis",
     "CapabilityTag",
     "HiddenStateSnapshotV1",

@@ -77,14 +77,13 @@ def test_w80_capability_matrix_hosted_blocks_substrate_axes():
 
 
 def test_w80_capability_matrix_local_universal_axes_dominates():
-    """At least 5 axes should be universally available on
-    every local surface (façade + numpy + transformers if
-    installed)."""
+    """The lean no-transformers path still has a meaningful
+    local-universal surface."""
     from coordpy.capability_matrix_v1 import (
         build_capability_matrix_v1,
     )
     m = build_capability_matrix_v1(
-        include_transformers=_HAS_HF)
+        include_transformers=False)
     univ = m.axes_universal_on_local()
     assert len(univ) >= 5
 
@@ -94,7 +93,7 @@ def test_w80_capability_matrix_asymmetry_report_records_load_bearing_gap():
         build_capability_matrix_v1,
     )
     m = build_capability_matrix_v1(
-        include_transformers=_HAS_HF)
+        include_transformers=False)
     rep = m.asymmetry_report()
     # Hosted-blocked AND local-universal = asymmetry surface.
     # This is the load-bearing W80 bar.
@@ -104,6 +103,46 @@ def test_w80_capability_matrix_asymmetry_report_records_load_bearing_gap():
     asym = set(rep["asymmetry_axes"])
     assert asym.issubset(set(rep["hosted_blocked_axes"]))
     assert asym.issubset(set(rep["local_universal_axes"]))
+
+
+def test_w80_capability_matrix_facade_surface_not_overclaimed():
+    from coordpy.capability_matrix_v1 import (
+        W80_SURFACE_LOCAL_OPENAI_FACADE,
+        build_capability_matrix_v1,
+    )
+    from coordpy.runtime_instrumentation_v1 import (
+        CapabilityTag,
+        InstrumentationAxis,
+    )
+    m = build_capability_matrix_v1(
+        include_transformers=False)
+    facade = next(
+        s for s in m.surfaces
+        if s.surface_id == W80_SURFACE_LOCAL_OPENAI_FACADE)
+    assert facade.axis_tag(
+        InstrumentationAxis.WRITE_KV_RESTORE.value
+    ) == CapabilityTag.UNAVAILABLE.value
+    assert facade.axis_tag(
+        InstrumentationAxis.INJECT_PREFIX_STATE.value
+    ) == CapabilityTag.UNAVAILABLE.value
+    assert facade.axis_tag(
+        InstrumentationAxis.REPLAY_FROM_KV.value
+    ) == CapabilityTag.UNAVAILABLE.value
+    assert facade.axis_tag(
+        InstrumentationAxis.READ_PER_LAYER_LOGITS.value
+    ) == CapabilityTag.UNAVAILABLE.value
+
+
+@pytest.mark.skipif(
+    not _HAS_HF,
+    reason="transformers / torch not installed")
+def test_w80_capability_matrix_local_universal_axes_with_transformers():
+    from coordpy.capability_matrix_v1 import (
+        build_capability_matrix_v1,
+    )
+    m = build_capability_matrix_v1(
+        include_transformers=True)
+    assert len(m.axes_universal_on_local()) >= 5
 
 
 def test_w80_capability_matrix_renders_markdown():

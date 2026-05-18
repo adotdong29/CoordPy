@@ -154,6 +154,30 @@ def test_w81_gateway_substrate_replay_is_byte_identical():
     assert bool(body["byte_identical_within_1e_minus_8"])
 
 
+def test_w81_gateway_substrate_replay_accepts_registered_cids():
+    from coordpy.deployable_substrate_gateway_v1 import (
+        W81_GATEWAY_PATH_SUBSTRATE_FORWARD,
+        W81_GATEWAY_PATH_SUBSTRATE_REPLAY,
+    )
+    gw = _build_gateway()
+    fwd = gw.dispatch(
+        path=W81_GATEWAY_PATH_SUBSTRATE_FORWARD,
+        body={"prompt": "cid backed replay"})
+    assert int(fwd.status) == 200
+    replay = gw.dispatch(
+        path=W81_GATEWAY_PATH_SUBSTRATE_REPLAY,
+        body={
+            "forward_trace_cid": fwd.body["forward_trace_cid"],
+            "kv_cache_cid": fwd.body["kv_cache_cid"],
+        })
+    assert int(replay.status) == 200
+    body = replay.body
+    assert body["replay_source"] == "registered_trace"
+    assert bool(body["registered_forward_trace_match"])
+    assert bool(body["registered_kv_cache_match"])
+    assert float(body["final_logit_max_abs_diff"]) < 1e-8
+
+
 def test_w81_gateway_substrate_conformance_passes_12_axes():
     from coordpy.deployable_substrate_gateway_v1 import (
         W81_GATEWAY_PATH_SUBSTRATE_CONFORMANCE,

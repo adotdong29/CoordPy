@@ -58,12 +58,16 @@ def test_w80_r201_all_pass_against_live_model():
     not _HAS_HF,
     reason="transformers / torch not installed")
 def test_w80_r201_replay_is_byte_identical_within_fp32_tol():
+    from coordpy.runtime_instrumentation_v1 import (
+        W80_REPLAY_FROM_KV_MAX_ABS_DIFF,
+    )
     from coordpy.r201_benchmark import run_r201
     r = run_r201()
     # The replay-vs-recompute summary should report byte-identity.
     summary = r["metrics"]["replay_vs_recompute_summary"]
     assert bool(summary["replay_byte_identical"])
-    assert float(summary["max_abs_diff_last_logits"]) < 5e-3
+    assert float(summary["max_abs_diff_last_logits"]) < float(
+        W80_REPLAY_FROM_KV_MAX_ABS_DIFF)
 
 
 @pytest.mark.skipif(
@@ -145,6 +149,9 @@ def test_w80_r201_cross_backend_replay_delta():
     """The replay-from-KV mechanism produces small last-row
     logit divergence on BOTH backends — the W80 cross-backend
     mechanism transfer evidence."""
+    from coordpy.runtime_instrumentation_v1 import (
+        W80_REPLAY_FROM_KV_MAX_ABS_DIFF,
+    )
     from coordpy.r201_benchmark import run_r201
     r = run_r201()
     delta = r["metrics"]["xback_replay_delta"]
@@ -153,4 +160,5 @@ def test_w80_r201_cross_backend_replay_delta():
     # NumPy: byte-identical replay (< 1e-8).
     assert float(delta["numpy_diff"]) < 1e-8
     # Transformers: byte-identical-in-fp32 replay (< 5e-3).
-    assert float(delta["transformers_diff"]) < 5e-3
+    assert float(delta["transformers_diff"]) < float(
+        W80_REPLAY_FROM_KV_MAX_ABS_DIFF)

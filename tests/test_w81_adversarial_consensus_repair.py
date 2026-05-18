@@ -171,6 +171,20 @@ def test_w81_consensus_v1_competitive_with_median():
     assert float(rep.v1_beats_median_frac) >= 0.40
 
 
+def test_w81_consensus_bench_exercises_default_routes_honestly():
+    from coordpy.adversarial_consensus_repair_v1 import (
+        run_adversarial_consensus_bench_v1,
+    )
+    rep = run_adversarial_consensus_bench_v1(
+        n_seeds=80, n_witnesses=7, n_corrupted=2, seed=11)
+    # The shipped default config should no longer be silently
+    # replaced by a fusion-only threshold override.
+    assert float(rep.escalate_frac) < 1.0
+    assert float(rep.commit_frac + rep.abstain_frac
+                 + rep.escalate_frac + rep.replay_frac) == (
+        pytest.approx(1.0))
+
+
 def test_w81_consensus_decision_audit_chain_is_content_addressed():
     """Identical inputs -> identical audit CID. Different
     inputs -> different audit CID."""

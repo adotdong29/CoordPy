@@ -118,7 +118,7 @@ W81_DECISION_KINDS: tuple[str, ...] = (
 W81_DEFAULT_DELAY_HALFLIFE: float = 6.0
 W81_DEFAULT_CORRUPTION_PENALTY_K: float = 3.0
 W81_DEFAULT_ABSTAIN_WIDTH_THRESHOLD: float = 0.40
-W81_DEFAULT_ESCALATE_CORRUPTION_THRESHOLD: float = 0.65
+W81_DEFAULT_ESCALATE_CORRUPTION_THRESHOLD: float = 8.0
 W81_DEFAULT_REPLAY_TRUST_FLOOR: float = 0.40
 W81_DEFAULT_BOOTSTRAP_REPEATS: int = 64
 W81_DEFAULT_SEED: int = 81_020_001
@@ -513,12 +513,17 @@ class AdversarialConsensusBenchReportV1:
     n_seeds: int
     n_witnesses: int
     n_corrupted: int
+    config_cid: str
     v1_mean_error: float
     naive_mean_error: float
     median_mean_error: float
     v1_beats_naive_frac: float
     v1_beats_median_frac: float
     v1_strictly_beats_naive: bool
+    commit_frac: float
+    abstain_frac: float
+    escalate_frac: float
+    replay_frac: float
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -526,6 +531,7 @@ class AdversarialConsensusBenchReportV1:
             "n_seeds": int(self.n_seeds),
             "n_witnesses": int(self.n_witnesses),
             "n_corrupted": int(self.n_corrupted),
+            "config_cid": str(self.config_cid),
             "v1_mean_error": float(round(
                 self.v1_mean_error, 12)),
             "naive_mean_error": float(round(
@@ -538,6 +544,14 @@ class AdversarialConsensusBenchReportV1:
                 self.v1_beats_median_frac, 12)),
             "v1_strictly_beats_naive": bool(
                 self.v1_strictly_beats_naive),
+            "commit_frac": float(round(
+                self.commit_frac, 12)),
+            "abstain_frac": float(round(
+                self.abstain_frac, 12)),
+            "escalate_frac": float(round(
+                self.escalate_frac, 12)),
+            "replay_frac": float(round(
+                self.replay_frac, 12)),
         }
 
     def cid(self) -> str:
@@ -559,20 +573,23 @@ def run_adversarial_consensus_bench_v1(
     """Run the adversarial consensus bench.
 
     Returns a content-addressed report. Used by tests + docs.
+    The bench exercises the *actual routed controller* given by
+    ``config``. It does not silently disable the shipped abstain
+    or escalate thresholds.
     """
-    cfg = config or TrustWeightedConsensusConfigV1(
-        # For the bench, set abstain threshold high enough that
-        # V1 will produce a fused value on most seeds (so we can
-        # compare error against naive averaging fairly).
-        abstain_width_threshold=10.0,
-        escalate_corruption_threshold=10.0,
-    )
+    cfg = config or TrustWeightedConsensusConfigV1()
     rng = _np.random.default_rng(int(seed))
     v1_errs: list[float] = []
     naive_errs: list[float] = []
     median_errs: list[float] = []
     v1_beats_naive_count = 0
     v1_beats_median_count = 0
+    decision_counts: dict[str, int] = {
+        W81_DECISION_COMMIT: 0,
+        W81_DECISION_ABSTAIN: 0,
+        W81_DECISION_ESCALATE: 0,
+        W81_DECISION_REPLAY: 0,
+    }
     n_honest = int(n_witnesses) - int(n_corrupted)
     for s in range(int(n_seeds)):
         # Generate ground truth.
@@ -606,6 +623,9 @@ def run_adversarial_consensus_bench_v1(
         # V1 fused estimate.
         decision = trust_weighted_consensus_v1(
             witnesses=witnesses, config=cfg)
+        decision_counts[str(decision.decision_kind)] = (
+            int(decision_counts.get(
+                str(decision.decision_kind), 0)) + 1)
         if decision.fused_value is not None:
             v1_err = float(_np.linalg.norm(
                 decision.fused_value - truth))
@@ -640,6 +660,7 @@ def run_adversarial_consensus_bench_v1(
         n_seeds=int(n_seeds),
         n_witnesses=int(n_witnesses),
         n_corrupted=int(n_corrupted),
+        config_cid=str(cfg.cid()),
         v1_mean_error=v1_mean,
         naive_mean_error=naive_mean,
         median_mean_error=median_mean,
@@ -648,6 +669,18 @@ def run_adversarial_consensus_bench_v1(
         v1_beats_median_frac=float(
             v1_beats_median_count / float(n_seeds)),
         v1_strictly_beats_naive=bool(v1_mean < naive_mean),
+        commit_frac=float(
+            decision_counts[W81_DECISION_COMMIT]
+            / float(n_seeds)),
+        abstain_frac=float(
+            decision_counts[W81_DECISION_ABSTAIN]
+            / float(n_seeds)),
+        escalate_frac=float(
+            decision_counts[W81_DECISION_ESCALATE]
+            / float(n_seeds)),
+        replay_frac=float(
+            decision_counts[W81_DECISION_REPLAY]
+            / float(n_seeds)),
     )
 
 

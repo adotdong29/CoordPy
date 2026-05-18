@@ -21,10 +21,12 @@ is a real deployable gateway with:
   envelope
 * Content-addressing on every request and response (request
   CID + response CID); the audit log is content-addressed too
-* Deterministic replay hooks — every chat-completion response
-  carries a ``substrate_forward_trace_cid`` + ``kv_cache_cid``
-  that the ``/v1/substrate/replay`` endpoint will accept to
-  reproduce the forward trace
+* Deterministic replay hooks — every explicit substrate trace
+  response (and every chat-completion response with
+  side-channel opt-in) carries a
+  ``substrate_forward_trace_cid`` + ``kv_cache_cid`` pair that
+  the ``/v1/substrate/replay`` endpoint will accept to
+  reproduce the original forward trace
 * A bearer-token auth shim (config-driven; ``None`` means
   open for local dev), so the gateway can be locked down in
   research deployments
@@ -236,6 +238,10 @@ class DeployableSubstrateGatewayV1:
         default_factory=LocalOpenAICompatibleFacadeV1)
     audit: list[dict[str, Any]] = dataclasses.field(
         default_factory=list)
+    replay_registry_by_trace_cid: dict[str, dict[str, Any]] = (
+        dataclasses.field(default_factory=dict))
+    replay_registry_by_kv_cid: dict[str, dict[str, Any]] = (
+        dataclasses.field(default_factory=dict))
     request_counter: int = 0
 
     def cid(self) -> str:
@@ -341,6 +347,68 @@ class DeployableSubstrateGatewayV1:
         self.request_counter = int(self.request_counter) + 1
         return resp
 
+    def _normalize_split(
+            self, *,
+            token_ids: list[int],
+            requested_split: int | None = None,
+    ) -> int:
+        split = int(requested_split) if requested_split is not None else 1
+        if split < 1 or split >= max(2, len(token_ids)):
+            split = max(1, len(token_ids) // 2)
+        return int(split)
+
+    def _register_replay_artifact(
+            self, *,
+            source_path: str,
+            prompt: str,
+            token_ids: list[int],
+            split_at: int,
+            forward_trace_cid: str,
+            kv_cache_cid: str,
+    ) -> None:
+        artifact = {
+            "source_path": str(source_path),
+            "prompt": str(prompt),
+            "token_ids": [int(t) for t in token_ids],
+            "split_at": int(split_at),
+            "forward_trace_cid": str(forward_trace_cid),
+            "kv_cache_cid": str(kv_cache_cid),
+        }
+        self.replay_registry_by_trace_cid[str(
+            forward_trace_cid)] = dict(artifact)
+        self.replay_registry_by_kv_cid[str(
+            kv_cache_cid)] = dict(artifact)
+
+    def _resolve_replay_artifact(
+            self, *,
+            forward_trace_cid: str | None,
+            kv_cache_cid: str | None,
+    ) -> dict[str, Any] | None:
+        by_trace = None
+        by_kv = None
+        if forward_trace_cid:
+            by_trace = self.replay_registry_by_trace_cid.get(
+                str(forward_trace_cid))
+            if by_trace is None:
+                raise KeyError(
+                    "unknown forward_trace_cid for replay")
+        if kv_cache_cid:
+            by_kv = self.replay_registry_by_kv_cid.get(
+                str(kv_cache_cid))
+            if by_kv is None:
+                raise KeyError("unknown kv_cache_cid for replay")
+        if by_trace is not None and by_kv is not None:
+            if (str(by_trace["forward_trace_cid"])
+                    != str(by_kv["forward_trace_cid"])
+                    or str(by_trace["kv_cache_cid"])
+                    != str(by_kv["kv_cache_cid"])):
+                raise ValueError(
+                    "forward_trace_cid and kv_cache_cid refer "
+                    "to different registered traces")
+        return (
+            dict(by_trace) if by_trace is not None
+            else (dict(by_kv) if by_kv is not None else None))
+
     # ------------------------------------------------------------
     # /v1/chat/completions
     # ------------------------------------------------------------
@@ -381,6 +449,8 @@ class DeployableSubstrateGatewayV1:
             )
             resp = self.facade.chat_completions_create(
                 request=req)
+            prompt = "\n".join(
+                f"{m.role}: {m.content}" for m in msgs)
             stream_requested = bool(body.get("stream", False))
             # OpenAI shape: system_fingerprint is a deterministic
             # build-identifier; we set it to a runtime-params-CID
@@ -423,6 +493,17 @@ class DeployableSubstrateGatewayV1:
             }
             if resp.substrate_side_channel is not None:
                 sc = resp.substrate_side_channel
+                ids = tokenize_bytes_v79(prompt, max_len=32)
+                split = self._normalize_split(
+                    token_ids=ids, requested_split=None)
+                self._register_replay_artifact(
+                    source_path=W81_GATEWAY_PATH_CHAT_COMPLETIONS,
+                    prompt=prompt,
+                    token_ids=ids,
+                    split_at=split,
+                    forward_trace_cid=str(
+                        sc.forward_trace_cid),
+                    kv_cache_cid=str(sc.kv_cache_cid))
                 body_out["substrate_side_channel"] = {
                     "schema": str(sc.schema),
                     "runtime_params_cid": str(
@@ -470,6 +551,15 @@ class DeployableSubstrateGatewayV1:
                 input_token_ids=ids,
                 hidden_state_injections_per_layer=None,
                 attention_bias_injections_per_layer=None)
+            split = self._normalize_split(
+                token_ids=ids, requested_split=None)
+            self._register_replay_artifact(
+                source_path=W81_GATEWAY_PATH_COMPLETIONS,
+                prompt=prompt,
+                token_ids=ids,
+                split_at=split,
+                forward_trace_cid=str(trace.cid()),
+                kv_cache_cid=str(kv.cid()))
             if trace.seq_len > 0:
                 logits = _np.asarray(
                     trace.logits, dtype=_np.float64)
@@ -525,6 +615,15 @@ class DeployableSubstrateGatewayV1:
                 input_token_ids=ids,
                 hidden_state_injections_per_layer=None,
                 attention_bias_injections_per_layer=None)
+            split = self._normalize_split(
+                token_ids=ids, requested_split=None)
+            self._register_replay_artifact(
+                source_path=W81_GATEWAY_PATH_SUBSTRATE_FORWARD,
+                prompt=prompt,
+                token_ids=ids,
+                split_at=split,
+                forward_trace_cid=str(trace.cid()),
+                kv_cache_cid=str(kv.cid()))
             return self._respond(
                 path=W81_GATEWAY_PATH_SUBSTRATE_FORWARD,
                 status=200,
@@ -569,11 +668,36 @@ class DeployableSubstrateGatewayV1:
             request_cid: str,
     ) -> GatewayResponseV1:
         try:
-            prompt = str(body.get("prompt", ""))
-            split = int(body.get("split_at", 1))
-            ids = tokenize_bytes_v79(prompt, max_len=32)
-            if split < 1 or split >= max(2, len(ids)):
-                split = max(1, len(ids) // 2)
+            requested_forward_trace_cid = body.get(
+                "forward_trace_cid")
+            requested_kv_cache_cid = body.get("kv_cache_cid")
+            artifact = self._resolve_replay_artifact(
+                forward_trace_cid=(
+                    str(requested_forward_trace_cid)
+                    if requested_forward_trace_cid is not None
+                    else None),
+                kv_cache_cid=(
+                    str(requested_kv_cache_cid)
+                    if requested_kv_cache_cid is not None
+                    else None))
+            replay_source = "prompt"
+            registered_forward_trace_cid = None
+            registered_kv_cache_cid = None
+            if artifact is not None:
+                prompt = str(artifact["prompt"])
+                ids = [int(t) for t in artifact["token_ids"]]
+                split = int(artifact["split_at"])
+                replay_source = "registered_trace"
+                registered_forward_trace_cid = str(
+                    artifact["forward_trace_cid"])
+                registered_kv_cache_cid = str(
+                    artifact["kv_cache_cid"])
+            else:
+                prompt = str(body.get("prompt", ""))
+                ids = tokenize_bytes_v79(prompt, max_len=32)
+                split = self._normalize_split(
+                    token_ids=ids,
+                    requested_split=body.get("split_at", 1))
             prefix = ids[:split]
             suffix = ids[split:]
             trace_a, kv_a = forward_controlled_runtime(
@@ -590,6 +714,13 @@ class DeployableSubstrateGatewayV1:
                 input_token_ids=ids,
                 hidden_state_injections_per_layer=None,
                 attention_bias_injections_per_layer=None)
+            self._register_replay_artifact(
+                source_path=W81_GATEWAY_PATH_SUBSTRATE_REPLAY,
+                prompt=prompt,
+                token_ids=ids,
+                split_at=split,
+                forward_trace_cid=str(trace_full.cid()),
+                kv_cache_cid=str(kv_full.cid()))
             replay_logits = _np.asarray(
                 trace_b.logits, dtype=_np.float64)
             full_logits = _np.asarray(
@@ -605,10 +736,40 @@ class DeployableSubstrateGatewayV1:
                 status=200,
                 body={
                     "schema": str(W81_GATEWAY_V1_SCHEMA_VERSION),
+                    "replay_source": str(replay_source),
+                    "requested_forward_trace_cid": (
+                        str(requested_forward_trace_cid)
+                        if requested_forward_trace_cid
+                        is not None else None),
+                    "requested_kv_cache_cid": (
+                        str(requested_kv_cache_cid)
+                        if requested_kv_cache_cid
+                        is not None else None),
+                    "registered_forward_trace_cid": (
+                        str(registered_forward_trace_cid)
+                        if registered_forward_trace_cid
+                        is not None else None),
+                    "registered_kv_cache_cid": (
+                        str(registered_kv_cache_cid)
+                        if registered_kv_cache_cid
+                        is not None else None),
                     "split_at": int(split),
                     "prefix_kv_cache_cid": str(kv_a.cid()),
                     "replay_trace_cid": str(trace_b.cid()),
                     "recompute_trace_cid": str(trace_full.cid()),
+                    "recompute_kv_cache_cid": str(kv_full.cid()),
+                    "registered_forward_trace_match": (
+                        bool(
+                            registered_forward_trace_cid
+                            == str(trace_full.cid()))
+                        if registered_forward_trace_cid
+                        is not None else None),
+                    "registered_kv_cache_match": (
+                        bool(
+                            registered_kv_cache_cid
+                            == str(kv_full.cid()))
+                        if registered_kv_cache_cid
+                        is not None else None),
                     "final_logit_max_abs_diff": float(diff),
                     "byte_identical_within_1e_minus_8": bool(
                         diff < 1e-8),

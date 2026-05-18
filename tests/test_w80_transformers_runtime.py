@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from types import SimpleNamespace
 
 try:
     import torch  # type: ignore  # noqa: F401
@@ -18,12 +19,83 @@ except Exception:  # noqa: BLE001
     _HAS_HF = False
 
 
-pytestmark = pytest.mark.skipif(
+def test_w80_transformers_probe_honest_when_runtime_init_fails(
+        monkeypatch):
+    import coordpy.transformers_runtime_v1 as tr
+
+    monkeypatch.setattr(
+        tr,
+        "_probe_transformers_runtime_instantiable",
+        lambda model_name: (
+            False,
+            "transformers + torch importable but runtime "
+            "instantiation failed: TypeError: broken",
+        ),
+    )
+    p = tr.probe_transformers_runtime_v1()
+    assert not bool(p.transformers_available)
+    assert "instantiation failed" in " ".join(p.notes)
+
+
+def test_w80_transformers_runtime_uses_torch_dtype_kwarg(
+        monkeypatch):
+    import coordpy.transformers_runtime_v1 as tr
+
+    call: dict[str, object] = {}
+
+    class _FakeTorch:
+        float32 = "float32"
+
+        @staticmethod
+        def set_grad_enabled(_enabled: bool) -> None:
+            return None
+
+    class _FakeAutoModelForCausalLM:
+        @classmethod
+        def from_pretrained(cls, model_name, **kwargs):
+            call["model_name"] = str(model_name)
+            call["kwargs"] = dict(kwargs)
+            return SimpleNamespace(
+                config=SimpleNamespace(
+                    num_hidden_layers=6,
+                    num_attention_heads=12,
+                    hidden_size=768,
+                    model_type="gpt2",
+                ),
+                eval=lambda: None,
+                named_parameters=lambda: [],
+            )
+
+    class _FakeAutoTokenizer:
+        @classmethod
+        def from_pretrained(cls, model_name):
+            call["tokenizer_model_name"] = str(model_name)
+            return object()
+
+    monkeypatch.setattr(
+        tr,
+        "_torch_modules",
+        lambda: (
+            _FakeTorch(),
+            _FakeAutoModelForCausalLM,
+            _FakeAutoTokenizer,
+        ),
+    )
+
+    tr.TransformersRuntimeV1(model_name="fake/model")
+
+    kwargs = dict(call["kwargs"])
+    assert call["model_name"] == "fake/model"
+    assert call["tokenizer_model_name"] == "fake/model"
+    assert kwargs["torch_dtype"] == "float32"
+    assert "dtype" not in kwargs
+    assert kwargs["attn_implementation"] == "eager"
+
+
+@pytest.mark.skipif(
     not _HAS_HF,
     reason="transformers / torch not installed",
 )
-
-
 def test_w80_transformers_probe_records_availability():
     from coordpy.transformers_runtime_v1 import (
         probe_transformers_runtime_v1,
@@ -37,6 +109,10 @@ def test_w80_transformers_probe_records_availability():
     assert p.cid() == p2.cid()
 
 
+@pytest.mark.skipif(
+    not _HAS_HF,
+    reason="transformers / torch not installed",
+)
 def test_w80_transformers_runtime_loads_distilgpt2():
     from coordpy.transformers_runtime_v1 import (
         TransformersRuntimeV1,
@@ -49,6 +125,10 @@ def test_w80_transformers_runtime_loads_distilgpt2():
     assert int(rt.head_dim) == 64
 
 
+@pytest.mark.skipif(
+    not _HAS_HF,
+    reason="transformers / torch not installed",
+)
 def test_w80_transformers_runtime_deterministic_forward():
     from coordpy.transformers_runtime_v1 import (
         TransformersRuntimeV1,
@@ -61,7 +141,14 @@ def test_w80_transformers_runtime_deterministic_forward():
     assert t1.cid() == t2.cid()
 
 
+@pytest.mark.skipif(
+    not _HAS_HF,
+    reason="transformers / torch not installed",
+)
 def test_w80_transformers_runtime_replay_byte_identical():
+    from coordpy.runtime_instrumentation_v1 import (
+        W80_REPLAY_FROM_KV_MAX_ABS_DIFF,
+    )
     from coordpy.transformers_runtime_v1 import (
         TransformersRuntimeV1,
     )
@@ -78,11 +165,15 @@ def test_w80_transformers_runtime_replay_byte_identical():
     diff = float(np.max(np.abs(full_last - rep_last)))
     # fp32 CPU replay: ≤ 5e-3 is honest under the W80 contract.
     # In practice on distilgpt2 we see < 1e-3.
-    assert diff < 5e-3, (
+    assert diff < float(W80_REPLAY_FROM_KV_MAX_ABS_DIFF), (
         f"transformers replay diff {diff} > 5e-3 — fp32 "
         "should suffice")
 
 
+@pytest.mark.skipif(
+    not _HAS_HF,
+    reason="transformers / torch not installed",
+)
 def test_w80_transformers_runtime_passes_conformance():
     from coordpy.runtime_instrumentation_v1 import (
         run_instrumentation_conformance_v1,
@@ -101,6 +192,10 @@ def test_w80_transformers_runtime_passes_conformance():
     assert int(r.n_pass) >= 10
 
 
+@pytest.mark.skipif(
+    not _HAS_HF,
+    reason="transformers / torch not installed",
+)
 def test_w80_transformers_runtime_hidden_inject_moves_cid():
     from coordpy.runtime_instrumentation_v1 import (
         InjectionPlanV1,
@@ -124,6 +219,10 @@ def test_w80_transformers_runtime_hidden_inject_moves_cid():
     assert t_base.cid() != t_inj.cid()
 
 
+@pytest.mark.skipif(
+    not _HAS_HF,
+    reason="transformers / torch not installed",
+)
 def test_w80_transformers_runtime_prefix_inject_moves_cid():
     from coordpy.runtime_instrumentation_v1 import (
         InjectionPlanV1,
@@ -145,6 +244,10 @@ def test_w80_transformers_runtime_prefix_inject_moves_cid():
     assert t_base.cid() != t_pref.cid()
 
 
+@pytest.mark.skipif(
+    not _HAS_HF,
+    reason="transformers / torch not installed",
+)
 def test_w80_transformers_runtime_attention_bias_moves_cid():
     from coordpy.runtime_instrumentation_v1 import (
         InjectionPlanV1,
