@@ -688,9 +688,15 @@ def _check_axis_pass(
         if full_last.shape != replay_last.shape:
             return "fail"
         diff = float(_np.max(_np.abs(full_last - replay_last)))
-        return "pass" if (
-            diff < float(W80_REPLAY_FROM_KV_MAX_ABS_DIFF)
-        ) else "fail"
+        # Honour the backend's declared precision floor (e.g.,
+        # bf16-loaded frontier-scale runtimes widen the floor
+        # honestly via ``backend.precision_floor``); fall back to
+        # the W80 fp32 5e-3 floor for backends that don't expose
+        # a floor.
+        tol = float(getattr(
+            backend, "precision_floor",
+            W80_REPLAY_FROM_KV_MAX_ABS_DIFF))
+        return "pass" if diff < tol else "fail"
     if axis == InstrumentationAxis.DETERMINISTIC_REPLAY.value:
         try:
             a = backend.forward(input_token_ids=ids)

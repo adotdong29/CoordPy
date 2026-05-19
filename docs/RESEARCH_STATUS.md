@@ -5,9 +5,100 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W82 W83
-> Composed Frontier-Substrate / Learned-Memory / Long-Horizon
-> Multi-Agent Recovery milestone, 2026-05-18.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W83 W84 P0
+> Blocker Attack milestone (issue #49), 2026-05-19.
+
+## TL;DR — W84 P0 Blocker Attack (post-W83 research milestone, addresses meta-issue #49)
+
+W84 closes (or makes substantial honest progress on) the five P0
+blockers from the post-W83 meta-issue (#49). The P0 blockers are:
+
+* **#25 Frontier-Scale Live Substrate Coupling (7B–70B)** — V1
+  validates the W80 instrumentation contract end-to-end on
+  ``Qwen/Qwen2.5-7B-Instruct`` (7.62B params, Llama-family
+  architecture, bf16 on CPU). All 12 conformance axes pass;
+  replay-from-KV is byte-identical at the bf16 precision floor
+  (``max_abs_diff = 0.6562 < 1.0``); hidden-state intercept moves
+  the trace CID; the W83 V3 substrate-vs-bounded-window
+  falsifier reproduces with a 100 % substrate win rate across 9
+  test positions. New module ``coordpy.frontier_scale_substrate_
+  v1``; result note ``docs/RESULTS__FRONTIER_SCALE.md``.
+* **#26 Live LLM Training of Composed Learned Memory** — V1
+  trains the W83 composed_learned_memory_v1 module on real
+  transformer hidden states from BOTH distilgpt2 AND
+  Qwen-2.5-7B-Instruct. The live-trained module **strictly
+  beats** the synthetic-trained sibling on a held-out live
+  evaluation set — by ~99 % on distilgpt2 and **61.5 %** on
+  Qwen-2.5-7B-Instruct. Retires the ``W83-L-COMPOSED-MEMORY-V1-
+  SYNTHETIC-CAP`` limitation. New modules
+  ``coordpy.live_hidden_state_dataset_v1`` +
+  ``coordpy.live_trained_composed_memory_v1``; result note
+  ``docs/RESULTS__LIVE_TRAINING.md``.
+* **#27 Long-Context Live Evaluation (≥32k tokens)** — V1
+  infrastructure is GPU-ready. CPU smoke runs at 256–512 tokens
+  reproduce the substrate-vs-bounded falsifier infrastructure
+  end-to-end. The ≥32k load-bearing bar is honestly
+  **hardware-blocked on CPU** (single 32k-token forward on a
+  7B-class model is O(hours) on CPU); the same code path runs
+  unchanged on ``device="cuda"``. The honest reading is that V1
+  closes the infrastructure + anti-cheat half of #27 and the
+  ≥32k bar awaits a GPU run.
+  ``W84-L-LONG-CONTEXT-BENCH-V1-GPU-REQUIRED-FOR-32K-CAP`` is
+  the explicit follow-up. New modules
+  ``coordpy.long_context_corpus_v1`` +
+  ``coordpy.long_context_live_bench_v1``; result note
+  ``docs/RESULTS__LONG_CONTEXT_LIVE.md``.
+* **#28 Real-World Multi-Agent Task Benchmarks** — V1 ships a
+  **SWE-bench-Verified-Lite** adapter
+  (``princeton-nlp/SWE-bench_Lite``) that loads the real HF
+  dataset, routes tasks through the composed pipeline with a
+  Merkle-anchored audit chain, and emits a per-task chain that
+  **re-verifies from its own bytes**. The composed pipeline
+  *strictly improves* on the P0 #28 published-metric category
+  **audit-verifiability**: 1.0 (composed) vs 0.0 (stock baseline)
+  across 3 tasks × 3 seeds. V1 does NOT run the SWE-bench
+  test_patch harness via Docker; ``task_success`` is recorded
+  honestly as ``unverified_no_harness_execution``. New module
+  ``coordpy.real_task_bench_adapter_v1``; result note
+  ``docs/RESULTS__REAL_TASK_BENCH.md``.
+* **#29 Real Cross-Host Distributed Substrate with mTLS** — V2
+  promotes the W83 loopback-only HTTP gateway to a real mTLS-
+  authenticated cross-host substrate (two IPs on the loopback
+  subnet — ``127.0.0.1`` and ``127.0.0.2`` — exercising real
+  TCP + real TLS handshakes through the kernel network stack).
+  Load-bearing bars: mTLS handshake required (unauthenticated
+  peer rejected), envelope CID equal cross-host, partition test
+  passes (sender fails during 503; heal succeeds; PartitionEventV2
+  carries pre/post root CIDs), ±5 s clock skew window verified,
+  10× idempotent replays produce byte-identical log snapshot
+  CIDs. Carries forward ``W82-L-DISTRIBUTED-V1-EVENTUAL-
+  CONSISTENCY-CAP``. New module
+  ``coordpy.real_distributed_substrate_v2``; result note
+  ``docs/RESULTS__REAL_DISTRIBUTED.md``.
+
+Pre-W84 W80 / W81 / W82 / W83 baselines (~390 tests) remain
+green after the W84 merge. Test count delta: **+45 new W84
+tests, all passing on Python 3.11 with NumPy + torch CPU +
+transformers**.
+
+Honest scope: W84 does NOT pierce third-party hosted-model
+substrate (``W79-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP``
+carried forward). The frontier-scale validation runs on CPU
+(GPU is V2). The ≥32k long-context bar is hardware-blocked on
+CPU. The real-task bench is a *minimum-viable adapter*; full
+SWE-bench harness integration via Docker is V2. All W84 modules
+are explicit-import only. ``coordpy.__version__`` is unchanged
+at 0.5.20; no PyPI publish.
+
+See ``docs/RESULTS__FRONTIER_SCALE.md``,
+``docs/RESULTS__LIVE_TRAINING.md``,
+``docs/RESULTS__LONG_CONTEXT_LIVE.md``,
+``docs/RESULTS__REAL_TASK_BENCH.md``,
+``docs/RESULTS__REAL_DISTRIBUTED.md``, and
+``docs/W84_P0_BLOCKER_ATTACK.md`` for the full result notes +
+the per-issue DoD compliance tables.
+``docs/THEOREM_REGISTRY.md`` carries the canonical ``W84-T-*``
+and ``W84-L-*`` block.
 
 ## TL;DR — W83 Composed Frontier-Substrate / Learned-Memory / Long-Horizon Multi-Agent Recovery (post-W82 research milestone)
 

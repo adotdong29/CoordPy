@@ -143,6 +143,7 @@ def run_hidden_state_intercept_bench_v1(
             W83_HIB_DEFAULT_REPLAY_TOLERANCE),
         inject_layer: int = W83_HIB_DEFAULT_INJECT_LAYER,
         inject_magnitude: float = 1.0,
+        model_dtype: str = "fp32",
 ) -> HiddenStateInterceptBenchReportV1:
     """Run the live HF hidden-state intercept bench.
 
@@ -177,7 +178,8 @@ def run_hidden_state_intercept_bench_v1(
         )
     try:
         runtime = TransformersRuntimeV1(
-            model_name=str(model_name))
+            model_name=str(model_name),
+            model_dtype=str(model_dtype))
     except Exception as exc:  # noqa: BLE001
         return HiddenStateInterceptBenchReportV1(
             schema=(

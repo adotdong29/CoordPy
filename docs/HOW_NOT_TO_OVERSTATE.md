@@ -2,9 +2,84 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W82
-> W83 Composed Frontier-Substrate / Learned-Memory / Long-Horizon
-> Multi-Agent Recovery milestone, 2026-05-18.
+> README-of-README must satisfy these rules. Last touched: post-W83
+> W84 P0 Blocker Attack milestone (issue #49), 2026-05-19.
+
+## W84 (P0 Blocker Attack — Frontier-Scale Substrate / Live LLM Training / Long-Context Live Eval / Real-Task Bench / Real Distributed) — explicit do-not-overstate rules
+
+W84 addresses the five P0 blockers from the post-W83 meta-issue
+(#49). Three of the five (#25, #26, #29) close their load-bearing
+DoD bars empirically. Two (#27, #28) ship V1 *infrastructure*
+with the load-bearing bar hardware-blocked on CPU; V1 closes the
+infrastructure half and the load-bearing bar awaits a GPU run or
+a Docker-harness V2 respectively.
+
+- **W84 does NOT pierce the third-party hosted-model wall.** The
+  W79 ``W79-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` carries
+  forward unchanged. The frontier-scale validation runs on
+  *open-weight* models under the local controlled runtime.
+- **W84 does NOT claim ``replay_byte_identical`` at the W80 fp32
+  floor (5e-3) on bf16 models.** The bf16 precision floor is
+  honestly recorded — ``max_abs_diff = 0.6562`` on
+  Qwen-2.5-7B-Instruct at the W80 contract's bf16-aware floor of
+  ``1.0``. The fp32 floor on distilgpt2 is unchanged.
+- **W84 does NOT claim the W80 contract works on every
+  open-weight architecture family.** V1 validates on
+  GPT-2-family (distilgpt2, W80 baseline) and Llama-family
+  lineage (Qwen-2.5-7B-Instruct, new in W84). Mistral / Llama-3.x
+  / Phi-4 / Gemma-2 / MoE variants are V2 stretch.
+- **W84 does NOT claim composed_learned_memory strictly beats
+  synthetic-trained on every layer + every model.** V1 measures
+  layer 2 of distilgpt2 and layer 10 of Qwen-2.5-7B-Instruct.
+  Other layers' wins are not claimed; multi-layer training is
+  V2.
+- **W84 does NOT close the ≥32k-token P0 #27 bar on CPU.** The
+  long-context bench infrastructure runs end-to-end at small
+  horizons; the ≥32k load-bearing bar is hardware-blocked on
+  CPU (single 32k-token forward on a 7B-class model is O(hours)
+  on CPU). The V1 infrastructure is GPU-ready; an explicit
+  follow-up GPU run is required to close P0 #27. The
+  ``W84-L-LONG-CONTEXT-BENCH-V1-GPU-REQUIRED-FOR-32K-CAP``
+  limitation records this honestly.
+- **W84 does NOT run the SWE-bench test_patch harness via
+  Docker.** The V1 real-task bench adapter ships the audit-chain
+  integration and *audit-verifiability* head-to-head. The
+  *task-success-rate* + *cost-per-success* + *recovery-from-
+  failure-rate* metrics require V2 + harness execution via
+  Docker. V1 records ``task_success`` honestly as
+  ``unverified_no_harness_execution``.
+- **W84 does NOT claim the real cross-host distributed
+  substrate is production-ready.** V2 uses self-signed
+  certificates generated at runtime; production deploys use
+  real PKI. V2 handles single A↔B partition; three-way
+  split-brain is V2.5. V2 verifies across ±5 s skew; larger
+  skews require V3.
+- **W84 does NOT collapse hosted-API calls into "substrate
+  access".** The P0 #27 anti-cheat is carried forward: hosted
+  APIs can be benched (for task-success at long context only)
+  but the substrate intercept + hidden-state injection bars
+  remain on the controlled runtime. The V2 distributed
+  substrate is over open-weight controlled runtimes, NOT
+  hosted APIs.
+- **W84 does NOT change ``coordpy.__version__`` or the stable
+  public surface.** All W84 modules are explicit-import only.
+  ``coordpy.__version__`` stays at ``0.5.20``;
+  ``coordpy.SDK_VERSION`` stays at ``coordpy.sdk.v3.43``.
+
+The mandatory rule remains: when speaking about W84 results,
+state both the win AND the limitation. Examples:
+
+- ✅ "W84 P0 #25 validates the W80 contract on Qwen-2.5-7B-
+  Instruct in bf16; all 12 axes pass; the bf16 precision floor
+  is 0.6562 < 1.0 — wider than the fp32 floor."
+- ❌ "W84 reaches replay-byte-identity on a 7B frontier model
+  at the fp32 floor." (The bf16 floor is 0.6562, not 5e-3; this
+  reading is wrong.)
+- ✅ "W84 P0 #27 ships the long-context bench infrastructure
+  GPU-ready; the ≥32k bar is hardware-blocked on CPU and
+  requires a follow-up GPU run."
+- ❌ "W84 closes the ≥32k long-context bar." (V1 closes the
+  infrastructure half; the load-bearing bar awaits a GPU run.)
 
 ## W83 (Composed Frontier-Substrate / Learned-Memory / Long-Horizon Multi-Agent Recovery) — explicit do-not-overstate rules
 

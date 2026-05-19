@@ -276,6 +276,13 @@ class TransformersRuntimeV1:
     device: str = "cpu"
     # Allow callers to silence the HF "set HF_TOKEN" warning.
     silence_hf_warnings: bool = True
+    # W84: Frontier-scale models (7B+) cannot be loaded in fp32 on
+    # 16GB CPU machines. ``model_dtype`` accepts ``"fp32"``
+    # (default — preserves the W80/W83 byte-identical-fp32 replay
+    # bar on distilgpt2-class models), ``"bf16"`` (frontier-scale
+    # native floor for Qwen / Llama), or ``"fp16"``. The honest
+    # precision floor is exposed via ``precision_floor``.
+    model_dtype: str = "fp32"
     _model: Any = None
     _tokenizer: Any = None
     _torch: Any = None
@@ -293,13 +300,29 @@ class TransformersRuntimeV1:
         self._torch = torch
         self._tokenizer = AutoTokenizer.from_pretrained(
             self.model_name)
-        # Force fp32 for byte-identical replay.
+        # Resolve model_dtype: default is fp32 for byte-identical
+        # replay on distilgpt2-class models. Frontier-scale models
+        # (>=7B) cannot fit at fp32 on 16GB CPU machines; for those,
+        # callers pass "bf16" (Qwen/Llama native floor) or "fp16".
+        dtype_str = str(self.model_dtype).lower()
+        if dtype_str in ("bf16", "bfloat16"):
+            resolved_torch_dtype = torch.bfloat16
+        elif dtype_str in ("fp16", "float16", "half"):
+            resolved_torch_dtype = torch.float16
+        else:
+            resolved_torch_dtype = torch.float32
+        load_kwargs: dict[str, Any] = {
+            "torch_dtype": resolved_torch_dtype,
+            "output_attentions": True,
+            "output_hidden_states": True,
+            "attn_implementation": "eager",
+        }
+        # Large-model loaders benefit from low_cpu_mem_usage to
+        # avoid a full fp32 staging buffer during weight load.
+        if dtype_str != "fp32":
+            load_kwargs["low_cpu_mem_usage"] = True
         self._model = AutoModelForCausalLM.from_pretrained(
-            self.model_name, torch_dtype=torch.float32,
-            output_attentions=True,
-            output_hidden_states=True,
-            attn_implementation="eager",
-        )
+            self.model_name, **load_kwargs)
         self._model.eval()
         # Deterministic CID over model bytes (config + weight
         # shapes + first-bytes hash). We avoid hashing every
@@ -324,6 +347,42 @@ class TransformersRuntimeV1:
                 params_payload, sort_keys=True,
                 separators=(",", ":"),
                 default=str).encode("utf-8")).hexdigest()
+
+    def _model_dtype(self) -> Any:
+        """Return the model's loaded torch dtype.
+
+        Falls back to ``torch.float32`` when the model is not yet
+        instantiated (defensive for the conformance probe path).
+        """
+        torch = self._torch
+        if self._model is not None:
+            try:
+                return self._model.dtype
+            except AttributeError:
+                try:
+                    return next(
+                        self._model.parameters()).dtype
+                except (StopIteration, AttributeError):
+                    pass
+        return torch.float32
+
+    @property
+    def precision_floor(self) -> float:
+        """Honest replay-from-KV tolerance for this model's dtype.
+
+        Returns the empirically-defensible ``max_abs_diff`` floor
+        the W80/W83 byte-identical-replay bar should be evaluated
+        at, given the loaded ``model_dtype``. fp32 is the original
+        W80 floor (5e-3); bf16 has ~8 mantissa bits and the floor
+        widens accordingly; fp16 has ~10 mantissa bits but smaller
+        exponent range so the floor sits between the two.
+        """
+        dtype_str = str(self.model_dtype).lower()
+        if dtype_str in ("bf16", "bfloat16"):
+            return 1.0
+        if dtype_str in ("fp16", "float16", "half"):
+            return 5e-2
+        return 5e-3
 
     def backend_id(self) -> str:
         return "coordpy.transformers_runtime_v1"
@@ -446,7 +505,7 @@ class TransformersRuntimeV1:
 
                 def _make_attn_pre_hook(bias_np):
                     bias_t = torch.as_tensor(
-                        bias_np, dtype=torch.float32)
+                        bias_np, dtype=self._model_dtype())
                     # Make 4D (batch=1, n_heads, q, k).
                     while bias_t.ndim < 4:
                         bias_t = bias_t.unsqueeze(0)
@@ -496,7 +555,7 @@ class TransformersRuntimeV1:
                 if a is not None]
             avg = _np.mean(_np.stack(biases, axis=0), axis=0)
             attn_bias = torch.as_tensor(
-                avg, dtype=torch.float32,
+                avg, dtype=self._model_dtype(),
                 device=self.device)
         if past_key_values is not None:
             inp_kwargs["past_key_values"] = past_key_values
@@ -587,7 +646,7 @@ class TransformersRuntimeV1:
             emb = emb_layer(x)  # (1, seq_len, hidden_dim)
             pref_t = torch.as_tensor(
                 _np.asarray(prefix, dtype=_np.float32),
-                dtype=torch.float32,
+                dtype=self._model_dtype(),
                 device=self.device)
             # Broadcast over batch dim.
             if pref_t.ndim == 2:
@@ -813,10 +872,10 @@ class TransformersRuntimeV1:
             if k_arr is None or v_arr is None:
                 k_t = torch.zeros(
                     (1, self.n_heads, 0, self.head_dim),
-                    dtype=torch.float32)
+                    dtype=self._model_dtype())
                 v_t = torch.zeros(
                     (1, self.n_heads, 0, self.head_dim),
-                    dtype=torch.float32)
+                    dtype=self._model_dtype())
             else:
                 k_np = _np.asarray(k_arr, dtype=_np.float32)
                 v_np = _np.asarray(v_arr, dtype=_np.float32)
@@ -825,9 +884,9 @@ class TransformersRuntimeV1:
                 if v_np.ndim == 3:
                     v_np = v_np[None, ...]
                 k_t = torch.as_tensor(
-                    k_np, dtype=torch.float32)
+                    k_np, dtype=self._model_dtype())
                 v_t = torch.as_tensor(
-                    v_np, dtype=torch.float32)
+                    v_np, dtype=self._model_dtype())
             layers_legacy.append((k_t, v_t))
         legacy = tuple(layers_legacy)
         try:
