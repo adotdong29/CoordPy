@@ -5,9 +5,103 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W82 W83
-> Composed Frontier-Substrate / Learned-Memory / Long-Horizon
-> Multi-Agent Recovery milestone, 2026-05-18.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W83 W84
+> Post-W83 Blocker Audit / Tightening milestone, 2026-05-19.
+
+## TL;DR — W84 Post-W83 Blocker Audit & Tightening (post-W83 research milestone)
+
+W84 audits the new post-W83 blocker backlog (meta issue #49)
+against every P0 (#25–#29) and P1 (#30–#37) child issue's
+explicit Definition of Done and *How NOT to close this* anti-
+cheat clauses. The audit verdicts and the W84 in-repo tightening
+work land together. See
+``docs/AUDIT_POST_W83_BLOCKERS.md`` for the audit ledger and
+``docs/RESULTS_W84_POST_W83_BLOCKER_TIGHTENING.md`` for the
+result note.
+
+W84 ships eleven new modules:
+
+* ``coordpy.budget_enforcement_v1`` — `RunBudgetSpecV1` +
+  `BudgetEnforcerV1` + content-addressed `CostModelV1` + over-
+  budget stress bench (#37, partial).
+* ``coordpy.tool_call_substrate_v1`` — `ToolCallSchemaV1` +
+  `ToolResultSchemaV1` + sandboxed `ToolSandboxAdapterV1` +
+  idempotency contract + 5-agent audit-replayable team bench
+  (#33, partial).
+* ``coordpy.constrained_policy_optimisation_v1`` —
+  `LagrangianRefinementV1` + per-action floors/ceilings +
+  projection fallback + 10-seed floor-recovery bench + price-
+  of-safety report (#34, partial).
+* ``coordpy.streaming_substrate_intercept_v1`` — per-token
+  streaming forward on the W79 controlled runtime +
+  real SSE endpoint + mid-stream injection (#32, partial).
+* ``coordpy.capacity_bench_harness_v1`` — three-axis capacity
+  bench + `EventGraphIndexedQueryCacheV1` remediation +
+  identified cliff + measured 5–7× speedup (#36, partial; NOT
+  full OoM).
+* ``coordpy.cross_process_distributed_substrate_v1`` — two real
+  OS subprocesses + mTLS-shaped HMAC handshake +
+  `PartitionProxyV1` + ±5 s skew + idempotent apply across
+  real network (#29, partial; literal multi-host still
+  blocked-on-hardware).
+* ``coordpy.frontier_capability_probe_v1`` — honest hardware
+  probe; refuses to mock a frontier model; bench harness raises
+  `FrontierBlockedOnHardwareError` when no 7B+ open-weight
+  model is locally cached (#25, infrastructure; STILL OPEN).
+* ``coordpy.live_hidden_state_dataset_v1`` —
+  `LiveHiddenStateDatasetCapsuleV1` + `TrainingTraceWitnessV1`
+  + held-out disjointness enforcement; raises
+  `LiveTrainingBlockedOnHardwareError` when transformers / torch
+  are absent — never falls back to synthetic data (#26,
+  infrastructure; STILL OPEN).
+* ``coordpy.long_context_substrate_bench_v1`` — needle-in-
+  haystack corpus + controlled-runtime long-context substrate
+  vs bounded-V3 head-to-head at {2k, 8k, 32k} (#27, partial;
+  live-LLM 32k still blocked-on-hardware).
+* ``coordpy.real_task_bench_adapter_v1`` — `RealTaskBenchAdapter
+  V1` contract + SWE-bench-Lite JSONL ingest +
+  `RealTaskBenchPlanChainV1` Merkle root; refuses to run the
+  full harness without a real model client (#28,
+  infrastructure; STILL OPEN).
+* ``coordpy.precision_tier_contract_v1`` — three first-class
+  precision tiers (TIER_FP32 / TIER_BF16 / TIER_INT8) with
+  per-tier `max_abs_diff_floor` and `semantic_equivalence_floor`;
+  contract refuses widened-floor declarations (#30,
+  infrastructure; STILL OPEN).
+
+Four written proofs are added under ``papers/proofs/``:
+
+* `w84_proof_trust_weighted_consensus_error_bound.md` (#35).
+* `w84_proof_integrity_drop_does_not_increase_error.md` (#35).
+* `w84_proof_lhr_slot_capacity_bound.md` (#35).
+* `w84_proof_replay_from_kv_exact.md` (#35).
+
+Each proof ships an empirical sanity test in
+`tests/test_w84_analytical_bounds.py` confirming the proved
+bound is NOT violated by the existing benches.
+
+**No issue in #49 is closed by W84**, by design — the audit is
+strict. P0 #25, #26, #27, #28 remain hardware-blocked on this
+host (no GPU + no 7B+ open-weight model in cache); their
+infrastructure is wired so a GPU host runs the benches without
+re-implementing. P0 #29 and P1 #32, #33, #34, #35, #36, #37 are
+materially tightened with measurable in-repo gains; they remain
+open in the meta issue because the literal multi-machine or
+production-bench bars are not met yet.
+
+**Stable boundary preservation**: ``coordpy.__version__``
+unchanged at 0.5.20; ``coordpy.SDK_VERSION`` unchanged at
+``coordpy.sdk.v3.43``. No PyPI publish. ``coordpy/__init__.py``
+untouched. All W84 modules are explicit-import only.
+
+**Test count delta**: +88 new W84 tests; all pass. W83 + W82 +
+W81 + W80 + W79 baselines remain green.
+
+See:
+* ``docs/AUDIT_POST_W83_BLOCKERS.md`` — strict audit of every
+  P0/P1 child against DoD + anti-cheat clauses.
+* ``docs/RESULTS_W84_POST_W83_BLOCKER_TIGHTENING.md`` — W84
+  result note.
 
 ## TL;DR — W83 Composed Frontier-Substrate / Learned-Memory / Long-Horizon Multi-Agent Recovery (post-W82 research milestone)
 

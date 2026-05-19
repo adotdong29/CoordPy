@@ -13,6 +13,58 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W84 Post-W83 Blocker Audit & Tightening**
+  (post-W83, 2026-05-19) —
+  *strict honesty pass over the new post-W83 blocker backlog
+  meta issue #49. Eleven new W84 modules + four written
+  proofs land. **No issue in #49 is closed by W84 by design**
+  — the audit is strict. P0 #25–#28 remain hardware-blocked
+  on this host (no GPU, no 7B+ open-weight model in cache);
+  the W84 capability-probe + adapter-shape infrastructure
+  wires those benches so a GPU host can run them without
+  re-implementation. P0 #29 ships partial cross-process
+  distributed substrate with mTLS-shaped HMAC + partition
+  proxy + ±5 s skew + idempotent apply across real TCP
+  sockets (two real OS subprocesses on the same machine;
+  literal multi-host remains open). P1 line is materially
+  tightened: #32 streaming substrate (per-token forward +
+  SSE endpoint + mid-stream injection on the controlled
+  runtime; CID equivalence at fp64 floor), #33 tool
+  substrate (content-addressed `ToolCallSchemaV1` /
+  `ToolResultSchemaV1` + sandboxed `ToolSandboxAdapterV1` +
+  idempotency contract + 5-agent merged-audit team bench),
+  #34 constrained policy (Lagrangian + projection + 10-seed
+  floor-recovery bench; Lagrangian strictly beats unconstrained
+  REINFORCE on floor respect), #35 analytical bounds (four
+  written proofs + empirical sanity tests confirming the
+  bounds are not violated), #36 capacity scaling (3-axis bench
+  + `EventGraphIndexedQueryCacheV1` remediation moving the
+  BY_KIND cliff ~5–7× at Q=100 N=50k — not full OoM,
+  reported honestly), #37 budget enforcement (`RunBudgetSpec
+  V1` + pre-action `BudgetEnforcerV1` + content-addressed
+  cost model + breach audits + over/under-budget stress
+  bench). Modules added under `coordpy/`:
+  `budget_enforcement_v1`, `tool_call_substrate_v1`,
+  `constrained_policy_optimisation_v1`,
+  `streaming_substrate_intercept_v1`,
+  `capacity_bench_harness_v1`,
+  `cross_process_distributed_substrate_v1`,
+  `frontier_capability_probe_v1`,
+  `live_hidden_state_dataset_v1`,
+  `long_context_substrate_bench_v1`,
+  `real_task_bench_adapter_v1`,
+  `precision_tier_contract_v1`. Proofs added under
+  `papers/proofs/`:
+  `w84_proof_trust_weighted_consensus_error_bound`,
+  `w84_proof_integrity_drop_does_not_increase_error`,
+  `w84_proof_lhr_slot_capacity_bound`,
+  `w84_proof_replay_from_kv_exact`. `coordpy.__version__ ==
+  "0.5.20"`, `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`.
+  No version bump. No PyPI release. **+88 new W84 tests**
+  pass. W79–W83 baselines remain green. Result note:
+  `docs/RESULTS_W84_POST_W83_BLOCKER_TIGHTENING.md`.
+  Audit ledger: `docs/AUDIT_POST_W83_BLOCKERS.md`.
+
 - **W83 Composed Frontier-Substrate / Learned-Memory /
   Long-Horizon Multi-Agent Recovery**
   (post-W82, 2026-05-18) —

@@ -2,9 +2,93 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W82
-> W83 Composed Frontier-Substrate / Learned-Memory / Long-Horizon
-> Multi-Agent Recovery milestone, 2026-05-18.
+> README-of-README must satisfy these rules. Last touched: post-W83
+> W84 Post-W83 Blocker Audit & Tightening milestone, 2026-05-19.
+
+## W84 (Post-W83 Blocker Audit & Tightening) — explicit do-not-overstate rules
+
+W84 is a strict audit + in-repo tightening pass. The W84 work
+materially strengthens the P1 surface; it does NOT close the
+P0 hardware-blocked line. The following rules are mandatory
+reading before any W84 claim is repeated.
+
+- **W84 does NOT close any post-W83 P0 issue.** Issues #25
+  (frontier 7B+), #26 (live training), #27 (live-LLM long
+  context), and #28 (real-task bench head-to-head) remain
+  honestly hardware-blocked. W84 ships capability-probe and
+  adapter-shape infrastructure so a GPU host can run them;
+  it does not run them. **Carry-forward limitation:**
+  ``W84-L-AUDIT-NO-CLOSURE-CAP``.
+- **W84 does NOT close real cross-host distributed substrate
+  (#29).** The cross-process work spawns two real OS
+  subprocesses with mTLS-shaped HMAC + partition + skew +
+  idempotent apply over real TCP sockets — but both run on
+  the SAME machine. The DoD's literal multi-machine bar
+  remains open. **Carry-forward limitation:**
+  ``W84-L-CROSS-PROCESS-DISTRIBUTED-V1-SAME-HOST-CAP``.
+- **W84 mTLS is HMAC-shaped, not X.509.** The protocol
+  property (mutual auth on every connection, refusal of
+  unsigned peers) holds; the wire format is HMAC-SHA256 plus
+  a content-addressed trust-root CID. Real X.509 cert exchange
+  is W85+. **Carry-forward limitation:**
+  ``W84-L-CROSS-PROCESS-DISTRIBUTED-V1-HMAC-NOT-X509-CAP``.
+- **W84 does NOT close quantized runtime (#30).** The
+  precision-tier contract ships (TIER_FP32 / TIER_BF16 /
+  TIER_INT8 with declared per-tier floors), and the
+  contract refuses widened floors. But int8 weights are not
+  loaded — that needs bitsandbytes + CUDA, which this host
+  does not have. **Carry-forward limitation:**
+  ``W84-L-PRECISION-TIER-V1-NO-INT8-LOAD-CAP``.
+- **W84 does NOT advance MoE substrate (#31).** Blocked on
+  Mixtral / Qwen-MoE weights + GPU.
+- **W84 streaming intercept runs on the controlled NumPy
+  runtime, not HF transformers.** The CID-equivalence claim
+  is at the fp64 NumPy floor (1e-10). HF streaming is V2.
+  **Carry-forward limitation:**
+  ``W84-L-STREAMING-V1-CONTROLLED-RUNTIME-ONLY-CAP``.
+- **W84 tool substrate uses pure-Python sandboxes.** A real
+  production sandbox (Docker / subprocess + seccomp) is V2.
+  RAG-index state-content-addressing is V2. Stateful database
+  transactions are V2. **Carry-forward limitations:**
+  ``W84-L-TOOL-SUBSTRATE-V1-PURE-PYTHON-CAP``,
+  ``W84-L-TOOL-SUBSTRATE-V1-NO-STATEFUL-DB-CAP``.
+- **W84 constrained policy V1 uses Lagrangian + projection.**
+  TRPO / PPO-clip variants and multi-policy refinement are
+  V2. Mean-utility "price of safety" can be negative on the
+  W84 default floor-press regime because unconstrained
+  REINFORCE gets stuck in a poor local optimum; the bench
+  honestly reports both signs. **Carry-forward limitation:**
+  ``W84-L-CONSTRAINED-POLICY-V1-LINEAR-CAP``.
+- **W84 analytical bounds are math-readable, not formally
+  verified.** Four proofs ship under `papers/proofs/`; each
+  has an empirical sanity test that does NOT violate the
+  bound. Formal verification (Lean / Coq / Isabelle) is the
+  separate P3 issue #48. **Carry-forward limitation:**
+  ``W84-L-PROOFS-V1-MATH-READABLE-CAP``.
+- **W84 capacity bench cliff does NOT move a full order of
+  magnitude.** At Q=100, N=50k the measured cliff move is
+  ~5–7× (not the 10× the issue body asks for). W84 reports
+  the speedup factor honestly and the
+  ``cliff_moves_at_least_one_order_of_magnitude`` field is
+  ``False`` at the default config. **Carry-forward
+  limitation:** ``W84-L-CAPACITY-V1-NOT-FULL-OOM-CAP``.
+- **W84 budget enforcement is per-run, not per-tenant.**
+  Per-tenant / per-agent / per-step budgets compose with
+  multi-tenancy issue #43 and are V2. Dynamic cost models
+  are V2. **Carry-forward limitations:**
+  ``W84-L-BUDGET-ENFORCEMENT-V1-PER-RUN-CAP``,
+  ``W84-L-BUDGET-ENFORCEMENT-V1-STATIC-COST-MODEL-CAP``.
+- **W84 real-task bench adapter is plan-only.** The adapter
+  ingests SWE-bench-Lite JSONL and emits a Merkle-rooted
+  plan chain; it refuses to run the full harness without a
+  real model client. **Carry-forward limitations:**
+  ``W84-L-REAL-TASK-BENCH-V1-PLAN-ONLY-CAP``,
+  ``W84-L-REAL-TASK-BENCH-V1-SWE-BENCH-LITE-ONLY-CAP``.
+- **W84 long-context bench is substrate-side only.** The
+  controlled-runtime substrate strictly beats bounded-V3 at
+  8k and 32k positions on the needle-in-haystack task. This
+  is NOT a live-LLM 32k claim. **Carry-forward limitation:**
+  ``W84-L-LONG-CONTEXT-V1-CONTROLLED-RUNTIME-CAP``.
 
 ## W83 (Composed Frontier-Substrate / Learned-Memory / Long-Horizon Multi-Agent Recovery) — explicit do-not-overstate rules
 

@@ -1,6 +1,31 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W82 / W83, 2026-05-18 —
+> **Latest milestone marker (post-W83 / W84, 2026-05-19 —
+> Post-W83 Blocker Audit & Tightening, forty-second
+> post-release research milestone — strict honesty pass
+> over the new post-W83 blocker backlog meta issue #49.
+> Eleven new W84 modules + four written proofs land. No
+> issue in #49 is closed by W84 by design — the audit is
+> strict. P0 #25–#28 remain hardware-blocked on this host;
+> the W84 capability-probe + adapter-shape infrastructure
+> wires those benches so a GPU host can run them without
+> re-implementation. P1 #29 (partial cross-process distributed
+> with mTLS-shaped HMAC + partition + skew + idempotency),
+> #32 (streaming substrate with per-token + SSE + mid-stream
+> injection on the controlled runtime), #33 (tool substrate
+> with content-addressed call/result + sandbox + idempotency
+> + 5-agent merged-audit team bench), #34 (Lagrangian +
+> projection + 10-seed floor-recovery bench), #35 (four
+> written proofs + empirical sanity tests), #36 (3-axis
+> capacity bench + indexed-query remediation moving the cliff
+> ~5–7× at Q=100 N=50k), #37 (RunBudgetSpecV1 + pre-action
+> enforcer + content-addressed cost model + breach audits)
+> are materially tightened. ``coordpy.__version__ ==
+> "0.5.20"``, ``coordpy.SDK_VERSION == "coordpy.sdk.v3.43"``.
+> No version bump. No PyPI release. +88 new W84 tests pass.
+> W79–W83 baselines remain green.**
+
+> **Previous milestone marker (post-W82 / W83, 2026-05-18 —
 > Composed Frontier-Substrate / Learned-Memory / Long-Horizon
 > Multi-Agent Recovery, forty-first post-release research
 > milestone — first milestone after the W80/W81/W82
