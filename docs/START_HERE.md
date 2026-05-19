@@ -795,6 +795,11 @@ you need milestone-by-milestone history.
 > | Team-boundary capsule formalism (W4) | [`CAPSULE_TEAM_FORMALISM.md`](CAPSULE_TEAM_FORMALISM.md)           |
 > | Long-running master plan             | [`context_zero_master_plan.md`](context_zero_master_plan.md)       |
 > | Two-Mac MLX runbook                  | [`MLX_DISTRIBUTED_RUNBOOK.md`](MLX_DISTRIBUTED_RUNBOOK.md)         |
+> | Post-W82 research milestone (W83)    | [`RESULTS_W83_COMPOSED_FRONTIER_SUBSTRATE_LEARNED_MEMORY.md`](RESULTS_W83_COMPOSED_FRONTIER_SUBSTRATE_LEARNED_MEMORY.md) |
+> | Pre-committed success bar (W83)      | [`SUCCESS_CRITERION_W83_COMPOSED_FRONTIER_SUBSTRATE_LEARNED_MEMORY.md`](SUCCESS_CRITERION_W83_COMPOSED_FRONTIER_SUBSTRATE_LEARNED_MEMORY.md) |
+> | Post-W81 blocker attack (W82)        | [`W82_P2_BLOCKER_ATTACK.md`](W82_P2_BLOCKER_ATTACK.md) |
+> | Post-W80 blocker attack (W81)        | [`W81_P1_BLOCKER_ATTACK.md`](W81_P1_BLOCKER_ATTACK.md) |
+> | Post-W79 blocker attack (W80)        | [`W80_CAPABILITY_MATRIX.md`](W80_CAPABILITY_MATRIX.md) |
 > | Post-W65 research milestone (W66)    | [`RESULTS_W66_STRONGER_TEAM_SUBSTRATE_OS.md`](RESULTS_W66_STRONGER_TEAM_SUBSTRATE_OS.md) |
 > | Pre-committed success bar (W66)      | [`SUCCESS_CRITERION_W66_STRONGER_TEAM_SUBSTRATE_OS.md`](SUCCESS_CRITERION_W66_STRONGER_TEAM_SUBSTRATE_OS.md) |
 > | Post-W64 research milestone (W65)    | [`RESULTS_W65_TEAM_SUBSTRATE_COORDINATION.md`](RESULTS_W65_TEAM_SUBSTRATE_COORDINATION.md) |

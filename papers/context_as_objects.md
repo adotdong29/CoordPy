@@ -2,10 +2,40 @@
 
 > Main paper draft for the Context Zero programme.
 >
-> **Post-W78 research-line update (W79 Stronger Direct-Blocker-
-> Attack / Replacement-Then-Restart-After-Long-Delay /
-> Controlled-Runtime Substrate / OpenAI-Compatible-Façade /
-> Learned-Consolidation Budget-Primary Two-Plane Multi-Agent
+> **Post-W82 research-line update (W83 Composed Frontier-Substrate
+> / Learned-Memory / Long-Horizon Multi-Agent Recovery,
+> 2026-05-18).**
+>
+> *Forty-first post-release research milestone — first
+> milestone after the W80/W81/W82 P0/P1/P2 blocker-attack stack
+> to **compose** those building blocks into one learned,
+> integrity-anchored multi-agent recovery pipeline AND
+> demonstrate measurable composed-pipeline gains across a
+> **20-regime** sweep (19 W79 carry-forward + 1 new
+> ``composed_long_horizon_under_compound_failure``). The W83
+> contribution is structural: it composes substrate restore +
+> integrity verify + adversarial consensus repair + Merkle anchor
+> into one decision pipeline, runs the pipeline across the
+> 20-regime line, and demonstrates audit-verifiable
+> task-success at >= 0.75 overall (>=0.50 on the new regime).
+> Sixteen mechanism advances across four planes (hosted
+> control-plane, real substrate-plane, controlled-runtime /
+> local-deployment-surface, learned-memory). The strongest-
+> known bounded baseline V3 (k=256 + φ=0.65 rolling summary +
+> retrieval) abstains on 100% of horizons past coverage — the
+> bounded-context-is-good-enough hypothesis is falsified at a
+> much higher difficulty than before. Honest scope: W83 does
+> NOT pierce third-party hosted-model substrate; the hosted-
+> control-plane gain is *auditability*, not substrate access.
+> The composed_learned_memory is trained on synthetic data; the
+> distributed gateway is loopback-only. ``coordpy.__version__``
+> stays at 0.5.20; no PyPI publish. The W79 update below is
+> preserved for historical continuity.*
+
+> **Previous post-W78 research-line update (W79 Stronger
+> Direct-Blocker-Attack / Replacement-Then-Restart-After-Long-
+> Delay / Controlled-Runtime Substrate / OpenAI-Compatible-Façade
+> / Learned-Consolidation Budget-Primary Two-Plane Multi-Agent
 > Substrate Programme, 2026-05-17).**
 >
 > *Twenty-fourth substrate-attack milestone, and the

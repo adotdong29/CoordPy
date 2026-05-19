@@ -1,6 +1,59 @@
 # Context-Zero — Master Plan
 
-> **Latest milestone marker (post-W78 / W79, 2026-05-17 —
+> **Latest milestone marker (post-W82 / W83, 2026-05-18 —
+> Composed Frontier-Substrate / Learned-Memory / Long-Horizon
+> Multi-Agent Recovery, forty-first post-release research
+> milestone — first milestone after the W80/W81/W82
+> P0/P1/P2 blocker-attack stack to **compose** those building
+> blocks into one learned, integrity-anchored multi-agent
+> recovery pipeline AND demonstrate measurable composed-
+> pipeline gains across a **20-regime** sweep (19 W79 carry-
+> forward + 1 new ``composed_long_horizon_under_compound_
+> failure``). Sixteen mechanism advances across four planes:
+> hosted control-plane audit anchoring (``coordpy.hosted_audit_
+> anchoring_v1``), real substrate-plane composition
+> (``coordpy.compose_repair_integrity_pipeline_v1``,
+> ``coordpy.composed_long_horizon_multi_agent_recovery_v1``,
+> ``coordpy.integrity_trust_coupled_consensus_v1``),
+> controlled-runtime / local-deployment-surface (``coordpy.
+> distributed_gateway_coordination_v1``, ``coordpy.hidden_
+> state_intercept_bench_v1``), and learned-memory /
+> differentiable-reconstruction (``coordpy.composed_learned_
+> memory_v1``, ``coordpy.recurrent_slot_reconstruction_v1``,
+> ``coordpy.online_economics_refinement_v1``, ``coordpy.cross_
+> runtime_hidden_state_projector_v1``). Strongest-known bounded
+> falsifier upgraded to ``coordpy.bounded_window_baseline_v3``
+> (k=256 + φ=0.65 rolling summary + retrieval). Three benchmark
+> families: ``coordpy.r202_benchmark`` (composed team-success;
+> 7 H-bars), ``coordpy.r203_benchmark`` (V3 falsifier; 5
+> H-bars), ``coordpy.r204_benchmark`` (trainable-memory
+> gauntlet; 8 H-bars). The composed ``coordpy.w83_team``
+> strictly wraps the W79 team; ``verify_w83_handoff`` returns
+> ``(True, [])`` at default config. **65 new W83 tests** all
+> pass; W79–W82 baselines (258 tests) remain green.
+> ``coordpy.__version__ == "0.5.20"``,
+> ``coordpy.SDK_VERSION == "coordpy.sdk.v3.43"``. No version
+> bump. No PyPI release.**
+
+> **Previous milestone marker (post-W81 / W82, 2026-05-18 —
+> P2-Blocker Attack: Far-Horizon Blackout Benchmark V1 +
+> Simultaneous Compound-Failure Benchmark V1 + Cross-Runtime
+> State Portability V1 + Cryptographic State Integrity V1 +
+> Event-Sourced Memory Graph V1 + Distributed Substrate
+> Coordination V1).**
+
+> **Previous milestone marker (post-W80 / W81, 2026-05-18 —
+> P1-Blocker Attack: Deployable Substrate Gateway V1 +
+> Sequence-Conditioned Learned Consolidation V2 + Learned
+> Multi-Runtime Economics V1 + Differentiable Memory Substrate
+> V1 + Adversarial Consensus & Repair V1).**
+
+> **Previous milestone marker (post-W79 / W80, 2026-05-18 —
+> P0-Blocker Attack: Frontier-Quality Local Runtime + Runtime
+> Instrumentation Contract + Second-Backend Parity Matrix +
+> Living Capability Matrix + Live Local-Model Evaluation).**
+
+> **Previous milestone marker (post-W78 / W79, 2026-05-17 —
 > Stronger Direct-Blocker-Attack /
 > Replacement-Then-Restart-After-Long-Delay / Controlled-Runtime
 > Substrate / OpenAI-Compatible-Façade / Learned-Consolidation

@@ -5,12 +5,85 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W81 W82
-> milestone (Far-Horizon Blackout Benchmark / Simultaneous
-> Compound-Failure Benchmark / Cross-Runtime State Portability /
-> Cryptographic State Integrity / Event-Sourced Memory Graph /
-> Distributed Substrate Coordination — P2-blocker attack),
-> 2026-05-18.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W82 W83
+> Composed Frontier-Substrate / Learned-Memory / Long-Horizon
+> Multi-Agent Recovery milestone, 2026-05-18.
+
+## TL;DR — W83 Composed Frontier-Substrate / Learned-Memory / Long-Horizon Multi-Agent Recovery (post-W82 research milestone)
+
+W83 is the first milestone after the W80/W81/W82 P0/P1/P2
+blocker-attack stack to **compose** those building blocks into a
+single learned, integrity-anchored multi-agent recovery pipeline
+AND demonstrate measurable composed-pipeline gains across a
+20-regime sweep (19 W79 carry-forward + 1 new
+``composed_long_horizon_under_compound_failure``).
+
+Sixteen mechanism advances across four planes:
+
+* **Hosted control-plane gain** —
+  ``coordpy.hosted_audit_anchoring_v1`` (Merkle-rooted hosted
+  transcripts, client-side audit; does NOT pierce hosted
+  substrate).
+* **Real substrate-plane gains** —
+  ``coordpy.compose_repair_integrity_pipeline_v1`` (substrate
+  restore + integrity verify + adversarial consensus repair +
+  Merkle anchor), ``coordpy.composed_long_horizon_multi_agent_
+  recovery_v1`` (composed pipeline across 20 regimes),
+  ``coordpy.integrity_trust_coupled_consensus_v1`` (composes W82
+  integrity verdicts into W81 trust prior with hard-drop of
+  BAD_SIGNATURE).
+* **Controlled-runtime / local-deployment-surface gains** —
+  ``coordpy.distributed_gateway_coordination_v1`` (composes W81
+  HTTP deployable gateway with W82 distributed coordination over
+  real loopback TCP), ``coordpy.hidden_state_intercept_bench_
+  v1`` (live HF substrate intercept; skip-friendly when HF/torch
+  absent).
+* **Learned-memory / differentiable-reconstruction gains** —
+  ``coordpy.composed_learned_memory_v1`` (full-BPTT recurrent +
+  slot-router + slot-attention; beats W81 V2 and ridge),
+  ``coordpy.recurrent_slot_reconstruction_v1`` (differentiable
+  LHR head; beats query-only ridge and nearest-slot),
+  ``coordpy.online_economics_refinement_v1`` (REINFORCE-style
+  online policy refinement; beats offline W81 V1 on drifted
+  simulation), ``coordpy.cross_runtime_hidden_state_projector_
+  v1`` (learned least-squares projector; beats W82 deterministic
+  orthonormal projector).
+
+The strongest-known bounded baseline is also strengthened:
+``coordpy.bounded_window_baseline_v3`` (k=256 + φ=0.65 rolling
+summary + retrieval) provably abstains on 100% of horizons past
+coverage in the W83 falsifier proof; the load-bearing
+falsifier line is therefore strictly harder than W79's V2.
+
+Three benchmark families ship:
+
+* **R-202** — composed team-success benchmark across 20 regimes
+  (7 H-bars; all pass).
+* **R-203** — bounded-window-V3 falsifier benchmark (5 H-bars;
+  all pass).
+* **R-204** — trainable-memory gauntlet (8 H-bars; all pass).
+
+The new ``coordpy.w83_team`` orchestrator strictly wraps the
+W79 team and ``verify_w83_handoff`` returns ``(True, [])`` at
+default config; the W79 team's envelope CID is preserved
+byte-for-byte. **Test count delta**: +65 new W83 tests, all
+passing on Python 3.11 with NumPy. W79–W82 baselines (258
+tests) remain green after the W83 merge.
+
+Honest scope: W83 does NOT pierce third-party hosted-model
+substrate; the hosted-control-plane gain is *auditability*, not
+substrate access. The composed_learned_memory is trained on
+synthetic data; live LLM training is W84+ work. The distributed
+gateway is loopback-only. The hidden-state intercept bench
+skips when HF/torch is absent. All W83 modules are
+explicit-import only. ``coordpy.__version__`` is unchanged at
+0.5.20; no PyPI publish.
+
+See ``docs/RESULTS_W83_COMPOSED_FRONTIER_SUBSTRATE_LEARNED_MEMORY.md``
+and ``docs/SUCCESS_CRITERION_W83_COMPOSED_FRONTIER_SUBSTRATE_LEARNED_MEMORY.md``
+for the full result note + pre-committed success bar.
+``docs/THEOREM_REGISTRY.md`` carries the canonical ``W83-T-*``
+and ``W83-L-*`` block.
 
 ## TL;DR — W82 P2-Blocker Attack (post-W81 research milestone)
 

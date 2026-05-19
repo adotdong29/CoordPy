@@ -2,11 +2,74 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W81
-> W82 milestone (P2-Blocker Attack — Far-Horizon Blackout Benchmark
-> / Simultaneous Compound-Failure Benchmark / Cross-Runtime State
-> Portability / Cryptographic State Integrity / Event-Sourced
-> Memory Graph / Distributed Substrate Coordination), 2026-05-18.
+> README-of-README must satisfy these rules. Last touched: post-W82
+> W83 Composed Frontier-Substrate / Learned-Memory / Long-Horizon
+> Multi-Agent Recovery milestone, 2026-05-18.
+
+## W83 (Composed Frontier-Substrate / Learned-Memory / Long-Horizon Multi-Agent Recovery) — explicit do-not-overstate rules
+
+W83 composes the W80/W81/W82 building blocks into one learned,
+integrity-anchored multi-agent recovery pipeline. The composed
+gains are real and measured; the carry-forward caveats below are
+mandatory reading before any W83 claim is repeated.
+
+- **W83 does NOT pierce third-party hosted-model substrate.**
+  The W79 ``W79-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` carries
+  forward unchanged. Hosted audit anchoring is over the observed
+  text/logprob/prefix-cache surface only; the hosted-control-
+  plane gain is *auditability*, not substrate access.
+- **W83 does NOT validate composed_learned_memory against a live
+  LLM hidden-state trace.** Training data is synthetic temporal-
+  integration + delayed-recall sequences. Live LLM training is
+  W84+ work.
+- **W83 does NOT claim composed_learned_memory strictly beats
+  W81 differentiable memory on every dataset.** The full-BPTT
+  advantage over W81 diffmem's per-step detachment is small on
+  the W83 default seq_len=14..18 synthetic data. The load-
+  bearing W83 claim is "composed beats W81 V2 (recurrent without
+  slots) AND ridge"; "composed is competitive with W81 diffmem
+  within 15% relative MSE" is a stretch goal, not a load-bearing
+  claim.
+- **W83 does NOT replace MASC V15.** The 19 W79 MASC V15 regimes
+  are preserved unchanged. W83 introduces exactly **one** new
+  regime, ``composed_long_horizon_under_compound_failure``, at
+  the composed pipeline layer — not at MASC.
+- **W83 does NOT replace W56–W79 substrate controllers.** W83 is
+  strict composition on top of the existing substrate stack.
+- **W83 hidden-state intercept bench V1 uses ~16-token prompts
+  on distilgpt2.** Long-context replay survival is W84+ work.
+  When transformers / torch are absent, the bench skips the live
+  check and returns a content-addressed report saying
+  ``transformers_available=False``. CI on lean environments
+  stays green.
+- **W83 distributed gateway coordination V1 binds to 127.0.0.1
+  only.** Real cross-host networking (TLS, auth, firewalls,
+  partitions) is W84+ work. The destination application is still
+  in-process; only the *transport* is HTTP.
+- **W83 bounded-window baseline V3 is still bounded.** V3 is
+  the *strongest known* bounded baseline (k=256 + φ=0.65 rolling
+  summary + retrieval). The falsifier proof shows V3 abstains
+  on 100% of horizons past coverage. The load-bearing W83
+  claim is NOT that bounded context is universally falsified;
+  it is that even V3 cannot match the substrate-coupled
+  pipeline on long-horizon regimes past coverage. Bounded
+  baselines remain competitive inside the window.
+- **W83 cross-runtime hidden-state projector V1 is a learned
+  linear map.** Non-linear projectors would require matched
+  source/target pairs at scale + live model inference — both
+  out of V1 scope.
+- **W83 online economics refinement V1 uses REINFORCE with a
+  moving-average baseline.** Actor-critic or proximal policy
+  baselines are out of V1 scope. The reward signal comes from
+  the W83 drifted simulation, not from live LLM cost / quality
+  data.
+- **W83 integrity-trust-coupled consensus uses HMAC-SHA256.**
+  Full X.509 / Ed25519 PKI is out of scope. Production
+  deployments must layer real signing on top.
+- **W83 ``coordpy.__version__`` is unchanged at 0.5.20.** No
+  PyPI publish. ``coordpy/__init__.py`` untouched. Every W83
+  module is explicit-import only. The stable SDK surface is
+  byte-for-byte unchanged.
 
 ## W82 (P2-Blocker Attack — Far-Horizon Blackout Benchmark / Simultaneous Compound-Failure Benchmark / Cross-Runtime State Portability / Cryptographic State Integrity / Event-Sourced Memory Graph / Distributed Substrate Coordination) — explicit do-not-overstate rules
 

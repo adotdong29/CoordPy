@@ -13,6 +13,81 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W83 Composed Frontier-Substrate / Learned-Memory /
+  Long-Horizon Multi-Agent Recovery**
+  (post-W82, 2026-05-18) —
+  *first milestone after the W80/W81/W82 P0/P1/P2 blocker-attack
+  stack to **compose** those building blocks into one learned,
+  integrity-anchored multi-agent recovery pipeline AND
+  demonstrate measurable composed-pipeline gains across a
+  **20-regime** sweep (19 W79 carry-forward + 1 new
+  ``composed_long_horizon_under_compound_failure``)*.
+  Sixteen mechanism advances across four planes — hosted
+  control-plane: (M1) ``coordpy.hosted_audit_anchoring_v1``
+  (Merkle-rooted hosted transcripts; client-side audit;
+  does NOT pierce hosted-model substrate). Real substrate-
+  plane: (M2) ``coordpy.compose_repair_integrity_pipeline_v1``
+  (substrate restore + integrity verify + adversarial consensus
+  repair + Merkle anchor end-to-end pipeline). (M3)
+  ``coordpy.composed_long_horizon_multi_agent_recovery_v1``
+  (composed pipeline across 20 regimes; overall
+  task-success ≥ 0.75; audit-verifiable rate = 1.0). (M4)
+  ``coordpy.integrity_trust_coupled_consensus_v1`` (composes
+  W82 integrity verdicts into W81 trust prior with hard-drop
+  of BAD_SIGNATURE; beats W81 V1 on mean error;
+  refuses-to-commit under many-tampered). Controlled-runtime /
+  local-deployment-surface: (M5) ``coordpy.distributed_gateway_
+  coordination_v1`` (composes W81 HTTP deployable gateway with
+  W82 distributed coordination over real loopback TCP; merkle
+  roots match). (M6) ``coordpy.hidden_state_intercept_bench_
+  v1`` (live HF substrate intercept; skip-friendly when
+  transformers / torch absent; live: replay byte-identical +
+  hidden-state inject moves trace CID). Learned-memory /
+  differentiable-reconstruction: (M7) ``coordpy.composed_
+  learned_memory_v1`` (full-BPTT recurrent + slot-router +
+  slot-attention; beats W81 V2 and ridge; competitive with W81
+  diffmem). (M8) ``coordpy.recurrent_slot_reconstruction_v1``
+  (differentiable LHR head; beats query-only ridge AND
+  nearest-slot; competitive with full-information ridge).
+  (M9) ``coordpy.online_economics_refinement_v1`` (REINFORCE-
+  style online policy refinement on the W83 drifted deployment
+  simulation; mean utility strictly improves; optimality gap
+  strictly shrinks). (M10) ``coordpy.cross_runtime_hidden_
+  state_projector_v1`` (learned linear projector; beats W82
+  deterministic orthonormal projector on anchor cosine + on
+  downstream classifier accuracy). Strongest-known bounded
+  falsifier upgraded: (M11) ``coordpy.bounded_window_baseline_
+  v3`` (k=256 + φ=0.65 rolling summary + retrieval); abstains
+  on 100% of horizons past coverage at horizon levels {1024,
+  2048, 8192, 32_768, 100_000}. Benchmark families: (M12)
+  ``coordpy.r202_benchmark`` (composed team-success; 7
+  H-bars). (M13) ``coordpy.r203_benchmark`` (V3 falsifier;
+  5 H-bars). (M14) ``coordpy.r204_benchmark`` (trainable-
+  memory gauntlet; 8 H-bars). (M15) supporting:
+  ``DriftedDeploymentSimulationV1`` per-action multiplier
+  wrapper around the W81 sim. (M16) ``coordpy.w83_team``
+  strictly wraps the W79 team; ``verify_w83_handoff`` returns
+  ``(True, [])`` at default config.
+  Honest scope (load-bearing limitations):
+  ``W83-L-NO-THIRD-PARTY-SUBSTRATE-COUPLING-CAP`` carries
+  forward W79 unchanged; ``W83-L-COMPOSED-MEMORY-V1-SYNTHETIC-
+  CAP`` — composed_learned_memory trained on synthetic data,
+  live LLM training is W84+ work;
+  ``W83-L-HIDDEN-INTERCEPT-BENCH-V1-SHORT-PROMPT-CAP`` —
+  live HF intercept uses ~16-token prompts;
+  ``W83-L-DIST-GATEWAY-V1-LOOPBACK-CAP`` — distributed gateway
+  is 127.0.0.1-only;
+  ``W83-L-BW-V3-STILL-BOUNDED-CAP`` — V3 is still bounded;
+  ``W83-L-NEW-REGIME-IS-EXACTLY-ONE-CAP`` — W83 adds exactly
+  one new regime;
+  ``W83-L-NO-VERSION-BUMP-NO-PYPI-CAP`` —
+  ``coordpy.__version__`` stays 0.5.20, no PyPI publish,
+  ``coordpy/__init__.py`` untouched. **65 new W83 tests pass**;
+  W79–W82 baselines (258 tests) remain green. See
+  ``docs/RESULTS_W83_COMPOSED_FRONTIER_SUBSTRATE_LEARNED_
+  MEMORY.md`` for the full result note and
+  ``docs/SUCCESS_CRITERION_W83_COMPOSED_FRONTIER_SUBSTRATE_
+  LEARNED_MEMORY.md`` for the pre-committed success bar.
 - **W79 Stronger Direct-Blocker-Attack /
   Replacement-Then-Restart-After-Long-Delay / Controlled-Runtime
   Substrate / OpenAI-Compatible-Façade / Learned-Consolidation
