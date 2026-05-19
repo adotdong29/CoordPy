@@ -2,8 +2,104 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W83
-> W84 Post-W83 Blocker Audit & Tightening milestone, 2026-05-19.
+> README-of-README must satisfy these rules. Last touched: post-W84
+> W85 Frontier Text Live / GSM8K Head-To-Head / Long-Context Live
+> push milestone, 2026-05-19.
+
+## W85 (Frontier Text Live / GSM8K Head-To-Head / Long-Context Live) — explicit do-not-overstate rules
+
+W85 plugs CoordPy into a real frontier-class text runtime (NVIDIA
+NIM serving Llama-3.1-8B / Llama-3.1-70B / Llama-3.3-70B /
+Mixtral-8x7B / Phi-3.5-MoE / Qwen / Gemma / DeepSeek). NIM is
+**text-only**: there is no hidden-state hook, no KV cache export,
+no per-layer instrumentation. The W85 work materially advances
+the *text-axis* of #25 / #27 / #28 / #31 while honestly preserving
+the *substrate-axis* gap for all of them. The following rules are
+mandatory reading before any W85 claim is repeated.
+
+- **W85 does NOT close any post-W83 P0 issue.** Issues #25
+  (frontier substrate coupling), #26 (live hidden-state
+  training), #27 (live-LLM long-context with hidden-state
+  intercept) remain honestly substrate-blocked. W85 advances
+  the text-axis of #27 to **PARTIALLY SOLVED** (live composed
+  strictly beats bounded V3 at 33.5 k input tokens on both
+  Llama-3.1-8B and Llama-3.3-70B via NIM). **W85 does NOT
+  close #28** — the live N=20×3-seed GSM8K head-to-head on
+  Llama-3.1-8B-Instruct empirically refuted the strict-
+  improvement claim: B mean 71.7% < A0 mean 75.0% < A1 mean
+  81.7%. The bench infrastructure (real adapter, real Merkle
+  audit chain, real published benchmark) is materially
+  stronger than the W84 plan-only stub but the strict-improve
+  bar is NOT met. **Carry-forward limitations:**
+  ``W85-L-NO-FRONTIER-SUBSTRATE-CLOSURE-CAP``,
+  ``W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP``.
+- **W85 NIM access is text-only.** NIM exposes chat completions
+  over an OpenAI-compatible HTTP surface; there is no hidden-
+  state hook, no KV cache export, no per-layer instrumentation,
+  no cross-runtime state export. The W85
+  ``NIMFrontierCapabilityClaimV1`` records ``hidden_state_access
+  =False``, ``kv_cache_replay=False``,
+  ``per_layer_instrumentation=False``,
+  ``cross_runtime_state_export=False`` — these axes MUST appear
+  as ``False`` in any honest claim. **Carry-forward
+  limitations:** ``W85-L-NIM-FRONTIER-TEXT-ONLY-CAP``,
+  ``W85-L-NIM-FRONTIER-NO-SUBSTRATE-CAP``,
+  ``W85-L-NIM-FRONTIER-REMOTE-CAP``.
+- **W85 long-context live bench measures task success, not
+  substrate-side replay.** The needle-in-haystack bench
+  measures whether the composed retrieval pipeline produces
+  the correct needle on a live frontier text model; it does NOT
+  measure substrate hidden-state intercept moves CID. The
+  hidden-state intercept bar of #27 remains OPEN. The bench's
+  3-arm head-to-head (A\_FULL / A\_BOUNDED\_V3 / B\_COMPOSED)
+  uses a *perfect substring retrieval* as the composed-pipeline
+  block-selection step; this is an upper bound on what a real
+  W82 substrate slot recovery would achieve, which is honest
+  because the W82 substrate's load-bearing property is exactly
+  "indexed view over past content; serve the relevant slot".
+  **Carry-forward limitations:**
+  ``W85-L-LONG-CONTEXT-LIVE-V1-NIM-TEXT-ONLY-CAP``,
+  ``W85-L-LONG-CONTEXT-LIVE-V1-CHAR-PROXY-CAP``.
+- **W85 GSM8K bench is on a published math-reasoning benchmark,
+  not on SWE-bench-Verified.** The #28 issue body lists
+  SWE-bench / GAIA / MLE-bench / OSWorld as "Good candidates"
+  but the prose reads "pick one and do it well". W85 picks
+  GSM8K (Cobbe et al. 2021), a real, published, widely-cited
+  math-reasoning benchmark with a canonical 1319-problem test
+  set and a published numeric-exact-match metric. SWE-bench-
+  Verified is not satisfied. Any claim that #28 is *fully*
+  closed by W85 would overstate. **Carry-forward limitation:**
+  ``W85-L-REAL-TASK-BENCH-V1-NOT-SWE-BENCH-CAP``.
+- **W85 head-to-head sample size is 60 problems per arm.**
+  20 problems × 3 seeds. Within-seed variance and seed-to-seed
+  variance are both reported as bench bools, not hidden behind
+  point estimates. Any claim that asserts a strict-improvement
+  bool on this bench must point at the bench bools, not at the
+  raw means. **Carry-forward limitation:**
+  ``W85-L-GSM8K-BENCH-V1-N20-SUBSET-CAP``.
+- **W85 does NOT advance #25 in the substrate sense.** The
+  frontier-class open-weight models are reachable via NIM
+  text-only. The W80 instrumentation contract is NOT exercised
+  via NIM. Issue #25's load-bearing claim is *substrate
+  coupling*, not *text-only reachability*. **Carry-forward
+  limitation:** ``W85-L-NIM-FRONTIER-NO-SUBSTRATE-CAP``.
+- **W85 does NOT advance #29 (real cross-host distributed
+  substrate).** NIM is not a substrate participant. The W84
+  cross_process_distributed_substrate_v1 remains the
+  load-bearing line for the protocol properties; literal
+  multi-machine still requires real hosts.
+- **W85 GSM8K audit chain is offline-verifiable.** Each call
+  emits a content-addressed capsule; the bench Merkle root
+  commits to all outcome capsules. The driver writes a
+  per-call sidecar (full prompts + responses) so the chain is
+  verifiable from disk without re-calling NIM. This honestly
+  satisfies the #28 anti-cheat "must be re-verifiable from
+  disk by a third party". A third party need NIM access only
+  if they want to RE-RUN the bench, not to VERIFY the
+  Merkle chain. **Carry-forward limitation:**
+  ``W85-L-GSM8K-BENCH-V1-SIDECAR-REQUIRED-FOR-OFFLINE-VERIFY-CAP``.
+
+
 
 ## W84 (Post-W83 Blocker Audit & Tightening) — explicit do-not-overstate rules
 

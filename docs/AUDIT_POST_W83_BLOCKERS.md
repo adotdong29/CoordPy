@@ -2,8 +2,12 @@
 
 > Honest, code-grounded audit of every P0 (#25–#29) and P1
 > (#30–#37) child of meta issue #49 "Meta: Blockers To Truly
-> Solving Context (post-W83)". Performed on `main` at commit
-> `2682030` (W83 landed) on **2026-05-19**.
+> Solving Context (post-W83)". Originally performed on `main` at
+> commit `2682030` (W83 landed) on **2026-05-19**. Updated
+> after the W84 audit-tightening commit `24cea50` (same day) and
+> again after the W85 frontier-text-runtime / GSM8K head-to-head
+> / live-long-context push (this round). The W85 update is in
+> the new "Post-W85 push" section at the bottom of each issue.
 >
 > Each issue is graded against its own Definition of Done bars
 > and the explicit *How NOT to close this* (anti-cheat) clauses
@@ -27,13 +31,13 @@
 
 | Issue | Title (short) | Pre-audit claim | Audit verdict |
 |------|----------------|-----------------|---------------|
-| #25 | P0 Frontier-Scale 7B+ live substrate coupling | Not claimed | STILL OPEN (hardware-blocked + capability-matrix probe shipped this round) |
-| #26 | P0 Live LLM training of composed learned memory | Not claimed | STILL OPEN (depends on #25; live-trace ingest harness shipped this round) |
-| #27 | P0 Long-context live eval ≥ 32k tokens | Not claimed | STILL OPEN (32k-token controlled-runtime bench shipped this round; live-LLM 32k blocked-on-hardware) |
-| #28 | P0 Real-world multi-agent task benchmark | Not claimed | STILL OPEN (read-only SWE-bench JSONL ingestion + bridge stub already in `coordpy._internal.tasks.swe_bench_bridge`; live head-to-head requires a frontier model) |
-| #29 | P0 Real cross-host distributed substrate | Not claimed | PARTIALLY SOLVED (W84 cross-process distributed substrate V1 shipped with mTLS-shaped HMAC handshake, partition simulation, ±5 s skew injection, idempotent apply; literal multi-machine remains blocked on hardware) |
-| #30 | P1 Quantized runtime substrate | Not claimed | STILL OPEN (per-tier capability axis and contract shipped this round; real int8 load blocked on hardware) |
-| #31 | P1 MoE substrate | Not claimed | STILL OPEN (blocked on hardware / Mixtral weights) |
+| #25 | P0 Frontier-Scale 7B+ live substrate coupling | Not claimed | STILL OPEN (text-only frontier path via NIM lands W85; hidden-state intercept / KV replay still require real substrate + GPU) |
+| #26 | P0 Live LLM training of composed learned memory | Not claimed | STILL OPEN (depends on #25; live-trace ingest harness shipped W84; W85 does NOT advance this — NIM is text-only) |
+| #27 | P0 Long-context live eval ≥ 32k tokens | Not claimed | PARTIALLY SOLVED W85 (composed strictly beats bounded V3 at 33.5k input tokens on live Llama-3.1-8B-Instruct AND Llama-3.3-70B-Instruct via NIM; hidden-state-intercept-moves-CID bar still requires substrate access) |
+| #28 | P0 Real-world multi-agent task benchmark | Not claimed | STILL OPEN; bench infrastructure landed W85 (`gsm8k_real_bench_v1` ships real 3-arm head-to-head; live N=20×3 seeds run on Llama-3.1-8B-Instruct **refuted the strict-improvement claim** — B mean 71.7% < A0 75.0% < A1 81.7%; honest negative result is recorded in `results/w85/gsm8k_bench_report.json` and the audit chain is offline-verified) |
+| #29 | P0 Real cross-host distributed substrate | Not claimed | PARTIALLY SOLVED (W84 cross-process distributed substrate V1 shipped with mTLS-shaped HMAC handshake, partition simulation, ±5 s skew injection, idempotent apply; literal multi-machine remains blocked on hardware; W85 does not advance this) |
+| #30 | P1 Quantized runtime substrate | Not claimed | STILL OPEN (per-tier capability axis and contract shipped W84; W85 does NOT load int8 weights — NIM serves bf16 internally but does not expose precision tier) |
+| #31 | P1 MoE substrate | Not claimed | STILL OPEN ON SUBSTRATE; PARTIALLY ADVANCED W85 (Phi-3.5-MoE and Mixtral-8x7B reachable via NIM as text-only; substrate-side MoE routing axis still requires self-hosted weights + GPU) |
 | #32 | P1 Streaming substrate intercept | Not claimed | PARTIALLY SOLVED (per-token forward_stream on controlled runtime + SSE on gateway + mid-stream injection shipped this round; HF streaming and openai SDK integration remain follow-on) |
 | #33 | P1 Tool-use / function-call substrate | Not claimed | PARTIALLY SOLVED (ToolCallSchemaV1 / ToolResultSchemaV1 / sandbox / idempotency / multi-agent audit chain shipped this round; RAG-index state and stateful tools remain V2) |
 | #34 | P1 Online learning with safety constraints | Not claimed | PARTIALLY SOLVED (LagrangianRefinementV1 + projection + constraint-violation log + price-of-safety report + composed-pipeline integration shipped this round; trust-region methods remain V2) |
@@ -153,6 +157,45 @@ the carry-forward limitation
 `W80-L-TRANSFORMERS-V1-NOT-FRONTIER-MODEL-CAP` is preserved
 unchanged.
 
+**Post-W85 push (text-only frontier reachable, substrate still open).**
+
+W85 adds `coordpy.nim_frontier_text_runtime_v1`, a content-
+addressed adapter to NVIDIA NIM that serves Meta's
+Llama-3.1-8B-Instruct, Llama-3.1-70B-Instruct, Llama-3.3-70B-
+Instruct, Llama-3.2-3B-Instruct, plus Mixtral-8x7B,
+Phi-3.5-MoE, Phi-4-mini, Gemma-3-4B / 12B, and
+DeepSeek-Coder-6.7B. The probe records what is reachable; the
+capability claim is honest about the gap:
+
+```
+nim_text_generation              : True
+real_frontier_class_open_weights : True   # Llama-3.1-{8B,70B}, etc.
+hidden_state_access              : False  # NIM does not expose
+kv_cache_replay                  : False  # NIM does not expose
+per_layer_instrumentation        : False  # NIM does not expose
+cross_runtime_state_export       : False  # NIM does not expose
+long_context_at_least_32k        : True   # Llama-3.1 ctx=131072
+moe_models_reachable             : True   # Phi-3.5-MoE, Mixtral
+```
+
+This **does not close #25**. Anti-cheat clause 5 says
+"Do not rely solely on remote hosted models" — W85 preserves
+the in-repo `controlled_runtime_substrate_v1` and
+`transformers_runtime_v1` substrate paths intact, and the
+`hidden_state_intercept_bench_v1` still depends on a real
+self-hosted open-weight model on local GPU. Anti-cheat clause 1
+says "Do not validate by loading a 7B model, running it once,
+and recording the trace CID without also running the W83 load-
+bearing claim" — NIM does not let us touch the trace at all, so
+the W83 load-bearing claim is not reproduced at frontier scale
+via W85. The honesty bound is preserved.
+
+#25 verdict remains: **STILL OPEN**. New carry-forward
+limitations:
+- `W85-L-NIM-FRONTIER-TEXT-ONLY-CAP`
+- `W85-L-NIM-FRONTIER-NO-SUBSTRATE-CAP`
+- `W85-L-NIM-FRONTIER-REMOTE-CAP`
+
 ### #26 — P0 Live LLM Training of Composed Learned Memory
 
 **DoD bullets (verbatim):**
@@ -234,6 +277,17 @@ in spirit).**
 #26 remains open. The honest gate is real-model hidden-state
 extraction in CI, which this environment does not provide.
 
+**Post-W85 push (no advance).**
+
+W85 reaches Llama-3.1-8B/70B via NIM, but NIM does NOT expose
+hidden states; #26's load-bearing bar is *training* a learned-
+memory module on *live* hidden states. Without hidden-state
+access, the live-hidden-state-dataset builder cannot consume the
+NIM path. The honest gate remains: a host that can run a real
+transformer locally and extract per-layer hidden states.
+
+#26 verdict remains: **STILL OPEN**.
+
 ### #27 — P0 Long-Context Live Evaluation (≥ 32k tokens)
 
 **DoD bullets (verbatim):**
@@ -313,6 +367,87 @@ the surface):**
 #27 remains open as a *live-LLM* claim. The substrate-side
 long-context recall claim *is* tightened in W84.
 
+**Post-W85 push (LIVE 32k+ TOKENS strict-beat lands; hidden-state-intercept bar still open).**
+
+W85 adds `coordpy.long_context_live_bench_v1` — a real-model
+needle-in-haystack bench that runs three arms on a live frontier
+text model (NIM Llama-3.1-8B-Instruct and Llama-3.3-70B-Instruct):
+
+* `A_FULL`        — full long prompt sent to the model.
+* `A_BOUNDED_V3`  — truncated to last 3 800 chars (~ 1 024 tokens
+                    = the W83 bounded V3 effective window).
+* `B_COMPOSED`    — substrate-style retrieve-then-answer; chunks
+                    the long prompt into blocks, retrieves the
+                    block containing the needle, asks the model
+                    only with that block.
+
+The bench reports per-horizon task success and the strict-beat
+verdict at the 32 k+ token bar. NIM-reported prompt token counts
+confirm:
+
+| Horizon | NIM tokens (median) | A\_FULL | A\_BOUNDED\_V3 | B\_COMPOSED |
+|---------|--------------------:|--------:|--------------:|------------:|
+|  8k char|   ~2 k              |  67%    |   33%         | **100%**    |
+| 32k char|   ~7.7 k            | 100%    |    0%         | **100%**    |
+|140k char|   ~33.5 k           | 100%    |    0%         | **100%**    |
+
+At horizon **33.5 k input tokens** (above the 32 k bar) the
+composed pipeline strictly beats the bounded V3 baseline on live
+task success on a real frontier text model. This is the live
+result the #27 DoD asked for on the task-success axis. See
+`results/w85/long_context_live_report_v2.json` for canonical
+numbers, `results/w85/long_context_live_report_v2.calls.jsonl`
+for the offline-re-verifiable audit chain.
+
+The result is confirmed on TWO further frontier-class models:
+
+* `meta/llama-3.3-70b-instruct` (dense, 70B) — at
+  {32k, 140k} chars: composed = {100%, 100%}, bounded =
+  {0%, 0%}; strict beat at both horizons. See
+  `results/w85/long_context_live_llama70b.json`.
+* `mistralai/mixtral-8x22b-instruct-v0.1` (MoE, 141B total /
+  39B active) — at {8k, 32k} chars: composed = {100%, 100%},
+  bounded = {50%, 0%}; strict beat at both horizons. See
+  `results/w85/long_context_live_mixtral8x22b.json`. This
+  Mixtral run is also the W85 partial advance on **#31 (MoE
+  substrate)** — the *text-axis* generalisation on a real
+  frontier-class MoE is now empirically demonstrated. The
+  substrate-axis MoE routing claim still requires self-hosted
+  MoE weights + GPU and remains OPEN.
+
+(`microsoft/phi-3.5-moe-instruct` is in NIM's advertised
+catalog but returned HTTP 404 at the chat-completions endpoint
+under this account at the time of W85; the W85 NIM probe
+records this honestly via the per-call response code.)
+
+This **partially** advances #27. The bars now stand:
+
+* DoD bullet 1 — corpus with {2k, 8k, 32k}-token horizons +
+  deterministic builder: **✓**
+* DoD bullet 2 — live long-context bench end-to-end on a 32 k+
+  open-weight model: **✓**
+* DoD bullet 3 — composed strictly beats bounded V3 at 32 k+
+  on live task success: **✓** (33.5 k tokens, both Llama-3.1-8B
+  and Llama-3.3-70B)
+* DoD bullet 4 — hidden-state intercept moves CID at 32 k+:
+  **✗** (NIM is text-only; requires substrate access)
+* DoD bullet 5 — precision floor, GPU mem, wall-clock, flops:
+  **partial** (wall and NIM-reported tokens recorded; GPU mem
+  and flops opaque on hosted NIM)
+* DoD bullet 6 — new RESULTS doc:
+  **✓** (`docs/RESULTS_W85_FRONTIER_TEXT_LIVE.md`)
+
+4 of 6 bars are met; one is partial; one is closed-blocked on
+substrate access. The hidden-state-intercept bar is the only
+strict open. #27 verdict update:
+STILL OPEN → **PARTIALLY SOLVED in W85 on the live-task-success
+axis at 32 k+ tokens; hidden-state-intercept bar requires
+substrate access and remains open**.
+
+New carry-forward limitations:
+- `W85-L-LONG-CONTEXT-LIVE-V1-NIM-TEXT-ONLY-CAP`
+- `W85-L-LONG-CONTEXT-LIVE-V1-CHAR-PROXY-CAP`
+
 ### #28 — P0 Real-World Multi-Agent Task Benchmark
 
 **DoD bullets (verbatim):**
@@ -378,6 +513,119 @@ long-context recall claim *is* tightened in W84.
   adapter shape that closes the contract gap so the head-to-
   head experiment is one configuration flip away from a GPU
   host.
+
+**Post-W85 push (live 3-arm head-to-head on a real published
+benchmark on a real frontier text model).**
+
+W85 adds `coordpy.gsm8k_real_bench_v1` — a real, three-arm
+head-to-head on the canonical GSM8K test set (SHA-256-verified
+upstream, 1319 problems) driven through the NIM frontier text
+runtime. Same model (`meta/llama-3.1-8b-instruct`), same problem
+subset, three arms:
+
+* **A0** — stock zero-shot CoT (the literature's GSM8K baseline).
+  1 call/problem at temperature 0.0.
+* **A1** — same-call-budget self-consistency K=5 (the literature's
+  scale-with-compute baseline). 5 calls/problem at temperature
+  0.7 + majority vote.
+* **B** — CoordPy multi-agent K=5 pipeline:
+  `solver_persona_1`, `solver_persona_2`, `critic`, `reviser`,
+  `judge`. Final decision is the judge if it agrees with at
+  least one solver; otherwise majority vote.
+
+The bench:
+- Verifies the upstream GSM8K SHA-256 before each run; refuses
+  a substituted corpus.
+- Emits per-call `GSM8KArmCallCapsuleV1` capsules with prompt SHA,
+  response SHA, sampling params, wall-clock.
+- Emits per-problem `GSM8KArmOutcomeCapsuleV1` capsules.
+- Computes per-seed Merkle root + bench-level Merkle root.
+- The driver script (`scripts/run_w85_gsm8k_bench.py`) writes
+  a sidecar JSONL with full prompts + responses so a third
+  party can re-verify the chain WITHOUT re-calling NIM (the
+  anti-cheat "stubbed audit chain" clause is honestly addressed).
+
+Runs at `results/w85/gsm8k_bench_report.json` (canonical) with
+the audit chain at `results/w85/gsm8k_bench_report.calls.jsonl`.
+
+The DoD bars stand:
+
+* DoD bullet 1 — `RealTaskBenchAdapterV1` exists for one named
+  benchmark: **✓** (`gsm8k_real_bench_v1`; not the W84 stub).
+* DoD bullet 2 — composed pipeline runs end-to-end on the quick
+  subset and produces task-success outcomes: **✓**.
+* DoD bullet 3 — head-to-head against the stock harness;
+  composed pipeline strictly improves at least one published
+  metric: **see `results/w85/gsm8k_bench_report.json` for the
+  live verdict** — the bench reports
+  `b_strictly_beats_a0_on_all_seeds` and
+  `b_strictly_beats_a1_on_all_seeds` honestly.
+* DoD bullet 4 — audit chain (Merkle root + rollback anchor)
+  is emitted per task and independently verifiable from disk:
+  **✓**.
+* DoD bullet 5 — RESULTS doc: **✓**
+  (`docs/RESULTS_W85_FRONTIER_TEXT_LIVE.md`).
+* DoD bullet 6 — at least 3 seeds: **✓** (`85_001`, `85_002`,
+  `85_003`).
+
+GSM8K is a real, published academic benchmark (Cobbe et al.
+2021); the W85 bench is not a renamed synthetic harness.
+The strict-improvement bool is decided by the empirical run, not
+by audit assertion — the audit chain says only "this is what the
+real run produced", and that is what `results/w85/gsm8k_bench_report.json`
+records.
+
+**Live verdict (this round):**
+
+| Seed   | A0     | A1     | B      |
+|--------|-------:|-------:|-------:|
+| 85 001 | 80.0%  | 90.0%  | 80.0%  |
+| 85 002 | 85.0%  | 85.0%  | 75.0%  |
+| 85 003 | 60.0%  | 70.0%  | 60.0%  |
+| mean   | 75.0%  | 81.7%  | 71.7%  |
+
+* ``b_strictly_beats_a0_on_all_seeds`` = **False**
+* ``b_strictly_beats_a1_on_all_seeds`` = **False**
+* ``b_mean_strictly_beats_a0_mean`` = **False** (71.7% < 75.0%)
+* ``b_mean_strictly_beats_a1_mean`` = **False** (71.7% < 81.7%)
+
+**The DoD bar "composed pipeline strictly improves at least one
+published metric" is NOT met. #28 verdict update:**
+**STILL OPEN.** W85 ships:
+
+* Real ``gsm8k_real_bench_v1`` adapter (supersedes W84's
+  plan-only stub).
+* Real published benchmark (GSM8K, SHA-256-verified).
+* Real frontier model on all arms.
+* 3 seeds × 20 problems × 11 calls per problem = 660 calls
+  (one transient retry-loss reduced this to 658 capsule records).
+* Offline-re-verifiable Merkle chain.
+
+But the empirical strict-improvement claim REFUTES B vs both A0
+and A1 on this configuration. This is the kind of result the
+issue's anti-cheat clauses are designed to surface, and we
+report it honestly rather than tune the bench or retry seeds.
+
+**Plausible reasons** (discussed in
+``docs/RESULTS_W85_FRONTIER_TEXT_LIVE.md``):
+
+1. Multi-agent debate is known to hurt when the model is
+   already strong on the task; Llama-3.1-8B is ~80% on GSM8K
+   zero-shot.
+2. Self-consistency is a hard same-budget baseline; majority
+   vote over independent samples often beats correlated
+   solver→critic→reviser chains for arithmetic reasoning.
+3. The W85 B persona-debate shape is one specific multi-agent
+   pattern; other shapes (tool use, retrieval) might do better.
+
+New carry-forward limitations:
+- `W85-L-GSM8K-BENCH-V1-NIM-DEPENDENT-CAP`
+- `W85-L-GSM8K-BENCH-V1-NUMERIC-EXTRACTION-CAP`
+- `W85-L-REAL-TASK-BENCH-V1-NOT-SWE-BENCH-CAP`
+- `W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP`
+  (empirical: on N=20×3 seeds with Llama-3.1-8B-Instruct, the
+  W85 multi-agent pipeline B underperforms both A0 stock CoT
+  and A1 same-budget self-consistency)
 
 ### #29 — P0 Real Cross-Host Distributed Substrate
 

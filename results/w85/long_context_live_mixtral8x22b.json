@@ -1,0 +1,30 @@
+{
+  "schema": "coordpy.long_context_live_bench_v1.v1",
+  "model_id": "mistralai/mixtral-8x22b-instruct-v0.1",
+  "horizons_chars": [
+    8000,
+    32000
+  ],
+  "per_horizon": [
+    {
+      "horizon_chars": 8000,
+      "n_prompts": 2,
+      "a_full_success_rate": 1.0,
+      "a_bounded_v3_success_rate": 0.5,
+      "b_composed_success_rate": 1.0,
+      "composed_strictly_beats_bounded": true
+    },
+    {
+      "horizon_chars": 32000,
+      "n_prompts": 2,
+      "a_full_success_rate": 1.0,
+      "a_bounded_v3_success_rate": 0.0,
+      "b_composed_success_rate": 1.0,
+      "composed_strictly_beats_bounded": true
+    }
+  ],
+  "composed_strictly_beats_bounded_at_32k": true,
+  "composed_strictly_beats_bounded_at_every_horizon": true,
+  "n_calls": 12,
+  "bench_merkle_root": "dbdbfdb245e7352291a20b53e1eb7374a50448031dc2b5e81c388ef4e01e64c6"
+}

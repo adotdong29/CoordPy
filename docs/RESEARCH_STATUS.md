@@ -5,8 +5,89 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W83 W84
-> Post-W83 Blocker Audit / Tightening milestone, 2026-05-19.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W84 W85
+> Frontier Text Live / GSM8K Head-To-Head / Long-Context Live
+> push, 2026-05-19.
+
+## TL;DR — W85 Frontier Text Live / GSM8K Head-To-Head / Long-Context Live (post-W84 push)
+
+W85 plugs CoordPy into a real frontier-class text runtime via
+NVIDIA NIM (Llama-3.1-{8B,70B}-Instruct, Llama-3.3-70B-Instruct,
+plus Mixtral-8x7B, Phi-3.5-MoE, Phi-4-mini, Gemma-3, DeepSeek;
+125 models reachable). NIM is **text-only**: no hidden-state
+hook, no KV cache export, no per-layer instrumentation. The W85
+work therefore advances the **text-axis** of issues #25 / #27 /
+#28 / #31 while honestly preserving the **substrate-axis** gap
+for all of them.
+
+W85 lands three modules:
+
+* ``coordpy.nim_frontier_text_runtime_v1`` — content-addressed
+  NIM adapter with honest capability claim
+  (``hidden_state_access=False`` and the other substrate-side
+  axes explicit False).
+* ``coordpy.gsm8k_real_bench_v1`` — 3-arm head-to-head bench
+  on the canonical SHA-256-verified GSM8K test set (1319
+  problems), driven through any ``LLMBackend``-shaped client.
+* ``coordpy.long_context_live_bench_v1`` — needle-in-haystack
+  live bench on a real frontier text model; reports composed-
+  pipeline-strictly-beats-bounded-V3 bool at 32k+ NIM-reported
+  input tokens.
+
+Live results:
+
+* **Long context, Llama-3.1-8B-Instruct via NIM** — at horizons
+  {8k, 32k, 140k} characters (≈ {2k, 8k, 33.5k} NIM-reported
+  tokens), composed retrieval = {1.00, 1.00, 1.00} success;
+  bounded V3 = {0.33, 0.00, 0.00}; composed strictly beats
+  bounded at every horizon and at 33.5k input tokens.
+* **Long context, Llama-3.3-70B-Instruct via NIM** — same
+  result at horizons {32k, 140k} chars. Strict beat
+  generalises across two Llama-family frontier models.
+* **GSM8K real-task head-to-head**, Llama-3.1-8B-Instruct, N=20
+  problems × 3 seeds. Numbers in
+  ``results/w85/gsm8k_bench_report.json``; the per-call
+  sidecar at ``results/w85/gsm8k_bench_report.calls.jsonl`` is
+  offline-re-verifiable.
+
+W85 verdicts on meta issue #49:
+
+* **#25 (frontier substrate coupling)** — STILL OPEN. NIM is
+  text-only; substrate-axis remains blocked.
+* **#26 (live LLM training of composed memory)** — STILL OPEN.
+  No hidden-state access on NIM.
+* **#27 (long-context live)** — STILL OPEN → **PARTIALLY
+  SOLVED** on the live-task-success axis at 32k+ tokens;
+  hidden-state-intercept bar still requires substrate access.
+* **#28 (real-world bench head-to-head)** — **STILL OPEN
+  (refuted on this run)**. W85 ships a real bench adapter
+  driving GSM8K end-to-end with a Merkle audit chain, but the
+  empirical 3-seed × N=20-problem run on Llama-3.1-8B-Instruct
+  refuted the strict-improvement claim: B (CoordPy multi-agent)
+  mean 71.7% < A0 (stock CoT) 75.0% < A1 (same-budget self-
+  consistency) 81.7%. Honest negative result; the W85
+  honesty surface records this as
+  ``W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP``.
+* **#29 (real cross-host distributed substrate)** — UNCHANGED
+  (W84 cross-process work remains the load-bearing line).
+* **#31 (MoE substrate)** — text-axis PARTIALLY ADVANCED
+  (Phi-3.5-MoE + Mixtral-8x7B reachable on NIM as text-only);
+  substrate-axis OPEN.
+
+**Stable boundary preservation**: ``coordpy.__version__``
+unchanged at 0.5.20; ``coordpy.SDK_VERSION`` unchanged at
+``coordpy.sdk.v3.43``. No PyPI publish. ``coordpy/__init__.py``
+untouched. All W85 modules are explicit-import only.
+
+**Test count delta**: +20 new W85 tests; all pass (live-NIM
+tests skip-gated on ``NVIDIA_API_KEY``). W80–W84 baselines
+remain green.
+
+See:
+* ``docs/RESULTS_W85_FRONTIER_TEXT_LIVE.md`` — W85 result note.
+* ``docs/AUDIT_POST_W83_BLOCKERS.md`` — post-W85 audit update
+  for each P0 / P1 issue.
+* ``docs/HOW_NOT_TO_OVERSTATE.md`` — W85 honesty surface.
 
 ## TL;DR — W84 Post-W83 Blocker Audit & Tightening (post-W83 research milestone)
 

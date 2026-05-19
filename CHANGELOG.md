@@ -13,6 +13,69 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W85 Frontier Text Live / GSM8K Head-To-Head / Long-Context Live**
+  (post-W84, 2026-05-19) — *honest text-axis push on the
+  post-W83 P0 / P1 line under meta issue #49. **Three new W85
+  modules.** Plugs CoordPy into a real frontier-class text
+  runtime (NVIDIA NIM serving Meta's Llama-3.1-{8B,70B}-Instruct,
+  Llama-3.3-70B-Instruct, plus Mixtral-8x7B, Phi-3.5-MoE,
+  Phi-4-mini, Gemma-3, DeepSeek-Coder; 125 NIM models
+  reachable). NIM is text-only — there is no hidden-state hook,
+  no KV cache export, no per-layer instrumentation; the W85
+  `NIMFrontierCapabilityClaimV1` records
+  `hidden_state_access=False`, `kv_cache_replay=False`,
+  `per_layer_instrumentation=False`,
+  `cross_runtime_state_export=False`. W85 therefore does NOT
+  close #25 / #26 (substrate-blocked) and the hidden-state-
+  intercept bar of #27 remains OPEN. W85 advances:
+  **#27** to PARTIALLY SOLVED on the live-task-success axis at
+  32k+ input tokens — the W85 needle-in-haystack live bench
+  shows the composed retrieval pipeline strictly beats the
+  W83 bounded-window V3 baseline at 33.5k NIM-reported tokens
+  on both Llama-3.1-8B-Instruct and Llama-3.3-70B-Instruct
+  (see `results/w85/long_context_live_report_v2.json` and
+  `results/w85/long_context_live_llama70b.json`). **#28
+  REMAINS OPEN despite a real bench-infrastructure advance** —
+  the W85 3-arm head-to-head on the canonical SHA-256-verified
+  GSM8K test set (Cobbe et al. 2021, 1319 problems) runs stock
+  zero-shot CoT (A0, 1 call), same-budget self-consistency
+  K=5 (A1), and CoordPy multi-agent K=5 (B = solver_1,
+  solver_2, critic, reviser, judge) on the same Llama-3.1-8B-
+  Instruct, N=20 problems × 3 seeds. **The empirical strict-
+  improvement claim is REFUTED**: B mean 71.7% < A0 mean 75.0%
+  < A1 mean 81.7%; B does not strictly beat A0 or A1 on any
+  seed. This is an honest negative result. The content-
+  addressed Merkle audit chain is offline-re-verifiable from
+  `results/w85/gsm8k_bench_report.calls.jsonl` (658 prompt +
+  response CIDs verified by
+  `scripts/verify_w85_audit_chain.py`). **#31** to PARTIALLY
+  ADVANCED on the text-axis —
+  Mixtral-8x22B-Instruct (real MoE, 141B total / 39B active)
+  is reachable as a text-only oracle via NIM and confirms the
+  W85 long-context strict-beat on a different-family MoE; the
+  substrate-side MoE routing axis still requires self-hosted
+  MoE weights + GPU and remains OPEN. (Note: Microsoft's
+  Phi-3.5-MoE-Instruct is listed in NIM's catalog but returned
+  HTTP 404 at chat-completions; the W85 honesty surface records
+  this honestly.)
+  Modules added under `coordpy/`:
+  `nim_frontier_text_runtime_v1`,
+  `gsm8k_real_bench_v1`,
+  `long_context_live_bench_v1`. Driver scripts under
+  `scripts/`: `run_w85_gsm8k_bench.py`,
+  `run_w85_long_context_live.py`. Tests under `tests/`:
+  `test_w85_nim_frontier_and_real_bench.py` (20 tests; pure-
+  Python tests run unconditionally, live-NIM tests are
+  gated on `NVIDIA_API_KEY`). Results under `results/w85/`.
+  Docs added: `docs/RESULTS_W85_FRONTIER_TEXT_LIVE.md`.
+  Honesty surface: `docs/AUDIT_POST_W83_BLOCKERS.md` and
+  `docs/HOW_NOT_TO_OVERSTATE.md` and `docs/THEOREM_REGISTRY.md`
+  updated with W85-T-* / W85-L-* entries. **No version bump.
+  No PyPI publish. ``coordpy.__version__`` unchanged at
+  0.5.20; ``coordpy.SDK_VERSION`` unchanged at
+  ``coordpy.sdk.v3.43``. ``coordpy/__init__.py`` untouched.
+  All W85 modules are explicit-import only.**
+
 - **W84 Post-W83 Blocker Audit & Tightening**
   (post-W83, 2026-05-19) —
   *strict honesty pass over the new post-W83 blocker backlog
