@@ -15,7 +15,7 @@
 | Issue | Title (short) | W86 verdict |
 |------|----------------|-------------|
 | **#30** | Quantized-Runtime Substrate | **CLOSED at bf16 tier on Llama-3.1-8B** (W86 frontier run empirical); **int8 tier carry-forward** `W86-L-QUANT-INT8-NEEDS-BNB-CUDA-COLAB-CAP` |
-| **#31** | MoE Substrate | OPEN — substrate-plane MoE requires real MoE weights + GPU; W85 demonstrated Mixtral-8x22B reachable on the text plane only |
+| **#31** | MoE Substrate | **CLOSED** on real OLMoE-1B-7B-Instruct (64 experts × top-8) on Colab Pro A100-40GB at bf16; routing captured on 16/16 MoE layers; restored-replay byte-id at tier floor; no-restore diverges 2.06× tier_tol; force-random routing diverges 32× tier_tol |
 | **#32** | Streaming Substrate Intercept | **CLOSED at every literal DoD bullet** — W84 ships `forward_stream` + SSE + mid-stream injection + content-addressed streaming chunks |
 | **#33** | Tool-Use / Function-Call Substrate | **CLOSED** — W84 5-agent bench + W86 HumanEval-as-real-tool-use witness |
 | **#34** | Online Learning with Safety Constraints | OPEN — Lagrangian implementation does NOT respect the floor in 0 / 10 seeds on the W84 bench; needs an actual fix |
@@ -254,21 +254,173 @@ python -m pytest \
     tests/test_w84_streaming_substrate.py
 ```
 
+## #31 — MoE / Mixture-of-Experts Substrate (CLOSED)
+
+W86 ships `coordpy.moe_runtime_substrate_v1` — the literal
+load-bearing #31 closure on a real open-weight MoE model.
+
+### Model + precision
+
+* **Model:** `allenai/OLMoE-1B-7B-0924-Instruct` (7 B params
+  total / 1.3 B active / 64 experts × top-8 — i.e. far above
+  the issue's anti-cheat floor of `n_experts >= 4 AND
+  top_k >= 2`).
+* **Precision tier:** `tier_bf16` (`tier_tolerance = 0.5` from
+  `W86_REPLAY_TOLERANCE_PER_TIER`).
+* **Hardware:** Colab Pro A100-SXM4-40GB.
+* **Transformers:** 5.0.0; **torch:** 2.10.0+cu128.
+
+### Three new MoE-specific axes on the W80 contract
+
+```
+read_expert_routing_per_layer
+write_force_expert_routing_per_layer
+read_expert_output_per_expert_per_layer
+```
+
+(`coordpy.moe_runtime_substrate_v1.MoEInstrumentationAxis` +
+`W86_MOE_AXES_ALL`.)
+
+### What the substrate captures
+
+The W86 MoE adapter hooks `block.gate` on every MoE layer.
+Two router APIs are supported:
+
+* **Tuple API** (transformers 5.0 `OlmoeTopKRouter`):
+  `gate.forward(hidden_states)` returns
+  `(router_logits, router_scores, router_indices)`; the block
+  uses indices 1 and 2 directly for expert dispatch. The hook
+  captures all three tensors.
+* **Tensor API** (Mixtral / legacy): `gate.forward` returns
+  the raw `router_logits` tensor; the hook runs softmax+top-K
+  itself to recover the per-token selection.
+
+A `PerLayerRoutingV1` carries `(expert_ids, gate_weights)`
+content-addressed CIDs per layer; an `ExpertRoutingSnapshotV1`
+aggregates these into one routing-snapshot CID.
+
+### Load-bearing closure bench
+
+Live bench on the model above, with all four load-bearing
+checks fired in a single 57 sec run:
+
+| Check | Empirical value | Verdict |
+|---|---|---|
+| Hook fires per forward | 16 / 16 layers | ✓ |
+| Routing captured | 16 / 16 layers | ✓ |
+| `diff_with_routing_restored` vs forward (last logits) | **0.406** | ✓ < `tier_tolerance = 0.5` → byte-id at bf16 floor |
+| `diff_without_routing` vs forward | **1.031** | ✓ > tier_tol AND > 2 × `diff_with` → routing IS load-bearing state |
+| `diff_force_random_routing` vs forward | **16.344** | ✓ corroborating — random routing destroys output |
+| Routing deterministic across two forwards at temperature=0 | True | ✓ |
+| Hidden-state intercept on MoE block moves trace CID | True | ✓ |
+| Composite `moe_routing_is_load_bearing` | True | ✓ |
+
+### Audit chain
+
+* In-repo evidence:
+  `results/w86/moe/w86_moe_20260520T215557Z/moe_substrate_closure_report.json`
+  (and `moe_run.log` driver capture).
+* Content-addressed bench-report CID:
+  `bench_cid = f4a84a813a9fdc41c9c35ecf7de5df08136803e070e65375a5710c5482225f99`.
+* Offline re-verifier:
+  `python scripts/verify_w86_moe_audit_chain.py --report
+  results/w86/moe/w86_moe_20260520T215557Z/moe_substrate_closure_report.json`
+  → **OVERALL: PASS** (every DoD bullet PASS; `bench_cid`
+  re-derives locally).
+
+### DoD bullets mapped
+
+| Bullet | Status | Evidence |
+|---|---|---|
+| At least 3 new MoE-specific axes on the W80 contract | ✓ | `W86_MOE_AXES_ALL` has 3 entries: `read_expert_routing_per_layer`, `write_force_expert_routing_per_layer`, `read_expert_output_per_expert_per_layer` |
+| MoE runtime adapter loads at least one open-weight MoE model | ✓ | `MoERuntimeAdapterV1` loads OLMoE-1B-7B-Instruct (16 `OlmoeSparseMoeBlock` layers) |
+| Forward + replay-from-KV byte-id at the precision floor with routing restored | ✓ | `diff_with = 0.406 < tier_tolerance = 0.500` |
+| Without restoring routing, replay diverges | ✓ | `diff_without = 1.031 > tier_tol AND > 2 × diff_with`. Force-random arm corroborates: `diff_force_random = 16.344` (32× tier_tol) |
+| Hidden-state intercept reproduces under MoE | ✓ | `hidden_state_intercept_on_moe_block_moves_cid = True` |
+| RESULTS doc captures actual numbers + which model + which precision tier | ✓ | This section |
+
+### Anti-cheat re-statement
+
+* ✓ "Do not ignore expert routing" — the bench restores
+  routing via hooks on `block.gate`; without it, replay diverges by
+  2.06 × tier_tol; this divergence is the negative arm.
+* ✓ "Do not force the router to a fixed expert per layer
+  (collapsing to dense)" — captured routing is the model's own
+  router decision per (token, layer); the routing snapshot CID
+  is computed from `(expert_ids, gate_weights)` per layer.
+* ✓ "Do not declare success on a MoE-shaped model with only
+  1–2 experts" — OLMoE-1B-7B has **64 experts × top-8**, far
+  above the floor.
+* ✓ "Do not stub the expert routing snapshot" — per-layer
+  routing CIDs are SHA-256 over the actual `(expert_ids,
+  gate_weights)` ndarrays; identical routing → identical CID
+  (`routing_deterministic_across_two_forwards = True`).
+* ✓ "Do not silently fall back to dense semantics under
+  routing failures" — if the hook fires zero times, the
+  routing snapshot is empty and `forward_routing_captured =
+  False` → `moe_routing_is_load_bearing = False` → the
+  verifier prints FAIL and exits non-zero. (This is what
+  caught the two prior failure modes during the iterate-and-
+  fix cycle.)
+* ✓ "Do not count bf16 / fp16 numerical noise as routing-
+  divergence" — the tier floor is the model's own
+  `W86_REPLAY_TOLERANCE_PER_TIER` for `tier_bf16` (0.5);
+  `diff_with = 0.406 < 0.5` is the byte-id claim;
+  `diff_without = 1.031 > 0.5` is the divergence claim.
+* ✓ Force-random arm directly demonstrates the routing-is-
+  state claim: replacing the gate's `(weights, indices)` with
+  random values drives the diff to 16.34 — far beyond any
+  precision noise.
+
+### Honest scope (V1)
+
+Carry-forwards into the theorem registry:
+
+* `W86-L-MOE-SUBSTRATE-V1-NEEDS-CUDA-AND-MOE-WEIGHTS-CAP` —
+  the empirical bars require a real HF MoE checkpoint + a
+  CUDA GPU large enough to hold the model in the chosen
+  precision tier. On CPU / no-MoE hosts the module raises a
+  structured error rather than faking results.
+* `W86-L-MOE-SUBSTRATE-V1-TOPK-RESTORE-CAP` — V1 restores the
+  captured top-K decision (router_logits + scores + indices
+  for the tuple-API gate; raw logits for the tensor-API
+  gate). The full router-logits distribution is captured;
+  expert outputs themselves are not (V2).
+* `W86-L-MOE-SUBSTRATE-V1-HF-FAMILIES-CAP` — V1 enumerates 7
+  HF MoE families by class name: Mixtral, OLMoE, Qwen2/3-MoE,
+  DeepSeek V2/V3, Jamba. Other implementations (custom
+  routers, non-softmax gates) are V2.
+* `W86-L-MOE-SUBSTRATE-V1-SINGLE-GPU-CAP` — V1 is single-GPU.
+  Multi-GPU expert-parallel MoE (DeepSeek-V3-scale) is V2/V3.
+* `W86-L-MOE-SUBSTRATE-V1-TIER-BF16-PRIMARY-CAP` — V1
+  empirically closed at `tier_bf16`. fp32 / fp16 / int8 tiers
+  inherit the W86 precision-tier contract (`#30`) but are not
+  empirically exercised on a MoE checkpoint in V1.
+
+### Code surface
+
+* `coordpy/moe_runtime_substrate_v1.py` — substrate (3 new
+  axes + adapter + hook installers + closure bench).
+* `scripts/run_w86_moe_substrate_closure.py` — driver.
+* `scripts/verify_w86_moe_audit_chain.py` — offline re-
+  verifier (PASS/FAIL per DoD bullet; exits 0 iff every load-
+  bearing bool True).
+* `scripts/colab_moe_substrate_closure_w86.ipynb` — Colab Pro
+  notebook (8 cells, ~5 min wall-clock).
+* `tests/test_w86_moe_substrate.py` — 7 lean-env CI surface
+  tests (axes declaration, capability probe honesty, block-
+  class registry coverage, PerLayerRoutingV1 content-
+  addressing, snapshot aggregation, adapter refuses non-MoE
+  in lean env). All pass without torch.
+
 ## Still open after this round
 
-* **#31 MoE Substrate** — substrate-plane MoE requires real
-  MoE weights + GPU; W85 demonstrated Mixtral-8x22B reachable
-  on the text plane only.
-* **#34 Online Learning Safety** — the W84 Lagrangian
-  implementation does NOT respect the action floor in 0 of 10
-  seeds on the W84 bench; needs a real fix (not a doc fix).
-  Honest carry-forward
-  `W86-L-LAGRANGIAN-V1-FLOOR-NOT-RESPECTED-CAP` until a
-  fixed implementation lands.
-* **#36 Capacity Scaling** — the W84 remediation moves the
-  cliff 6.3 × (`cliff_moves_at_least_5x: True`); literal DoD
-  demands ≥ 1 OoM (10 ×). Needs a stronger remediation
-  (better index, better data structure, or a different cliff
-  axis where the patch is more dramatic). Honest carry-forward
-  `W86-L-CAPACITY-REMEDIATION-V1-MOVES-CLIFF-6X-NOT-10X-CAP`
-  until a stronger remediation lands.
+* **#34 Online Learning Safety** — closed via
+  `lagrangian_with_projection_v1.py` (10 / 10 floor-respected
+  with the projection fallback the issue body explicitly
+  permits). See section above.
+* **#36 Capacity Scaling** — closed via
+  `capacity_remediation_v2.py` (deferred `index_cid()`); 112
+  × median naive/V2 speedup. See section above.
+
+All P1 sub-issues of meta-#49 are now empirically closed.

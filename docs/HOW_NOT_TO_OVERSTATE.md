@@ -20,12 +20,18 @@ is repeated.
   NOT empirically met by W86; the contract + driver are
   ready but require bitsandbytes + CUDA + a fresh Colab run.
 
-- **#31 is the ONE remaining open P1.** Reports MUST NOT
-  claim "all P1s closed". The honest count is 7 of 8 P1
-  closed; #31 (MoE substrate) remains open because real MoE
-  substrate routing read/write requires self-hosted MoE
-  weights + GPU. W85 demonstrated Mixtral-8x22B on the text
-  plane only.
+- **#31 is now closed (8/8 P1s).** Closed W86 on real
+  OLMoE-1B-7B-Instruct (64 experts × top-8) on Colab Pro
+  A100-40GB at bf16. Reports MAY claim "all P1s closed" and
+  "all P0+P1s of meta-#49 closed". When citing #31 specifically,
+  carry the V1 limitations: empirical bars require CUDA + MoE
+  weights; V1 supports 7 HF MoE families by class name (Mixtral,
+  OLMoE, Qwen2/3-MoE, DeepSeek V2/V3, Jamba); single-GPU only;
+  empirical closure at `tier_bf16`; expert OUTPUTS per
+  (layer, expert) are captured-only (read axis), not restored
+  independently of the model's own expert dispatch
+  (`W86-L-MOE-SUBSTRATE-V1-{NEEDS-CUDA-AND-MOE-WEIGHTS,
+  TOPK-RESTORE,HF-FAMILIES,SINGLE-GPU,TIER-BF16-PRIMARY}-CAP`).
 
 - **#34 closure is via Lagrangian + projection, NOT
   Lagrangian-only.** The W84 LagrangianRefinementV1 alone
