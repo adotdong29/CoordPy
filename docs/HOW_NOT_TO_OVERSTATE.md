@@ -2,9 +2,78 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W84
-> W85 Frontier Text Live / GSM8K Head-To-Head / Long-Context Live
-> push milestone, 2026-05-19.
+> README-of-README must satisfy these rules. Last touched: post-W85
+> W86 Frontier-Scale Substrate Closure milestone, 2026-05-20.
+
+## W86 (Frontier-Scale Substrate Closure on real Llama-3.1-8B) — explicit do-not-overstate rules
+
+W86 closes #25 and #26 on a real frontier-class open-weight model
+(Llama-3.1-8B-Instruct on Colab Pro A100-40GB in bf16). The
+closure ran end-to-end across three independent Colab Pro runs
+on 2026-05-20 with byte-identical strict-beat verdicts for #26.
+The following rules are mandatory before any W86 claim is
+repeated.
+
+- **W86 does NOT claim closure of every P0.** #28 (real-world
+  multi-agent task bench, strict improvement on a published
+  metric) remains OPEN — the W85 GSM8K negative result stands.
+  #29 (literal multi-machine cross-host substrate) remains
+  PARTIALLY SOLVED at the W84 cross-process bar; W86 does not
+  advance the literal multi-machine bar yet. The W86 plans for
+  #28 and #29 are documented in
+  ``docs/PLAN_W86_28_ALTERNATIVE_HEAD_TO_HEAD.md`` and
+  ``docs/PLAN_W86_29_REAL_MULTI_HOST.md``.
+
+- **W86 #27 closure is partial only.** The W85 live-task-
+  success axis (composed > bounded V3 at 33.5 k input tokens)
+  remains met. The substrate-side hidden-state-intercept-at-
+  32 k bar is the only #27 DoD bullet still pending; the bench
+  code is shipped and tested, the OOM and split-phase fixes
+  are pushed, but the actual Colab Pro Phase B execution has
+  not yet succeeded at the 32 k bar. **#27 may NOT be called
+  closed until the next Phase B run produces a positive
+  ``intercept_moves_cid_at_min_32k`` bool.**
+
+- **W86 conformance is 10 / 12 — exactly at the DoD bar, with
+  two honest fails.** The two failing axes (write_attention_
+  bias on Llama's GQA; replay_from_kv against the conformance
+  harness's hardcoded fp32 floor at bf16) are documented
+  carry-forward limitations in the theorem registry. They
+  must NOT be silently hidden or claimed as passes; the
+  conformance harness reports them honestly.
+
+- **W86 replay-from-KV byte-identity is at the bf16 tier
+  floor, not fp32.** Measured ``max_abs_diff = 0.15625`` is
+  ~ 30 × the W80 fp32 floor (5e-3), and stays within the W84
+  bf16 tier tolerance (5e-1). Reports MUST cite the tier
+  alongside the diff. Reports that say "byte-identical" without
+  qualifying the tier are wrong.
+
+- **W86 #26 strict-beat is on a PROJECTED hidden-state task,
+  not raw 4096-d.** Live hidden states are projected through
+  a fixed content-addressed R^{4096} → R^{8} projection so the
+  W83 composed-learned-memory module's working dimensions match
+  between the live and synthetic baselines. The projection is
+  part of the dataset CID; richer projections are V2. Reports
+  that say "live training beats synthetic on raw Llama-3.1-8B
+  hidden states" without qualifying the projection are wrong.
+
+- **W86 #25 is closed at the issue's literal DoD bars, not at
+  every imaginable substrate bar.** The issue text says
+  ``n_pass >= 10 of 12`` axes; we have exactly 10. Hidden-
+  state intercept moves CID; we verify True at frontier
+  scale. Replay-from-KV byte-identity holds at the tier floor;
+  we report the tier and the measured diff. One W83 load-
+  bearing claim is reproduced at frontier; we point to the
+  hidden-state intercept mechanism. Reports that claim "every
+  substrate axis works perfectly on Llama-3.1-8B" are wrong;
+  the two carry-forwards apply.
+
+- **W86 ran on Colab Pro's A100; future runs can use any cuda
+  host.** No GCP charges were incurred. The notebook is
+  re-runnable. The closure code is precision-tier-aware and
+  device-agnostic; A100 is one of several hosts that satisfy
+  the bf16 tier.
 
 ## W85 (Frontier Text Live / GSM8K Head-To-Head / Long-Context Live) — explicit do-not-overstate rules
 

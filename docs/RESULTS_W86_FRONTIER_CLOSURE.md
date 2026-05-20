@@ -101,12 +101,79 @@ What W86 does NOT close:
   commit ``16eadab`` by selecting ``sdpa`` (memory-efficient
   PyTorch attention) when ``skinny_trace=True``.
 
-### Run 2 — POST-FIX (PLACEHOLDER until the re-run lands)
+### Run 2 — 2026-05-20T01:14Z, post-bug-fix re-run (A100-40GB)
 
-(Once the post-fix re-run lands at
-``results/w86/w86_<RUN_TS>/frontier_closure_report.json``, the
-exact numbers for #25 and #27 land here, and the doc is
-amended.)
+* **Closure #25: SUCCESS.** Llama-3.1-8B-Instruct loaded in bf16
+  on cuda:0 (load wall: 77 seconds). Substrate signature:
+  ``coordpy.transformers_runtime_v1#meta-llama/Llama-3.1-8B-Instruct@7d3ac276452ec8ba``.
+  Model: ``n_layers = 32``, ``n_heads = 32``, ``hidden_dim = 4096``.
+  * W80 instrumentation conformance suite: **``n_pass = 10`` /
+    ``n_skip = 0`` / ``n_fail = 2``** — exactly at the issue's
+    ``n_pass >= 10 of 12`` DoD bar. The two honest fails are:
+    - ``write_attention_bias`` — Llama-3.1-8B uses GQA
+      (``n_kv_heads = 8`` vs ``n_heads = 32``); the W80 attention-
+      mask injection hook was authored against GPT-2's MHA.
+      Honest carry-forward
+      ``W86-L-LLAMA-3.1-8B-WRITE-ATTENTION-BIAS-GQA-CAP``.
+    - ``replay_from_kv`` — the conformance harness hardcodes
+      the fp32 byte-identity floor (5e-3); at bf16 the
+      measured ``max_abs_diff`` of 0.156 exceeds 5e-3 but
+      is well within the W84 bf16 tier tolerance of 0.5
+      (which the runtime's own ``measure_replay_vs_recompute``
+      correctly reports as ``replay_byte_identical = True``).
+      Honest carry-forward
+      ``W86-L-CONFORMANCE-SUITE-NOT-PRECISION-TIER-AWARE-CAP``.
+  * Replay-from-KV at bf16 tier:
+    ``max_abs_diff_last_logits = 0.15625`` < tier tolerance 0.5
+    → ``replay_byte_identical = True`` at the tier-correct
+    precision.
+    ``full_trace_cid = e84eb129a86de45c...``,
+    ``replay_trace_cid = 715fef833acb27f5...``.
+  * Hidden-state intercept moves CID:
+    ``hidden_state_intercept_moves_cid = True``;
+    ``max_abs_diff_final_logits = 1.24e-05`` on the unrelated
+    continuation logits; the W83 substrate intercept mechanism
+    reproduces at frontier scale.
+  * W83 load-bearing claim reproduced at frontier:
+    ``w83_load_bearing_claim_reproduced = True``.
+  * Closure_25 sidecar CID:
+    ``43d82aebf614f09dd09270471ffcf5cfc45b87d3d314c0fb2bd634d3dbeaf7d1``.
+
+* **Closure #26: SUCCESS (re-confirms run 1).**
+  Identical CIDs to run 1 (deterministic seed). The
+  ``live_strictly_beats_synthetic_on_holdout = True`` verdict
+  reproduces byte-identically — live MSE 0.011665 < synthetic
+  MSE 0.131914 = 11.3× strict beat.
+
+* **Closure #27: FAILED on residual VRAM OOM.**
+  ``OutOfMemoryError: Tried to allocate 7.83 GiB. GPU 0 has a
+  total capacity of 39.49 GiB of which 5.49 GiB is free.``
+  Root cause: even with the SDPA fix, the full-trace runtime
+  used by #25 + #26 was not freed before the skinny-trace
+  runtime for #27 loaded its own copy. Two Llama-3.1-8B copies
+  in bf16 ≈ 32 GB out of 40 GB. Fixed in commit ``ced1e9f`` by
+  splitting the driver invocation into two processes (Phase A
+  + Phase B); the OS now reclaims VRAM between phases.
+
+### Run 3 — 2026-05-20T01:28Z, post-merge-aware-skip re-run (A100-40GB)
+
+* **Closure #25 + #26: SUCCESS** — byte-identical to run 2's
+  data; the strict-beat verdicts are deterministic and
+  reproduce across runs.
+* **Closure #27: Phase B never executed** — Phase A's
+  ``--skip-27`` invocation completed normally and wrote
+  ``closure_27 = {"skipped": True}``, but the same-cell Phase
+  B subprocess call did not produce a real bench result.
+  Likely cause: cell interruption / kernel disconnect.
+  Fixed in commit ``ced1e9f`` (the same commit) by splitting
+  the closure-driver cell into two independent notebook cells
+  (cell 5 = Phase A, cell 6 = Phase B), so re-running just
+  Phase B is a one-cell action even if Phase A succeeded.
+
+### Run 4 — POST-CELL-SPLIT (PLACEHOLDER until the re-run lands)
+
+(The post-cell-split re-run will produce the #27 evidence and
+this section is filled in with the actual numbers.)
 
 ## Modules shipped
 

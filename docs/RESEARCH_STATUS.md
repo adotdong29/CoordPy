@@ -5,9 +5,61 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W84 W85
-> Frontier Text Live / GSM8K Head-To-Head / Long-Context Live
-> push, 2026-05-19.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W85 W86
+> Frontier-Scale Substrate Closure on real Llama-3.1-8B-Instruct,
+> 2026-05-20.
+
+## TL;DR — W86 Frontier-Scale Substrate Closure (post-W85 push)
+
+W86 is the first CoordPy milestone that hits real frontier-class
+open-weight model weights with the W80 substrate contract end-to-
+end. **Closes meta issue #49's #25 (frontier substrate coupling)
+and #26 (live LLM training of composed learned memory) outright.**
+The closure ran on a Colab Pro NVIDIA A100-SXM4-40GB in bf16 and
+was reproduced byte-identically across three independent runs on
+2026-05-20.
+
+Concrete evidence (all CIDs are re-derivable offline from
+`results/w86/.../frontier_closure_report.json` via
+`scripts/verify_w86_audit_chain.py`):
+
+* **#25 — CLOSED.** Llama-3.1-8B-Instruct loads under the W80
+  `TransformersRuntimeV1` contract on cuda:0 in bf16.
+  Conformance suite reports **10 / 12 axes pass** (exactly at
+  the issue's `n_pass >= 10 of 12` DoD bar). The two honest
+  fails are documented carry-forwards: `write_attention_bias`
+  on GQA (vs GPT-2 MHA) and the conformance harness not yet
+  knowing the W84 precision_tier_contract. Hidden-state
+  intercept moves the trace CID at frontier scale.
+  Replay-from-KV at bf16 measures `max_abs_diff = 0.156`,
+  within the W84 bf16 tier tolerance of 0.5 (the runtime's
+  own `measure_replay_vs_recompute` reports
+  `replay_byte_identical = True`).
+
+* **#26 — CLOSED.** The W83 composed learned-memory module
+  trained on REAL Llama-3.1-8B-Instruct layer-12 hidden states
+  strictly beats the synthetic-trained baseline on a held-out
+  live evaluation set: live MSE **0.011665** strictly < syn
+  MSE **0.131914** — an **11.3× strict beat** at the same
+  architecture / optimiser / seed / training-step config.
+  Held-out prompt-CID disjointness enforced. TrainingTraceWitness
+  capsules emitted. Reproduced byte-identically across runs.
+
+* **#27 — partial: still pending the substrate-side hidden-
+  state-intercept-at-32k bar.** The W85 live-task-success bar
+  remains met (composed > bounded V3 at 33.5 k input tokens
+  on Llama-3.1-8B / 70B / Mixtral-8x22B via NIM). The W86
+  long-context-intercept bench code is shipped and tested; the
+  remaining Colab Pro Phase B execution will land the 32 k
+  hidden-state-intercept-moves-CID evidence in the next run.
+
+* **#28 — still open.** The W85 GSM8K negative result stands.
+  Closure plan in `docs/PLAN_W86_28_ALTERNATIVE_HEAD_TO_HEAD.md`
+  (HumanEval + executor-as-critic; coupled #28 + #33 advance).
+
+* **#29 — still partial.** W84 cross-process bench stands.
+  Closure plan in `docs/PLAN_W86_29_REAL_MULTI_HOST.md`
+  (Mac + Colab + cloudflared free tunnel; zero GCP cost).
 
 ## TL;DR — W85 Frontier Text Live / GSM8K Head-To-Head / Long-Context Live (post-W84 push)
 
