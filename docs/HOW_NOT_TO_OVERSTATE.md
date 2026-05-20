@@ -5,6 +5,72 @@
 > README-of-README must satisfy these rules. Last touched: post-W85
 > W86 Frontier-Scale Substrate Closure milestone, 2026-05-20.
 
+## W86 (P1 line closures post-P0-sweep) — explicit do-not-overstate rules
+
+The W86 P1 sweep closes 7 of 8 P1 blockers in meta-#49. The
+following rules are mandatory before any W86 P1-closure claim
+is repeated.
+
+- **#30 is CLOSED at the bf16 tier, NOT at int8.** Reports
+  citing #30 closure MUST cite the bf16-tier closure (the
+  W86 frontier run on Llama-3.1-8B) AND the int8 carry-
+  forward `W86-L-QUANT-INT8-NEEDS-BNB-CUDA-COLAB-CAP`. The
+  int8 bullet of the DoD (Llama-3.1-8B-AWQ or
+  Qwen-2.5-7B-GPTQ load + replay + ≥ 95% top-1) is honestly
+  NOT empirically met by W86; the contract + driver are
+  ready but require bitsandbytes + CUDA + a fresh Colab run.
+
+- **#31 is the ONE remaining open P1.** Reports MUST NOT
+  claim "all P1s closed". The honest count is 7 of 8 P1
+  closed; #31 (MoE substrate) remains open because real MoE
+  substrate routing read/write requires self-hosted MoE
+  weights + GPU. W85 demonstrated Mixtral-8x22B on the text
+  plane only.
+
+- **#34 closure is via Lagrangian + projection, NOT
+  Lagrangian-only.** The W84 LagrangianRefinementV1 alone
+  achieves 0/10 floor-respected on the W84 floor-recovery
+  bench (Monte-Carlo dual estimator has high variance).
+  The W86 closure combines Lagrangian refinement (for
+  utility) with the projection-fallback the issue body
+  explicitly permits (for floor-respect-by-construction).
+  Reports MUST cite both halves of the closure path and the
+  carry-forward `W86-L-LAGRANGIAN-V1-FLOOR-NOT-RESPECTED-ALONE-CAP`.
+
+- **#36 closure is via V2 remediation (deferred graph.cid()),
+  NOT a fundamentally new algorithm.** The W84
+  EventGraphIndexedQueryCacheV1 already shipped the index;
+  V2 just defers the O(N) `graph.cid()` hash to a lazy
+  `index_cid()` call that an auditor can still ask for. The
+  content-addressed identity is PRESERVED; the hot query
+  path skips the hash. Reports MUST cite that the
+  remediation is a deferred-hash optimisation, not a new
+  data structure.
+
+- **#37 closure is via composed-pipeline integration.** W84
+  shipped the standalone enforcer; W86 ships the actual
+  integration (`budget_enforced_composed_recovery_v1`)
+  that the literal DoD bullet 2 demands. Reports MUST cite
+  both halves of the closure.
+
+- **#33 closure leans on the W86 HumanEval witness.** The W84
+  tool-substrate ships every literal DoD bullet, but the
+  most production-realistic witness is the W86 HumanEval
+  bench where the executor IS a real CPython subprocess
+  running unit tests against model outputs. Reports MUST
+  cite this dual witness (W84 5-agent + W86 HumanEval).
+
+- **#32 closure does NOT include a literal OpenAI Python SDK
+  integration test.** W84 ships the SSE-conformant gateway
+  endpoint + `forward_stream` + mid-stream injection; the
+  SSE wire format is verified by `urllib`-level conformance.
+  The literal `openai` Python SDK integration test was a
+  documented W84 carry-forward and remains so; any SSE-
+  compatible client (openai, anthropic, fetch, curl) can
+  consume the W84 stream. Reports MUST NOT claim "we tested
+  with the openai SDK" — we tested with urllib (which
+  validates the wire format).
+
 ## W86 (HumanEval head-to-head with executor-as-critic, #28 closure) — explicit do-not-overstate rules
 
 W86 closes #28 on the literal "strict improvement on at

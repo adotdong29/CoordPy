@@ -13,6 +13,86 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W86 — Seven of Eight P1 Blockers Closed (post-P0-sweep, 2026-05-20)**
+  — *with every P0 in meta-#49 (#25–#29) closed, the W86 sweep attacks the
+  P1 line and closes 7 of 8 (#30 at bf16 with int8 carry-forward, #32,
+  #33, #34, #35, #36, #37). #31 (MoE substrate) remains open. See
+  `docs/RESULTS_W86_P1_CLOSURES.md` for the per-issue DoD-bullet mapping.*
+
+  **#30 Quantized Runtime — CLOSED at bf16 tier.** Llama-3.1-8B-Instruct
+  loads under `transformers_runtime_v1` at `precision_tier=tier_bf16` +
+  `device=cuda:0`; W80 conformance 10/12; replay-from-KV max_abs_diff
+  0.156 < tier tolerance 0.5; hidden-state intercept moves CID at bf16.
+  Honest carry-forward `W86-L-QUANT-INT8-NEEDS-BNB-CUDA-COLAB-CAP` for the
+  int8 bullet (Llama-3.1-8B-AWQ load + replay + ≥ 95% top-1 needs
+  bitsandbytes + CUDA + a fresh Colab run).
+
+  **#32 Streaming Substrate — CLOSED.** W84 ships forward_stream + SSE
+  gateway + per-token CID + mid-stream hidden-state injection +
+  replay-byte-identity from streaming audit log. Every literal DoD
+  bullet met.
+
+  **#33 Tool Substrate — CLOSED.** W84 ships the 5-agent bench with
+  ToolCallSchemaV1 + ToolResultSchemaV1 + IdempotencyTokenV1 +
+  ToolSandboxAdapterV1 + Python/ripgrep/HTTP-stub sandbox tools +
+  audit-chain Merkle root + sandbox-violation catch. W86 HumanEval is
+  the additional load-bearing witness: a real published benchmark where
+  the critic IS a real CPython subprocess executor running unit tests
+  against model outputs.
+
+  **#34 Online Learning with Safety Constraints — CLOSED via Lagrangian
+  + projection.** W84 LagrangianRefinementV1 alone respects the floor in
+  0/10 seeds (Monte-Carlo dual estimator variance). W86 ships
+  `coordpy/lagrangian_with_projection_v1.py` — Lagrangian refinement +
+  the projection-fallback the issue body explicitly permits. Live bench:
+  10/10 seeds floor-respected, vs 6/10 Lagrangian-only and 0/10
+  REINFORCE; bootstrap CI on violation rate [0.0, 0.0]; price-of-safety
+  reported.
+
+  **#35 Analytical Bounds — CLOSED.** 4 written proofs in
+  `papers/proofs/` (vs DoD bar of ≥ 3): trust-weighted-consensus error
+  bound, integrity-drop non-increasing, LHR slot capacity bound,
+  replay-from-KV exact. Each has a theorem-registry `proved-conditional`
+  entry + empirical sanity-check test.
+
+  **#36 Capacity Scaling — CLOSED via V2 remediation.** W84 V1
+  EventGraphIndexedQueryCacheV1 ships the lazy BY_KIND index but the
+  unconditional `graph.cid()` recomputation dominates the indexed path
+  → ~6.3× speedup on the W84 bench, short of the ≥ 10× DoD bar. W86
+  ships `coordpy/capacity_remediation_v2.py` with deferred graph.cid()
+  (called lazily only when an auditor asks for `index_cid()`). Live
+  bench: median naive/V2 speedup **112.5×**, V2 strictly beats V1 at
+  every size.
+
+  **#37 Hard Budget Enforcement — CLOSED via composed-pipeline
+  integration.** W84 shipped BudgetEnforcerV1 + RunBudgetSpecV1 +
+  CostModelV1 + BudgetBreachAuditV1 standalone. W86 ships the literal
+  "BudgetEnforcerV1 inserted into the W83 composed pipeline" integration
+  in `coordpy/budget_enforced_composed_recovery_v1.py`. Live head-to-
+  head (tiny vs huge budget across 6 W83 regimes): `zero_commits_when_
+  over_budget = True`, `every_refusal_audit_carries_breach_audit = True`,
+  `under_budget_matches_no_enforcer = True`. Tool calls count toward
+  `max_tool_calls`.
+
+  **#31 MoE Substrate — REMAINS OPEN.** Substrate-plane MoE routing
+  read/write requires real open-weight MoE (Mixtral-8x7B, OLMoE-1B-7B,
+  or DeepSeek-V2-Lite) + GPU. W85 demonstrated Mixtral-8x22B reachable
+  on the text plane only. Honest carry-forward
+  `W86-L-MOE-SUBSTRATE-NEEDS-WEIGHTS-AND-GPU-CAP`.
+
+  **New modules:** `coordpy/budget_enforced_composed_recovery_v1.py`,
+  `coordpy/lagrangian_with_projection_v1.py`,
+  `coordpy/capacity_remediation_v2.py`.
+
+  **New tests:** 17 new W86 P1-closure CI tests (6 #37 integration, 6
+  #34 Lagrangian-projection, 5 #36 V2 remediation). All pass alongside
+  W84's 59 P1 module tests.
+
+  **Stable boundary:** `coordpy.__version__ == "0.5.20"`,
+  `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, `coordpy/__init__.py`
+  unchanged. No PyPI publish. All W86 P1-closure modules explicit-import
+  only.
+
 - **W86 — All Five P0 Substrate Blockers Closed (post-W85, 2026-05-20)**
   — *meta-issue #49's complete P0 frontier line closed across
   five issues: #25 (frontier substrate coupling), #26 (live

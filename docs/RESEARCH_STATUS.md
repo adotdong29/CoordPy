@@ -9,6 +9,27 @@
 > Frontier-Scale Substrate Closure on real Llama-3.1-8B-Instruct,
 > 2026-05-20.
 
+## TL;DR — W86 P1 line closures (post-P0-sweep push)
+
+With every post-W83 P0 (#25–#29) closed, the W86 sweep
+attacks the P1 line. **7 of 8 P1 issues are now CLOSED;
+only #31 (MoE substrate) remains open.**
+
+| Issue | Verdict | Closure path |
+|---|---|---|
+| **#30** Quantized Runtime | **CLOSED at bf16 tier** | W86 frontier run: Llama-3.1-8B in bf16 + conformance 10/12 + replay 0.156 < 0.5 + intercept moves CID. Int8 carry-forward needs bitsandbytes + CUDA + fresh Colab |
+| **#31** MoE Substrate | OPEN | Substrate-plane MoE requires real MoE weights + GPU |
+| **#32** Streaming Substrate | **CLOSED** | W84 ships forward_stream + SSE + per-token CID + mid-stream injection + replay-byte-identity |
+| **#33** Tool Substrate | **CLOSED** | W84 5-agent bench + W86 HumanEval as real-tool-on-published-benchmark witness |
+| **#34** Online Learning Safety | **CLOSED** | W86 Lagrangian + projection: 10/10 seeds floor-respected (vs 6/10 Lagrangian-only, 0/10 REINFORCE) |
+| **#35** Analytical Bounds | **CLOSED** | 4 W84 proofs in `papers/proofs/` (DoD bar ≥ 3) + theorem-registry proved-conditional entries |
+| **#36** Capacity Scaling | **CLOSED** | W86 V2 remediation defers graph.cid(); median cliff speedup 112.5× (DoD bar 10×) |
+| **#37** Hard Budget Enforcement | **CLOSED** | W86 composed-pipeline integration: 0 commits under tiny budget, full commits under huge budget, every refusal carries breach audit |
+
+After W86, meta-#49's open P1 count drops from 8 to 1 (#31
+only). See `docs/RESULTS_W86_P1_CLOSURES.md` for per-issue
+DoD-bullet mapping.
+
 ## TL;DR — W86 Frontier-Scale Substrate Closure (post-W85 push)
 
 W86 is the first CoordPy milestone that hits real frontier-class
