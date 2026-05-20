@@ -811,30 +811,44 @@ class TransformersRuntimeV1:
             per_layer=tuple(per_layer_hidden),
             final=final_hidden,
         )
-        # KV cache.
+        # KV cache. In skinny_trace mode we explicitly DROP the
+        # KV cache copy because (a) the per-layer fp64 numpy
+        # arrays cost ~8 GB of host RAM at 32 k tokens × 32
+        # layers × 8 KV heads × 128 head_dim, and (b) the trace
+        # CID does not need byte-level KV to detect a hidden-
+        # state injection: distinct hidden_state_inject_per_layer
+        # changes the FINAL LOGITS row of the forward trace, and
+        # those are content-addressed independently. Carrying the
+        # full KV in the trace at 32 k tokens crashes the host
+        # RAM on Colab Pro's A100 instance.
         k_layers: list["_np.ndarray | None"] = []
         v_layers: list["_np.ndarray | None"] = []
-        # HF returns either:
-        # - a tuple of (k, v) per layer (legacy)
-        # - a DynamicCache object (newer transformers).
-        layers_kv = self._extract_layers_from_past(
-            past_key_values)
-        for k_t, v_t in layers_kv:
-            if k_t is None or v_t is None:
+        if bool(self.skinny_trace):
+            for _ in range(int(self.n_layers)):
                 k_layers.append(None)
                 v_layers.append(None)
-                continue
-            k = _ndarray_from_torch(k_t)
-            v = _ndarray_from_torch(v_t)
-            # k shape: (batch, n_kv_heads, seq_len, head_dim).
-            # Reduce to (n_heads, seq_len, head_dim) by taking
-            # batch 0.
-            if k.ndim == 4 and k.shape[0] == 1:
-                k = k[0]
-            if v.ndim == 4 and v.shape[0] == 1:
-                v = v[0]
-            k_layers.append(k)
-            v_layers.append(v)
+        else:
+            # HF returns either:
+            # - a tuple of (k, v) per layer (legacy)
+            # - a DynamicCache object (newer transformers).
+            layers_kv = self._extract_layers_from_past(
+                past_key_values)
+            for k_t, v_t in layers_kv:
+                if k_t is None or v_t is None:
+                    k_layers.append(None)
+                    v_layers.append(None)
+                    continue
+                k = _ndarray_from_torch(k_t)
+                v = _ndarray_from_torch(v_t)
+                # k shape: (batch, n_kv_heads, seq_len,
+                # head_dim). Reduce to (n_heads, seq_len,
+                # head_dim) by taking batch 0.
+                if k.ndim == 4 and k.shape[0] == 1:
+                    k = k[0]
+                if v.ndim == 4 and v.shape[0] == 1:
+                    v = v[0]
+                k_layers.append(k)
+                v_layers.append(v)
         kv_snapshot = KVCacheSnapshotV1(
             schema=(
                 W80_RUNTIME_INSTRUMENTATION_V1_SCHEMA_VERSION),

@@ -363,16 +363,43 @@ def run_long_context_intercept_bench_v1(
         try:
             base_trace = runtime.forward(input_token_ids=ids)
             t_base = float(time.time() - t0)
-            print(
-                f"[lc-intercept] horizon={horizon}: baseline "
-                f"forward done in {t_base:.2f}s; "
-                "running injected forward...", flush=True)
+            # Extract CID NOW, then drop the trace object so the
+            # GPU KV cache (~4 GB at 32 k tokens) and the trace's
+            # internal CPU buffers can be freed before the second
+            # forward starts.
+            base_cid = str(base_trace.cid())
+            del base_trace
+            try:
+                import gc
+                gc.collect()
+                import torch  # type: ignore
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    torch.cuda.synchronize()
+                    free_b, _ = torch.cuda.mem_get_info()
+                    print(
+                        f"[lc-intercept] horizon={horizon}: "
+                        f"baseline forward done in {t_base:.2f}s "
+                        f"(VRAM free now {free_b / (1024**3):.2f} GiB); "
+                        "running injected forward...",
+                        flush=True)
+                else:
+                    print(
+                        f"[lc-intercept] horizon={horizon}: "
+                        f"baseline forward done in {t_base:.2f}s; "
+                        "running injected forward...",
+                        flush=True)
+            except Exception:  # noqa: BLE001
+                print(
+                    f"[lc-intercept] horizon={horizon}: "
+                    f"baseline forward done in {t_base:.2f}s; "
+                    "running injected forward...", flush=True)
             t1 = time.time()
             inj_trace = runtime.forward(
                 input_token_ids=ids, injection=plan)
             t_inj = float(time.time() - t1)
-            base_cid = str(base_trace.cid())
             inj_cid = str(inj_trace.cid())
+            del inj_trace
             print(
                 f"[lc-intercept] horizon={horizon}: injected "
                 f"forward done in {t_inj:.2f}s; base_cid="
