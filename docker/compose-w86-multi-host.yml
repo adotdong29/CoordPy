@@ -1,0 +1,106 @@
+# W86 — docker-compose multi-host substrate for #29 closure.
+#
+# Three services on a docker bridge network:
+#   * host-a — CrossProcessSubstrateNode (principal alpha)
+#   * host-b — CrossProcessSubstrateNode (principal beta)
+#   * partition-proxy — packet-drop proxy fronting host-b
+#
+# Each service is its own container with its own /etc/hostname,
+# its own filesystem, its own kernel network namespace. The
+# orchestrator (running on the docker HOST) drives the bench by
+# hitting host-a directly and host-b via the partition proxy on
+# the shared bridge network.
+#
+# The HMAC keys + clock-skew values are passed via env vars. The
+# orchestrator script generates fresh keys per run and writes
+# them into a .env file before `docker compose up`.
+
+services:
+  host-a:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.coordpy-substrate
+    image: coordpy-substrate:w86
+    container_name: w86-host-a
+    hostname: host-a
+    command:
+      - serve
+      - --bind-host=0.0.0.0
+      - --bind-port=8080
+      - --self-id=alpha
+      - --peer-id=client
+      - --self-key=${ALPHA_KEY}
+      - --peer-key=${CLIENT_KEY}
+      - --clock-skew-s=2.0
+      - --max-skew-s=60.0
+    environment:
+      COORDPY_HEALTHZ_PORT: "8080"
+    networks:
+      coordpy_w86_net:
+        aliases:
+          - host-a
+    ports:
+      - "18080:8080"
+
+  host-b:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.coordpy-substrate
+    image: coordpy-substrate:w86
+    container_name: w86-host-b
+    hostname: host-b
+    command:
+      - serve
+      - --bind-host=0.0.0.0
+      - --bind-port=8080
+      - --self-id=beta
+      - --peer-id=client
+      - --self-key=${BETA_KEY}
+      - --peer-key=${CLIENT_KEY}
+      - --clock-skew-s=-2.0
+      - --max-skew-s=60.0
+    environment:
+      COORDPY_HEALTHZ_PORT: "8080"
+    networks:
+      coordpy_w86_net:
+        aliases:
+          - host-b
+    ports:
+      - "18081:8080"
+
+  partition-proxy:
+    image: coordpy-substrate:w86
+    container_name: w86-partition-proxy
+    hostname: partition-proxy
+    depends_on:
+      host-b:
+        condition: service_healthy
+    command:
+      - serve-proxy
+      - --bind-host=0.0.0.0
+      - --bind-port=9000
+      - --upstream-host=host-b
+      - --upstream-port=8080
+    networks:
+      coordpy_w86_net:
+        aliases:
+          - partition-proxy
+    ports:
+      - "19000:9000"
+    healthcheck:
+      test:
+        - "CMD"
+        - "python"
+        - "-c"
+        - >-
+          import urllib.request,sys;
+          sys.exit(0 if urllib.request.urlopen(
+          'http://127.0.0.1:9000/healthz', timeout=2).status==200
+          else 1)
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+networks:
+  coordpy_w86_net:
+    driver: bridge

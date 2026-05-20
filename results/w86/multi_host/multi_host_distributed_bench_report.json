@@ -1,0 +1,30 @@
+{
+  "schema": "coordpy.multi_host_distributed_substrate_v1.v1",
+  "topology": {
+    "schema": "coordpy.multi_host_distributed_substrate_v1.v1",
+    "host_a_label": "alpha (container w86-host-a)",
+    "host_a_base_url": "http://127.0.0.1:18080",
+    "host_a_hostname": "host-a",
+    "host_b_label": "beta (container w86-host-b)",
+    "host_b_base_url": "http://127.0.0.1:18081",
+    "host_b_hostname": "host-b",
+    "proxy_base_url": "http://127.0.0.1:19000",
+    "docker_network_id": "3874e50af2a76b75253b7306191f6b1290c9a495232fa3f5b76232e433eb9ebb"
+  },
+  "n_envelopes": 8,
+  "mtls_unauthenticated_refused": true,
+  "mtls_bad_signature_refused": true,
+  "cross_host_post_root_match": true,
+  "partition_drops_all_traffic": true,
+  "partition_recovery_seconds": 0.004766,
+  "partition_heals_and_recovers": true,
+  "skew_injection_within_tolerance": true,
+  "idempotent_apply_holds": true,
+  "n_idempotent_replays": 10,
+  "n_distinct_replay_digests": 1,
+  "rtt_host_a_ms": 2.602,
+  "rtt_host_b_ms": 1.734,
+  "sender_root_cid": "3e03629c051342620800cd0b6481a24583cd4a5c25f9b1617064e007c0229605",
+  "receiver_root_cid": "3e03629c051342620800cd0b6481a24583cd4a5c25f9b1617064e007c0229605",
+  "wall_clock_seconds": 2.107834
+}
