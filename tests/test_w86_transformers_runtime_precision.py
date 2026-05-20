@@ -217,3 +217,113 @@ def test_w86_runtime_skinny_trace_flag_default_false(monkeypatch):
     rt_skinny = tr.TransformersRuntimeV1(
         model_name="fake/model", skinny_trace=True)
     assert rt_skinny.skinny_trace is True
+
+
+def test_w86_runtime_skinny_trace_uses_sdpa_attention(monkeypatch):
+    """Skinny trace mode must pick attn_implementation=sdpa so a
+    32 k-token forward fits in 24-40 GB of VRAM. Eager attention
+    materialises the full (seq_len, seq_len) matrix and OOMs at
+    long context. Caught by the first Colab Pro run."""
+    import coordpy.transformers_runtime_v1 as tr
+
+    captured: dict[str, object] = {}
+
+    class _FakeTorch:
+        float32 = "float32"
+        bfloat16 = "bfloat16"
+        float16 = "float16"
+
+        @staticmethod
+        def set_grad_enabled(_enabled: bool) -> None:
+            return None
+
+    class _FakeAutoModelForCausalLM:
+        @classmethod
+        def from_pretrained(cls, model_name, **kwargs):
+            captured["kwargs"] = dict(kwargs)
+            return SimpleNamespace(
+                config=SimpleNamespace(
+                    num_hidden_layers=6,
+                    num_attention_heads=12,
+                    hidden_size=768,
+                    model_type="gpt2",
+                ),
+                eval=lambda: None,
+                named_parameters=lambda: [],
+            )
+
+    class _FakeAutoTokenizer:
+        @classmethod
+        def from_pretrained(cls, model_name):
+            return object()
+
+    monkeypatch.setattr(
+        tr, "_torch_modules",
+        lambda: (_FakeTorch(), _FakeAutoModelForCausalLM,
+                 _FakeAutoTokenizer))
+
+    tr.TransformersRuntimeV1(
+        model_name="fake/model",
+        precision_tier=tr.W86_PRECISION_TIER_BF16,
+        skinny_trace=True,
+    )
+    kw = captured["kwargs"]
+    assert kw["attn_implementation"] == "sdpa", (
+        "skinny trace must use sdpa to fit long context")
+    assert kw["output_attentions"] is False, (
+        "skinny trace must not request per-layer attention "
+        "probabilities (they materialise the full attention "
+        "matrix)")
+    assert kw["output_hidden_states"] is False, (
+        "skinny trace must not request per-layer hidden states "
+        "(they retain full-sequence arrays internally)")
+
+
+def test_w86_runtime_full_trace_keeps_eager_attention(
+        monkeypatch):
+    """The default (skinny_trace=False) must keep eager
+    attention so the W80 conformance suite's READ_ATTENTION_PROBS
+    axis still passes. Regression on the existing W80 contract."""
+    import coordpy.transformers_runtime_v1 as tr
+
+    captured: dict[str, object] = {}
+
+    class _FakeTorch:
+        float32 = "float32"
+        bfloat16 = "bfloat16"
+        float16 = "float16"
+
+        @staticmethod
+        def set_grad_enabled(_enabled: bool) -> None:
+            return None
+
+    class _FakeAutoModelForCausalLM:
+        @classmethod
+        def from_pretrained(cls, model_name, **kwargs):
+            captured["kwargs"] = dict(kwargs)
+            return SimpleNamespace(
+                config=SimpleNamespace(
+                    num_hidden_layers=6,
+                    num_attention_heads=12,
+                    hidden_size=768,
+                    model_type="gpt2",
+                ),
+                eval=lambda: None,
+                named_parameters=lambda: [],
+            )
+
+    class _FakeAutoTokenizer:
+        @classmethod
+        def from_pretrained(cls, model_name):
+            return object()
+
+    monkeypatch.setattr(
+        tr, "_torch_modules",
+        lambda: (_FakeTorch(), _FakeAutoModelForCausalLM,
+                 _FakeAutoTokenizer))
+
+    tr.TransformersRuntimeV1(model_name="fake/model")
+    kw = captured["kwargs"]
+    assert kw["attn_implementation"] == "eager"
+    assert kw["output_attentions"] is True
+    assert kw["output_hidden_states"] is True

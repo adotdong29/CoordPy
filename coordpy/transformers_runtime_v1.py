@@ -361,11 +361,25 @@ class TransformersRuntimeV1:
                 f"expected one of fp32/bf16/fp16/int8")
         self._tokenizer = AutoTokenizer.from_pretrained(
             self.model_name)
+        # ``attn_implementation``:
+        # * "eager" exposes per-layer attention probabilities
+        #   cleanly (used by the W80 conformance suite + the
+        #   short-context hidden-state intercept bench). But it
+        #   materialises the full (seq_len, seq_len) attention
+        #   matrix and OOMs at ≥ 32 k tokens.
+        # * "sdpa" uses PyTorch's memory-efficient attention; the
+        #   block-level hidden-state injection hook still fires,
+        #   but per-layer attention probabilities are not exposed
+        #   so the READ_ATTENTION_PROBS axis becomes
+        #   BACKEND_SPECIFIC-best-effort.
+        # In skinny_trace mode we pick sdpa because the bench
+        # explicitly does not capture attention probs anyway.
+        attn_impl = "sdpa" if self.skinny_trace else "eager"
         load_kwargs: dict[str, Any] = {
             "torch_dtype": self._torch_dtype,
-            "output_attentions": True,
-            "output_hidden_states": True,
-            "attn_implementation": "eager",
+            "output_attentions": not self.skinny_trace,
+            "output_hidden_states": not self.skinny_trace,
+            "attn_implementation": attn_impl,
         }
         if tier == W86_PRECISION_TIER_INT8:
             try:
@@ -689,10 +703,13 @@ class TransformersRuntimeV1:
             x = torch.as_tensor(
                 [ids], dtype=torch.long).to(self.device)
             emb = emb_layer(x)  # (1, seq_len, hidden_dim)
+            # Prefix must match the embedding tensor's dtype + device,
+            # which is the runtime's working dtype (bf16 on cuda, fp32
+            # on cpu).
             pref_t = torch.as_tensor(
                 _np.asarray(prefix, dtype=_np.float32),
-                dtype=torch.float32,
-                device=self.device)
+                dtype=emb.dtype,
+                device=emb.device)
             # Broadcast over batch dim.
             if pref_t.ndim == 2:
                 pref_t = pref_t.unsqueeze(0)
@@ -909,18 +926,31 @@ class TransformersRuntimeV1:
         2. ``DynamicCache()`` + per-layer ``update()`` on newer
            releases.
         3. Legacy tuple-of-(k, v) for the oldest paths.
+
+        Reconstructed tensors are placed on ``self.device`` and
+        in the runtime's working dtype so HF's attention-layer
+        ``cat`` against the new keys/values does not hit a
+        cross-device or cross-dtype error.
         """
         torch = self._torch
+        target_device = (
+            self.device if str(self.device).startswith("cuda")
+            else "cpu")
+        target_dtype = self._torch_dtype
+        if target_dtype is None:
+            target_dtype = torch.float32
         layers_legacy = []
         for k_arr, v_arr in zip(
                 snapshot.k_per_layer, snapshot.v_per_layer):
             if k_arr is None or v_arr is None:
                 k_t = torch.zeros(
                     (1, self.n_heads, 0, self.head_dim),
-                    dtype=torch.float32)
+                    dtype=target_dtype,
+                    device=target_device)
                 v_t = torch.zeros(
                     (1, self.n_heads, 0, self.head_dim),
-                    dtype=torch.float32)
+                    dtype=target_dtype,
+                    device=target_device)
             else:
                 k_np = _np.asarray(k_arr, dtype=_np.float32)
                 v_np = _np.asarray(v_arr, dtype=_np.float32)
@@ -929,9 +959,11 @@ class TransformersRuntimeV1:
                 if v_np.ndim == 3:
                     v_np = v_np[None, ...]
                 k_t = torch.as_tensor(
-                    k_np, dtype=torch.float32)
+                    k_np, dtype=target_dtype,
+                    device=target_device)
                 v_t = torch.as_tensor(
-                    v_np, dtype=torch.float32)
+                    v_np, dtype=target_dtype,
+                    device=target_device)
             layers_legacy.append((k_t, v_t))
         legacy = tuple(layers_legacy)
         try:
