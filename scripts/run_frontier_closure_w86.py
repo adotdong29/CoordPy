@@ -385,6 +385,17 @@ def main(argv: list[str] | None = None) -> int:
             tz=dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # Process-level isolation pattern: if a previous invocation
+    # already wrote some of the closures to disk, merge into
+    # them so a multi-phase Colab run gets one consolidated
+    # report at the end. The notebook uses this pattern: invoke
+    # the driver once with --skip-27 (loads full-trace model,
+    # runs #25 + #26, exits → CUDA cleared); then invoke again
+    # with --skip-25 --skip-26 (loads skinny-trace model, runs
+    # #27). Each invocation is a fresh process so the OS
+    # reclaims GPU memory between phases.
+    prev_report_path = (
+        out_dir / "frontier_closure_report.json")
     overall: dict[str, Any] = {
         "schema": "coordpy.w86.frontier_closure_report.v1",
         "run_started_utc": (
@@ -399,64 +410,110 @@ def main(argv: list[str] | None = None) -> int:
         "env": _detect_torch_env(),
         "out_dir": str(out_dir),
     }
+    if prev_report_path.exists():
+        try:
+            prev = json.loads(
+                prev_report_path.read_bytes().decode("utf-8"))
+            # Preserve previous closures + first-run start time.
+            for k in (
+                    "closure_25", "closure_25_error",
+                    "closure_26", "closure_26_error",
+                    "closure_27", "closure_27_error",
+                    "model_load_wall_seconds",
+                    "runtime_backend_id",
+                    "runtime_backend_runtime_id",
+                    "model_n_layers", "model_n_heads",
+                    "model_hidden_dim",
+                    "run_started_utc"):
+                if k in prev:
+                    overall[k] = prev[k]
+            overall["multi_phase_merged"] = True
+            overall["previous_report_cid"] = str(
+                prev.get("report_cid", ""))
+            print(
+                "[w86] merging into existing report at "
+                f"{prev_report_path}", flush=True)
+        except Exception as exc:  # noqa: BLE001
+            print(
+                f"[w86] WARNING: could not parse existing report "
+                f"{prev_report_path}: {exc}", flush=True)
+
     print(f"[w86] out_dir = {out_dir}", flush=True)
     print(
         f"[w86] env = {json.dumps(overall['env'], indent=0)}",
         flush=True)
 
     # Construct ONE main runtime (full-trace mode) for #25 and
-    # #26. The #27 bench creates its own skinny-trace runtime
-    # internally.
+    # #26 only when at least one of them is not skipped. The #27
+    # bench creates its own skinny-trace runtime internally. This
+    # gate lets the user invoke the driver twice in series:
+    # (a) ``--skip-27`` runs #25 + #26 (loads full-trace model,
+    #     exits, OS reclaims VRAM);
+    # (b) ``--skip-25 --skip-26`` runs only #27 (loads skinny-
+    #     trace model fresh, no contention with phase-a runtime).
     runtime: Any = None
-    try:
-        from coordpy.transformers_runtime_v1 import (
-            TransformersRuntimeV1,
-        )
+    need_main_runtime = (
+        (not args.skip_25) or (not args.skip_26))
+    if need_main_runtime:
+        try:
+            from coordpy.transformers_runtime_v1 import (
+                TransformersRuntimeV1,
+            )
+            print(
+                "[w86] loading "
+                f"{args.model_name} on {args.device} at "
+                f"{args.precision_tier}...", flush=True)
+            t_load_0 = time.time()
+            runtime = TransformersRuntimeV1(
+                model_name=str(args.model_name),
+                device=str(args.device),
+                precision_tier=str(args.precision_tier),
+            )
+            overall["model_load_wall_seconds"] = float(
+                round(time.time() - t_load_0, 6))
+            overall["runtime_backend_id"] = str(
+                runtime.backend_id())
+            overall["runtime_backend_runtime_id"] = str(
+                runtime.backend_runtime_id())
+            overall["model_n_layers"] = int(runtime.n_layers)
+            overall["model_n_heads"] = int(runtime.n_heads)
+            overall["model_hidden_dim"] = int(
+                runtime.hidden_dim)
+            print(
+                f"[w86] loaded: n_layers={runtime.n_layers}, "
+                f"n_heads={runtime.n_heads}, "
+                f"hidden_dim={runtime.hidden_dim}", flush=True)
+        except Exception as exc:  # noqa: BLE001
+            overall["model_load_error"] = (
+                f"{type(exc).__name__}: {str(exc)[:300]}")
+            print(
+                f"[w86] FAILED to load model: {exc}",
+                file=sys.stderr, flush=True)
+            # Save and exit honestly; never fake a positive
+            # result. The report_cid is computed even on failure
+            # so the failure manifest is itself auditable.
+            overall["run_finished_utc"] = (
+                dt.datetime.now(
+                    tz=dt.timezone.utc).isoformat())
+            overall["report_cid"] = _sha256_hex({
+                "kind": "w86_frontier_closure_report_v1",
+                "report": {
+                    k: v for k, v in overall.items()
+                    if k != "report_cid"},
+            })
+            _save_json(
+                out_dir / "frontier_closure_report.json",
+                overall)
+            return 1
+    else:
         print(
-            "[w86] loading "
-            f"{args.model_name} on {args.device} at "
-            f"{args.precision_tier}...", flush=True)
-        t_load_0 = time.time()
-        runtime = TransformersRuntimeV1(
-            model_name=str(args.model_name),
-            device=str(args.device),
-            precision_tier=str(args.precision_tier),
-        )
-        overall["model_load_wall_seconds"] = float(
-            round(time.time() - t_load_0, 6))
-        overall["runtime_backend_id"] = str(
-            runtime.backend_id())
-        overall["runtime_backend_runtime_id"] = str(
-            runtime.backend_runtime_id())
-        overall["model_n_layers"] = int(runtime.n_layers)
-        overall["model_n_heads"] = int(runtime.n_heads)
-        overall["model_hidden_dim"] = int(runtime.hidden_dim)
-        print(
-            f"[w86] loaded: n_layers={runtime.n_layers}, "
-            f"n_heads={runtime.n_heads}, "
-            f"hidden_dim={runtime.hidden_dim}", flush=True)
-    except Exception as exc:  # noqa: BLE001
-        overall["model_load_error"] = (
-            f"{type(exc).__name__}: {str(exc)[:300]}")
-        print(
-            f"[w86] FAILED to load model: {exc}",
-            file=sys.stderr, flush=True)
-        # Save and exit honestly; never fake a positive result.
-        # The report_cid is computed even on failure so the
-        # failure manifest is itself auditable.
-        overall["run_finished_utc"] = (
-            dt.datetime.now(tz=dt.timezone.utc).isoformat())
-        overall["report_cid"] = _sha256_hex({
-            "kind": "w86_frontier_closure_report_v1",
-            "report": {
-                k: v for k, v in overall.items()
-                if k != "report_cid"},
-        })
-        _save_json(out_dir / "frontier_closure_report.json",
-                   overall)
-        return 1
+            "[w86] skipping main runtime load (only #27 will "
+            "run; bench creates its own skinny-trace runtime)",
+            flush=True)
 
-    # #25 substrate coupling.
+    # #25 substrate coupling. If we already merged a previous
+    # phase's closure_25, do NOT overwrite it with the skip
+    # sentinel.
     if not args.skip_25:
         print("[w86] running #25 substrate coupling...",
               flush=True)
@@ -470,10 +527,10 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:  # noqa: BLE001
             overall["closure_25_error"] = (
                 f"{type(exc).__name__}: {str(exc)[:300]}")
-    else:
+    elif "closure_25" not in overall:
         overall["closure_25"] = {"skipped": True}
 
-    # #26 live learned memory.
+    # #26 live learned memory. Same merge-aware skip pattern.
     if not args.skip_26:
         print("[w86] running #26 live learned memory...",
               flush=True)
@@ -492,18 +549,49 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:  # noqa: BLE001
             overall["closure_26_error"] = (
                 f"{type(exc).__name__}: {str(exc)[:300]}")
-    else:
+    elif "closure_26" not in overall:
         overall["closure_26"] = {"skipped": True}
 
     # #27 long-context hidden-state intercept.
     if not args.skip_27:
         # Free the main runtime BEFORE the long-context bench so
         # its skinny-trace runtime gets fresh VRAM headroom for
-        # the 32 k forward.
-        del runtime
+        # the 32 k forward. The aggressive cleanup pattern below
+        # (null model + tokenizer references, gc.collect(), then
+        # cuda.empty_cache() + synchronize) is needed because
+        # `del runtime` alone only decrements the local reference
+        # — the underlying torch model + tokenizer objects are
+        # still alive in Python's gc until the next collection.
+        # If even this is not enough on a particular card, the
+        # notebook can invoke the driver TWICE (once with
+        # --skip-27 then once with --skip-25 --skip-26) so the OS
+        # reclaims the VRAM at process exit.
+        if runtime is not None:
+            try:
+                runtime._model = None  # noqa: SLF001
+                runtime._tokenizer = None  # noqa: SLF001
+                runtime._torch = None  # noqa: SLF001
+            except Exception:  # noqa: BLE001
+                pass
+            del runtime
+        runtime = None
+        try:
+            import gc
+            gc.collect()
+        except Exception:  # noqa: BLE001
+            pass
         try:
             import torch  # type: ignore
-            torch.cuda.empty_cache()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                torch.cuda.synchronize()
+                free_gb, total_gb = (
+                    torch.cuda.mem_get_info())
+                print(
+                    "[w86] after main-runtime teardown: "
+                    f"{free_gb / (1024**3):.2f} GiB free / "
+                    f"{total_gb / (1024**3):.2f} GiB total",
+                    flush=True)
         except Exception:  # noqa: BLE001
             pass
         print("[w86] running #27 long-context intercept "
@@ -522,7 +610,7 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:  # noqa: BLE001
             overall["closure_27_error"] = (
                 f"{type(exc).__name__}: {str(exc)[:300]}")
-    else:
+    elif "closure_27" not in overall:
         overall["closure_27"] = {"skipped": True}
 
     overall["run_finished_utc"] = (
