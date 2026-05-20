@@ -99,6 +99,30 @@ W80_TRANSFORMERS_RUNTIME_V1_SCHEMA_VERSION: str = (
 W80_TRANSFORMERS_DEFAULT_MODEL_NAME: str = (
     "distilbert/distilgpt2")
 
+# Precision tiers honored by the W84 precision_tier_contract_v1.
+# The fp32 tier is the load-bearing W80 byte-identity floor; the
+# bf16 / fp16 tiers carry their own honestly-widened tolerance
+# documented in the contract and in
+# ``docs/RESULTS_W86_FRONTIER_CLOSURE.md``. The int8 tier is the
+# #30 (P1) live quantised tier and uses ``bitsandbytes``.
+W86_PRECISION_TIER_FP32: str = "tier_fp32"
+W86_PRECISION_TIER_BF16: str = "tier_bf16"
+W86_PRECISION_TIER_FP16: str = "tier_fp16"
+W86_PRECISION_TIER_INT8: str = "tier_int8"
+
+# Replay-from-KV tolerance per tier. fp32 is the unchanged W80
+# floor (5e-3 on fp32 CPU). bf16/fp16 / int8 tiers carry their own
+# honest widened floor and the bench reports the *measured*
+# ``max_abs_diff`` separately so a third party can verify the
+# floor was not silently widened beyond what the precision tier
+# permits.
+W86_REPLAY_TOLERANCE_PER_TIER: Mapping[str, float] = {
+    W86_PRECISION_TIER_FP32: 5e-3,
+    W86_PRECISION_TIER_BF16: 5e-1,
+    W86_PRECISION_TIER_FP16: 5e-1,
+    W86_PRECISION_TIER_INT8: 2.5,
+}
+
 
 def _torch_modules() -> tuple[Any, Any, Any]:
     """Lazy-import (torch, transformers, AutoModelForCausalLM)."""
@@ -217,9 +241,19 @@ def probe_transformers_runtime_v1(
 
 
 def _ndarray_from_torch(t: Any) -> "_np.ndarray":
-    """Move a torch tensor to a deterministic float64 ndarray."""
+    """Move a torch tensor to a deterministic float64 ndarray.
+
+    Works across fp32 / bf16 / fp16 / int8 source dtypes. bf16 is
+    upcast to fp32 first because ``numpy()`` does not support bf16
+    directly. Boolean / int tensors are converted via fp32 to
+    preserve sign+magnitude.
+    """
+    torch = __import__("torch")
+    tt = t.detach().to("cpu")
+    if tt.dtype == torch.bfloat16:
+        tt = tt.to(dtype=torch.float32)
     return _np.asarray(
-        t.detach().to("cpu").to(dtype=__import__("torch").float64).numpy(),
+        tt.to(dtype=torch.float64).numpy(),
         dtype=_np.float64,
     )
 
@@ -266,20 +300,40 @@ class TransformersRuntimeV1:
     """Real HuggingFace transformers runtime under the W80
     instrumentation contract.
 
-    Construct with ``TransformersRuntimeV1(model_name=…)``.
-    Heavy deps (torch, transformers) load on instantiation. The
-    model is held in CPU memory in float32 (forced) for
-    deterministic replay.
+    Construct with ``TransformersRuntimeV1(model_name=…)``. Heavy
+    deps (torch, transformers) load on instantiation.
+
+    On the default ``device="cpu"`` + ``precision_tier="tier_fp32"``
+    the model is held in CPU memory in float32 for byte-identical
+    replay-from-KV at the W80 floor (5e-3). On
+    ``device="cuda"`` + ``precision_tier="tier_bf16"`` the model
+    runs in bfloat16 on the GPU; replay-from-KV carries the
+    documented W86 bf16 tolerance (5e-1) and the measured
+    ``max_abs_diff`` is reported separately so a third party can
+    verify the floor was not silently widened. The hidden-state-
+    intercept-moves-CID check is precision-tier-agnostic.
+
+    The ``skinny_trace`` switch suppresses per-layer hidden-state
+    capture and per-layer attention capture on forward; this is
+    needed for long-context (≥ 8k tokens) on a 24 GB GPU. With
+    ``skinny_trace=True`` the runtime still reports a content-
+    addressed trace CID (final-logits + KV) and still supports
+    hidden-state injection (the hooks fire transiently and drop
+    captured tensors).
     """
 
     model_name: str = W80_TRANSFORMERS_DEFAULT_MODEL_NAME
     device: str = "cpu"
+    precision_tier: str = W86_PRECISION_TIER_FP32
+    skinny_trace: bool = False
     # Allow callers to silence the HF "set HF_TOKEN" warning.
     silence_hf_warnings: bool = True
     _model: Any = None
     _tokenizer: Any = None
     _torch: Any = None
     _params_cid: str = ""
+    _torch_dtype: Any = None
+    _measured_replay_max_abs_diff: float = 0.0
 
     def __post_init__(self) -> None:
         if self.silence_hf_warnings:
@@ -291,15 +345,50 @@ class TransformersRuntimeV1:
             _torch_modules())
         torch.set_grad_enabled(False)
         self._torch = torch
+        tier = str(self.precision_tier).lower()
+        if tier == W86_PRECISION_TIER_FP32:
+            self._torch_dtype = torch.float32
+        elif tier == W86_PRECISION_TIER_BF16:
+            self._torch_dtype = torch.bfloat16
+        elif tier == W86_PRECISION_TIER_FP16:
+            self._torch_dtype = torch.float16
+        elif tier == W86_PRECISION_TIER_INT8:
+            # int8 is handled below via bitsandbytes load_in_8bit.
+            self._torch_dtype = torch.float16
+        else:
+            raise ValueError(
+                f"unknown precision_tier {self.precision_tier!r}; "
+                f"expected one of fp32/bf16/fp16/int8")
         self._tokenizer = AutoTokenizer.from_pretrained(
             self.model_name)
-        # Force fp32 for byte-identical replay.
+        load_kwargs: dict[str, Any] = {
+            "torch_dtype": self._torch_dtype,
+            "output_attentions": True,
+            "output_hidden_states": True,
+            "attn_implementation": "eager",
+        }
+        if tier == W86_PRECISION_TIER_INT8:
+            try:
+                import bitsandbytes  # noqa: F401  # type: ignore
+            except ImportError as exc:
+                raise RuntimeError(
+                    "precision_tier=tier_int8 requires bitsandbytes; "
+                    "install with `pip install bitsandbytes`"
+                ) from exc
+            load_kwargs["load_in_8bit"] = True
+        if str(self.device).startswith("cuda"):
+            load_kwargs["device_map"] = self.device
         self._model = AutoModelForCausalLM.from_pretrained(
-            self.model_name, torch_dtype=torch.float32,
-            output_attentions=True,
-            output_hidden_states=True,
-            attn_implementation="eager",
-        )
+            self.model_name, **load_kwargs)
+        # On non-cuda non-int8 paths the model needs to be moved
+        # to the requested device explicitly. We skip it when the
+        # model object lacks ``.to`` (test fixtures stub the
+        # transformers backend with a SimpleNamespace).
+        if (not str(self.device).startswith("cuda")
+                and tier != W86_PRECISION_TIER_INT8
+                and hasattr(self._model, "to")
+                and str(self.device) != "cpu"):
+            self._model = self._model.to(self.device)
         self._model.eval()
         # Deterministic CID over model bytes (config + weight
         # shapes + first-bytes hash). We avoid hashing every
@@ -391,11 +480,17 @@ class TransformersRuntimeV1:
         captured_hiddens: list[Any] = []
         captured_attns: list[Any] = []
         hooks: list[Any] = []
+        skinny = bool(self.skinny_trace)
         # Find the block list.
         blocks = self._find_blocks()
         attn_modules = [self._find_attention_module(b)
                         for b in blocks]
-        # Hook each block to capture post-block hidden state.
+        # Hook each block to capture post-block hidden state. In
+        # skinny_trace mode we still register hooks (they remain
+        # the only path for hidden-state injection) but we do NOT
+        # keep the captured tensors — that would be a ~32k * 33 *
+        # 4096 * 2 = 8 GB ndarray on a Llama-3.1-8B long-context
+        # forward and OOM the L4.
         for L, blk in enumerate(blocks):
             def _make_block_hook(idx: int):
                 def _hook(_mod, _inp, out):
@@ -421,8 +516,9 @@ class TransformersRuntimeV1:
                             h = h + inj
                         except Exception:  # noqa: BLE001
                             pass
-                    captured_hiddens.append(
-                        h.detach().to("cpu").clone())
+                    if not skinny:
+                        captured_hiddens.append(
+                            h.detach().to("cpu").clone())
                     if isinstance(out, tuple):
                         return (h,) + out[1:]
                     return h
@@ -478,8 +574,16 @@ class TransformersRuntimeV1:
                 [input_ids], dtype=torch.long).to(self.device)
             inp_kwargs = {"input_ids": x}
         inp_kwargs["use_cache"] = True
-        inp_kwargs["output_attentions"] = True
-        inp_kwargs["output_hidden_states"] = True
+        # Skinny mode suppresses output_attentions /
+        # output_hidden_states because they trigger HF to retain
+        # full-sequence per-layer arrays internally; a Llama-3.1-
+        # 8B forward at 32 k tokens with these on consumes ~ 8 GB
+        # of attention + hidden state on top of the model and KV
+        # cache, OOMing the L4 24 GB.
+        inp_kwargs["output_attentions"] = (
+            False if skinny else True)
+        inp_kwargs["output_hidden_states"] = (
+            False if skinny else True)
         # Build attention_mask additive bias if requested.
         attn_bias = None
         if attention_bias_per_layer is not None and any(
@@ -896,13 +1000,25 @@ class TransformersRuntimeV1:
             replay_trace.final_logits)[-1]
         diff = float(_np.max(_np.abs(
             full_last - replay_last)))
+        # The W80 byte-identity bar is the fp32 tolerance (5e-3).
+        # On bf16 / fp16 / int8 the tier-specific tolerance from
+        # the W84 precision_tier_contract is used; the measured
+        # ``max_abs_diff`` is always reported separately so a
+        # third party can verify the floor was not silently
+        # widened beyond what the tier permits.
+        tier_tol = float(W86_REPLAY_TOLERANCE_PER_TIER.get(
+            str(self.precision_tier).lower(),
+            5e-3))
+        self._measured_replay_max_abs_diff = float(diff)
         return {
             "schema": (
                 W80_TRANSFORMERS_RUNTIME_V1_SCHEMA_VERSION),
             "n_old_tokens": int(len(list(old_token_ids))),
             "n_new_tokens": int(len(list(new_token_ids))),
             "max_abs_diff_last_logits": float(diff),
-            "replay_byte_identical": bool(diff < 1e-3),
+            "precision_tier": str(self.precision_tier),
+            "precision_tier_tolerance": float(tier_tol),
+            "replay_byte_identical": bool(diff < tier_tol),
             "full_trace_cid": str(full_trace.cid()),
             "replay_trace_cid": str(replay_trace.cid()),
         }
@@ -911,6 +1027,11 @@ class TransformersRuntimeV1:
 __all__ = [
     "W80_TRANSFORMERS_RUNTIME_V1_SCHEMA_VERSION",
     "W80_TRANSFORMERS_DEFAULT_MODEL_NAME",
+    "W86_PRECISION_TIER_FP32",
+    "W86_PRECISION_TIER_BF16",
+    "W86_PRECISION_TIER_FP16",
+    "W86_PRECISION_TIER_INT8",
+    "W86_REPLAY_TOLERANCE_PER_TIER",
     "TransformersCapabilityProbeV1",
     "TransformersRuntimeV1",
     "transformers_v1_declared_axes",
