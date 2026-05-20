@@ -443,6 +443,23 @@ def main(argv: list[str] | None = None) -> int:
         f"[w86] env = {json.dumps(overall['env'], indent=0)}",
         flush=True)
 
+    # Diagnostic: print VRAM state at process start so a multi-
+    # phase run shows whether Phase A's VRAM has actually been
+    # reclaimed by the OS before Phase B loads its own model.
+    try:
+        import torch  # type: ignore
+        if torch.cuda.is_available():
+            free_b, total_b = torch.cuda.mem_get_info()
+            print(
+                "[w86] CUDA mem at process start: "
+                f"free={free_b / (1024**3):.2f} GiB / "
+                f"total={total_b / (1024**3):.2f} GiB",
+                flush=True)
+    except Exception as exc:  # noqa: BLE001
+        print(
+            f"[w86] CUDA mem probe failed: {type(exc).__name__}: "
+            f"{exc}", flush=True)
+
     # Construct ONE main runtime (full-trace mode) for #25 and
     # #26 only when at least one of them is not skipped. The #27
     # bench creates its own skinny-trace runtime internally. This
@@ -511,6 +528,22 @@ def main(argv: list[str] | None = None) -> int:
             "run; bench creates its own skinny-trace runtime)",
             flush=True)
 
+    # Helper: write a partial report after each closure step so
+    # a mid-run process kill preserves whatever did succeed. The
+    # report_cid is only stamped on the FINAL write so a partial
+    # report is visibly "in-progress" (no top-level report_cid).
+    def _write_partial(overall_partial: dict[str, Any]) -> None:
+        try:
+            tmp = {k: v for k, v in overall_partial.items()
+                   if k != "report_cid"}
+            tmp["partial_report"] = True
+            _save_json(
+                out_dir / "frontier_closure_report.json", tmp)
+        except Exception as exc:  # noqa: BLE001
+            print(
+                "[w86] WARNING: partial-report write failed: "
+                f"{type(exc).__name__}: {exc}", flush=True)
+
     # #25 substrate coupling. If we already merged a previous
     # phase's closure_25, do NOT overwrite it with the skip
     # sentinel.
@@ -527,6 +560,7 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:  # noqa: BLE001
             overall["closure_25_error"] = (
                 f"{type(exc).__name__}: {str(exc)[:300]}")
+        _write_partial(overall)
     elif "closure_25" not in overall:
         overall["closure_25"] = {"skipped": True}
 
@@ -549,6 +583,7 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:  # noqa: BLE001
             overall["closure_26_error"] = (
                 f"{type(exc).__name__}: {str(exc)[:300]}")
+        _write_partial(overall)
     elif "closure_26" not in overall:
         overall["closure_26"] = {"skipped": True}
 
@@ -610,6 +645,7 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:  # noqa: BLE001
             overall["closure_27_error"] = (
                 f"{type(exc).__name__}: {str(exc)[:300]}")
+        _write_partial(overall)
     elif "closure_27" not in overall:
         overall["closure_27"] = {"skipped": True}
 
