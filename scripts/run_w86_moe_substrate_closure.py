@@ -203,10 +203,14 @@ def main(argv: list[str] | None = None) -> int:
                 "forward_routing_captured",
                 "replay_with_routing_matches_forward_floor",
                 "moe_routing_is_load_bearing",
+                "routing_deterministic_across_two_forwards",
                 "hidden_state_intercept_on_moe_block_moves_cid",
                 "n_moe_layers", "n_experts", "top_k",
                 "n_layers_routing_captured",
-                "max_abs_diff_replay_vs_forward_last_logits",
+                "tier_tolerance",
+                "max_abs_diff_with_routing_vs_forward_last_logits",
+                "max_abs_diff_without_routing_vs_forward_last_logits",
+                "max_abs_diff_force_random_vs_forward_last_logits",
                 "wall_clock_seconds", "bench_cid"):
             if k in rd:
                 print(f"[w86-moe] {k}: {rd[k]}", flush=True)

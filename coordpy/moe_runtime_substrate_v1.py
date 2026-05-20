@@ -473,6 +473,8 @@ class MoERuntimeAdapterV1:
     _top_k: int = 0
     _captured_routing: list["PerLayerRoutingV1 | None"] = (
         dataclasses.field(default_factory=list))
+    _captured_raw_logits: list[Any] = (
+        dataclasses.field(default_factory=list))
 
     def __post_init__(self) -> None:
         from .transformers_runtime_v1 import (
@@ -525,80 +527,66 @@ class MoERuntimeAdapterV1:
     def declared_axes(self) -> Mapping[str, str]:
         return moe_declared_axes()
 
-    def _install_router_hooks(
-            self, *,
-            force_routing: Sequence[
-                "PerLayerRoutingV1 | None"] | None = None,
-    ) -> list[Any]:
-        """Install per-block forward hooks that capture the
-        router's top-K selection. Returns a list of hook
-        handles that the caller MUST remove."""
+    def _gate_module(self, block: Any) -> Any:
+        """Return the router-linear sub-module on this MoE block.
+
+        Modern HF MoE blocks (OLMoE / Mixtral / Qwen-MoE /
+        DeepSeek-V2) expose the router as ``block.gate``; some
+        forks use ``block.router``. The returned sub-module's
+        forward output IS the raw ``router_logits`` tensor of
+        shape ``(B*T, n_experts)`` — hooking it is robust to
+        transformers version drift (in 5.0 the block's own
+        forward no longer returns ``router_logits`` by default,
+        which is why the V1 block-level hook captured nothing).
+        """
+        if hasattr(block, "gate"):
+            return block.gate
+        if hasattr(block, "router"):
+            return block.router
+        raise RuntimeError(
+            f"MoE block {type(block).__name__} has neither "
+            "`gate` nor `router` attribute; can't hook the "
+            "router. File an issue with the model name.")
+
+    def _install_router_hooks(self) -> list[Any]:
+        """Install forward hooks on each MoE block's gate that
+        capture (a) the raw ``router_logits`` tensor and (b) the
+        top-K (expert_ids, gate_weights). Returns hook handles
+        that the caller MUST remove."""
         import torch  # type: ignore
+        n_blocks = int(len(self._moe_blocks))
         captured: list["PerLayerRoutingV1 | None"] = [
-            None] * int(len(self._moe_blocks))
+            None] * n_blocks
+        raw_logits_list: list[Any] = [None] * n_blocks
         hooks: list[Any] = []
-        seq_len_holder = {"v": 0}
-        # Reset captured-routing state on each install.
         for layer_idx, block, _cls_name in self._moe_blocks:
-            def _make_hook(li: int, force: "PerLayerRoutingV1 | None"):
-                def _hook(_mod, inp, out):
-                    # The MoE block's forward returns
-                    # (hidden, router_logits) in HF (Mixtral/
-                    # OLMoE) or just hidden (some forks). The
-                    # output's first tensor is hidden_states.
-                    hidden = out[0] if isinstance(
-                        out, tuple) else out
-                    # hidden shape: (B, T, D). Capture seq_len.
-                    if hasattr(hidden, "shape"):
-                        try:
-                            seq_len_holder["v"] = int(
-                                hidden.shape[-2])
-                        except Exception:  # noqa: BLE001
-                            pass
-                    # router_logits is the second output if
-                    # present.
-                    router_logits = None
-                    if (isinstance(out, tuple)
-                            and len(out) >= 2):
-                        router_logits = out[1]
-                    if router_logits is None:
-                        # Fall back: try the block's last
-                        # ``gate`` invocation. For models that
-                        # don't return router_logits we record
-                        # an empty routing snapshot and the
-                        # restore path becomes a no-op for
-                        # this layer.
-                        captured[li] = None
-                        return out
-                    # router_logits shape: (B*T, n_experts) for
-                    # HF Mixtral/OLMoE.
-                    rl = router_logits.detach()
+            gate = self._gate_module(block)
+
+            def _make_gate_hook(li: int):
+                def _gate_hook(_mod, _inp, out_logits):
+                    if not hasattr(out_logits, "shape"):
+                        return None
+                    rl = out_logits.detach()
+                    # rl shape: (B*T, n_experts) for HF MoE.
+                    if rl.ndim != 2:
+                        return None
                     n_experts_observed = int(rl.shape[-1])
-                    # Compute top-K + softmax.
                     routing_weights = torch.softmax(
                         rl.float(), dim=-1)
+                    k = int(self._top_k or 1)
                     selected_weights, selected_experts = (
-                        torch.topk(
-                            routing_weights,
-                            int(self._top_k or 1), dim=-1))
-                    # Renormalize the selected-K to sum to 1.
+                        torch.topk(routing_weights, k, dim=-1))
                     selected_weights = (
                         selected_weights
                         / (selected_weights.sum(
                             dim=-1, keepdim=True) + 1e-12))
-                    # Move to numpy.
                     ids_np = (
                         selected_experts.to("cpu")
                         .to(dtype=torch.int32).numpy())
                     weights_np = (
                         selected_weights.to("cpu")
                         .to(dtype=torch.float32).numpy())
-                    # ids_np shape: (B*T, top_k). Reshape to
-                    # (T, top_k) by taking batch 0 (HF passes
-                    # B=1 through hooks here).
-                    if ids_np.ndim == 2:
-                        # Assume B=1, drop batch dim.
-                        pass
+                    raw_logits_list[li] = rl.to("cpu").float()
                     captured[li] = PerLayerRoutingV1(
                         schema=(
                             W86_MOE_SUBSTRATE_V1_SCHEMA_VERSION),
@@ -612,16 +600,95 @@ class MoERuntimeAdapterV1:
                         expert_ids=ids_np,
                         gate_weights=weights_np,
                     )
-                    return out
-                return _hook
-            h = block.register_forward_hook(
-                _make_hook(layer_idx, (
-                    force_routing[layer_idx]
-                    if force_routing is not None
-                    and layer_idx < len(force_routing)
-                    else None)))
+                    return None
+                return _gate_hook
+
+            h = gate.register_forward_hook(
+                _make_gate_hook(layer_idx))
             hooks.append(h)
         self._captured_routing = captured
+        self._captured_raw_logits = raw_logits_list
+        return hooks
+
+    def _install_routing_restore_hooks(
+            self, *,
+            raw_logits_per_layer: list[Any],
+            n_target_tokens: int | None = None,
+    ) -> list[Any]:
+        """Install gate hooks that REPLACE the gate's output
+        with previously-captured router_logits.
+
+        The HF MoE block's own ``forward`` continues to run
+        softmax + top-K + expert dispatch on the replacement
+        logits — so injecting the captured ``router_logits``
+        deterministically re-creates the same routing the forward
+        used. The block computes the rest of its math itself,
+        which keeps the substrate honest (no faked outputs).
+
+        During replay-from-KV the gate sees only the new tokens
+        and produces ``(B*n_new, n_experts)``. We slice the
+        captured tensor at ``[-n_new:]`` to inject the matching
+        rows.
+        """
+        hooks: list[Any] = []
+        for layer_idx, block, _cls_name in self._moe_blocks:
+            gate = self._gate_module(block)
+            saved = raw_logits_per_layer[int(layer_idx)] if (
+                int(layer_idx) < len(raw_logits_per_layer)
+            ) else None
+            if saved is None:
+                continue
+
+            def _make_restore_hook(saved_tensor):
+                def _hook(_mod, _inp, out_logits):
+                    if not hasattr(out_logits, "shape"):
+                        return out_logits
+                    n_rows = int(out_logits.shape[0])
+                    # saved_tensor is on CPU as float32; cast +
+                    # move to match the current gate output.
+                    rep = saved_tensor[-n_rows:].to(
+                        device=out_logits.device,
+                        dtype=out_logits.dtype)
+                    return rep
+                return _hook
+
+            h = gate.register_forward_hook(
+                _make_restore_hook(saved))
+            hooks.append(h)
+        return hooks
+
+    def _install_force_random_routing_hooks(
+            self, *, seed: int = 0,
+    ) -> list[Any]:
+        """Install gate hooks that REPLACE the gate output with
+        deterministic-random router_logits — i.e., force a
+        DIFFERENT top-K selection than the model's own router.
+
+        Used by the bench as the load-bearing demonstration that
+        MoE routing IS state: same prompt + same KV + DIFFERENT
+        routing → measurably different output.
+        """
+        import torch  # type: ignore
+        gen = torch.Generator(device="cpu").manual_seed(int(seed))
+        hooks: list[Any] = []
+        for layer_idx, block, _cls_name in self._moe_blocks:
+            gate = self._gate_module(block)
+
+            def _make_random_hook(seed_li):
+                def _hook(_mod, _inp, out_logits):
+                    if not hasattr(out_logits, "shape"):
+                        return out_logits
+                    rand = torch.randn(
+                        out_logits.shape, generator=gen,
+                        dtype=torch.float32)
+                    return rand.to(
+                        device=out_logits.device,
+                        dtype=out_logits.dtype)
+                return _hook
+
+            h = gate.register_forward_hook(
+                _make_random_hook(int(layer_idx)))
+            hooks.append(h)
         return hooks
 
     def forward_with_routing_capture(
@@ -656,31 +723,57 @@ class MoERuntimeAdapterV1:
         )
         return trace, snapshot
 
-    def replay_with_routing(
+    @property
+    def captured_raw_logits(self) -> list[Any]:
+        """List of CPU float32 tensors (one per MoE layer) with
+        the raw router_logits from the most recent forward."""
+        return list(self._captured_raw_logits)
+
+    def replay_with_routing_restored(
             self, *,
             kv: Any,
             new_token_ids: Sequence[int],
-            routing: ExpertRoutingSnapshotV1 | None = None,
+            raw_logits_per_layer: list[Any],
     ) -> Any:
-        """Replay-from-KV.
+        """Replay-from-KV with the captured router_logits
+        restored — the model's own block.gate output is
+        overridden by the saved tensor (sliced to the new-token
+        rows), so the rest of the MoE block re-computes
+        softmax+top-K+expert dispatch on the same logits as the
+        original forward.
 
-        If ``routing`` is provided, the router hooks return the
-        recorded ``(expert_ids, gate_weights)`` instead of the
-        model's own router. If ``routing`` is None, the model's
-        own router fires — this is the *negative* path the bench
-        uses to prove routing is load-bearing.
+        This is the load-bearing positive arm: ``max_abs_diff``
+        on final-token logits should be at the tier floor.
         """
-        # NOTE: the V1 replay path uses the W80
-        # ``replay_from_kv``, which uses the model's own router.
-        # The forced-routing path requires modifying the MoE
-        # block's forward to honour an injected
-        # (expert_ids, gate_weights). For V1 we install
-        # *capture* hooks both with and without restoration; the
-        # negative claim is then: trace.cid() with routing
-        # restored == trace.cid() of the original forward; trace
-        # .cid() without restoration differs.
-        return self._runtime.replay_from_kv(
-            kv=kv, new_token_ids=list(new_token_ids))
+        hooks = self._install_routing_restore_hooks(
+            raw_logits_per_layer=list(raw_logits_per_layer))
+        try:
+            return self._runtime.replay_from_kv(
+                kv=kv, new_token_ids=list(new_token_ids))
+        finally:
+            for h in hooks:
+                h.remove()
+
+    def forward_with_force_random_routing(
+            self, *, input_token_ids: Sequence[int],
+            seed: int = 0,
+    ) -> Any:
+        """Forward with the gate's output replaced by
+        deterministic-random logits per layer — i.e., force a
+        DIFFERENT top-K than the model's own router.
+
+        Used by the bench as the explicit demonstration that
+        routing is load-bearing: same prompt + different routing
+        → measurably different final logits.
+        """
+        hooks = self._install_force_random_routing_hooks(
+            seed=int(seed))
+        try:
+            return self._runtime.forward(
+                input_token_ids=list(input_token_ids))
+        finally:
+            for h in hooks:
+                h.remove()
 
 
 # ---------------------------------------------------------------
@@ -729,10 +822,16 @@ class MoESubstrateClosureBenchReportV1:
     routing_snapshot_cid: str
     replay_trace_cid_with_routing: str
     replay_trace_cid_without_routing: str
+    forward_force_random_routing_trace_cid: str
     max_abs_diff_replay_vs_forward_last_logits: float
+    max_abs_diff_with_routing_vs_forward_last_logits: float
+    max_abs_diff_without_routing_vs_forward_last_logits: float
+    max_abs_diff_force_random_vs_forward_last_logits: float
+    tier_tolerance: float
     forward_routing_captured: bool
     replay_with_routing_matches_forward_floor: bool
     moe_routing_is_load_bearing: bool
+    routing_deterministic_across_two_forwards: bool
     hidden_state_intercept_on_moe_block_moves_cid: bool
     wall_clock_seconds: float
     bench_cid: str
@@ -755,11 +854,30 @@ class MoESubstrateClosureBenchReportV1:
                 self.replay_trace_cid_with_routing),
             "replay_trace_cid_without_routing": str(
                 self.replay_trace_cid_without_routing),
+            "forward_force_random_routing_trace_cid": str(
+                self.forward_force_random_routing_trace_cid),
             "max_abs_diff_replay_vs_forward_last_logits": (
                 float(round(
                     self
                     .max_abs_diff_replay_vs_forward_last_logits,
                     6))),
+            "max_abs_diff_with_routing_vs_forward_last_logits":
+                float(round(
+                    self
+                    .max_abs_diff_with_routing_vs_forward_last_logits,
+                    6)),
+            "max_abs_diff_without_routing_vs_forward_last_logits":
+                float(round(
+                    self
+                    .max_abs_diff_without_routing_vs_forward_last_logits,
+                    6)),
+            "max_abs_diff_force_random_vs_forward_last_logits":
+                float(round(
+                    self
+                    .max_abs_diff_force_random_vs_forward_last_logits,
+                    6)),
+            "tier_tolerance": float(round(
+                self.tier_tolerance, 6)),
             "forward_routing_captured": bool(
                 self.forward_routing_captured),
             "replay_with_routing_matches_forward_floor": bool(
@@ -767,6 +885,9 @@ class MoESubstrateClosureBenchReportV1:
                 .replay_with_routing_matches_forward_floor),
             "moe_routing_is_load_bearing": bool(
                 self.moe_routing_is_load_bearing),
+            "routing_deterministic_across_two_forwards": bool(
+                self
+                .routing_deterministic_across_two_forwards),
             "hidden_state_intercept_on_moe_block_moves_cid": (
                 bool(
                     self
@@ -834,7 +955,7 @@ def run_moe_substrate_closure_bench_v1(
     old_ids = ids[: -int(n_continuation_tokens)]
     new_ids = ids[-int(n_continuation_tokens):]
 
-    # Step 1+2+3: forward with routing capture (on full ids).
+    # Step 1: forward(full ids) WITH router capture.
     fwd_trace, routing = (
         adapter.forward_with_routing_capture(
             input_token_ids=ids))
@@ -842,44 +963,86 @@ def run_moe_substrate_closure_bench_v1(
         int(routing.n_layers_with_routing) > 0)
     fwd_trace_cid = str(fwd_trace.cid())
     routing_cid = str(routing.cid())
+    raw_logits = list(adapter.captured_raw_logits)
 
-    # Step 4: replay-from-KV. We rebuild past_kv from
-    # forward(old_ids) and replay the new tokens. Compare logits.
-    old_trace = runtime.forward(input_token_ids=old_ids)
-    replay_trace = runtime.replay_from_kv(
-        kv=old_trace.kv, new_token_ids=new_ids)
-    # Forward over the full prompt's last n_continuation
-    # logits == the replay's logits at the same positions.
-    full_last = _np.asarray(fwd_trace.final_logits)
-    # fwd_trace.final_logits shape: (seq_len, vocab). Last n_new
-    # rows.
-    if full_last.ndim == 2:
-        full_last_rows = full_last[
-            -int(n_continuation_tokens):, :]
-    else:
-        full_last_rows = full_last
-    replay_last = _np.asarray(replay_trace.final_logits)
-    if replay_last.ndim == 2:
-        replay_last_rows = replay_last
-    else:
-        replay_last_rows = replay_last
-    n_compare = int(min(
-        full_last_rows.shape[0],
-        replay_last_rows.shape[0]))
-    max_diff = float(_np.max(_np.abs(
-        full_last_rows[-n_compare:]
-        - replay_last_rows[-n_compare:])))
     from .transformers_runtime_v1 import (
         W86_REPLAY_TOLERANCE_PER_TIER,
     )
     tier_tol = float(W86_REPLAY_TOLERANCE_PER_TIER.get(
         str(precision_tier).lower(), 5e-3))
-    replay_with_routing_byte_id = bool(max_diff < tier_tol)
-    replay_with_routing_cid = str(replay_trace.cid())
+
+    # Build forward's last-n logit rows once — every diff uses
+    # the same reference.
+    def _last_rows(trace: Any) -> "_np.ndarray":
+        arr = _np.asarray(trace.final_logits)
+        if arr.ndim == 2:
+            return arr[-int(n_continuation_tokens):, :]
+        return arr
+
+    fwd_last_rows = _last_rows(fwd_trace)
+
+    def _diff_against_forward(trace: Any) -> float:
+        other = _np.asarray(trace.final_logits)
+        if other.ndim == 2:
+            other_rows = other[
+                -int(n_continuation_tokens):, :]
+        else:
+            other_rows = other
+        n_cmp = int(min(
+            fwd_last_rows.shape[0], other_rows.shape[0]))
+        return float(_np.max(_np.abs(
+            fwd_last_rows[-n_cmp:]
+            - other_rows[-n_cmp:])))
+
+    # Step 2: replay-from-KV, WITHOUT routing restored
+    # (model's own router fires; tiny KV-cache bf16 noise can
+    # flip the top-K → MoE cascades the divergence → this is the
+    # *negative* arm that proves routing is load-bearing).
+    old_trace = runtime.forward(input_token_ids=old_ids)
+    replay_without = runtime.replay_from_kv(
+        kv=old_trace.kv, new_token_ids=new_ids)
+    diff_without = _diff_against_forward(replay_without)
+    replay_trace_cid_without_routing = str(
+        replay_without.cid())
+
+    # Step 3: replay-from-KV, WITH routing restored. The
+    # captured raw router_logits replace block.gate's output
+    # during replay, so the block re-creates the original
+    # routing deterministically.
+    if forward_routing_captured:
+        replay_with = adapter.replay_with_routing_restored(
+            kv=old_trace.kv,
+            new_token_ids=new_ids,
+            raw_logits_per_layer=raw_logits)
+        diff_with = _diff_against_forward(replay_with)
+        replay_with_routing_cid = str(replay_with.cid())
+    else:
+        # No capture → no restore is possible. Report the
+        # without-restore diff as the with-restore value so the
+        # report is honest about the failure mode.
+        diff_with = float(diff_without)
+        replay_with_routing_cid = str(
+            replay_trace_cid_without_routing)
+    replay_with_routing_byte_id = bool(
+        diff_with < tier_tol)
+
+    # Step 4: force-random routing forward — direct
+    # demonstration that DIFFERENT routing → measurably
+    # different output (corroborates the load-bearing claim).
+    if forward_routing_captured:
+        force_random_trace = (
+            adapter.forward_with_force_random_routing(
+                input_token_ids=ids, seed=int(0)))
+        diff_force_random = _diff_against_forward(
+            force_random_trace)
+        force_random_trace_cid = str(force_random_trace.cid())
+    else:
+        diff_force_random = 0.0
+        force_random_trace_cid = ""
 
     # Step 5: hidden-state intercept on the MoE block residual.
-    # We use the W80 hidden_state_inject_per_layer surface
-    # (which fires AFTER each transformer block, including MoE).
+    # Uses the W80 hidden_state_inject_per_layer surface (which
+    # fires AFTER each transformer block, including MoE).
     from .runtime_instrumentation_v1 import (
         InjectionPlanV1,
         W80_RUNTIME_INSTRUMENTATION_V1_SCHEMA_VERSION as W80_SV,
@@ -906,35 +1069,27 @@ def run_moe_substrate_closure_bench_v1(
     intercept_moves_cid = bool(
         str(fwd_trace.cid()) != str(inj_trace.cid()))
 
-    # Step 6: negative claim — capture routing on a SECOND
-    # forward and verify both routings agree (deterministic).
-    # This is the load-bearing property the issue body asks for:
-    # the routing IS state. Two forwards at temperature=0 must
-    # produce the same routing; the routing CID is what
-    # distinguishes one forward's state from another's.
+    # Step 6: routing determinism. Two forwards at temperature
+    # =0 with the same prompt must produce the same routing.
     _trace2, routing2 = (
         adapter.forward_with_routing_capture(
             input_token_ids=ids))
     routing_deterministic = bool(
         routing.cid() == routing2.cid())
-    # The "without routing" replay is the standard replay
-    # path which uses the model's OWN router. At temperature
-    # =0 the router output is deterministic given the same
-    # KV cache, so the replay logits match the forward logits
-    # at the tier floor. The negative claim is encoded in
-    # `routing_deterministic` (TRUE) plus the existence of a
-    # distinct routing CID per forward.
+
+    # Load-bearing := (1) routing was captured, (2) restoring
+    # it yields byte-identity at the tier floor, (3) NOT
+    # restoring it diverges substantially, (4) the routing is
+    # deterministic across forwards.
+    LOAD_BEARING_DIVERGENCE_RATIO = 10.0
     moe_routing_is_load_bearing = bool(
         forward_routing_captured
+        and replay_with_routing_byte_id
+        and diff_without >= (
+            LOAD_BEARING_DIVERGENCE_RATIO * tier_tol)
         and routing_deterministic
         and len(routing.per_layer) > 0
         and routing.per_layer[0].expert_ids is not None)
-    # The "without routing" trace CID is the same as the
-    # standard replay path's CID (since the standard replay
-    # also uses the model's own router, which is the
-    # deterministic same routing the forward used).
-    replay_trace_cid_without_routing = str(
-        replay_trace.cid())
     wall = float(time.time() - t0)
 
     report = MoESubstrateClosureBenchReportV1(
@@ -952,14 +1107,25 @@ def run_moe_substrate_closure_bench_v1(
             replay_with_routing_cid),
         replay_trace_cid_without_routing=str(
             replay_trace_cid_without_routing),
+        forward_force_random_routing_trace_cid=str(
+            force_random_trace_cid),
         max_abs_diff_replay_vs_forward_last_logits=float(
-            max_diff),
+            diff_with),
+        max_abs_diff_with_routing_vs_forward_last_logits=float(
+            diff_with),
+        max_abs_diff_without_routing_vs_forward_last_logits=(
+            float(diff_without)),
+        max_abs_diff_force_random_vs_forward_last_logits=float(
+            diff_force_random),
+        tier_tolerance=float(tier_tol),
         forward_routing_captured=bool(
             forward_routing_captured),
         replay_with_routing_matches_forward_floor=bool(
             replay_with_routing_byte_id),
         moe_routing_is_load_bearing=bool(
             moe_routing_is_load_bearing),
+        routing_deterministic_across_two_forwards=bool(
+            routing_deterministic),
         hidden_state_intercept_on_moe_block_moves_cid=bool(
             intercept_moves_cid),
         wall_clock_seconds=float(wall),

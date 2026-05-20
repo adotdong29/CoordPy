@@ -105,28 +105,69 @@ def main(argv: list[str] | None = None) -> int:
             f"{n_moe_layers} MoE layers"
             + (f" (block class {moe_class!r})"
                if moe_class else ""))
-        # Forward + replay-from-KV with routing matches at the
-        # precision floor.
+        # Forward + replay-from-KV WITH routing restored
+        # matches at the precision floor.
+        tier_tol = float(rd.get("tier_tolerance", 5e-3))
         replay_ok = bool(rd.get(
             "replay_with_routing_matches_forward_floor",
             False))
-        diff = float(rd.get(
-            "max_abs_diff_replay_vs_forward_last_logits",
-            1.0))
+        diff_with = float(rd.get(
+            "max_abs_diff_with_routing_vs_forward_last_logits",
+            rd.get(
+                "max_abs_diff_replay_vs_forward_last_logits",
+                1.0)))
         notes.append(
             ("PASS" if replay_ok else "FAIL")
-            + " #31 forward + replay-from-KV under MoE "
-            f"contract matches at tier floor "
-            f"(max_abs_diff = {diff:.4f})")
+            + " #31 forward + replay-from-KV WITH routing "
+            f"restored matches at tier floor "
+            f"(max_abs_diff = {diff_with:.6f}, "
+            f"tier_tol = {tier_tol:.6f})")
         if not replay_ok:
             ok = False
-        # Routing capture is load-bearing.
+        # Negative arm: WITHOUT routing diverges.
+        diff_without = float(rd.get(
+            "max_abs_diff_without_routing_vs_forward_last_logits",
+            0.0))
+        divergence_ratio = (
+            (diff_without / tier_tol)
+            if tier_tol > 0 else 0.0)
+        negative_arm_ok = bool(
+            diff_without >= 10.0 * tier_tol
+            and diff_without > diff_with)
+        notes.append(
+            ("PASS" if negative_arm_ok else "FAIL")
+            + " #31 replay-without-routing diverges from "
+            f"forward by {diff_without:.4f} "
+            f"({divergence_ratio:.1f}x tier_tol) — proves "
+            "routing is load-bearing state")
+        if not negative_arm_ok:
+            ok = False
+        # Corroborating: force-random routing diverges.
+        diff_random = float(rd.get(
+            "max_abs_diff_force_random_vs_forward_last_logits",
+            0.0))
+        if diff_random > 0:
+            notes.append(
+                f"INFO #31 force-random routing diff = "
+                f"{diff_random:.4f}")
+        # Determinism.
+        det = bool(rd.get(
+            "routing_deterministic_across_two_forwards",
+            False))
+        notes.append(
+            ("PASS" if det else "FAIL")
+            + " #31 routing is deterministic across two "
+            "forwards at temperature=0")
+        if not det:
+            ok = False
+        # Routing capture is load-bearing (composite).
         load_bearing = bool(
             rd.get("moe_routing_is_load_bearing", False))
         notes.append(
             ("PASS" if load_bearing else "FAIL")
-            + " #31 MoE routing is load-bearing (captured + "
-            "deterministic across forwards)")
+            + " #31 MoE routing is load-bearing "
+            "(captured + restored byte-id + no-restore diverges "
+            "+ deterministic)")
         if not load_bearing:
             ok = False
         # Hidden-state intercept on MoE block moves CID.
