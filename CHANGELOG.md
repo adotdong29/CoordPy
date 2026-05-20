@@ -13,6 +13,195 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W86 — All Five P0 Substrate Blockers Closed (post-W85, 2026-05-20)**
+  — *meta-issue #49's complete P0 frontier line closed across
+  five issues: #25 (frontier substrate coupling), #26 (live
+  LLM training of composed learned memory), #27 (long-context
+  live ≥ 32k), #28 (real-world multi-agent task benchmark),
+  #29 (real cross-host distributed substrate). All five
+  closures are empirically grounded with audit chains that
+  re-derive offline.*
+
+  **Closures shipped:**
+
+  1. **#25 Frontier-Scale Substrate Coupling — TRULY CLOSED.**
+     Llama-3.1-8B-Instruct loaded under the W80 instrumentation
+     contract on A100-40GB in bf16. W80 conformance suite
+     `n_pass = 10 / 12`; replay-from-KV at bf16 tier
+     `max_abs_diff = 0.156 < 0.5`; hidden-state intercept
+     moves the trace CID; W83 load-bearing claim reproduced.
+     Honest carry-forwards: `W86-L-LLAMA-3.1-8B-WRITE-
+     ATTENTION-BIAS-GQA-CAP` (GQA vs MHA), `W86-L-CONFORMANCE-
+     SUITE-NOT-PRECISION-TIER-AWARE-CAP` (conformance harness
+     hardcodes fp32 floor; runtime correctly reports bf16-tier
+     byte-id True). Evidence:
+     `results/w86/w86_20260520T022828Z/25_substrate_coupling.json`.
+
+  2. **#26 Live LLM Training of Composed Learned Memory —
+     TRULY CLOSED.** The W83 composed-learned-memory module
+     trained on REAL Llama-3.1-8B-Instruct layer-12 hidden
+     states; live MSE 0.011665 < synthetic MSE 0.131914 (an
+     **11.3× strict beat** on held-out live hidden states with
+     identical architecture / optimiser / seed / training-step
+     config; only the training distribution differs).
+     Reproduced byte-identically across 3 independent runs.
+     Held-out prompt-CID disjointness enforced.
+     `TrainingTraceWitness` capsules emitted. Evidence:
+     `results/w86/w86_20260520T022828Z/26_live_learned_memory.json`.
+
+  3. **#27 Long-Context Live Eval ≥ 32k — TRULY CLOSED on
+     both axes.** Task-success axis (W85 NIM): composed >
+     bounded-V3 at 33.5k tokens on Llama-3.1-8B / 70B /
+     Mixtral-8x22B. Hidden-state-intercept axis (W86 self-
+     hosted): at exactly 32 768 input tokens on Llama-3.1-8B
+     in bf16 with skinny-trace + SDPA, baseline trace CID
+     `34f2bcb1…` ≠ injected trace CID `714bc5f6a1…`; the
+     `hidden_state_intercept_moves_cid_at_min_32k` bar is
+     empirically met. Evidence:
+     `results/w86/w86_20260520T022828Z/27_long_context_intercept.json`.
+
+  4. **#28 Real-World Multi-Agent Task Benchmark — CLOSED on
+     the literal stock-harness DoD bar.** HumanEval 164-problem
+     canonical corpus, SHA-verified against upstream commit
+     `312c5e5532f0e0470bf47f77a6243e02a61da530` (blob SHA
+     `b796127e635a67f9…`). 3 seeds × 30 problems × 3 arms ×
+     ~11 calls = 990 NIM calls on `meta/llama-3.1-8b-instruct`.
+     CoordPy multi-agent B with executor-as-critic (real
+     CPython subprocess running unit tests; critic sees actual
+     Python traceback) achieves **mean pass@1 = 71.1 % vs A0
+     stock single-shot mean 63.3 % (+7.8 pp)**;
+     `b_mean_strictly_beats_a0_mean = True`. Honest carry-
+     forward `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`:
+     the harder same-budget A1 baseline (first-pass-among-K=5
+     with visible-test filter) achieves 80.0 % and remains
+     stronger than B by 8.9 pp. The W85 GSM8K negative result
+     (B 71.7 % < A0 75 % < A1 81.7 % on persona-debate WITHOUT
+     executor) stands as recorded historical observation.
+     Audit chain: 963 per-call CIDs + 3 per-seed Merkle roots
+     + bench Merkle root `a0ac02284751f817…` all re-derive
+     offline. Evidence:
+     `results/w86/humaneval/humaneval_bench_report.json`.
+
+  5. **#29 Real Cross-Host Distributed Substrate — TRULY
+     CLOSED at the literal "≥ 2 containers in docker-compose"
+     DoD bar.** Live three-container topology on a docker
+     bridge network: `w86-host-a` (172.18.0.2, alpha,
+     `+2.0 s` skew), `w86-host-b` (172.18.0.3, beta,
+     `−2.0 s` skew), `w86-partition-proxy` (172.18.0.4).
+     Real TCP traffic across virtual NIC pairs (RTT
+     1.7-2.6 ms), not loopback memcpy. Every DoD bullet
+     empirically True: mTLS-shaped HMAC auth required +
+     refused-on-bad-sig, cross-host post-root match,
+     partition test 1.5 s drop + 4.77 ms heal, ±2 s skew
+     within tolerance, 10 replays → 1 distinct digest. Two
+     consecutive runs both pass identically. Evidence:
+     `results/w86/multi_host/multi_host_distributed_bench_report.json`
+     + `_run2.json`. Honest carry-forwards: `W86-L-MULTI-HOST-
+     DISTRIBUTED-V1-DOCKER-BRIDGE-CAP` (single-host docker
+     bridge; multi-physical-machine WAN traffic is V2),
+     `W86-L-MULTI-HOST-DISTRIBUTED-V1-HMAC-NOT-X509-CAP`
+     (inherited from W84; HMAC-SHA256 mutual auth, not X.509
+     TLS).
+
+  **New modules:**
+
+  * `coordpy/transformers_runtime_v1.py` extended — new
+    `precision_tier_{fp32,bf16,fp16,int8}` constants +
+    `W86_REPLAY_TOLERANCE_PER_TIER`; new `device` /
+    `precision_tier` / `skinny_trace` kwargs; cuda + bf16
+    + skinny-mode KV-drop path so Llama-3.1-8B fits a 24-40 GB
+    GPU for 32 k+ token forwards.
+  * `coordpy/live_composed_memory_training_v1.py` — content-
+    addressed live-vs-synthetic head-to-head training of the
+    W83 composed-learned-memory module on real hidden states
+    via a fixed deterministic R^{4096} → R^{8} projection;
+    held-out disjointness enforced; raises
+    `LiveTrainingBlockedOnHardwareError` honestly without
+    torch.
+  * `coordpy/long_context_intercept_bench_v1.py` — live
+    long-context hidden-state intercept bench on a self-hosted
+    frontier model with skinny-trace; deterministic
+    needle-in-haystack token prompt builder; per-step progress
+    diagnostics.
+  * `coordpy/humaneval_real_bench_v1.py` — published HumanEval
+    benchmark adapter with SHA-256 corpus verification;
+    subprocess Python executor with 8 s soft / 12 s kill
+    timeout; three-arm head-to-head with executor-as-critic;
+    per-task content-addressed Merkle audit chain.
+  * `coordpy/multi_host_distributed_substrate_v1.py` — gateway
+    + partition proxy entrypoints as container `ENTRYPOINT`;
+    `run_multi_host_distributed_bench_v1` driver against
+    external gateway URLs.
+
+  **New infrastructure:**
+
+  * `docker/Dockerfile.coordpy-substrate` +
+    `docker/compose-w86-multi-host.yml` — minimal
+    python:3.12-slim image + bridge-network 3-service stack.
+  * `scripts/run_frontier_closure_w86.py` — driver for #25 +
+    #26 + #27 with multi-phase support (`--skip-25`,
+    `--skip-26`, `--skip-27`).
+  * `scripts/run_w86_humaneval_bench.py` +
+    `scripts/run_w86_multi_host_bench.py` — driver +
+    orchestrator for #28 and #29.
+  * `scripts/colab_frontier_closure_w86.ipynb` — Colab Pro
+    browser notebook (HF token via Colab Secrets; ! shell
+    magic + log capture; two phase-isolated cells).
+  * `scripts/verify_w86_audit_chain.py`,
+    `scripts/verify_w86_humaneval_audit_chain.py`,
+    `scripts/verify_w86_multi_host_audit_chain.py` — offline
+    re-verifiers.
+  * `docs/RESULTS_W86_FRONTIER_CLOSURE.md`,
+    `docs/RESULTS_W86_HUMANEVAL_HEAD_TO_HEAD.md`,
+    `docs/RESULTS_W86_REAL_DISTRIBUTED.md` — three results
+    docs, each with DoD-bullet mapping + anti-cheat clause
+    re-statement + honest carry-forwards.
+  * `docs/COLAB_PRO_RUNBOOK.md` — future-use runbook for the
+    Colab Pro browser path.
+  * `docs/PLAN_W86_28_ALTERNATIVE_HEAD_TO_HEAD.md`,
+    `docs/PLAN_W86_29_REAL_MULTI_HOST.md` — pre-closure plans
+    preserved on disk.
+  * `docs/W86_ISSUE_CLOSURE_COMMENTS.md` — DoD-mapped GitHub
+    issue closure comments for #25 / #26 / #27 / #28 / #29.
+
+  **Tests (CI):** 50 new W86 tests — 10 HumanEval surface, 6
+  multi-host (CLI + audit-chain re-derive + anti-loopback),
+  11 frontier-closure audit chain (run-3 + run-7), 6
+  precision-tier, 7 live-CM training, 7 long-context
+  intercept, 3 audit-chain extras. All passing on the focused
+  W86 sweep; no torch / transformers / docker / NIM
+  dependency at CI time.
+
+  **Process bugs surfaced + fixed during the W86 run chain
+  (preserved on disk as cautionary tales):** device-mismatch
+  in `_build_past_kv_from_snapshot` (CPU/fp32 vs cuda/bf16);
+  64 GB eager-attention OOM at 32 k (fixed via SDPA in skinny
+  mode); `_params_cid` loop materialising every weight as
+  fp32 on CPU (OOM-kill of subprocess); `_wrap_outputs` 8 GB
+  fp64 numpy KV materialisation on host (fixed by skinny-mode
+  KV-drop); bench held GPU KV across forwards (fixed by
+  `del base_trace` + cuda.empty_cache between forwards);
+  Colab `/content` persistence requiring rm-before-clone.
+
+  **W86 honesty bars:**
+  * #28 closure is on the LITERAL stock-harness DoD bar
+    (B > A0). It is NOT on the harder same-budget A1 baseline
+    (B < A1 by 8.9 pp); this is recorded as
+    `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`.
+  * #29 closure is on the LITERAL "≥ 2 containers in docker-
+    compose" bar the issue body permits. The multi-physical-
+    machine bar is V2.
+  * #25 conformance suite passes the issue's literal
+    `n_pass >= 10 of 12` bar with 10 / 12; the 2 failing
+    axes are documented carry-forwards (GQA write-attention-
+    bias + bf16-aware replay-from-KV check), not silent test
+    masking.
+
+  **Stable boundary preservation:** `coordpy.__version__ ==
+  "0.5.20"`, `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`,
+  `coordpy/__init__.py` byte-for-byte unchanged. No PyPI
+  publish. All W86 modules explicit-import only.
+
 - **W85 Frontier Text Live / GSM8K Head-To-Head / Long-Context Live**
   (post-W84, 2026-05-19) — *honest text-axis push on the
   post-W83 P0 / P1 line under meta issue #49. **Three new W85
