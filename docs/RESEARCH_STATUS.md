@@ -63,9 +63,18 @@ Concrete evidence (all CIDs are re-derivable offline from
   Closure plan in `docs/PLAN_W86_28_ALTERNATIVE_HEAD_TO_HEAD.md`
   (HumanEval + executor-as-critic; coupled #28 + #33 advance).
 
-* **#29 — still partial.** W84 cross-process bench stands.
-  Closure plan in `docs/PLAN_W86_29_REAL_MULTI_HOST.md`
-  (Mac + Colab + cloudflared free tunnel; zero GCP cost).
+* **#29 — CLOSED.** Live 3-container docker-compose topology
+  (``host-a`` 172.18.0.2, ``host-b`` 172.18.0.3,
+  ``partition-proxy`` 172.18.0.4 on bridge network
+  ``coordpy_w86_coordpy_w86_net``). Each container has its
+  own kernel network namespace, hostname, filesystem layer;
+  traffic crosses real virtual NIC pairs (RTT ~ 1-3 ms), not
+  loopback memcpy. All 7 DoD bars met: mTLS-auth-required +
+  refused-on-bad-sig, cross-host post-root match, 1.5 s
+  partition drops + 4.77 ms heal, ±2 s skew within W84
+  tolerance, 10 replays → 1 distinct digest. Bench wall-clock
+  2.1 s; ``report_cid 5582f0986c741d79...`` re-derives offline.
+  See ``docs/RESULTS_W86_REAL_DISTRIBUTED.md``.
 
 ## TL;DR — W85 Frontier Text Live / GSM8K Head-To-Head / Long-Context Live (post-W84 push)
 

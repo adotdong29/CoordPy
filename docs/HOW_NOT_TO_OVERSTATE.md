@@ -5,6 +5,50 @@
 > README-of-README must satisfy these rules. Last touched: post-W85
 > W86 Frontier-Scale Substrate Closure milestone, 2026-05-20.
 
+## W86 (Real Multi-Host Distributed Substrate, #29 closure) — explicit do-not-overstate rules
+
+W86 closes #29 on a 3-container docker-compose topology. The
+following rules are mandatory before any W86 #29 claim is
+repeated.
+
+- **W86 closes #29 at the literal "≥ 2 containers in docker-
+  compose" bar the issue body permits.** Reports MUST cite
+  this exact bar, NOT a stronger "≥ 2 physical machines on a
+  WAN" claim. The W86 V1 topology is single-host (docker
+  bridge network); containers ARE separate hosts in the
+  kernel-namespace + hostname + filesystem-layer + virtual-
+  NIC-pair sense, but they share the host's hardware clock
+  and Linux kernel. The V2 multi-physical-machine path is
+  documented in ``docs/PLAN_W86_29_REAL_MULTI_HOST.md`` and
+  is NOT closed.
+
+- **W86 mTLS is HMAC-shaped, not X.509 TLS.** The protocol
+  property the issue asks for (mutual auth on every
+  connection, refusal of unsigned/bad-sig peers) is met. The
+  cryptographic mechanism is HMAC-SHA256 over
+  ``method || path || ts_ns || body_sha256``. Reports MUST
+  cite this carry-forward
+  ``W86-L-MULTI-HOST-DISTRIBUTED-V1-HMAC-NOT-X509-CAP`` if
+  they describe the auth as "mTLS".
+
+- **W86 #29 partition test uses a packet-drop proxy, not a
+  network-level partition.** The proxy's
+  ``/admin/start_drop`` admin endpoint refuses to forward
+  traffic for a configurable window; the proxy returns 502.
+  This is the same as the W84 ``PartitionProxyV1`` semantics,
+  not a Linux `iptables` rule or AWS Security Group change.
+  The protocol property the issue asks for (the partition
+  produces total connectivity loss; the system heals; an
+  envelope sent after heal succeeds) is met.
+
+- **W86 #29 closure is FAST (2.1 s wall-clock) BECAUSE the
+  substrate is the W84 controlled NumPy substrate — no
+  frontier LLM runs in the container topology.** The #29
+  bench is the distributed-protocol bench, not the
+  long-context inference bench. Reports MUST NOT conflate
+  the two: a "fast multi-host distributed bench" is not a
+  "fast frontier model" claim.
+
 ## W86 (Frontier-Scale Substrate Closure on real Llama-3.1-8B) — explicit do-not-overstate rules
 
 W86 closes #25 and #26 on a real frontier-class open-weight model
