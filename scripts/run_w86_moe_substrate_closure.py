@@ -200,6 +200,8 @@ def main(argv: list[str] | None = None) -> int:
     rd = overall.get("closure_31", {})
     if rd:
         for k in (
+                "moe_block_class_name", "gate_class_name",
+                "gate_returns_tuple", "hook_fires_per_forward",
                 "forward_routing_captured",
                 "replay_with_routing_matches_forward_floor",
                 "moe_routing_is_load_bearing",

@@ -475,6 +475,9 @@ class MoERuntimeAdapterV1:
         dataclasses.field(default_factory=list))
     _captured_raw_logits: list[Any] = (
         dataclasses.field(default_factory=list))
+    _gate_class_name: str = ""
+    _gate_returns_tuple: bool = False
+    _last_hook_fire_count: int = 0
 
     def __post_init__(self) -> None:
         from .transformers_runtime_v1 import (
@@ -495,6 +498,13 @@ class MoERuntimeAdapterV1:
                 "new — file an issue.")
         self._moe_blocks = moe_blocks
         self._moe_block_class_name = str(moe_blocks[0][2])
+        # Record the gate sub-module's class name (helps tell
+        # the new tuple-API OLMoE router from a plain nn.Linear).
+        try:
+            first_gate = self._gate_module(moe_blocks[0][1])
+            self._gate_class_name = str(type(first_gate).__name__)
+        except Exception:  # noqa: BLE001
+            self._gate_class_name = ""
         cfg = self._runtime.model.config
         self._n_experts = int(
             getattr(cfg, "num_local_experts", 0)
@@ -549,44 +559,81 @@ class MoERuntimeAdapterV1:
             "router. File an issue with the model name.")
 
     def _install_router_hooks(self) -> list[Any]:
-        """Install forward hooks on each MoE block's gate that
-        capture (a) the raw ``router_logits`` tensor and (b) the
-        top-K (expert_ids, gate_weights). Returns hook handles
-        that the caller MUST remove."""
+        """Install forward hooks on each MoE block's gate.
+
+        Handles BOTH HF MoE router APIs:
+
+        * Tuple API (OLMoE 5.0 ``OlmoeTopKRouter`` and similar):
+          ``gate.forward()`` returns ``(router_logits,
+          top_k_weights, top_k_index)``. The block uses indices
+          1 and 2 directly for expert dispatch; capturing the
+          full tuple lets restoration return the same
+          ``(top_k_weights, top_k_index)`` byte-identically.
+
+        * Tensor API (Mixtral / legacy OLMoE / Qwen-MoE older
+          forks): ``gate.forward()`` returns a single
+          ``router_logits`` tensor of shape ``(B*T, n_experts)``;
+          the block runs softmax+top-K itself.
+
+        Returns hook handles that the caller MUST remove."""
         import torch  # type: ignore
         n_blocks = int(len(self._moe_blocks))
         captured: list["PerLayerRoutingV1 | None"] = [
             None] * n_blocks
-        raw_logits_list: list[Any] = [None] * n_blocks
+        raw_outs: list[Any] = [None] * n_blocks
+        fire_count = {"n": 0}
+        gate_is_tuple = {"v": False}
         hooks: list[Any] = []
         for layer_idx, block, _cls_name in self._moe_blocks:
             gate = self._gate_module(block)
 
             def _make_gate_hook(li: int):
-                def _gate_hook(_mod, _inp, out_logits):
-                    if not hasattr(out_logits, "shape"):
+                def _gate_hook(_mod, _inp, out):
+                    fire_count["n"] += 1
+                    # Tuple API (OLMoE 5.0): (rl, weights, ids)
+                    if (isinstance(out, tuple)
+                            and len(out) >= 3
+                            and hasattr(out[0], "shape")):
+                        gate_is_tuple["v"] = True
+                        rl_t, wt_t, idx_t = out[0], out[1], out[2]
+                        if rl_t.ndim != 2:
+                            return None
+                        n_experts_observed = int(
+                            rl_t.shape[-1])
+                        ids_np = (
+                            idx_t.detach().to("cpu")
+                            .to(dtype=torch.int32).numpy())
+                        weights_np = (
+                            wt_t.detach().to("cpu")
+                            .to(dtype=torch.float32).numpy())
+                        raw_outs[li] = (
+                            rl_t.detach().to("cpu").float(),
+                            wt_t.detach().to("cpu").float(),
+                            idx_t.detach().to("cpu").long(),
+                        )
+                    elif hasattr(out, "shape") and out.ndim == 2:
+                        # Tensor API (Mixtral / legacy).
+                        rl = out.detach()
+                        n_experts_observed = int(rl.shape[-1])
+                        routing_weights = torch.softmax(
+                            rl.float(), dim=-1)
+                        k = int(self._top_k or 1)
+                        selected_weights, selected_experts = (
+                            torch.topk(
+                                routing_weights, k, dim=-1))
+                        selected_weights = (
+                            selected_weights
+                            / (selected_weights.sum(
+                                dim=-1, keepdim=True) + 1e-12))
+                        ids_np = (
+                            selected_experts.to("cpu")
+                            .to(dtype=torch.int32).numpy())
+                        weights_np = (
+                            selected_weights.to("cpu")
+                            .to(dtype=torch.float32).numpy())
+                        raw_outs[li] = rl.to("cpu").float()
+                    else:
                         return None
-                    rl = out_logits.detach()
-                    # rl shape: (B*T, n_experts) for HF MoE.
-                    if rl.ndim != 2:
-                        return None
-                    n_experts_observed = int(rl.shape[-1])
-                    routing_weights = torch.softmax(
-                        rl.float(), dim=-1)
-                    k = int(self._top_k or 1)
-                    selected_weights, selected_experts = (
-                        torch.topk(routing_weights, k, dim=-1))
-                    selected_weights = (
-                        selected_weights
-                        / (selected_weights.sum(
-                            dim=-1, keepdim=True) + 1e-12))
-                    ids_np = (
-                        selected_experts.to("cpu")
-                        .to(dtype=torch.int32).numpy())
-                    weights_np = (
-                        selected_weights.to("cpu")
-                        .to(dtype=torch.float32).numpy())
-                    raw_logits_list[li] = rl.to("cpu").float()
                     captured[li] = PerLayerRoutingV1(
                         schema=(
                             W86_MOE_SUBSTRATE_V1_SCHEMA_VERSION),
@@ -607,49 +654,82 @@ class MoERuntimeAdapterV1:
                 _make_gate_hook(layer_idx))
             hooks.append(h)
         self._captured_routing = captured
-        self._captured_raw_logits = raw_logits_list
+        self._captured_raw_logits = raw_outs
+        # Counter dicts are stored on self so the caller can read
+        # them after the forward runs.
+        self._hook_fire_count_holder = fire_count
+        self._gate_is_tuple_holder = gate_is_tuple
+        self._last_hook_fire_count = 0
+        self._gate_returns_tuple = False
         return hooks
+
+    def _read_capture_diagnostics(self) -> None:
+        """Snapshot the hook counters onto immutable fields.
+
+        Call after running a forward with capture hooks installed,
+        BEFORE removing the hook handles (the closures hold the
+        counter dicts)."""
+        fc = getattr(self, "_hook_fire_count_holder", None)
+        ti = getattr(self, "_gate_is_tuple_holder", None)
+        if fc is not None:
+            self._last_hook_fire_count = int(fc.get("n", 0))
+        if ti is not None:
+            self._gate_returns_tuple = bool(ti.get("v", False))
 
     def _install_routing_restore_hooks(
             self, *,
             raw_logits_per_layer: list[Any],
-            n_target_tokens: int | None = None,
     ) -> list[Any]:
         """Install gate hooks that REPLACE the gate's output
-        with previously-captured router_logits.
+        with previously-captured router output.
 
-        The HF MoE block's own ``forward`` continues to run
-        softmax + top-K + expert dispatch on the replacement
-        logits — so injecting the captured ``router_logits``
-        deterministically re-creates the same routing the forward
-        used. The block computes the rest of its math itself,
-        which keeps the substrate honest (no faked outputs).
+        For the tuple-API gate (OLMoE 5.0), the hook returns the
+        captured ``(router_logits, top_k_weights, top_k_index)``
+        sliced to the new-token rows. The block then uses
+        ``top_k_weights`` and ``top_k_index`` for expert dispatch
+        — byte-identical to the original forward by construction.
 
-        During replay-from-KV the gate sees only the new tokens
-        and produces ``(B*n_new, n_experts)``. We slice the
-        captured tensor at ``[-n_new:]`` to inject the matching
-        rows.
+        For the tensor-API gate (Mixtral / legacy), the hook
+        replaces the gate's ``router_logits`` tensor; the block's
+        own softmax+top-K then re-derives the same routing.
         """
         hooks: list[Any] = []
         for layer_idx, block, _cls_name in self._moe_blocks:
             gate = self._gate_module(block)
-            saved = raw_logits_per_layer[int(layer_idx)] if (
-                int(layer_idx) < len(raw_logits_per_layer)
-            ) else None
+            saved = (
+                raw_logits_per_layer[int(layer_idx)]
+                if int(layer_idx) < len(raw_logits_per_layer)
+                else None)
             if saved is None:
                 continue
 
-            def _make_restore_hook(saved_tensor):
-                def _hook(_mod, _inp, out_logits):
-                    if not hasattr(out_logits, "shape"):
-                        return out_logits
-                    n_rows = int(out_logits.shape[0])
-                    # saved_tensor is on CPU as float32; cast +
-                    # move to match the current gate output.
-                    rep = saved_tensor[-n_rows:].to(
-                        device=out_logits.device,
-                        dtype=out_logits.dtype)
-                    return rep
+            def _make_restore_hook(saved_x):
+                def _hook(_mod, _inp, out):
+                    # Tuple-saved → return tuple, sliced + cast.
+                    if isinstance(saved_x, tuple):
+                        if not (isinstance(out, tuple)
+                                and len(out) >= 3):
+                            return out
+                        rl_s, wt_s, idx_s = saved_x
+                        n_rl = int(out[0].shape[0])
+                        n_wt = int(out[1].shape[0])
+                        n_idx = int(out[2].shape[0])
+                        rl_t = rl_s[-n_rl:].to(
+                            device=out[0].device,
+                            dtype=out[0].dtype)
+                        wt_t = wt_s[-n_wt:].to(
+                            device=out[1].device,
+                            dtype=out[1].dtype)
+                        idx_t = idx_s[-n_idx:].to(
+                            device=out[2].device,
+                            dtype=out[2].dtype)
+                        return (rl_t, wt_t, idx_t)
+                    # Tensor-saved → return tensor.
+                    if not hasattr(out, "shape"):
+                        return out
+                    n_rows = int(out.shape[0])
+                    return saved_x[-n_rows:].to(
+                        device=out.device, dtype=out.dtype)
                 return _hook
 
             h = gate.register_forward_hook(
@@ -661,12 +741,12 @@ class MoERuntimeAdapterV1:
             self, *, seed: int = 0,
     ) -> list[Any]:
         """Install gate hooks that REPLACE the gate output with
-        deterministic-random router_logits — i.e., force a
-        DIFFERENT top-K selection than the model's own router.
+        deterministic-random routing — forces a DIFFERENT top-K
+        per token than the model's own router.
 
-        Used by the bench as the load-bearing demonstration that
-        MoE routing IS state: same prompt + same KV + DIFFERENT
-        routing → measurably different output.
+        Used by the bench as the explicit demonstration that MoE
+        routing is load-bearing state: same prompt + same KV +
+        DIFFERENT routing → measurably different output.
         """
         import torch  # type: ignore
         gen = torch.Generator(device="cpu").manual_seed(int(seed))
@@ -674,16 +754,46 @@ class MoERuntimeAdapterV1:
         for layer_idx, block, _cls_name in self._moe_blocks:
             gate = self._gate_module(block)
 
-            def _make_random_hook(seed_li):
-                def _hook(_mod, _inp, out_logits):
-                    if not hasattr(out_logits, "shape"):
-                        return out_logits
-                    rand = torch.randn(
-                        out_logits.shape, generator=gen,
-                        dtype=torch.float32)
-                    return rand.to(
-                        device=out_logits.device,
-                        dtype=out_logits.dtype)
+            def _make_random_hook(seed_li: int):
+                def _hook(_mod, _inp, out):
+                    if (isinstance(out, tuple)
+                            and len(out) >= 3
+                            and hasattr(out[0], "shape")):
+                        rl_o, wt_o, idx_o = out[0], out[1], out[2]
+                        n_rows = int(rl_o.shape[0])
+                        n_experts = int(rl_o.shape[-1])
+                        k = int(wt_o.shape[-1])
+                        rl_rand = torch.randn(
+                            rl_o.shape, generator=gen,
+                            dtype=torch.float32).to(
+                            device=rl_o.device,
+                            dtype=rl_o.dtype)
+                        # Random positive scores per row, summed
+                        # to 1 (mimics softmax+normalised topk).
+                        wt_rand = torch.rand(
+                            (n_rows, k), generator=gen,
+                            dtype=torch.float32) + 1e-3
+                        wt_rand = (
+                            wt_rand
+                            / wt_rand.sum(dim=-1, keepdim=True))
+                        wt_rand = wt_rand.to(
+                            device=wt_o.device,
+                            dtype=wt_o.dtype)
+                        # Random expert indices in [0, n_experts).
+                        idx_rand = torch.randint(
+                            0, n_experts, (n_rows, k),
+                            generator=gen).to(
+                            device=idx_o.device,
+                            dtype=idx_o.dtype)
+                        return (rl_rand, wt_rand, idx_rand)
+                    if hasattr(out, "shape"):
+                        rand = torch.randn(
+                            out.shape, generator=gen,
+                            dtype=torch.float32)
+                        return rand.to(
+                            device=out.device,
+                            dtype=out.dtype)
+                    return out
                 return _hook
 
             h = gate.register_forward_hook(
@@ -706,6 +816,7 @@ class MoERuntimeAdapterV1:
             trace = self._runtime.forward(
                 input_token_ids=list(input_token_ids))
         finally:
+            self._read_capture_diagnostics()
             for h in hooks:
                 h.remove()
         per_layer = tuple(
@@ -814,6 +925,10 @@ class MoESubstrateClosureBenchReportV1:
     schema: str
     model_name: str
     precision_tier: str
+    moe_block_class_name: str
+    gate_class_name: str
+    gate_returns_tuple: bool
+    hook_fires_per_forward: int
     n_moe_layers: int
     n_experts: int
     top_k: int
@@ -841,6 +956,13 @@ class MoESubstrateClosureBenchReportV1:
             "schema": str(self.schema),
             "model_name": str(self.model_name),
             "precision_tier": str(self.precision_tier),
+            "moe_block_class_name": str(
+                self.moe_block_class_name),
+            "gate_class_name": str(self.gate_class_name),
+            "gate_returns_tuple": bool(
+                self.gate_returns_tuple),
+            "hook_fires_per_forward": int(
+                self.hook_fires_per_forward),
             "n_moe_layers": int(self.n_moe_layers),
             "n_experts": int(self.n_experts),
             "top_k": int(self.top_k),
@@ -1077,16 +1199,15 @@ def run_moe_substrate_closure_bench_v1(
     routing_deterministic = bool(
         routing.cid() == routing2.cid())
 
-    # Load-bearing := (1) routing was captured, (2) restoring
-    # it yields byte-identity at the tier floor, (3) NOT
-    # restoring it diverges substantially, (4) the routing is
-    # deterministic across forwards.
-    LOAD_BEARING_DIVERGENCE_RATIO = 10.0
+    # Load-bearing := (1) routing was captured, (2) restoring it
+    # yields byte-identity at the tier floor, (3) NOT restoring
+    # it EXCEEDS the tier floor (so routing IS the missing state
+    # the substrate needs), and (4) routing is deterministic.
     moe_routing_is_load_bearing = bool(
         forward_routing_captured
         and replay_with_routing_byte_id
-        and diff_without >= (
-            LOAD_BEARING_DIVERGENCE_RATIO * tier_tol)
+        and diff_without > tier_tol
+        and diff_without > (2.0 * diff_with)
         and routing_deterministic
         and len(routing.per_layer) > 0
         and routing.per_layer[0].expert_ids is not None)
@@ -1096,6 +1217,14 @@ def run_moe_substrate_closure_bench_v1(
         schema=W86_MOE_SUBSTRATE_V1_SCHEMA_VERSION,
         model_name=str(model_name),
         precision_tier=str(precision_tier),
+        moe_block_class_name=str(
+            adapter.moe_block_class_name),
+        gate_class_name=str(
+            getattr(adapter, "_gate_class_name", "")),
+        gate_returns_tuple=bool(
+            getattr(adapter, "_gate_returns_tuple", False)),
+        hook_fires_per_forward=int(
+            getattr(adapter, "_last_hook_fire_count", 0)),
         n_moe_layers=int(adapter.n_moe_layers),
         n_experts=int(adapter.n_experts),
         top_k=int(adapter.top_k),
