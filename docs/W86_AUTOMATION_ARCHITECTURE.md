@@ -5,11 +5,14 @@
 > map of the W86 automation stack: every script, every
 > benchmark, every closure path, and how they stitch together.
 >
-> **W86 milestone state at time of writing (commit
-> `73a4c10`):** all five P0 substrate blockers (#25–#29)
-> closed; seven of eight P1 blockers (#30, #32, #33, #34, #35,
-> #36, #37) closed; #31 (MoE substrate) closure code is ready
-> and pending one Colab Pro run.
+> **W86 milestone state (commit `b5c9e4f`, 2026-05-20):**
+> **all 5 P0 + all 8 P1 sub-issues of meta-#49 empirically
+> closed on GitHub.** #31 (MoE substrate) was the final
+> closure, landed on real OLMoE-1B-7B-Instruct on Colab Pro
+> A100-40GB at bf16 (canonical evidence
+> `results/w86/moe/w86_moe_20260520T215557Z/`,
+> `bench_cid = f4a84a813a9fdc41…`). See Section 10 for the
+> lessons learned across the three failed iterations.
 
 ## 1. The four hosts
 
@@ -148,38 +151,70 @@ $ python scripts/verify_w86_multi_host_audit_chain.py \
     --report results/w86/multi_host/multi_host_distributed_bench_report.json
 ```
 
-### #31 MoE substrate (Colab Pro A100, ~5 min) — NEW THIS ROUND
+### #31 MoE substrate (Colab Pro A100, ~5 min) — CLOSED 2026-05-20
 
 ```text
 1. https://colab.research.google.com/github/adotdong29/CoordPy/blob/main/scripts/colab_moe_substrate_closure_w86.ipynb
-2. Runtime → Change runtime type → A100 GPU
+2. Runtime → Change runtime type → A100 GPU (V100 / L4 also
+   fine — OLMoE-1B-7B is small; T4 borderline)
 3. 🔑 Same `hf_token` secret as #25–#27. OLMoE is NOT a
-   gated repo, so the token is only used to avoid HF rate
-   limits.
-4. Runtime → Disconnect and delete runtime
+   gated repo, so the token only avoids HF rate limits.
+4. Runtime → Disconnect and delete runtime (forces a fresh
+   git clone of origin/main)
 5. Open URL fresh → Runtime → Run all
 6. Driver runs the closure end-to-end:
-   - probe model is MoE
-   - load OLMoE-1B-7B in bf16 (model is 7 B / 1.3 B active /
-     8 experts top-2)
-   - forward + capture per-layer routing
-   - replay-from-KV; compare last-token logits at bf16 tier
-   - intercept hidden state on a MoE block; verify CID moves
-   - check routing is deterministic across two forwards
+   - probe model is MoE (n_experts >= 4 AND top_k >= 2 from
+     AutoConfig)
+   - load `allenai/OLMoE-1B-7B-0924-Instruct` in bf16
+     (7 B params total / 1.3 B active / **64 experts × top-8**)
+   - forward(full_ids) WITH router-capture hooks on
+     `block.gate` (the `OlmoeTopKRouter` module); capture the
+     full 3-tuple `(router_logits, top_k_weights, top_k_index)`
+     per layer
+   - forward(old_ids) — clean, no hooks; collect KV cache
+   - replay-from-KV WITHOUT routing restored — model's own
+     router fires; the tiny bf16 KV-cache noise can flip
+     the top-K decision → MoE cascade → divergence (the
+     *negative* arm)
+   - replay-from-KV WITH routing restored — gate hooks
+     replace the gate's tuple output with the captured
+     tuple; block uses captured top_k_weights + top_k_index
+     byte-identically → byte-id at tier floor (the *positive*
+     arm)
+   - forward WITH force-random routing — gate hooks return
+     random (logits, scores, indices) tuples; output diverges
+     massively (corroborating arm)
+   - hidden-state intercept on a MoE block; verify trace CID
+     moves
+   - second clean forward → verify routing CID matches first
+     (determinism check)
 7. Drive save + zip download
 8. Local: python scripts/verify_w86_moe_audit_chain.py \
      --report results/w86/moe/<TS>/moe_substrate_closure_report.json
 ```
 
-Expected: `OVERALL: PASS` on the verifier with the four #31
-load-bearing bools green:
-- `forward_routing_captured = True` (per-layer routing
-  snapshotted via per-block forward hooks)
+Expected: `OVERALL: PASS` on the verifier. Canonical evidence
+landed at `results/w86/moe/w86_moe_20260520T215557Z/` with
+`bench_cid = f4a84a813a9fdc41…`. Headline numbers (live A100
+bf16):
+
+| Field | Value | Meaning |
+|---|---|---|
+| `gate_class_name` | `OlmoeTopKRouter` | confirms transformers 5.0 tuple-API gate |
+| `gate_returns_tuple` | `True` | confirms hook strategy is tuple-aware |
+| `hook_fires_per_forward` | 16 / 16 | every MoE layer's gate hooked + fired |
+| `n_layers_routing_captured` | 16 / 16 | every layer's routing snapshotted |
+| `diff_with_routing` | 0.406 | < tier_tolerance 0.500 → byte-id ✓ |
+| `diff_without_routing` | 1.031 | > tier_tol AND > 2 × diff_with ✓ |
+| `diff_force_random` | 16.344 | 32× tier_tol — corroborates ✓ |
+
+Four #31 load-bearing bools, all green:
+- `forward_routing_captured = True`
 - `replay_with_routing_matches_forward_floor = True`
-  (last-logits diff < bf16 tier tolerance 0.5)
-- `moe_routing_is_load_bearing = True` (routing is captured
-  and deterministic — the *negative* claim that proves
-  routing is state, not freely synthesisable)
+- `moe_routing_is_load_bearing = True` (composite: captured
+  AND restored byte-id AND no-restore diverges AND
+  deterministic — the *negative* claim that proves routing
+  IS state, not freely synthesisable)
 - `hidden_state_intercept_on_moe_block_moves_cid = True`
 
 ### #30 / #32 / #33 / #34 / #35 / #36 / #37 P1 closures (local CPU, <2 min combined)
@@ -364,24 +399,46 @@ Three arms:
   reviser + judge — the multi-agent + executor-as-critic
   CoordPy path
 
-### MoE driver (`scripts/run_w86_moe_substrate_closure.py`) — NEW
+### MoE driver (`scripts/run_w86_moe_substrate_closure.py`)
 
 ```text
 1. import coordpy.moe_runtime_substrate_v1
 2. probe_moe_capability_v1(model_name) — read config without
-   loading weights; refuse if not MoE
+   loading weights; refuse if not MoE (uses AutoConfig to
+   check num_local_experts + num_experts_per_tok)
 3. MoERuntimeAdapterV1(model_name=…, device=cuda:0,
                        precision_tier=tier_bf16)
-   - auto-detects MoE block class (Mixtral / OLMoE / Qwen-
-     MoE / DeepSeek)
-4. forward + per-block router-output hook → capture per-layer
-   (expert_ids, gate_weights)
-5. replay-from-KV; compare logits at bf16 tier
-6. hidden-state intercept on a MoE block → verify CID moves
-7. second forward → verify routing is deterministic (the
-   "routing is state" claim)
-8. write content-addressed MoESubstrateClosureBenchReportV1
-9. exit 0 iff every load-bearing bool is True
+   - auto-detects MoE block class via W86_MOE_BLOCK_CANDIDATE_NAMES
+     (7 HF families: Mixtral / OLMoE / Qwen2-MoE / Qwen3-MoE /
+     DeepseekV2 / DeepseekV3 / Jamba)
+   - records moe_block_class_name + gate_class_name for the
+     report (diagnostic visibility)
+4. forward WITH router-capture hooks on block.gate (NOT on
+   the block itself — see Lessons Learned)
+   - Hook handles BOTH router APIs:
+     * Tuple API (transformers 5.0 OlmoeTopKRouter): out is
+       (router_logits, top_k_weights, top_k_index) 3-tuple;
+       capture all three
+     * Tensor API (Mixtral / legacy): out is router_logits
+       tensor; run softmax+top-K to derive (weights, indices)
+   - Per-layer hook_fire counter (catches the bail-out failure
+     mode where hooks attach but don't capture)
+5. replay-from-KV WITHOUT restore — negative arm; reports
+   diff_without_routing
+6. replay-from-KV WITH restore — gate hook returns captured
+   tuple sliced to new-token rows; block re-uses captured
+   top-K byte-identically; reports diff_with_routing
+7. forward WITH force-random routing — gate hook returns random
+   (logits, scores, indices); reports diff_force_random
+8. hidden-state intercept on a MoE block via the W80
+   hidden_state_inject_per_layer surface → verify CID moves
+9. second clean forward → verify routing CID matches first
+   (determinism check)
+10. write content-addressed MoESubstrateClosureBenchReportV1
+    with diagnostic fields (moe_block_class_name,
+    gate_class_name, gate_returns_tuple, hook_fires_per_forward)
+    + tier_tolerance + all three diffs + load-bearing bools
+11. exit 0 iff every load-bearing bool is True
 ```
 
 ## 7. The Colab Pro browser workflow (what you do)
@@ -491,13 +548,175 @@ Every W86 closure preserves the stable SDK release contract:
 * All W86 modules are explicit-import only (no re-exports via
   `coordpy.__experimental__`).
 
-## 10. Where things go next
+## 10. Lessons learned — the three #31 iterations
 
-The single remaining open issue is **#31 (MoE substrate)** —
-the code is shipped (`coordpy/moe_runtime_substrate_v1.py`),
-the driver + verifier + Colab notebook are ready, the CI
-surface tests pass. The empirical closure waits on one Colab
-Pro A100 run with the OLMoE-1B-7B model.
+The first three Colab runs of the MoE closure all FAILED before
+the fourth produced `OVERALL: PASS`. Each failure exposed a real
+gotcha worth recording for the next agent who works on substrate
+closures against a new HF model or transformers version.
+
+### Iteration 1 → 2 — block-level forward returns no router_logits
+
+**Symptom (zip `w86_moe_20260520T010426Z` style first run):**
+adapter found 16 MoE layers; hidden-state intercept worked;
+0 / 16 routing captures fired.
+
+**Initial hook attempted:** `block.register_forward_hook(...)`,
+reading `out[1]` as `router_logits` (the historical Mixtral /
+pre-5.0-OLMoE convention).
+
+**Root cause:** In transformers 5.0 the MoE block's `forward()`
+no longer returns the `(hidden_states, router_logits)` 2-tuple
+by default — it returns ONLY `final_hidden_states`. The hook
+saw `out` as a plain tensor with no router_logits to capture.
+
+**Fix:** Hook `block.gate` (a sub-module) instead of the block.
+Whatever the block does internally, `self.gate(x)` is an
+`nn.Module.__call__` that triggers forward hooks reliably. This
+also makes the hook robust to future block-level forward
+refactors that don't change the gate's API.
+
+**Take-away:** **When hooking a transformer's internal state,
+attach to the smallest sub-module that defines the abstraction
+you care about.** Block-level forward signatures churn between
+versions; sub-module forwards rarely do.
+
+### Iteration 2 → 3 — tuple-return router (transformers 5.0)
+
+**Symptom (zip `w86_moe_20260520T213742Z`):** identical
+diagnostic — 0 / 16 captures, despite hooking the gate this time.
+
+**Initial hook code:**
+```python
+def _gate_hook(_mod, _inp, out):
+    if not hasattr(out, "shape"):
+        return None  # <-- always taken
+    ...
+```
+
+**Root cause:** Confirmed against
+`huggingface/transformers/main/src/transformers/models/olmoe/modeling_olmoe.py`:
+in transformers 5.0, `block.gate` is `OlmoeTopKRouter` (NOT
+`nn.Linear`), and its `forward(hidden_states)` returns a
+**3-TUPLE** `(router_logits, router_scores, router_indices)`.
+The block does:
+```python
+_, top_k_weights, top_k_index = self.gate(hidden_states)
+final_hidden_states = self.experts(hidden_states, top_k_index,
+                                   top_k_weights).reshape(...)
+```
+The block ignores index 0 (router_logits); it uses indices 1
+and 2 directly for expert dispatch. My hook bailed because
+tuples have no `.shape`.
+
+**Fix:** Tuple-aware detection:
+```python
+if isinstance(out, tuple) and len(out) >= 3 and hasattr(out[0], "shape"):
+    # OLMoE 5.0 tuple-API path: capture all three tensors
+    rl, weights, indices = out[0], out[1], out[2]
+elif hasattr(out, "shape") and out.ndim == 2:
+    # Mixtral / legacy tensor-API: run softmax+top-K ourselves
+    ...
+```
+
+This made restoration cleaner: the hook returns the captured
+3-tuple → the block uses MY top_k_weights + top_k_index
+byte-identically (no need to re-run softmax+top-K — the block
+ignores router_logits anyway).
+
+**Take-away:** **When supporting "the same" HF model across
+transformers versions, the type signatures of internal-module
+returns are NOT a stable contract.** Always inspect the actual
+source of the deployed version (not historical examples), and
+when in doubt detect both shapes defensively. **A
+`hook_fires_per_forward` counter caught this in 30 seconds — add
+diagnostic counters early.**
+
+### Iteration 3 → 4 — verifier `bench_cid` hash format
+
+**Symptom (zip `w86_moe_20260520T215557Z`):** EVERY load-bearing
+substrate bool was True, the bench passed, but the verifier
+printed `FAIL bench_cid: recorded=f4a84a... derived=f2ba27...`
+→ `OVERALL: FAIL`. User saw "fail" and thought the substrate
+broke.
+
+**Root cause:** The substrate computes `bench_cid` like this:
+```python
+report = MoE...(bench_cid="", ...)
+cid = report.cid()  # hashes to_dict() which has "bench_cid": ""
+return dataclasses.replace(report, bench_cid=str(cid))
+```
+The hashed dict contains `"bench_cid": ""` as a real key. The
+verifier was stripping the key entirely (`{k: v for k, v in
+rd.items() if k != "bench_cid"}`) before hashing, so the two
+JSON-serialised dicts differed by exactly that key.
+
+**Fix:** Inject `bench_cid=""` instead of stripping the key:
+```python
+rd_for_hash = {**rd, "bench_cid": ""}
+```
+
+**Take-away:** **Content-addressing requires the verifier to
+serialise the EXACT same dict shape the producer hashed —
+including any "placeholder" fields the producer included.** A
+self-test that round-trips a fresh report through the verifier
+in CI would have caught this without burning a Colab run. Add
+to the V2 backlog.
+
+### Summary — what to copy for the next substrate closure
+
+1. **Build a capability probe** that uses AutoConfig (no
+   weights download) to refuse politely on hosts that can't
+   support the closure. Saves expensive false starts.
+2. **Hook at the smallest stable sub-module** (here:
+   `block.gate`, not `block`). Block-level forward signatures
+   change; sub-module forwards rarely do.
+3. **Add hook-fire counters AND record the inferred API
+   shape** (tuple vs tensor) to the report from day 1. The
+   first failed run will pinpoint the failure mode without
+   blind iteration.
+4. **Two arms for load-bearingness, not one**: with-restore
+   (byte-id at floor) PLUS without-restore (diverges past the
+   floor). A force-random arm corroborates and makes the claim
+   visually unmistakable.
+5. **Tier tolerance from a single source of truth**
+   (`W86_REPLAY_TOLERANCE_PER_TIER`). Carry it through the
+   report as `tier_tolerance` so the verifier doesn't have to
+   re-derive it.
+6. **Content-addressing**: verifier MUST mirror the producer's
+   hash payload exactly (including placeholder fields). Add a
+   CI test that synthesises a fresh report → verifier → PASS
+   to catch hash-format drift.
+7. **Vendor the canonical evidence** under `results/w86/<sub>/
+   <TS>/<report>.json`. Logs are gitignored; the
+   content-addressed JSON is the audit anchor.
+
+## 11. Where things go next
+
+All 13 sub-issues of meta-#49 (5 P0 + 8 P1) are now empirically
+closed on GitHub. The substrate stack from W80–W86 is complete:
+
+* Dense transformer substrate (W80 + W86 frontier closure).
+* Quantized substrate at bf16 (#30; int8 carry-forward).
+* **MoE substrate at bf16 on real open-weight 64-expert model**
+  (#31, this milestone).
+* Multi-host distributed substrate (#29 docker-compose).
+* Composed safety: budget enforcement (#37), Lagrangian +
+  projection (#34), capacity remediation V2 (#36).
+
+Next likely lines (post-W86):
+
+* **MoE V2** — multi-GPU expert-parallel; mixed precision MoE;
+  fp32 / fp16 / int8 tier closures on a MoE checkpoint;
+  pure-Lagrangian (no projection fallback) for #34.
+* **int8 tier closure for #30** — `bitsandbytes` on Colab;
+  infrastructure ready, just needs the run.
+* **Frontier-scale MoE** — DeepSeek-V3-Lite or Mixtral-8x22B
+  through the W86 contract (single-GPU or two-GPU expert
+  parallel via `accelerate`).
+* **A self-test for the audit-chain verifier** — synthesise a
+  fresh report → verifier → PASS. Catches verifier hash-format
+  drift like the iteration-3 bug.
 
 After that lands, meta-#49's complete post-W83 P0 + P1 line
 is closed. Subsequent work would belong in fresh issues:
