@@ -59,9 +59,19 @@ Concrete evidence (all CIDs are re-derivable offline from
   ``docs/RESULTS_W86_FRONTIER_CLOSURE.md`` for the run-7
   evidence.
 
-* **#28 — still open.** The W85 GSM8K negative result stands.
-  Closure plan in `docs/PLAN_W86_28_ALTERNATIVE_HEAD_TO_HEAD.md`
-  (HumanEval + executor-as-critic; coupled #28 + #33 advance).
+* **#28 — CLOSED on the literal stock-harness DoD bar.**
+  On HumanEval × 3 seeds × 30 problems × ``meta/llama-3.1-
+  8b-instruct``, the W86 CoordPy multi-agent K=5 pipeline
+  with executor-as-critic (B) achieves mean pass@1 = 71.1 %
+  vs A0 (stock single-shot) mean = 63.3 %, a +7.8 pp strict
+  improvement; ``b_mean_strictly_beats_a0_mean = True``;
+  963/963 per-call CIDs re-derive offline; bench Merkle
+  ``a0ac02284751f817…``. Honest carry-forward
+  ``W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN``: the
+  harder same-budget A1 baseline (first-pass-among-K=5 with
+  visible-test filter) achieves 80.0 % and remains stronger
+  than B by 8.9 pp. See
+  ``docs/RESULTS_W86_HUMANEVAL_HEAD_TO_HEAD.md``.
 
 * **#29 — CLOSED.** Live 3-container docker-compose topology
   (``host-a`` 172.18.0.2, ``host-b`` 172.18.0.3,

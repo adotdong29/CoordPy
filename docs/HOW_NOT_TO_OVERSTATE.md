@@ -5,6 +5,57 @@
 > README-of-README must satisfy these rules. Last touched: post-W85
 > W86 Frontier-Scale Substrate Closure milestone, 2026-05-20.
 
+## W86 (HumanEval head-to-head with executor-as-critic, #28 closure) — explicit do-not-overstate rules
+
+W86 closes #28 on the literal "strict improvement on at
+least one published metric vs the stock harness" DoD bar
+(B mean pass@1 71.1 % > A0 mean 63.3 % across 3 seeds × 30
+problems on Llama-3.1-8B-Instruct). The following rules are
+mandatory before any W86 #28 claim is repeated.
+
+- **W86 #28 closure is on the A0 baseline, NOT on A1.**
+  Reports MUST cite both: B strictly beats A0 (stock single-
+  shot pass@1: +7.8 pp); B does NOT beat A1 (same-budget K=5
+  first-pass-with-visible-test-filter: −8.9 pp). The W86
+  closure is honest about both directions. Reports that
+  claim "B beats every baseline" are wrong; reports that
+  hide the A1 result are wrong.
+
+- **W86 #28 does NOT claim multi-agent superiority over the
+  strongest same-budget baseline.** The harder same-budget
+  fair comparison (A1: 5 independent samples, pick first
+  that passes visible tests) achieves 80.0 % and remains
+  stronger than B (71.1 %). The Reflexion / Self-Debug
+  literature's "multi-agent + executor beats self-consistency
+  at same budget" claim does NOT replicate at this scale on
+  this configuration. Reports that claim it does are wrong;
+  carry-forward
+  ``W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`` is
+  mandatory.
+
+- **W86 #28 result is empirically PROGRESS over W85.** W85
+  GSM8K had B 71.7 % < A0 75 % < A1 81.7 % (B loses to BOTH
+  baselines). W86 HumanEval has A0 63.3 % < B 71.1 % < A1
+  80 % (B beats A0, loses to A1). The pattern shift between
+  GSM8K and HumanEval is consistent with the literature:
+  multi-agent with executor signal helps over single-shot
+  when the task has verifiable subgoals (executor signal
+  exists); it doesn't help over same-budget sampling when
+  the executor signal is also available to the simpler
+  baseline. Reports MUST cite this nuance, NOT just claim
+  "multi-agent works now".
+
+- **W86 #28 uses a Python subprocess executor, not a
+  hardened sandbox.** The executor runs candidate code in a
+  fresh CPython subprocess with wall-clock timeout (8 s soft
+  + 12 s kill). Out-of-process side effects (network,
+  filesystem writes) are not blocked. HumanEval academic
+  problems do not exercise side effects; harder benchmarks
+  (SWE-bench, full-repo tasks) would need a seccomp /
+  namespace sandbox. Carry-forward
+  ``W86-L-HUMANEVAL-V1-SUBPROCESS-PYTHON-EXECUTOR-CAP`` is
+  mandatory.
+
 ## W86 (Real Multi-Host Distributed Substrate, #29 closure) — explicit do-not-overstate rules
 
 W86 closes #29 on a 3-container docker-compose topology. The
