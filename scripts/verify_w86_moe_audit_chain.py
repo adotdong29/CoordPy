@@ -81,13 +81,17 @@ def main(argv: list[str] | None = None) -> int:
             f"hook_fires_per_forward = "
             f"{rd.get('hook_fires_per_forward', '?')}")
         # Anti-cheat: bench_cid re-derives from the report.
+        # The substrate computes cid() over to_dict() at a moment
+        # when bench_cid="" (i.e., before dataclasses.replace
+        # stamps the final value). Mirror that: inject
+        # bench_cid="" rather than stripping the key entirely,
+        # otherwise the JSON-serialised dicts won't match.
         recorded_cid = str(rd.get("bench_cid", ""))
-        rd_no_cid = {
-            k: v for k, v in rd.items() if k != "bench_cid"}
+        rd_for_hash = {**rd, "bench_cid": ""}
         derived_cid = _sha256({
             "kind":
                 "w86_moe_substrate_closure_bench_report_v1",
-            "report": rd_no_cid,
+            "report": rd_for_hash,
         })
         if recorded_cid == derived_cid:
             notes.append(
