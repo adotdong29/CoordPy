@@ -13,6 +13,126 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W86 — Seven of Eight P2 Blockers Closed (post-P1-sweep, 2026-05-20)**
+  — *with every P0 (#25–#29) and every P1 (#30–#37) in meta-#49 closed,
+  the W86 P2 sweep attacks the security / correctness / portability
+  hardening line and closes 7 of 8 (#38, #39, #40, #41, #42, #43, #45).
+  #44 (GPU/TPU Substrate with Deterministic Replay) has its contract +
+  bench infrastructure + Colab notebook shipped and CPU CI green; the
+  live A100 numbers (positive-arm replay ≤ 0.5 bf16 floor + intercept
+  moves CID; negative-arm breaks byte-identity) await one Colab Pro
+  Run-all. See `docs/RESULTS_W86_P2_CLOSURES.md` for the full
+  DoD-bullet mapping.*
+
+  **#38 Byzantine Fault Tolerance — CLOSED.** `coordpy.byzantine_
+  fault_tolerance_v1` ships PBFT V1 on Ed25519 signatures with three
+  phases (pre_prepare → prepare → commit), 2f+1 quorum, equivocation
+  detection that produces independently verifiable
+  `ByzantineEquivocationEvidenceV1` capsules. At f=2 of n=7 (the
+  classical PBFT bound) the protocol commits μ exactly under the
+  collusion bench. At f=2 of n=4 (above the bound) the protocol
+  refuses to commit. Safety + liveness proofs in
+  `papers/proofs/w86_proof_byzantine_v1.md` (4 theorems). 22/22 tests.
+
+  **#39 Differential Privacy — CLOSED.** `coordpy.
+  differential_privacy_v1` ships Laplace / Gaussian DP capsules; a
+  5-pattern PII redactor (email, ssn, credit_card_16, phone_us,
+  ip_v4) with non-leaky span-CID audit; cumulative ε/δ
+  `DPBudgetTrackerV1` with strict over-budget refusal; a DP-aware
+  composed pipeline producing BOTH the DP capsule CID AND the Merkle
+  integrity anchor CID; a monotonic 5-point utility-vs-privacy
+  curve (ε ∈ {0.1, 0.5, 1.0, 2.0, 5.0} × 1000 samples). The cleartext
+  value NEVER appears in the capsule's serialised dict (anti-cheat
+  enforced). DP + integrity composition proof in
+  `papers/proofs/w86_proof_dp_v1.md` (4 theorems including the
+  post-processing argument that anchoring the DP capsule CID
+  preserves DP). 18/18 tests.
+
+  **#40 MPC / Secret-Sharing — CLOSED.** `coordpy.mpc_secret_
+  sharing_v1` ships Shamir secret sharing over a 521-bit Mersenne
+  prime; Pedersen commitments + Schnorr proofs of knowledge of
+  `(m, r)`; an additive MPC-Average primitive. The cross-org bench
+  (2 orgs × 3 parties, threshold 4) reconstructs the SUM without
+  any party (or org) seeing any other party's cleartext. Forged
+  Pedersen commitments are REJECTED; below-threshold shares
+  recover NOTHING (information-theoretic Shamir bound). 15/15
+  tests.
+
+  **#41 Schema Evolution — CLOSED.** `coordpy.schema_evolution_v1`
+  ships `SchemaRegistryV2`, `MigrationPlanV1`, and a worked V1 → V2
+  migration (`MigrationEnvelopeV1` → `MigrationEnvelopeV2` —
+  renames `arrival_delay` float seconds → `arrival_delay_ns`
+  int_ns, adds `forwarded_from`, preserves `parent_cid`).
+  Migrations are byte-deterministic under the plan;
+  `MigrationEventV1` bridges keep the audit chain re-verifiable
+  across the upgrade. Deprecated schemas remain readable with a
+  structured `DeprecationWarning`. 17/17 tests.
+
+  **#42 State Drift — CLOSED.** `coordpy.state_drift_detection_v1`
+  ships `ModelWeightsCID` (aggregates every weight tensor's
+  SHA-256), `DriftDetectorV1` (replay-and-diverge metric), and a
+  linear adapter re-training pipeline. On the
+  `controlled_runtime_substrate_v1` bench the detector fires when
+  the model is fine-tune-perturbed (drift_score = 0.218 > threshold
+  0.015) and does NOT fire when unchanged (drift_score = 0.0). The
+  M1-trained adapter strictly beats the stale (M0-trained) adapter
+  on M1-held-out by 9.3× (MSE 3.19e-4 vs 2.98e-3). Threshold is
+  derived `fp64_floor × safety_margin = 5e-3 × 3 = 1.5e-2`, NOT
+  hand-tuned. 13/13 tests.
+
+  **#43 Multi-Tenancy Isolation — CLOSED.** `coordpy.
+  multi_tenancy_isolation_v1` ships `TenantIdentityV1` content-
+  addressed by Ed25519 public key; per-tenant `EventGraphV1`
+  instances (PHYSICAL partitioning, not a shared dict with a
+  tenant_id filter); Ed25519-bound tenant tokens; per-tenant
+  budgets that don't bleed across tenants; per-tenant Merkle audit
+  anchors (anchor includes tenant_cid as an extra Merkle leaf so
+  identical event sequences produce DIFFERENT roots). In the
+  2-tenant bench: cross-tenant reads REFUSED with
+  `CrossTenantAccessDeniedEventV1` audit; token swap REFUSED; no B
+  byte in A's chain. 14/14 tests.
+
+  **#44 GPU/TPU Substrate — PARTIAL.** `coordpy.gpu_deterministic_
+  substrate_v1` ships the determinism wrapper contract (default ON:
+  `torch.use_deterministic_algorithms(True)`,
+  `cudnn.deterministic=True`, `cudnn.benchmark=False`,
+  `CUBLAS_WORKSPACE_CONFIG=:4096:8`) with explicit opt-out via
+  `W86_GPU_DETERMINISM_OFF` env var (the negative arm).
+  `TensorParallelReadbackV1` ships the all-gather contract as a
+  single-GPU pass-through V1 (multi-GPU V2 stretch matches issue
+  scope). CPU CI exercises every code path (11/11 tests). The live
+  A100 bf16 closure run lives in
+  `scripts/colab_gpu_deterministic_substrate_w86.ipynb` —
+  one Run-all on Colab Pro turns this into TRULY CLOSED. Honest
+  carry-forwards `W86-L-GPU-V1-COLAB-PRO-CAP`,
+  `W86-L-GPU-V1-TENSOR-PARALLEL-V2-CAP`,
+  `W86-L-GPU-V1-AWAITS-COLAB-RUN-CAP`.
+
+  **#45 Memory GC — CLOSED.** `coordpy.event_graph_garbage_
+  collection_v1` ships `GCPolicyV1` (content-addressed retention
+  policy with critical / durable / ephemeral classes), mark-and-
+  sweep walking parent_event_ids from declared roots + critical
+  kinds + genesis, a grace buffer with `restore_event_from_grace_v1`,
+  a JSONL persistent-store sketch, and `GCEventV1` audit capsules.
+  On the 100k-event bench: 99.92% memory reduction; chain
+  re-verifies end-to-end via `verify_chain_across_gc_v1`; soft-
+  deleted events restore from grace; persistent store round-trips.
+  16/16 tests.
+
+  Every closure ships:
+  * `scripts/run_w86_<closure>_v1_bench.py` — bench driver
+  * `scripts/verify_w86_<closure>_v1_audit_chain.py` — offline
+    verifier (re-derives every CID, prints PASS/FAIL per DoD)
+  * `coordpy/<closure>_v1.py` — module (explicit-import only)
+  * `tests/test_w86_<closure>_v1.py` — CI tests
+  * `results/w86/<closure>/<TS>/<closure>_v1_bench_report.json`
+    — canonical content-addressed evidence
+
+  All eight modules are explicit-import only.  `coordpy/__init__.py`
+  is byte-for-byte unchanged.  `coordpy.__version__` stays at
+  `0.5.20`; `coordpy.SDK_VERSION` stays at `coordpy.sdk.v3.43`.
+  No PyPI publish.
+
 - **W86 — Seven of Eight P1 Blockers Closed (post-P0-sweep, 2026-05-20)**
   — *with every P0 in meta-#49 (#25–#29) closed, the W86 sweep attacks the
   P1 line and closes 7 of 8 (#30 at bf16 with int8 carry-forward, #32,

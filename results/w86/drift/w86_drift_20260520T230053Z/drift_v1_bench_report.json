@@ -1,0 +1,22 @@
+{
+  "kind": "w86_drift_v1_bench_report",
+  "report": {
+    "detector_does_not_fire_when_unchanged": true,
+    "detector_fires_when_changed": true,
+    "drift_score_changed": 0.217912305736,
+    "drift_score_unchanged": 0.0,
+    "fallback_recommendation_is_recompute_for_stale": true,
+    "new_holdout_mse": 0.000319353804,
+    "new_memory_strictly_beats_stale_on_holdout": true,
+    "new_weights_cid": "cb43d8a6ae92cff9a000ecfcba000658bb70eb1ff33ec71beeabc7f0899f6473",
+    "no_change_weights_cid": "3bd548f29b0aef074a5288c6b03fc60908ecb80002ebe3fbfdd81d35d6fda76f",
+    "old_weights_cid": "3bd548f29b0aef074a5288c6b03fc60908ecb80002ebe3fbfdd81d35d6fda76f",
+    "report_cid": "8b9a833fd1e9547bcaff8f902fd5158c4ff83226a0625906e6c44adc79352e23",
+    "schema": "coordpy.state_drift_detection_v1.v1",
+    "stale_holdout_mse": 0.002980390423,
+    "stale_verdict_marks_fresh_capsule_fresh": true,
+    "stale_verdict_marks_old_capsule_stale": true,
+    "threshold": 0.015
+  },
+  "schema": "coordpy.state_drift_detection_v1.w86_v1"
+}

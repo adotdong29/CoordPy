@@ -696,6 +696,73 @@ to the V2 backlog.
 All 13 sub-issues of meta-#49 (5 P0 + 8 P1) are now empirically
 closed on GitHub. The substrate stack from W80–W86 is complete:
 
+### W86 P2 hardening sweep — 7 of 8 closed (2026-05-20)
+
+Following the P0+P1 sweep, the W86 P2 hardening sweep closes
+the security / correctness / portability line:
+
+| Issue | Closure path | Driver / module | Verifier | Evidence |
+|---|---|---|---|---|
+| **#38** BFT | local CPU (Ed25519 + PBFT V1) | `scripts/run_w86_bft_v1_bench.py` | `scripts/verify_w86_bft_v1_audit_chain.py` | `results/w86/bft/<TS>/bft_v1_suite_report.json` |
+| **#39** DP | local CPU (Laplace/Gaussian + budget tracker) | `scripts/run_w86_dp_v1_bench.py` | `scripts/verify_w86_dp_v1_audit_chain.py` | `results/w86/dp/<TS>/dp_v1_bench_report.json` |
+| **#40** MPC | local CPU (Shamir + Pedersen + Schnorr) | `scripts/run_w86_mpc_v1_bench.py` | `scripts/verify_w86_mpc_v1_audit_chain.py` | `results/w86/mpc/<TS>/mpc_v1_bench_report.json` |
+| **#41** Schema Evolution | local CPU | `scripts/run_w86_schema_evolution_v1_bench.py` | `scripts/verify_w86_schema_evolution_v1_audit_chain.py` | `results/w86/schema_evolution/<TS>/schema_evolution_v1_bench_report.json` |
+| **#42** State Drift | local CPU (controlled_runtime_substrate fine-tune sim) | `scripts/run_w86_drift_v1_bench.py` | `scripts/verify_w86_drift_v1_audit_chain.py` | `results/w86/drift/<TS>/drift_v1_bench_report.json` |
+| **#43** Multi-Tenancy | local CPU (Ed25519 tenant tokens) | `scripts/run_w86_multi_tenancy_v1_bench.py` | `scripts/verify_w86_multi_tenancy_v1_audit_chain.py` | `results/w86/tenancy/<TS>/multi_tenancy_v1_bench_report.json` |
+| **#44** GPU Determinism | **PARTIAL** — local CPU contract check + Colab Pro A100 GPU run | `scripts/run_w86_gpu_substrate_v1_bench.py` + `scripts/colab_gpu_deterministic_substrate_w86.ipynb` | `scripts/verify_w86_gpu_substrate_v1_audit_chain.py` | (pending) `results/w86/gpu_substrate/<TS>/gpu_substrate_v1_bench_report.json` |
+| **#45** Memory GC | local CPU (100k-event bench) | `scripts/run_w86_gc_v1_bench.py` | `scripts/verify_w86_gc_v1_audit_chain.py` | `results/w86/gc/<TS>/gc_v1_bench_report.json` |
+
+Pattern: every P2 closure shipped at the SAME automation
+discipline as the P0/P1 closures:
+
+1. Content-addressed JSON report with a recoverable
+   `report_cid` (or `suite_cid`) computed via the canonical
+   SHA-256 of the report dict.
+2. Offline re-verifier that re-derives every CID and prints
+   PASS/FAIL per DoD bullet — exits 0 iff every load-bearing
+   bool is True.
+3. Two consecutive runs at the default seed produce
+   byte-identical reports (deterministic seed → deterministic
+   RNG → deterministic CID).
+4. CI tests under `tests/test_w86_*_v1.py` that skip cleanly
+   when the optional dep is missing (e.g.
+   `pytest.importorskip("cryptography")` for BFT/tenancy).
+
+### Colab automation — extended for #44
+
+The W86 Colab playbook (notebook generator → terminal-side
+push → user one-click Run-all → Drive sync + zip download)
+extended to a NINTH closure (#44 GPU substrate) without
+re-implementing any infrastructure:
+
+* `scripts/colab_gpu_deterministic_substrate_w86.ipynb` is a
+  near-clone of the MoE notebook with cells: env probe →
+  install transformers + accelerate + huggingface_hub → HF
+  login via Colab Secret → clone CoordPy → drive bench →
+  offline verify → save to Drive + zip download.
+* The driver (`scripts/run_w86_gpu_substrate_v1_bench.py`)
+  exercises BOTH the positive arm (deterministic ON, default)
+  and the negative arm (`W86_GPU_DETERMINISM_OFF=1`) in a
+  single invocation, then aggregates into one
+  `GPUSubstrateBenchReportV1` capsule.
+* The verifier re-derives the report CID + asserts every DoD
+  bool. Exit 0 iff the wrapper is active, replay-byte-id at
+  the bf16 floor, intercept moves CID, AND the negative arm
+  breaks byte-identity.
+
+### Where the remaining one issue stands
+
+#44 is **one Run-all on Colab Pro from TRULY CLOSED.** The
+notebook is at the standard adotdong29/CoordPy GitHub
+location; the user pattern is identical to the prior W86
+Colab closures (e.g. #25/#26/#27, #31). The CPU CI
+(11 tests) already exercises every code path that doesn't
+need a GPU; the only thing that requires Colab is the actual
+A100 / L4 numerical evidence.
+
+After that lands, meta-#49's complete P0+P1+P2 backlog is
+closed.
+
 * Dense transformer substrate (W80 + W86 frontier closure).
 * Quantized substrate at bf16 (#30; int8 carry-forward).
 * **MoE substrate at bf16 on real open-weight 64-expert model**

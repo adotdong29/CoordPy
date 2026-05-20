@@ -1,0 +1,20 @@
+{
+  "kind": "w86_schema_evolution_v1_bench_report",
+  "report": {
+    "chain_verifies_across_migration": true,
+    "deprecated_payload_readable": true,
+    "deprecation_warning_emitted": true,
+    "deterministic_migration": true,
+    "dropped_field_count": 0,
+    "migration_event_cid": "fdc35431ece36431cc7afb23289df1c570715a487b5ff79921d47e1ceef3f850",
+    "migration_plan_cid": "a30039945a482e32bb3d4edcc15fe41d9b6e7c77ac7f441492ad7a58ca832bde",
+    "provenance_preserved": true,
+    "registry_cid_after": "5d4e03d600bb460665df5446fa939695e2e138c31aede8ab7994e5ca45317948",
+    "registry_cid_before": "5d4e03d600bb460665df5446fa939695e2e138c31aede8ab7994e5ca45317948",
+    "report_cid": "c947faf648e8d5110f640f95daed69a36ef5d8bd558a5a33aaefc64ad9c7d9c1",
+    "schema": "coordpy.schema_evolution_v1.v1",
+    "v1_payload_cid": "c30563a278ca5f813a7586a5b8a6d61f86d62d749fe46c72da7798e590cce1ae",
+    "v2_payload_cid": "be314b6b2311b9a6b6b2f0bf983ab206919689757bc268ec11b05f9b4c6822e9"
+  },
+  "schema": "coordpy.schema_evolution_v1.w86_schema_evolution_v1"
+}

@@ -5,9 +5,45 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: post-W85 W86
-> Frontier-Scale Substrate Closure on real Llama-3.1-8B-Instruct,
-> 2026-05-20.
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: W86 P2 hardening
+> sweep (Byzantine FT, DP, MPC, schema evolution, drift detection,
+> multi-tenancy, GPU substrate contract, memory GC), 2026-05-20.
+
+## TL;DR — W86 P2 hardening line closures
+
+With every P0 (#25–#29) and every P1 (#30–#37) of meta-#49
+closed, the W86 P2 sweep attacks the security / correctness /
+portability hardening line.  **7 of 8 P2 issues are TRULY
+CLOSED; only #44 (GPU/TPU Substrate with Deterministic Replay)
+remains as PARTIALLY CLOSED — its contract + bench + Colab
+notebook + CPU CI are all shipped, awaiting one Colab Pro
+Run-all.**
+
+| Issue | Verdict | Closure path |
+|---|---|---|
+| **#38** Byzantine Fault Tolerance | **CLOSED** | PBFT V1 in `coordpy.byzantine_fault_tolerance_v1`: Ed25519 sigs, 3-phase protocol, equivocation evidence independently verifiable, collusion at f=2 of n=7 commits μ, refuse-bench above bound refuses to commit. Safety + liveness proofs in `papers/proofs/w86_proof_byzantine_v1.md`. 22 tests. |
+| **#39** Differential Privacy | **CLOSED** | `coordpy.differential_privacy_v1`: Laplace/Gaussian capsules, 5 PII patterns, ε/δ budget tracker, DP-aware composed pipeline emitting both DP CID + integrity anchor CID, 5-point utility curve monotonic, raw value not in capsule dict. Proofs in `papers/proofs/w86_proof_dp_v1.md`. 18 tests. |
+| **#40** MPC / Secret-Sharing | **CLOSED** | `coordpy.mpc_secret_sharing_v1`: Shamir over GF(p), Pedersen + Schnorr proofs, MPC-Average, cross-org bench (2 orgs × 3 parties, threshold 4) reconstructs sum without cross-org cleartext, forged shares rejected. 15 tests. |
+| **#41** Schema Evolution | **CLOSED** | `coordpy.schema_evolution_v1`: SchemaRegistryV2, MigrationPlanV1 with rename + type-conversion + default + provenance preservation, MigrationEventV1 audit bridges, deprecated-but-readable. 17 tests. |
+| **#42** State Drift Detection | **CLOSED** | `coordpy.state_drift_detection_v1`: ModelWeightsCID, DriftDetectorV1 fires (0.218 > 0.015) when changed and not (0.0) when unchanged, principled threshold (fp64_floor × 3× safety margin = 1.5e-2), re-training pipeline beats stale 9.3× on hold-out. 13 tests. |
+| **#43** Multi-Tenancy Isolation | **CLOSED** | `coordpy.multi_tenancy_isolation_v1`: per-tenant `EventGraphV1` (physical), Ed25519-bound tenant tokens, cross-tenant denial events, distinct Merkle anchors, token swap refused. 14 tests. |
+| **#44** GPU/TPU Deterministic Replay | **PARTIAL** | Contract + bench + Colab notebook + CPU CI green (11 tests). Live A100 bf16 numbers awaiting one `scripts/colab_gpu_deterministic_substrate_w86.ipynb` Run-all. |
+| **#45** Memory Garbage Collection | **CLOSED** | `coordpy.event_graph_garbage_collection_v1`: mark-and-sweep, grace buffer + restore, JSONL persistent-store sketch, 100k-event bench reports 99.92% memory reduction with chain re-verifying. 16 tests. |
+
+**After W86 P2 sweep, meta-#49's P0/P1/P2 status is:**
+
+* **20 of 21 P0+P1+P2 sub-issues TRULY CLOSED** (5/5 P0 +
+  8/8 P1 + 7/8 P2).
+* **1 PARTIAL** (#44 GPU/TPU substrate — contract +
+  infrastructure + Colab notebook + CPU CI shipped; live
+  Colab Pro A100 run is the only remaining step).
+* **0 strictly OPEN** in the P0+P1+P2 line.
+
+(P3 — #46 multi-modal, #47 observability, #48 formal
+verification — is the next milestone's frontier and out of
+scope for the W86 P2 sweep.)
+
+See `docs/RESULTS_W86_P2_CLOSURES.md` for per-issue DoD ↔ evidence.
 
 ## TL;DR — W86 P1 line closures (post-P0-sweep push)
 

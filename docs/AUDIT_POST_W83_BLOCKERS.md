@@ -1168,3 +1168,44 @@ issue* until that host runs.
 - The stable SDK surface
   (`RunSpec`, `run`, `AgentTeam`, `coordpy-team` CLI) is
   byte-for-byte unchanged.
+
+---
+
+## P2 hardening line (#38–#45) — closed in W86 P2 sweep (2026-05-20)
+
+After the W86 closure of all 5 P0 (#25–#29) and all 8 P1
+(#30–#37) sub-issues of meta-#49, the eight P2 children
+(#38–#45) were attacked in a single sweep.  Verdicts:
+
+| Issue | Title (short)                           | Verdict | Notes |
+|------:|-----------------------------------------|---------|-------|
+| #38   | Byzantine Fault Tolerance (PBFT V1)     | **TRULY CLOSED** | Ed25519 sigs, 3-phase PBFT, equivocation evidence independently verifiable, collusion bench at f commits μ exactly, refuse-bench above bound refuses to commit. Safety + liveness proofs in `papers/proofs/w86_proof_byzantine_v1.md`. |
+| #39   | Differential Privacy V1                 | **TRULY CLOSED** | Laplace/Gaussian DP capsules, ≥5 PII patterns, cumulative ε/δ budget tracker with breach refusal, DP-aware composed pipeline producing both DP capsule CID + integrity anchor CID, 5-point utility curve monotonic. Proofs in `papers/proofs/w86_proof_dp_v1.md`. |
+| #40   | MPC / Secret-Sharing V1                 | **TRULY CLOSED** | Shamir k-of-n over GF(p), Pedersen + Schnorr proofs, forged shares rejected, MPC-average primitive, cross-org bench (2 orgs × 3 parties, threshold 4) reconstructs sum without any party seeing others' cleartext. |
+| #41   | Schema Evolution V1                     | **TRULY CLOSED** | `SchemaRegistryV2` content-addressed, V1 → V2 example migration with rename + type-conversion + default + provenance preservation, `MigrationEventV1` audit bridges, deprecated-but-readable enforced. |
+| #42   | State Drift Detection V1                | **TRULY CLOSED** | `ModelWeightsCID`, `DriftDetectorV1` fires when changed (drift_score=0.218) and not when unchanged (drift_score=0.0), principled threshold (fp64_floor × 3× safety margin = 1.5e-2), re-training pipeline beats stale by 9.3× on hold-out. |
+| #43   | Multi-Tenancy Isolation V1              | **TRULY CLOSED** | Per-tenant `EventGraphV1` (physical, not logical), Ed25519-bound tenant tokens (token swap refused), cross-tenant denial audit events, per-tenant budgets and audit anchors with distinct Merkle roots, no B byte in A's chain. |
+| #44   | GPU/TPU Substrate Deterministic Replay  | **PARTIALLY CLOSED** | Contract + bench + Colab notebook + CPU CI shipped; the live A100 numbers (positive-arm replay ≤ 0.5 bf16 floor + intercept moves CID; negative-arm breaks byte-identity) await `scripts/colab_gpu_deterministic_substrate_w86.ipynb` on Colab Pro. |
+| #45   | Memory Garbage Collection V1            | **TRULY CLOSED** | `GCPolicyV1`, mark-and-sweep preserving load-bearing roots, grace buffer + restore, JSONL persistent-store sketch, 100k-event bench reports 99.92% memory reduction with chain re-verifying end-to-end. |
+
+**7 of 8 P2 sub-issues truly closed; #44 is the only remaining open issue in meta-#49.**
+
+Two consecutive runs of each closure produce byte-identical
+content-addressed reports (`<closure>_report.report_cid`).
+Every closure ships an offline re-verifier under
+`scripts/verify_w86_<closure>_v1_audit_chain.py` that re-
+derives every CID and exits 0 iff every DoD bool is True.
+
+Canonical evidence index:
+
+* `results/w86/bft/<TS>/bft_v1_suite_report.json`
+* `results/w86/gc/<TS>/gc_v1_bench_report.json`
+* `results/w86/schema_evolution/<TS>/schema_evolution_v1_bench_report.json`
+* `results/w86/tenancy/<TS>/multi_tenancy_v1_bench_report.json`
+* `results/w86/dp/<TS>/dp_v1_bench_report.json`
+* `results/w86/mpc/<TS>/mpc_v1_bench_report.json`
+* `results/w86/drift/<TS>/drift_v1_bench_report.json`
+* (pending) `results/w86/gpu_substrate/<TS>/gpu_substrate_v1_bench_report.json`
+
+See `docs/RESULTS_W86_P2_CLOSURES.md` for the full
+DoD ↔ evidence mapping.

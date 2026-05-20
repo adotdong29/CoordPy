@@ -5153,3 +5153,157 @@ W48-C-MULTI-HOST-SHARED-STATE) remains substrate-blocked /
 deliberately-deferred and out of capsule-layer scope.
 
 Last touched: post-W50 research milestone (W51 family) 2026-05-11.
+
+---
+
+# W86 P2 hardening line — what to say, what NOT to say (2026-05-20)
+
+## #38 Byzantine Fault Tolerance V1
+
+Acceptable: *"`coordpy.byzantine_fault_tolerance_v1` ships a
+real PBFT-style 3-phase consensus on top of Ed25519
+signatures.  At `f = ⌊(n−1)/3⌋` (the classical PBFT bound),
+honest replicas commit μ exactly under the n=7 collusion bench.
+Above the bound (n=4, f=2) the protocol REFUSES to commit;
+safety holds, liveness is sacrificed honestly.  Equivocation
+evidence is independently verifiable (a third party with the
+membership public keys re-derives `conclusively_byzantine =
+True`).  Safety + liveness proofs in `papers/proofs/
+w86_proof_byzantine_v1.md`."*
+
+Forbidden phrasing: *"W86 BFT runs on real distributed
+networks"* (it runs in-process; the W86 multi-host substrate
+carries it on the wire in V2), *"W86 BFT supports view-change"*
+(it doesn't — Byzantine primary kills liveness), *"W86 BFT
+uses BLS threshold signatures"* (Ed25519 only).
+
+## #39 Differential Privacy V1
+
+Acceptable: *"`coordpy.differential_privacy_v1` ships
+DPCapsuleV1 with Laplace / Gaussian mechanisms; a 5-pattern
+PIIRedactor; a DPBudgetTrackerV1 with strict over-budget
+refusal; a DP-aware composed pipeline producing BOTH the DP
+capsule CID AND the integrity Merkle anchor CID; a 5-point
+utility-vs-privacy curve (ε ∈ {0.1, 0.5, 1.0, 2.0, 5.0} ×
+1000 samples) that is monotonic by Theorem 1.  The
+cleartext value NEVER appears in the DP capsule's serialised
+dict.  Proofs in `papers/proofs/w86_proof_dp_v1.md`."*
+
+Forbidden phrasing: *"W86 DP uses Rényi DP"* (basic
+composition only), *"W86 DP redactor is presidio-complete"*
+(5 regex classes only), *"W86 DP retains the original
+payload"* (it strictly does not — anti-cheat clause 4 is the
+key load-bearing claim).
+
+## #40 MPC / Secret-Sharing V1
+
+Acceptable: *"`coordpy.mpc_secret_sharing_v1` ships Shamir
+secret sharing over a 521-bit Mersenne prime; Pedersen
+commitments + Schnorr proofs of knowledge; MPC-Average via
+sum-of-shares.  The cross-org bench (2 orgs × 3 parties,
+threshold 4) reconstructs the SUM but no party (and no org)
+sees any other party's cleartext.  Forged Pedersen commitments
+are rejected.  Below-threshold shares recover NOTHING
+(information-theoretic Shamir bound)."*
+
+Forbidden phrasing: *"W86 MPC supports general MPC-multiply"*
+(it only does additive), *"W86 MPC uses BLS threshold
+signatures"* (Schnorr + Pedersen only), *"W86 MPC scales to
+n orgs"* (2 orgs V1; n V2).
+
+## #41 Schema Evolution V1
+
+Acceptable: *"`coordpy.schema_evolution_v1` ships
+SchemaRegistryV2 + MigrationPlanV1 + MigrationEventV1.  A
+V1 → V2 example migration (`MigrationEnvelopeV1` →
+`MigrationEnvelopeV2`) renames `arrival_delay` (float seconds)
+to `arrival_delay_ns` (int_ns), adds `forwarded_from` with a
+default, preserves `parent_cid`, and is byte-deterministic
+under the plan.  Audit chains re-verify across the migration
+via MigrationEventV1 bridges.  Deprecated schemas remain
+readable with a structured DeprecationWarning."*
+
+Forbidden phrasing: *"W86 schema evolution supports lossy
+migrations"* (V1 is lossless; lossy V2), *"W86 schema
+evolution handles the full n-way DAG"* (linear V1 → V2 V2 ;
+DAG V2), *"W86 schema evolution recomputes old data under
+new schemas"* (it does not — anti-cheat clause 1).
+
+## #42 State Drift V1
+
+Acceptable: *"`coordpy.state_drift_detection_v1` ships
+ModelWeightsCID + DriftDetectorV1 + LinearAdapterV1.  On the
+`controlled_runtime_substrate_v1` bench, the detector
+correctly fires when the model is perturbed (drift_score =
+0.218 vs threshold 0.015) and does NOT fire when unchanged
+(drift_score = 0.0).  The new adapter trained on M1-derived
+hidden states strictly beats the stale (M0-trained) adapter
+on the M1-held-out set (9.3× lower MSE).  The threshold is
+derived from `fp64_floor × safety_margin = 5e-3 × 3 =
+1.5e-2`, NOT hand-tuned to the bench."*
+
+Forbidden phrasing: *"W86 drift detection runs on real
+fine-tuned Llama"* (V1 runs on the controlled runtime; real-
+HF integration is V2 — uses #25 closure infra), *"W86 drift
+detection is online"* (offline V1; online V2 / V3).
+
+## #43 Multi-Tenancy V1
+
+Acceptable: *"`coordpy.multi_tenancy_isolation_v1` ships
+TenantIdentityV1 + per-tenant EventGraphV1 instances
+(physical, not logical) + Ed25519-bound tenant tokens.  In
+the 2-tenant bench: cross-tenant reads are REFUSED with a
+content-addressed CrossTenantAccessDeniedEventV1 audit;
+Tenant A draining its $1 budget leaves Tenant B's
+spent_cost_usd at 0.0; A's Merkle audit anchor ≠ B's anchor;
+a token signed with B's key claiming A's identity FAILS
+verification; no B byte appears in A's chain."*
+
+Forbidden phrasing: *"W86 multi-tenancy is logical filtering
+of a shared graph"* (the data model is physical partitioning —
+anti-cheat clause 2 explicitly forbids logical filtering),
+*"W86 multi-tenancy is n-tenant"* (V1 is 2; n V2), *"W86 multi-
+tenancy uses X.509 PKI"* (Ed25519 only).
+
+## #44 GPU/TPU Substrate V1 (PARTIAL)
+
+Acceptable: *"`coordpy.gpu_deterministic_substrate_v1` ships
+the determinism-wrapper contract + the negative-arm
+infrastructure + the tensor-parallel readback pass-through V1.
+On a CPU host the contract check exercises every code path
+(env var inverts mode, capsule shapes round-trip, TP
+world_size=1 returns the tensor unchanged).  The live A100
+bf16 closure run lives in `scripts/
+colab_gpu_deterministic_substrate_w86.ipynb`; the JSON it
+produces re-verifies offline via
+`scripts/verify_w86_gpu_substrate_v1_audit_chain.py`.  The
+#44 closure is conditional on running the notebook once on
+Colab Pro."*
+
+Forbidden phrasing: *"W86 GPU substrate is byte-identical at
+the fp32 floor on GPU"* (bf16 tier 0.5 floor — anti-cheat
+clause 2 forbids silent floor widening), *"W86 GPU substrate
+verifies multi-GPU tensor parallel"* (V1 ships the pass-through
+contract; multi-GPU V2 stretch, matches issue scope), *"W86
+GPU substrate is closed without a Colab run"* (it is NOT —
+the live numbers are the load-bearing evidence).
+
+## #45 Memory Garbage Collection V1
+
+Acceptable: *"`coordpy.event_graph_garbage_collection_v1` ships
+GCPolicyV1 + mark-and-sweep + grace buffer + JSONL persistent-
+store sketch + content-addressed GCEventV1.  On the 100k-event
+bench: 99.92% memory reduction; chain re-verifies end-to-end
+via `verify_chain_across_gc_v1`; soft-deleted events restore
+from grace; the JSONL store round-trips.  Critical event kinds
+(commit_anchor, rollback_anchor, tenant_identity,
+schema_migration) and genesis are NEVER purged."*
+
+Forbidden phrasing: *"W86 GC is incremental"* (V1 is mark-and-
+sweep, full-traversal — copying / generational / incremental
+V2), *"W86 GC handles 1M events"* (100k V1 minimum,
+documented; 1M is V2), *"W86 GC is coordinated multi-host"*
+(single-host V1, multi-host V3), *"W86 GC has an LSM-tree
+persistent store"* (JSONL sketch only).
+
+Last touched: W86 P2 hardening sweep 2026-05-20.
