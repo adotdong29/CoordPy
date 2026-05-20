@@ -279,6 +279,9 @@ def run_long_context_intercept_bench_v1(
 
     for horizon in horizons:
         horizon = int(horizon)
+        print(
+            f"[lc-intercept] horizon={horizon}: building "
+            "haystack prompt...", flush=True)
         needle_value = 423171 + horizon
         prompt_text = build_long_haystack_token_prompt_v1(
             n_tokens=horizon,
@@ -288,12 +291,17 @@ def run_long_context_intercept_bench_v1(
         )
         # Tokenize and clip to exactly ``horizon`` if we
         # overshot.
+        print(
+            f"[lc-intercept] horizon={horizon}: tokenizing "
+            f"{len(prompt_text)} chars...", flush=True)
         ids = runtime.tokenize(
             prompt_text, max_len=horizon)
         if len(ids) < horizon:
             # Grow prompt text until we reach horizon.
             extra_seed = int(seed) + 1
+            grow_iter = 0
             while len(ids) < horizon:
+                grow_iter += 1
                 more = build_long_haystack_token_prompt_v1(
                     n_tokens=max(64, horizon - len(ids)),
                     needle_position=0,
@@ -303,7 +311,17 @@ def run_long_context_intercept_bench_v1(
                 prompt_text = prompt_text + " " + more
                 ids = runtime.tokenize(
                     prompt_text, max_len=horizon)
+                if grow_iter % 5 == 0:
+                    print(
+                        f"[lc-intercept] horizon={horizon}: "
+                        f"grow_iter={grow_iter}, "
+                        f"n_tokens={len(ids)}/{horizon}",
+                        flush=True)
         n_actual = int(len(ids))
+        print(
+            f"[lc-intercept] horizon={horizon}: tokenized to "
+            f"{n_actual} tokens; preparing injection...",
+            flush=True)
 
         # Build the injection. We inject an L2-normalised
         # constant additive bias of magnitude ``inject_magnitude``
@@ -338,16 +356,28 @@ def run_long_context_intercept_bench_v1(
             position_offset=None,
         )
 
+        print(
+            f"[lc-intercept] horizon={horizon}: running "
+            "baseline forward...", flush=True)
         t0 = time.time()
         try:
             base_trace = runtime.forward(input_token_ids=ids)
             t_base = float(time.time() - t0)
+            print(
+                f"[lc-intercept] horizon={horizon}: baseline "
+                f"forward done in {t_base:.2f}s; "
+                "running injected forward...", flush=True)
             t1 = time.time()
             inj_trace = runtime.forward(
                 input_token_ids=ids, injection=plan)
             t_inj = float(time.time() - t1)
             base_cid = str(base_trace.cid())
             inj_cid = str(inj_trace.cid())
+            print(
+                f"[lc-intercept] horizon={horizon}: injected "
+                f"forward done in {t_inj:.2f}s; base_cid="
+                f"{base_cid[:16]} inj_cid={inj_cid[:16]}",
+                flush=True)
             moves = bool(base_cid != inj_cid)
             detail = (
                 f"horizon={horizon}, n_actual_tokens={n_actual}, "

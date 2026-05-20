@@ -407,12 +407,24 @@ class TransformersRuntimeV1:
         # Deterministic CID over model bytes (config + weight
         # shapes + first-bytes hash). We avoid hashing every
         # weight tensor to keep init fast.
+        # IMPORTANT (W86): slice 8 elements FIRST, then cross-
+        # device-copy. The naive `p.detach().to("cpu").float()
+        # .flatten()[:8].sum().item()` materialises every weight
+        # as fp32 on CPU just to read 8 floats; on 8 B+ models
+        # this loops 290+ times and can briefly hold ~500 MB
+        # CPU-side per iteration, OOM-killing the process under
+        # constrained Colab host RAM. Computing the sum-of-first-
+        # 8-elements yields the same numerical value (and the
+        # same params_cid) but allocates ~32 bytes per param.
         param_summary = []
         for name, p in self._model.named_parameters():
+            head = p.detach().flatten()[:8]
+            # Convert + reduce on whatever device p lives on,
+            # then move the scalar sum to CPU.
             param_summary.append((
                 name, tuple(int(s) for s in p.shape),
-                float(p.detach().to("cpu").float()
-                      .flatten()[:8].sum().item())))
+                float(head.to(dtype=torch.float32).sum()
+                      .item())))
         cfg = self._model.config
         params_payload = {
             "model_name": str(self.model_name),
@@ -427,6 +439,21 @@ class TransformersRuntimeV1:
                 params_payload, sort_keys=True,
                 separators=(",", ":"),
                 default=str).encode("utf-8")).hexdigest()
+        # Diagnostic: print CUDA mem state after model load +
+        # params_cid computation so a multi-phase Colab run shows
+        # exactly how much VRAM the model occupies on this card.
+        try:
+            if (hasattr(torch, "cuda")
+                    and torch.cuda.is_available()):
+                free_b, total_b = torch.cuda.mem_get_info()
+                print(
+                    "[w80-transformers-runtime] model loaded; "
+                    f"params_cid={self._params_cid[:16]}; "
+                    f"VRAM free={free_b / (1024**3):.2f} GiB / "
+                    f"total={total_b / (1024**3):.2f} GiB",
+                    flush=True)
+        except Exception:  # noqa: BLE001
+            pass
 
     def backend_id(self) -> str:
         return "coordpy.transformers_runtime_v1"
