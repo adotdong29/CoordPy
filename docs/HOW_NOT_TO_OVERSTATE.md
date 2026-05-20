@@ -24,15 +24,20 @@ repeated.
   ``docs/PLAN_W86_28_ALTERNATIVE_HEAD_TO_HEAD.md`` and
   ``docs/PLAN_W86_29_REAL_MULTI_HOST.md``.
 
-- **W86 #27 closure is partial only.** The W85 live-task-
-  success axis (composed > bounded V3 at 33.5 k input tokens)
-  remains met. The substrate-side hidden-state-intercept-at-
-  32 k bar is the only #27 DoD bullet still pending; the bench
-  code is shipped and tested, the OOM and split-phase fixes
-  are pushed, but the actual Colab Pro Phase B execution has
-  not yet succeeded at the 32 k bar. **#27 may NOT be called
-  closed until the next Phase B run produces a positive
-  ``intercept_moves_cid_at_min_32k`` bool.**
+- **W86 closes #27 on BOTH axes empirically.** The W85 live-
+  task-success bar (composed > bounded V3 at 33.5 k input
+  tokens) held already on NIM Llama-3.1-8B / 70B / Mixtral-
+  8x22B. The W86 run 7 (2026-05-20T02:28Z on Colab Pro A100-
+  40GB) lands the substrate-side hidden-state-intercept-at-32 k
+  bar empirically: baseline_trace_cid ``34f2bcb1...`` ≠
+  injected_trace_cid ``714bc5f6a1...`` at exactly 32 768 input
+  tokens with bf16 + SDPA + skinny-trace. Reports MAY now cite
+  #27 as closed, AS LONG AS they cite both axes (task-success
+  via NIM in W85; intercept via self-hosted Llama-3.1-8B in
+  W86) and the underlying carry-forwards (skinny-trace mode
+  drops per-layer KV in the trace because the cross-device
+  fp64 numpy copy was the host-RAM hot spot — see
+  ``W86-L-LONG-CONTEXT-INTERCEPT-V1-SKINNY-TRACE-CAP``).
 
 - **W86 conformance is 10 / 12 — exactly at the DoD bar, with
   two honest fails.** The two failing axes (write_attention_

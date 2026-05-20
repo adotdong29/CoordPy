@@ -23,6 +23,9 @@ import pytest
 W86_RUN3_DIR = (
     Path(__file__).resolve().parent.parent
     / "results" / "w86" / "w86_20260520T012814Z")
+W86_RUN7_DIR = (
+    Path(__file__).resolve().parent.parent
+    / "results" / "w86" / "w86_20260520T022828Z")
 
 
 def _canonical_bytes(payload):
@@ -182,3 +185,111 @@ def test_w86_run3_model_identity():
         "model_hidden_dim", 0)) == 4096
     assert report.get("precision_tier") == "tier_bf16"
     assert report.get("device") == "cuda:0"
+
+
+# ---------------------------------------------------------------
+# Run 7 — the CANONICAL closure run (2026-05-20T02:28Z).
+# All three P0 closures pass in a single end-to-end Colab Pro
+# A100 run. This is the run cited as evidence in
+# docs/RESULTS_W86_FRONTIER_CLOSURE.md.
+# ---------------------------------------------------------------
+
+@pytest.mark.skipif(
+    not (W86_RUN7_DIR / "frontier_closure_report.json").exists(),
+    reason="W86 run-7 evidence not present in this checkout")
+def test_w86_run7_top_level_report_cid_re_derives():
+    report = json.loads(
+        (W86_RUN7_DIR / "frontier_closure_report.json")
+        .read_bytes().decode("utf-8"))
+    recorded = report.get("report_cid", "")
+    derived = _sha256_hex({
+        "kind": "w86_frontier_closure_report_v1",
+        "report": {
+            k: v for k, v in report.items()
+            if k != "report_cid"},
+    })
+    assert derived == recorded, (
+        f"recorded={recorded} derived={derived}")
+
+
+@pytest.mark.skipif(
+    not (W86_RUN7_DIR / "27_long_context_intercept.json").exists(),
+    reason="W86 run-7 #27 evidence not present in this checkout")
+def test_w86_run7_closure_27_sidecar_cid_re_derives():
+    side = json.loads(
+        (W86_RUN7_DIR / "27_long_context_intercept.json")
+        .read_bytes().decode("utf-8"))
+    recorded = side.get("report_cid", "")
+    derived = _sha256_hex({
+        "kind": "w86_27_long_context_intercept_report",
+        "out": {
+            k: v for k, v in side.items()
+            if k != "report_cid"},
+    })
+    assert derived == recorded
+
+
+@pytest.mark.skipif(
+    not (W86_RUN7_DIR / "frontier_closure_report.json").exists(),
+    reason="W86 run-7 evidence not present in this checkout")
+def test_w86_run7_27_intercept_moves_cid_at_32k():
+    """The #27 hidden-state-intercept-at-32k axis: baseline
+    trace CID must differ from injected trace CID at exactly
+    32 768 input tokens on the live Llama-3.1-8B-Instruct
+    runtime."""
+    report = json.loads(
+        (W86_RUN7_DIR / "frontier_closure_report.json")
+        .read_bytes().decode("utf-8"))
+    c27 = report.get("closure_27", {})
+    assert c27.get("issue") == 27
+    assert bool(
+        c27.get("intercept_moves_cid_at_min_32k")) is True
+    bench = c27.get("bench", {})
+    assert bench.get(
+        "intercept_moves_cid_at_min_32k") is True
+    horizons = bench.get("horizons", [])
+    assert len(horizons) >= 1
+    h0 = horizons[0]
+    assert int(h0.get("n_input_tokens_actual", 0)) >= 32768
+    assert bool(h0.get("intercept_moves_cid")) is True
+    base_cid = str(h0.get("baseline_trace_cid", ""))
+    inj_cid = str(h0.get("injected_trace_cid", ""))
+    assert len(base_cid) == 64
+    assert len(inj_cid) == 64
+    assert base_cid != inj_cid, (
+        "intercept moves CID requires baseline != injected; "
+        f"both ended up {base_cid}")
+
+
+@pytest.mark.skipif(
+    not (W86_RUN7_DIR / "frontier_closure_report.json").exists(),
+    reason="W86 run-7 evidence not present in this checkout")
+def test_w86_run7_verifier_passes_all_three_closures():
+    """``scripts/verify_w86_audit_chain.py`` must exit 0 on
+    run 7's evidence and print PASS on EVERY #25 + #26 + #27
+    DoD bullet — the literal canonical-closure run."""
+    repo_root = Path(__file__).resolve().parent.parent
+    report_path = (
+        W86_RUN7_DIR / "frontier_closure_report.json")
+    proc = subprocess.run(
+        [sys.executable,
+         str(repo_root / "scripts" / "verify_w86_audit_chain.py"),
+         "--report", str(report_path)],
+        capture_output=True, text=True, check=False)
+    assert proc.returncode == 0, (
+        f"verifier failed: {proc.stdout}\n{proc.stderr}")
+    expected_pass_lines = [
+        "PASS top-level report_cid",
+        "PASS closure_25 sidecar CID",
+        "PASS closure_26 sidecar CID",
+        "PASS closure_27 sidecar CID",
+        "PASS #25 hidden-state intercept moves CID at frontier",
+        "PASS #25 W80 conformance",
+        "PASS #25 replay-from-KV at tier",
+        "PASS #26 live-trained MSE strictly",
+        "PASS #27 hidden-state intercept moves CID at ≥ 32 k tokens",
+    ]
+    for line in expected_pass_lines:
+        assert line in proc.stdout, (
+            f"verifier did not print expected line: {line!r}\n"
+            f"full stdout: {proc.stdout}")

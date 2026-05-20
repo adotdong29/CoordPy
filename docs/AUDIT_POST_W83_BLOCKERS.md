@@ -8,10 +8,10 @@
 > after the W85 frontier-text-runtime / GSM8K head-to-head /
 > live-long-context push, and again after the **W86 frontier-
 > scale substrate closure on Colab Pro A100-40GB on 2026-05-20**
-> (#25 + #26 closed across 3 independent runs; #27 hidden-state-
-> intercept-at-32k phase split + OOM fix pushed, awaiting next
-> Phase B execution). Successive update sections are at the
-> bottom of each issue.
+> (issues #25, #26, AND #27 ALL truly closed via 7 successive
+> live Colab Pro runs; the audit chain across all seven runs is
+> preserved on disk under ``results/w86/``). Successive update
+> sections are at the bottom of each issue.
 >
 > Each issue is graded against its own Definition of Done bars
 > and the explicit *How NOT to close this* (anti-cheat) clauses
@@ -37,7 +37,7 @@
 |------|----------------|-----------------|---------------|
 | #25 | P0 Frontier-Scale 7B+ live substrate coupling | Not claimed | **TRULY CLOSED W86** (Llama-3.1-8B-Instruct loaded under W80 contract on Colab Pro A100-40GB in bf16; conformance suite 10/12 pass; hidden_state_intercept_moves_cid = True; replay-from-KV at bf16 tier 0.156 < 0.5 tolerance; W83 load-bearing claim reproduced; reproduced across 3 independent runs on 2026-05-20; audit chain re-verifiable via `scripts/verify_w86_audit_chain.py`) |
 | #26 | P0 Live LLM training of composed learned memory | Not claimed | **TRULY CLOSED W86** (composed-learned-memory module trained end-to-end on live Llama-3.1-8B-Instruct layer-12 hidden states; held-out live MSE 0.011665 strictly < synthetic-trained MSE 0.131914 = 11.3× strict beat; same architecture / optimiser / seed / training-step config; held-out prompt-CID disjointness enforced; TrainingTraceWitnessV1 capsules emitted; reproduced byte-identically across 3 independent runs) |
-| #27 | P0 Long-context live eval ≥ 32k tokens | Not claimed | PARTIALLY SOLVED W85 (composed strictly beats bounded V3 at 33.5k input tokens on live Llama-3.1-8B-Instruct AND Llama-3.3-70B-Instruct via NIM; hidden-state-intercept-moves-CID bar at 32 k+ still pending: substrate-coupled bench shipped in W86, OOM and split-phase fixes pushed, awaiting next live Colab Pro Phase B execution) |
+| #27 | P0 Long-context live eval ≥ 32k tokens | Not claimed | **TRULY CLOSED W86** (live-task-success axis: composed strictly beats bounded V3 at 33.5k input tokens on live Llama-3.1-8B + 70B + Mixtral-8x22B via NIM in W85; hidden-state-intercept-moves-CID axis: baseline `34f2bcb1...` ≠ injected `714bc5f6a1...` on live Llama-3.1-8B at exactly 32 768 input tokens on A100-40GB in bf16 with skinny-trace + SDPA attention in W86; live long-context prompt corpus with deterministic builder + per-task Merkle audit chain re-verifiable offline via `scripts/verify_w86_audit_chain.py`) |
 | #28 | P0 Real-world multi-agent task benchmark | Not claimed | STILL OPEN; bench infrastructure landed W85 (`gsm8k_real_bench_v1` ships real 3-arm head-to-head; live N=20×3 seeds run on Llama-3.1-8B-Instruct **refuted the strict-improvement claim** — B mean 71.7% < A0 75.0% < A1 81.7%; honest negative result is recorded in `results/w85/gsm8k_bench_report.json` and the audit chain is offline-verified) |
 | #29 | P0 Real cross-host distributed substrate | Not claimed | PARTIALLY SOLVED (W84 cross-process distributed substrate V1 shipped with mTLS-shaped HMAC handshake, partition simulation, ±5 s skew injection, idempotent apply; literal multi-machine remains blocked on hardware; W85 does not advance this) |
 | #30 | P1 Quantized runtime substrate | Not claimed | STILL OPEN (per-tier capability axis and contract shipped W84; W85 does NOT load int8 weights — NIM serves bf16 internally but does not expose precision tier) |

@@ -170,10 +170,88 @@ What W86 does NOT close:
   (cell 5 = Phase A, cell 6 = Phase B), so re-running just
   Phase B is a one-cell action even if Phase A succeeded.
 
-### Run 4 — POST-CELL-SPLIT (PLACEHOLDER until the re-run lands)
+### Runs 4–6 — diagnostic chain that pinpointed two more bugs
 
-(The post-cell-split re-run will produce the #27 evidence and
-this section is filled in with the actual numbers.)
+Three intermediate Colab Pro A100-40GB runs surfaced two
+hard-to-spot bugs in the closure path. The audit chains are
+preserved on disk in `results/w86/w86_20260520T013857Z/`,
+`w86_20260520T015316Z/`, and `w86_20260520T020456Z/`:
+
+* **Run 4 (013857Z):** Phase B's subprocess apparently never
+  ran (Colab cell quirk); fix was to split cell 5 into separate
+  Phase A and Phase B notebook cells with `!` shell magic +
+  log capture into `OUT_DIR/phase_{a,b}.log`.
+* **Run 5 (015316Z):** Phase B's subprocess died silently
+  after `Loading weights: 100%|██████████| 291/291`. The
+  `phase_b.log` pinpointed it: the W80 `_params_cid`
+  computation called
+  `p.detach().to("cpu").float().flatten()[:8].sum().item()`
+  per parameter, materialising each Llama-3.1-8B weight as
+  fp32 on host RAM just to read 8 floats. Fix:
+  `p.detach().flatten()[:8].to(torch.float32).sum().item()` —
+  slice on whatever device the param lives on, then move only
+  the scalar sum to CPU. Same numerical value, same params_cid.
+* **Run 6 (020456Z):** Phase B completed the FIRST 32 k forward
+  cleanly in 23.74 s, then died during the SECOND (injected)
+  forward. Two compounding causes: `_wrap_outputs` materialised
+  the full KV cache as fp64 numpy (~8 GB host RAM at 32 k
+  tokens × 32 layers) even in skinny mode, AND the trace
+  object held GPU KV references alive across forwards. Fixes:
+  in skinny_trace mode set k/v_per_layer to all None (no
+  cross-device copy); in the bench, extract `base_cid` then
+  `del base_trace` + `gc.collect()` + `torch.cuda.empty_cache()`
+  before the second forward.
+
+### Run 7 — 2026-05-20T02:28Z, FULL CLOSURE (A100-40GB)
+
+`results/w86/w86_20260520T022828Z/`. **All three P0 closures
+pass on a single end-to-end run.**
+
+* **Closure #25: SUCCESS** (identical to runs 2 + 3 — the W80
+  contract is deterministic on this model).
+  Sidecar CID `cda24bd00c11ba77...`.
+
+* **Closure #26: SUCCESS** (identical to runs 1 + 2 + 3 — the
+  strict-beat reproduces byte-identically).
+  Sidecar CID `40761a409aaf2a93...`.
+
+* **Closure #27 hidden-state-intercept axis: SUCCESS.**
+  - Model loaded; VRAM free dropped from 39.08 GiB → 24.04 GiB
+    (Llama-3.1-8B in bf16 uses ~15 GB).
+  - Haystack prompt: 196 807 chars → tokenized to exactly
+    **32 768 tokens** (at the literal #27 32 k bar).
+  - Baseline forward at 32 768 tokens completed in 16.10 s.
+  - **VRAM free AFTER baseline forward: 24.01 GiB** — the
+    skinny-trace + bench cleanup released the KV cache
+    cleanly; the second forward had the same headroom as the
+    first.
+  - Injected forward (additive bias at layer 16, magnitude 1.0,
+    positions [n//3 : 2n//3]) completed in 15.28 s.
+  - `baseline_trace_cid = 34f2bcb1073ef28b8979b7165ee7caa49efdbc40b28fed790d41cfb1bb862145`
+  - `injected_trace_cid = 714bc5f6a10483274cfdcd4477b2d5f7ec071ba0add7a03efa821d372d8c456f`
+  - `intercept_moves_cid_at_min_32k = True`.
+  - Total #27 wall-clock 269 seconds (model load + bench).
+  Sidecar CID `1455497593aaf5ed...`.
+
+* **Top-level report CID** `12b530d9e19c78b7...` re-derives
+  offline via `scripts/verify_w86_audit_chain.py`. All four
+  CIDs (top + three sidecars) verify. All five DoD bullets
+  pass.
+
+## What W86 closes (post-Run-7 verdict)
+
+| Bar | Issue | Status |
+|-----|------|--------|
+| Live LLM training of W83 composed learned memory | #26 | **CLOSED** |
+| One open-weight 7B+ model loads under W80 instrumentation contract | #25 | **CLOSED** |
+| Conformance suite ≥ 10/12 axes on frontier model | #25 | **CLOSED** |
+| Hidden-state intercept moves the trace CID on frontier model (short context) | #25 | **CLOSED** |
+| Replay-from-KV precision floor measured + reported honestly | #25 | **CLOSED** |
+| At least one W83 load-bearing claim reproduced at frontier scale | #25 | **CLOSED** |
+| Hidden-state intercept moves CID at ≥ 32 k tokens | #27 | **CLOSED** |
+| Live composed > bounded V3 at 32 k+ token horizon (task-success axis) | #27 | CLOSED W85 |
+| Long-context prompt corpus + deterministic builder | #27 | CLOSED W84 / W85 |
+| Per-task Merkle audit chain | #25 / #26 / #27 | **CLOSED W86** |
 
 ## Modules shipped
 

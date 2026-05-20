@@ -45,13 +45,19 @@ Concrete evidence (all CIDs are re-derivable offline from
   Held-out prompt-CID disjointness enforced. TrainingTraceWitness
   capsules emitted. Reproduced byte-identically across runs.
 
-* **#27 — partial: still pending the substrate-side hidden-
-  state-intercept-at-32k bar.** The W85 live-task-success bar
-  remains met (composed > bounded V3 at 33.5 k input tokens
-  on Llama-3.1-8B / 70B / Mixtral-8x22B via NIM). The W86
-  long-context-intercept bench code is shipped and tested; the
-  remaining Colab Pro Phase B execution will land the 32 k
-  hidden-state-intercept-moves-CID evidence in the next run.
+* **#27 — CLOSED.** Both axes of the issue are now empirically
+  met. The W85 live-task-success bar held already (composed >
+  bounded V3 at 33.5 k input tokens on Llama-3.1-8B / 70B /
+  Mixtral-8x22B via NIM). The W86 long-context-intercept bench
+  on self-hosted Llama-3.1-8B-Instruct on A100-40GB shows
+  ``baseline_trace_cid = 34f2bcb1...`` ≠
+  ``injected_trace_cid = 714bc5f6a1...`` at exactly 32 768
+  input tokens with skinny-trace + SDPA attention. Wall-clock
+  baseline forward 16.10 s; injected forward 15.28 s; VRAM
+  free after baseline 24.01 GiB (KV cache released cleanly
+  between forwards). See
+  ``docs/RESULTS_W86_FRONTIER_CLOSURE.md`` for the run-7
+  evidence.
 
 * **#28 — still open.** The W85 GSM8K negative result stands.
   Closure plan in `docs/PLAN_W86_28_ALTERNATIVE_HEAD_TO_HEAD.md`
