@@ -1,0 +1,179 @@
+{
+  "annotations": {"list": []},
+  "description": "W87 / P3 #47 — Observability V1: CoordPy gateway + composed-pipeline metrics. Import into Grafana (any version >=9.x) and point at a Prometheus datasource scraping the gateway's /metrics endpoint.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode": "none"}, "thresholdsStyle": {"mode": "off"}}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "reqps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "id": 1,
+      "title": "Gateway request rate (by path)",
+      "type": "timeseries",
+      "targets": [{
+        "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+        "editorMode": "code",
+        "expr": "sum by(path) (rate(coordpy_gateway_requests_total[1m]))",
+        "legendFormat": "{{path}}",
+        "range": true,
+        "refId": "A"
+      }]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "unit": "s"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "id": 2,
+      "title": "Gateway request latency p50/p95/p99",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.50, sum by(le) (rate(coordpy_gateway_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "p50",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.95, sum by(le) (rate(coordpy_gateway_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "p95",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "editorMode": "code",
+          "expr": "histogram_quantile(0.99, sum by(le) (rate(coordpy_gateway_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "p99",
+          "range": true,
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "id": 3,
+      "title": "Consensus: commits vs abstains",
+      "type": "timeseries",
+      "targets": [
+        {
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "editorMode": "code",
+          "expr": "sum by(decision_kind) (rate(coordpy_consensus_commits_total[1m]))",
+          "legendFormat": "commit:{{decision_kind}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "editorMode": "code",
+          "expr": "sum by(reason) (rate(coordpy_consensus_abstains_total[1m]))",
+          "legendFormat": "abstain:{{reason}}",
+          "range": true,
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 1}, {"color": "red", "value": 5}]}, "unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 8},
+      "id": 4,
+      "title": "Integrity verdicts (last hour)",
+      "type": "stat",
+      "targets": [{
+        "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+        "editorMode": "code",
+        "expr": "sum by(verdict) (increase(coordpy_integrity_verdicts_total[1h]))",
+        "legendFormat": "{{verdict}}",
+        "range": false,
+        "refId": "A"
+      }]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 8},
+      "id": 5,
+      "title": "Event graph size",
+      "type": "stat",
+      "targets": [{
+        "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+        "editorMode": "code",
+        "expr": "coordpy_event_graph_size",
+        "legendFormat": "{{tenant_id}}",
+        "range": false,
+        "refId": "A"
+      }]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "unit": "s"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 12, "x": 0, "y": 16},
+      "id": 6,
+      "title": "Audit anchor age (alert >300s)",
+      "type": "timeseries",
+      "targets": [{
+        "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+        "editorMode": "code",
+        "expr": "coordpy_audit_anchor_root_age_seconds",
+        "legendFormat": "anchor age",
+        "range": true,
+        "refId": "A"
+      }]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 6, "w": 12, "x": 12, "y": 16},
+      "id": 7,
+      "title": "OTLP spans emitted (by span_name)",
+      "type": "timeseries",
+      "targets": [{
+        "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+        "editorMode": "code",
+        "expr": "sum by(span_name) (rate(coordpy_observability_spans_emitted_total[1m]))",
+        "legendFormat": "{{span_name}}",
+        "range": true,
+        "refId": "A"
+      }]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["coordpy", "w87", "observability"],
+  "templating": {
+    "list": [{
+      "current": {"selected": false, "text": "Prometheus", "value": "Prometheus"},
+      "hide": 0,
+      "includeAll": false,
+      "label": "Datasource",
+      "multi": false,
+      "name": "DS_PROMETHEUS",
+      "options": [],
+      "query": "prometheus",
+      "refresh": 1,
+      "regex": "",
+      "skipUrlSync": false,
+      "type": "datasource"
+    }]
+  },
+  "time": {"from": "now-1h", "to": "now"},
+  "timepicker": {},
+  "timezone": "",
+  "title": "CoordPy — W87 Observability V1",
+  "uid": "coordpy-w87-obs-v1",
+  "version": 1,
+  "weekStart": ""
+}

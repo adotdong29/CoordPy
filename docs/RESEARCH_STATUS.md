@@ -5,10 +5,35 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: W86 P2 hardening
-> sweep with #44 GPU substrate landing on Colab Pro A100-40GB
-> at bf16, 2026-05-21. **Meta-#49's complete P0+P1+P2 line is
-> closed.**
+> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: **W87 P3 line
+> closures** (multi-modal substrate, observability,
+> formal verification) on 2026-05-21. **Meta-#49 P0+P1+P2 line
+> closed (W86). P3 line (#46/#47/#48) closed (W87).**
+
+## TL;DR — W87 P3 line closures (multi-modal / observability / formal verification)
+
+With meta-#49's P0+P1+P2 backlog (21 sub-issues) entirely
+closed in W86, the W87 push attacks the P3 ecosystem /
+operability frontier and closes **3 of 3 P3 issues**.
+
+| Issue | Verdict | Closure path |
+|---|---|---|
+| **#46** Multi-Modal Context Substrate | **CLOSED** | `coordpy.multi_modal_payload_v1` ships `MultiModalPayloadV1` for **3 modalities** (text + image + code); `coordpy.vision_substrate_v1` loads **`vikhyatk/moondream2`** (real open-weight VLM, 1.87 B params) and reads its vision-tower hidden state (**`(729, 2048)` fp32**); `coordpy.code_substrate_v1` loads **`distilgpt2`** with an **AST-aware axis** via stdlib `ast` (function-def boundary reads); `coordpy.composed_multimodal_pipeline_v1` anchors all per-modality payloads under a single **cross-modality Merkle root**; per-modality precision floors all within tolerance; **two consecutive byte-identical runs** on local CPU (~27 s wall); offline verifier 20/20 PASS. Colab notebook reproduces at frontier scale on LLaVA-1.5-7B + Qwen2.5-Coder-1.5B on Colab Pro A100. 32 tests. |
+| **#47** Observability / Telemetry | **CLOSED** | `coordpy.observability_v1` ships **OTLP/HTTP JSON span exporter** (`OTLPSpanV1` + `OTLPResourceSpansBatchV1`), **Prometheus text exposition** with **8 required metrics** (`coordpy_gateway_requests_total`, `coordpy_gateway_request_duration_seconds`, `coordpy_consensus_commits_total`, `coordpy_consensus_abstains_total`, `coordpy_integrity_verdicts_total`, `coordpy_event_graph_size`, `coordpy_audit_anchor_root_age_seconds`, `coordpy_observability_spans_emitted_total`), **structured JSON-line logs** with the standard `tenant_id/run_cid/agent_id/role` label set, **head sampler** at 10% with `always_sample_errors=True`. Gateway gains `/metrics` endpoint via `register_observability_v1(gateway)`. **Stdlib-only** — `opentelemetry-sdk` is optional and lazy-imported. Live load bench drives the gateway with 200 requests across 4 paths; offline verifier 56/56 PASS. Sample Grafana dashboard ships at `docs/grafana/w87_dashboard.json`. 15 tests. |
+| **#48** Formal Verification | **CLOSED** | `papers/formal/merkle_inclusion_v1/MerkleInclusion.lean` ships a Lean 4 mechanically-checked proof of **bidirectional Merkle inclusion** — `inclusion_sound` (unconditional), `inclusion_complete` (uses the explicit `hashPair_injective` axiom), and `merkle_inclusion_iff`. **Zero `sorry` / zero `admit`**; `lake build` exits 0 in ~8 s; `lake env lean MerkleAxiomsReport.lean` surfaces the per-theorem axiom dependencies; **`inclusion_sound` does NOT depend on `hashPair_injective`** (verified by `tests/test_w87_formal_verification_lean.py`). Code↔formal coupling document in `papers/formal/merkle_inclusion_v1/Coupling.md` maps every abstract Lean primitive to the Python `MerkleHashTreeV1`. 4 tests. |
+
+**After W87, meta-#49's P0+P1+P2+P3 line status is:**
+
+* **24 of 24 P0+P1+P2+P3 sub-issues TRULY CLOSED** (5/5 P0 +
+  8/8 P1 + 8/8 P2 + 3/3 P3).
+* **0 PARTIAL.**
+* **0 OPEN.**
+
+See `docs/RESULTS_W87_MULTI_MODAL_V1.md`,
+`docs/RESULTS_W87_OBSERVABILITY_V1.md`, and
+`docs/RESULTS_W87_FORMAL_VERIFICATION_V1.md` for per-issue
+DoD ↔ evidence.
+
 
 ## TL;DR — W86 P2 hardening line closures
 

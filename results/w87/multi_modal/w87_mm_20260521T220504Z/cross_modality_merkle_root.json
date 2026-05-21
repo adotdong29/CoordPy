@@ -1,0 +1,20 @@
+{
+  "n_leaves": 3,
+  "n_modalities": 3,
+  "per_modality_payload_cids": [
+    [
+      "code",
+      "b6d8bf7dcfd7c8b9996c49e49c9fccd63a844f9d29e4445ed77100074e48ea81"
+    ],
+    [
+      "image",
+      "48d3e29919a056b3579a1eb714b0cc7b644a461763a53f6d8235ffd361100b3f"
+    ],
+    [
+      "text",
+      "333bb82c04cce646aee8722375bf5eb6329139192e2a4a5f897df728a5ae09db"
+    ]
+  ],
+  "root_cid": "48658e319f4552cdc3a2fc38a5900c85e3c48c8d34d863771aff1adc8dc9ab07",
+  "schema": "coordpy.multi_modal_payload_v1.v1"
+}

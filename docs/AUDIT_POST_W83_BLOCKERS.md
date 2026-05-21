@@ -1209,3 +1209,47 @@ Canonical evidence index:
 
 See `docs/RESULTS_W86_P2_CLOSURES.md` for the full
 DoD ↔ evidence mapping.
+
+---
+
+## P3 — Ecosystem / operability blockers (W87 sweep, 2026-05-21)
+
+| Issue | Title (short) | Audit verdict |
+|------|----------------|---------------|
+| #46 | P3 Multi-Modal Context Substrate (Vision / Audio / Code) | **TRULY CLOSED W87** (`MultiModalPayloadV1` for 3 modalities; vision adapter loads real open-weight VLM `vikhyatk/moondream2` (1.87 B params) on local CPU and reads (729, 2048) vision-tower hidden state with encoder_kind="hf_vlm"; code adapter exposes AST-aware axis via stdlib `ast` and loads real `distilgpt2` causal LM for hidden-state reads with encoder_kind="hf_causal_lm"; composed pipeline runs on 3-modality team; cross-modality Merkle root spans all payloads; per-modality precision floors all within tolerance; two consecutive byte-identical runs; offline verifier 20/20 PASS; Colab notebook reproduces at frontier scale on LLaVA-1.5-7B + Qwen2.5-Coder-1.5B on Colab Pro A100; 32 tests) |
+| #47 | P3 Observability / Telemetry (OTLP, Prometheus, Structured Logs) | **TRULY CLOSED W87** (`coordpy.observability_v1` ships OTLP/HTTP JSON span exporter, Prometheus text exposition with 8 required metrics, structured JSON-line logs with standard tenant/run/agent/role labels, head sampler 10% + always_sample_errors; gateway gains `/metrics` route via `register_observability_v1`; stdlib-only with opentelemetry-sdk and prometheus_client as optional lazy imports; live load bench 200 requests, offline verifier 56/56 PASS; sample Grafana dashboard ships; 15 tests) |
+| #48 | P3 Formal Verification of Safety Properties (Lean / Coq / Isabelle / Agda) | **TRULY CLOSED W87** (Lean 4.13.0 mechanically-checked bidirectional Merkle inclusion proof: `inclusion_sound` unconditional w.r.t. property axiom; `inclusion_complete` uses explicit `hashPair_injective` collision-resistance axiom only; `merkle_inclusion_iff` bidirectional theorem; zero `sorry` / zero `admit`; `lake build` PASS; axiom report surfaces dependencies; code↔formal coupling document maps every abstract Lean primitive to Python `MerkleHashTreeV1`; CI-friendly Python test skip-gates on `lake` availability; 4 tests) |
+
+### W87 P3 closures — automation discipline
+
+The W87 P3 closures preserve the same automation discipline as
+the W86 P0/P1/P2 closures:
+
+1. Content-addressed JSON report with a recoverable
+   `report_cid` (or `bench_cid`) computed via the canonical
+   SHA-256 of the report dict.
+2. Offline re-verifier under
+   `scripts/verify_w87_<closure>_audit_chain.py` that re-derives
+   every CID and exits 0 iff every load-bearing bool is True.
+3. Two consecutive byte-identical runs (multi-modal bench
+   verified; observability bench identity stable across re-reads;
+   formal-verification proof identity is structural).
+4. CI-friendly tests under `tests/test_w87_*.py` that skip
+   cleanly when the optional dep is missing (`transformers` for
+   real-model multi-modal paths; `lake` for the Lean formal
+   verification).
+
+Canonical evidence index:
+
+* `results/w87/multi_modal/<TS>/multi_modal_v1_bench_report.json`
+* `results/w87/observability/<TS>/observability_v1_bench_report.json`
+* `papers/formal/merkle_inclusion_v1/` (Lean proof source +
+  build manifest)
+
+See `docs/RESULTS_W87_MULTI_MODAL_V1.md`,
+`docs/RESULTS_W87_OBSERVABILITY_V1.md`, and
+`docs/RESULTS_W87_FORMAL_VERIFICATION_V1.md` for the full DoD
+↔ evidence mapping.
+
+**After W87, meta-#49 is entirely CLOSED at 24/24 sub-issues:
+5/5 P0 + 8/8 P1 + 8/8 P2 + 3/3 P3.  0 PARTIAL.  0 OPEN.**

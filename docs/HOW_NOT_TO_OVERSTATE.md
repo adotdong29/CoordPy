@@ -2,8 +2,112 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: post-W85
-> W86 Frontier-Scale Substrate Closure milestone, 2026-05-20.
+> README-of-README must satisfy these rules. Last touched: **W87
+> P3 line closures** (multi-modal substrate, observability,
+> formal verification) on 2026-05-21.
+
+## W87 (P3 line closures — multi-modal / observability / formal verification) — explicit do-not-overstate rules
+
+The W87 push closes the three P3 sub-issues of meta-#49.  The
+following rules are mandatory before any W87 claim is repeated.
+
+- **#46 closure: local-CPU run uses Moondream-2 (1.87 B params),
+  NOT LLaVA-1.5-7B.** The local canonical run uses
+  `vikhyatk/moondream2` because it fits on CPU. The Colab
+  notebook upgrades to `llava-hf/llava-1.5-7b-hf` on Colab Pro
+  A100, but the local-CPU evidence is on Moondream-2. Reports
+  citing #46 closure MUST cite both: the local Moondream-2 run
+  (cited as the load-bearing real-VLM evidence) AND the Colab
+  upgrade path. Carry-forward
+  ``W87-L-MULTI-MODAL-V1-LOCAL-CPU-VLM-IS-MOONDREAM2-CAP`` is
+  mandatory.
+
+- **#46 closure: local-CPU code-LM is distilgpt2, NOT
+  Qwen-Coder.** The local code substrate uses `distilgpt2` (a
+  general causal LM) because code-fine-tuned models (Qwen-Coder
+  7B, DeepSeek-Coder V2 Lite) are GPU-only at practical sizes.
+  The AST-aware axis is the load-bearing claim and is
+  model-independent. Colab notebook upgrades to
+  `Qwen/Qwen2.5-Coder-1.5B`. Carry-forward
+  ``W87-L-MULTI-MODAL-V1-CODE-LM-IS-DISTILGPT2-CAP`` is mandatory.
+
+- **#46 closure: cross-modality Merkle root is V1
+  ("leaf-flatten + sort + hash"), NOT a full per-modality
+  inclusion-path tree.** The identity property (root commits to
+  every payload byte-for-byte) is met. Per-modality inclusion
+  paths are V2. Carry-forward
+  ``W87-L-MULTI-MODAL-V1-CROSS-MODALITY-MERKLE-FLAT-CAP``.
+
+- **#46 closure: V1 is read-only across modalities.**  Cross-
+  modal injection (e.g., swapping an image embedding mid-LLM-
+  forward) is V2. Carry-forward
+  ``W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP``.
+
+- **#46 closure: AST-aware axis covers Python source only.**
+  Other languages (Go, Rust, JS) need tree-sitter or equivalent;
+  V2. Carry-forward
+  ``W87-L-MULTI-MODAL-V1-AST-PYTHON-ONLY-CAP``.
+
+- **#47 closure: stdlib-only.** No hard `opentelemetry-sdk`
+  dependency; spans are emitted in OTLP/HTTP JSON wire format
+  directly. Reports MUST NOT claim "powered by the
+  opentelemetry SDK" — the SDK is optional and lazy. The
+  Prometheus exposition is the v0.0.4 text format; protobuf
+  encoding is V2. Carry-forwards
+  ``W87-L-OBSERVABILITY-V1-STDLIB-CAP`` and
+  ``W87-L-OBSERVABILITY-V1-PROMETHEUS-TEXT-CAP``.
+
+- **#47 closure: head sampling only.** V1 supports head
+  sampling with a configurable rate; tail-based and parent-
+  based sampling are V2. Default rate is 10% with
+  `always_sample_errors=True`. Carry-forward
+  ``W87-L-OBSERVABILITY-V1-HEAD-SAMPLING-CAP``.
+
+- **#47 closure: 8 metrics pre-registered, NOT all auto-wired.**
+  The `coordpy_event_graph_size` and
+  `coordpy_audit_anchor_root_age_seconds` gauges and the
+  `coordpy_consensus_*_total` counters are pre-registered by
+  `ObservabilityV1.default()` but require the W82 event graph,
+  hosted audit anchor, and consensus controller to call the
+  `.set(...)` / `.inc(...)` methods to populate them. V2
+  threads the bundle into those modules natively. Carry-forwards
+  ``W87-L-OBSERVABILITY-V1-EVENT-GRAPH-GAUGE-MANUAL-CAP`` and
+  ``W87-L-OBSERVABILITY-V1-CONSENSUS-COUNTERS-MANUAL-CAP``.
+
+- **#48 closure: binary trees (fanout = 2) only.** The Lean
+  proof covers the canonical fanout-2 case; the Python
+  `MerkleHashTreeV1` uses fanout = 4 by default. The property
+  is identical for any fanout but the n-ary formal generalisation
+  is V2. Reports citing #48 closure MUST cite the binary scope.
+  Carry-forward ``W87-L-FORMAL-MERKLE-FANOUT-2-CAP``.
+
+- **#48 closure: `Hash` and `hashPair` are declaration axioms;
+  `hashPair_injective` is the ONLY PROPERTY axiom.** Reports
+  MUST cite that the bidirectional proof uses one explicit
+  collision-resistance assumption (formal statement of
+  SHA-256 collision-resistance), surfaced via
+  `MerkleAxiomsReport.lean`. Reports that claim "proved
+  unconditionally" are wrong (only `inclusion_sound` is
+  unconditional w.r.t. the property axiom; the iff direction
+  uses `hashPair_injective`). Carry-forward
+  ``W87-L-FORMAL-MERKLE-HASH-AXIOMATIC-CAP``.
+
+- **#48 closure: re-checking requires `elan` / `lake`
+  installed.** The CI-friendly Python test
+  `tests/test_w87_formal_verification_lean.py` SKIP-gates
+  cleanly when `lake` is absent; the package's main test suite
+  stays green without the Lean toolchain. Reports MUST NOT
+  claim the proof "re-checks in any CI" — it re-checks in any
+  CI that has `lake` on PATH.
+
+- **W87 P3 closures do NOT bump `coordpy.__version__` or
+  `coordpy.SDK_VERSION`.** All P3 modules are explicit-import
+  only (`coordpy.multi_modal_payload_v1`,
+  `coordpy.vision_substrate_v1`, `coordpy.code_substrate_v1`,
+  `coordpy.composed_multimodal_pipeline_v1`,
+  `coordpy.observability_v1`); not re-exported through
+  `coordpy.__init__`. The stable release contract is
+  byte-for-byte unchanged. No PyPI publish.
 
 ## W86 (P1 line closures post-P0-sweep) — explicit do-not-overstate rules
 

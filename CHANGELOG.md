@@ -13,6 +13,85 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W87 — All Three P3 Blockers Closed; Meta-#49 Entirely Complete (2026-05-21)**
+  — *with meta-#49's P0+P1+P2 backlog (21 sub-issues) closed in W86,
+  the W87 push attacks the P3 ecosystem / operability frontier and
+  closes ALL 3 P3 sub-issues. Meta-#49 is now CLOSED at 24/24
+  sub-issues.*
+
+  **#46 Multi-Modal Context Substrate — CLOSED.**
+  `coordpy.multi_modal_payload_v1` ships `MultiModalPayloadV1` for
+  3 modalities (text + image + code) with content-addressing over
+  modality + raw_bytes_cid + embedding_cid + encoder_cid + extras.
+  `coordpy.vision_substrate_v1.VisionSubstrateAdapterV1` loads a
+  real open-weight VLM (`vikhyatk/moondream2`, 1.87 B params, fp32)
+  on local CPU and reads its vision-tower hidden state of shape
+  (729, 2048); encoder_kind="hf_vlm".
+  `coordpy.code_substrate_v1.CodeSubstrateAdapterV1` walks Python
+  source via stdlib `ast` to expose an AST-aware axis (function-
+  def boundary reads) and integrates with the W80
+  `transformers_runtime_v1` for real causal-LM hidden state.
+  `coordpy.composed_multimodal_pipeline_v1.
+  run_composed_multi_modal_pipeline_v1` anchors all per-modality
+  payloads into a single cross-modality Merkle root; per-modality
+  precision floors all within tolerance.
+  Live bench (`scripts/run_w87_multi_modal_bench.py`) on local CPU
+  exercises 3 modalities end-to-end in ~27 s; two consecutive
+  byte-identical runs. Offline verifier
+  (`scripts/verify_w87_multi_modal_audit_chain.py`) 20/20 PASS.
+  Colab notebook (`scripts/colab_w87_multi_modal_substrate.ipynb`)
+  reproduces at frontier scale on LLaVA-1.5-7B + Qwen2.5-Coder-
+  1.5B on Colab Pro A100. 32 tests.
+
+  **#47 Observability / Telemetry — CLOSED.**
+  `coordpy.observability_v1` ships OTLP/HTTP JSON span exporter
+  (`OTLPSpanV1` + `OTLPResourceSpansBatchV1`), Prometheus text
+  exposition with 8 required metrics (`coordpy_gateway_requests_
+  total`, `coordpy_gateway_request_duration_seconds`,
+  `coordpy_consensus_commits_total`,
+  `coordpy_consensus_abstains_total`,
+  `coordpy_integrity_verdicts_total`, `coordpy_event_graph_size`,
+  `coordpy_audit_anchor_root_age_seconds`,
+  `coordpy_observability_spans_emitted_total`), structured JSON-
+  line logs with the standard `tenant_id/run_cid/agent_id/role`
+  label set, and a head sampler at 10% with
+  `always_sample_errors=True`. Gateway gains `/metrics` endpoint
+  via `register_observability_v1(gateway)`. Stdlib-only — no hard
+  `opentelemetry-sdk` dep; opt-in via lazy import. Live load bench
+  (`scripts/run_w87_observability_bench.py`) drives the gateway
+  with 200 requests across 4 paths; offline verifier
+  (`scripts/verify_w87_observability_audit_chain.py`) 56/56 PASS.
+  Sample Grafana dashboard at `docs/grafana/w87_dashboard.json`.
+  15 tests.
+
+  **#48 Formal Verification of Safety Properties — CLOSED.**
+  `papers/formal/merkle_inclusion_v1/MerkleInclusion.lean` ships a
+  Lean 4 mechanically-checked proof of bidirectional Merkle
+  inclusion: `inclusion_sound` (unconditional w.r.t. the property
+  axiom), `inclusion_complete` (uses the explicit
+  `hashPair_injective` collision-resistance axiom), and
+  `merkle_inclusion_iff`. **Zero `sorry` / zero `admit`**; `lake
+  build` (Lean 4.13.0) exits 0 in ~8 s; `lake env lean
+  MerkleAxiomsReport.lean` surfaces the per-theorem axiom
+  dependencies; `inclusion_sound` does NOT depend on
+  `hashPair_injective` (verified by
+  `tests/test_w87_formal_verification_lean.py`). Code↔formal
+  coupling document
+  (`papers/formal/merkle_inclusion_v1/Coupling.md`) maps every
+  abstract Lean primitive to the Python
+  `MerkleHashTreeV1`. Build manifest
+  (`papers/formal/merkle_inclusion_v1/lakefile.lean`) + toolchain
+  pin (`lean-toolchain` = v4.13.0). 4 CI-friendly tests
+  (skip-gated on `lake` availability).
+
+  After W87, **meta-#49 is entirely CLOSED at 24/24 sub-issues**
+  (5/5 P0 + 8/8 P1 + 8/8 P2 + 3/3 P3); 0 PARTIAL; 0 OPEN.
+
+  Carry-forward limitations: `W87-L-MULTI-MODAL-V1-*` (5),
+  `W87-L-OBSERVABILITY-V1-*` (5), `W87-L-FORMAL-MERKLE-*` (3).
+  See `docs/HOW_NOT_TO_OVERSTATE.md` for the canonical
+  honesty contract.
+
 - **W86 — All Eight P2 Blockers Closed; Meta-#49 P0+P1+P2 Line Complete (2026-05-20 → 2026-05-21)**
   — *with every P0 (#25–#29) and every P1 (#30–#37) in meta-#49 closed,
   the W86 P2 sweep attacks the security / correctness / portability
