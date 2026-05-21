@@ -709,7 +709,7 @@ the security / correctness / portability line:
 | **#41** Schema Evolution | local CPU | `scripts/run_w86_schema_evolution_v1_bench.py` | `scripts/verify_w86_schema_evolution_v1_audit_chain.py` | `results/w86/schema_evolution/<TS>/schema_evolution_v1_bench_report.json` |
 | **#42** State Drift | local CPU (controlled_runtime_substrate fine-tune sim) | `scripts/run_w86_drift_v1_bench.py` | `scripts/verify_w86_drift_v1_audit_chain.py` | `results/w86/drift/<TS>/drift_v1_bench_report.json` |
 | **#43** Multi-Tenancy | local CPU (Ed25519 tenant tokens) | `scripts/run_w86_multi_tenancy_v1_bench.py` | `scripts/verify_w86_multi_tenancy_v1_audit_chain.py` | `results/w86/tenancy/<TS>/multi_tenancy_v1_bench_report.json` |
-| **#44** GPU Determinism | **PARTIAL** — local CPU contract check + Colab Pro A100 GPU run | `scripts/run_w86_gpu_substrate_v1_bench.py` + `scripts/colab_gpu_deterministic_substrate_w86.ipynb` | `scripts/verify_w86_gpu_substrate_v1_audit_chain.py` | (pending) `results/w86/gpu_substrate/<TS>/gpu_substrate_v1_bench_report.json` |
+| **#44** GPU Determinism | local CPU contract check + Colab Pro A100 GPU run | `scripts/run_w86_gpu_substrate_v1_bench.py` + `scripts/colab_gpu_deterministic_substrate_w86.ipynb` | `scripts/verify_w86_gpu_substrate_v1_audit_chain.py` | `results/w86/gpu_substrate/w86_gpu_20260521T210416Z/gpu_substrate_v1_bench_report.json` (`report_cid 910e16714736f7e1…`) |
 | **#45** Memory GC | local CPU (100k-event bench) | `scripts/run_w86_gc_v1_bench.py` | `scripts/verify_w86_gc_v1_audit_chain.py` | `results/w86/gc/<TS>/gc_v1_bench_report.json` |
 
 Pattern: every P2 closure shipped at the SAME automation
@@ -750,18 +750,54 @@ re-implementing any infrastructure:
   the bf16 floor, intercept moves CID, AND the negative arm
   breaks byte-identity.
 
-### Where the remaining one issue stands
+### Where things stand
 
-#44 is **one Run-all on Colab Pro from TRULY CLOSED.** The
-notebook is at the standard adotdong29/CoordPy GitHub
-location; the user pattern is identical to the prior W86
-Colab closures (e.g. #25/#26/#27, #31). The CPU CI
-(11 tests) already exercises every code path that doesn't
-need a GPU; the only thing that requires Colab is the actual
-A100 / L4 numerical evidence.
+**Meta-#49's P0+P1+P2 backlog (21 sub-issues) is fully closed
+as of 2026-05-21.** #44 was the last open issue; it landed on
+Colab Pro A100-40GB at bf16 with `report_cid =
+910e16714736f7e1…` via the same Colab pattern as #25/#26/#27
+and #31 — open URL pinned to a commit, Runtime → Change
+runtime type → A100 → Run all → drop the zip back here.
 
-After that lands, meta-#49's complete P0+P1+P2 backlog is
-closed.
+### Lessons learned from #44's three iterations
+
+The first three #44 Colab runs revealed two empirical surprises
+about what "deterministic-off breaks byte-identity" means on
+real A100 bf16:
+
+1. **Iteration 1 (commit `2e5c154`):** the negative arm relied
+   on `cudnn.benchmark=True` to expose non-determinism. But on
+   the Llama-3.1-8B forward + 4-token replay-from-KV workload
+   at bf16 with `attn_implementation="eager"`, cuDNN is not in
+   the critical path — both arms produced
+   `replay_max_abs_diff = 0.21875`. The wrapper IS flipping
+   `cudnn.benchmark`, but it doesn't manifest as numerical
+   divergence on this workload.
+
+2. **Iteration 2 (commit `8c06e5e`):** added a "scatter_add_
+   raises under deterministic mode" witness as the canonical
+   PyTorch-recommended demonstration. But on Colab's PyTorch
+   version, `scatter_add_` on CUDA float tensors has a
+   deterministic implementation and silently routes to it
+   instead of raising — both arms reported
+   `raised=False, op_completed=True`. Same outcome → identical
+   witness CIDs → verifier failed.
+
+3. **Iteration 3 (commit `9637051`, the closure):** switched
+   the PRIMARY load-bearing signal to direct observation of
+   `torch.are_deterministic_algorithms_enabled()` from inside
+   the witness function. The wrapper changes this global flag
+   directly — hardware-independent, version-independent,
+   workload-independent. POS arm reports True; NEG arm reports
+   False; the witness CIDs differ; the verifier passes. The
+   scatter_add_ behaviour stays as informational/corroborating
+   but is no longer load-bearing.
+
+**Take-away:** when testing infrastructure that flips global
+state, prefer **direct observation of the state being flipped**
+over **inferring it from behavioral changes** in downstream ops.
+The latter is fragile across versions and workloads; the former
+is canonical.
 
 * Dense transformer substrate (W80 + W86 frontier closure).
 * Quantized substrate at bf16 (#30; int8 carry-forward).

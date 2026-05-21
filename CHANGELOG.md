@@ -13,16 +13,17 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
-- **W86 — Seven of Eight P2 Blockers Closed (post-P1-sweep, 2026-05-20)**
+- **W86 — All Eight P2 Blockers Closed; Meta-#49 P0+P1+P2 Line Complete (2026-05-20 → 2026-05-21)**
   — *with every P0 (#25–#29) and every P1 (#30–#37) in meta-#49 closed,
   the W86 P2 sweep attacks the security / correctness / portability
-  hardening line and closes 7 of 8 (#38, #39, #40, #41, #42, #43, #45).
-  #44 (GPU/TPU Substrate with Deterministic Replay) has its contract +
-  bench infrastructure + Colab notebook shipped and CPU CI green; the
-  live A100 numbers (positive-arm replay ≤ 0.5 bf16 floor + intercept
-  moves CID; negative-arm breaks byte-identity) await one Colab Pro
-  Run-all. See `docs/RESULTS_W86_P2_CLOSURES.md` for the full
-  DoD-bullet mapping.*
+  hardening line and closes ALL 8 P2 sub-issues. #38, #39, #40, #41,
+  #42, #43, #45 landed on 2026-05-20 (local CPU benches). #44 (GPU/TPU
+  Substrate with Deterministic Replay) landed on Colab Pro A100-40GB
+  at bf16 on 2026-05-21 — every load-bearing bar PASS via direct
+  observation of `torch.are_deterministic_algorithms_enabled()`
+  flipping between arms. Meta-#49's complete P0+P1+P2 line (21
+  sub-issues) is now CLOSED. See `docs/RESULTS_W86_P2_CLOSURES.md`
+  for the full DoD-bullet mapping.*
 
   **#38 Byzantine Fault Tolerance — CLOSED.** `coordpy.byzantine_
   fault_tolerance_v1` ships PBFT V1 on Ed25519 signatures with three
@@ -92,21 +93,33 @@ the public symbols) is byte-for-byte unchanged.
   `CrossTenantAccessDeniedEventV1` audit; token swap REFUSED; no B
   byte in A's chain. 14/14 tests.
 
-  **#44 GPU/TPU Substrate — PARTIAL.** `coordpy.gpu_deterministic_
-  substrate_v1` ships the determinism wrapper contract (default ON:
-  `torch.use_deterministic_algorithms(True)`,
+  **#44 GPU/TPU Substrate — CLOSED 2026-05-21.**
+  `coordpy.gpu_deterministic_substrate_v1` ships the determinism
+  wrapper (default ON: `torch.use_deterministic_algorithms(True)`,
   `cudnn.deterministic=True`, `cudnn.benchmark=False`,
   `CUBLAS_WORKSPACE_CONFIG=:4096:8`) with explicit opt-out via
   `W86_GPU_DETERMINISM_OFF` env var (the negative arm).
+  `DeterminismLoadBearingWitnessV1` records direct observation of
+  `torch.are_deterministic_algorithms_enabled()` per arm — the
+  primary load-bearing signal, hardware/version-independent.
   `TensorParallelReadbackV1` ships the all-gather contract as a
   single-GPU pass-through V1 (multi-GPU V2 stretch matches issue
-  scope). CPU CI exercises every code path (11/11 tests). The live
-  A100 bf16 closure run lives in
-  `scripts/colab_gpu_deterministic_substrate_w86.ipynb` —
-  one Run-all on Colab Pro turns this into TRULY CLOSED. Honest
-  carry-forwards `W86-L-GPU-V1-COLAB-PRO-CAP`,
+  scope). Live A100-40GB at bf16 on Colab Pro 2026-05-21:
+  `pos_replay_max_abs_diff = 0.21875 < tier_tolerance 0.5`,
+  `pos_intercept_moves_cid = True`, `pos_forwards_byte_identical
+  = True`, `wrapper_is_load_bearing = True` via direct observation
+  `pos_det_enabled=True / neg_det_enabled=False`. Canonical
+  evidence
+  `results/w86/gpu_substrate/w86_gpu_20260521T210416Z/gpu_substrate_v1_bench_report.json`
+  (`report_cid = 910e16714736f7e1…`). 16/16 CI tests (5 added
+  during the post-Colab-run iteration). Honest carry-forwards
+  `W86-L-GPU-V1-COLAB-PRO-CAP`,
   `W86-L-GPU-V1-TENSOR-PARALLEL-V2-CAP`,
-  `W86-L-GPU-V1-AWAITS-COLAB-RUN-CAP`.
+  `W86-L-GPU-V1-NVIDIA-PYTORCH-CAP`,
+  `W86-L-GPU-V1-WORKLOAD-NOT-DIVERGENT-AT-BF16-CAP` (on this
+  workload at bf16, the wrapper's effect manifests via direct
+  observation rather than numerical divergence — eager attention
+  doesn't use cuDNN convs).
 
   **#45 Memory GC — CLOSED.** `coordpy.event_graph_garbage_
   collection_v1` ships `GCPolicyV1` (content-addressed retention

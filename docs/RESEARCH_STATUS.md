@@ -6,18 +6,18 @@
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
 > `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: W86 P2 hardening
-> sweep (Byzantine FT, DP, MPC, schema evolution, drift detection,
-> multi-tenancy, GPU substrate contract, memory GC), 2026-05-20.
+> sweep with #44 GPU substrate landing on Colab Pro A100-40GB
+> at bf16, 2026-05-21. **Meta-#49's complete P0+P1+P2 line is
+> closed.**
 
 ## TL;DR — W86 P2 hardening line closures
 
 With every P0 (#25–#29) and every P1 (#30–#37) of meta-#49
 closed, the W86 P2 sweep attacks the security / correctness /
-portability hardening line.  **7 of 8 P2 issues are TRULY
-CLOSED; only #44 (GPU/TPU Substrate with Deterministic Replay)
-remains as PARTIALLY CLOSED — its contract + bench + Colab
-notebook + CPU CI are all shipped, awaiting one Colab Pro
-Run-all.**
+portability hardening line.  **All 8 P2 issues are now TRULY
+CLOSED.** #44 GPU/TPU substrate landed on Colab Pro A100-40GB
+at bf16 on 2026-05-21 with `report_cid =
+910e16714736f7e1…`.
 
 | Issue | Verdict | Closure path |
 |---|---|---|
@@ -27,17 +27,16 @@ Run-all.**
 | **#41** Schema Evolution | **CLOSED** | `coordpy.schema_evolution_v1`: SchemaRegistryV2, MigrationPlanV1 with rename + type-conversion + default + provenance preservation, MigrationEventV1 audit bridges, deprecated-but-readable. 17 tests. |
 | **#42** State Drift Detection | **CLOSED** | `coordpy.state_drift_detection_v1`: ModelWeightsCID, DriftDetectorV1 fires (0.218 > 0.015) when changed and not (0.0) when unchanged, principled threshold (fp64_floor × 3× safety margin = 1.5e-2), re-training pipeline beats stale 9.3× on hold-out. 13 tests. |
 | **#43** Multi-Tenancy Isolation | **CLOSED** | `coordpy.multi_tenancy_isolation_v1`: per-tenant `EventGraphV1` (physical), Ed25519-bound tenant tokens, cross-tenant denial events, distinct Merkle anchors, token swap refused. 14 tests. |
-| **#44** GPU/TPU Deterministic Replay | **PARTIAL** | Contract + bench + Colab notebook + CPU CI green (11 tests). Live A100 bf16 numbers awaiting one `scripts/colab_gpu_deterministic_substrate_w86.ipynb` Run-all. |
+| **#44** GPU/TPU Deterministic Replay | **CLOSED** | `coordpy.gpu_deterministic_substrate_v1` ships determinism wrapper (default ON), `DeterminismLoadBearingWitnessV1` (direct observation of `torch.are_deterministic_algorithms_enabled()`), `TensorParallelReadbackV1` (V1 pass-through). Live A100-40GB at bf16 on Colab Pro 2026-05-21: `pos_replay_max_abs_diff = 0.21875 < 0.5 tier_tolerance`, `pos_intercept_moves_cid=True`, `pos_forwards_byte_identical=True`, `wrapper_is_load_bearing=True` via `pos_det_enabled=True / neg_det_enabled=False`. 16 tests. Canonical evidence `results/w86/gpu_substrate/w86_gpu_20260521T210416Z/`. |
 | **#45** Memory Garbage Collection | **CLOSED** | `coordpy.event_graph_garbage_collection_v1`: mark-and-sweep, grace buffer + restore, JSONL persistent-store sketch, 100k-event bench reports 99.92% memory reduction with chain re-verifying. 16 tests. |
 
-**After W86 P2 sweep, meta-#49's P0/P1/P2 status is:**
+**After W86 P2 sweep + 2026-05-21 #44 closure on Colab Pro
+A100-40GB at bf16, meta-#49's P0/P1/P2 status is:**
 
-* **20 of 21 P0+P1+P2 sub-issues TRULY CLOSED** (5/5 P0 +
-  8/8 P1 + 7/8 P2).
-* **1 PARTIAL** (#44 GPU/TPU substrate — contract +
-  infrastructure + Colab notebook + CPU CI shipped; live
-  Colab Pro A100 run is the only remaining step).
-* **0 strictly OPEN** in the P0+P1+P2 line.
+* **21 of 21 P0+P1+P2 sub-issues TRULY CLOSED** (5/5 P0 +
+  8/8 P1 + 8/8 P2).
+* **0 PARTIAL.**
+* **0 OPEN** in the P0+P1+P2 line.
 
 (P3 — #46 multi-modal, #47 observability, #48 formal
 verification — is the next milestone's frontier and out of

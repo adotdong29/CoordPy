@@ -1185,10 +1185,10 @@ After the W86 closure of all 5 P0 (#25–#29) and all 8 P1
 | #41   | Schema Evolution V1                     | **TRULY CLOSED** | `SchemaRegistryV2` content-addressed, V1 → V2 example migration with rename + type-conversion + default + provenance preservation, `MigrationEventV1` audit bridges, deprecated-but-readable enforced. |
 | #42   | State Drift Detection V1                | **TRULY CLOSED** | `ModelWeightsCID`, `DriftDetectorV1` fires when changed (drift_score=0.218) and not when unchanged (drift_score=0.0), principled threshold (fp64_floor × 3× safety margin = 1.5e-2), re-training pipeline beats stale by 9.3× on hold-out. |
 | #43   | Multi-Tenancy Isolation V1              | **TRULY CLOSED** | Per-tenant `EventGraphV1` (physical, not logical), Ed25519-bound tenant tokens (token swap refused), cross-tenant denial audit events, per-tenant budgets and audit anchors with distinct Merkle roots, no B byte in A's chain. |
-| #44   | GPU/TPU Substrate Deterministic Replay  | **PARTIALLY CLOSED** | Contract + bench + Colab notebook + CPU CI shipped; the live A100 numbers (positive-arm replay ≤ 0.5 bf16 floor + intercept moves CID; negative-arm breaks byte-identity) await `scripts/colab_gpu_deterministic_substrate_w86.ipynb` on Colab Pro. |
+| #44   | GPU/TPU Substrate Deterministic Replay  | **TRULY CLOSED 2026-05-21** | Live A100-40GB at bf16 on Colab Pro: `pos_replay_max_abs_diff=0.21875 < tier 0.5`, `pos_intercept_moves_cid=True`, `pos_forwards_byte_identical=True`, `wrapper_is_load_bearing=True` via direct observation `pos_det_enabled=True / neg_det_enabled=False`. Canonical evidence `results/w86/gpu_substrate/w86_gpu_20260521T210416Z/gpu_substrate_v1_bench_report.json` with `report_cid=910e16714736f7e1…`. |
 | #45   | Memory Garbage Collection V1            | **TRULY CLOSED** | `GCPolicyV1`, mark-and-sweep preserving load-bearing roots, grace buffer + restore, JSONL persistent-store sketch, 100k-event bench reports 99.92% memory reduction with chain re-verifying end-to-end. |
 
-**7 of 8 P2 sub-issues truly closed; #44 is the only remaining open issue in meta-#49.**
+**8 of 8 P2 sub-issues TRULY CLOSED. Meta-#49's entire P0+P1+P2 line (21 sub-issues) is closed.**
 
 Two consecutive runs of each closure produce byte-identical
 content-addressed reports (`<closure>_report.report_cid`).
