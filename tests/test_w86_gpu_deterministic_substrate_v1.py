@@ -16,13 +16,16 @@ import pytest
 
 from coordpy.gpu_deterministic_substrate_v1 import (
     DETERMINISM_OFF_ENV_VAR,
+    DeterminismLoadBearingWitnessV1,
     DeterminismMode,
     DeterminismWrapperConfigV1,
     DeterminismWrapperResultV1,
     GPUSubstrateBenchReportV1,
     GPUSubstrateContractCheckV1,
     TensorParallelReadbackV1,
+    W86_GPU_V1_DETERMINISM_WITNESS_OP,
     apply_determinism_wrapper_v1,
+    determinism_load_bearing_witness_v1,
     run_gpu_substrate_contract_check_v1,
 )
 
@@ -99,11 +102,54 @@ def test_gpu_substrate_bench_report_cid_stable():
         pos_forwards_byte_identical=True,
         neg_replay_max_abs_diff=5.0,
         neg_replay_breaks_byte_identity=True,
+        pos_determinism_witness_raised=True,
+        neg_determinism_witness_completed=True,
+        wrapper_is_load_bearing=True,
+        pos_determinism_witness_cid="b" * 64,
+        neg_determinism_witness_cid="c" * 64,
         tier_tolerance=0.5,
         tp_readback_passthrough_byte_identical=True)
     r1 = GPUSubstrateBenchReportV1(**fields)
     r2 = GPUSubstrateBenchReportV1(**fields)
     assert r1.cid() == r2.cid()
+
+
+def test_determinism_witness_capsule_content_addressed():
+    w = DeterminismLoadBearingWitnessV1(
+        op_attempted=True, op_completed=False, raised=True,
+        raise_msg="x", op_name="Tensor.scatter_add_",
+        cuda_available=True)
+    assert len(w.cid()) == 64
+    w2 = DeterminismLoadBearingWitnessV1(
+        op_attempted=True, op_completed=True, raised=False,
+        raise_msg="", op_name="Tensor.scatter_add_",
+        cuda_available=True)
+    # Different result → different CID.
+    assert w.cid() != w2.cid()
+
+
+def test_determinism_witness_runs_on_cpu_returns_no_cuda():
+    """Without CUDA the witness honestly reports cuda_available=False
+    and op_attempted=False (it does NOT silently 'pass')."""
+    w = determinism_load_bearing_witness_v1()
+    try:
+        import torch  # type: ignore
+        cuda = torch.cuda.is_available()
+    except ImportError:
+        cuda = False
+    if not cuda:
+        assert w.cuda_available is False
+        assert w.op_attempted is False
+
+
+def test_determinism_witness_op_name_is_canonical():
+    """The witness op MUST be one PyTorch lists as non-deterministic.
+    ``Tensor.scatter_add_`` on CUDA float tensors is in
+    https://docs.pytorch.org/docs/stable/generated/torch.use_deterministic_algorithms.html
+    """
+    assert W86_GPU_V1_DETERMINISM_WITNESS_OP == "Tensor.scatter_add_"
+    w = determinism_load_bearing_witness_v1()
+    assert w.op_name == W86_GPU_V1_DETERMINISM_WITNESS_OP
 
 
 def test_contract_check_passes_locally():

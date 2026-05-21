@@ -61,12 +61,21 @@ def main(argv: list[str] | None = None) -> int:
     notes.append(
         f"INFO neg_replay_max_abs_diff = "
         f"{rep.get('neg_replay_max_abs_diff')}")
+    notes.append(
+        f"INFO determinism witness: "
+        f"pos_raised={rep.get('pos_determinism_witness_raised')}, "
+        f"neg_completed={rep.get('neg_determinism_witness_completed')}, "
+        f"wrapper_is_load_bearing="
+        f"{rep.get('wrapper_is_load_bearing')}")
 
     bars = [
         "pos_replay_within_tier_tolerance",
         "pos_intercept_moves_cid",
         "pos_forwards_byte_identical",
         "neg_replay_breaks_byte_identity",
+        "wrapper_is_load_bearing",
+        "pos_determinism_witness_raised",
+        "neg_determinism_witness_completed",
         "tp_readback_passthrough_byte_identical",
     ]
     for b in bars:
@@ -81,7 +90,9 @@ def main(argv: list[str] | None = None) -> int:
             "determinism_wrapper_result_cid",
             "tensor_parallel_config_cid",
             "pos_forward_trace_cid_first",
-            "pos_forward_trace_cid_second"):
+            "pos_forward_trace_cid_second",
+            "pos_determinism_witness_cid",
+            "neg_determinism_witness_cid"):
         v = rep.get(cid, "")
         if len(v) != 64:
             notes.append(f"FAIL {cid} not 64 chars: {v!r}")
@@ -95,6 +106,14 @@ def main(argv: list[str] | None = None) -> int:
         notes.append(
             "FAIL pos_forwards_byte_identical=True but trace "
             "CIDs differ")
+        ok = False
+    # The two witness CIDs MUST differ (one raised, one completed
+    # — different fields → different CIDs).
+    if (rep.get("pos_determinism_witness_cid")
+            == rep.get("neg_determinism_witness_cid")):
+        notes.append(
+            "FAIL pos and neg determinism witness CIDs are "
+            "identical — wrapper was not active in one arm")
         ok = False
 
     for n in notes:

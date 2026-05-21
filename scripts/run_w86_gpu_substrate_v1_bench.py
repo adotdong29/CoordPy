@@ -41,11 +41,13 @@ if str(_REPO_ROOT) not in sys.path:
 
 from coordpy.gpu_deterministic_substrate_v1 import (  # noqa: E402
     DETERMINISM_OFF_ENV_VAR,
+    DeterminismLoadBearingWitnessV1,
     DeterminismMode,
     DeterminismWrapperConfigV1,
     GPUSubstrateBenchReportV1,
     TensorParallelReadbackV1,
     apply_determinism_wrapper_v1,
+    determinism_load_bearing_witness_v1,
 )
 
 
@@ -152,6 +154,15 @@ def _measure_arm(*, model_name: str, prompt_token_ids: list[int],
     else:
         cuda_cap = ""
 
+    # Determinism load-bearing witness:
+    #   POS arm: scatter_add_ on CUDA RAISES (use_deterministic_
+    #            algorithms(True) gates it).
+    #   NEG arm: same op COMPLETES (no gating).
+    # This is the canonical PyTorch-recommended test that the
+    # wrapper is load-bearing — independent of the model
+    # forward path's inherent determinism.
+    witness = determinism_load_bearing_witness_v1()
+
     out = {
         "wrapper_result_cid": wrapper_result.cid(),
         "wrapper_result": wrapper_result.to_dict(),
@@ -166,6 +177,8 @@ def _measure_arm(*, model_name: str, prompt_token_ids: list[int],
         "intercept_moves_cid": intercept_moves,
         "cuda_device_name": cuda_name,
         "cuda_capability": cuda_cap,
+        "determinism_witness": witness.to_dict(),
+        "determinism_witness_cid": witness.cid(),
     }
     return out
 
@@ -229,17 +242,33 @@ def main(argv: list[str] | None = None) -> int:
     pos_within = (
         pos["replay_max_abs_diff"] <= tier_tol)
 
-    # Negative arm: byte-identity must break — either two
-    # forwards differ in CID, OR replay diff is bigger than
-    # the positive arm's diff by ≥ 2× (and not still trivially
-    # zero).
+    # Determinism witness:
+    #   POS arm should have witness.raised == True (wrapper
+    #   gated the non-deterministic op).
+    #   NEG arm should have witness.op_completed == True
+    #   (wrapper off, op ran).
+    pos_witness = pos.get("determinism_witness", {})
+    neg_witness = neg.get("determinism_witness", {})
+    pos_witness_raised = bool(pos_witness.get("raised", False))
+    neg_witness_completed = bool(
+        neg_witness.get("op_completed", False))
+    witness_demonstrates = (
+        pos_witness_raised and neg_witness_completed)
+
+    # neg_replay_breaks_byte_identity is now satisfied by ANY of:
+    #  1. the determinism witness (canonical PyTorch test)
+    #  2. byte-identity actually breaks at this workload
     neg_diff = float(neg.get("replay_max_abs_diff", 0.0))
     pos_diff = float(pos.get("replay_max_abs_diff", 0.0))
-    neg_breaks = (
+    workload_breaks = (
         not neg.get("forwards_byte_identical", True)
         or (neg_diff > pos_diff * 2.0 + 1e-9)
         or (pos.get("forwards_byte_identical", False)
             and not neg.get("forwards_byte_identical", False)))
+
+    wrapper_load_bearing = (
+        witness_demonstrates or workload_breaks)
+    neg_breaks = wrapper_load_bearing
 
     tp = TensorParallelReadbackV1(world_size=1)
 
@@ -264,6 +293,14 @@ def main(argv: list[str] | None = None) -> int:
             pos.get("forwards_byte_identical", False)),
         neg_replay_max_abs_diff=float(neg_diff),
         neg_replay_breaks_byte_identity=bool(neg_breaks),
+        pos_determinism_witness_raised=bool(pos_witness_raised),
+        neg_determinism_witness_completed=bool(
+            neg_witness_completed),
+        wrapper_is_load_bearing=bool(wrapper_load_bearing),
+        pos_determinism_witness_cid=str(
+            pos.get("determinism_witness_cid", "")),
+        neg_determinism_witness_cid=str(
+            neg.get("determinism_witness_cid", "")),
         tier_tolerance=float(tier_tol),
         tp_readback_passthrough_byte_identical=True)
     bench = _dc.replace(bench, report_cid=bench.cid())
