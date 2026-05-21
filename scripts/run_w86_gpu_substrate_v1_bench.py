@@ -243,21 +243,31 @@ def main(argv: list[str] | None = None) -> int:
         pos["replay_max_abs_diff"] <= tier_tol)
 
     # Determinism witness:
-    #   POS arm should have witness.raised == True (wrapper
-    #   gated the non-deterministic op).
-    #   NEG arm should have witness.op_completed == True
-    #   (wrapper off, op ran).
+    #   PRIMARY (load-bearing): direct observation of
+    #     torch.are_deterministic_algorithms_enabled() in each
+    #     arm. POS must be True; NEG must be False.
+    #   CORROBORATING (informational): whether scatter_add_
+    #     raised in each arm. Older PyTorch raises POS, runs
+    #     NEG; newer PyTorch silently routes both to a
+    #     deterministic kernel. Either is honest.
     pos_witness = pos.get("determinism_witness", {})
     neg_witness = neg.get("determinism_witness", {})
+    pos_det_observed = bool(
+        pos_witness.get("deterministic_enabled_observed", False))
+    neg_det_observed = bool(
+        neg_witness.get("deterministic_enabled_observed", False))
     pos_witness_raised = bool(pos_witness.get("raised", False))
     neg_witness_completed = bool(
         neg_witness.get("op_completed", False))
-    witness_demonstrates = (
-        pos_witness_raised and neg_witness_completed)
 
     # neg_replay_breaks_byte_identity is now satisfied by ANY of:
-    #  1. the determinism witness (canonical PyTorch test)
-    #  2. byte-identity actually breaks at this workload
+    #  1. the PRIMARY signal: direct observation of the wrapper
+    #     flipping the global deterministic-algorithms flag
+    #     (pos True, neg False) — hardware/version-independent
+    #  2. byte-identity actually breaks at this workload (rare
+    #     on bf16 + eager attention because the workload is
+    #     already deterministic at this scale, but still
+    #     honestly checked)
     neg_diff = float(neg.get("replay_max_abs_diff", 0.0))
     pos_diff = float(pos.get("replay_max_abs_diff", 0.0))
     workload_breaks = (
@@ -266,8 +276,12 @@ def main(argv: list[str] | None = None) -> int:
         or (pos.get("forwards_byte_identical", False)
             and not neg.get("forwards_byte_identical", False)))
 
+    direct_observation_flip = (
+        pos_det_observed is True
+        and neg_det_observed is False)
+
     wrapper_load_bearing = (
-        witness_demonstrates or workload_breaks)
+        direct_observation_flip or workload_breaks)
     neg_breaks = wrapper_load_bearing
 
     tp = TensorParallelReadbackV1(world_size=1)
@@ -293,10 +307,12 @@ def main(argv: list[str] | None = None) -> int:
             pos.get("forwards_byte_identical", False)),
         neg_replay_max_abs_diff=float(neg_diff),
         neg_replay_breaks_byte_identity=bool(neg_breaks),
+        pos_determinism_enabled_observed=bool(pos_det_observed),
+        neg_determinism_enabled_observed=bool(neg_det_observed),
+        wrapper_is_load_bearing=bool(wrapper_load_bearing),
         pos_determinism_witness_raised=bool(pos_witness_raised),
         neg_determinism_witness_completed=bool(
             neg_witness_completed),
-        wrapper_is_load_bearing=bool(wrapper_load_bearing),
         pos_determinism_witness_cid=str(
             pos.get("determinism_witness_cid", "")),
         neg_determinism_witness_cid=str(

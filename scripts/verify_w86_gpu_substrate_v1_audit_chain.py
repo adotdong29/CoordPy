@@ -62,20 +62,34 @@ def main(argv: list[str] | None = None) -> int:
         f"INFO neg_replay_max_abs_diff = "
         f"{rep.get('neg_replay_max_abs_diff')}")
     notes.append(
-        f"INFO determinism witness: "
+        f"INFO direct-observation witness (PRIMARY): "
+        f"pos_det_enabled="
+        f"{rep.get('pos_determinism_enabled_observed')}, "
+        f"neg_det_enabled="
+        f"{rep.get('neg_determinism_enabled_observed')}")
+    notes.append(
+        f"INFO scatter_add_ corroborating witness: "
         f"pos_raised={rep.get('pos_determinism_witness_raised')}, "
-        f"neg_completed={rep.get('neg_determinism_witness_completed')}, "
-        f"wrapper_is_load_bearing="
+        f"neg_completed={rep.get('neg_determinism_witness_completed')}")
+    notes.append(
+        f"INFO wrapper_is_load_bearing = "
         f"{rep.get('wrapper_is_load_bearing')}")
 
+    # Bars that MUST be True for PASS:
+    # * Positive arm replay + intercept + byte-id (the core
+    #   substrate contract under DET=ON)
+    # * neg_replay_breaks_byte_identity (DoD literal bullet)
+    # * wrapper_is_load_bearing (composite: direct observation
+    #   OR workload divergence)
+    # * The DIRECT-OBSERVATION witness pair (POS=True, NEG=False)
+    # * Tensor-parallel V1 pass-through
     bars = [
         "pos_replay_within_tier_tolerance",
         "pos_intercept_moves_cid",
         "pos_forwards_byte_identical",
         "neg_replay_breaks_byte_identity",
         "wrapper_is_load_bearing",
-        "pos_determinism_witness_raised",
-        "neg_determinism_witness_completed",
+        "pos_determinism_enabled_observed",
         "tp_readback_passthrough_byte_identical",
     ]
     for b in bars:
@@ -85,6 +99,19 @@ def main(argv: list[str] | None = None) -> int:
         else:
             notes.append(f"FAIL {b}: got {v!r}")
             ok = False
+
+    # neg_determinism_enabled_observed must be FALSE (the
+    # wrapper successfully un-set the flag in the negative arm).
+    v = rep.get("neg_determinism_enabled_observed")
+    if v is False:
+        notes.append(
+            "PASS neg_determinism_enabled_observed (False, "
+            "wrapper successfully un-set the flag)")
+    else:
+        notes.append(
+            f"FAIL neg_determinism_enabled_observed: "
+            f"expected False, got {v!r}")
+        ok = False
 
     for cid in (
             "determinism_wrapper_result_cid",

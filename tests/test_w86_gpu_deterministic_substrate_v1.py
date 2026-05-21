@@ -102,9 +102,11 @@ def test_gpu_substrate_bench_report_cid_stable():
         pos_forwards_byte_identical=True,
         neg_replay_max_abs_diff=5.0,
         neg_replay_breaks_byte_identity=True,
+        pos_determinism_enabled_observed=True,
+        neg_determinism_enabled_observed=False,
+        wrapper_is_load_bearing=True,
         pos_determinism_witness_raised=True,
         neg_determinism_witness_completed=True,
-        wrapper_is_load_bearing=True,
         pos_determinism_witness_cid="b" * 64,
         neg_determinism_witness_cid="c" * 64,
         tier_tolerance=0.5,
@@ -116,16 +118,37 @@ def test_gpu_substrate_bench_report_cid_stable():
 
 def test_determinism_witness_capsule_content_addressed():
     w = DeterminismLoadBearingWitnessV1(
+        deterministic_enabled_observed=True,
         op_attempted=True, op_completed=False, raised=True,
         raise_msg="x", op_name="Tensor.scatter_add_",
         cuda_available=True)
     assert len(w.cid()) == 64
     w2 = DeterminismLoadBearingWitnessV1(
+        deterministic_enabled_observed=False,
         op_attempted=True, op_completed=True, raised=False,
         raise_msg="", op_name="Tensor.scatter_add_",
         cuda_available=True)
-    # Different result → different CID.
+    # Different observation → different CID.
     assert w.cid() != w2.cid()
+
+
+def test_determinism_witness_cid_differs_on_det_enabled_alone():
+    """Even if scatter_add_ behaves identically (both arms have
+    raised=False, op_completed=True — as happens on newer
+    PyTorch), the two witnesses MUST have different CIDs
+    because deterministic_enabled_observed differs.
+    """
+    pos = DeterminismLoadBearingWitnessV1(
+        deterministic_enabled_observed=True,
+        op_attempted=True, op_completed=True, raised=False,
+        raise_msg="", op_name="Tensor.scatter_add_",
+        cuda_available=True)
+    neg = DeterminismLoadBearingWitnessV1(
+        deterministic_enabled_observed=False,
+        op_attempted=True, op_completed=True, raised=False,
+        raise_msg="", op_name="Tensor.scatter_add_",
+        cuda_available=True)
+    assert pos.cid() != neg.cid()
 
 
 def test_determinism_witness_runs_on_cpu_returns_no_cuda():
@@ -140,6 +163,36 @@ def test_determinism_witness_runs_on_cpu_returns_no_cuda():
     if not cuda:
         assert w.cuda_available is False
         assert w.op_attempted is False
+
+
+def test_witness_records_deterministic_flag_observation():
+    """The witness's `deterministic_enabled_observed` field
+    must reflect `torch.are_deterministic_algorithms_enabled()`
+    at witness time. This is the primary load-bearing signal.
+    """
+    try:
+        import torch  # type: ignore
+    except ImportError:
+        pytest.skip("torch not installed")
+    # Set deterministic mode ON, run witness, observe.
+    try:
+        os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
+        torch.use_deterministic_algorithms(True)
+        w_on = determinism_load_bearing_witness_v1()
+        # Set deterministic mode OFF, observe.
+        torch.use_deterministic_algorithms(False)
+        w_off = determinism_load_bearing_witness_v1()
+    finally:
+        # Restore default.
+        try:
+            torch.use_deterministic_algorithms(False)
+        except Exception:
+            pass
+    assert w_on.deterministic_enabled_observed is True
+    assert w_off.deterministic_enabled_observed is False
+    # The two witnesses MUST have different CIDs because
+    # deterministic_enabled_observed differs.
+    assert w_on.cid() != w_off.cid()
 
 
 def test_determinism_witness_op_name_is_canonical():

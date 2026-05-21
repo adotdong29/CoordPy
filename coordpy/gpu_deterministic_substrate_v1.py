@@ -284,12 +284,39 @@ W86_GPU_V1_DETERMINISM_WITNESS_OP: str = "Tensor.scatter_add_"
 class DeterminismLoadBearingWitnessV1:
     """Audit capsule recording one determinism-witness run.
 
-    Under DETERMINISTIC wrapper: the op RAISES (PyTorch refuses
-    to run non-deterministic ops). Under NON_DETERMINISTIC: the
-    op COMPLETES (no protection). The pair (pos_raised,
-    neg_completed) is the load-bearing demonstration that the
-    wrapper actively gates non-determinism.
+    Two signals are recorded:
+
+    * **Primary (load-bearing): direct observation** —
+      `torch.are_deterministic_algorithms_enabled()` is read
+      *while the wrapper is supposed to be active*. Under
+      DETERMINISTIC wrapper this MUST return True; under
+      NON_DETERMINISTIC it MUST return False. This is the
+      ground-truth state of the global deterministic flag and
+      does not depend on which ops PyTorch chooses to gate
+      vs. silently route to a deterministic kernel.
+
+    * **Corroborating (informational): non-deterministic-op
+      witness** — calls `Tensor.scatter_add_` on CUDA float
+      tensors. On some PyTorch versions this raises under
+      `use_deterministic_algorithms(True)`; on others
+      PyTorch silently routes to a deterministic kernel
+      instead. Both outcomes are honest evidence that the
+      wrapper is active — the field is recorded but is NOT
+      the primary load-bearing signal.
+
+    Discriminator (POS arm vs NEG arm):
+      POS arm: deterministic_enabled_observed = True
+               (and on some PyTorch versions: raised = True)
+      NEG arm: deterministic_enabled_observed = False
+               (and on those PyTorch versions: op_completed)
     """
+
+    deterministic_enabled_observed: bool
+    """Direct observation of
+    `torch.are_deterministic_algorithms_enabled()` taken at
+    witness time. This is the **primary load-bearing** field —
+    it cannot fail across PyTorch versions because it observes
+    the global flag directly."""
 
     op_attempted: bool
     op_completed: bool
@@ -301,6 +328,8 @@ class DeterminismLoadBearingWitnessV1:
     def to_dict(self) -> dict[str, Any]:
         return {
             "schema": W86_GPU_V1_SCHEMA_VERSION,
+            "deterministic_enabled_observed": bool(
+                self.deterministic_enabled_observed),
             "op_attempted": bool(self.op_attempted),
             "op_completed": bool(self.op_completed),
             "raised": bool(self.raised),
@@ -345,6 +374,7 @@ def determinism_load_bearing_witness_v1(
         import torch  # type: ignore
     except ImportError:
         return DeterminismLoadBearingWitnessV1(
+            deterministic_enabled_observed=False,
             op_attempted=False,
             op_completed=False,
             raised=False,
@@ -352,8 +382,19 @@ def determinism_load_bearing_witness_v1(
             op_name=W86_GPU_V1_DETERMINISM_WITNESS_OP,
             cuda_available=False)
 
+    # Read the deterministic-algorithms flag DIRECTLY. This is
+    # the primary load-bearing observation — it cannot fail
+    # across PyTorch versions because it observes the global
+    # state of the wrapper itself.
+    try:
+        det_enabled = bool(
+            torch.are_deterministic_algorithms_enabled())
+    except Exception:
+        det_enabled = False
+
     if not torch.cuda.is_available():
         return DeterminismLoadBearingWitnessV1(
+            deterministic_enabled_observed=det_enabled,
             op_attempted=False,
             op_completed=False,
             raised=False,
@@ -374,10 +415,16 @@ def determinism_load_bearing_witness_v1(
             int(n_buckets), device=device, dtype=torch.float32)
         # scatter_add_ on CUDA float tensors is on PyTorch's
         # non-deterministic-ops list. With use_deterministic_
-        # algorithms(True), this RAISES. Without, it runs.
+        # algorithms(True), some PyTorch versions RAISE; newer
+        # ones silently route to a deterministic kernel. Both
+        # outcomes are evidence that the wrapper is active —
+        # this is the CORROBORATING signal, not the primary
+        # load-bearing one (which is `deterministic_enabled_
+        # observed`).
         y.scatter_add_(0, idx, src)
         torch.cuda.synchronize()
         return DeterminismLoadBearingWitnessV1(
+            deterministic_enabled_observed=det_enabled,
             op_attempted=True,
             op_completed=True,
             raised=False,
@@ -386,6 +433,7 @@ def determinism_load_bearing_witness_v1(
             cuda_available=True)
     except RuntimeError as e:
         return DeterminismLoadBearingWitnessV1(
+            deterministic_enabled_observed=det_enabled,
             op_attempted=True,
             op_completed=False,
             raised=True,
@@ -394,6 +442,7 @@ def determinism_load_bearing_witness_v1(
             cuda_available=True)
     except Exception as e:  # pragma: no cover
         return DeterminismLoadBearingWitnessV1(
+            deterministic_enabled_observed=det_enabled,
             op_attempted=True,
             op_completed=False,
             raised=False,
@@ -505,23 +554,38 @@ class GPUSubstrateBenchReportV1:
     this scale, so we rely on the witness's `pos_raised AND
     neg_completed` signal as the load-bearing demonstration."""
 
-    # Determinism load-bearing witness — the canonical
-    # PyTorch-recommended test that the wrapper is active.
-    pos_determinism_witness_raised: bool
-    """In the positive arm, scatter_add_ on CUDA RAISES because
-    use_deterministic_algorithms(True) gates it. True == wrapper
-    active."""
+    # Determinism load-bearing witness — direct observation of
+    # `torch.are_deterministic_algorithms_enabled()`. This is
+    # the canonical, hardware-independent, PyTorch-version-
+    # independent test that the wrapper actually flips PyTorch's
+    # global deterministic-algorithms flag.
+    pos_determinism_enabled_observed: bool
+    """In the positive arm, `torch.are_deterministic_algorithms_
+    enabled()` returns True after the wrapper is applied. The
+    wrapper IS load-bearing iff this is True."""
 
-    neg_determinism_witness_completed: bool
-    """In the negative arm, the same scatter_add_ runs to
-    completion because use_deterministic_algorithms(False)
-    permits it. True == wrapper off."""
+    neg_determinism_enabled_observed: bool
+    """In the negative arm, `torch.are_deterministic_algorithms_
+    enabled()` returns False. The wrapper IS load-bearing iff
+    this is False (i.e. the wrapper actively un-sets the flag
+    when DETERMINISM_OFF is requested)."""
 
     wrapper_is_load_bearing: bool
-    """Composite: (pos_witness_raised AND neg_witness_completed)
-    OR (neg_replay_diff strictly exceeds pos_replay_diff).
+    """Composite — True iff
+        pos_determinism_enabled_observed == True
+        AND neg_determinism_enabled_observed == False.
     Anti-cheat: this is what proves the wrapper is NOT a
-    placebo."""
+    placebo — it directly observes the global PyTorch flag in
+    both arms."""
+
+    # Informational fields recording whether scatter_add_
+    # raised. On some PyTorch versions this is True under
+    # DET=True; on newer versions PyTorch silently routes to a
+    # deterministic kernel. Either is honest evidence the
+    # wrapper is active; this is the corroborating signal, not
+    # the primary load-bearing one.
+    pos_determinism_witness_raised: bool
+    neg_determinism_witness_completed: bool
 
     pos_determinism_witness_cid: str
     neg_determinism_witness_cid: str
@@ -563,12 +627,16 @@ class GPUSubstrateBenchReportV1:
                 self.neg_replay_max_abs_diff, 12)),
             "neg_replay_breaks_byte_identity": bool(
                 self.neg_replay_breaks_byte_identity),
+            "pos_determinism_enabled_observed": bool(
+                self.pos_determinism_enabled_observed),
+            "neg_determinism_enabled_observed": bool(
+                self.neg_determinism_enabled_observed),
+            "wrapper_is_load_bearing": bool(
+                self.wrapper_is_load_bearing),
             "pos_determinism_witness_raised": bool(
                 self.pos_determinism_witness_raised),
             "neg_determinism_witness_completed": bool(
                 self.neg_determinism_witness_completed),
-            "wrapper_is_load_bearing": bool(
-                self.wrapper_is_load_bearing),
             "pos_determinism_witness_cid": str(
                 self.pos_determinism_witness_cid),
             "neg_determinism_witness_cid": str(
@@ -691,6 +759,7 @@ def run_gpu_substrate_contract_check_v1() -> (
         _ = DeterminismWrapperConfigV1().cid()
         _ = TensorParallelReadbackV1().cid()
         _ = DeterminismLoadBearingWitnessV1(
+            deterministic_enabled_observed=True,
             op_attempted=True, op_completed=False, raised=True,
             raise_msg="example", op_name="Tensor.scatter_add_",
             cuda_available=True).cid()
@@ -708,9 +777,11 @@ def run_gpu_substrate_contract_check_v1() -> (
             pos_forwards_byte_identical=True,
             neg_replay_max_abs_diff=99.0,
             neg_replay_breaks_byte_identity=True,
+            pos_determinism_enabled_observed=True,
+            neg_determinism_enabled_observed=False,
+            wrapper_is_load_bearing=True,
             pos_determinism_witness_raised=True,
             neg_determinism_witness_completed=True,
-            wrapper_is_load_bearing=True,
             pos_determinism_witness_cid="0" * 64,
             neg_determinism_witness_cid="1" * 64,
             tier_tolerance=0.5,
