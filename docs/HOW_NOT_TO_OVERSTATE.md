@@ -4,7 +4,73 @@
 > programme. Every milestone note, paper draft, README claim, or
 > README-of-README must satisfy these rules. Last touched: **W87
 > P3 line closures** (multi-modal substrate, observability,
-> formal verification) on 2026-05-21.
+> formal verification) on 2026-05-21; **post-W87 honest framing
+> consolidated** on 2026-05-22.
+
+## Post-W87 meta rules (mandatory before ANY repeat of W87 closure claims)
+
+After meta-#49 (24/24 sub-issues across P0+P1+P2+P3) and
+meta-#4 (16/16 W79-era umbrella children) were both closed on
+GitHub:
+
+- **Do NOT say or imply we "solved multi-agent context".**
+  We closed the *blocker backlog*. We did not show CoordPy
+  multi-agent teams beat strong single-agent baselines at
+  fair compute on a broad set of real tasks. The single fair-
+  budget published benchmark we ran (HumanEval × Llama-3.1-8B,
+  3 seeds × 30 problems) showed B beats A0 (+7.8 pp) but
+  loses to A1 self-consistency at the same budget (−8.9 pp).
+  Carry-forward
+  `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN` is mandatory.
+  The W85 GSM8K result reinforces:
+  `W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP`.
+
+- **Do NOT collapse "closed every blocker" into "solved the
+  problem".** The blocker backlog was a research-engineering
+  surface (substrate, integrity, security, observability,
+  formal verification, multi-modal). The problem is an
+  empirical-claim surface (multi-agent teams measurably
+  outperform single-agent baselines under fair budget on real
+  benchmarks at scale). Closing the former is necessary but
+  not sufficient for the latter.
+
+- **Do NOT extrapolate single-host frontier evidence to
+  multi-machine WAN.** Frontier-scale closures (#25 Llama-
+  3.1-8B, #31 OLMoE-1B-7B, #44 GPU determinism, #46 LLaVA-
+  1.5-7B + Qwen2.5-Coder-1.5B) all ran on Colab Pro A100-40GB
+  single-host. The multi-host closure (#29) is docker-compose
+  bridge; W86-L-MULTI-HOST-DISTRIBUTED-V1-DOCKER-BRIDGE-CAP
+  is mandatory. Reports that say "we run distributed at
+  frontier scale" are wrong.
+
+- **Do NOT claim cross-modal reasoning is load-bearing-better
+  than single-modal.** W87 #46 closes the multi-modal
+  substrate (text + image + code, real VLM, real audit chain)
+  but does NOT demonstrate cross-modal-superior performance
+  on a published benchmark. V1 is read-only across modalities;
+  cross-modal injection is V2. Carry-forward
+  `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP` is
+  mandatory.
+
+- **Do NOT claim "the safety story is formally verified".**
+  W87 #48 closes the formal-verification DoD ("at least one
+  safety property formally verified") with bidirectional
+  Merkle inclusion proved in Lean 4 for fanout-2 binary trees
+  with one explicit collision-resistance axiom. **Other
+  safety properties — replay-byte-identity, consensus safety
+  under f Byzantine adversaries, cross-tenant no-leakage —
+  are NOT formally verified.** Carry-forwards
+  `W87-L-FORMAL-MERKLE-FANOUT-2-CAP`,
+  `W87-L-FORMAL-MERKLE-HASH-AXIOMATIC-CAP`,
+  `W87-L-FORMAL-MERKLE-PYTHON-INCLUSION-PATH-SHAPE-CAP`
+  are mandatory.
+
+- **The canonical "did we solve it?" surface is
+  `docs/HONEST_FRAMING_POST_W87.md`.** Any other doc that
+  attempts a "we solved it" claim is wrong and must be
+  brought into alignment with that file before publishing.
+
+## W87 (P3 line closures — multi-modal / observability / formal verification) — explicit do-not-overstate rules
 
 ## W87 (P3 line closures — multi-modal / observability / formal verification) — explicit do-not-overstate rules
 

@@ -5,10 +5,44 @@
 > doc on what is *true now*, this file is right and the other file
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
-> `docs/HOW_NOT_TO_OVERSTATE.md`. Last touched: **W87 P3 line
+> `docs/HOW_NOT_TO_OVERSTATE.md`. For **whether the programme
+> has solved multi-agent context** (it has not), see
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W87 P3 line
 > closures** (multi-modal substrate, observability,
-> formal verification) on 2026-05-21. **Meta-#49 P0+P1+P2 line
-> closed (W86). P3 line (#46/#47/#48) closed (W87).**
+> formal verification) on 2026-05-21; honest framing
+> consolidated post-W87 on 2026-05-22. **Meta-#49 P0+P1+P2
+> line closed (W86). P3 line (#46/#47/#48) closed (W87).
+> Meta-#4 (W79-era umbrella, 16 children) closed by
+> supersession (2026-05-22).**
+
+## Have we solved multi-agent context?
+
+**No.** Closing meta-#49 (24/24 sub-issues) and meta-#4
+(16/16 sub-issues) closes the *blocker backlog* — the
+substrate to attack the problem.  It is **not** the same as
+demonstrating multi-agent CoordPy teams outperform strong
+single-agent baselines at fair compute on a broad set of real
+tasks.  In particular:
+
+* On the one fair-budget published benchmark we ran
+  (HumanEval × Llama-3.1-8B-Instruct, 3 seeds × 30 problems),
+  CoordPy multi-agent + executor-as-critic beat the stock
+  single-shot baseline by +7.8 pp but **lost to self-
+  consistency at the same compute budget by −8.9 pp**.
+  Carry-forward: `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`.
+* The W85 GSM8K head-to-head showed the same pattern.
+  Carry-forward:
+  `W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP`.
+
+What we shipped is real and load-bearing for the next wave.
+What we did **not** ship is convincing empirical evidence that
+multi-agent teams under CoordPy are best-in-class on real
+benchmarks.  See `docs/HONEST_FRAMING_POST_W87.md` for the full
+"what we did vs. what would constitute solving" bar.
+
+Any claim in any other doc, paper draft, demo, or external
+pitch that the programme has *solved* multi-agent context is
+overstatement and is rejected by this file.
 
 ## TL;DR — W87 P3 line closures (multi-modal / observability / formal verification)
 

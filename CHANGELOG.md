@@ -13,6 +13,27 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **Post-W87 honest framing — closing the backlog ≠ solving the problem (2026-05-22)**
+  — *with meta-#49 (24/24) and meta-#4 (16/16) both CLOSED on
+  GitHub, the canonical honest framing was consolidated into
+  `docs/HONEST_FRAMING_POST_W87.md` and cross-referenced from
+  `docs/RESEARCH_STATUS.md`, `docs/THEOREM_REGISTRY.md`,
+  `docs/HOW_NOT_TO_OVERSTATE.md`, and
+  `docs/AUDIT_POST_W83_BLOCKERS.md`.  The headline: closing
+  the post-W83 blocker backlog (substrate, integrity, security,
+  observability, formal verification, multi-modal) does NOT
+  establish that multi-agent CoordPy teams outperform strong
+  single-agent baselines at fair compute on real benchmarks.
+  On HumanEval × Llama-3.1-8B-Instruct the CoordPy multi-agent
+  + executor-as-critic path beats stock single-shot (+7.8 pp)
+  but loses to same-budget self-consistency (−8.9 pp).  W85
+  GSM8K reinforces the same pattern.  Until that empirical bar
+  is met across multiple diverse published benchmarks, the
+  right framing is "we built the substrate to attack the
+  problem honestly," not "we solved the problem."  Reports,
+  paper drafts, demos, and external pitches must align with
+  the new honesty surface before publication.*
+
 - **W87 — All Three P3 Blockers Closed; Meta-#49 Entirely Complete (2026-05-21)**
   — *with meta-#49's P0+P1+P2 backlog (21 sub-issues) closed in W86,
   the W87 push attacks the P3 ecosystem / operability frontier and

@@ -5,6 +5,16 @@
 > If this file disagrees with any other doc on the *status* of a
 > claim, this file is right and the other file is stale.
 >
+> **The meta-claim "the programme has solved multi-agent
+> context" is NOT in this registry — because it has not been
+> established.**  See `docs/HONEST_FRAMING_POST_W87.md` for the
+> canonical post-W87 framing of what has been shipped (real
+> substrate, integrity, security, observability, formal
+> verification, multi-modal) vs. what has NOT been demonstrated
+> (multi-agent CoordPy teams beating strong single-agent
+> baselines at fair compute on a broad set of real
+> benchmarks).
+>
 > Status vocabulary (definitions in `docs/HOW_NOT_TO_OVERSTATE.md`):
 >
 > - **proved** — mathematical proof or proof-by-inspection.
@@ -16,6 +26,25 @@
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
 > Last touched: **W87 P3 line closures** (multi-modal substrate / observability / formal verification) on 2026-05-21; post-W85 W86 Frontier-Scale Substrate Closure (real Llama-3.1-8B-Instruct on A100 in bf16; #25 + #26 closed across three independent Colab Pro runs) added 2026-05-20; (older milestones — see git log).
+
+## Post-W87 frontier claims that are explicitly NOT in this registry
+
+The following claims are repeatedly asked about and are
+explicitly **NOT** established by the closures in this
+registry.  Reports that assert them are overstatement.
+
+| Claim (NOT in registry) | Status | Honest reading |
+|---|---|---|
+| "The programme has solved multi-agent context." | NOT established | Closing meta-#49 + meta-#4 closes the blocker backlog, not the empirical bar. See `docs/HONEST_FRAMING_POST_W87.md`. |
+| "Multi-agent CoordPy teams beat strong single-agent baselines at fair compute on real benchmarks." | NOT established | On HumanEval × Llama-3.1-8B (3 seeds × 30 problems): B beats A0 (+7.8 pp) but loses to A1 self-consistency at same budget (−8.9 pp). On GSM8K × Llama-3.1-8B (N=20×3 seeds): B loses to both A0 and A1. Carry-forwards `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN` and `W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP`. |
+| "Cross-modal reasoning (vision + code + text) is load-bearing-better than single-modal." | NOT established | W87 #46 ships the substrate with real VLM + real code-LM + cross-modality Merkle root, but V1 is read-only across modalities; no benchmark demonstrates cross-modal-superior performance. Carry-forward `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP`. |
+| "The entire safety story is formally verified." | NOT established | W87 #48 closes the DoD ("at least one safety property formally verified") with Merkle inclusion in Lean 4 for fanout-2 binary trees + one collision-resistance axiom. Replay-byte-identity, consensus safety under f Byzantine, cross-tenant no-leakage are NOT formally verified. |
+| "Frontier-scale evidence is distributed at WAN scale." | NOT established | Frontier closures (#25/#26/#27/#31/#44/#46) ran on Colab Pro A100-40GB single-host. Multi-host (#29) is docker-compose bridge. Carry-forward `W86-L-MULTI-HOST-DISTRIBUTED-V1-DOCKER-BRIDGE-CAP`. |
+| "CoordPy has been validated at 10+ agents over weeks of real interaction." | NOT established | Most W6X–W79 multi-agent regimes are synthetic harness benchmarks at 2–5 agents. The first real-published-benchmark closure (#28 HumanEval) shipped the negative same-budget result above. |
+
+This list is canonical.  When the next research wave's meta
+issue lands and any of these claims is established, the
+matching `WXX-T-*` entry will land in the registry above.
 
 ## W87 P3 line closures — Multi-Modal Substrate, Observability, Formal Verification (W87-T-* and W87-L-*)
 

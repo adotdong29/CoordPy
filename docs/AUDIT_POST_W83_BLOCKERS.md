@@ -1253,3 +1253,51 @@ See `docs/RESULTS_W87_MULTI_MODAL_V1.md`,
 
 **After W87, meta-#49 is entirely CLOSED at 24/24 sub-issues:
 5/5 P0 + 8/8 P1 + 8/8 P2 + 3/3 P3.  0 PARTIAL.  0 OPEN.**
+
+---
+
+## Meta-conclusion (post-W87, 2026-05-22): closing the backlog ≠ solving the problem
+
+With both meta-#49 (24/24 sub-issues) and meta-#4 (16/16
+W79-era umbrella children) closed on GitHub, the natural
+question is: **did the programme just solve multi-agent
+context?**
+
+**No.**
+
+What closed: the *blocker backlog* — substrate, integrity,
+security, observability, formal verification, multi-modal.
+Every closure has real, re-verifiable, audit-chained
+evidence with documented honest limits.
+
+What did NOT close: the *empirical bar* that multi-agent
+CoordPy teams measurably outperform strong single-agent
+baselines at fair compute on a broad set of real
+benchmarks at scale.
+
+The load-bearing evidence:
+
+* **HumanEval × Llama-3.1-8B-Instruct (3 seeds × 30 problems,
+  W86 #28 closure):** CoordPy multi-agent + executor-as-critic
+  (B) mean pass@1 = 71.1 % beats stock single-shot (A0) =
+  63.3 % by +7.8 pp.  This closes the literal #28 DoD bar
+  ("strict improvement on at least one published metric vs
+  the stock harness").  But B **loses** to same-budget
+  self-consistency (A1 = K=5 first-pass-with-visible-test-
+  filter, 80.0 %) by −8.9 pp.  Carry-forward
+  `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN` is mandatory.
+* **GSM8K × Llama-3.1-8B-Instruct (W85 N=20×3 seeds):** B
+  loses to BOTH A0 and A1.  Carry-forward
+  `W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP`.
+
+Until the empirical bar is met across multiple diverse
+published benchmarks, the right framing is **"we built the
+substrate to attack the problem honestly"**, not **"we solved
+the problem"**.
+
+The canonical post-W87 honesty surface is
+`docs/HONEST_FRAMING_POST_W87.md`.  Every paper draft, demo,
+README claim, or external pitch must align with it before
+publication.  The next research wave's meta issue should
+target the empirical bar directly — not redo the substrate
+backlog.
