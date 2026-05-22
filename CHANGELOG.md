@@ -13,6 +13,78 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W88 post-W87 empirical superiority wave V1 — both honest negative / partial; carry-forwards stay (2026-05-22)**
+  — *the first programme milestone explicitly oriented around
+  the empirical bars in `docs/HONEST_FRAMING_POST_W87.md`
+  §"What would actually constitute 'solving' it" — not another
+  closure cycle.  Pre-commit bench shape + retirement bars
+  locked in `docs/RUNBOOK_W88.md` BEFORE any run.  W88 attacked
+  two canonical carry-forwards; **neither retired**; **two new
+  `W88-L-*` carry-forwards added** documenting honest negative /
+  partial empirical findings.*
+
+  **W88 HumanEval sequential-reflexion (vs
+  `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`):**
+  `coordpy.humaneval_reflexion_bench_v1` ships a K=5
+  sequential-reflexion B-pipeline (each turn conditioned on the
+  cumulative history of prior candidates + actual executor
+  stderr).  Run on NIM Llama-3.1-8B-Instruct, 3 seeds × 30
+  problems, bench Merkle `11997891e2b834fe…`, audit verifier
+  7/7 PASS.  Result: B mean pass@1 71.1 % (= W86 B) beats A0
+  63.3 % by +7.78 pp; B loses to A1 (first-pass-among-K=5)
+  74.4 % by **−3.33 pp**.  Gap closed from W86's −8.9 pp by
+  5.6 pp; sign did not flip.  B beats A1 on 0/3 seeds (ties on
+  2/3, loses 10 pp on seed 1).  Two independent multi-agent
+  B-shapes (W86 executor-critic, W88 sequential-reflexion) now
+  both lose to first-pass-among-K=5 at this scale.  The W86
+  carry-forward STAYS.  New W88 carry-forward
+  `W88-L-HUMANEVAL-REFLEXION-V1-A1-SAME-BUDGET-NOT-BEATEN-CAP`.
+
+  **W88 cross-modal code (vs
+  `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP`):**
+  `coordpy.cross_modal_code_bench_v1` ships a HumanEval-Visual
+  corpus synthesiser (PIL-rendered doctest images, two strip
+  modes `doctest_only` / `all_docstring`), three arms (A0_text /
+  A1_vlm / B_cross), content-addressed audit chain.  Run on NIM
+  `meta/llama-3.2-11b-vision-instruct` +
+  `meta/llama-3.1-8b-instruct`, 3 seeds × 12 problems, K=5
+  budget, bench Merkle `37ac174e21cbe3f9…`, audit verifier 4/4
+  PASS.  Result split:
+  - **Image is strongly load-bearing (3/6 bars MET):** A0_text
+    66.7 % → A1_vlm 86.1 % (+19.4 pp); B_cross 80.6 % >
+    A0_text 66.7 % by **+13.89 pp**.  The W87 multi-modal
+    substrate empirically carries load-bearing information.
+  - **Multi-agent cross-modal split NOT load-bearing (3/6 bars
+    FAIL):** B_cross 80.6 % loses to A1_vlm 86.1 % at the same
+    K=5 budget by **−5.56 pp**; B beats A1_vlm on 0/3 seeds.
+    The W87 carry-forward STAYS.  New W88 carry-forward
+    `W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`.
+
+  **Modules added:**
+  `coordpy/humaneval_reflexion_bench_v1.py`,
+  `coordpy/cross_modal_code_bench_v1.py`,
+  `scripts/run_w88_humaneval_reflexion_bench.py`,
+  `scripts/run_w88_cross_modal_code_bench.py`,
+  `scripts/verify_w88_humaneval_reflexion_audit_chain.py`,
+  `scripts/verify_w88_cross_modal_code_audit_chain.py`,
+  `scripts/inspect_w88_per_task_outcomes.py`,
+  `scripts/colab_w88_humaneval_reflexion.ipynb`,
+  `tests/test_w88_humaneval_reflexion_v1.py` (8 tests),
+  `tests/test_w88_cross_modal_code_v1.py` (12 tests).  All 20
+  W88 CI tests + 31-test broader regression suite green.
+
+  **Documentation:**  `docs/RUNBOOK_W88.md` (pre-commit
+  contract), `docs/RESULTS_W88_HUMANEVAL_REFLEXION_V1.md`,
+  `docs/RESULTS_W88_CROSS_MODAL_CODE_V1.md`.  Cross-cutting
+  surfaces (`docs/RESEARCH_STATUS.md`,
+  `docs/THEOREM_REGISTRY.md`, `docs/HOW_NOT_TO_OVERSTATE.md`,
+  `docs/HONEST_FRAMING_POST_W87.md`) updated.
+
+  **Stable boundary unchanged:** `coordpy.__version__` =
+  `0.5.20`; `coordpy.SDK_VERSION` = `coordpy.sdk.v3.43`; no
+  PyPI publish; `coordpy/__init__.py` untouched; W88 modules
+  are explicit-import only.
+
 - **Post-W87 honest framing — closing the backlog ≠ solving the problem (2026-05-22)**
   — *with meta-#49 (24/24) and meta-#4 (16/16) both CLOSED on
   GitHub, the canonical honest framing was consolidated into

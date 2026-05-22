@@ -2,9 +2,12 @@
 
 > **Canonical, mandatory honesty surface for any claim that
 > follows from the W87 closure of meta-#49.**  Last touched
-> 2026-05-22 after meta-#4 (W79-era) and meta-#49 (post-W83)
-> were both closed on GitHub with all 24 + 16 sub-issues
-> CLOSED.
+> 2026-05-22 to reflect the W88 post-W87 empirical superiority
+> wave V1 results — no carry-forward retired; two new
+> `W88-L-*` carry-forwards added documenting the negative /
+> partial findings.  Prior touch was 2026-05-22 after meta-#4
+> (W79-era) and meta-#49 (post-W83) were both closed on GitHub
+> with all 24 + 16 sub-issues CLOSED.
 >
 > If this file disagrees with any other doc about whether we
 > *solved multi-agent context*, this file is right and the
@@ -65,7 +68,8 @@ load-bearing for honesty.
 
 ### 1. The fair-budget multi-agent superiority claim is NOT empirically established
 
-**Carry-forward: `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`**
+**Carry-forwards: `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`,
+`W88-L-HUMANEVAL-REFLEXION-V1-A1-SAME-BUDGET-NOT-BEATEN-CAP`**
 
 On the one published-benchmark fair head-to-head we ran
 (HumanEval, 3 seeds × 30 problems × `meta/llama-3.1-8b-instruct`):
@@ -82,6 +86,29 @@ On the one published-benchmark fair head-to-head we ran
 The Reflexion / Self-Debug literature's "multi-agent + executor
 beats self-consistency at same budget" claim **does NOT
 replicate at this scale on this configuration**.
+
+**W88 retry:** post-W87, we re-attacked this carry-forward with
+a cleaner sequential-reflexion B-pipeline
+(`coordpy.humaneval_reflexion_bench_v1`).  Same model, same
+budget, same task subset discipline — different B-shape: 5
+sequential model calls, each conditioned on the cumulative
+history of prior candidates AND the actual executor stderr.
+Every call is code-producing; W86's redundant judge call is
+removed.  Result on 3 seeds × 30 problems × NIM Llama-3.1-8B
+(bench Merkle `11997891e2b834fe…`, verifier 7/7 PASS):
+
+* W88 B mean pass@1 = **71.1 %** (≈ W86 B); A1 mean = 74.4 %
+  (≈ W86 A1 within sampling variance).
+* W88 B − A1 = **−3.33 pp**.  The gap closed by **5.6 pp** vs
+  W86's −8.9 pp.  The sign did NOT flip.  B beats A1 on 0/3
+  seeds (ties on 2/3, loses 10 pp on seed 1).
+
+W88 contributes the new carry-forward
+`W88-L-HUMANEVAL-REFLEXION-V1-A1-SAME-BUDGET-NOT-BEATEN-CAP`
+recording the second failure.  The W86 carry-forward STAYS.
+**Two independent multi-agent B-shapes (executor-critic +
+sequential-reflexion) both lose to first-pass-among-K=5
+self-consistency at this scale on this model.**
 
 This alone is enough to say we have not solved multi-agent
 context.  A substrate that loses to self-consistency at the
@@ -108,7 +135,8 @@ documented in `docs/PLAN_W86_29_REAL_MULTI_HOST.md` and is
 
 ### 3. Cross-modal reasoning is NOT shown load-bearing-better than single-modal
 
-**Carry-forward: `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP`**
+**Carry-forwards: `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP`,
+`W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`**
 
 The W87 multi-modal substrate runs three modalities (text +
 image + code) through a composed pipeline with a single cross-
@@ -118,6 +146,39 @@ modalities.  We never demonstrated that a vision + code + text
 team outperforms any single-modal team on a published
 benchmark.  Cross-modal injection (e.g. swapping an image
 embedding mid-LLM-forward to affect code generation) is V2.
+
+**W88 retry:** post-W87, we ran a published-benchmark fair
+head-to-head with three arms on a synthesised HumanEval-Visual
+corpus (`coordpy.cross_modal_code_bench_v1`, 3 seeds × 12
+problems × NIM `meta/llama-3.2-11b-vision-instruct` +
+`meta/llama-3.1-8b-instruct`, K=5 budget, bench Merkle
+`37ac174e21cbe3f9…`, verifier 4/4 audit PASS):
+
+* **A0_text** (text-only LLM, no image): 66.7 % mean pass@1
+* **A1_vlm** (single-agent VLM, K=5 first-pass): 86.1 %
+* **B_cross** (VLM-extract → code-LM-reflexion-K=4): 80.6 %
+
+The result is split:
+
+* **Half of the retirement bar PASSES.**  Image is strongly
+  load-bearing: A1_vlm beats A0_text by +19.4 pp and B_cross
+  beats A0_text by +13.9 pp.  The W87 multi-modal substrate IS
+  carrying real load-bearing information — it is not a
+  decorative wrapper.  This is a meaningful empirical
+  contribution.
+* **Half of the retirement bar FAILS.**  The cross-modal team
+  organisation is NOT load-bearing: B_cross 80.6 % loses to
+  A1_vlm 86.1 % at the same K=5 budget by **−5.56 pp**, on
+  **0/3 seeds**.  At the 11B-VLM + 8B-code-LM scale on
+  doctest-stripped HumanEval, the unified VLM is strong enough
+  at code that splitting "extract from image" and "generate
+  code from extraction" introduces more information loss at
+  the handoff than the multi-agent diversity gains back.
+
+W88 contributes the new carry-forward
+`W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`
+recording the team-organisation failure.  The W87 carry-forward
+STAYS — retirement required BOTH halves of the bar.
 
 ### 4. Formal verification covers ONE property at ONE fanout
 
@@ -236,3 +297,26 @@ Until that meta issue is closed with the same discipline as
 meta-#49, claims of having solved multi-agent context are
 overstatement and must be rejected by any reader of this
 file.
+
+### W88 contribution (2026-05-22)
+
+The W88 post-W87 empirical superiority wave V1 attacked both
+items above and produced two honest negative / partial results:
+
+* **HumanEval sequential reflexion**: gap to A1 closed from
+  W86's −8.9 pp to W88's −3.33 pp; sign did not flip.  Two
+  independent B-shapes (executor-critic + sequential-reflexion)
+  both lose to first-pass-among-K=5 at this scale on
+  Llama-3.1-8B.  The carry-forward stays.
+* **Cross-modal code**: image is strongly load-bearing
+  (+13.9 pp B_cross over A0_text on the V1 corpus); but the
+  multi-agent VLM-extract + code-LM-generate split loses to
+  the same-budget single-agent VLM by −5.56 pp.  Half of the
+  bar passes; half fails.  The carry-forward stays.
+
+W88's contribution is the empirical refinement: the gap is
+smaller than W86 reported, but the multi-agent shape still
+loses to strong same-budget baselines on the published
+benchmarks we have tested.  The next wave's task is to find a
+multi-agent structure that ACTUALLY wins — not to relax the
+bars until a "win" appears.

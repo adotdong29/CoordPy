@@ -5486,3 +5486,75 @@ documented; 1M is V2), *"W86 GC is coordinated multi-host"*
 persistent store"* (JSONL sketch only).
 
 Last touched: W86 P2 hardening sweep 2026-05-20.
+
+---
+
+# W88 post-W87 empirical superiority wave V1 — what to say,
+# what NOT to say (2026-05-22)
+
+## W88 HumanEval sequential-reflexion bench V1
+
+Acceptable: *"`coordpy.humaneval_reflexion_bench_v1` ships a
+same-budget sequential-reflexion B-pipeline (5 model calls,
+each conditioned on the cumulative history of prior candidates
++ executor stderr) and runs the W86 three-arm head-to-head
+against NIM Llama-3.1-8B-Instruct on 3 seeds × 30 HumanEval
+problems.  Result: B mean pass@1 = 71.1 % beats A0 stock
+single-shot 63.3 % by +7.8 pp (reproduces W86 #28 DoD bar);
+but B (71.1 %) loses to A1 first-pass-among-K=5 self-
+consistency (74.4 %) by −3.33 pp.  The gap to A1 closed from
+W86's −8.9 pp to W88's −3.33 pp — a real structural
+improvement that did NOT flip the sign.  The W86 carry-forward
+`W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN` stays unretired;
+W88 contributes the new
+`W88-L-HUMANEVAL-REFLEXION-V1-A1-SAME-BUDGET-NOT-BEATEN-CAP`
+carry-forward.  Audit chain re-derives 7/7 PASS offline."*
+
+Forbidden phrasing: *"W88 retired the W86 same-budget multi-
+agent carry-forward"* (it did NOT — the sign did not flip,
+B still loses to A1), *"W88 sequential reflexion beats
+self-consistency on HumanEval"* (it does not at this scale; it
+TIES on 2/3 seeds and loses on 1/3 by 10 pp), *"W88 closes
+the gap to zero"* (it closes from −8.9 pp to −3.33 pp; the
+margin is still negative), *"W88 proves Reflexion is better
+than self-consistency"* (the literature claim does NOT
+replicate at Llama-3.1-8B scale on HumanEval K=5 in this run),
+*"W88 means CoordPy multi-agent is empirically superior at
+fair compute"* (it does NOT — this is the second multi-agent
+shape to lose to first-pass-K=5 at this scale).
+
+## W88 cross-modal code bench V1
+
+Acceptable: *"`coordpy.cross_modal_code_bench_v1` ships a
+HumanEval-Visual corpus synthesiser (PIL-rendered doctest
+images, two strip modes), three arms (A0_text / A1_vlm /
+B_cross), and a content-addressed audit chain that re-derives
+offline.  The W88 bench runs against NIM Llama-3.2-11B-Vision
++ Llama-3.1-8B on 3 seeds × 12 problems × K=5.  **Image is
+strongly load-bearing:** A1_vlm 86.1 % beats A0_text 66.7 % by
++19.4 pp, and B_cross 80.6 % beats A0_text by +13.9 pp.
+**Multi-agent cross-modal split is NOT load-bearing at this
+scale:** B_cross 80.6 % loses to single-agent A1_vlm 86.1 % at
+the same K=5 budget by −5.56 pp on 0/3 seeds.  Half of the
+W87 retirement bar passes (image carries real load-bearing
+information); half fails (the multi-agent organisation does
+NOT beat the same-budget single-agent VLM).  The W87
+carry-forward `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP`
+stays unretired; W88 contributes the new
+`W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`
+carry-forward."*
+
+Forbidden phrasing: *"W88 retired the W87 cross-modal
+carry-forward"* (it did NOT — only one of two retirement bars
+passed), *"W88 proved cross-modal teams outperform single-
+modal"* (it proved IMAGE is load-bearing, NOT that team
+organisation is load-bearing — different claim), *"CoordPy's
+cross-modal team beat the single-agent VLM"* (it did NOT —
+B_cross 80.6 % < A1_vlm 86.1 %), *"the cross-modal split is
+a win"* (it's a loss by 5.56 pp at this scale on this
+configuration), *"vision + code split is always better than
+unified VLM"* (the W88 evidence says the opposite at this
+scale; cross-modal injection at the substrate layer is V2).
+
+Last touched: W88 post-W87 empirical superiority wave V1
+2026-05-22.

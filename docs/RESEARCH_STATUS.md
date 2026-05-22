@@ -7,13 +7,17 @@
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
 > `docs/HOW_NOT_TO_OVERSTATE.md`. For **whether the programme
 > has solved multi-agent context** (it has not), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W87 P3 line
-> closures** (multi-modal substrate, observability,
-> formal verification) on 2026-05-21; honest framing
-> consolidated post-W87 on 2026-05-22. **Meta-#49 P0+P1+P2
-> line closed (W86). P3 line (#46/#47/#48) closed (W87).
-> Meta-#4 (W79-era umbrella, 16 children) closed by
-> supersession (2026-05-22).**
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W88 post-W87
+> empirical superiority wave V1** on 2026-05-22 (HumanEval
+> sequential-reflexion + cross-modal code; both NEGATIVE /
+> PARTIAL — neither carry-forward retires). W87 P3 line closures
+> (multi-modal substrate, observability, formal verification)
+> 2026-05-21; honest framing consolidated post-W87 on
+> 2026-05-22. **Meta-#49 P0+P1+P2 line closed (W86). P3 line
+> (#46/#47/#48) closed (W87). Meta-#4 (W79-era umbrella, 16
+> children) closed by supersession (2026-05-22). W88 added two
+> new `W88-L-*` carry-forwards on the empirical superiority
+> front.**
 
 ## Have we solved multi-agent context?
 
@@ -24,15 +28,24 @@ demonstrating multi-agent CoordPy teams outperform strong
 single-agent baselines at fair compute on a broad set of real
 tasks.  In particular:
 
-* On the one fair-budget published benchmark we ran
-  (HumanEval × Llama-3.1-8B-Instruct, 3 seeds × 30 problems),
-  CoordPy multi-agent + executor-as-critic beat the stock
-  single-shot baseline by +7.8 pp but **lost to self-
-  consistency at the same compute budget by −8.9 pp**.
+* On the W86 published benchmark we ran (HumanEval × Llama-3.1-8B,
+  3 seeds × 30 problems), CoordPy multi-agent + executor-as-critic
+  beat the stock single-shot baseline by +7.8 pp but **lost to
+  self-consistency at the same compute budget by −8.9 pp**.
   Carry-forward: `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`.
+* The W88 retry with a cleaner sequential-reflexion B-pipeline
+  closed the gap (−8.9 pp → −3.33 pp) but did NOT flip the sign.
+  Carry-forward:
+  `W88-L-HUMANEVAL-REFLEXION-V1-A1-SAME-BUDGET-NOT-BEATEN-CAP`.
 * The W85 GSM8K head-to-head showed the same pattern.
   Carry-forward:
   `W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP`.
+* The W88 cross-modal head-to-head proved IMAGE is load-bearing
+  (+13.9 pp B_cross over text-only) but the multi-agent
+  VLM-extract + code-LM-generate split LOST to the same-budget
+  single-agent VLM by −5.56 pp.  Carry-forwards:
+  `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP` and
+  `W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`.
 
 What we shipped is real and load-bearing for the next wave.
 What we did **not** ship is convincing empirical evidence that
@@ -43,6 +56,46 @@ benchmarks.  See `docs/HONEST_FRAMING_POST_W87.md` for the full
 Any claim in any other doc, paper draft, demo, or external
 pitch that the programme has *solved* multi-agent context is
 overstatement and is rejected by this file.
+
+## TL;DR — W88 post-W87 empirical superiority wave V1
+
+The first programme milestone explicitly oriented around the
+empirical bars in `docs/HONEST_FRAMING_POST_W87.md` §"What would
+actually constitute 'solving' it" — multi-benchmark same-budget
+multi-agent superiority and cross-modal load-bearing-better-than-
+single-modal.  Pre-commit bench shape + retirement bars locked
+in `docs/RUNBOOK_W88.md` BEFORE any run.
+
+W88 attacked two canonical carry-forwards.  Neither retired.
+Both runs produced honest, audit-chain-verified negative /
+partial results:
+
+| Carry-forward | W88 attack | Retirement bars | Result |
+|---|---|---|---|
+| `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN` | `coordpy.humaneval_reflexion_bench_v1` — K=5 sequential-reflexion B-pipeline (each turn conditioned on cumulative executor stderr); NIM Llama-3.1-8B-Instruct on 3 seeds × 30 HumanEval problems | 4 bars (B>A1 mean / margin≥+1pp / B>A0 reproduces / per-seed majority) | 1/4 met (B>A0 reproduces); 3/4 fail.  B 71.1 % vs A1 74.4 % = **−3.33 pp**.  Gap closed from W86's −8.9 pp by 5.6 pp; sign did not flip.  Carry-forward STAYS.  New carry-forward `W88-L-HUMANEVAL-REFLEXION-V1-A1-SAME-BUDGET-NOT-BEATEN-CAP` added. |
+| `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP` | `coordpy.cross_modal_code_bench_v1` — HumanEval-Visual corpus synthesiser (PIL-rendered doctest images) + 3 arms (A0_text / A1_vlm / B_cross); NIM Llama-3.2-11B-Vision + Llama-3.1-8B on 3 seeds × 12 problems | 6 bars (image load-bearing × 3 + team load-bearing × 3) | 3/6 met (image direction); 3/6 fail (team direction).  A0_text 66.7 % → A1_vlm 86.1 % (+19.4 pp); B_cross 80.6 % vs A1_vlm 86.1 % = **−5.56 pp**.  Carry-forward STAYS.  New carry-forward `W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP` added. |
+
+**Audit chains re-derive offline:** W88 HumanEval reflexion
+verifier 7/7 PASS on 990 NIM call SHA-256s + 3 per-seed Merkle
+roots + bench Merkle root.  W88 cross-modal verifier 4/4 PASS
+on 180 text + 216 VLM SHA-256s + 3 per-seed + bench Merkle roots.
+
+**Two consecutive negative / partial results are themselves a
+contribution.**  W86's executor-as-critic and W88's sequential
+reflexion are TWO INDEPENDENT multi-agent B-shapes; both lose
+to first-pass-among-K=5 self-consistency at Llama-3.1-8B scale
+on HumanEval.  W88's cross-modal split is the first
+load-bearing-test of multi-agent cross-modal organisation
+against the same-budget single-agent VLM; the split loses.
+The next wave must find a multi-agent structure that ACTUALLY
+wins on a published benchmark, not relax the bars to claim a
+"win".
+
+See `docs/RUNBOOK_W88.md` for the pre-committed bar contract,
+`docs/RESULTS_W88_HUMANEVAL_REFLEXION_V1.md` and
+`docs/RESULTS_W88_CROSS_MODAL_CODE_V1.md` for the full results,
+and the W88 entries in `docs/THEOREM_REGISTRY.md` /
+`docs/HOW_NOT_TO_OVERSTATE.md`.
 
 ## TL;DR — W87 P3 line closures (multi-modal / observability / formal verification)
 
