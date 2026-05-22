@@ -1,14 +1,32 @@
 # W87 — Multi-Modal Context Substrate V1
 
-> **W87 / P3 #46 — TRULY CLOSED on live open-weight VLM
-> + open-weight code LM on local CPU.**  The composed pipeline
-> runs across **three modalities** (text + image + code), the
-> audit chain spans all three under a single cross-modality
-> Merkle root, replay-from-encoder byte-identity holds at the
-> per-modality precision floor, and the cross-modality identity
-> reproduces byte-for-byte across two consecutive runs.  The
-> Colab notebook reproduces the same closure at frontier scale
-> on LLaVA-1.5-7B / Qwen2.5-Coder-1.5B on Colab Pro A100.
+> **W87 / P3 #46 — TRULY CLOSED on live frontier-scale
+> open-weight VLM + open-weight code LM on Colab Pro A100-40GB
+> at bf16, 2026-05-22.**  The composed pipeline runs across
+> **three modalities** (text + image + code), the audit chain
+> spans all three under a single cross-modality Merkle root,
+> replay-from-encoder byte-identity holds at the per-modality
+> precision floor, and the offline verifier re-derives every CID
+> byte-for-byte: **20/20 PASS, OVERALL: PASS** on the canonical
+> A100 LLaVA-1.5-7B run.  Local-CPU Moondream-2 run reproduces
+> the same closure off-line (no GPU required) and ships as the
+> CI-friendly evidence path.
+
+## Canonical evidence — Colab Pro A100 (LLaVA-1.5-7B + Qwen2.5-Coder-1.5B)
+
+* `results/w87/multi_modal/w87_mm_20260522T030335Z_colab_a100_llava/`
+  - `multi_modal_v1_bench_report.json`
+    - `bench_cid = 0f6acc233f5ff90bc0d928b01d0489afcc03c44df6401eb83cb015c3d58e9d42`
+    - `cross_modality_root_cid = 29591729f5dac1a1147496cb0d95eb9e1ec091ff94cdbb566d009e02e5cc545d`
+  - `vlm_model_name = llava-hf/llava-1.5-7b-hf` (loaded REAL at bf16 on A100-40GB)
+  - `code_model_name = Qwen/Qwen2.5-Coder-1.5B` (loaded REAL at bf16 on A100)
+  - `image_encoder_kind = "hf_vlm"`
+  - `code_encoder_kind = "hf_causal_lm"`
+  - `image_hidden_shape = (596, 4096)` — REAL LLaVA-1.5 final-layer hidden state covering ~576 image tokens + ~20 text tokens at the LLM's 4096-dim hidden state
+  - `code_hidden_shape = (12, 1536)` — Qwen2.5-Coder-1.5B last-layer hidden state pooled per source line at 1536-dim
+  - `code_ast_n_functions = 2` (the AST-aware axis captured `quicksort` + `Sorter.sort`)
+  - Wall: 76 s on A100 (~60 s LLaVA load + ~5 s Qwen-Coder + ~10 s 2x VLM forward + ~1 s 2x code forward)
+  - Verifier `scripts/verify_w87_multi_modal_audit_chain.py`: **20/20 PASS, OVERALL: PASS**
 
 ## TL;DR
 
@@ -50,7 +68,7 @@
   `llava-hf/llava-1.5-7b-hf` + `Qwen/Qwen2.5-Coder-1.5B` at
   bf16.
 
-## Canonical evidence
+## Canonical evidence — Local CPU (Moondream-2 + distilgpt2)
 
 * Local-CPU canonical run:
   `results/w87/multi_modal/w87_mm_20260521T220504Z/`

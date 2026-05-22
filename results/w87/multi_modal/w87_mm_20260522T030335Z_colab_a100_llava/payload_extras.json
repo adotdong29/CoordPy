@@ -1,0 +1,68 @@
+{
+  "code": {
+    "embedding_cid": "ae7ed49c8ff391af89cafcd0960ada448c1287c9d0529b43542d809b3e1aa0fb",
+    "embedding_shape": [
+      12,
+      1536
+    ],
+    "encoder_cid": "a78c54146f57ce0f21a64f26c7f3d8f2ab37fd2819760758f445e2540a064b71",
+    "extras": {
+      "ast_function_boundaries": [
+        {
+          "end_line": 7,
+          "is_async": false,
+          "n_args": 1,
+          "n_lines": 7,
+          "name": "quicksort",
+          "qualname": "quicksort",
+          "schema": "coordpy.code_substrate_v1.v1",
+          "start_line": 1
+        },
+        {
+          "end_line": 12,
+          "is_async": false,
+          "n_args": 2,
+          "n_lines": 2,
+          "name": "sort",
+          "qualname": "Sorter.sort",
+          "schema": "coordpy.code_substrate_v1.v1",
+          "start_line": 11
+        }
+      ],
+      "n_functions": 2
+    },
+    "modality": "code",
+    "raw_bytes_cid": "4694fd196b773192a10933dc05ee85ccccc3a01af60bb1ba6aaf085296a32845",
+    "raw_bytes_size": 312,
+    "schema": "coordpy.multi_modal_payload_v1.v1"
+  },
+  "image": {
+    "embedding_cid": "bb797db7e23ca42cf1bc1c7b2001421f74ae342651c27e8c26e236eb82113a67",
+    "embedding_shape": [
+      596,
+      4096
+    ],
+    "encoder_cid": "8894b33e3b4bfe82abb8e08ebbc3b8200d8845a78efd6d032850e82e35e88265",
+    "extras": {
+      "encoder_kind": "hf_vlm",
+      "prompt": "What do you see in this image?"
+    },
+    "modality": "image",
+    "raw_bytes_cid": "d14f1370a490235361203392dfbc1dc35d2bc8228119062e5b91f8bc6b03beab",
+    "raw_bytes_size": 268,
+    "schema": "coordpy.multi_modal_payload_v1.v1"
+  },
+  "text": {
+    "embedding_cid": "740b0cd23669a55fd6aa7ce2aa42ad030c90e4353e9d5ca5e87f967e132e6be3",
+    "embedding_shape": [
+      16,
+      8
+    ],
+    "encoder_cid": "6cc9647b3a1360e961f007e14545a001268a7c246cad418510ca743229b1bd12",
+    "extras": {},
+    "modality": "text",
+    "raw_bytes_cid": "7d1226b46b6dda5e766f9b6a8de20b5a2107faead498229b10f8940dbf1b8bfd",
+    "raw_bytes_size": 38,
+    "schema": "coordpy.multi_modal_payload_v1.v1"
+  }
+}
