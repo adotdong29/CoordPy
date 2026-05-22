@@ -292,14 +292,44 @@ class VisionSubstrateAdapterV1:
                 self._model = self._model.to(device)
             self._family = "moondream"
         else:
-            from transformers import (  # type: ignore
-                AutoProcessor, AutoModelForVision2Seq)
+            # transformers 4.45-4.49 exposes AutoModelForVision2Seq;
+            # transformers 4.50+/5.x renamed it to
+            # AutoModelForImageTextToText.  Try the new name first
+            # so we work on whatever Colab Pro currently ships.
+            from transformers import AutoProcessor  # type: ignore
+            import transformers as _tx  # type: ignore
+            _vlm_auto = None
+            for _name in ("AutoModelForImageTextToText",
+                          "AutoModelForVision2Seq"):
+                _vlm_auto = getattr(_tx, _name, None)
+                if _vlm_auto is not None:
+                    break
+            if _vlm_auto is None:
+                raise BlockedOnHardwareError(
+                    modality="image",
+                    missing=(
+                        "AutoModelForImageTextToText/"
+                        "AutoModelForVision2Seq",),
+                    hint=(
+                        f"transformers {_tx.__version__} exposes "
+                        "neither Auto class; upgrade to "
+                        "transformers>=4.45 (4.50+ for the new "
+                        "AutoModelForImageTextToText name)"))
             self._processor = AutoProcessor.from_pretrained(
                 self.model_name)
-            self._model = AutoModelForVision2Seq.from_pretrained(
-                self.model_name, torch_dtype=dtype,
-                device_map=device, output_hidden_states=True,
-                trust_remote_code=True)
+            # Older transformers wants torch_dtype=, newer wants
+            # dtype= (the former is deprecated but still accepted in
+            # 5.x with a warning).  Try the new kwarg first.
+            try:
+                self._model = _vlm_auto.from_pretrained(
+                    self.model_name, dtype=dtype,
+                    device_map=device, output_hidden_states=True,
+                    trust_remote_code=True)
+            except TypeError:
+                self._model = _vlm_auto.from_pretrained(
+                    self.model_name, torch_dtype=dtype,
+                    device_map=device, output_hidden_states=True,
+                    trust_remote_code=True)
             self._family = "vision2seq"
         self._model.eval()
         self.device = str(device)
