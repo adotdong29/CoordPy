@@ -236,6 +236,7 @@ def run_multi_modal_bench_v1(
         require_real_code: bool = False,
         out_dir: str | None = None,
         source: str = DEFAULT_SOURCE,
+        embedding_dim: int = 2048,
 ) -> MultiModalBenchReportV1:
     t_start = time.time()
     # Text payload (always real — hash-deterministic).
@@ -263,22 +264,25 @@ def run_multi_modal_bench_v1(
         code_loaded_real = False
     code_p = code_adapter.encode(source)
     # Vision adapter (real if transformers + VLM available;
-    # stub otherwise).
+    # stub otherwise).  Auto-pick bf16 on CUDA, fp32 on CPU —
+    # avoids OOM for LLaVA-7B / Idefics-2-8B at fp32 on A100.
     cap = probe_vision_substrate_capability_v1()
+    vlm_precision_tier = (
+        "tier_bf16" if cap.cuda_available else "tier_fp32")
     try:
         if require_real_vlm:
             vision_adapter = VisionSubstrateAdapterV1(
                 model_name=vlm_model_name,
                 require_real_vlm=True,
-                precision_tier="tier_fp32",
-                embedding_dim=2048)
+                precision_tier=vlm_precision_tier,
+                embedding_dim=int(embedding_dim))
             vlm_loaded_real = True
         elif cap.can_load_vlm:
             vision_adapter = VisionSubstrateAdapterV1(
                 model_name=vlm_model_name,
                 require_real_vlm=False,
-                precision_tier="tier_fp32",
-                embedding_dim=2048)
+                precision_tier=vlm_precision_tier,
+                embedding_dim=int(embedding_dim))
             try:
                 vision_adapter._load_real_vlm_or_raise()
                 vlm_loaded_real = True
@@ -467,13 +471,19 @@ def main(argv: list[str] | None = None) -> int:
         "--out-dir", type=str, default=None,
         help="output directory (auto-generated under "
              "results/w87/multi_modal/ if omitted)")
+    parser.add_argument(
+        "--embedding-dim", type=int, default=2048,
+        help="Embedding dim per modality (default 2048; use "
+             "4096 for LLaVA-1.5-7B / Idefics-2-8B; large "
+             "values are truncated to the model's hidden dim)")
     args = parser.parse_args(argv)
     rep = run_multi_modal_bench_v1(
         vlm_model_name=str(args.vlm_model),
         code_model_name=str(args.code_model),
         require_real_vlm=bool(args.require_real_vlm),
         require_real_code=bool(args.require_real_code),
-        out_dir=args.out_dir)
+        out_dir=args.out_dir,
+        embedding_dim=int(args.embedding_dim))
     print()
     print("Load-bearing closure bools:")
     for k in (

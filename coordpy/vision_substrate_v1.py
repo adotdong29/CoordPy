@@ -395,7 +395,25 @@ class VisionSubstrateAdapterV1:
             text = self._processor.apply_chat_template(
                 messages, add_generation_prompt=True)
         except Exception:  # noqa: BLE001
-            text = str(prompt)
+            # Fallback: LLaVA/Idefics-style template with explicit
+            # image token.  All AutoModelForVision2Seq processors
+            # we target accept `<image>` in this form.
+            text = "USER: <image>\n" + str(prompt) + "\nASSISTANT:"
+        # Defensive: every Vision2Seq processor we support requires
+        # the image-token marker present in `text` so it can locate
+        # where to splice image features.  If the chat template (or
+        # fallback) somehow omitted it, prepend the processor's own
+        # image token (or "<image>" as the universal default).
+        img_token = "<image>"
+        for candidate in (
+                getattr(self._processor, "image_token", None),
+                getattr(getattr(self._processor, "tokenizer", None),
+                        "image_token", None)):
+            if candidate:
+                img_token = str(candidate)
+                break
+        if img_token not in str(text):
+            text = f"{img_token}\n{text}"
         inputs = self._processor(
             text=text, images=img, return_tensors="pt").to(
             self.device)
@@ -412,7 +430,10 @@ class VisionSubstrateAdapterV1:
         arr = last.detach().to(torch.float32).cpu().numpy()
         if arr.ndim == 3:
             arr = arr[0]
-        n = min(arr.shape[0], 49)
+        # Allow up to 1024 tokens — covers LLaVA-1.5 (576 image
+        # tokens + text), Idefics-2 (64 per image-tile + text),
+        # Qwen2-VL (variable per image).
+        n = min(arr.shape[0], 1024)
         d = min(arr.shape[1], int(self.embedding_dim))
         out = arr[:n, :d].astype(_np.float32)
         return out
@@ -458,8 +479,36 @@ class VisionSubstrateAdapterV1:
             import torch  # type: ignore
             img = Image.open(io.BytesIO(bytes(image_bytes))).convert(
                 "RGB")
+            # Build a chat-template text (same robustness as in
+            # _encode_image_real) so the processor receives the
+            # required <image> token.
+            messages = [
+                {"role": "user",
+                 "content": [
+                     {"type": "image"},
+                     {"type": "text", "text": str(prompt)},
+                 ]},
+            ]
+            try:
+                text = self._processor.apply_chat_template(
+                    messages, add_generation_prompt=True)
+            except Exception:  # noqa: BLE001
+                text = (
+                    "USER: <image>\n" + str(prompt) +
+                    "\nASSISTANT:")
+            img_token = "<image>"
+            for candidate in (
+                    getattr(self._processor, "image_token", None),
+                    getattr(
+                        getattr(self._processor, "tokenizer", None),
+                        "image_token", None)):
+                if candidate:
+                    img_token = str(candidate)
+                    break
+            if img_token not in str(text):
+                text = f"{img_token}\n{text}"
             inputs = self._processor(
-                text=str(prompt), images=img,
+                text=text, images=img,
                 return_tensors="pt").to(self.device)
             with torch.no_grad():
                 outputs = self._model(
@@ -476,7 +525,7 @@ class VisionSubstrateAdapterV1:
             proj_cid = _array_cid_fp32(proj)
             llm_cid = _array_cid_fp32(llm)
             embedding = llm if llm.ndim == 2 else llm[0]
-            n_patches = int(min(embedding.shape[0], 49))
+            n_patches = int(min(embedding.shape[0], 1024))
             emb_dim = int(min(embedding.shape[1],
                               self.embedding_dim))
         enc = self.encoder_fingerprint()
