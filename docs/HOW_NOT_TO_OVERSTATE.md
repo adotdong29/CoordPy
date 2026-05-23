@@ -5851,5 +5851,33 @@ prevented variance-driven false positives), *"we need looser
 bars to make progress"* (W91 P2b shows looser bars would
 produce false retirements).
 
-Last touched: W91 post-W90 empirical superiority wave V4
-2026-05-23.
+Last touched: W91 cross-modal disconfirmation 2026-05-23.
+
+## W91 MBPP retry at 5 seeds × 30 (PARTIAL — mean robust; per-seed bar still fails)
+
+Acceptable: *"At Llama-3.3-70B-Instruct on MBPP-sanitized ×
+5 seeds × 30 problems × K=5, B sequential reflexion mean
+pass@1 = 84.0 % strictly beats A1 first-pass-among-K=5 mean =
+82.7 % by +1.33 pp (margin clears +1.0 pp threshold).  B ≥ A1
+on 4/5 seeds; strict B > A1 on 2/5 seeds.  3 of 4 pre-
+committed retirement bars met; per-seed strict majority bar
+fails at 2/5.  The 5-seed extension CONFIRMS the W90 P1
+(3-seed) pattern at larger N: mean direction positive and
+robust; per-seed strict signal fragile due to ceiling-
+saturation (A1 hits 90 % on 2 of 5 seeds).  `W89-L-HUMANEVAL-REFLEXION-V2-HUMANEVAL-K5-SCALE-CAP`
+is REFINED with stronger 5-seed evidence but still NOT
+retired.  New carry-forward
+`W91-L-MBPP-REFLEXION-V2-5SEED-PARTIAL-CAP`."*
+
+Forbidden phrasing: *"W91 retired the MBPP carry-forward"*
+(it did NOT — the per-seed strict majority bar still fails),
+*"MBPP-70B is now solved"* (the per-seed strength is below
+the W89 bar; 2/5 strict wins is not majority), *"the mean
++1.33 pp is the retirement claim"* (without per-seed
+majority, the mean alone is not sufficient under the
+pre-committed discipline).  Acceptable: *"the W89 architecture's
+mean direction generalises to MBPP-70B with stronger 5-seed
+evidence; per-seed strict majority continues to elude us at
+the K=5 budget on this ceiling-saturated benchmark."*
+
+Last touched: W91 MBPP confirmation 2026-05-23.

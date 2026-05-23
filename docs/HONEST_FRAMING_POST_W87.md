@@ -434,9 +434,18 @@ at K=5 budget on Llama-3.2-{11B, 90B}-Vision-Instruct on
 HumanEval-Visual is NOT load-bearing-better than unified VLM —
 the 6 configurations agree.
 
-The MBPP retry (W91 Prong 1 at 5 seeds × 30) is still running
-as of this commit.  Result will land in a follow-up commit
-under W91 P1.
+**W91 Prong 1 (MBPP retry at 5 seeds × 30, completed 2026-05-23):**
+B 84.0 % > A1 82.7 % by **+1.33 pp** on the mean (margin
+clears +1.0 pp threshold).  B ≥ A1 on 4/5 seeds; strict
+B > A1 on **2/5 seeds**.  3 of 4 retirement bars met; per-seed
+strict majority bar still fails at 2/5 (need ≥ 3/5).
+**The W89 reflexion architecture's directional cross-benchmark
+generalisation to MBPP is now CONFIRMED at 5-seed scale on
+the mean.**  But the per-seed strict majority bar continues
+to fail due to ceiling effects on 2 of 5 seeds (A1 hits 90 %).
+`W89-L-HUMANEVAL-REFLEXION-V2-HUMANEVAL-K5-SCALE-CAP` is
+REFINED with stronger 5-seed evidence but still NOT retired.
+New carry-forward `W91-L-MBPP-REFLEXION-V2-5SEED-PARTIAL-CAP`.
 
 ### W88 → W89 → W90 contribution
 

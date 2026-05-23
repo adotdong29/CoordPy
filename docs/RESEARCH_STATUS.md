@@ -147,13 +147,34 @@ STAY.  New W91-L-* carry-forwards:
 `W91-L-CROSS-MODAL-VLM-LOOP-V2-3-SEED-VARIANCE-CAP`,
 `W91-L-CROSS-MODAL-VLM-LOOP-V2-DECISIVE-NEGATIVE-CAP`.
 
-### W91 Prong 1 — MBPP retry at 5 seeds × 30 (RUNNING)
+### W91 Prong 1 — MBPP retry at 5 seeds × 30 (CONFIRMED at 5 seeds; per-seed bar still fails)
 
-The MBPP retry at 5 seeds × 30 problems × 70B is launched in
-background as of this commit.  Result will land in a follow-
-up commit.  Expected: tests whether the W90 P1 +1.11 pp / 1
-of 3 seed result was variance-driven (analogous to W91 P2's
-disconfirmation) or genuine cross-benchmark generalisation.
+5 seeds × 30 problems × K=5 × Llama-3.3-70B-Instruct.  Bench
+Merkle `b5cc804be2caa4da…`; audit verifier 6/7 PASS.  Total
+wall 8h 31min; 1650 NIM calls.
+
+* A0 mean 75.3 % | A1 mean 82.7 % | **B mean 84.0 %**
+* B − A1 = **+1.33 pp** (margin clears +1.0 pp threshold).
+* B ≥ A1 on 4/5 seeds; strict B > A1 on 2/5 seeds.
+* B beats A0 on 5/5 seeds (+8.67 pp).
+* **3 of 4 retirement bars met; per-seed strict majority
+  bar continues to FAIL at 2/5 (need ≥ 3/5).**
+
+The 5-seed extension CONFIRMS the W90 P1 (3-seed) pattern:
+mean direction positive and robust at larger N; per-seed
+strict signal fragile due to ceiling-saturation (2 of 5
+seeds hit A1 = 90 %).  Unlike the cross-modal W91 P2/P2b
+disconfirmation pattern (where the 7-seed run reversed the
+3-seed signal), the MBPP mean direction REMAINS POSITIVE at
+5 seeds.  The W89 reflexion architecture's cross-benchmark
+generalisation to MBPP is now CONFIRMED on the mean.
+
+`W89-L-HUMANEVAL-REFLEXION-V2-HUMANEVAL-K5-SCALE-CAP` is
+REFINED with stronger 5-seed evidence but still NOT retired.
+New carry-forward `W91-L-MBPP-REFLEXION-V2-5SEED-PARTIAL-CAP`
+records the partial nature: mean robust, per-seed strict
+majority bar continues to fail at 5-seed scale on this
+benchmark / model.
 
 ### W91 strategic finding
 

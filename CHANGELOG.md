@@ -13,7 +13,7 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
-- **W91 post-W90 empirical superiority wave V4 — cross-modal disconfirmation via pre-committed 7-seed extension; MBPP retry pending (2026-05-23)**
+- **W91 post-W90 empirical superiority wave V4 — cross-modal disconfirmation + MBPP 5-seed confirmation (mean robust; per-seed bar still fails) (2026-05-23)**
   — *Cross-modal prong of W91 is the cleanest possible
   disconfirmation of a marginal positive signal under
   W88/W89/W90 anti-cheat discipline.  W91 P2 (3 seeds × 12
@@ -61,11 +61,28 @@ the public symbols) is byte-for-byte unchanged.
   before P2b disconfirmed it.  The retirement-bar discipline
   is empirically the right discipline.
 
-  **W91 Prong 1 — MBPP retry at 5 seeds × 30 (RUNNING as of
-  this commit):** launched in background to test whether the
-  W90 P1 +1.11 pp / 1-of-3-seed result was variance-driven
-  (analogous to W91 P2's disconfirmation) or genuine.  Result
-  will land in a follow-up commit.
+  **W91 Prong 1 — MBPP retry at 5 seeds × 30 (CONFIRMED at
+  5-seed scale; per-seed strict majority bar still fails):**
+  Result: A0 75.3 % / A1 82.7 % / **B 84.0 %**.  B − A1 =
+  **+1.33 pp** on mean (margin clears +1.0 pp threshold).
+  B ≥ A1 on 4/5 seeds; strict B > A1 on 2/5 seeds.  3 of 4
+  pre-committed retirement bars met; per-seed strict majority
+  bar continues to FAIL at 2/5 (need ≥ 3/5).  Unlike the
+  cross-modal W91 P2/P2b disconfirmation, the MBPP mean
+  direction REMAINS POSITIVE at 5-seed scale.  The W89
+  architecture's cross-benchmark generalisation to MBPP is
+  now CONFIRMED on the mean at larger N; per-seed strict
+  signal fragile due to ceiling-saturation (A1 hits 90 % on
+  2 of 5 seeds).  Total wall 8h 31min; 1650 NIM calls; bench
+  Merkle `b5cc804be2caa4da…`; audit verifier 6/7 PASS.
+  `W89-L-HUMANEVAL-REFLEXION-V2-HUMANEVAL-K5-SCALE-CAP` is
+  REFINED with stronger 5-seed evidence but still NOT
+  retired.  New carry-forward
+  `W91-L-MBPP-REFLEXION-V2-5SEED-PARTIAL-CAP`.
+
+  **Bench artifact (W91 P1):**
+  `results/w91/mbpp_reflexion_5seeds/.../` (1650-call sidecar
+  + bench report).
 
   **Documentation (new):**
   - `docs/RUNBOOK_W91.md` (pre-commit contract with P2b
