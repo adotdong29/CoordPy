@@ -5558,3 +5558,102 @@ scale; cross-modal injection at the substrate layer is V2).
 
 Last touched: W88 post-W87 empirical superiority wave V1
 2026-05-22.
+
+---
+
+# W89 post-W88 empirical superiority wave V2 — what to say,
+# what NOT to say (2026-05-22)
+
+## W89 HumanEval sequential-reflexion at 70B (RETIREMENT)
+
+Acceptable: *"At Llama-3.3-70B-Instruct scale on 3 seeds × 30
+HumanEval problems × K=5 budget, the W88 sequential-reflexion
+B-pipeline strictly beats first-pass-among-K=5 self-consistency
+by **+5.56 pp** on the mean (B 91.1 %, A1 85.6 %), with B beating
+A1 on **2/3 seeds**.  Per-seed B − A1 = (+13.3 / −3.3 / +6.7) pp.
+All 4 pre-committed retirement bars from `RUNBOOK_W89.md` met;
+audit chain re-derives offline 7/7 PASS.  The W86 / W88
+HumanEval same-budget multi-agent carry-forwards
+(`W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`,
+`W88-L-HUMANEVAL-REFLEXION-V1-A1-SAME-BUDGET-NOT-BEATEN-CAP`)
+are RETIRED at 70B scale.  The 8B-scale negative evidence
+persists as the new `W89-L-HUMANEVAL-REFLEXION-V2-8B-CAP`
+carry-forward.  This is the FIRST empirical demonstration in
+this programme of a multi-agent CoordPy pipeline beating the
+strongest same-budget single-agent baseline on a published
+benchmark."*
+
+Forbidden phrasing: *"W89 proved multi-agent CoordPy wins at
+all scales on all benchmarks"* (it proved 70B-HumanEval-K=5
+ONLY; 8B still loses; GSM8K still loses; cross-modal split
+still loses), *"we solved multi-agent context"* (one
+published-benchmark same-budget win does not satisfy the
+multi-benchmark + cross-modal bars from
+`HONEST_FRAMING_POST_W87.md`), *"W89 retired the GSM8K
+carry-forward"* (W89 did NOT run GSM8K;
+`W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP`
+stays), *"the retirement is universal"* (it is scoped to
+Llama-3.3-70B-Instruct on HumanEval-30 K=5; smaller models
+and different benchmarks may differ), *"the retirement
+overturns W86 / W88"* (it scopes them — the 8B negative
+result still stands as new `W89-L-*` carry-forward),
+*"frontier 405B / GPT-5 will also win at this bench"* (untested;
+larger-than-70B is V2 work).
+
+## W89 cross-modal at 90B-Vision (STAYS NEGATIVE on team-organisation)
+
+Acceptable: *"W89 ran two cross-modal retries.  P2 used
+Llama-3.2-90B-Vision-Instruct + Llama-3.1-8B with
+`strip_mode=all_docstring`; P3 used 90B-Vision + Llama-3.3-70B
+with `doctest_only`.  Both runs preserve the W88 anti-cheat
+discipline.  **Image is empirically load-bearing at all three
+W88+W89 configurations** (B_cross − A0_text = +13.9 / +16.7 /
++52.8 pp).  **The cross-modal team SPLIT is falsified at all
+three model scales** (B_cross − A1_vlm = −5.6 / −27.8 / −5.6
+pp); scaling code-LM 9× (8B→70B) and VLM 8× (11B→90B) does
+NOT flip the sign in `doctest_only`, and `all_docstring`
+widens the gap 5×.  The unified VLM at K=5 fair budget is
+structurally stronger than VLM-extract + code-LM-generate at
+the tested scales.  Carry-forwards
+`W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP`,
+`W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`,
+`W89-L-CROSS-MODAL-SPLIT-MODEL-SCALE-INVARIANT-CAP`, and
+`W89-L-CROSS-MODAL-ALL-DOCSTRING-SPLIT-WORSE-CAP` all stand."*
+
+Forbidden phrasing: *"W89 retired the cross-modal carry-forward"*
+(it did NOT — both retirement bars still fail at all three
+model scales), *"scaling models will eventually retire it"*
+(W89 evidence says the opposite: the gap is approximately
+invariant under model scale in doctest_only mode and widens
+in all_docstring mode), *"cross-modal teams don't work"*
+(W89 evidence shows the SPECIFIC VLM-extract + code-LM-generate
++ reflexion shape fails; other shapes — VLM-in-loop reflexion,
+parallel heterogeneous pool, substrate-level injection — are
+untested), *"the image is decorative"* (the image is strongly
+load-bearing across all three scales; the W87 multi-modal
+substrate IS carrying real information — this half of the bar
+PASSES).
+
+## W89 strategic interpretation
+
+Acceptable: *"The W86/W88 negative HumanEval result was
+SCALE-DEPENDENT, not architecture-dependent — at 70B the same
+W88 sequential-reflexion architecture clears the bar.  The
+W87/W88 cross-modal split is, by contrast, STRUCTURALLY
+falsified at every model scale tested; future cross-modal
+retirement requires a different architecture, not just larger
+models.  The Reflexion / Self-Debug literature replicates at
+70B on HumanEval under the CoordPy anti-cheat discipline; the
+cross-modal split does not."*
+
+Forbidden phrasing: *"the empirical bar is met"* (it is met on
+HumanEval-70B-K=5; GSM8K, MBPP+, SWE-bench, MATH, and cross-
+modal all remain open), *"all carry-forwards retire if you
+scale up enough"* (W89 directly counter-evidence on the
+cross-modal side), *"the W89 architecture is universal"*
+(sequential reflexion at K=5 works at 70B on HumanEval; it does
+NOT work at 8B; cross-modal extension does NOT work even at
+larger scale).
+
+Last touched: W89 post-W88 empirical superiority wave V2
+2026-05-22.

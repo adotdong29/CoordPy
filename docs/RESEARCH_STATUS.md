@@ -6,56 +6,154 @@
 > is stale. For *theorem-by-theorem* status, see
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
 > `docs/HOW_NOT_TO_OVERSTATE.md`. For **whether the programme
-> has solved multi-agent context** (it has not), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W88 post-W87
-> empirical superiority wave V1** on 2026-05-22 (HumanEval
-> sequential-reflexion + cross-modal code; both NEGATIVE /
-> PARTIAL — neither carry-forward retires). W87 P3 line closures
-> (multi-modal substrate, observability, formal verification)
+> has solved multi-agent context** (it has not — but the
+> empirical bar is now PARTIALLY met on HumanEval at 70B), see
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W89 post-W88
+> empirical superiority wave V2** on 2026-05-22 — **TWO
+> HumanEval-prong carry-forwards RETIRED at 70B scale**;
+> cross-modal prong stays NEGATIVE at three model scales.
+> Prior: W88 post-W87 empirical superiority wave V1 (both
+> NEGATIVE / PARTIAL) 2026-05-22; W87 P3 line closures
 > 2026-05-21; honest framing consolidated post-W87 on
 > 2026-05-22. **Meta-#49 P0+P1+P2 line closed (W86). P3 line
 > (#46/#47/#48) closed (W87). Meta-#4 (W79-era umbrella, 16
 > children) closed by supersession (2026-05-22). W88 added two
-> new `W88-L-*` carry-forwards on the empirical superiority
-> front.**
+> new `W88-L-*` carry-forwards; W89 RETIRED two HumanEval
+> carry-forwards at 70B scale and added four new W89-L-*
+> carry-forwards on the cross-modal and 8B-scale fronts.**
 
 ## Have we solved multi-agent context?
 
-**No.** Closing meta-#49 (24/24 sub-issues) and meta-#4
-(16/16 sub-issues) closes the *blocker backlog* — the
-substrate to attack the problem.  It is **not** the same as
-demonstrating multi-agent CoordPy teams outperform strong
-single-agent baselines at fair compute on a broad set of real
-tasks.  In particular:
+**No** — but for the first time, one same-budget multi-agent
+superiority claim is empirically established on a published
+benchmark at frontier model scale.  Closing meta-#49 (24/24
+sub-issues) and meta-#4 (16/16 sub-issues) closes the *blocker
+backlog* — the substrate to attack the problem.  W89 closes the
+first published-benchmark empirical superiority claim.  The
+broader empirical bar (multi-benchmark superiority + working
+cross-modal architecture) still requires more work.
 
-* On the W86 published benchmark we ran (HumanEval × Llama-3.1-8B,
-  3 seeds × 30 problems), CoordPy multi-agent + executor-as-critic
-  beat the stock single-shot baseline by +7.8 pp but **lost to
-  self-consistency at the same compute budget by −8.9 pp**.
-  Carry-forward: `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`.
-* The W88 retry with a cleaner sequential-reflexion B-pipeline
-  closed the gap (−8.9 pp → −3.33 pp) but did NOT flip the sign.
-  Carry-forward:
+The current empirical state:
+
+* **HumanEval × Llama-3.3-70B-Instruct (W89 retirement):** B
+  sequential-reflexion-K=5 mean pass@1 = **91.1 %** > A1
+  first-pass-among-K=5 mean = **85.6 %** by **+5.56 pp**, with
+  B winning on 2/3 seeds.  All 4 retirement bars met; audit
+  chain re-derives 7/7 PASS.  RETIRED carry-forwards:
+  `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`,
   `W88-L-HUMANEVAL-REFLEXION-V1-A1-SAME-BUDGET-NOT-BEATEN-CAP`.
-* The W85 GSM8K head-to-head showed the same pattern.
-  Carry-forward:
-  `W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP`.
-* The W88 cross-modal head-to-head proved IMAGE is load-bearing
-  (+13.9 pp B_cross over text-only) but the multi-agent
-  VLM-extract + code-LM-generate split LOST to the same-budget
-  single-agent VLM by −5.56 pp.  Carry-forwards:
-  `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP` and
-  `W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`.
+* **HumanEval × Llama-3.1-8B (8B-scale still negative):** B
+  71.1 % < A1 74.4 % by −3.33 pp (W88).  New
+  carry-forward `W89-L-HUMANEVAL-REFLEXION-V2-8B-CAP` scopes
+  the negative result to 8B; the W89 retirement is conditional
+  on model scale.
+* **GSM8K × Llama-3.1-8B (W85 negative, unchanged):** B lost to
+  both A0 and A1.  Carry-forward
+  `W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP`
+  stays; W89 did not run GSM8K; whether the 70B retirement
+  extends to GSM8K is V2.
+* **Cross-modal × HumanEval-Visual (three model scales, all
+  negative on team-organisation; all positive on
+  image-load-bearing):** B_cross − A1_vlm = −5.56 / −27.78 /
+  −5.56 pp at W88 11B+8B doctest_only / W89 P2 90B+8B
+  all_docstring / W89 P3 90B+70B doctest_only.  Image IS
+  load-bearing (B − A0_text = +13.9 / +16.7 / +52.8 pp).  Team
+  organisation is structurally FALSIFIED at every model scale
+  tested.  Carry-forwards
+  `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP`,
+  `W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`,
+  `W89-L-CROSS-MODAL-SPLIT-MODEL-SCALE-INVARIANT-CAP`, and
+  `W89-L-CROSS-MODAL-ALL-DOCSTRING-SPLIT-WORSE-CAP` all stand.
 
-What we shipped is real and load-bearing for the next wave.
-What we did **not** ship is convincing empirical evidence that
-multi-agent teams under CoordPy are best-in-class on real
-benchmarks.  See `docs/HONEST_FRAMING_POST_W87.md` for the full
-"what we did vs. what would constitute solving" bar.
+What we now have: the substrate (closed) + one
+published-benchmark same-budget multi-agent superiority claim
+at frontier scale (W89 retirement).  See
+`docs/HONEST_FRAMING_POST_W87.md` for the full "what we did
+vs. what would constitute solving" bar.
 
 Any claim in any other doc, paper draft, demo, or external
 pitch that the programme has *solved* multi-agent context is
 overstatement and is rejected by this file.
+
+## TL;DR — W89 post-W88 empirical superiority wave V2 (FIRST RETIREMENT)
+
+The first programme milestone to actually RETIRE an empirical
+carry-forward.  Pre-commit bench shape + retirement bars locked
+in `docs/RUNBOOK_W89.md` BEFORE any W89 run.  Targeted both
+W88-residual carry-forward families with two structural pivots:
+(1) stronger model on HumanEval; (2) stronger VLM + harder
+image-load-bearing regime on cross-modal.
+
+### W89 Prong 1 (HumanEval, 70B): **RETIREMENT**
+
+`coordpy.humaneval_reflexion_bench_v1` ships unchanged; only the
+NIM model id flips to `meta/llama-3.3-70b-instruct`.  3 seeds ×
+30 problems × K=5 budget; bench Merkle `977c213285995bd5…`;
+audit verifier 7/7 PASS.  Total wall 2 h 51 min; 990 NIM calls.
+
+Result:
+
+| Arm | Mean pass@1 | Per-seed |
+|----|---:|---|
+| A0 stock single-shot (T=0)         | 46.7 % | 0.600 / 0.400 / 0.400 |
+| A1 first-pass-among-K=5 (T=0.7)    | 85.6 % | 0.800 / 0.867 / 0.900 |
+| **B sequential-reflexion-K=5 (T=0.7)** | **91.1 %** | **0.933 / 0.833 / 0.967** |
+
+* B − A1 = **+5.56 pp** (margin exceeds the +1.0 pp pre-committed
+  minimum).
+* B beats A1 on **2/3 seeds** (per-seed +13.3 / −3.3 / +6.7 pp).
+* All 4 pre-committed retirement bars MET.
+* `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN` and
+  `W88-L-HUMANEVAL-REFLEXION-V1-A1-SAME-BUDGET-NOT-BEATEN-CAP`
+  **RETIRED at 70B scale**.
+* New carry-forward `W89-L-HUMANEVAL-REFLEXION-V2-8B-CAP`
+  scopes the negative result to 8B (the 8B negative evidence
+  persists).
+* `W89-L-HUMANEVAL-REFLEXION-V2-A0-T0-ANOMALY-CAP` records
+  the unexpectedly low 70B A0 mean (46.7 % vs W88 8B's
+  63.3 %); does NOT affect the headline B-vs-A1 finding.
+
+This is the **first empirical demonstration in this programme
+of a multi-agent CoordPy pipeline beating the strongest same-
+budget single-agent baseline on a published benchmark** under
+the W86/W88 anti-cheat discipline.
+
+### W89 Prong 2 + Prong 3 (cross-modal): STAYS NEGATIVE
+
+Two retry runs.  Both negative on the team-organisation
+direction; both positive on the image-load-bearing direction.
+
+* **P2** (90B-Vision + 8B-code, `all_docstring`): B−A1_vlm =
+  −27.78 pp (gap widens 5× from W88's −5.56 pp; split COLLAPSES
+  when image is the sole information source).
+* **P3** (90B-Vision + 70B-code, `doctest_only`): B−A1_vlm =
+  −5.56 pp (gap is invariant under model scale in
+  doctest_only mode; both arms scaled up proportionally).
+
+Cross-modal carry-forwards stay; new carry-forwards added:
+`W89-L-CROSS-MODAL-SPLIT-MODEL-SCALE-INVARIANT-CAP` and
+`W89-L-CROSS-MODAL-ALL-DOCSTRING-SPLIT-WORSE-CAP`.
+
+**Audit chains re-derive offline:** W89 P1 verifier 7/7 PASS on
+990 SHA + 3 per-seed Merkle + bench Merkle; W89 P2 verifier
+4/4 audit PASS on 180+216 SHA + 3+1 Merkle; W89 P3 verifier
+4/4 audit PASS on 180+216 SHA + 3+1 Merkle.
+
+**Strategic finding:** the W86/W88 negative HumanEval result
+was scale-dependent, not architecture-dependent — at 70B, the
+same W88 sequential-reflexion architecture beats A1.  The
+W87/W88 cross-modal split, by contrast, is structurally
+falsified at every model scale tested; future attempts need
+a different architecture (VLM-in-loop, parallel heterogeneous
+pool, or substrate-level cross-modal injection), not just
+larger models.
+
+See `docs/RUNBOOK_W89.md`, `docs/W88_FAILURE_DIAGNOSIS.md`,
+`docs/RESULTS_W89_HUMANEVAL_REFLEXION_V2.md`,
+`docs/RESULTS_W89_CROSS_MODAL_CODE_V2.md`, and the W89 entries
+in `docs/THEOREM_REGISTRY.md` /
+`docs/HOW_NOT_TO_OVERSTATE.md`.
+
 
 ## TL;DR — W88 post-W87 empirical superiority wave V1
 

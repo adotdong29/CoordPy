@@ -13,6 +13,98 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W89 post-W88 empirical superiority wave V2 — FIRST RETIREMENT at 70B-HumanEval; cross-modal stays negative (2026-05-22)**
+  — *the first programme milestone to actually RETIRE empirical
+  carry-forwards under the pre-committed retirement-bar
+  discipline.  Pre-commit bench shape locked in
+  `docs/RUNBOOK_W89.md` BEFORE any W89 run.  Two structural
+  pivots from W88: (1) stronger model on the HumanEval prong
+  (Llama-3.3-70B-Instruct); (2) stronger VLM
+  (Llama-3.2-90B-Vision-Instruct) + harder image-load-bearing
+  regime (`strip_mode=all_docstring`) on the cross-modal
+  prong.  Pre-W89 diagnostic note:
+  `docs/W88_FAILURE_DIAGNOSIS.md` written BEFORE any W89 run.*
+
+  **W89 Prong 1 — HumanEval at 70B (RETIREMENT):**
+  `coordpy.humaneval_reflexion_bench_v1` ships unchanged; only
+  the NIM model id flips to `meta/llama-3.3-70b-instruct`.
+  Run on 3 seeds × 30 problems × K=5 budget; bench Merkle
+  `977c213285995bd5…`; audit verifier 7/7 PASS; total wall
+  2 h 51 min; 990 NIM calls.  Result: A0 46.7 % / A1 85.6 % /
+  B **91.1 %**.  B − A1 = **+5.56 pp**; B beats A1 on
+  **2/3 seeds** (per-seed +13.3 / −3.3 / +6.7 pp).
+  **All 4 pre-committed retirement bars MET.**  The W86 and
+  W88 HumanEval same-budget multi-agent carry-forwards
+  (`W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN`,
+  `W88-L-HUMANEVAL-REFLEXION-V1-A1-SAME-BUDGET-NOT-BEATEN-CAP`)
+  are RETIRED at 70B scale.  The 8B-scale negative evidence
+  persists as new `W89-L-HUMANEVAL-REFLEXION-V2-8B-CAP`
+  carry-forward.  This is the FIRST empirical demonstration
+  in this programme of a multi-agent CoordPy pipeline beating
+  the strongest same-budget single-agent baseline on a
+  published benchmark.  Additional honest observations:
+  `W89-L-HUMANEVAL-REFLEXION-V2-A0-T0-ANOMALY-CAP` records
+  the unexpectedly low 70B A0 mean (46.7 %); does NOT affect
+  B-vs-A1 finding.  `W89-L-HUMANEVAL-REFLEXION-V2-SEED-2-LOSS-CAP`
+  records the single seed-2 loss (−3.3 pp); within A1's
+  seed-to-seed variance.
+
+  **W89 Prong 2 + Prong 3 — Cross-modal (STAYS NEGATIVE):**
+  Two retry runs of `coordpy.cross_modal_code_bench_v1`,
+  both preserving the W88 anti-cheat discipline.
+  - P2 (`90B-Vision + 8B-code`, `strip_mode=all_docstring`):
+    A0_text 41.7 % / A1_vlm 86.1 % / B_cross 58.3 %.
+    B − A1 = **−27.78 pp** (split COLLAPSES when image is sole
+    info source).  Bench Merkle `00caee17e5c3f738…`; verifier
+    4/4 audit PASS.
+  - P3 (`90B-Vision + 70B-code`, `strip_mode=doctest_only`):
+    A0_text 33.3 % / A1_vlm 91.7 % / B_cross 86.1 %.
+    B − A1 = **−5.56 pp** (same gap as W88; scaling both
+    models proportionally preserves the gap).  Bench Merkle
+    `79fac23cc8316d60…`; verifier 4/4 audit PASS.
+  **Image IS load-bearing across all three configurations**
+  (B − A0_text = +13.9 / +16.7 / +52.8 pp; all exceed +5.0 pp
+  pre-committed threshold).  **The cross-modal team SPLIT is
+  FALSIFIED at all three model scales**; scaling models alone
+  cannot retire the carry-forward.  New carry-forwards:
+  `W89-L-CROSS-MODAL-SPLIT-MODEL-SCALE-INVARIANT-CAP` (gap is
+  approximately scale-invariant in doctest_only mode);
+  `W89-L-CROSS-MODAL-ALL-DOCSTRING-SPLIT-WORSE-CAP` (gap
+  widens 5× when image is sole info source).  The W87 / W88
+  cross-modal carry-forwards STAY.
+
+  **Strategic finding:** the W86/W88 negative HumanEval result
+  was SCALE-DEPENDENT, not architecture-dependent — at 70B the
+  same W88 sequential-reflexion architecture clears the bar.
+  The W87/W88 cross-modal split is, by contrast, STRUCTURALLY
+  falsified at every model scale tested; future cross-modal
+  retirement requires a different architecture, not just
+  larger models.
+
+  **Documentation:**  `docs/RUNBOOK_W89.md` (pre-commit
+  contract), `docs/W88_FAILURE_DIAGNOSIS.md` (structural-
+  failure analysis written BEFORE W89 runs),
+  `docs/RESULTS_W89_HUMANEVAL_REFLEXION_V2.md` (retirement
+  record), `docs/RESULTS_W89_CROSS_MODAL_CODE_V2.md` (cross-
+  modal negative record).  Cross-cutting surfaces
+  (`docs/RESEARCH_STATUS.md`, `docs/THEOREM_REGISTRY.md`,
+  `docs/HOW_NOT_TO_OVERSTATE.md`,
+  `docs/HONEST_FRAMING_POST_W87.md`) updated; the two W86/W88
+  HumanEval carry-forwards marked **retired-at-70B** in the
+  registry; the cross-modal carry-forwards explicitly stay.
+
+  **Bench artifacts:**  three new run directories under
+  `results/w88/{humaneval_reflexion,cross_modal_code}/`:
+  P1 humaneval-reflexion-70B (990 calls); P2 cross-modal-90B-
+  all_docstring-8B (180+216 calls); P3 cross-modal-90B-doctest_only-70B
+  (180+216 calls).
+
+  **Stable boundary unchanged:**  `coordpy.__version__` =
+  `0.5.20`; `coordpy.SDK_VERSION` = `coordpy.sdk.v3.43`; no
+  PyPI publish; `coordpy/__init__.py` untouched; no new
+  modules (W89 is parameter-only retries of the W88
+  infrastructure).
+
 - **W88 post-W87 empirical superiority wave V1 — both honest negative / partial; carry-forwards stay (2026-05-22)**
   — *the first programme milestone explicitly oriented around
   the empirical bars in `docs/HONEST_FRAMING_POST_W87.md`
