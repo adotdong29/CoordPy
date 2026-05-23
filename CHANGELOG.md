@@ -13,6 +13,81 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W91 post-W90 empirical superiority wave V4 — cross-modal disconfirmation via pre-committed 7-seed extension; MBPP retry pending (2026-05-23)**
+  — *Cross-modal prong of W91 is the cleanest possible
+  disconfirmation of a marginal positive signal under
+  W88/W89/W90 anti-cheat discipline.  W91 P2 (3 seeds × 12
+  problems × all_docstring × VLM-in-loop × 90B-Vision) showed
+  B 86.1 % > A1_vlm 83.3 % by **+2.78 pp** on the mean (5/6
+  retirement bars met; only the +5 pp margin bar failed at
+  +2.78 < +5.0).  Per the W91 runbook's pre-committed
+  conditional, the follow-up W91 P2b (7 seeds, same config)
+  CLEANLY DISCONFIRMED the P2 signal: at 7 seeds B 77.4 %
+  loses to A1_vlm 84.5 % by **−7.14 pp**; B wins only 2/7
+  seeds.  The 3-seed +2.78 pp positive was variance-driven,
+  not structural.*
+
+  **Both bench reports re-derive offline (4/4 audit PASS
+  each):**
+  - W91 P2 bench Merkle `e335a129db6030c7…` (3 seeds, +2.78
+    pp, 5/6 bars).
+  - W91 P2b bench Merkle `12dee027ec865214…` (7 seeds, −7.14
+    pp, 3/6 bars).
+
+  **Cumulative cross-modal evidence after W91 (6
+  configurations):**
+  - Image is load-bearing across all 6 (B − A0_text = +13.9 /
+    +16.7 / +52.8 / +16.7 / +41.7 / +34.5 pp).
+  - Multi-agent cross-modal team is NOT load-bearing-better
+    than unified VLM at fair K=5 budget across all 6
+    (B − A1_vlm = −5.6 / −27.8 / −5.6 / +0.0 / +2.78 /
+    −7.14 pp).
+
+  **Carry-forwards stay:**
+  `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP`,
+  `W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`,
+  plus the W89/W90 cross-modal-cap chain.
+
+  **New W91-L-* carry-forwards:**
+  - `W91-L-CROSS-MODAL-VLM-LOOP-V2-3-SEED-VARIANCE-CAP`
+    (the W91 P2 marginal +2.78 pp at 3 seeds was variance)
+  - `W91-L-CROSS-MODAL-VLM-LOOP-V2-DECISIVE-NEGATIVE-CAP`
+    (the W91 P2b 7-seed result is the most decisive negative
+    cross-modal evidence to date)
+
+  **W91-T-PRE-COMMIT-MARGIN-BAR-VALIDATED:** the W88 +5 pp
+  pre-committed margin bar (preserved through W89/W90/W91)
+  correctly rejected the W91 P2 marginal +2.78 pp signal
+  before P2b disconfirmed it.  The retirement-bar discipline
+  is empirically the right discipline.
+
+  **W91 Prong 1 — MBPP retry at 5 seeds × 30 (RUNNING as of
+  this commit):** launched in background to test whether the
+  W90 P1 +1.11 pp / 1-of-3-seed result was variance-driven
+  (analogous to W91 P2's disconfirmation) or genuine.  Result
+  will land in a follow-up commit.
+
+  **Documentation (new):**
+  - `docs/RUNBOOK_W91.md` (pre-commit contract with P2b
+    conditional)
+  - `docs/RESULTS_W91_CROSS_MODAL_VLM_LOOP_V2.md` (both runs
+    + decisive negative interpretation)
+
+  **Truth surfaces updated:**
+  `docs/RESEARCH_STATUS.md`, `docs/THEOREM_REGISTRY.md`,
+  `docs/HOW_NOT_TO_OVERSTATE.md`, `docs/HONEST_FRAMING_POST_W87.md`.
+
+  **Bench artifacts:**
+  `results/w91/cross_modal_vlm_loop_all_docstring/.../`,
+  `results/w91/cross_modal_vlm_loop_all_docstring_7seeds/.../`.
+
+  **No new modules; no new tests** — W91 reuses
+  `coordpy.cross_modal_vlm_loop_bench_v1` unchanged.
+
+  **Stable boundary unchanged:** `coordpy.__version__` =
+  `0.5.20`; `coordpy.SDK_VERSION` = `coordpy.sdk.v3.43`; no
+  PyPI publish; `coordpy/__init__.py` untouched.
+
 - **W90 post-W89 empirical superiority wave V3 — NO new retirements; significant architectural refinements (2026-05-23)**
   — *Three-prong attack on the post-W89 empirical bar.
   Pre-commit bench shape locked in `docs/RUNBOOK_W90.md`

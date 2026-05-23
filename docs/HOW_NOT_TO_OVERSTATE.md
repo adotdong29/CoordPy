@@ -5773,3 +5773,83 @@ larger K, deep cross-modal substrate injection).
 
 Last touched: W90 post-W89 empirical superiority wave V3
 2026-05-23.
+
+---
+
+# W91 post-W90 empirical superiority wave V4 — what to say,
+# what NOT to say (2026-05-23)
+
+## W91 cross-modal VLM-in-loop at all_docstring (PARTIAL → DISCONFIRMED)
+
+Acceptable: *"W91 P2 (3 seeds × 12 problems × all_docstring +
+VLM-in-loop + 90B-Vision) showed B 86.1 % > A1_vlm 83.3 % by
+**+2.78 pp** on the mean; B beat A1_vlm on 2/3 seeds; image
+beat A0_text by +41.67 pp.  Five of six retirement bars met
+(the +5 pp margin bar failed at +2.78 < +5.0).  Per the W91
+runbook pre-committed conditional, the follow-up 7-seed run
+(W91 P2b) was launched immediately.  W91 P2b CLEANLY
+DISCONFIRMED the P2 signal: at 7 seeds B 77.4 % loses to
+A1_vlm 84.5 % by **−7.14 pp**, B wins only 2/7 seeds.  The
+W91 P2 +2.78 pp at 3 seeds was variance-driven, not
+structural.  The +5 pp pre-committed margin bar correctly
+rejected the marginal P2 result before P2b had a chance to
+disconfirm it.  The W88 cross-modal carry-forward STAYS
+with stronger negative evidence now from 7 seeds."*
+
+Forbidden phrasing: *"W91 retired the cross-modal
+carry-forward"* (it did NOT — both runs together preserve the
+W88 negative with stronger evidence), *"cross-modal team
+organisation beats unified VLM at K=5"* (the 7-seed evidence
+says NO at this scale on this corpus), *"the +2.78 pp gap is
+robust evidence"* (it's NOT robust; the 7-seed extension
+explicitly disconfirms it), *"more seeds means cherry-picking"*
+(W91 P2b was PRE-COMMITTED conditional in the W91 runbook
+BEFORE results were known; expanding scope to test a marginal
+positive result IS anti-cherry-pick honesty), *"the +5 pp bar
+is too strict"* (the bar discipline is exactly what prevented
+a false retirement).
+
+## W91 cross-modal cumulative finding (decisive negative)
+
+Acceptable: *"After 6 cross-modal configurations spanning W88
+V1, W89 P2, W89 P3, W90 P2, W91 P2, W91 P2b — covering
+3 model-scale jumps (11B-V → 90B-V, 8B-code → 70B-code), 2
+strip modes (doctest_only / all_docstring), 2 architectures
+(VLM-extract+code-LM split / VLM-in-loop), 3- and 7-seed scales
+— **image is empirically load-bearing on all six**
+(B − A0_text = +13.9 / +16.7 / +52.8 / +16.7 / +41.7 / +34.5
+pp; all > +5 pp), while **multi-agent cross-modal organisation
+is NOT load-bearing-better than unified VLM at fair K=5
+budget on all six** (B − A1_vlm = −5.6 / −27.8 / −5.6 / +0.0 /
++2.78@3-seed / −7.14@7-seed pp).  The W87 multi-modal
+substrate carries real image-load-bearing information; the
+cross-modal TEAM-ORGANISATION at K=5 on HumanEval-Visual is
+NOT empirically superior to unified VLM K=5."*
+
+Forbidden phrasing: *"cross-modal teams don't work"* (only
+under the specific configurations tested), *"the W87
+substrate is broken"* (the substrate is PROVEN load-bearing
+in 6/6 configurations on the image axis; only the team-
+organisation question is negative), *"VLM-in-loop is dead"*
+(it's the best architecture so far — closes the gap from
+W88/W89's negative gaps to ~zero or marginally negative;
+just not strict-superiority-at-+5pp).
+
+## W91 pre-commit discipline validated
+
+Acceptable: *"The W91 evidence empirically validates the
+W88/W89/W90 pre-committed retirement-bar discipline.  W91 P2's
+3-seed result hit 5/6 bars; the +5 pp margin bar correctly
+rejected the marginal positive.  Without that bar, the 3-seed
++2.78 pp would have been a false retirement; the 7-seed
+follow-up (also pre-committed conditional in the runbook)
+showed the underlying mean is −7.14 pp."*
+
+Forbidden phrasing: *"W91 broke the retirement discipline"* (no
+— the discipline worked exactly as designed: tight bars
+prevented variance-driven false positives), *"we need looser
+bars to make progress"* (W91 P2b shows looser bars would
+produce false retirements).
+
+Last touched: W91 post-W90 empirical superiority wave V4
+2026-05-23.

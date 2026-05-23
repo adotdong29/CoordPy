@@ -9,21 +9,25 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W90 post-W89
-> empirical superiority wave V3** on 2026-05-23 — no NEW
-> retirements; W90 P1 MBPP-70B shows directional cross-benchmark
-> generalisation on the MEAN (+1.11 pp; 1/3 seeds; 3/4 bars —
-> per-seed majority FAILS); W90 P2 cross-modal VLM-in-loop
-> CLOSES the W88/W89 gap from −5.6 / −27.8 / −5.6 pp to **+0.00
-> pp** (best architecture yet, TIES A1_vlm); W90 P3 GSM8K-70B
-> cancelled mid-run.  Prior: W89 (2026-05-22) RETIRED two
-> HumanEval carry-forwards at 70B; W88 (2026-05-22) both
-> negative; W87 P3 line closures 2026-05-21.  **Meta-#49 P0+P1+P2
-> line closed (W86). P3 line (#46/#47/#48) closed (W87).
-> Meta-#4 closed by supersession (2026-05-22).  W89 RETIRED 2
-> carry-forwards at 70B-HumanEval; W90 added 7 new
-> `W90-L-*` carry-forwards documenting MBPP partial generalisation,
-> cross-modal-VLM-in-loop tie, GSM8K-not-tested.**
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W91 post-W90
+> empirical superiority wave V4** on 2026-05-23 — cross-modal
+> prong: W91 P2 (3 seeds × 12 × all_docstring × VLM-in-loop)
+> showed B +2.78 pp / 5 of 6 bars (margin bar fails); the
+> pre-committed conditional W91 P2b (7 seeds) CLEANLY
+> DISCONFIRMED P2 (B −7.14 pp / 2 of 7 seeds).  The +5 pp
+> margin bar correctly rejected the marginal P2 result.  The
+> W88 cross-modal carry-forward STAYS with stronger negative
+> evidence.  MBPP retry at 5 seeds × 30 problems × 70B (W91
+> Prong 1) still running; will follow-up commit.  Prior: W90
+> (2026-05-23) both partial / tie; W89 (2026-05-22) first
+> retirement; W88 (2026-05-22) both negative; W87 P3 line
+> closures 2026-05-21.  **Meta-#49 P0+P1+P2 line closed (W86).
+> P3 line (#46/#47/#48) closed (W87).  Meta-#4 closed by
+> supersession (2026-05-22).  W89 RETIRED 2 HumanEval carry-
+> forwards at 70B; W90+W91 added 11 new `W90-L-*` /
+> `W91-L-*` carry-forwards documenting partial / decisive
+> negatives across MBPP partial generalisation, cross-modal
+> VLM-in-loop tie+disconfirmed-positive, GSM8K-not-tested.**
 
 ## Have we solved multi-agent context?
 
@@ -77,6 +81,100 @@ vs. what would constitute solving" bar.
 Any claim in any other doc, paper draft, demo, or external
 pitch that the programme has *solved* multi-agent context is
 overstatement and is rejected by this file.
+
+## TL;DR — W91 post-W90 empirical superiority wave V4 (cross-modal disconfirmation; MBPP retry running)
+
+The W91 wave attacks the remaining cross-modal carry-forward
+with a structurally-motivated combination — W90 P2's
+VLM-in-loop architecture × W89 P2's harder `all_docstring`
+regime.  Pre-commit bench shape + conditional W91 P2b extension
+locked in `docs/RUNBOOK_W91.md` BEFORE any W91 run.
+
+### W91 Prong 2 — Cross-modal VLM-in-loop at `all_docstring`, 3 seeds (PARTIAL: 5/6 BARS MET)
+
+3 seeds × 12 problems × K=5 × Llama-3.2-90B-Vision-Instruct
+× `strip_mode=all_docstring`.  Bench Merkle `e335a129db6030c7…`;
+audit verifier 4/4 audit PASS.
+
+* A0_text  44.4 % | A1_vlm 83.3 % | **B_vlm_loop 86.1 %**
+* B − A1_vlm = **+2.78 pp** (FIRST cross-modal config where B
+  mean strictly beats A1_vlm mean).
+* B beats A1_vlm on **2/3 seeds** (per-seed: +8.33, +8.33,
+  −8.33 — the −8.33 is seed 3 where A1_vlm hit 100 % ceiling).
+* B beats A0_text on 3/3 seeds (+41.67 pp).
+* **5 of 6 retirement bars MET; the +5 pp margin bar FAILS**
+  (B − A1_vlm +2.78 pp < +5.0 pp).
+
+Per the W91 runbook's pre-committed conditional, the marginal
++2.78 pp triggered W91 P2b (7 seeds, same config).
+
+### W91 Prong 2b — Cross-modal VLM-in-loop at `all_docstring`, 7 seeds (DECISIVE DISCONFIRMATION)
+
+7 seeds × 12 problems × K=5 × same config.  Bench Merkle
+`12dee027ec865214…`; audit verifier 4/4 audit PASS.
+
+* A0_text  42.9 % | A1_vlm 84.5 % | **B_vlm_loop 77.4 %**
+* B − A1_vlm = **−7.14 pp** (NEGATIVE; reverses P2 signal).
+* B beats A1_vlm on **only 2/7 seeds**.
+* B beats A0_text on 7/7 seeds (+34.5 pp).
+* **3/6 retirement bars met** (image direction); 3/6 fail
+  (team-organisation direction).
+
+**The W91 P2 +2.78 pp result did NOT replicate at 7 seeds.
+The 3-seed positive signal was variance-driven, not
+structural.** The +5 pp pre-committed margin bar correctly
+rejected the marginal P2 result before P2b had a chance to
+disconfirm it; the bar discipline is empirically validated.
+
+### Cumulative cross-modal evidence after W91
+
+Across 6 configurations (W88 V1 + W89 P2 + W89 P3 + W90 P2 +
+W91 P2 + W91 P2b):
+
+* **Image is load-bearing across ALL SIX** (B − A0_text =
+  +13.9 / +16.7 / +52.8 / +16.7 / +41.7 / +34.5 pp).
+* **Multi-agent cross-modal team is NOT load-bearing-better
+  than unified VLM at fair K=5 budget** (B − A1_vlm = −5.6 /
+  −27.8 / −5.6 / +0.0 / +2.78(3s)/−7.14(7s) pp).
+
+The W87 multi-modal substrate genuinely carries load-bearing
+image information; the cross-modal TEAM-ORGANISATION question
+is decisively NEGATIVE at K=5 on this corpus on these VLMs.
+
+`W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP` and
+`W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP` both
+STAY.  New W91-L-* carry-forwards:
+`W91-L-CROSS-MODAL-VLM-LOOP-V2-3-SEED-VARIANCE-CAP`,
+`W91-L-CROSS-MODAL-VLM-LOOP-V2-DECISIVE-NEGATIVE-CAP`.
+
+### W91 Prong 1 — MBPP retry at 5 seeds × 30 (RUNNING)
+
+The MBPP retry at 5 seeds × 30 problems × 70B is launched in
+background as of this commit.  Result will land in a follow-
+up commit.  Expected: tests whether the W90 P1 +1.11 pp / 1
+of 3 seed result was variance-driven (analogous to W91 P2's
+disconfirmation) or genuine cross-benchmark generalisation.
+
+### W91 strategic finding
+
+**The +5 pp pre-committed margin bar discipline is empirically
+validated.**  Without it, W91 P2's marginal +2.78 pp would have
+been declared a retirement; the 7-seed follow-up showed the
+underlying mean is −7.14 pp.  Tight bars prevent variance-
+driven false positives.
+
+The cross-modal team architecture's negative result is now
+robust across model scales, architectures, regimes, and at
+adequate seed counts.  Future cross-modal retirement attempts
+must change something more fundamental than the W88/W89/W90/W91
+team architectures: K budget, benchmark choice, or
+substrate-level cross-modal injection.
+
+See `docs/RUNBOOK_W91.md`,
+`docs/RESULTS_W91_CROSS_MODAL_VLM_LOOP_V2.md`, and the W91
+entries in `docs/THEOREM_REGISTRY.md` /
+`docs/HOW_NOT_TO_OVERSTATE.md`.
+
 
 ## TL;DR — W90 post-W89 empirical superiority wave V3
 

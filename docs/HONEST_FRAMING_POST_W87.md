@@ -2,17 +2,19 @@
 
 > **Canonical, mandatory honesty surface for any claim that
 > follows from the W87 closure of meta-#49.**  Last touched
-> 2026-05-23 after the W90 post-W89 empirical superiority wave
-> V3 — **no NEW retirements**; the W89 70B-HumanEval retirement
-> remains; W90 MBPP-70B shows DIRECTIONAL cross-benchmark
-> generalisation on the MEAN (+1.11 pp) but fails the per-seed
-> majority bar (1/3) so the "HumanEval-only" cap is REFINED not
-> retired; W90 VLM-in-loop CLOSES the cross-modal gap from
-> W88/W89's −5.6 / −27.8 / −5.6 pp to **+0.00 pp** (best
-> architecture so far) but TIES A1_vlm so the cross-modal
-> carry-forward also STAYS.  Prior touches: W89 (2026-05-22)
-> first retirement; W88 (2026-05-22) both negative; meta-#49
-> + meta-#4 closed 2026-05-22.
+> 2026-05-23 after the W91 post-W90 empirical superiority wave
+> V4 — **no NEW retirements**.  The W89 70B-HumanEval
+> retirement remains.  W91 P2 (3 seeds) showed cross-modal
+> VLM-in-loop at all_docstring beats A1_vlm by +2.78 pp on the
+> mean (5/6 retirement bars met; the +5 pp margin bar fails);
+> the pre-committed conditional W91 P2b (7 seeds) **CLEANLY
+> DISCONFIRMED** the P2 signal — at 7 seeds B is −7.14 pp
+> BELOW A1_vlm.  The +5 pp margin bar correctly rejected the
+> P2 variance-driven positive; the W88 cross-modal carry-
+> forward STAYS with stronger negative evidence now from 7
+> seeds.  Prior touches: W90 (2026-05-23) both partial / tie;
+> W89 (2026-05-22) first retirement; W88 (2026-05-22) both
+> negative; meta-#49 + meta-#4 closed 2026-05-22.
 >
 > If this file disagrees with any other doc about whether we
 > *solved multi-agent context*, this file is right and the
@@ -387,6 +389,54 @@ Until that meta issue is closed with the same discipline as
 meta-#49, claims of having solved multi-agent context are
 overstatement and must be rejected by any reader of this
 file.
+
+### W91 cross-modal contribution (2026-05-23)
+
+The W91 wave's cross-modal prong used the cleanest possible
+pre-commit conditional test under W88/W89/W90 anti-cheat
+discipline:
+
+* **W91 P2 (3 seeds, all_docstring, VLM-in-loop, 90B-Vision):**
+  B 86.1 % > A1_vlm 83.3 % by **+2.78 pp** on the mean; B beats
+  A1_vlm on 2/3 seeds; B beats A0_text by +41.7 pp on 3/3
+  seeds.  **5 of 6 retirement bars met; the +5 pp margin bar
+  failed** (+2.78 < +5.0).  This was the first cross-modal
+  configuration where B strictly beat A1_vlm on both mean and
+  per-seed majority — but the +5 pp margin discipline (the
+  pre-committed retirement threshold inherited from W88
+  unchanged) correctly identified this as marginal.
+
+* **W91 P2b (7 seeds, same config, pre-committed conditional):**
+  per the W91 runbook, P2's marginal positive result triggered
+  the pre-committed 7-seed extension.  Result: B 77.4 % <
+  A1_vlm 84.5 % by **−7.14 pp** on the mean; B beats A1_vlm on
+  only **2/7 seeds**.  The P2 signal was **variance-driven and
+  did NOT replicate** at adequate seed count.
+
+**Two consequences:**
+
+1. The cross-modal carry-forward
+   `W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`
+   stays, with the **decisive negative evidence now from 7
+   seeds at the harder regime** (W91-L-CROSS-MODAL-VLM-LOOP-V2-DECISIVE-NEGATIVE-CAP).
+2. The +5 pp pre-committed margin bar **VALIDATED its purpose**:
+   it correctly rejected a 3-seed variance-driven positive
+   that would have been a false retirement.  The W88 / W89 /
+   W90 retirement-bar discipline is empirically the right
+   discipline.
+
+The image-load-bearing direction is now PROVEN at **6
+independent configurations** (B − A0_text = +13.9 / +16.7 /
++52.8 / +16.7 / +41.7 / +34.5 pp; all > +5 pp pre-committed
+threshold).  The W87 multi-modal substrate genuinely carries
+load-bearing information.  But cross-modal team organisation
+at K=5 budget on Llama-3.2-{11B, 90B}-Vision-Instruct on
+HumanEval-Visual is NOT load-bearing-better than unified VLM —
+the 6 configurations agree.
+
+The MBPP retry (W91 Prong 1 at 5 seeds × 30) is still running
+as of this commit.  Result will land in a follow-up commit
+under W91 P1.
 
 ### W88 → W89 → W90 contribution
 
