@@ -7,20 +7,23 @@
 > `docs/THEOREM_REGISTRY.md`. For *what may be claimed*, see
 > `docs/HOW_NOT_TO_OVERSTATE.md`. For **whether the programme
 > has solved multi-agent context** (it has not — but the
-> empirical bar is now PARTIALLY met on HumanEval at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W89 post-W88
-> empirical superiority wave V2** on 2026-05-22 — **TWO
-> HumanEval-prong carry-forwards RETIRED at 70B scale**;
-> cross-modal prong stays NEGATIVE at three model scales.
-> Prior: W88 post-W87 empirical superiority wave V1 (both
-> NEGATIVE / PARTIAL) 2026-05-22; W87 P3 line closures
-> 2026-05-21; honest framing consolidated post-W87 on
-> 2026-05-22. **Meta-#49 P0+P1+P2 line closed (W86). P3 line
-> (#46/#47/#48) closed (W87). Meta-#4 (W79-era umbrella, 16
-> children) closed by supersession (2026-05-22). W88 added two
-> new `W88-L-*` carry-forwards; W89 RETIRED two HumanEval
-> carry-forwards at 70B scale and added four new W89-L-*
-> carry-forwards on the cross-modal and 8B-scale fronts.**
+> empirical bar is now PARTIALLY met on HumanEval at 70B and
+> directionally on MBPP at 70B), see
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W90 post-W89
+> empirical superiority wave V3** on 2026-05-23 — no NEW
+> retirements; W90 P1 MBPP-70B shows directional cross-benchmark
+> generalisation on the MEAN (+1.11 pp; 1/3 seeds; 3/4 bars —
+> per-seed majority FAILS); W90 P2 cross-modal VLM-in-loop
+> CLOSES the W88/W89 gap from −5.6 / −27.8 / −5.6 pp to **+0.00
+> pp** (best architecture yet, TIES A1_vlm); W90 P3 GSM8K-70B
+> cancelled mid-run.  Prior: W89 (2026-05-22) RETIRED two
+> HumanEval carry-forwards at 70B; W88 (2026-05-22) both
+> negative; W87 P3 line closures 2026-05-21.  **Meta-#49 P0+P1+P2
+> line closed (W86). P3 line (#46/#47/#48) closed (W87).
+> Meta-#4 closed by supersession (2026-05-22).  W89 RETIRED 2
+> carry-forwards at 70B-HumanEval; W90 added 7 new
+> `W90-L-*` carry-forwards documenting MBPP partial generalisation,
+> cross-modal-VLM-in-loop tie, GSM8K-not-tested.**
 
 ## Have we solved multi-agent context?
 
@@ -74,6 +77,79 @@ vs. what would constitute solving" bar.
 Any claim in any other doc, paper draft, demo, or external
 pitch that the programme has *solved* multi-agent context is
 overstatement and is rejected by this file.
+
+## TL;DR — W90 post-W89 empirical superiority wave V3
+
+The W90 milestone tests THREE prongs against the post-W89
+empirical bar:
+
+1. **Prong 1 — MBPP-70B (cross-benchmark generalisation of W89
+   win):** Reuses the W88/W89 sequential-reflexion B-pipeline
+   on a new module `coordpy.mbpp_reflexion_bench_v1` with the
+   canonical sanitized-mbpp corpus (SHA-anchored).  3 seeds ×
+   30 problems × K=5 × Llama-3.3-70B-Instruct.  Bench Merkle
+   `b50cafbe7669cba8…`; audit verifier 6/7 PASS (3 audit + 3 of
+   4 retirement bars).  **Result: B 82.2 % > A1 81.1 % by
+   +1.11 pp on the mean** (margin meets +1.0 pp threshold);
+   B never loses to A1 on any seed (ties on 2/3, wins on 1/3);
+   `B beats A1 on > half of seeds` (1/3) **FAILS**.  Three of
+   four bars met; the per-seed majority bar fails.
+   `W89-L-HUMANEVAL-REFLEXION-V2-HUMANEVAL-K5-SCALE-CAP` is
+   REFINED but NOT retired; new carry-forwards
+   `W90-L-MBPP-REFLEXION-V1-PARTIAL-CAP` and
+   `W90-L-MBPP-REFLEXION-V1-CEILING-CAP`.
+
+2. **Prong 2 — Cross-modal VLM-in-loop (structural pivot from
+   W88/W89 split):** new module
+   `coordpy.cross_modal_vlm_loop_bench_v1` with same VLM in the
+   loop across all K=5 turns, image in context every turn.
+   12 problems × 3 seeds × K=5 × Llama-3.2-90B-Vision-Instruct.
+   Bench Merkle `cb8b4250ef141ba5…`; audit verifier 4/4 PASS.
+   **Result: B 91.7 % EQUALS A1_vlm 91.7 %** (B − A1 = +0.00
+   pp); B beats A0_text by +16.67 pp; B beats A1_vlm on 1/3
+   seeds, ties 2/3, never loses.  3/6 retirement bars met
+   (image direction); 3/6 fail (team-organisation direction).
+   **The W90 VLM-in-loop is the strongest cross-modal
+   architecture in the programme** — closes the W88/W89 gap
+   (−5.6 / −27.8 / −5.6 pp) to exactly zero, but TIES rather
+   than strictly beats.  `W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`
+   STAYS; new carry-forwards
+   `W90-L-CROSS-MODAL-VLM-LOOP-V1-K5-TIE-CAP` and
+   `W90-L-CROSS-MODAL-VLM-LOOP-V1-K5-CEILING-CAP` and
+   `W90-L-CROSS-MODAL-VLM-LOOP-V1-90B-VISION-SCALE-CAP`.
+
+3. **Prong 3 — GSM8K × 70B (stretch, cancelled):** W85 GSM8K
+   bench launched at Llama-3.3-70B-Instruct then cancelled
+   mid-run (problem 4/60) to free NIM rate-limit capacity for
+   Prongs 1 & 2.  `W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP`
+   stays untested at 70B; new `W90-L-GSM8K-70B-NOT-TESTED-CAP`
+   records the gap.
+
+**Cumulative empirical position after W90:**
+
+* HumanEval × 70B → clean retirement (W89; +5.56 pp; 2/3 seeds).
+* MBPP × 70B → partial generalisation (W90 P1; +1.11 pp; 1/3
+  seeds).
+* GSM8K × 70B → untested (W90 P3 cancelled).
+* Cross-modal × 90B-Vision → tie at +0.00 pp (W90 P2; best
+  architecture so far, but does not strictly beat).
+* Cross-modal multi-scale image-load-bearing → PROVEN at 4
+  independent configurations (B − A0_text = +13.9 / +16.7 /
+  +52.8 / +16.7 pp).
+
+**W90 strategic finding:** the W89 architecture's
+cross-benchmark scope is fragile at K=5 — directional but not
+strong — and the cross-modal team-organisation bar requires
+either a less-saturated benchmark (the unified-VLM ceiling at
+K=5 is too high to leave room for reflexion to clearly win) or
+a larger K budget where reflexion has more iterations to add
+value.
+
+See `docs/RUNBOOK_W90.md`, `docs/RESULTS_W90_MBPP_REFLEXION_V1.md`,
+`docs/RESULTS_W90_CROSS_MODAL_VLM_LOOP_V1.md`, and the W90
+entries in `docs/THEOREM_REGISTRY.md` /
+`docs/HOW_NOT_TO_OVERSTATE.md`.
+
 
 ## TL;DR — W89 post-W88 empirical superiority wave V2 (FIRST RETIREMENT)
 

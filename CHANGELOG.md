@@ -13,6 +13,115 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W90 post-W89 empirical superiority wave V3 — NO new retirements; significant architectural refinements (2026-05-23)**
+  — *Three-prong attack on the post-W89 empirical bar.
+  Pre-commit bench shape locked in `docs/RUNBOOK_W90.md`
+  BEFORE any W90 run.  W90 P1 ships a NEW MBPP-sanitized
+  benchmark module; W90 P2 ships a NEW cross-modal VLM-in-loop
+  architecture module; W90 P3 stretch was cancelled mid-run.
+  No carry-forwards retired; both P1 and P2 produce
+  significant refinements that REFINE the W89/W88 carry-
+  forwards without clearing the strong-success bars.*
+
+  **W90 Prong 1 — MBPP × Llama-3.3-70B-Instruct (PARTIAL):**
+  New module `coordpy.mbpp_reflexion_bench_v1` (sequential
+  reflexion architecture, same shape as W88; canonical
+  MBPP-sanitized 427 problems; SHA-anchored corpus).
+  3 seeds × 30 problems × K=5; bench Merkle
+  `b50cafbe7669cba8…`; audit verifier 6/7 PASS; total wall
+  5h 02 min; 990 NIM calls.  Result: A0 76.7 % / A1 81.1 % /
+  **B 82.2 %**.  B − A1 = **+1.11 pp** on the mean; B never
+  loses to A1 on any seed (ties on 2/3, wins on 1/3
+  by +3.33 pp).  Three of four retirement bars met;
+  per-seed majority bar fails (1/3 < 2/3).
+  `W89-L-HUMANEVAL-REFLEXION-V2-HUMANEVAL-K5-SCALE-CAP` is
+  REFINED but NOT retired.  New carry-forwards:
+  `W90-L-MBPP-REFLEXION-V1-PARTIAL-CAP`,
+  `W90-L-MBPP-REFLEXION-V1-CEILING-CAP`,
+  `W90-L-MBPP-REFLEXION-V1-RATE-LIMIT-CAP`.
+
+  **W90 Prong 2 — Cross-modal VLM-in-loop × Llama-3.2-90B-Vision
+  (BEST ARCHITECTURE; TIES):** New module
+  `coordpy.cross_modal_vlm_loop_bench_v1` — structural pivot
+  from W88/W89's falsified VLM-extract + code-LM-generate split;
+  drops the text-only handoff entirely; keeps the SAME VLM in
+  the loop across K=5 turns with the image in context every
+  turn.  3 seeds × 12 problems × K=5; bench Merkle
+  `cb8b4250ef141ba5…`; audit verifier 4/4 PASS; total wall
+  1h 03 min; 36 text + 360 VLM calls.  Result: A0_text 75.0 % /
+  A1_vlm 91.7 % / **B_vlm_loop 91.7 %**.  B − A0_text =
+  **+16.67 pp** (image is load-bearing — confirmed at 4th
+  configuration).  B − A1_vlm = **+0.00 pp** (B TIES A1_vlm;
+  B beats A1 on 1/3 seeds, ties 2/3, never loses).  3/6
+  retirement bars met (image direction); 3/6 fail
+  (team-organisation direction).  **The W90 VLM-in-loop is
+  the BEST cross-modal architecture in the programme so far**
+  — closes the gap to A1_vlm from W88/W89's −5.6 / −27.8 /
+  −5.6 pp to exactly zero — but TIES rather than strictly
+  beats.  `W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`
+  and `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP` both
+  STAY.  New carry-forwards:
+  `W90-L-CROSS-MODAL-VLM-LOOP-V1-K5-TIE-CAP`,
+  `W90-L-CROSS-MODAL-VLM-LOOP-V1-K5-CEILING-CAP`,
+  `W90-L-CROSS-MODAL-VLM-LOOP-V1-90B-VISION-SCALE-CAP`.
+
+  **W90 Prong 3 — GSM8K × 70B (CANCELLED):**  Re-launched the
+  W85 `coordpy.gsm8k_real_bench_v1` infrastructure at
+  Llama-3.3-70B-Instruct; cancelled at problem 4/60 to free
+  NIM rate-limit capacity for Prongs 1 & 2.  New
+  carry-forward `W90-L-GSM8K-70B-NOT-TESTED-CAP` records
+  the gap; remains V2 work.
+
+  **Strategic finding:** the W86/W88 negative HumanEval result
+  was scale-dependent (W89 fixed by going to 70B); the
+  W88/W89 cross-modal split was a SPECIFIC architectural
+  failure (W90 P2 fixed by VLM-in-loop, closing gap to zero);
+  but the strong-superiority bars at K=5 budget at
+  ceiling-saturated benchmarks (91.7 %) require either harder
+  benchmarks, larger budgets, or different architecture.
+
+  **Modules added (explicit-import only):**
+  `coordpy/mbpp_reflexion_bench_v1.py`,
+  `coordpy/cross_modal_vlm_loop_bench_v1.py`.
+
+  **Drivers + verifiers:**
+  `scripts/run_w90_mbpp_reflexion_bench.py`,
+  `scripts/run_w90_cross_modal_vlm_loop_bench.py`,
+  `scripts/verify_w90_mbpp_reflexion_audit_chain.py`,
+  `scripts/verify_w90_cross_modal_vlm_loop_audit_chain.py`.
+
+  **Tests (12 new W90 tests; all green):**
+  `tests/test_w90_mbpp_reflexion_v1.py` (7),
+  `tests/test_w90_cross_modal_vlm_loop_v1.py` (5).
+
+  **Documentation:** `docs/RUNBOOK_W90.md` (pre-commit
+  contract), `docs/RESULTS_W90_MBPP_REFLEXION_V1.md` (MBPP
+  partial), `docs/RESULTS_W90_CROSS_MODAL_VLM_LOOP_V1.md`
+  (cross-modal tie).  Truth surfaces (`docs/RESEARCH_STATUS.md`,
+  `docs/THEOREM_REGISTRY.md`, `docs/HOW_NOT_TO_OVERSTATE.md`,
+  `docs/HONEST_FRAMING_POST_W87.md`) updated.
+
+  **Bench artifacts:**
+  `results/w90/mbpp_reflexion/.../`,
+  `results/w90/cross_modal_vlm_loop/.../`.
+
+  **Stable boundary unchanged:** `coordpy.__version__` =
+  `0.5.20`; `coordpy.SDK_VERSION` = `coordpy.sdk.v3.43`; no
+  PyPI publish; `coordpy/__init__.py` untouched.
+
+  **No retirement claimed.**  W89's HumanEval-70B retirement
+  remains the only confirmed same-budget multi-agent
+  superiority claim in this programme.  W90 contributes:
+  (a) directional cross-benchmark generalisation on MBPP-70B
+  (mean +1.11 pp; 1/3 seeds) — strong evidence for the W89
+  architecture's directional generality but fragile at K=5;
+  (b) the strongest cross-modal architecture so far (VLM-in-
+  loop closes the gap to zero from W88/W89's negative gaps,
+  but TIES rather than beats); (c) 4-configuration robust
+  evidence that the W87 multi-modal substrate's image-load-
+  bearing property is REAL (B − A0_text = +13.9 / +16.7 /
+  +52.8 / +16.7 pp).
+
 - **W89 post-W88 empirical superiority wave V2 — FIRST RETIREMENT at 70B-HumanEval; cross-modal stays negative (2026-05-22)**
   — *the first programme milestone to actually RETIRE empirical
   carry-forwards under the pre-committed retirement-bar

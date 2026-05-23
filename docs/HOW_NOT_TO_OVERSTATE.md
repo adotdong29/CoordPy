@@ -5657,3 +5657,119 @@ larger scale).
 
 Last touched: W89 post-W88 empirical superiority wave V2
 2026-05-22.
+
+---
+
+# W90 post-W89 empirical superiority wave V3 — what to say,
+# what NOT to say (2026-05-23)
+
+## W90 MBPP sequential-reflexion at 70B (PARTIAL — NO RETIREMENT)
+
+Acceptable: *"The W90 wave runs the W88/W89 sequential-
+reflexion B-pipeline on a SECOND published code benchmark
+(MBPP-sanitized, 427 problems, SHA-anchored).  Three seeds ×
+30 problems × K=5 × Llama-3.3-70B-Instruct.  Result: B 82.2 %
+> A1 81.1 % by **+1.11 pp** on the mean (margin just clears the
++1.0 pp pre-committed threshold).  B never loses to A1 on any
+seed: ties on seeds 1 (90/90) and 2 (73.3/73.3), wins on
+seed 3 (83.3 vs 80.0 = +3.33 pp).  Three of four pre-committed
+retirement bars met; the per-seed majority bar (1/3 < 2/3) fails.
+The W89 70B-HumanEval retirement direction GENERALISES to MBPP
+on the mean; the strength is fragile (1/3 seeds; ceiling
+effect: A1 reaches 81 % so the failure-residual for B's
+reflexion to rescue is small).  Bench Merkle b50cafbe7669cba8...;
+audit verifier 6/7 PASS.  New carry-forwards
+W90-L-MBPP-REFLEXION-V1-PARTIAL-CAP and
+W90-L-MBPP-REFLEXION-V1-CEILING-CAP record the honest
+limitations.  W89-L-HUMANEVAL-REFLEXION-V2-HUMANEVAL-K5-SCALE-CAP
+is REFINED but NOT retired."*
+
+Forbidden phrasing: *"W90 MBPP retires the HumanEval-only cap"*
+(no — the per-seed majority bar fails), *"multi-agent beats
+self-consistency on MBPP"* (only on 1/3 seeds at +3.33 pp; on
+2/3 seeds it ties; the +1.11 pp mean is marginal), *"the W89
+architecture wins on every code benchmark"* (only HumanEval
+clears the strong bar; MBPP is directional but fragile;
+LiveCodeBench / SWE-bench untested), *"the +1.11 pp delta is
+robust"* (it's within the seed-to-seed variance of A1 at this
+scale).
+
+## W90 cross-modal VLM-in-loop at 90B-Vision (BEST ARCHITECTURE BUT TIE)
+
+Acceptable: *"The W90 wave attacks the cross-modal failure
+with a STRUCTURAL pivot from the W88/W89 split: drop the
+VLM-extract + code-LM-generate handoff entirely; keep the SAME
+VLM in the loop across all K=5 turns with the image in context
+every turn (no text-only handoff).  Three seeds × 12 problems
+× K=5 × Llama-3.2-90B-Vision-Instruct.  Result: B 91.7 %
+EQUALS A1_vlm 91.7 % on the mean (B − A1 = **+0.00 pp**);
+B never loses to A1 on any seed (ties on 2, wins on 1); B
+beats A0_text by +16.67 pp.  3/6 retirement bars met (image
+direction); 3/6 fail (team-organisation direction).  **The
+W90 VLM-in-loop is the strongest cross-modal architecture in
+the programme so far** — closes the gap to A1_vlm from
+W88/W89's −5.6 / −27.8 / −5.6 pp to exactly zero.  But TIES
+rather than strictly beats.  The W88/W89 split's failure mode
+is now empirically localised as the text-only handoff (removing
+the handoff closes the gap to zero); but multi-turn reflexion
+at multimodal-90B scale doesn't yet add measurable margin over
+first-pass-K=5 at K=5.  Bench Merkle cb8b4250ef141ba5...; audit
+verifier 4/4 PASS.  New carry-forwards
+W90-L-CROSS-MODAL-VLM-LOOP-V1-K5-TIE-CAP,
+W90-L-CROSS-MODAL-VLM-LOOP-V1-K5-CEILING-CAP, and
+W90-L-CROSS-MODAL-VLM-LOOP-V1-90B-VISION-SCALE-CAP record the
+honest limitations.  W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP
+and W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP both
+STAY."*
+
+Forbidden phrasing: *"W90 retired the cross-modal carry-forward"*
+(it did NOT — B ties A1_vlm; per-seed B wins 1/3 only),
+*"cross-modal team organisation beats unified VLM"* (it
+doesn't strictly beat at K=5; it ties), *"the architecture is
+solved"* (the gap closed to zero but the strong-superiority
+claim requires +5 pp margin; not met), *"the W88 split is
+fixed by VLM-in-loop"* (the W88 SPLIT's empirical failure
+stands; VLM-in-loop is a DIFFERENT architecture; W88 split
+remains falsified).  *"cross-modal substrate is irrelevant"*
+(it carries +16.67 pp of load over the no-image baseline;
+that's a real positive empirical claim across 4 configurations).
+
+## W90 GSM8K stretch (NOT RUN)
+
+Acceptable: *"The W90 P3 GSM8K-70B retry was launched and
+cancelled at problem 4/60 to free NIM rate-limit capacity for
+Prongs 1 & 2 (which were the higher-confidence retirement
+candidates).  Whether the W89 70B-scale lever retires the
+GSM8K carry-forward
+(W85-L-GSM8K-BENCH-V1-MULTI-AGENT-DOES-NOT-BEAT-SELF-CONSISTENCY-CAP)
+is honestly recorded as untested in
+W90-L-GSM8K-70B-NOT-TESTED-CAP; remains V2 work."*
+
+Forbidden phrasing: *"W90 retired GSM8K"* (it did not; the
+test was cancelled), *"GSM8K is unsolvable at 70B"* (we don't
+know; we cancelled the run), *"we know the answer"*
+(we don't — the W85 8B negative is the only data we have).
+
+## W90 strategic summary
+
+Acceptable: *"The W90 wave's strategic finding is that the
+W89 70B-HumanEval retirement is the only confirmed same-budget
+multi-agent superiority claim in this programme; MBPP shows
+directional generalisation on the mean but fragile per-seed
+strength; cross-modal VLM-in-loop closes the gap to zero but
+does not flip the sign at K=5 with the 91.7 % unified-VLM
+ceiling.  Future attempts should target benchmarks with
+less-saturated baselines (MBPP-Hard, LiveCodeBench-Hard,
+SWE-bench Verified) or larger K budgets where reflexion has
+more iterations to add value."*
+
+Forbidden phrasing: *"the W89 win was a one-off"* (MBPP +1.11
+pp on mean is real directional evidence), *"reflexion doesn't
+work at multimodal scale"* (W90 P2 ties A1_vlm — it works as
+well as independent sampling; the architectural improvement
+over W88/W89 is real), *"we've exhausted the empirical
+attack"* (multiple V2 directions remain: harder benchmarks,
+larger K, deep cross-modal substrate injection).
+
+Last touched: W90 post-W89 empirical superiority wave V3
+2026-05-23.

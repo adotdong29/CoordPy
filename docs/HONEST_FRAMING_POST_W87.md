@@ -2,15 +2,17 @@
 
 > **Canonical, mandatory honesty surface for any claim that
 > follows from the W87 closure of meta-#49.**  Last touched
-> 2026-05-22 to reflect the W89 post-W88 empirical superiority
-> wave V2 results — **TWO carry-forwards RETIRED at 70B scale**:
-> `W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN` and
-> `W88-L-HUMANEVAL-REFLEXION-V1-A1-SAME-BUDGET-NOT-BEATEN-CAP`
-> on the HumanEval prong; cross-modal prong still STAYS at all
-> three model scales tested.  Prior touch was 2026-05-22 after
-> the W88 wave (both negative / partial) and earlier after
-> meta-#4 (W79-era) and meta-#49 (post-W83) were closed on
-> GitHub with all 24 + 16 sub-issues CLOSED.
+> 2026-05-23 after the W90 post-W89 empirical superiority wave
+> V3 — **no NEW retirements**; the W89 70B-HumanEval retirement
+> remains; W90 MBPP-70B shows DIRECTIONAL cross-benchmark
+> generalisation on the MEAN (+1.11 pp) but fails the per-seed
+> majority bar (1/3) so the "HumanEval-only" cap is REFINED not
+> retired; W90 VLM-in-loop CLOSES the cross-modal gap from
+> W88/W89's −5.6 / −27.8 / −5.6 pp to **+0.00 pp** (best
+> architecture so far) but TIES A1_vlm so the cross-modal
+> carry-forward also STAYS.  Prior touches: W89 (2026-05-22)
+> first retirement; W88 (2026-05-22) both negative; meta-#49
+> + meta-#4 closed 2026-05-22.
 >
 > If this file disagrees with any other doc about whether we
 > *solved multi-agent context*, this file is right and the
@@ -386,53 +388,94 @@ meta-#49, claims of having solved multi-agent context are
 overstatement and must be rejected by any reader of this
 file.
 
-### W88 → W89 contribution (2026-05-22)
+### W88 → W89 → W90 contribution
 
-The W88 wave V1 produced two negative / partial results.  The
-W89 wave V2 retried with stronger model + harder image-load-
-bearing regime and produced the FIRST RETIREMENT in this
-programme:
+**W88 wave V1 (2026-05-22):** two negative / partial results.
 
-**HumanEval prong (W89 wave V2): RETIREMENT.**  At Llama-3.3-
-70B-Instruct scale on 3 seeds × 30 problems × K=5: B sequential
+**W89 wave V2 (2026-05-22): FIRST RETIREMENT.**  At Llama-3.3-
+70B-Instruct on 3 seeds × 30 HumanEval × K=5: B sequential
 reflexion 91.1 % > A1 first-pass-K=5 85.6 % by **+5.56 pp**;
 B beats A1 on 2/3 seeds; all 4 pre-committed retirement bars
 met; audit chain re-derives 7/7 PASS.  The W86 / W88 HumanEval
 carry-forwards retire AT 70B SCALE.  The 8B-scale evidence
 remains canonical as `W89-L-HUMANEVAL-REFLEXION-V2-8B-CAP`.
 
-**Cross-modal prong (W89 wave V2): STAYS NEGATIVE on
-team-organisation.**  Image-load-bearing direction now
-PROVEN at three model scales (B_cross − A0_text = +13.9 /
-+16.7 / +52.8 pp).  Multi-agent split direction FALSIFIED at
-all three scales (B_cross − A1_vlm = −5.6 / −27.8 / −5.6 pp).
-Scaling models alone cannot retire.  The next attempt must
-change architecture.
+Cross-modal (W89): STAYS NEGATIVE on team-organisation at 3
+model scales (B_cross − A1_vlm = −5.6 / −27.8 / −5.6 pp).
 
-W89's contribution is the FIRST published-benchmark same-
-budget multi-agent superiority demonstration at frontier model
-scale.  What is now warranted:
+**W90 wave V3 (2026-05-23): NO NEW RETIREMENTS; significant
+refinements.**
 
-* The Reflexion / Self-Debug literature replicates at 70B
-  scale on HumanEval — under the W86/W88 anti-cheat
-  discipline.
-* Multi-agent CoordPy at frontier scale is no longer "an open
-  question against the strongest same-budget single-agent
-  baseline" on this one benchmark.  It beats the baseline.
+* **W90 P1 MBPP × 70B (directional generalisation):** at
+  Llama-3.3-70B on 3 seeds × 30 MBPP-sanitized × K=5: B
+  sequential reflexion 82.2 % > A1 first-pass-K=5 81.1 % by
+  **+1.11 pp** on the mean; B never loses to A1 on any seed
+  (ties on 2, wins on 1).  **3 of 4 retirement bars met; the
+  per-seed majority bar (1/3 < 2/3) fails.**  This is the
+  W89 architecture's first published-benchmark generalisation
+  test; the direction is positive but the per-seed strength is
+  below the W89 bar.  `W89-L-HUMANEVAL-REFLEXION-V2-HUMANEVAL-K5-SCALE-CAP`
+  is REFINED (added `W90-L-MBPP-REFLEXION-V1-PARTIAL-CAP`)
+  but NOT retired.
+* **W90 P2 cross-modal VLM-in-loop × 90B-Vision (best architecture so far, but TIES):**
+  removing the W88/W89 text-only extraction handoff and keeping
+  the VLM in the loop with image-context-every-turn closes the
+  gap to A1_vlm from W88/W89's −5.6 / −27.8 / −5.6 pp to
+  exactly **+0.00 pp**.  B 91.7 % equals A1_vlm 91.7 % on the
+  mean; B wins 1/3 seeds, ties 2/3, never loses.  **The
+  cross-modal split's failure mode is empirically localised:
+  the text-only extraction handoff was the problem.**  But B
+  does not strictly beat A1_vlm; `W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`
+  STAYS, with `W90-L-CROSS-MODAL-VLM-LOOP-V1-K5-TIE-CAP` and
+  `W90-L-CROSS-MODAL-VLM-LOOP-V1-K5-CEILING-CAP` added as
+  honest refinements.
+* **W90 P3 GSM8K × 70B (cancelled mid-run):** the W85 GSM8K
+  retry at 70B was launched and cancelled at problem 4/60 to
+  free NIM rate-limit capacity for Prongs 1 & 2.  Recorded as
+  `W90-L-GSM8K-70B-NOT-TESTED-CAP`; remains V2.
 
-What is still NOT warranted:
+The cumulative W89/W90 contribution:
 
-* "Multi-agent CoordPy beats single-agent at all scales" — the
-  8B-scale negative result still holds.
+* **The 70B-HumanEval retirement (W89) is the only confirmed
+  same-budget multi-agent superiority claim in this programme.**
+* **MBPP × 70B directionally agrees (mean) but not strongly
+  enough for per-seed majority** — the W89 architecture's
+  cross-benchmark scope is fragile at MBPP K=5.
+* **The cross-modal architecture has been narrowed: the text-
+  only extraction handoff in W88/W89's split was the failure
+  mode** — VLM-in-loop closes the gap to zero — but multi-turn
+  reflexion at multimodal scale doesn't yet beat first-pass-K=5
+  at K=5.
+* **The W87 multi-modal substrate's image-load-bearing
+  property is now PROVEN at FOUR independent configurations**
+  (B − A0_text = +13.9 / +16.7 / +52.8 / +16.7 pp).  This is
+  the most robust positive empirical claim in the cross-modal
+  programme so far.
+
+What is now warranted:
+
+* Reflexion / Self-Debug literature replicates at 70B on
+  HumanEval under the W86/W88 anti-cheat discipline (W89).
+* The W89 architecture directionally generalises to a second
+  published code benchmark (MBPP-70B mean +1.11 pp) — but
+  fragilely (1/3 seeds).
+* The image carries real load-bearing information at 4
+  configurations on HumanEval-Visual.
+* VLM-in-loop reflexion is the strongest cross-modal team
+  architecture in this programme so far.
+
+What is NOT warranted:
+
+* "MBPP-70B is a clean retirement" — the per-seed majority
+  bar fails; the +1.11 pp mean is marginal.
 * "Multi-agent CoordPy beats single-agent on all benchmarks" —
-  W85 GSM8K still loses; W88/W89 cross-modal split still
-  loses.
-* "We solved multi-agent context" — the substrate-level work
-  still requires multi-benchmark extension (MBPP+, SWE-bench,
-  MATH, GSM8K-70B retry) and a working cross-modal architecture.
+  W85 GSM8K still loses; W90 P3 untested.
+* "Cross-modal team organisation is load-bearing" — VLM-in-loop
+  TIES but does not strictly beat A1_vlm at K=5.
+* "We solved multi-agent context" — see above.
 
-The next wave's task: extend the 70B-HumanEval win to
-additional published benchmarks (MBPP+, MATH, GSM8K) AND find
-a cross-modal architecture that actually wins (VLM-in-loop,
-parallel heterogeneous pool, or substrate-level cross-modal
-injection).
+The next wave's task: take MBPP to a less-saturated subset
+(MBPP-Hard, MBPP+, LiveCodeBench) where reflexion has more
+headroom; take cross-modal to a benchmark with non-saturated
+unified-VLM ceiling; retire GSM8K-70B; OR attack at K=10
+budget where multi-agent has more room.
