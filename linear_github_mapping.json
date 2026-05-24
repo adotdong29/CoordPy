@@ -67,7 +67,8 @@
       "title": "MathVista cross-modal preflight (cheap probes + bench scaffolding + pre-committed gates)",
       "outcome": "PREFLIGHT EARNS PHASE 2 — 4 W95 probes PASS + 5 W93 gates PASS on W95-B0 candidate; cheap NIM pilot is now entitled per RUNBOOK_W95",
       "commits": [
-        "c14a8a1"
+        "c14a8a1",
+        "ab022ce"
       ],
       "docs": [
         "docs/RUNBOOK_W95.md",
