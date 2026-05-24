@@ -1,0 +1,82 @@
+{
+  "schema": "coordpy.linear_github_mapping.v1",
+  "team": "CoordPy",
+  "project": "CoordPy",
+  "linear_workspace_url": "https://linear.app/coordpy/",
+  "github_repo": "adotdong29/CoordPy",
+  "comment": "Canonical mapping of milestone → (commits, docs, Linear issues). Update this file at end-of-milestone; run scripts/sync_linear_github_v1.py to validate and emit Linear-ready summaries. Adding a milestone entry: append to milestones array, list commits + result/runbook docs + Linear issue IDs.",
+  "milestones": [
+    {
+      "id": "W89",
+      "title": "HumanEval-70B-Reflexion-K=5 same-budget multi-agent superiority retirement",
+      "outcome": "RETIRED — first confirmed same-budget multi-agent superiority retirement (+5.56 pp B over A1, 2-of-3 per-seed majority)",
+      "commits": [],
+      "docs": [
+        "docs/RESULTS_W89_HUMANEVAL_REFLEXION_V2.md"
+      ],
+      "linear_issues": [],
+      "carry_forwards_retired": [
+        "W86-L-HUMANEVAL-V1-A1-SAME-BUDGET-NOT-BEATEN"
+      ],
+      "carry_forwards_added": [
+        "W89-L-HUMANEVAL-REFLEXION-V2-HUMANEVAL-K5-SCALE-CAP"
+      ]
+    },
+    {
+      "id": "W93",
+      "title": "Preflight-first empirical superiority wave (5-gate harness; 3 candidate kills; no expensive bench)",
+      "outcome": "DISCIPLINE — preflight infrastructure landed; 3 candidates killed in cheap evidence; no NIM spend",
+      "commits": [
+        "b79cd82"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W93.md",
+        "docs/RESULTS_W93_PREFLIGHT_DISCIPLINE_V1.md",
+        "docs/W93_FAILURE_DIAGNOSIS.md"
+      ],
+      "linear_issues": [
+        "COO-13"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": []
+    },
+    {
+      "id": "W94",
+      "title": "Preflight-earned K=10 pilot killed; cross-modal pivot to MathVista documented",
+      "outcome": "KILLED — K=10 pilot ceiling-saturated A1 to 100% on 15-problem slice; 3-of-6 pre-committed gates failed; HumanEval-Visual K=5 retired as cross-modal battlefield; MathVista selected as W95 line",
+      "commits": [
+        "9355b2f"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W94.md",
+        "docs/RESULTS_W94_K10_PILOT_V1.md",
+        "docs/W94_CROSS_MODAL_BATTLEFIELD_SCOUTING.md"
+      ],
+      "linear_issues": [
+        "COO-7",
+        "COO-8",
+        "COO-10"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W94-L-K10-PILOT-CEILING-SATURATION-CAP"
+      ]
+    },
+    {
+      "id": "W95",
+      "title": "MathVista cross-modal preflight (cheap probes + bench scaffolding + pre-committed gates)",
+      "outcome": "PREFLIGHT EARNS PHASE 2 — 4 W95 probes PASS + 5 W93 gates PASS on W95-B0 candidate; cheap NIM pilot is now entitled per RUNBOOK_W95",
+      "commits": [],
+      "docs": [
+        "docs/RUNBOOK_W95.md",
+        "docs/RESULTS_W95_MATHVISTA_PREFLIGHT_V1.md"
+      ],
+      "linear_issues": [
+        "COO-11",
+        "COO-16"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": []
+    }
+  ]
+}

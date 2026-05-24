@@ -13,6 +13,71 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W95 MathVista cross-modal cheap-probe preflight — composite PASS; Phase 2 NIM pilot preflight-earned; no NIM spend yet (2026-05-24)**
+  — *First execution of the W94-selected MathVista battlefield
+  under W93 preflight-first discipline.  W95 ships the corpus
+  + executor + cheap-probe infrastructure but launches NO NIM
+  bench in this milestone — Phase 1 (cheap probes) is the
+  deliverable; Phase 2 (NIM pilot) is preflight-earned but
+  awaits explicit launch.*
+
+  **W95 Phase-1 cheap probes (run `20260524T193937Z`)**:
+  P1 corpus integrity = PASS (parquet SHA-256
+  `373f6c0b412a9be2cec36711cee724e03f4c5db6908f3c13db903aa9694d4f2d`,
+  141 568 126 bytes, 1000/1000 problems, all images present,
+  all answer/question types valid); P2 executor self-test on
+  gold = PASS (1000/1000 = 100.00 % pass on gold-as-prediction;
+  by-rule: 17 multi_choice_letter + 523 multi_choice_text +
+  458 numeric_tolerance + 2 text_exact); P3 A1 failure-
+  residual estimate = PASS (Llama-3.2-11B-Vision published
+  single-shot 33 % → estimated A1@K=5 = 59.75 % → 40.25 pp
+  residual; ceiling 80 %); P4 decomposition argument = PASS
+  (1086-char structural argument; 57.0 % of 200-problem
+  sample is geometry/chart/figure/table).  Corpus Merkle root
+  `dea27472fc12e697b1bb708d62dd4072662dcc7edd36bf89c9a9a3c6946101d5`.
+
+  **W93 5-gate harness on W95-B0** (`vlm_reader + math_solver +
+  executor-guided reflexion`): G1 hypothesis (1102 chars) PASS;
+  G2 sidecar evidence (composes the 4 MathVista probes) PASS;
+  G3 adversarial ablation (structural — removing the
+  `vlm_reader` stage collapses W95-B0 to A1 unified VLM by
+  construction) PASS; G4 budget accounting (5 calls = K=5)
+  PASS; G5 benchmark justification (816-char argument citing
+  W94 scouting note) PASS.
+
+  **Composite verdict PASS**: W95-B0 is entitled to a cheap
+  NIM pilot (Phase 2: 1 seed × 30 problems × K=5 ×
+  Llama-3.2-11B-Vision-Instruct via NIM; ~330 calls, ~30-60
+  min wall) per the pre-committed gates in `docs/RUNBOOK_W95.md`.
+  No NIM pilot has been launched in W95 itself.
+
+  **What W95 ships:** `coordpy.mathvista_loader_v1` (testmini
+  fetcher + SHA-anchored corpus + Merkle root); `coordpy.
+  mathvista_executor_v1` (multi-choice / numeric-tolerance /
+  text canonical answer-match, mirroring MathVista upstream
+  semantics with no judge dependency); `coordpy.mathvista_
+  preflight_v1` (4 cheap probes + composite verdict);
+  `scripts/run_w95_mathvista_preflight.py`;
+  `docs/RUNBOOK_W95.md` (pre-committed Phase 2 + Phase 3
+  pilot gates and retirement bars); `docs/RESULTS_W95_MATHVISTA_
+  PREFLIGHT_V1.md`; `tests/test_w95_mathvista_v1.py` (44 new
+  CI tests; all green); `linear_github_mapping.json` +
+  `scripts/sync_linear_github_v1.py` + `docs/LINEAR_GITHUB_
+  SYNC.md` (durable Linear ↔ GitHub bridge); `results/w95/
+  mathvista_preflight/20260524T193937Z/` (full verdict +
+  corpus manifest committed alongside).
+
+  **No new carry-forward retirements.**  W95 does NOT retire
+  any W88–W94 carry-forward.  No NIM spend; no empirical
+  superiority claim; no expensive run earned.  The W95
+  deliverable is preflight infrastructure + the entitled but
+  unspent pilot.
+
+  **Stable boundary preservation:** `coordpy.__version__`
+  unchanged at `0.5.20`; `coordpy.SDK_VERSION` unchanged at
+  `coordpy.sdk.v3.43`; no PyPI publish; `coordpy/__init__.py`
+  untouched; W95 modules are explicit-import only.
+
 - **W94 preflight-earned K=10 pilot + cross-modal battlefield pivot — K=10 hypothesis KILLED in cheap pilot; no Phase-2 launched (2026-05-24)**
   — *First true test of the W93 preflight-first discipline.
   W93-C (K=10 reflexion) was the only W93 candidate that

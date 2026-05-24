@@ -9,15 +9,26 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W94 K=10
-> pilot + cross-modal pivot** on 2026-05-24 — K=10 hypothesis
-> KILLED in cheap 90-min pilot (A1 saturates to 100 % at K=10
-> on 15-problem slice; B = A1 = 100 %; B − A1 = +0.00 pp; 3
-> of 6 pre-committed pilot gates fail; no Phase-2 launched).
-> Cross-modal battlefield pivot to MathVista documented for
-> W95+.  W93 preflight discipline empirically validated.  No
-> new retirements; W89 70B-HumanEval K=5 remains the only
-> confirmed same-budget multi-agent superiority claim.  Prior:
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W95
+> MathVista cheap-probe preflight** on 2026-05-24 — all 4 W95
+> cheap probes (corpus integrity / executor self-test on gold /
+> A1 failure-residual estimate / decomposition argument) PASS
+> against the canonical `AI4Math/MathVista` testmini parquet
+> (SHA `373f6c0b…`, 1000 problems, Merkle `dea27472fc12…`); all
+> 5 W93 gates PASS on the W95-B0 candidate
+> (`vlm_reader + math_solver + executor-guided reflexion`).
+> Composite verdict PASS.  Phase 2 (cheap NIM pilot, 1 seed ×
+> 30 problems × K=5 × Llama-3.2-11B-Vision-Instruct, ~330 NIM
+> calls) is preflight-earned per `docs/RUNBOOK_W95.md` but NOT
+> launched.  No new retirements; W89 70B-HumanEval K=5 remains
+> the only confirmed same-budget multi-agent superiority claim.
+> Prior: **W94 K=10 pilot + cross-modal pivot** on 2026-05-24 —
+> K=10 hypothesis KILLED in cheap 90-min pilot (A1 saturates to
+> 100 % at K=10 on 15-problem slice; B = A1 = 100 %; B − A1 =
+> +0.00 pp; 3 of 6 pre-committed pilot gates fail; no Phase-2
+> launched).  Cross-modal battlefield pivot to MathVista
+> documented for W95+.  W93 preflight discipline empirically
+> validated.  Prior:
 > W93 post-W92 preflight-first empirical superiority wave V6
 > on 2026-05-24 — discipline-first milestone.  No expensive bench run
 > launched; all 3 candidate architectures (self-verifying
