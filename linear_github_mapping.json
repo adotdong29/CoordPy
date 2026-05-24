@@ -66,10 +66,14 @@
       "id": "W95",
       "title": "MathVista cross-modal preflight (cheap probes + bench scaffolding + pre-committed gates)",
       "outcome": "PREFLIGHT EARNS PHASE 2 — 4 W95 probes PASS + 5 W93 gates PASS on W95-B0 candidate; cheap NIM pilot is now entitled per RUNBOOK_W95",
-      "commits": [],
+      "commits": [
+        "c14a8a1"
+      ],
       "docs": [
         "docs/RUNBOOK_W95.md",
-        "docs/RESULTS_W95_MATHVISTA_PREFLIGHT_V1.md"
+        "docs/RESULTS_W95_MATHVISTA_PREFLIGHT_V1.md",
+        "docs/LINEAR_GITHUB_SYNC.md",
+        "linear_github_mapping.json"
       ],
       "linear_issues": [
         "COO-11",
