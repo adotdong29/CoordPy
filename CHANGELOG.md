@@ -13,6 +13,90 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W95 MathVista Phase 2 cheap NIM pilot — 9/9 pre-committed gates PASS; B beats A1 by +10.00 pp at K=5 on Llama-3.2-11B-Vision; Phase 3 preflight-earned but not launched (2026-05-24)**
+  — *First NIM spend on the W95 MathVista line under the W93/
+  W95 preflight-first discipline.  Built `coordpy.mathvista_
+  bench_v1` (A0_text / A1_vlm / B_vlm_team per-arm runners +
+  sidecars + per-seed Merkle + bench Merkle), the pilot runner,
+  and the offline audit verifier; smoke-tested on 1 problem
+  (11 calls, 28 s wall); then launched the pre-committed
+  Phase 2 pilot.*
+
+  **Pilot configuration**: 1 seed (95_005_001) × 30 problems
+  × K=5 × `meta/llama-3.2-11b-vision-instruct` via NIM;
+  deterministic slice from `select_mathvista_subset_v1(95_005_001,
+  30)` with pid sha256 `6d3a07eb2b1dac9d…` pre-committed
+  BEFORE any NIM call.  Same VLM for A0 (text-only mode),
+  A1 (K=5 image+query), and B (vlm_reader at T=0.0 + math_solver
+  at T=0.7 with up to 3 executor-guided reflexion turns,
+  padded to exactly K=5).  Budget: exactly 11 model calls /
+  problem on every problem (1 A0 + 5 A1 + 5 B = 330 total).
+  Total wall 440 s (~7.3 min); NIM call counts: text=150,
+  vlm=180.
+
+  **Headline result on the pre-committed slice**:
+  A0_text = **36.67 %** / A1_vlm K=5 = **66.67 %** / B_vlm_team
+  = **76.67 %**.  **B − A1 = +10.00 pp**; B − A0 = +40.00 pp;
+  B ≥ A1 on **27 / 30 problems** (vs ≥ 16/30 Phase-2 bar).
+  Per-problem rescue analysis: 6 B-only rescues (B PASS where
+  A1 FAILED) vs 3 A1-only rescues; net +3 problems rescued
+  by team decomposition.  17 problems where both arms agree.
+
+  **Audit chain**: bench Merkle root
+  `4f76bcd4ba605d1689103033dc1ef315befad4c521ff4851ca72d23832c11d50`;
+  seed Merkle root
+  `c697377f3dff8595efea176a486471ce1d79866545a2f231c8499e434b87b412`;
+  corpus parquet SHA-256 `373f6c0b412a9be2cec36711cee724e03f4c5db6908f3c13db903aa9694d4f2d`
+  re-verified at run start.  Offline verifier
+  `scripts/verify_w95_mathvista_audit_chain.py` reports 14/14
+  PASS (5 audit re-derivations + 9 pre-committed Phase 2
+  gates).
+
+  **Pre-committed W95 Phase 2 gates** (locked in
+  `docs/RUNBOOK_W95.md` BEFORE pilot ran): all 9 PASS:
+    1. slice pre-committed ✓
+    2. A1 < 90 % (66.67 %) ✓
+    3. B strictly beats A1 (+10.00 pp) ✓
+    4. margin ≥ +5 pp ✓
+    5. B beats A0 by ≥ +5 pp (+40.00 pp; image load-bearing) ✓
+    6. B ≥ A1 on majority of problems (27/30) ✓
+    7. budget accounting exact (11 calls/problem) ✓
+    8. audit chain present ✓
+    9. executor stays clean ✓
+
+  **Phase 3 status**: preflight-earned per the W95 contract.
+  Phase 3 (3 seeds × 100 problems × K=5; ~3 300 NIM calls;
+  ~80-100 min wall) is NOT launched in W95 itself — it is held
+  for explicit approval as a separate NIM spend.  If Phase 3
+  runs and clears the W88 6-bar retirement shape, it would
+  be the first confirmed same-budget multi-agent superiority
+  retirement on a CROSS-MODAL benchmark (the W89 retirement
+  was text-only code).
+
+  **Honest scope**: this is a SINGLE-SEED pilot result.  It
+  earns Phase 3 under the pre-committed contract.  It does
+  NOT retire any carry-forward.  W89 70B-HumanEval-K=5
+  remains the only confirmed multi-seed same-budget multi-
+  agent superiority retirement.  The W95 contribution at
+  this point is: a new working cross-modal team architecture
+  with a strong single-seed pilot signal, complete preflight
+  + audit infrastructure, and a documented entitlement to
+  Phase 3.
+
+  **What W95 ships beyond Phase 1**: `coordpy.mathvista_bench_v1`
+  (A0/A1/B runners + capsules + Merkle); `scripts/run_w95_mathvista_pilot.py`
+  (NIM driver + Phase 2 gate evaluation); `scripts/verify_w95_mathvista_audit_chain.py`
+  (offline audit); `docs/RESULTS_W95_MATHVISTA_PILOT_V1.md`;
+  `results/w95/mathvista_pilot/.../...20260524T201615Z/` (full
+  330-call sidecar + bench report + Phase 2 gate verdict);
+  8 new CI tests for the bench module (`tests/test_w95_mathvista_v1.py`
+  now has 52 total tests; all green).
+
+  **Stable boundary preservation**: `coordpy.__version__`
+  unchanged at `0.5.20`; `coordpy.SDK_VERSION` unchanged at
+  `coordpy.sdk.v3.43`; no PyPI publish; `coordpy/__init__.py`
+  untouched.
+
 - **W95 MathVista cross-modal cheap-probe preflight — composite PASS; Phase 2 NIM pilot preflight-earned; no NIM spend yet (2026-05-24)**
   — *First execution of the W94-selected MathVista battlefield
   under W93 preflight-first discipline.  W95 ships the corpus

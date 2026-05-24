@@ -1,0 +1,60 @@
+{
+  "K_multi_sample": 5,
+  "a0_text_mean_pass_at_1": 1.0,
+  "a1_vlm_mean_pass_at_1": 1.0,
+  "b_beats_a0_text_per_seed": [
+    false
+  ],
+  "b_beats_a1_vlm_per_seed": [
+    false
+  ],
+  "b_mean_minus_a0_text_mean_pp": 0.0,
+  "b_mean_minus_a1_vlm_mean_pp": 0.0,
+  "b_mean_strictly_beats_a0_text_mean": false,
+  "b_mean_strictly_beats_a1_vlm_mean": false,
+  "b_vlm_team_mean_pass_at_1": 1.0,
+  "bench_merkle_root": "826c7b0f39b66bf03db31d5e0ef772336a5ffcbdb74f7b27fe3c87ebab16294c",
+  "corpus_merkle_root": "dea27472fc12e697b1bb708d62dd4072662dcc7edd36bf89c9a9a3c6946101d5",
+  "corpus_parquet_sha256": "373f6c0b412a9be2cec36711cee724e03f4c5db6908f3c13db903aa9694d4f2d",
+  "n_b_ge_a1_problems_per_seed": [
+    1
+  ],
+  "n_problems": 1,
+  "n_seeds": 1,
+  "per_seed": [
+    {
+      "a0_text_pass_at_1": 1.0,
+      "a0_text_total_wall_ms": 650,
+      "a1_vlm_pass_at_1": 1.0,
+      "a1_vlm_total_wall_ms": 18080,
+      "b_vlm_team_pass_at_1": 1.0,
+      "b_vlm_team_total_wall_ms": 7461,
+      "n_problems": 1,
+      "outcome_cids": [
+        "5ba90a239e546ac7fa4d00e3f128e26fc70f7f37efb81fadbc2b9f305343c251",
+        "b9767df87518867a0699fc3f21d32c3fb0cd951cd182e48caea103859159ed1a",
+        "0d08dd2ccfa4cb0e14c770fb2fcc00c7fe7997539833f3867b0d2d48a40303c8"
+      ],
+      "per_problem_outcomes": [
+        {
+          "a0_outcome_cid": "5ba90a239e546ac7fa4d00e3f128e26fc70f7f37efb81fadbc2b9f305343c251",
+          "a0_text_passed": true,
+          "a1_outcome_cid": "b9767df87518867a0699fc3f21d32c3fb0cd951cd182e48caea103859159ed1a",
+          "a1_vlm_passed": true,
+          "answer_type": "integer",
+          "b_outcome_cid": "0d08dd2ccfa4cb0e14c770fb2fcc00c7fe7997539833f3867b0d2d48a40303c8",
+          "b_vlm_team_passed": true,
+          "gold_answer": "3",
+          "pid": "131",
+          "question_type": "free_form"
+        }
+      ],
+      "schema": "coordpy.mathvista_bench_v1.v1",
+      "seed": 95005001,
+      "seed_merkle_root": "de74585830f342da82cd110a3395e17fcc6624df666e674692de624fa7c5beaa"
+    }
+  ],
+  "schema": "coordpy.mathvista_bench_v1.v1",
+  "text_model_id": "meta/llama-3.2-11b-vision-instruct",
+  "vlm_model_id": "meta/llama-3.2-11b-vision-instruct"
+}

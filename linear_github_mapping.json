@@ -64,15 +64,17 @@
     },
     {
       "id": "W95",
-      "title": "MathVista cross-modal preflight (cheap probes + bench scaffolding + pre-committed gates)",
-      "outcome": "PREFLIGHT EARNS PHASE 2 — 4 W95 probes PASS + 5 W93 gates PASS on W95-B0 candidate; cheap NIM pilot is now entitled per RUNBOOK_W95",
+      "title": "MathVista cross-modal: preflight + Phase 2 cheap pilot (9/9 gates PASS; B beats A1 by +10 pp at K=5 on Llama-3.2-11B-Vision; Phase 3 preflight-earned but not launched)",
+      "outcome": "PHASE 2 PILOT PASSES — A0=36.67% / A1=66.67% / B=76.67%; B-A1=+10pp; B-A0=+40pp; B≥A1 on 27/30 problems; 14/14 audit re-derivations + gates PASS offline; Phase 3 entitled per RUNBOOK_W95",
       "commits": [
         "c14a8a1",
-        "ab022ce"
+        "ab022ce",
+        "1ebcdb5"
       ],
       "docs": [
         "docs/RUNBOOK_W95.md",
         "docs/RESULTS_W95_MATHVISTA_PREFLIGHT_V1.md",
+        "docs/RESULTS_W95_MATHVISTA_PILOT_V1.md",
         "docs/LINEAR_GITHUB_SYNC.md",
         "linear_github_mapping.json"
       ],
@@ -81,7 +83,9 @@
         "COO-16"
       ],
       "carry_forwards_retired": [],
-      "carry_forwards_added": []
+      "carry_forwards_added": [
+        "W95-L-MATHVISTA-PILOT-SINGLE-SEED-CAP"
+      ]
     }
   ]
 }

@@ -1,0 +1,53 @@
+{
+  "K": 5,
+  "gates": [
+    {
+      "gate": "1_slice_pre_committed",
+      "pass": true,
+      "summary": "slice taken by select_mathvista_subset_v1; 1 pids pre-committed."
+    },
+    {
+      "gate": "2_a1_lt_90pct",
+      "pass": false,
+      "summary": "A1@K=5 = 100.00% < 90 %? (FAIL \u2014 saturated)"
+    },
+    {
+      "gate": "3_b_strictly_beats_a1",
+      "pass": false,
+      "summary": "B = 100.00% vs A1 = 100.00%; B > A1? False"
+    },
+    {
+      "gate": "4_margin_b_over_a1_ge_5pp",
+      "pass": false,
+      "summary": "B \u2212 A1 = +0.00 pp (threshold \u2265 +5 pp)"
+    },
+    {
+      "gate": "5_b_over_a0_ge_5pp",
+      "pass": false,
+      "summary": "B \u2212 A0 = +0.00 pp (image must be load-bearing; threshold \u2265 +5 pp)"
+    },
+    {
+      "gate": "6_per_problem_b_ge_a1_majority",
+      "pass": true,
+      "summary": "B \u2265 A1 on 1/1 problems (threshold \u2265 1)"
+    },
+    {
+      "gate": "7_budget_accounting_exact",
+      "pass": true,
+      "summary": "Each problem uses 1 A0 + 5 A1 + 5 B = 11 calls (expected=11; OK)"
+    },
+    {
+      "gate": "8_audit_chain_present",
+      "pass": true,
+      "summary": "bench_merkle=826c7b0f39b66bf0\u2026, seed_merkle=de74585830f342da\u2026"
+    },
+    {
+      "gate": "9_executor_stays_clean",
+      "pass": true,
+      "summary": "Executor invariants intact: every arm routes through evaluate_answer_v1 with identical semantics; offline verifier re-checks."
+    }
+  ],
+  "n_problems": 1,
+  "overall_passes": false,
+  "schema": "coordpy.w95_phase2_gates.v1"
+}

@@ -527,3 +527,214 @@ def test_w95_published_sota_anchors_include_llama_vision():
         MATHVISTA_PUBLISHED_SOTA_SINGLE_SHOT_BY_MODEL.keys())
     assert "llama-3.2-11b-vision-instruct" in keys
     assert "llama-3.2-90b-vision-instruct" in keys
+
+
+# ---------------------------------------------------------------
+# Bench module — schema + extractor + per-arm + driver
+# (no NIM; uses deterministic mock gen functions)
+# ---------------------------------------------------------------
+
+from coordpy.mathvista_bench_v1 import (
+    MathVistaArmCallCapsuleV1,
+    MathVistaArmOutcomeCapsuleV1,
+    MathVistaBenchConfigV1,
+    MathVistaBenchReportV1,
+    W95_MATHVISTA_BENCH_V1_SCHEMA_VERSION,
+    extract_candidate_answer_v1,
+    run_mathvista_bench_v1,
+)
+
+
+def test_w95_bench_schema_version():
+    assert (
+        W95_MATHVISTA_BENCH_V1_SCHEMA_VERSION
+        == "coordpy.mathvista_bench_v1.v1")
+
+
+def test_w95_extract_candidate_picks_last_line():
+    out = extract_candidate_answer_v1(
+        response_text=(
+            "Let me think.\nThe shape has 4 sides.\n42"))
+    assert out == "42"
+
+
+def test_w95_extract_candidate_prefers_tagged_line():
+    out = extract_candidate_answer_v1(
+        response_text=(
+            "Let me think.\nThe answer is 7.\n"
+            "Some afterword."))
+    assert "7" in out
+
+
+def test_w95_extract_candidate_handles_empty():
+    assert extract_candidate_answer_v1(response_text="") == ""
+    assert extract_candidate_answer_v1(response_text="\n\n") == ""
+
+
+def test_w95_arm_capsule_cids_are_stable_under_to_dict():
+    c = MathVistaArmCallCapsuleV1(
+        schema=W95_MATHVISTA_BENCH_V1_SCHEMA_VERSION,
+        seed=1, pid="p1", arm_id="A0_text",
+        role="text_solver", call_idx=0, temperature=0.0,
+        prompt_cid="a" * 64, response_cid="b" * 64,
+        wall_ms=10)
+    cid1 = c.cid()
+    cid2 = c.cid()
+    assert cid1 == cid2
+    assert len(cid1) == 64
+
+
+def _make_fake_corpus_for_bench(n: int = 4):
+    corpus = []
+    for i in range(n):
+        if i % 2 == 0:
+            corpus.append(_make_num(
+                f"pid_b{i:03d}", str(i + 100),
+                precision=0.0, answer_type="integer"))
+        else:
+            corpus.append(_make_mc(
+                f"pid_b{i:03d}", "dog", ("cat", "dog")))
+    return tuple(corpus)
+
+
+def test_w95_bench_runs_e2e_with_perfect_mocks():
+    """With a perfect text_gen and vlm_gen that always emit the
+    gold answer verbatim, every arm should pass on every
+    problem — exercising the bench wiring end-to-end."""
+    corpus = _make_fake_corpus_for_bench(4)
+    answers_by_pid = {p.pid: p.answer for p in corpus}
+
+    def perfect_text_gen(prompt, max_tokens, temperature):
+        # Heuristic: find the pid embedded in the prompt (the
+        # question is `Q?` in our fixtures so we look at the
+        # answer-by-content from the prompt's structured facts).
+        for pid, ans in answers_by_pid.items():
+            if pid in prompt:
+                return ans, 1
+        # Fall back to the first answer (deterministic for
+        # the test).
+        return next(iter(answers_by_pid.values())), 1
+
+    def perfect_vlm_gen(prompt, image_bytes, max_tokens,
+                        temperature):
+        for pid, ans in answers_by_pid.items():
+            if pid in prompt:
+                return ans, 1
+        return next(iter(answers_by_pid.values())), 1
+
+    cfg = MathVistaBenchConfigV1(
+        n_problems=2, K_multi_sample=5,
+        seeds=(95_005_001,),
+        sampling_temperature=0.7,
+        max_tokens_per_call=32)
+    # We need the prompts to contain the pid so the perfect gens
+    # can choose the right answer.  The bench's prompts embed
+    # the question/query but NOT the pid; we hack by setting
+    # the answer to a unique sentinel and using extract logic
+    # that returns the last line.  Simpler: make all problems
+    # share the same gold answer.
+    uniform = (
+        _make_num("u_p1", "42", precision=0.0,
+                  answer_type="integer"),
+        _make_num("u_p2", "42", precision=0.0,
+                  answer_type="integer"),
+    )
+
+    def uniform_text(prompt, max_tokens, temperature):
+        return "42", 1
+
+    def uniform_vlm(prompt, image_bytes, max_tokens,
+                    temperature):
+        return "42", 1
+
+    report = run_mathvista_bench_v1(
+        text_gen=uniform_text, vlm_gen=uniform_vlm,
+        vlm_model_id="mock-vlm",
+        text_model_id="mock-text",
+        corpus=uniform,
+        corpus_parquet_sha256="ff" * 32,
+        corpus_merkle_root="aa" * 32,
+        config=cfg)
+    # Every arm passes every problem with mock 42-answers
+    # against gold 42.
+    assert isinstance(report, MathVistaBenchReportV1)
+    assert report.a0_text_mean_pass_at_1 == 1.0
+    assert report.a1_vlm_mean_pass_at_1 == 1.0
+    assert report.b_vlm_team_mean_pass_at_1 == 1.0
+    assert report.K_multi_sample == 5
+    assert len(report.per_seed) == 1
+    ps = report.per_seed[0]
+    assert ps.n_problems == 2
+    assert len(ps.outcome_cids) == 3 * 2  # 3 arms × 2 problems
+    assert len(ps.seed_merkle_root) == 64
+    assert len(report.bench_merkle_root) == 64
+
+
+def test_w95_bench_records_zero_pass_when_mocks_always_wrong():
+    """If every model call returns an unparseable string, every
+    numeric problem must fail every arm."""
+    uniform = (
+        _make_num("z_p1", "42", precision=0.0,
+                  answer_type="integer"),
+        _make_num("z_p2", "1000", precision=0.0,
+                  answer_type="integer"),
+    )
+
+    def wrong_text(prompt, max_tokens, temperature):
+        return "no idea", 1
+
+    def wrong_vlm(prompt, image_bytes, max_tokens,
+                  temperature):
+        return "no idea", 1
+
+    cfg = MathVistaBenchConfigV1(
+        n_problems=2, K_multi_sample=5,
+        seeds=(95_005_001,),
+        sampling_temperature=0.7,
+        max_tokens_per_call=32)
+    report = run_mathvista_bench_v1(
+        text_gen=wrong_text, vlm_gen=wrong_vlm,
+        vlm_model_id="mock-vlm",
+        text_model_id="mock-text",
+        corpus=uniform,
+        corpus_parquet_sha256="ff" * 32,
+        corpus_merkle_root="aa" * 32,
+        config=cfg)
+    assert report.a0_text_mean_pass_at_1 == 0.0
+    assert report.a1_vlm_mean_pass_at_1 == 0.0
+    assert report.b_vlm_team_mean_pass_at_1 == 0.0
+
+
+def test_w95_bench_per_problem_outcomes_record_per_arm_passes():
+    uniform = (
+        _make_num("a_p1", "42", precision=0.0,
+                  answer_type="integer"),
+    )
+
+    def gen(prompt, max_tokens, temperature):
+        return "42", 1
+
+    def vgen(prompt, image_bytes, max_tokens, temperature):
+        return "42", 1
+
+    cfg = MathVistaBenchConfigV1(
+        n_problems=1, K_multi_sample=5,
+        seeds=(95_005_001,),
+        sampling_temperature=0.7,
+        max_tokens_per_call=32)
+    report = run_mathvista_bench_v1(
+        text_gen=gen, vlm_gen=vgen,
+        vlm_model_id="mock-vlm",
+        text_model_id="mock-text",
+        corpus=uniform,
+        corpus_parquet_sha256="ff" * 32,
+        corpus_merkle_root="aa" * 32,
+        config=cfg)
+    po = report.per_seed[0].per_problem_outcomes[0]
+    assert po["pid"] == "a_p1"
+    assert po["a0_text_passed"]
+    assert po["a1_vlm_passed"]
+    assert po["b_vlm_team_passed"]
+    assert "a0_outcome_cid" in po
+    assert "a1_outcome_cid" in po
+    assert "b_outcome_cid" in po

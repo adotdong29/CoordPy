@@ -10,17 +10,24 @@
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
 > `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W95
-> MathVista cheap-probe preflight** on 2026-05-24 — all 4 W95
-> cheap probes (corpus integrity / executor self-test on gold /
-> A1 failure-residual estimate / decomposition argument) PASS
-> against the canonical `AI4Math/MathVista` testmini parquet
-> (SHA `373f6c0b…`, 1000 problems, Merkle `dea27472fc12…`); all
-> 5 W93 gates PASS on the W95-B0 candidate
-> (`vlm_reader + math_solver + executor-guided reflexion`).
-> Composite verdict PASS.  Phase 2 (cheap NIM pilot, 1 seed ×
-> 30 problems × K=5 × Llama-3.2-11B-Vision-Instruct, ~330 NIM
-> calls) is preflight-earned per `docs/RUNBOOK_W95.md` but NOT
-> launched.  No new retirements; W89 70B-HumanEval K=5 remains
+> MathVista Phase 2 cheap NIM pilot** on 2026-05-24 — **9/9
+> pre-committed Phase 2 gates PASS**.  At 1 seed × 30 problems
+> × K=5 × `meta/llama-3.2-11b-vision-instruct` on the
+> deterministic pre-committed slice of MathVista testmini:
+> A0_text = 36.67 %, A1_vlm K=5 = 66.67 %, **B_vlm_team =
+> 76.67 %**.  **B − A1 = +10.00 pp**; B − A0 = +40.00 pp;
+> B ≥ A1 on **27 / 30 problems**.  Bench Merkle
+> `4f76bcd4ba605d16…`; audit chain re-derives 14/14 offline.
+> **Phase 3 (3 seeds × 100 problems × K=5; ~3 300 NIM calls;
+> ~80-100 min wall) is preflight-earned but NOT launched in
+> W95.**  HONEST: this is a SINGLE-SEED pilot result; it does
+> NOT yet retire any carry-forward.  Multi-seed retirement
+> requires Phase 3.  W89 70B-HumanEval-K=5 remains the only
+> confirmed multi-seed same-budget multi-agent superiority
+> retirement.  Earlier W95 cheap-probe preflight (run
+> `20260524T193937Z`): all 4 W95 cheap probes (corpus integrity
+> / executor self-test on gold / A1 failure-residual estimate
+> / decomposition argument) PASSED, all 5 W93 gates PASSED.  No new retirements; W89 70B-HumanEval K=5 remains
 > the only confirmed same-budget multi-agent superiority claim.
 > Prior: **W94 K=10 pilot + cross-modal pivot** on 2026-05-24 —
 > K=10 hypothesis KILLED in cheap 90-min pilot (A1 saturates to
