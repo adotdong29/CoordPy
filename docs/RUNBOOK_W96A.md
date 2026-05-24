@@ -191,18 +191,129 @@ architecture refinement) per the Linear-recommended ordering.
 
 ## Phase 3 — full bench (only if W96-A Phase 2 earns it)
 
-If W96-A Phase 2 clears all 9 gates, the next step is a 3-seed
-× 100-problem full bench at 90B (same shape as W95 Phase 3,
-but at the 90B weight class).  That run is a separate runbook
-section (`docs/RUNBOOK_W96A.md` Phase 3 stub, to be authored
-ONLY after Phase 2 earns it).  The W88 6-bar retirement shape
-applies verbatim.
+### Phase 2 outcome (locked 2026-05-24)
 
-If Phase 2's signal is borderline (clears all gates but with a
-margin only 1-2 pp above the +5 pp bar), the runbook author
-MUST pre-commit which Phase 3 shape (3 × 100 at 90B vs the
-5-seed × 100 wider sample at 11B from `COO-18`) is run, BEFORE
-any NIM call on that larger run.
+**Phase 2 PASSED all 9 pre-committed gates** with **B − A1 =
++10.00 pp** at single-seed × 30 problems at 90B
+(`docs/RESULTS_W96A_MATHVISTA_90B_PILOT_V1.md`).  The
++10.00 pp margin is byte-equivalent to W95 Phase 2 at 11B,
+with identical B-only-rescue and A1-only-rescue counts.  The
++10 pp margin is NOT borderline (2× the +5 pp Phase 2 bar);
+under this runbook's pre-commit, Phase 3 at 90B is the
+default next step.
+
+### Phase 3 shape (locked 2026-05-24 BEFORE any Phase 3 NIM call)
+
+Identical W88 6-bar retirement shape to W95 Phase 3, only the
+VLM weight class changes.
+
+* **Bench**: same `coordpy.mathvista_bench_v1`.
+* **Model**: `meta/llama-3.2-90b-vision-instruct` via NIM.
+* **Budget**: K=5, exactly as Phase 2.
+* **Scope**: 3 seeds × 100 problems × K=5.  Seeds
+  pre-committed BEFORE any Phase 3 NIM call: **95_005_001 /
+  95_005_002 / 95_005_003** — the *exact same seed identities*
+  as W95 Phase 3 at 11B, so the 11B vs 90B comparison stays
+  problem-level fair across both Phase 2 (single seed) and
+  Phase 3 (3-seed).
+* **Expected cost**: 3 × 100 × 11 = 3300 NIM calls; expected
+  wall ~2.5-4 h (90B per-call wall observed in Phase 2 is
+  ~3.86 s avg; scaling linearly to 3300 calls is ~3.5 h).
+
+### Pre-committed Phase 3 retirement bars (W88 6-bar shape)
+
+Locked verbatim from `docs/RUNBOOK_W95.md` Phase 3 (reused
+without modification by the pilot script's `--phase phase3`
+mode in `_evaluate_phase3_retirement_bars()`).  All thresholds
+apply to the 3-seed cross-seed aggregates:
+
+1. `b_mean strictly beats a0_mean`
+2. `b_mean strictly beats a1_mean`
+3. `b_mean − a0_mean ≥ +5.0 pp`
+4. `b_mean − a1_mean ≥ +5.0 pp`
+5. B beats A0 on > half seeds (≥ 2 of 3).
+6. B beats A1 on > half seeds (≥ 2 of 3).
+7. Budget accounting exact (1 + 5 + 5 = 11 calls / problem on
+   every problem on every seed).
+8. Audit chain present (per-seed Merkle roots + bench Merkle
+   root re-derive offline).
+9. Slices pre-committed per seed (all 3 pid lists SHA-256
+   hashed BEFORE NIM).
+
+If all 6 retirement bars (1..6) PASS:
+
+* **NEW carry-forward retirement** — `W96-T-MATHVISTA-VLM-
+  TEAM-K5-90B-SUPERIORITY` is registered as the FIRST confirmed
+  cross-modal same-budget multi-agent superiority retirement.
+* This would be the SECOND confirmed same-budget multi-agent
+  superiority retirement overall (the first being W89
+  HumanEval-70B-Reflexion-K=5).
+
+If fewer bars pass:
+
+* `W96-L-MATHVISTA-90B-RETIREMENT-MARGIN-CAP` records the
+  additional negative evidence.
+* W96 advances to `COO-19` (architecture refinement / verifier
+  turn / tool-augmented solver) per the Linear-recommended
+  ordering, since further scaling has been empirically shown
+  to not help at 90B.
+
+### Anti-cheat additions for Phase 3
+
+* The 3 seed identities (95_005_001 / 95_005_002 / 95_005_003)
+  are pre-committed in this runbook BEFORE the Phase 3 NIM
+  call.  This is the SAME seed list W95 Phase 3 used at 11B,
+  so the 11B vs 90B Phase 3 comparison stays problem-level
+  fair on every seed.
+* Same model on every arm (90B Vision in vision-mode for A1 /
+  B-reader; text-only mode for A0 / B-solver).
+* Same K=5 budget; budget gate enforced byte-exactly.
+* Executor truth = `evaluate_answer_v1` for every arm; no LLM
+  judge.
+* Parquet SHA-256 anchored at run start.
+* Same NIM HTTPS path; 429-aware backoff carries over.
+
+### Phase 3 launch command (locked 2026-05-24)
+
+```
+NVIDIA_API_KEY=... python scripts/run_w95_mathvista_pilot.py \
+  --phase phase3 \
+  --vlm-model meta/llama-3.2-90b-vision-instruct \
+  --n-problems 100 --n-seeds 3 \
+  --seed-start 95005001 \
+  --out-dir results/w96/mathvista_90b_phase3 \
+  --expected-parquet-sha256 \
+    373f6c0b412a9be2cec36711cee724e03f4c5db6908f3c13db903aa9694d4f2d
+```
+
+### Q3 a-priori Phase 3 prediction (locked BEFORE Phase 3 NIM)
+
+The Phase 2 cross-scale evidence (11B and 90B both produce
++10.00 pp margin at single-seed × 30) is *suggestive* but
+not conclusive that 90B Phase 3 will replicate the W95 Phase
+3 narrowing (single-seed +10 pp → multi-seed +3.67 pp).  Two
+distinct outcomes are plausible at Phase 3:
+
+* **H3-A (90B replicates the narrowing):** the multi-seed
+  margin lands near +3-4 pp, similarly missing the +5 pp
+  retirement bar.  This would re-confirm `W95-L-MATHVISTA-
+  RETIREMENT-MARGIN-CAP` as a structural cap on the W95-B0
+  architecture at this benchmark; W96-A would NOT retire the
+  carry-forward and W96 would advance to W96-C architecture
+  refinement.
+* **H3-B (90B does NOT narrow):** the structural mechanism is
+  robust enough at 90B that the third-seed reversal seen at
+  11B (-5 pp on seed 95_005_003) does not appear at 90B,
+  and the multi-seed margin stays at +5-10 pp.  This would
+  retire the cross-modal carry-forward and become the SECOND
+  confirmed multi-seed same-budget multi-agent superiority
+  retirement.
+
+**Locked pre-Phase-3 prediction:**  H3-A is the marginally
+more likely outcome (the architectural-invariance evidence
+from Phase 2 cuts both ways — robust margin at single-seed
+AND robust narrowing at multi-seed), but the prior is weak
+and the evidence is the actual Phase 3 run.
 
 ## Anti-cheat (carry-forward from W88–W95)
 
