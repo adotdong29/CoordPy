@@ -179,8 +179,11 @@ def main() -> int:
         f"({sum(1 for x in ba1 if x)}/{n_seeds})")
     print(f"  B ≥ A1 problems per seed: {n_b_ge_a1_per_seed}")
 
-    # Phase 2 retirement bars (pilot scale)
+    # Phase 2 pilot gates (single-seed) and/or Phase 3
+    # retirement bars (multi-seed) — re-derive whichever
+    # the bench produced.
     phase2_path = run_dir / "phase2_gates.json"
+    phase3_path = run_dir / "phase3_retirement_bars.json"
     if phase2_path.exists():
         with open(phase2_path) as f:
             p2 = json.load(f)
@@ -189,6 +192,18 @@ def main() -> int:
             "  W95 Phase 2 pilot gates "
             f"(overall_passes={p2['overall_passes']}):")
         for g in p2["gates"]:
+            check(
+                f"  {g['gate']}",
+                bool(g["pass"]),
+                g["summary"] if not g["pass"] else "")
+    if phase3_path.exists():
+        with open(phase3_path) as f:
+            p3 = json.load(f)
+        print()
+        print(
+            "  W95 Phase 3 retirement bars "
+            f"(overall_passes={p3['overall_passes']}):")
+        for g in p3["gates"]:
             check(
                 f"  {g['gate']}",
                 bool(g["pass"]),

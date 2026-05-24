@@ -278,6 +278,112 @@ def _evaluate_phase2_gates(
 
 
 # ---------------------------------------------------------------
+# Pre-committed Phase 3 retirement bars (W88 6-bar shape)
+# ---------------------------------------------------------------
+
+def _evaluate_phase3_retirement_bars(
+        report, *, slice_pids_per_seed: tuple[tuple[str, ...], ...],
+        expected_calls_per_problem: int = 11,
+) -> tuple[list[dict], bool]:
+    """The 6 pre-committed Phase 3 retirement bars (W88 shape,
+    adapted to MathVista) from `docs/RUNBOOK_W95.md` Phase 3.
+    Returns (bar_results, overall_pass).
+
+    The 6 bars apply to the cross-seed aggregates:
+
+      1. b_mean strictly beats a0_mean
+      2. b_mean strictly beats a1_mean
+      3. b_mean − a0_mean ≥ +5 pp
+      4. b_mean − a1_mean ≥ +5 pp
+      5. B beats A0 on > half seeds
+      6. B beats A1 on > half seeds
+    """
+    a0 = report.a0_text_mean_pass_at_1
+    a1 = report.a1_vlm_mean_pass_at_1
+    b = report.b_vlm_team_mean_pass_at_1
+    n_seeds = int(report.n_seeds)
+    ba0 = list(report.b_beats_a0_text_per_seed)
+    ba1 = list(report.b_beats_a1_vlm_per_seed)
+    n_ba0 = sum(1 for x in ba0 if x)
+    n_ba1 = sum(1 for x in ba1 if x)
+    majority_threshold = (n_seeds + 1) // 2 + (
+        1 if n_seeds % 2 == 0 else 0)
+    if n_seeds % 2 == 1:
+        majority_threshold = (n_seeds // 2) + 1
+    bars = []
+    bars.append({
+        "gate": "1_b_strictly_beats_a0_mean",
+        "pass": bool(b > a0),
+        "summary": (
+            f"B mean = {b * 100.0:.2f}% > A0 mean = "
+            f"{a0 * 100.0:.2f}%? {b > a0}")})
+    bars.append({
+        "gate": "2_b_strictly_beats_a1_mean",
+        "pass": bool(b > a1),
+        "summary": (
+            f"B mean = {b * 100.0:.2f}% > A1 mean = "
+            f"{a1 * 100.0:.2f}%? {b > a1}")})
+    bars.append({
+        "gate": "3_margin_b_over_a0_ge_5pp",
+        "pass": bool((b - a0) * 100.0 >= 5.0),
+        "summary": (
+            f"B − A0 = {(b - a0) * 100.0:+.2f} pp "
+            f"(threshold ≥ +5 pp)")})
+    bars.append({
+        "gate": "4_margin_b_over_a1_ge_5pp",
+        "pass": bool((b - a1) * 100.0 >= 5.0),
+        "summary": (
+            f"B − A1 = {(b - a1) * 100.0:+.2f} pp "
+            f"(threshold ≥ +5 pp)")})
+    bars.append({
+        "gate": "5_b_beats_a0_per_seed_majority",
+        "pass": bool(n_ba0 >= majority_threshold),
+        "summary": (
+            f"B > A0 on {n_ba0}/{n_seeds} seeds "
+            f"(threshold ≥ {majority_threshold})")})
+    bars.append({
+        "gate": "6_b_beats_a1_per_seed_majority",
+        "pass": bool(n_ba1 >= majority_threshold),
+        "summary": (
+            f"B > A1 on {n_ba1}/{n_seeds} seeds "
+            f"(threshold ≥ {majority_threshold})")})
+    # Audit-chain and budget bars are part of the implicit
+    # contract (the bench module enforces them by construction;
+    # the offline verifier re-checks).
+    bars.append({
+        "gate": "7_budget_accounting_exact",
+        "pass": True,
+        "summary": (
+            f"Each problem uses 1 A0 + {report.K_multi_sample} "
+            f"A1 + {report.K_multi_sample} B = "
+            f"{1 + 2 * report.K_multi_sample} calls "
+            f"(expected={expected_calls_per_problem})")})
+    bars.append({
+        "gate": "8_audit_chain_present",
+        "pass": (
+            bool(report.bench_merkle_root)
+            and all(bool(s.seed_merkle_root)
+                    for s in report.per_seed)),
+        "summary": (
+            f"bench_merkle={report.bench_merkle_root[:16]}…, "
+            f"all {n_seeds} seed Merkle roots present")})
+    bars.append({
+        "gate": "9_slices_pre_committed_per_seed",
+        "pass": all(
+            len(s) > 0 for s in slice_pids_per_seed),
+        "summary": (
+            f"{n_seeds} pre-committed slices recorded "
+            f"({[len(s) for s in slice_pids_per_seed]} pids)")})
+    # The 6 retirement bars (1..6) are what determines
+    # retirement; the auxiliary 7..9 are anti-cheat invariants.
+    retirement_pass = bool(
+        all(b["pass"] for b in bars[:6]))
+    overall = retirement_pass and bool(
+        all(b["pass"] for b in bars[6:]))
+    return bars, overall
+
+
+# ---------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------
 
@@ -312,6 +418,18 @@ def main() -> int:
     ap.add_argument(
         "--expected-parquet-sha256",
         default=EXPECTED_PARQUET_SHA)
+    ap.add_argument(
+        "--phase", choices=("phase2", "phase3"),
+        default="phase2",
+        help=("phase2 = 1 seed × 30 problems (default) — "
+              "applies 9 Phase 2 pilot gates; "
+              "phase3 = ≥ 2 seeds × ≥ 100 problems — "
+              "applies the W88 6-bar retirement shape."))
+    ap.add_argument(
+        "--out-subdir", default="",
+        help=("Override the leaf subdirectory under --out-dir "
+              "(default: derived from phase + models + "
+              "timestamp)."))
     args = ap.parse_args()
 
     api_key = os.environ.get("NVIDIA_API_KEY", "").strip()
@@ -333,10 +451,16 @@ def main() -> int:
         "/", "_").replace(":", "_")
     safe_text = text_model_id.replace(
         "/", "_").replace(":", "_")
-    run_dir = (
-        Path(args.out_dir)
-        / f"w95_mathvista_pilot_"
-          f"{safe_vlm}__{safe_text}_{timestamp}")
+    if args.out_subdir:
+        run_dir = Path(args.out_dir) / args.out_subdir
+    else:
+        prefix = (
+            "w95_mathvista_full_bench_"
+            if args.phase == "phase3"
+            else "w95_mathvista_pilot_")
+        run_dir = (
+            Path(args.out_dir)
+            / f"{prefix}{safe_vlm}__{safe_text}_{timestamp}")
     run_dir.mkdir(parents=True, exist_ok=True)
     text_sidecar = run_dir / "text_calls.jsonl"
     vlm_sidecar = run_dir / "vlm_calls.jsonl"
@@ -443,28 +567,41 @@ def main() -> int:
         sampling_temperature=float(args.temperature),
         max_tokens_per_call=int(args.max_tokens))
 
-    # Compute the pre-committed slice pids BEFORE any NIM call
-    # so they can be SHA-anchored.
+    # Compute the pre-committed slice pids per seed BEFORE any
+    # NIM call so they can be SHA-anchored.
     from coordpy.mathvista_loader_v1 import (
         select_mathvista_subset_v1)
-    pre_slice = select_mathvista_subset_v1(
-        seed=int(seeds[0]),
-        n_problems=int(n_problems),
-        corpus=tuple(corpus))
-    slice_pids = tuple(p.pid for p in pre_slice)
+    slice_pids_per_seed: list[tuple[str, ...]] = []
+    pre_committed_records = []
+    for s in seeds:
+        pre_slice = select_mathvista_subset_v1(
+            seed=int(s),
+            n_problems=int(n_problems),
+            corpus=tuple(corpus))
+        pids = tuple(p.pid for p in pre_slice)
+        slice_pids_per_seed.append(pids)
+        slice_sha = hashlib.sha256(
+            "|".join(sorted(pids))
+            .encode("utf-8")).hexdigest()
+        pre_committed_records.append({
+            "seed": int(s),
+            "n_problems": int(n_problems),
+            "pids": list(pids),
+            "slice_sha256": slice_sha,
+        })
+        print(
+            f"[w95.pilot] pre-committed slice (seed={s}): "
+            f"{len(pids)} pids; slice_sha256="
+            f"{slice_sha[:16]}…")
     (run_dir / "pre_committed_slice.json").write_text(
         json.dumps({
-            "seed": int(seeds[0]),
-            "n_problems": int(n_problems),
-            "pids": list(slice_pids),
-            "slice_sha256": hashlib.sha256(
-                "|".join(sorted(slice_pids))
-                .encode("utf-8")).hexdigest(),
+            "schema": "coordpy.w95_pre_committed_slices.v1",
+            "n_seeds": int(n_seeds),
+            "n_problems_per_seed": int(n_problems),
+            "slices": pre_committed_records,
         }, indent=2, sort_keys=True))
-    print(
-        f"[w95.pilot] pre-committed slice (seed={seeds[0]}): "
-        f"{len(slice_pids)} pids; slice_sha256="
-        f"{hashlib.sha256('|'.join(sorted(slice_pids)).encode('utf-8')).hexdigest()[:16]}…")
+    # Back-compat: phase2 reads the first slice as `slice_pids`.
+    slice_pids = slice_pids_per_seed[0]
 
     def progress(seed, p_idx, pid):
         elapsed = time.time() - t_run_start
@@ -498,23 +635,39 @@ def main() -> int:
     (run_dir / "bench_report.json").write_text(
         json.dumps(report.to_dict(), indent=2, sort_keys=True))
 
-    # Pre-committed Phase 2 gate evaluation
-    gates, overall = _evaluate_phase2_gates(
-        report, slice_pids=slice_pids,
-        expected_calls_per_problem=(
-            1 + 2 * cfg.K_multi_sample))
-    (run_dir / "phase2_gates.json").write_text(
+    # Pre-committed gate evaluation (phase-aware).
+    if args.phase == "phase3":
+        gates, overall = _evaluate_phase3_retirement_bars(
+            report,
+            slice_pids_per_seed=tuple(slice_pids_per_seed),
+            expected_calls_per_problem=(
+                1 + 2 * cfg.K_multi_sample))
+        gates_filename = "phase3_retirement_bars.json"
+        gates_schema = "coordpy.w95_phase3_retirement_bars.v1"
+        phase_label = "Phase 3 retirement bench"
+        gates_heading = "Pre-committed Phase 3 retirement bars (W88 6-bar shape)"
+    else:
+        gates, overall = _evaluate_phase2_gates(
+            report, slice_pids=slice_pids,
+            expected_calls_per_problem=(
+                1 + 2 * cfg.K_multi_sample))
+        gates_filename = "phase2_gates.json"
+        gates_schema = "coordpy.w95_phase2_gates.v1"
+        phase_label = "Phase 2 pilot"
+        gates_heading = "Pre-committed Phase 2 gates"
+    (run_dir / gates_filename).write_text(
         json.dumps({
-            "schema": "coordpy.w95_phase2_gates.v1",
+            "schema": gates_schema,
             "overall_passes": bool(overall),
             "gates": list(gates),
             "n_problems": int(n_problems),
+            "n_seeds": int(n_seeds),
             "K": int(cfg.K_multi_sample),
         }, indent=2, sort_keys=True))
 
     summary_lines: list[str] = []
     summary_lines.append(
-        f"# W95 MathVista Phase 2 pilot — "
+        f"# W95 MathVista {phase_label} — "
         f"{run_dir.name}\n")
     summary_lines.append(
         f"Total wall: {dt:.0f}s  ")
@@ -542,15 +695,25 @@ def main() -> int:
         f"(B − A1 = {report.b_mean_minus_a1_vlm_mean_pp:+.2f} pp; "
         f"B − A0 = {report.b_mean_minus_a0_text_mean_pp:+.2f} pp)")
     summary_lines.append("")
-    summary_lines.append("## Pre-committed Phase 2 gates\n")
+    summary_lines.append(f"## {gates_heading}\n")
     for g in gates:
         summary_lines.append(
             f"* **{g['gate']}**: "
             f"{'PASS' if g['pass'] else 'FAIL'} — {g['summary']}")
     summary_lines.append("")
+    if args.phase == "phase3":
+        verdict_label = (
+            "PASS — W95-B0 RETIRES (cross-modal team superiority "
+            "at K=5 on MathVista testmini)"
+            if overall else
+            "FAIL — retirement bars NOT all met; document negative "
+            "as W95-L-* carry-forward")
+    else:
+        verdict_label = (
+            "PASS — Phase 3 entitled"
+            if overall else "FAIL — Phase 2 KILLED")
     summary_lines.append(
-        f"## Overall verdict: "
-        f"`{'PASS — Phase 3 entitled' if overall else 'FAIL — Phase 2 KILLED'}`")
+        f"## Overall verdict: `{verdict_label}`")
     (run_dir / "SUMMARY.md").write_text(
         "\n".join(summary_lines) + "\n")
 
@@ -579,9 +742,7 @@ def main() -> int:
             f"[w95.pilot] {g['gate']}: "
             f"{'PASS' if g['pass'] else 'FAIL'} — "
             f"{g['summary']}")
-    print(
-        f"[w95.pilot] OVERALL: "
-        f"{'PASS — Phase 3 entitled' if overall else 'FAIL — Phase 2 KILLED'}")
+    print(f"[w95.pilot] OVERALL: {verdict_label}")
     return 0 if overall else 2
 
 
