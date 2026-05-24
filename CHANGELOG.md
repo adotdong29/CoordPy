@@ -13,6 +13,86 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W95 MathVista Phase 3 retirement-grade bench — 5/6 W88 retirement bars PASS; bar 4 narrowly misses (+3.67 pp vs +5 pp margin); NOT retirement; preflight-first discipline validated for the third time (2026-05-24)**
+  — *3 seeds × 100 problems × K=5 × `meta/llama-3.2-11b-vision-instruct`
+  via NIM on the deterministic pre-committed slices of
+  `AI4Math/MathVista` testmini.  3300 NIM calls, 5864 s wall
+  (~97.7 min).  Pre-committed slice sha256 per seed:
+  `1569e2fa65e35cd6…` / `34d14d7496e98e1c…` /
+  `c74e78b87709ad46…`.*
+
+  **Per-arm cross-seed means**:
+    A0_text = **30.33 %**
+    A1_vlm K=5 = **67.67 %**
+    B_vlm_team = **71.33 %**
+    B − A1 = **+3.67 pp** (below +5 pp retirement bar)
+    B − A0 = **+41.00 pp**
+
+  **Per-seed B − A1 deltas**: +6.00 / +10.00 / **−5.00** pp;
+  the third seed reversed, dragging the mean below the +5 pp
+  threshold.  B > A1 per seed: 2 / 3; B > A0 per seed: 3 / 3;
+  B ≥ A1 on 267 / 300 problems (89.0 %).  Net per-problem
+  rescue: 44 B-only vs 33 A1-only = +11 net for B.
+
+  **Pre-committed W88 6-bar retirement shape on Phase 3**:
+
+    1. b_mean > a0_mean              PASS  (71.33 > 30.33)
+    2. b_mean > a1_mean              PASS  (71.33 > 67.67)
+    3. b_mean − a0_mean ≥ +5 pp      PASS  (+41.00 pp)
+    4. b_mean − a1_mean ≥ +5 pp      FAIL  (+3.67 pp; misses by 1.33 pp)
+    5. B > A0 > half seeds           PASS  (3 / 3)
+    6. B > A1 > half seeds           PASS  (2 / 3)
+
+  Plus anti-cheat invariants 7-9 (budget, audit chain,
+  per-seed slice pre-commit): all PASS.
+
+  Audit chain re-derives 13 / 14 PASS offline
+  (`scripts/verify_w95_mathvista_audit_chain.py`).  Bench
+  Merkle root
+  `2257c4991e0d07c85da6f70e372b82874d8ca3b38521da029cc8734d67cf2fb7`.
+
+  **Verdict**: under the pre-committed W88 6-bar shape, W95-B0
+  at K=5 on Llama-3.2-11B-Vision is **NOT retirement-grade**.
+  The team architecture IS empirically positive on the mean
+  (+3.67 pp) and on 2/3 seeds, but the +5 pp strict margin bar
+  exists exactly to gate against variance, and Phase 3 showed
+  the variance was real.
+
+  **Discipline validation (third time)**: W93 (preflight harness
+  killed 3 candidates without expensive runs) → W94 (preflight-
+  earned K=10 pilot killed in 90 min instead of 5 h) → W95 (a
+  single-seed +10 pp pilot signal narrowed to +3.67 pp under
+  multi-seed evaluation, missing the strict bar).  Each wave is
+  the discipline doing what it was designed to do.
+
+  **Adds carry-forward** `W95-L-MATHVISTA-RETIREMENT-MARGIN-CAP`:
+  on MathVista testmini at K=5 × Llama-3.2-11B-Vision, the
+  W95-B0 candidate beats unified-VLM K=5 on the cross-seed mean
+  by +3.67 pp (2/3 per-seed majority; 89 % per-problem
+  majority) but does NOT meet the pre-committed +5 pp
+  retirement-margin bar.  Plausible next directions: larger VLM
+  (90B-Vision), wider sample (≥ 5 seeds or ≥ 300 problems/seed),
+  architecture refinement (verifier turn, tool-aug solver), or
+  a different battlefield — each requires its own pre-committed
+  runbook + preflight.
+
+  **No retirements.**  W89 70B-HumanEval-K=5 remains the only
+  confirmed multi-seed same-budget multi-agent superiority
+  retirement.
+
+  **What W95 ships in Phase 3**: `scripts/run_w95_mathvista_pilot.py`
+  extended with `--phase phase3` + W88 6-bar evaluator;
+  `scripts/verify_w95_mathvista_audit_chain.py` extended to
+  re-derive phase3_retirement_bars.json;
+  `docs/RESULTS_W95_MATHVISTA_PHASE3_V1.md`; `results/w95/
+  mathvista_phase3/w95_mathvista_full_bench_..._20260524T204145Z/`
+  (full 3300-call sidecar + bench report + Phase 3 bars
+  verdict).
+
+  **Stable boundary preservation**: `coordpy.__version__` =
+  `0.5.20`; `coordpy.SDK_VERSION` = `coordpy.sdk.v3.43`; no
+  PyPI publish; `coordpy/__init__.py` untouched.
+
 - **W95 MathVista Phase 2 cheap NIM pilot — 9/9 pre-committed gates PASS; B beats A1 by +10.00 pp at K=5 on Llama-3.2-11B-Vision; Phase 3 preflight-earned but not launched (2026-05-24)**
   — *First NIM spend on the W95 MathVista line under the W93/
   W95 preflight-first discipline.  Built `coordpy.mathvista_

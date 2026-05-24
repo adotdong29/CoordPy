@@ -1,0 +1,54 @@
+{
+  "K": 5,
+  "gates": [
+    {
+      "gate": "1_b_strictly_beats_a0_mean",
+      "pass": true,
+      "summary": "B mean = 71.33% > A0 mean = 30.33%? True"
+    },
+    {
+      "gate": "2_b_strictly_beats_a1_mean",
+      "pass": true,
+      "summary": "B mean = 71.33% > A1 mean = 67.67%? True"
+    },
+    {
+      "gate": "3_margin_b_over_a0_ge_5pp",
+      "pass": true,
+      "summary": "B \u2212 A0 = +41.00 pp (threshold \u2265 +5 pp)"
+    },
+    {
+      "gate": "4_margin_b_over_a1_ge_5pp",
+      "pass": false,
+      "summary": "B \u2212 A1 = +3.67 pp (threshold \u2265 +5 pp)"
+    },
+    {
+      "gate": "5_b_beats_a0_per_seed_majority",
+      "pass": true,
+      "summary": "B > A0 on 3/3 seeds (threshold \u2265 2)"
+    },
+    {
+      "gate": "6_b_beats_a1_per_seed_majority",
+      "pass": true,
+      "summary": "B > A1 on 2/3 seeds (threshold \u2265 2)"
+    },
+    {
+      "gate": "7_budget_accounting_exact",
+      "pass": true,
+      "summary": "Each problem uses 1 A0 + 5 A1 + 5 B = 11 calls (expected=11)"
+    },
+    {
+      "gate": "8_audit_chain_present",
+      "pass": true,
+      "summary": "bench_merkle=2257c4991e0d07c8\u2026, all 3 seed Merkle roots present"
+    },
+    {
+      "gate": "9_slices_pre_committed_per_seed",
+      "pass": true,
+      "summary": "3 pre-committed slices recorded ([100, 100, 100] pids)"
+    }
+  ],
+  "n_problems": 100,
+  "n_seeds": 3,
+  "overall_passes": false,
+  "schema": "coordpy.w95_phase3_retirement_bars.v1"
+}

@@ -10,24 +10,29 @@
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
 > `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W95
-> MathVista Phase 2 cheap NIM pilot** on 2026-05-24 — **9/9
-> pre-committed Phase 2 gates PASS**.  At 1 seed × 30 problems
-> × K=5 × `meta/llama-3.2-11b-vision-instruct` on the
-> deterministic pre-committed slice of MathVista testmini:
-> A0_text = 36.67 %, A1_vlm K=5 = 66.67 %, **B_vlm_team =
-> 76.67 %**.  **B − A1 = +10.00 pp**; B − A0 = +40.00 pp;
-> B ≥ A1 on **27 / 30 problems**.  Bench Merkle
-> `4f76bcd4ba605d16…`; audit chain re-derives 14/14 offline.
-> **Phase 3 (3 seeds × 100 problems × K=5; ~3 300 NIM calls;
-> ~80-100 min wall) is preflight-earned but NOT launched in
-> W95.**  HONEST: this is a SINGLE-SEED pilot result; it does
-> NOT yet retire any carry-forward.  Multi-seed retirement
-> requires Phase 3.  W89 70B-HumanEval-K=5 remains the only
-> confirmed multi-seed same-budget multi-agent superiority
-> retirement.  Earlier W95 cheap-probe preflight (run
-> `20260524T193937Z`): all 4 W95 cheap probes (corpus integrity
-> / executor self-test on gold / A1 failure-residual estimate
-> / decomposition argument) PASSED, all 5 W93 gates PASSED.  No new retirements; W89 70B-HumanEval K=5 remains
+> MathVista Phase 3 retirement-grade bench** on 2026-05-24 —
+> **5 / 6 of the pre-committed W88 retirement bars PASS;
+> bar 4 (B − A1 margin ≥ +5 pp) FAILS at +3.67 pp.  At 3 seeds
+> × 100 problems × K=5 × `meta/llama-3.2-11b-vision-instruct`:
+> A0_text = 30.33 %, A1_vlm K=5 = 67.67 %, **B_vlm_team =
+> 71.33 %**.  Per-seed B − A1 = +6.00 / +10.00 / **−5.00** pp;
+> B > A1 on 2 / 3 seeds; B > A0 on 3 / 3 seeds; B ≥ A1 on
+> 267 / 300 problems (89 %); B − A0 mean = +41.00 pp (image
+> dramatically load-bearing).  3 300 NIM calls, 97.7 min wall.
+> Audit chain re-derives 13 / 14 PASS offline.**  Under the
+> W88 6-bar shape, W95-B0 is **NOT retirement-grade**: bar 4
+> narrowly misses the +5 pp margin by 1.33 pp.  The W93/W94/W95
+> preflight-first discipline correctly converted Phase 2's
+> single-seed +10 pp pilot into Phase 3's +3.67 pp multi-seed
+> finding that falls short of the strict bar.  Adds carry-
+> forward `W95-L-MATHVISTA-RETIREMENT-MARGIN-CAP`.  W95-B0 IS
+> empirically positive (B beats A1 on the mean and on 2/3
+> seeds) but not retirement-grade.  W89 70B-HumanEval-K=5
+> remains the only confirmed multi-seed same-budget multi-
+> agent superiority retirement.  Prior W95 Phase 2 pilot (run
+> `20260524T201615Z`): 9/9 gates PASS at single-seed +10 pp
+> signal.  W95 cheap-probe preflight (run `20260524T193937Z`):
+> all 4 W95 probes + 5 W93 gates PASS.  No new retirements; W89 70B-HumanEval K=5 remains
 > the only confirmed same-budget multi-agent superiority claim.
 > Prior: **W94 K=10 pilot + cross-modal pivot** on 2026-05-24 —
 > K=10 hypothesis KILLED in cheap 90-min pilot (A1 saturates to
