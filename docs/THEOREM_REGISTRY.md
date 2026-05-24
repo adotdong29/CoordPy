@@ -25,7 +25,7 @@
 > - **conjectural** — stated, falsifiable; not yet proved or systematically tested.
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
-> Last touched: **W93 post-W92 preflight-first empirical superiority wave V6** on 2026-05-24 — DISCIPLINE-FIRST milestone.  No expensive bench run; deliverable is preflight infrastructure (`coordpy.failure_cluster_miner_v1` + `coordpy.cross_modal_preflight_harness_v1`) + failure-mode diagnosis + 3 candidate kills (self-verifying VLM-in-loop, heterogeneous pool, K=10 reflexion).  All 3 candidates killed via cheap preflight against W88–W92 sidecar evidence.  W93 establishes a 5-gate preflight discipline that future expensive bench runs must pass; W94 should pilot K=10 reflexion (smallest cheapest test).  No new retirements; the W89 70B-HumanEval retirement remains.  Prior: W92 cross-modal role-specialized DECISIVE NEGATIVE on 2026-05-24; W91 cross-modal disconfirmation + MBPP confirmation on 2026-05-23; W90 wave V3 (MBPP +1.11 pp / cross-modal VLM-loop +0.00 pp) on 2026-05-23; W89 wave V2 RETIRED two HumanEval carry-forwards at 70B on 2026-05-22; W88 wave V1 both NEGATIVE on 2026-05-22; W87 P3 line closures on 2026-05-21.
+> Last touched: **W94 preflight-earned K=10 pilot + cross-modal battlefield pivot** on 2026-05-24 — K=10 hypothesis KILLED IN CHEAP PILOT.  At 1 seed × 15 problems × K=10 × Llama-3.3-70B-Instruct on HumanEval: A1 first-pass-among-K=10 saturates to **100 % ceiling**; B sequential-reflexion-K=10 also reaches 100 %; B − A1 = +0.00 pp.  **3 of 6 pre-committed pilot gates FAIL**; no full Phase-2 K=10 bench launched.  W94 also documents cross-modal battlefield pivot to MathVista (W95+ target; documented selection rationale; no W94 cross-modal NIM run).  The W93 preflight discipline successfully killed W93-C in a 90-minute pilot instead of a likely 5-hour full bench.  No new retirements; W89 70B-HumanEval K=5 retirement remains.  Prior: W93 post-W92 preflight-first discipline on 2026-05-24 (3 candidates killed in preflight); W92 cross-modal role-specialized DECISIVE NEGATIVE on 2026-05-24; W91 cross-modal disconfirmation + MBPP confirmation on 2026-05-23.  Prior: W92 cross-modal role-specialized DECISIVE NEGATIVE on 2026-05-24; W91 cross-modal disconfirmation + MBPP confirmation on 2026-05-23; W90 wave V3 (MBPP +1.11 pp / cross-modal VLM-loop +0.00 pp) on 2026-05-23; W89 wave V2 RETIRED two HumanEval carry-forwards at 70B on 2026-05-22; W88 wave V1 both NEGATIVE on 2026-05-22; W87 P3 line closures on 2026-05-21.
 
 ## Post-W87 frontier claims that are explicitly NOT in this registry
 
@@ -45,6 +45,35 @@ registry.  Reports that assert them are overstatement.
 This list is canonical.  When the next research wave's meta
 issue lands and any of these claims is established, the
 matching `WXX-T-*` entry will land in the registry above.
+
+## W94 preflight-earned K=10 pilot + cross-modal battlefield pivot (W94-T-* and W94-L-*)
+
+The W94 wave is the FIRST true test of the W93 preflight-first
+discipline.  W93-C (K=10 reflexion) passed all gates except
+G2 (no K=10 evidence in W88–W92 sidecars).  W94's pilot was a
+30-90 minute cheap test to resolve G2.
+
+**Result**: A1 first-pass-among-K=10 reaches **100 % ceiling**
+on the 15-problem slice; B also 100 %; B − A1 = +0.00 pp.
+**3 of 6 pre-committed W94 P1 pilot gates FAIL.**  The K=10
+hypothesis is empirically dead at this scale.  **No Phase-2
+full K=10 bench launched**, per the W94 runbook contract.
+
+The pilot also empirically VALIDATES the W93 discipline: a
+90-minute pilot killed a hypothesis that would have cost a
+likely 5-hour full bench to discover the same failure mode.
+
+W94 cross-modal: documented battlefield-selection (MathVista
+recommended for W95+) with rationale based on published SOTA
+scores + W88–W92 evidence.  No W94 cross-modal NIM run.
+
+| Claim | One-line description | Status | Code / evidence anchor |
+| ----- | -------------------- | ------ | ------------------ |
+| W94-T-K10-PILOT-SHIPS | The W88 `humaneval_reflexion_bench_v1` module supports arbitrary K via `K_multi_sample` config; W94 added a `--K` flag to the driver enabling K=10 pilot runs with no code changes to the bench module.  Total wall 88 min; 315 NIM calls; bench Merkle `4556feef9cb15b96…`; verifier 7/7 PASS. | mechanically-checked + empirical | `scripts/run_w88_humaneval_reflexion_bench.py`, `results/w94/k10_pilot/.../` |
+| W94-T-CROSS-MODAL-BATTLEFIELD-SELECTED | W94 documents MathVista as the recommended W95+ cross-modal battlefield based on published SOTA scores (~60-65 % single-shot frontier VLMs vs HumanEval-Visual's saturated ~88-92 %), structural team-decomposition rationale (VLM-Vision-Reader + Code-Math-Solver), and clean executor signal (numerical answer match + multi-choice exact match; no GPT-4-judge dependency). | empirical (published SOTA citations) | `docs/W94_CROSS_MODAL_BATTLEFIELD_SCOUTING.md` |
+| W94-L-K10-PILOT-CEILING-SATURATION-CAP | At 1 seed × 15 problems × K=10 × Llama-3.3-70B-Instruct on HumanEval, A1 first-pass-among-K=10 saturates to 100 % ceiling; B sequential-reflexion-K=10 also 100 %; B − A1 = +0.00 pp.  **3 of 6 pre-committed W94 P1 pilot gates FAIL**.  The W93-C hypothesis (K=10 amplifies reflexion's K=5 advantage) is empirically dead at this scale.  Doubling the budget K=5 → K=10 saturates the baseline faster than reflexion's per-turn marginal value grows.  Future budget-extension hypotheses (K=15, K=20) on HumanEval are presumptively dead by the same ceiling-saturation argument.  REPLACES `W93-L-W93C-K10-REFLEXION-NEEDS-PILOT-CAP`. | honest-limitation (kill documented) | `docs/RESULTS_W94_K10_PILOT_V1.md` |
+| W94-L-HUMANEVAL-VISUAL-RETIRED-AS-CROSS-MODAL-BATTLEFIELD-CAP | HumanEval-Visual at K=5 vs unified-VLM K=5 is now retired as a serious battlefield for cross-modal team retirement under the W88 / W89 / W90 / W91 / W92 retirement bars.  7 cross-modal configurations across 3 architecture families all failed the team-organisation bar.  W95+ cross-modal work moves to MathVista (per `docs/W94_CROSS_MODAL_BATTLEFIELD_SCOUTING.md`).  HumanEval-Visual remains a useful image-load-bearing benchmark (B − A0_text PROVEN positive at 7/7 configurations) but not a serious team-retirement battleground. | strategic-pivot | `docs/W94_CROSS_MODAL_BATTLEFIELD_SCOUTING.md`, `docs/RESULTS_W92_CROSS_MODAL_ROLE_SPECIALIZED_V1.md` |
+| W94-T-PREFLIGHT-DISCIPLINE-EMPIRICALLY-VALIDATED | The W93 preflight-first discipline (5-gate preflight harness + cheap pilot) empirically prevented a 5-hour full K=10 bench in W94.  The cheap 90-minute pilot definitively killed the W93-C hypothesis on G2-resolution alone.  The discipline is the right shape for future expensive runs: small pilot → go/no-go → conditional escalation. | meta-claim (validated by W94 outcome) | `docs/RUNBOOK_W93.md`, `docs/RUNBOOK_W94.md`, `docs/RESULTS_W94_K10_PILOT_V1.md` |
 
 ## W93 post-W92 preflight-first empirical superiority wave V6 (W93-T-* and W93-L-*)
 

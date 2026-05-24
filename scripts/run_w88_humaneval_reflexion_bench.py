@@ -187,6 +187,12 @@ def main() -> int:
         "--executor-timeout-s", type=float, default=8.0)
     parser.add_argument(
         "--executor-kill-after-s", type=float, default=12.0)
+    parser.add_argument(
+        "--K", type=int,
+        default=int(os.environ.get("W88_HE_K", "5")),
+        help=(
+            "K = model-call budget per problem on A1 and B "
+            "(default 5; W94 K=10 pilot uses 10)"))
     args = parser.parse_args()
 
     backend = args.backend
@@ -264,11 +270,12 @@ def main() -> int:
     print(f"corpus: {len(corpus)} problems")
     print(
         f"config: backend={backend} model={model_id} "
-        f"n_problems={n_problems} seeds={seeds}")
+        f"n_problems={n_problems} seeds={seeds} K={args.K}")
 
+    K = int(args.K)
     cfg = HumanEvalReflexionBenchConfigV1(
         n_problems=int(n_problems),
-        K_multi_sample=5,
+        K_multi_sample=K,
         seeds=seeds,
         sampling_temperature=float(args.temperature),
         max_tokens_per_call=int(args.max_tokens),

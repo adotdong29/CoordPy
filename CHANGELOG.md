@@ -13,6 +13,94 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W94 preflight-earned K=10 pilot + cross-modal battlefield pivot — K=10 hypothesis KILLED in cheap pilot; no Phase-2 launched (2026-05-24)**
+  — *First true test of the W93 preflight-first discipline.
+  W93-C (K=10 reflexion) was the only W93 candidate that
+  failed solely on G2 (no K=10 data); other gates passed.
+  W94 ran the smallest-decisive pilot (1 seed × 15 problems
+  × K=10 × Llama-3.3-70B-Instruct on the canonical HumanEval
+  corpus; ~90 min wall, 315 NIM calls; deterministic
+  pre-committed slice via `select_humaneval_subset_v1`).*
+
+  **W94 P1 pilot result**: A0 66.67 % / A1 **100.00 %** /
+  B **100.00 %**; B − A1 = **+0.00 pp**; B beats A1 per-
+  problem: **0/15 strict wins**.  3 of 6 pre-committed W94 P1
+  pilot gates FAIL (gates 2, 3, 4).  Bench Merkle
+  `4556feef9cb15b96…`; audit verifier 7/7 PASS.
+
+  **The W93-C K=10 hypothesis is empirically dead at this
+  scale.**  A1 first-pass-among-K=10 saturates to ceiling on
+  the 15-problem slice, leaving zero failure-residual for
+  reflexion to rescue.  Future budget-extension hypotheses on
+  HumanEval are presumptively dead by the same ceiling-
+  saturation argument.
+
+  **No Phase-2 full K=10 bench launched.**  Per W94 runbook
+  contract: if pilot gates fail, kill the hypothesis instead
+  of escalating.
+
+  **W94 P3 cross-modal battlefield pivot** (documentation
+  only, no NIM run): HumanEval-Visual at K=5 vs unified-VLM
+  K=5 is retired as a serious cross-modal retirement
+  battleground (W88-W92 + W94 cumulative evidence: 7
+  configurations across 3 architecture families all failed).
+  W95+ cross-modal work targets **MathVista** (testmini;
+  1000 problems; mixed multi-choice + numeric; SOTA frontier
+  VLM single-shot ~60-65 %; clean answer-match executor; no
+  judge dependency).  Selection rationale documented in
+  `docs/W94_CROSS_MODAL_BATTLEFIELD_SCOUTING.md`.
+
+  **W94 meta-claim** (W94-T-PREFLIGHT-DISCIPLINE-EMPIRICALLY-
+  VALIDATED): the W93 preflight-first discipline
+  successfully prevented a likely 5-hour full K=10 bench in
+  W94, saving ~4 hours of NIM compute and producing a
+  decisive negative in 90 minutes.  This is the right shape
+  for future expensive runs.
+
+  **Carry-forwards stay; no new retirements**.  Adds:
+  - `W94-L-K10-PILOT-CEILING-SATURATION-CAP` (REPLACES
+    `W93-L-W93C-K10-REFLEXION-NEEDS-PILOT-CAP`): budget-
+    extension K=10 saturates A1 on HumanEval.
+  - `W94-L-HUMANEVAL-VISUAL-RETIRED-AS-CROSS-MODAL-BATTLEFIELD-CAP`:
+    cross-modal retirement on HumanEval-Visual K=5 no longer
+    pursued; W95+ targets MathVista.
+
+  **Modules / drivers / tests**:
+  - `scripts/run_w88_humaneval_reflexion_bench.py` (modified):
+    added `--K` flag (default 5) so the W94 pilot ran at K=10
+    without any new module code.  Existing W88
+    `humaneval_reflexion_bench_v1` module supports arbitrary
+    K via `K_multi_sample` config natively.
+  - No new modules; no new tests; no new verifiers.
+
+  **Documentation**:
+  - `docs/RUNBOOK_W94.md` (new — pre-commit pilot gates +
+    Phase-2 retirement bars)
+  - `docs/RESULTS_W94_K10_PILOT_V1.md` (new — pilot kill
+    writeup)
+  - `docs/W94_CROSS_MODAL_BATTLEFIELD_SCOUTING.md` (new —
+    MathVista selection rationale)
+  - Truth surfaces (`docs/RESEARCH_STATUS.md`,
+    `docs/THEOREM_REGISTRY.md`, `docs/HOW_NOT_TO_OVERSTATE.md`,
+    `docs/HONEST_FRAMING_POST_W87.md`) updated.
+
+  **Bench artifact**:
+  `results/w94/k10_pilot/w88_nim_meta_llama-3.3-70b-instruct_20260524T164255Z/`
+  (315-call sidecar + bench report + per-seed Merkle root).
+
+  **Stable boundary unchanged**: `coordpy.__version__` =
+  `0.5.20`; `coordpy.SDK_VERSION` = `coordpy.sdk.v3.43`; no
+  PyPI publish; `coordpy/__init__.py` untouched.  Only
+  driver-script CLI flag added.
+
+  **Strategic implication for W95+**:
+  1. Drop budget-extension on HumanEval as a research lever.
+  2. Build MathVista bench infrastructure (corpus loader +
+     answer-match executor + cross-modal team architecture).
+  3. Run MathVista cheap probe; if unified VLM K=5 ceiling
+     ~75-80 %, build candidate cross-modal architecture and
+     preflight it.
+
 - **W93 preflight-first empirical superiority wave V6 — DISCIPLINE-FIRST milestone; no expensive bench launched; 3 candidates killed in cheap preflight (2026-05-24)**
   — *Deliberate execution-discipline pivot.  W88–W92 spent
   ~30 hours of NIM compute and produced 1 retirement +

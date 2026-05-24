@@ -6020,3 +6020,78 @@ could still surprise on a K=10 pilot; preflight kills the
 weak ideas but doesn't predict every outcome).
 
 Last touched: W93 preflight-first discipline 2026-05-24.
+
+---
+
+# W94 preflight-earned K=10 pilot + cross-modal battlefield
+# pivot — what to say, what NOT to say (2026-05-24)
+
+## W94 K=10 pilot (KILLED in 90-min cheap pilot)
+
+Acceptable: *"The W94 wave ran the smallest-decisive K=10
+pilot to resolve W93-C's G2 gate.  Slice: 1 seed × 15
+problems × K=10 × Llama-3.3-70B-Instruct on the canonical
+HumanEval corpus (15 problems are the deterministic first
+15 selected by `select_humaneval_subset_v1(88_028_001, 15)`,
+pre-committed BEFORE the pilot ran).  Result: A0 66.67 % /
+A1 100.00 % / B 100.00 %; B − A1 = +0.00 pp.  3 of 6 pre-
+committed W94 P1 pilot gates FAIL (gates 2, 3, 4: B does
+not strictly beat A1 anywhere).  The W93-C K=10 hypothesis is
+empirically dead: A1 first-pass-among-K=10 saturates to
+ceiling, leaving zero failure-residual for reflexion to
+rescue.  No Phase-2 full K=10 bench launched per the W94
+runbook.  90-min pilot, ~315 NIM calls, bench Merkle
+`4556feef9cb15b96…`, audit verifier 7/7 PASS."*
+
+Forbidden phrasing: *"W94 retired a carry-forward"* (no
+retirement; the pilot killed the W93-C hypothesis), *"K=10
+on HumanEval is also a retirement"* (it is NOT — A1 ties B
+at ceiling; no strict superiority), *"more budget = better"*
+(W94 empirically falsifies this for HumanEval at 70B),
+*"the pilot is too small"* (the pilot is exactly the size
+W94 pre-committed; it has decisive 3-of-6-gates-fail
+evidence; bench Merkle re-derives offline).
+
+## W94 cross-modal battlefield pivot (no NIM run)
+
+Acceptable: *"W94 documents the cross-modal battlefield pivot
+from HumanEval-Visual K=5 (now retired as a serious cross-
+modal retirement battleground per the W88–W92 + W94 cumulative
+evidence) to MathVista (testmini subset; SOTA frontier VLM
+single-shot ~60-65 %; ample failure-residual; clean answer-
+match executor).  Selection rationale documented in
+`docs/W94_CROSS_MODAL_BATTLEFIELD_SCOUTING.md`.  No W94
+cross-modal NIM run; W95+ will build the MathVista corpus
+loader + bench infrastructure.  HumanEval-Visual remains a
+useful IMAGE-LOAD-BEARING benchmark (B − A0_text PROVEN
+positive at 7/7 configurations) but is empirically dead as a
+team-retirement battleground."*
+
+Forbidden phrasing: *"W94 retired the cross-modal carry-
+forward"* (no — W94 is scouting + pivot documentation),
+*"MathVista will work"* (untested; W95+ pilot will resolve),
+*"HumanEval-Visual was always going to fail"* (W88-W92
+explored 3 architectures across 7 configurations before
+arriving at this conclusion; the falsification is
+empirically earned), *"image is decorative"* (image is
+PROVEN load-bearing at all 7 W88-W92-W94 configurations).
+
+## W94 preflight discipline validation
+
+Acceptable: *"W94 empirically validates the W93 preflight-
+first discipline.  The cheap 90-min K=10 pilot killed a
+hypothesis that would have cost a likely 5-hour full bench
+to discover the same failure mode.  The discipline saved
+~4 hours of NIM compute and prevented another "useful
+negative result" 5-hour run.  W93's preflight bar +
+W94's pilot-first pattern is the right shape for future
+expensive runs."*
+
+Forbidden phrasing: *"the preflight harness is infallible"*
+(it cannot predict every pilot outcome; W93-C passed all
+non-G2 gates yet died), *"all future hypotheses will die"*
+(MathVista pilot in W95+ may pass or fail; the discipline
+just prevents weak ones from getting full-bench treatment),
+*"preflight = bureaucracy"* (it saved 4+ hours in W94 alone).
+
+Last touched: W94 K=10 pilot + cross-modal pivot 2026-05-24.
