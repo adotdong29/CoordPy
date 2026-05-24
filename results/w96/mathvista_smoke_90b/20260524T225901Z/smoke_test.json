@@ -1,0 +1,13 @@
+{
+  "kind": "smoke_test",
+  "prompt": "Reply with exactly the single word 'OK' and nothing else.",
+  "q1_endpoint_reachable_pass": true,
+  "q2_threshold_ms": 30000,
+  "q2_wall_ms_plausibility_pass": false,
+  "response_len": 2,
+  "response_text": "OK",
+  "schema": "coordpy.w96a_smoke_test_sidecar.v1",
+  "vlm_model": "meta/llama-3.2-90b-vision-instruct",
+  "wall_ms_per_call": 32903,
+  "wall_ms_total": 32903
+}
