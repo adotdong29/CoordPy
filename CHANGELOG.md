@@ -13,6 +13,81 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W93 preflight-first empirical superiority wave V6 — DISCIPLINE-FIRST milestone; no expensive bench launched; 3 candidates killed in cheap preflight (2026-05-24)**
+  — *Deliberate execution-discipline pivot.  W88–W92 spent
+  ~30 hours of NIM compute and produced 1 retirement +
+  6 negative results.  W92's 5-hour role-specialized run cost
+  full bench price to discover an architecture that the cheap
+  miner could have predicted would fail.  W93 introduces
+  preflight-first discipline: no expensive bench launches
+  until cheap preflight gates pass.  Three W93 candidate
+  architectures killed in seconds of preflight.  No expensive
+  bench launched in W93.*
+
+  **W93 deliverable: iteration infrastructure**
+
+  - `coordpy/failure_cluster_miner_v1.py` (new) — analyses
+    11 W88–W92 bench reports locally; no NIM calls; runs in
+    seconds.  Per-bench-kind B − A1 means: humaneval_reflexion
+    +1.11 pp, mbpp_reflexion +1.22 pp, cross_modal_code
+    (split) −12.96 pp, cross_modal_vlm_loop −1.46 pp,
+    cross_modal_role_specialized −10.71 pp.
+  - `coordpy/cross_modal_preflight_harness_v1.py` (new) —
+    5-gate preflight harness (hypothesis written / cheap
+    sidecar evidence / adversarial ablation / budget
+    accounting / benchmark justification).  Content-addressed
+    verdict JSON.
+  - `scripts/run_w93_failure_miner.py` (new) — CLI runner.
+  - `scripts/run_w93_candidate_preflight.py` (new) — defines
+    3 W93 candidates and runs all through the harness.
+  - `tests/test_w93_preflight_v1.py` (new; 16 tests) — covers
+    all 5 gates + the miner discovery.
+  - `docs/RUNBOOK_W93.md` (new) — pre-committed discipline
+    contract.
+  - `docs/W93_FAILURE_DIAGNOSIS.md` (new) — written diagnosis
+    of W88–W92 evidence.
+  - `docs/RESULTS_W93_PREFLIGHT_DISCIPLINE_V1.md` (new) —
+    full results writeup.
+
+  **3 candidates evaluated, ALL killed**:
+
+  - **W93-A** Self-Verifying VLM-in-loop: killed on G2
+    (W91 P2b shows VLM-in-loop is already −7.14 pp at 7 seeds)
+    + G3 (W92 shows verifier-style additions make VLM-in-loop
+    WORSE).
+  - **W93-B** Heterogeneous Pool (3× VLM + 2× code-LM):
+    killed on G2 (W88 split evidence shows
+    code-LM-downstream-of-VLM-extraction samples NEVER beat
+    A1_vlm K=5 across 3 model scales — marginal contribution
+    is empirically NEGATIVE) + G3.
+  - **W93-C** Reflexion at K=10: killed on G2 ONLY (no K=10
+    evidence in W88–W92 sidecars; gates G1, G3, G4, G5 all
+    pass).  Most promising next direction.  W94
+    recommendation: 30-min K=10 pilot to gather preflight
+    evidence; if pilot shows B − A1 ≥ +5 pp at K=10, launch
+    full K=10 bench.
+
+  **Bench artifacts**:
+  `results/w93/failure_clusters.json` (cross-run miner output);
+  `results/w93/candidate_preflight_verdicts.json` (3 candidate
+  preflight verdicts).
+
+  **Carry-forwards stay; no new retirements**:
+  All W87–W92 carry-forwards remain.  W93 contributes the
+  empirical infrastructure + 7 new W93-T-* / W93-L-* claims
+  documenting the harness, the miner, the 3 candidate kills,
+  and the cross-modal 7-configuration cumulative analysis.
+
+  **Stable boundary unchanged**: `coordpy.__version__` =
+  `0.5.20`; `coordpy.SDK_VERSION` = `coordpy.sdk.v3.43`; no
+  PyPI publish; `coordpy/__init__.py` untouched; W93 modules
+  are explicit-import only.
+
+  **W94 directive**: any expensive bench run must pass the
+  5-gate preflight harness first.  Recommended next step:
+  K=10 reflexion pilot (~30 min wall) on HumanEval-70B to
+  gather preflight evidence for the K=10 hypothesis.
+
 - **W92 post-W91 empirical superiority wave V5 — decisive cross-modal benchmark falsification: 3rd architecture loses; HumanEval-Visual is now the wrong battlefield (2026-05-24)**
   — *The W92 cross-modal prong is the THIRD independent
   architectural attempt in the programme to retire the

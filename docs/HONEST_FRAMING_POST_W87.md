@@ -2,8 +2,17 @@
 
 > **Canonical, mandatory honesty surface for any claim that
 > follows from the W87 closure of meta-#49.**  Last touched
-> 2026-05-24 after the W92 post-W91 empirical superiority wave
-> V5 — **no NEW retirements**.  The W89 70B-HumanEval
+> 2026-05-24 after the W93 preflight-first discipline wave V6
+> — **no NEW retirements**.  W93 is a DISCIPLINE-FIRST
+> milestone: no expensive bench run launched; all 3 candidate
+> architectures killed in cheap preflight against W88–W92
+> sidecar evidence.  The W93 deliverable is the iteration
+> infrastructure (`coordpy.failure_cluster_miner_v1` +
+> `coordpy.cross_modal_preflight_harness_v1`) + failure-mode
+> diagnosis + documented kills + a 5-gate preflight bar that
+> future bench runs must pass.  Prior W92 still applies (3rd
+> cross-modal architecture decisively negative; HumanEval-Visual
+> K=5 is the wrong battlefield).  The W89 70B-HumanEval
 > retirement remains.  W92 introduced a NEW role-specialized
 > cross-modal architecture (VLM-Planner + Code-Implementer×3 +
 > VLM-Verifier) — the THIRD independent cross-modal team
@@ -396,6 +405,35 @@ Until that meta issue is closed with the same discipline as
 meta-#49, claims of having solved multi-agent context are
 overstatement and must be rejected by any reader of this
 file.
+
+### W93 preflight-first discipline contribution (2026-05-24)
+
+W88 → W92 spent ~30 hours of NIM compute and produced 1
+retirement + 6 negative results.  The pattern was: build a
+candidate; run the full expensive bench; discover it failed
+in some predictable way.  W93 introduces a hard pivot in
+execution discipline:
+
+* **`coordpy.failure_cluster_miner_v1`** — analyses W88–W92
+  bench reports + sidecars locally; no NIM calls; runs in
+  seconds.
+* **`coordpy.cross_modal_preflight_harness_v1`** — 5-gate
+  preflight harness.  A candidate must pass all 5 gates
+  (hypothesis written / cheap sidecar evidence / adversarial
+  ablation / budget accounting / benchmark justification)
+  before earning an expensive bench run.
+* **`docs/W93_FAILURE_DIAGNOSIS.md`** — written diagnosis.
+* **3 candidate architectures killed in cheap preflight**
+  (Self-Verifying VLM-in-loop, Heterogeneous Pool, K=10
+  Reflexion).  All documented in
+  `docs/RESULTS_W93_PREFLIGHT_DISCIPLINE_V1.md`.
+* **W94 recommendation**: 30-minute K=10 pilot on HumanEval-70B
+  to gather preflight evidence for the K=10 reflexion hypothesis.
+
+The W93 deliverable is the discipline shift + iteration
+infrastructure.  No expensive bench launched.  Per W93 runbook
+contract: "if no candidate survives preflight, the discipline
+is the milestone."
 
 ### W92 cross-modal contribution (2026-05-24)
 

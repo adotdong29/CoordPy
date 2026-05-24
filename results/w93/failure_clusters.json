@@ -1,0 +1,929 @@
+{
+  "schema": "coordpy.failure_cluster_miner_v1.v1",
+  "root": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results",
+  "per_run": [
+    {
+      "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/humaneval_reflexion/w88_nim_meta_llama-3.1-8b-instruct_20260522T213124Z",
+      "bench_kind": "humaneval_reflexion",
+      "config": {
+        "model_id": "meta/llama-3.1-8b-instruct",
+        "vlm_model_id": "",
+        "text_model_id": "",
+        "code_model_id": "",
+        "n_problems": 30,
+        "n_seeds": 3,
+        "K_multi_sample": 5
+      },
+      "per_seed": [
+        {
+          "seed": 88028001,
+          "arms": {
+            "a0_pass_at_1": 0.566667,
+            "a1_pass_at_1": 0.733333,
+            "b_pass_at_1": 0.633333
+          },
+          "b_minus_a1_pp": -10.0
+        },
+        {
+          "seed": 88028002,
+          "arms": {
+            "a0_pass_at_1": 0.7,
+            "a1_pass_at_1": 0.766667,
+            "b_pass_at_1": 0.766667
+          },
+          "b_minus_a1_pp": 0.0
+        },
+        {
+          "seed": 88028003,
+          "arms": {
+            "a0_pass_at_1": 0.633333,
+            "a1_pass_at_1": 0.733333,
+            "b_pass_at_1": 0.733333
+          },
+          "b_minus_a1_pp": 0.0
+        }
+      ],
+      "a1_only_wins": [],
+      "b_only_wins": [],
+      "shared_wins": [],
+      "shared_fails": [],
+      "mean_b_minus_a1_pp": -3.3333
+    },
+    {
+      "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/humaneval_reflexion/w88_nim_meta_llama-3.3-70b-instruct_20260522T222541Z",
+      "bench_kind": "humaneval_reflexion",
+      "config": {
+        "model_id": "meta/llama-3.3-70b-instruct",
+        "vlm_model_id": "",
+        "text_model_id": "",
+        "code_model_id": "",
+        "n_problems": 30,
+        "n_seeds": 3,
+        "K_multi_sample": 5
+      },
+      "per_seed": [
+        {
+          "seed": 88028001,
+          "arms": {
+            "a0_pass_at_1": 0.6,
+            "a1_pass_at_1": 0.8,
+            "b_pass_at_1": 0.933333
+          },
+          "b_minus_a1_pp": 13.3333
+        },
+        {
+          "seed": 88028002,
+          "arms": {
+            "a0_pass_at_1": 0.4,
+            "a1_pass_at_1": 0.866667,
+            "b_pass_at_1": 0.833333
+          },
+          "b_minus_a1_pp": -3.3334
+        },
+        {
+          "seed": 88028003,
+          "arms": {
+            "a0_pass_at_1": 0.4,
+            "a1_pass_at_1": 0.9,
+            "b_pass_at_1": 0.966667
+          },
+          "b_minus_a1_pp": 6.6667
+        }
+      ],
+      "a1_only_wins": [],
+      "b_only_wins": [],
+      "shared_wins": [],
+      "shared_fails": [],
+      "mean_b_minus_a1_pp": 5.5555
+    },
+    {
+      "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w90/mbpp_reflexion/w90_mbpp_nim_meta_llama-3.3-70b-instruct_20260523T014538Z",
+      "bench_kind": "mbpp_reflexion",
+      "config": {
+        "model_id": "meta/llama-3.3-70b-instruct",
+        "vlm_model_id": "",
+        "text_model_id": "",
+        "code_model_id": "",
+        "n_problems": 30,
+        "n_seeds": 3,
+        "K_multi_sample": 5
+      },
+      "per_seed": [
+        {
+          "seed": 90001,
+          "arms": {
+            "a0_pass_at_1": 0.9,
+            "a1_pass_at_1": 0.9,
+            "b_pass_at_1": 0.9
+          },
+          "b_minus_a1_pp": 0.0
+        },
+        {
+          "seed": 90002,
+          "arms": {
+            "a0_pass_at_1": 0.666667,
+            "a1_pass_at_1": 0.733333,
+            "b_pass_at_1": 0.733333
+          },
+          "b_minus_a1_pp": 0.0
+        },
+        {
+          "seed": 90003,
+          "arms": {
+            "a0_pass_at_1": 0.733333,
+            "a1_pass_at_1": 0.8,
+            "b_pass_at_1": 0.833333
+          },
+          "b_minus_a1_pp": 3.3333
+        }
+      ],
+      "a1_only_wins": [],
+      "b_only_wins": [],
+      "shared_wins": [],
+      "shared_fails": [],
+      "mean_b_minus_a1_pp": 1.1111
+    },
+    {
+      "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w91/mbpp_reflexion_5seeds/w90_mbpp_nim_meta_llama-3.3-70b-instruct_20260523T141809Z",
+      "bench_kind": "mbpp_reflexion",
+      "config": {
+        "model_id": "meta/llama-3.3-70b-instruct",
+        "vlm_model_id": "",
+        "text_model_id": "",
+        "code_model_id": "",
+        "n_problems": 30,
+        "n_seeds": 5,
+        "K_multi_sample": 5
+      },
+      "per_seed": [
+        {
+          "seed": 90001,
+          "arms": {
+            "a0_pass_at_1": 0.8,
+            "a1_pass_at_1": 0.9,
+            "b_pass_at_1": 0.9
+          },
+          "b_minus_a1_pp": 0.0
+        },
+        {
+          "seed": 90002,
+          "arms": {
+            "a0_pass_at_1": 0.666667,
+            "a1_pass_at_1": 0.7,
+            "b_pass_at_1": 0.766667
+          },
+          "b_minus_a1_pp": 6.6667
+        },
+        {
+          "seed": 90003,
+          "arms": {
+            "a0_pass_at_1": 0.7,
+            "a1_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.866667
+          },
+          "b_minus_a1_pp": 3.3334
+        },
+        {
+          "seed": 90004,
+          "arms": {
+            "a0_pass_at_1": 0.866667,
+            "a1_pass_at_1": 0.9,
+            "b_pass_at_1": 0.9
+          },
+          "b_minus_a1_pp": 0.0
+        },
+        {
+          "seed": 90005,
+          "arms": {
+            "a0_pass_at_1": 0.733333,
+            "a1_pass_at_1": 0.8,
+            "b_pass_at_1": 0.766667
+          },
+          "b_minus_a1_pp": -3.3333
+        }
+      ],
+      "a1_only_wins": [],
+      "b_only_wins": [],
+      "shared_wins": [],
+      "shared_fails": [],
+      "mean_b_minus_a1_pp": 1.3333
+    },
+    {
+      "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/cross_modal_code/w88_xm_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260522T222546Z",
+      "bench_kind": "cross_modal_code",
+      "config": {
+        "model_id": "",
+        "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+        "text_model_id": "",
+        "code_model_id": "meta/llama-3.1-8b-instruct",
+        "n_problems": 12,
+        "n_seeds": 3,
+        "K_multi_sample": 5
+      },
+      "per_seed": [
+        {
+          "seed": 88046001,
+          "arms": {
+            "a0_text_pass_at_1": 0.583333,
+            "a1_vlm_pass_at_1": 0.916667,
+            "b_pass_at_1": 0.75
+          },
+          "b_minus_a1_pp": -16.6667
+        },
+        {
+          "seed": 88046002,
+          "arms": {
+            "a0_text_pass_at_1": 0.416667,
+            "a1_vlm_pass_at_1": 0.75,
+            "b_pass_at_1": 0.583333
+          },
+          "b_minus_a1_pp": -16.6667
+        },
+        {
+          "seed": 88046003,
+          "arms": {
+            "a0_text_pass_at_1": 0.25,
+            "a1_vlm_pass_at_1": 0.916667,
+            "b_pass_at_1": 0.416667
+          },
+          "b_minus_a1_pp": -50.0
+        }
+      ],
+      "a1_only_wins": [],
+      "b_only_wins": [],
+      "shared_wins": [],
+      "shared_fails": [],
+      "mean_b_minus_a1_pp": -27.7778
+    },
+    {
+      "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/cross_modal_code/w88_xm_doctest_only_meta_llama-3.2-90b-vision-instruct__meta_llama-3.3-70b-instruct_20260522T231949Z",
+      "bench_kind": "cross_modal_code",
+      "config": {
+        "model_id": "",
+        "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+        "text_model_id": "",
+        "code_model_id": "meta/llama-3.3-70b-instruct",
+        "n_problems": 12,
+        "n_seeds": 3,
+        "K_multi_sample": 5
+      },
+      "per_seed": [
+        {
+          "seed": 88046001,
+          "arms": {
+            "a0_text_pass_at_1": 0.333333,
+            "a1_vlm_pass_at_1": 0.916667,
+            "b_pass_at_1": 0.833333
+          },
+          "b_minus_a1_pp": -8.3334
+        },
+        {
+          "seed": 88046002,
+          "arms": {
+            "a0_text_pass_at_1": 0.333333,
+            "a1_vlm_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.916667
+          },
+          "b_minus_a1_pp": 8.3334
+        },
+        {
+          "seed": 88046003,
+          "arms": {
+            "a0_text_pass_at_1": 0.333333,
+            "a1_vlm_pass_at_1": 1.0,
+            "b_pass_at_1": 0.833333
+          },
+          "b_minus_a1_pp": -16.6667
+        }
+      ],
+      "a1_only_wins": [],
+      "b_only_wins": [],
+      "shared_wins": [],
+      "shared_fails": [],
+      "mean_b_minus_a1_pp": -5.5556
+    },
+    {
+      "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/cross_modal_code/w88_xm_meta_llama-3.2-11b-vision-instruct__meta_llama-3.1-8b-instruct_20260522T214026Z",
+      "bench_kind": "cross_modal_code",
+      "config": {
+        "model_id": "",
+        "vlm_model_id": "meta/llama-3.2-11b-vision-instruct",
+        "text_model_id": "",
+        "code_model_id": "meta/llama-3.1-8b-instruct",
+        "n_problems": 12,
+        "n_seeds": 3,
+        "K_multi_sample": 5
+      },
+      "per_seed": [
+        {
+          "seed": 88046001,
+          "arms": {
+            "a0_text_pass_at_1": 0.583333,
+            "a1_vlm_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.833333
+          },
+          "b_minus_a1_pp": 0.0
+        },
+        {
+          "seed": 88046002,
+          "arms": {
+            "a0_text_pass_at_1": 0.75,
+            "a1_vlm_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.75
+          },
+          "b_minus_a1_pp": -8.3333
+        },
+        {
+          "seed": 88046003,
+          "arms": {
+            "a0_text_pass_at_1": 0.666667,
+            "a1_vlm_pass_at_1": 0.916667,
+            "b_pass_at_1": 0.833333
+          },
+          "b_minus_a1_pp": -8.3334
+        }
+      ],
+      "a1_only_wins": [],
+      "b_only_wins": [],
+      "shared_wins": [],
+      "shared_fails": [],
+      "mean_b_minus_a1_pp": -5.5555
+    },
+    {
+      "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w90/cross_modal_vlm_loop/w90_cmvl_doctest_only_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260523T014543Z",
+      "bench_kind": "cross_modal_vlm_loop",
+      "config": {
+        "model_id": "",
+        "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+        "text_model_id": "meta/llama-3.1-8b-instruct",
+        "code_model_id": "",
+        "n_problems": 12,
+        "n_seeds": 3,
+        "K_multi_sample": 5
+      },
+      "per_seed": [
+        {
+          "seed": 90046001,
+          "arms": {
+            "a0_text_pass_at_1": 0.833333,
+            "a1_vlm_pass_at_1": 0.916667,
+            "b_pass_at_1": 0.916667
+          },
+          "b_minus_a1_pp": 0.0
+        },
+        {
+          "seed": 90046002,
+          "arms": {
+            "a0_text_pass_at_1": 0.75,
+            "a1_vlm_pass_at_1": 0.916667,
+            "b_pass_at_1": 1.0
+          },
+          "b_minus_a1_pp": 8.3333
+        },
+        {
+          "seed": 90046003,
+          "arms": {
+            "a0_text_pass_at_1": 0.666667,
+            "a1_vlm_pass_at_1": 0.916667,
+            "b_pass_at_1": 0.833333
+          },
+          "b_minus_a1_pp": -8.3334
+        }
+      ],
+      "a1_only_wins": [],
+      "b_only_wins": [],
+      "shared_wins": [],
+      "shared_fails": [],
+      "mean_b_minus_a1_pp": 0.0
+    },
+    {
+      "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w91/cross_modal_vlm_loop_all_docstring/w90_cmvl_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260523T141814Z",
+      "bench_kind": "cross_modal_vlm_loop",
+      "config": {
+        "model_id": "",
+        "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+        "text_model_id": "meta/llama-3.1-8b-instruct",
+        "code_model_id": "",
+        "n_problems": 12,
+        "n_seeds": 3,
+        "K_multi_sample": 5
+      },
+      "per_seed": [
+        {
+          "seed": 90046001,
+          "arms": {
+            "a0_text_pass_at_1": 0.416667,
+            "a1_vlm_pass_at_1": 0.666667,
+            "b_pass_at_1": 0.75
+          },
+          "b_minus_a1_pp": 8.3333
+        },
+        {
+          "seed": 90046002,
+          "arms": {
+            "a0_text_pass_at_1": 0.5,
+            "a1_vlm_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.916667
+          },
+          "b_minus_a1_pp": 8.3334
+        },
+        {
+          "seed": 90046003,
+          "arms": {
+            "a0_text_pass_at_1": 0.416667,
+            "a1_vlm_pass_at_1": 1.0,
+            "b_pass_at_1": 0.916667
+          },
+          "b_minus_a1_pp": -8.3333
+        }
+      ],
+      "a1_only_wins": [],
+      "b_only_wins": [],
+      "shared_wins": [],
+      "shared_fails": [],
+      "mean_b_minus_a1_pp": 2.7778
+    },
+    {
+      "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w91/cross_modal_vlm_loop_all_docstring_7seeds/w90_cmvl_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260523T160253Z",
+      "bench_kind": "cross_modal_vlm_loop",
+      "config": {
+        "model_id": "",
+        "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+        "text_model_id": "meta/llama-3.1-8b-instruct",
+        "code_model_id": "",
+        "n_problems": 12,
+        "n_seeds": 7,
+        "K_multi_sample": 5
+      },
+      "per_seed": [
+        {
+          "seed": 90046001,
+          "arms": {
+            "a0_text_pass_at_1": 0.416667,
+            "a1_vlm_pass_at_1": 0.666667,
+            "b_pass_at_1": 0.5
+          },
+          "b_minus_a1_pp": -16.6667
+        },
+        {
+          "seed": 90046002,
+          "arms": {
+            "a0_text_pass_at_1": 0.5,
+            "a1_vlm_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.583333
+          },
+          "b_minus_a1_pp": -25.0
+        },
+        {
+          "seed": 90046003,
+          "arms": {
+            "a0_text_pass_at_1": 0.333333,
+            "a1_vlm_pass_at_1": 0.916667,
+            "b_pass_at_1": 1.0
+          },
+          "b_minus_a1_pp": 8.3333
+        },
+        {
+          "seed": 90046004,
+          "arms": {
+            "a0_text_pass_at_1": 0.333333,
+            "a1_vlm_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.75
+          },
+          "b_minus_a1_pp": -8.3333
+        },
+        {
+          "seed": 90046005,
+          "arms": {
+            "a0_text_pass_at_1": 0.416667,
+            "a1_vlm_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.916667
+          },
+          "b_minus_a1_pp": 8.3334
+        },
+        {
+          "seed": 90046006,
+          "arms": {
+            "a0_text_pass_at_1": 0.5,
+            "a1_vlm_pass_at_1": 1.0,
+            "b_pass_at_1": 0.833333
+          },
+          "b_minus_a1_pp": -16.6667
+        },
+        {
+          "seed": 90046007,
+          "arms": {
+            "a0_text_pass_at_1": 0.5,
+            "a1_vlm_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.833333
+          },
+          "b_minus_a1_pp": 0.0
+        }
+      ],
+      "a1_only_wins": [],
+      "b_only_wins": [],
+      "shared_wins": [],
+      "shared_fails": [],
+      "mean_b_minus_a1_pp": -7.1428
+    },
+    {
+      "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w92/cross_modal_role_specialized/w92_cmrs_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.3-70b-instruct_20260524T013332Z",
+      "bench_kind": "cross_modal_role_specialized",
+      "config": {
+        "model_id": "",
+        "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+        "text_model_id": "meta/llama-3.3-70b-instruct",
+        "code_model_id": "",
+        "n_problems": 12,
+        "n_seeds": 7,
+        "K_multi_sample": 5
+      },
+      "per_seed": [
+        {
+          "seed": 90046001,
+          "arms": {
+            "a0_text_pass_at_1": 0.416667,
+            "a1_vlm_pass_at_1": 0.75,
+            "b_pass_at_1": 0.583333
+          },
+          "b_minus_a1_pp": -16.6667
+        },
+        {
+          "seed": 90046002,
+          "arms": {
+            "a0_text_pass_at_1": 0.583333,
+            "a1_vlm_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.75
+          },
+          "b_minus_a1_pp": -8.3333
+        },
+        {
+          "seed": 90046003,
+          "arms": {
+            "a0_text_pass_at_1": 0.666667,
+            "a1_vlm_pass_at_1": 1.0,
+            "b_pass_at_1": 0.916667
+          },
+          "b_minus_a1_pp": -8.3333
+        },
+        {
+          "seed": 90046004,
+          "arms": {
+            "a0_text_pass_at_1": 0.416667,
+            "a1_vlm_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.75
+          },
+          "b_minus_a1_pp": -8.3333
+        },
+        {
+          "seed": 90046005,
+          "arms": {
+            "a0_text_pass_at_1": 0.583333,
+            "a1_vlm_pass_at_1": 0.916667,
+            "b_pass_at_1": 0.833333
+          },
+          "b_minus_a1_pp": -8.3334
+        },
+        {
+          "seed": 90046006,
+          "arms": {
+            "a0_text_pass_at_1": 0.5,
+            "a1_vlm_pass_at_1": 1.0,
+            "b_pass_at_1": 0.833333
+          },
+          "b_minus_a1_pp": -16.6667
+        },
+        {
+          "seed": 90046007,
+          "arms": {
+            "a0_text_pass_at_1": 0.583333,
+            "a1_vlm_pass_at_1": 0.833333,
+            "b_pass_at_1": 0.75
+          },
+          "b_minus_a1_pp": -8.3333
+        }
+      ],
+      "a1_only_wins": [],
+      "b_only_wins": [],
+      "shared_wins": [],
+      "shared_fails": [],
+      "mean_b_minus_a1_pp": -10.7142
+    }
+  ],
+  "cross_run_patterns": {
+    "n_runs_total": 11,
+    "by_bench_kind": {
+      "humaneval_reflexion": [
+        {
+          "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/humaneval_reflexion/w88_nim_meta_llama-3.1-8b-instruct_20260522T213124Z",
+          "mean_b_minus_a1_pp": -3.3333,
+          "config": {
+            "model_id": "meta/llama-3.1-8b-instruct",
+            "vlm_model_id": "",
+            "text_model_id": "",
+            "code_model_id": "",
+            "n_problems": 30,
+            "n_seeds": 3,
+            "K_multi_sample": 5
+          }
+        },
+        {
+          "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/humaneval_reflexion/w88_nim_meta_llama-3.3-70b-instruct_20260522T222541Z",
+          "mean_b_minus_a1_pp": 5.5555,
+          "config": {
+            "model_id": "meta/llama-3.3-70b-instruct",
+            "vlm_model_id": "",
+            "text_model_id": "",
+            "code_model_id": "",
+            "n_problems": 30,
+            "n_seeds": 3,
+            "K_multi_sample": 5
+          }
+        }
+      ],
+      "mbpp_reflexion": [
+        {
+          "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w90/mbpp_reflexion/w90_mbpp_nim_meta_llama-3.3-70b-instruct_20260523T014538Z",
+          "mean_b_minus_a1_pp": 1.1111,
+          "config": {
+            "model_id": "meta/llama-3.3-70b-instruct",
+            "vlm_model_id": "",
+            "text_model_id": "",
+            "code_model_id": "",
+            "n_problems": 30,
+            "n_seeds": 3,
+            "K_multi_sample": 5
+          }
+        },
+        {
+          "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w91/mbpp_reflexion_5seeds/w90_mbpp_nim_meta_llama-3.3-70b-instruct_20260523T141809Z",
+          "mean_b_minus_a1_pp": 1.3333,
+          "config": {
+            "model_id": "meta/llama-3.3-70b-instruct",
+            "vlm_model_id": "",
+            "text_model_id": "",
+            "code_model_id": "",
+            "n_problems": 30,
+            "n_seeds": 5,
+            "K_multi_sample": 5
+          }
+        }
+      ],
+      "cross_modal_code": [
+        {
+          "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/cross_modal_code/w88_xm_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260522T222546Z",
+          "mean_b_minus_a1_pp": -27.7778,
+          "config": {
+            "model_id": "",
+            "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+            "text_model_id": "",
+            "code_model_id": "meta/llama-3.1-8b-instruct",
+            "n_problems": 12,
+            "n_seeds": 3,
+            "K_multi_sample": 5
+          }
+        },
+        {
+          "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/cross_modal_code/w88_xm_doctest_only_meta_llama-3.2-90b-vision-instruct__meta_llama-3.3-70b-instruct_20260522T231949Z",
+          "mean_b_minus_a1_pp": -5.5556,
+          "config": {
+            "model_id": "",
+            "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+            "text_model_id": "",
+            "code_model_id": "meta/llama-3.3-70b-instruct",
+            "n_problems": 12,
+            "n_seeds": 3,
+            "K_multi_sample": 5
+          }
+        },
+        {
+          "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/cross_modal_code/w88_xm_meta_llama-3.2-11b-vision-instruct__meta_llama-3.1-8b-instruct_20260522T214026Z",
+          "mean_b_minus_a1_pp": -5.5555,
+          "config": {
+            "model_id": "",
+            "vlm_model_id": "meta/llama-3.2-11b-vision-instruct",
+            "text_model_id": "",
+            "code_model_id": "meta/llama-3.1-8b-instruct",
+            "n_problems": 12,
+            "n_seeds": 3,
+            "K_multi_sample": 5
+          }
+        }
+      ],
+      "cross_modal_vlm_loop": [
+        {
+          "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w90/cross_modal_vlm_loop/w90_cmvl_doctest_only_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260523T014543Z",
+          "mean_b_minus_a1_pp": 0.0,
+          "config": {
+            "model_id": "",
+            "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+            "text_model_id": "meta/llama-3.1-8b-instruct",
+            "code_model_id": "",
+            "n_problems": 12,
+            "n_seeds": 3,
+            "K_multi_sample": 5
+          }
+        },
+        {
+          "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w91/cross_modal_vlm_loop_all_docstring/w90_cmvl_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260523T141814Z",
+          "mean_b_minus_a1_pp": 2.7778,
+          "config": {
+            "model_id": "",
+            "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+            "text_model_id": "meta/llama-3.1-8b-instruct",
+            "code_model_id": "",
+            "n_problems": 12,
+            "n_seeds": 3,
+            "K_multi_sample": 5
+          }
+        },
+        {
+          "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w91/cross_modal_vlm_loop_all_docstring_7seeds/w90_cmvl_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260523T160253Z",
+          "mean_b_minus_a1_pp": -7.1428,
+          "config": {
+            "model_id": "",
+            "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+            "text_model_id": "meta/llama-3.1-8b-instruct",
+            "code_model_id": "",
+            "n_problems": 12,
+            "n_seeds": 7,
+            "K_multi_sample": 5
+          }
+        }
+      ],
+      "cross_modal_role_specialized": [
+        {
+          "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w92/cross_modal_role_specialized/w92_cmrs_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.3-70b-instruct_20260524T013332Z",
+          "mean_b_minus_a1_pp": -10.7142,
+          "config": {
+            "model_id": "",
+            "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+            "text_model_id": "meta/llama-3.3-70b-instruct",
+            "code_model_id": "",
+            "n_problems": 12,
+            "n_seeds": 7,
+            "K_multi_sample": 5
+          }
+        }
+      ]
+    },
+    "cross_modal_b_minus_a1_pp": [
+      {
+        "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/cross_modal_code/w88_xm_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260522T222546Z",
+        "bench_kind": "cross_modal_code",
+        "config": {
+          "model_id": "",
+          "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+          "text_model_id": "",
+          "code_model_id": "meta/llama-3.1-8b-instruct",
+          "n_problems": 12,
+          "n_seeds": 3,
+          "K_multi_sample": 5
+        },
+        "delta_pp": -27.7778
+      },
+      {
+        "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/cross_modal_code/w88_xm_doctest_only_meta_llama-3.2-90b-vision-instruct__meta_llama-3.3-70b-instruct_20260522T231949Z",
+        "bench_kind": "cross_modal_code",
+        "config": {
+          "model_id": "",
+          "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+          "text_model_id": "",
+          "code_model_id": "meta/llama-3.3-70b-instruct",
+          "n_problems": 12,
+          "n_seeds": 3,
+          "K_multi_sample": 5
+        },
+        "delta_pp": -5.5556
+      },
+      {
+        "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/cross_modal_code/w88_xm_meta_llama-3.2-11b-vision-instruct__meta_llama-3.1-8b-instruct_20260522T214026Z",
+        "bench_kind": "cross_modal_code",
+        "config": {
+          "model_id": "",
+          "vlm_model_id": "meta/llama-3.2-11b-vision-instruct",
+          "text_model_id": "",
+          "code_model_id": "meta/llama-3.1-8b-instruct",
+          "n_problems": 12,
+          "n_seeds": 3,
+          "K_multi_sample": 5
+        },
+        "delta_pp": -5.5555
+      },
+      {
+        "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w90/cross_modal_vlm_loop/w90_cmvl_doctest_only_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260523T014543Z",
+        "bench_kind": "cross_modal_vlm_loop",
+        "config": {
+          "model_id": "",
+          "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+          "text_model_id": "meta/llama-3.1-8b-instruct",
+          "code_model_id": "",
+          "n_problems": 12,
+          "n_seeds": 3,
+          "K_multi_sample": 5
+        },
+        "delta_pp": 0.0
+      },
+      {
+        "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w91/cross_modal_vlm_loop_all_docstring/w90_cmvl_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260523T141814Z",
+        "bench_kind": "cross_modal_vlm_loop",
+        "config": {
+          "model_id": "",
+          "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+          "text_model_id": "meta/llama-3.1-8b-instruct",
+          "code_model_id": "",
+          "n_problems": 12,
+          "n_seeds": 3,
+          "K_multi_sample": 5
+        },
+        "delta_pp": 2.7778
+      },
+      {
+        "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w91/cross_modal_vlm_loop_all_docstring_7seeds/w90_cmvl_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.1-8b-instruct_20260523T160253Z",
+        "bench_kind": "cross_modal_vlm_loop",
+        "config": {
+          "model_id": "",
+          "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+          "text_model_id": "meta/llama-3.1-8b-instruct",
+          "code_model_id": "",
+          "n_problems": 12,
+          "n_seeds": 7,
+          "K_multi_sample": 5
+        },
+        "delta_pp": -7.1428
+      },
+      {
+        "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w92/cross_modal_role_specialized/w92_cmrs_all_docstring_meta_llama-3.2-90b-vision-instruct__meta_llama-3.3-70b-instruct_20260524T013332Z",
+        "bench_kind": "cross_modal_role_specialized",
+        "config": {
+          "model_id": "",
+          "vlm_model_id": "meta/llama-3.2-90b-vision-instruct",
+          "text_model_id": "meta/llama-3.3-70b-instruct",
+          "code_model_id": "",
+          "n_problems": 12,
+          "n_seeds": 7,
+          "K_multi_sample": 5
+        },
+        "delta_pp": -10.7142
+      }
+    ],
+    "code_b_minus_a1_pp": [
+      {
+        "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/humaneval_reflexion/w88_nim_meta_llama-3.1-8b-instruct_20260522T213124Z",
+        "bench_kind": "humaneval_reflexion",
+        "config": {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "vlm_model_id": "",
+          "text_model_id": "",
+          "code_model_id": "",
+          "n_problems": 30,
+          "n_seeds": 3,
+          "K_multi_sample": 5
+        },
+        "delta_pp": -3.3333
+      },
+      {
+        "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w88/humaneval_reflexion/w88_nim_meta_llama-3.3-70b-instruct_20260522T222541Z",
+        "bench_kind": "humaneval_reflexion",
+        "config": {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "vlm_model_id": "",
+          "text_model_id": "",
+          "code_model_id": "",
+          "n_problems": 30,
+          "n_seeds": 3,
+          "K_multi_sample": 5
+        },
+        "delta_pp": 5.5555
+      },
+      {
+        "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w90/mbpp_reflexion/w90_mbpp_nim_meta_llama-3.3-70b-instruct_20260523T014538Z",
+        "bench_kind": "mbpp_reflexion",
+        "config": {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "vlm_model_id": "",
+          "text_model_id": "",
+          "code_model_id": "",
+          "n_problems": 30,
+          "n_seeds": 3,
+          "K_multi_sample": 5
+        },
+        "delta_pp": 1.1111
+      },
+      {
+        "run_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w91/mbpp_reflexion_5seeds/w90_mbpp_nim_meta_llama-3.3-70b-instruct_20260523T141809Z",
+        "bench_kind": "mbpp_reflexion",
+        "config": {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "vlm_model_id": "",
+          "text_model_id": "",
+          "code_model_id": "",
+          "n_problems": 30,
+          "n_seeds": 5,
+          "K_multi_sample": 5
+        },
+        "delta_pp": 1.3333
+      }
+    ]
+  }
+}

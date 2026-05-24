@@ -5948,3 +5948,75 @@ different benchmarks are V2), *"image utility doesn't help"*
 
 Last touched: W92 decisive cross-modal benchmark falsification
 2026-05-24.
+
+---
+
+# W93 preflight-first empirical superiority wave V6 — what to
+# say, what NOT to say (2026-05-24)
+
+## W93 discipline-first milestone (NO expensive bench run)
+
+Acceptable: *"W93 is a deliberate execution-discipline pivot.
+W88–W92 spent ~30 hours of NIM compute and produced 1
+retirement + 6 negative results.  W93 builds the iteration
+infrastructure (`coordpy.failure_cluster_miner_v1` +
+`coordpy.cross_modal_preflight_harness_v1`) so future
+expensive bench runs are pre-justified before launch.  All 3
+W93 candidate architectures (self-verifying VLM-in-loop /
+heterogeneous pool / K=10 reflexion) were killed in cheap
+preflight against W88–W92 sidecar evidence.  No expensive
+bench was launched.  This is the W93 runbook's pre-committed
+outcome: 'if no candidate survives preflight, the discipline
+is the milestone'.  16 CI tests verify the harness;
+content-addressed verdict JSON at
+`results/w93/candidate_preflight_verdicts.json`."*
+
+Forbidden phrasing: *"W93 retired a carry-forward"* (it did
+NOT — no expensive bench ran), *"W93 is a failure"* (it
+shipped the infrastructure that prevents the prior 5-hour
+weak-candidate runs), *"the cross-modal direction is dead"*
+(W93 killed 3 *specific candidate architectures* on
+*HumanEval-Visual K=5*; benchmark pivot + substrate-level
+injection remain open), *"preflight is bureaucracy"* (it
+prevented a likely 5-hour W92-style failure in this very
+milestone).
+
+## W93 candidate kills (3 documented)
+
+Acceptable: *"W93-A (Self-Verifying VLM-in-loop) killed on
+G2 + G3: W91 P2b 7-seed evidence already shows VLM-in-loop
+loses by −7.14 pp; W92 evidence shows adding verifier-style
+turns to VLM-in-loop made it WORSE.  W93-B (Heterogeneous
+Pool) killed on G2 + G3: W88 split evidence shows
+code-LM-downstream-of-VLM-extraction samples ALWAYS lost to
+A1_vlm K=5 across 3 model scales (marginal contribution is
+empirically NEGATIVE).  W93-C (Reflexion at K=10) killed on
+G2 ONLY: no K=10 evidence in W88–W92 sidecars; gates G1, G3,
+G4, G5 all pass; the most promising next direction.  W94
+recommendation: a small K=10 pilot (~30 min wall) to gather
+preflight evidence."*
+
+Forbidden phrasing: *"W93 candidates are all dead"* (W93-C
+is conditionally killed — needs pilot evidence), *"K=10
+reflexion will work"* (untested; preflight cannot confirm
+without the pilot), *"the W93 candidates are random"* (each
+candidate has explicit written hypothesis + structured
+evaluation against committed evidence).
+
+## W93 preflight discipline validation
+
+Acceptable: *"The W93 preflight harness empirically validates
+itself: had it been applied before W92, the role-specialized
+candidate would have been killed by G3 (the W91 P2b 7-seed
+evidence already showed VLM-in-loop's mean was negative; the
+W92 role-spec is a strict superset architecture and was
+unlikely to flip the sign).  The 5-hour W92 NIM cost would
+have been saved.  Future bench runs MUST pass all 5 gates."*
+
+Forbidden phrasing: *"preflight should have caught everything"*
+(W93 is the FIRST milestone with this discipline; prior
+runs had no such bar), *"preflight is infallible"* (W93-C
+could still surprise on a K=10 pilot; preflight kills the
+weak ideas but doesn't predict every outcome).
+
+Last touched: W93 preflight-first discipline 2026-05-24.

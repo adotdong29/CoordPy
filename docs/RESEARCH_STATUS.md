@@ -9,20 +9,20 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W92 post-W91
-> empirical superiority wave V5** on 2026-05-24 — cross-modal
-> role-specialized prong: NEW architecture (VLM-Planner + Code-
-> Implementer×3 + VLM-Verifier) on 7 seeds × 12 × all_docstring
-> × 90B-V + 70B-text gave B 77.4 % vs A1_vlm 88.1 % = **−10.71
-> pp**; B wins 0/7 seeds.  THIRD independent cross-modal team
-> architecture (after split + VLM-in-loop) to DECISIVELY lose
-> to unified-VLM K=5.  HumanEval-Visual at K=5 is now
-> empirically the WRONG battlefield; future cross-modal
-> retirement attempts must change BENCHMARK (MathVista,
-> ChartQA, DocVQA, MMVet candidates) or move to substrate-
-> level cross-modal injection.  Prior: W91 (2026-05-23) cross-
-> modal disconfirmation + MBPP confirmation; W90 (2026-05-23)
-> both partial / tie; W89 (2026-05-22) first retirement.  **Meta-#49 P0+P1+P2 line closed (W86).
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W93 post-W92
+> preflight-first empirical superiority wave V6** on 2026-05-24
+> — **DISCIPLINE-FIRST milestone**.  No expensive bench run
+> launched; all 3 candidate architectures (self-verifying
+> VLM-in-loop, heterogeneous pool, K=10 reflexion) killed in
+> cheap preflight against W88–W92 sidecar evidence.  Deliverable
+> is the iteration infrastructure
+> (`coordpy.failure_cluster_miner_v1` +
+> `coordpy.cross_modal_preflight_harness_v1`) + 5-gate
+> preflight discipline + failure-mode diagnosis + 3 documented
+> candidate kills.  Prior: W92 (2026-05-24) decisive cross-
+> modal benchmark falsification; W91 (2026-05-23) cross-modal
+> disconfirmation + MBPP confirmation; W90 (2026-05-23) both
+> partial / tie; W89 (2026-05-22) first retirement.  **Meta-#49 P0+P1+P2 line closed (W86).
 > P3 line (#46/#47/#48) closed (W87).  Meta-#4 closed by
 > supersession (2026-05-22).  W89 RETIRED 2 HumanEval carry-
 > forwards at 70B; W90+W91 added 11 new `W90-L-*` /
@@ -82,6 +82,72 @@ vs. what would constitute solving" bar.
 Any claim in any other doc, paper draft, demo, or external
 pitch that the programme has *solved* multi-agent context is
 overstatement and is rejected by this file.
+
+## TL;DR — W93 post-W92 preflight-first empirical superiority wave V6 (DISCIPLINE-FIRST milestone)
+
+The W93 wave is a deliberate execution-discipline pivot.  W88–
+W92 spent ~30 hours of NIM compute and produced 1 retirement
++ 6 negative results.  W92's 5-hour role-specialized run cost
+full bench price to discover an architecture is worse than
+the simpler VLM-in-loop — evidence the cheap miner could have
+predicted.  W93 introduces a preflight-first discipline: no
+expensive bench launches until cheap preflight gates pass.
+
+### W93 deliverable: iteration infrastructure + 3 documented candidate kills
+
+* **`coordpy.failure_cluster_miner_v1`** — analyses 11
+  W88–W92 bench reports locally; no NIM calls.  Discovers
+  per-bench-kind B − A1 means: humaneval_reflexion +1.11 pp,
+  mbpp_reflexion +1.22 pp, cross_modal_code (split) −12.96 pp,
+  cross_modal_vlm_loop −1.46 pp, cross_modal_role_specialized
+  −10.71 pp.  Image-load-bearing PROVEN at 7 configurations.
+* **`coordpy.cross_modal_preflight_harness_v1`** — 5-gate
+  preflight harness.  Pre-committed gates: hypothesis written /
+  cheap sidecar evidence / adversarial ablation / budget
+  accounting / benchmark justification.
+* **`docs/W93_FAILURE_DIAGNOSIS.md`** — written diagnosis.
+* **3 candidate architectures evaluated; ALL killed**:
+  - **W93-A** Self-Verifying VLM-in-loop: KILLED on G2 + G3
+    (W91 P2b shows VLM-in-loop fails at 7 seeds; W92 shows
+    verification additions hurt).
+  - **W93-B** Heterogeneous Pool: KILLED on G2 + G3 (W88
+    split's code-LM-downstream-of-VLM sample contribution is
+    empirically NEGATIVE).
+  - **W93-C** Reflexion at K=10: KILLED on G2 ONLY (no K=10
+    evidence in W88–W92 sidecars; needs a small NIM pilot).
+    Most promising next direction; W94 recommendation is a
+    30-min K=10 pilot to gather preflight evidence.
+
+### W93 strategic implications
+
+* Future expensive bench runs must pass the 5-gate preflight
+  harness FIRST.  This is the new minimum bar.
+* The cross-modal HumanEval-Visual K=5 battlefield is empirically
+  dead (3 architecture families confirm); future cross-modal
+  retirement requires benchmark pivot or substrate-level
+  cross-modal injection.
+* The MBPP per-seed-majority bar is ceiling-saturation-bound;
+  larger K or harder benchmark required.
+* No new retirements; the W89 70B-HumanEval retirement remains
+  the only confirmed same-budget multi-agent superiority claim.
+
+### Recommended W94+ direction
+
+1. K=10 reflexion pilot (~30 min wall on NIM): if B − A1 ≥
+   +5 pp at K=10 on HumanEval-70B, then full K=10 bench earns
+   the expensive run.  If pilot shows ≤ +1 pp, kill K=10 idea
+   cheaply.
+2. Build a MathVista / MBPP+ corpus loader (significant V2
+   work, but the right next benchmark pivot).
+3. Substrate-level cross-modal injection research (W87-L
+   direction; much harder).
+
+See `docs/RUNBOOK_W93.md`,
+`docs/W93_FAILURE_DIAGNOSIS.md`,
+`docs/RESULTS_W93_PREFLIGHT_DISCIPLINE_V1.md`, and the W93
+entries in `docs/THEOREM_REGISTRY.md` /
+`docs/HOW_NOT_TO_OVERSTATE.md`.
+
 
 ## TL;DR — W92 post-W91 empirical superiority wave V5 (decisive cross-modal benchmark falsification)
 

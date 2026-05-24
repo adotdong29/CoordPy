@@ -25,7 +25,7 @@
 > - **conjectural** — stated, falsifiable; not yet proved or systematically tested.
 > - **retracted** — earlier reading withdrawn; replaced by a more honest reading.
 >
-> Last touched: **W92 post-W91 empirical superiority wave V5** on 2026-05-24 — cross-modal role-specialized prong: NEW multi-agent architecture (VLM-Planner + Code-Implementer×3 + VLM-Verifier) on 7 seeds × 12 × all_docstring × 90B-V + 70B-text gave B 77.4 % vs A1_vlm 88.1 % = **−10.71 pp**; B wins 0/7 seeds.  THIRD independent cross-modal architecture (after split, VLM-in-loop) to DECISIVELY lose to unified VLM at K=5 on HumanEval-Visual.  W92 adds `W92-L-CROSS-MODAL-HUMANEVAL-VISUAL-WRONG-BATTLEFIELD-CAP`: HumanEval-Visual at K=5 vs unified-VLM-K=5 is now empirically the WRONG battlefield; future retirement attempts must change BENCHMARK (e.g., MathVista, ChartQA) or move to substrate-level cross-modal injection.  Prior: W91 cross-modal disconfirmation + MBPP confirmation on 2026-05-23; W90 wave V3 (MBPP +1.11 pp / cross-modal VLM-loop +0.00 pp) on 2026-05-23; W89 wave V2 RETIRED two HumanEval carry-forwards at 70B on 2026-05-22; W88 wave V1 both NEGATIVE on 2026-05-22; W87 P3 line closures on 2026-05-21.
+> Last touched: **W93 post-W92 preflight-first empirical superiority wave V6** on 2026-05-24 — DISCIPLINE-FIRST milestone.  No expensive bench run; deliverable is preflight infrastructure (`coordpy.failure_cluster_miner_v1` + `coordpy.cross_modal_preflight_harness_v1`) + failure-mode diagnosis + 3 candidate kills (self-verifying VLM-in-loop, heterogeneous pool, K=10 reflexion).  All 3 candidates killed via cheap preflight against W88–W92 sidecar evidence.  W93 establishes a 5-gate preflight discipline that future expensive bench runs must pass; W94 should pilot K=10 reflexion (smallest cheapest test).  No new retirements; the W89 70B-HumanEval retirement remains.  Prior: W92 cross-modal role-specialized DECISIVE NEGATIVE on 2026-05-24; W91 cross-modal disconfirmation + MBPP confirmation on 2026-05-23; W90 wave V3 (MBPP +1.11 pp / cross-modal VLM-loop +0.00 pp) on 2026-05-23; W89 wave V2 RETIRED two HumanEval carry-forwards at 70B on 2026-05-22; W88 wave V1 both NEGATIVE on 2026-05-22; W87 P3 line closures on 2026-05-21.
 
 ## Post-W87 frontier claims that are explicitly NOT in this registry
 
@@ -45,6 +45,31 @@ registry.  Reports that assert them are overstatement.
 This list is canonical.  When the next research wave's meta
 issue lands and any of these claims is established, the
 matching `WXX-T-*` entry will land in the registry above.
+
+## W93 post-W92 preflight-first empirical superiority wave V6 (W93-T-* and W93-L-*)
+
+The W93 wave is a deliberate execution-discipline pivot.  W88–
+W92 spent ~30 hours of NIM compute and produced 1 retirement +
+6 negative results.  The W92 5-hour run cost full bench price
+to discover the role-specialized architecture is worse than
+VLM-in-loop on HumanEval-Visual K=5 — evidence the cheap
+miner could have predicted.  W93 introduces preflight-first
+discipline + builds the iteration infrastructure.
+
+**No expensive bench was launched in W93.**  Three candidate
+architectures were killed in cheap preflight against W88–W92
+sidecar evidence.  The deliverable is the infrastructure +
+discipline shift.
+
+| Claim | One-line description | Status | Code / evidence anchor |
+| ----- | -------------------- | ------ | ------------------ |
+| W93-T-FAILURE-MINER-SHIPS | `coordpy.failure_cluster_miner_v1` analyses existing W88–W92 bench reports + sidecars locally; no NIM calls; runs in seconds; discovers 11 bench runs and summarises per-bench-kind B − A1 deltas.  16 CI tests; content-addressed report. | mechanically-checked (16 CI tests pass) | `coordpy/failure_cluster_miner_v1.py`, `tests/test_w93_preflight_v1.py` |
+| W93-T-PREFLIGHT-HARNESS-SHIPS | `coordpy.cross_modal_preflight_harness_v1` ships a 5-gate preflight harness (hypothesis written / cheap sidecar evidence / adversarial ablation / budget accounting / benchmark justification) for evaluating candidate architectures before launching expensive bench runs.  Produces content-addressed verdict JSON; no NIM calls. | mechanically-checked (16 CI tests including all 5 gates) | `coordpy/cross_modal_preflight_harness_v1.py`, `tests/test_w93_preflight_v1.py` |
+| W93-T-3-CANDIDATES-KILLED-IN-PREFLIGHT | 3 W93 candidate architectures (Self-Verifying VLM-in-loop / Heterogeneous Pool / K=10 Reflexion) defined with explicit hypotheses and run through the 5-gate harness.  ALL 3 killed in preflight against W88–W92 evidence.  No expensive bench launched. | empirical (canonical evidence `results/w93/candidate_preflight_verdicts.json`) | `scripts/run_w93_candidate_preflight.py`, `docs/RESULTS_W93_PREFLIGHT_DISCIPLINE_V1.md` |
+| W93-T-MINER-CONFIRMS-7-CONFIG-CROSS-MODAL-NEGATIVE | Cumulative mining across 7 cross-modal configurations (W88 V1 / W89 P2 / W89 P3 / W90 P2 / W91 P2 / W91 P2b / W92) confirms B − A1_vlm range = −27.78 to +2.78 pp; mean = −12.96 (split), −1.46 (VLM-in-loop), −10.71 (role-spec).  Image-load-bearing PROVEN at 7/7 configs (B − A0_text always > +5 pp). | empirical | `results/w93/failure_clusters.json`, `docs/W93_FAILURE_DIAGNOSIS.md` |
+| W93-L-W93A-SELF-VERIFY-KILLED-CAP | Candidate W93-A (Self-Verifying VLM-in-loop) killed in preflight on G2 (W91 P2b 7-seed evidence shows VLM-in-loop is already −7.14 pp; no preflight evidence that self-verification breaks this) and G3 (W92 evidence shows adding verifier-style turns to VLM-in-loop made it WORSE by −10.71 pp).  Cosmetic verification on a known-failing architecture is unlikely to flip the sign. | honest-limitation (kill documented) | `docs/RESULTS_W93_PREFLIGHT_DISCIPLINE_V1.md` |
+| W93-L-W93B-HETEROGENEOUS-POOL-KILLED-CAP | Candidate W93-B (Heterogeneous Pool: 3× VLM + 2× code-LM) killed in preflight on G2 (W88 split's code-LM-downstream-of-VLM-extraction samples ALWAYS lost to A1_vlm K=5 across 3 model scales; marginal contribution is NEGATIVE) and G3 (W92 mixed-modality evidence).  Adding empirically-negative samples to a pool cannot help. | honest-limitation (kill documented) | `docs/RESULTS_W93_PREFLIGHT_DISCIPLINE_V1.md` |
+| W93-L-W93C-K10-REFLEXION-NEEDS-PILOT-CAP | Candidate W93-C (Reflexion at K=10 budget) killed in preflight on G2 (no K=10 evidence in any W88–W92 sidecar; cheap preflight cannot confirm without a small NIM pilot).  Gates G1, G3, G4, G5 all pass; W93-C is the most promising next direction.  Recommended W94 step: 30-min K=10 pilot to gather preflight evidence. | honest-limitation (kill conditional on pilot) | `docs/RESULTS_W93_PREFLIGHT_DISCIPLINE_V1.md` |
 
 ## W92 post-W91 empirical superiority wave V5 (W92-T-* and W92-L-*)
 
