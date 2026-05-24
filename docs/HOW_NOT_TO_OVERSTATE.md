@@ -5881,3 +5881,70 @@ evidence; per-seed strict majority continues to elude us at
 the K=5 budget on this ceiling-saturated benchmark."*
 
 Last touched: W91 MBPP confirmation 2026-05-23.
+
+---
+
+# W92 post-W91 empirical superiority wave V5 — what to say,
+# what NOT to say (2026-05-24)
+
+## W92 cross-modal role-specialized (DECISIVE NEGATIVE — benchmark pivot required)
+
+Acceptable: *"W92 introduces a NEW multi-agent cross-modal
+architecture (VLM-Planner + Code-Implementer-×3 + VLM-Verifier)
+— the THIRD independent architecture in the programme after
+the W88/W89 split and W90/W91 VLM-in-loop.  At 7 seeds × 12
+problems × Llama-3.2-90B-Vision + Llama-3.3-70B-Instruct ×
+HumanEval-Visual all_docstring × K=5, B 77.4 % loses to
+A1_vlm 88.1 % by **−10.71 pp**; B wins **0 of 7 seeds**.
+Worse than W91 P2b's −7.14 pp.  Image is strongly load-bearing
+(B − A0_text = +23.81 pp).  3/6 retirement bars met (image
+direction); 3/6 fail.  Across THREE independent cross-modal
+team architectures at K=5 on HumanEval-Visual with Llama-3.2-
+{11B, 90B}-Vision-Instruct, the team architecture LOSES to
+unified-VLM K=5.  HumanEval-Visual at K=5 vs unified-VLM K=5
+is now empirically the WRONG battlefield for proving cross-
+modal team superiority; future retirement attempts must
+change the benchmark (MathVista, ChartQA candidates) or move
+to substrate-level cross-modal injection (the W87-L
+direction).  Bench Merkle c511df459a88ba2e...; audit verifier
+4/4 audit PASS."*
+
+Forbidden phrasing: *"W92 retired the cross-modal carry-
+forward"* (it did NOT — it produced the strongest negative
+evidence yet), *"role specialization beats unified VLM"*
+(it loses by −10.71 pp; 0/7 per-seed wins), *"the architecture
+needs more sophistication"* (W92 IS the most sophisticated
+architecture tried; the W91 P2b result was the same magnitude;
+the issue is not architecture sophistication but benchmark
+choice), *"the cross-modal team approach is wrong forever"*
+(the W92 evidence scopes the negative to HumanEval-Visual at
+K=5 with this VLM family; other benchmarks where unified VLM
+doesn't saturate at K=5 remain to be tested).  Acceptable
+follow-up: *"the cross-modal team architecture family at K=5
+on HumanEval-Visual is empirically a wrong battlefield; the
+next attempt must pivot to a less-saturated benchmark or to
+substrate-level injection."*
+
+## W92 cumulative cross-modal claim
+
+Acceptable: *"After W88 → W92 (7 cross-modal configurations
+spanning 3 architectures, 2 model scales, 2 strip modes, and
+3- and 7-seed counts), **image is empirically load-bearing
+across ALL SEVEN configurations** (B − A0_text = +13.9 /
++16.7 / +52.8 / +16.7 / +41.7 / +34.5 / +23.8 pp; all > +5 pp
+threshold).  **Multi-agent cross-modal team is NOT load-
+bearing-better than unified VLM at K=5 across ALL SEVEN
+configurations** (B − A1_vlm = −5.6 / −27.8 / −5.6 / +0.0 /
++2.78@3s / −7.14@7s / −10.71@7s pp).  The W87 multi-modal
+substrate carries real image-load-bearing information; the
+cross-modal TEAM-ORGANISATION at K=5 on HumanEval-Visual is
+empirically falsified across THREE architectures."*
+
+Forbidden phrasing: *"cross-modal teams never work"* (only
+under the specific configurations tested), *"the cross-modal
+research direction is dead"* (substrate-level injection +
+different benchmarks are V2), *"image utility doesn't help"*
+(image is PROVEN load-bearing in all 7 configurations).
+
+Last touched: W92 decisive cross-modal benchmark falsification
+2026-05-24.

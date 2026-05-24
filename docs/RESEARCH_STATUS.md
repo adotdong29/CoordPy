@@ -9,19 +9,20 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W91 post-W90
-> empirical superiority wave V4** on 2026-05-23 — cross-modal
-> prong: W91 P2 (3 seeds × 12 × all_docstring × VLM-in-loop)
-> showed B +2.78 pp / 5 of 6 bars (margin bar fails); the
-> pre-committed conditional W91 P2b (7 seeds) CLEANLY
-> DISCONFIRMED P2 (B −7.14 pp / 2 of 7 seeds).  The +5 pp
-> margin bar correctly rejected the marginal P2 result.  The
-> W88 cross-modal carry-forward STAYS with stronger negative
-> evidence.  MBPP retry at 5 seeds × 30 problems × 70B (W91
-> Prong 1) still running; will follow-up commit.  Prior: W90
-> (2026-05-23) both partial / tie; W89 (2026-05-22) first
-> retirement; W88 (2026-05-22) both negative; W87 P3 line
-> closures 2026-05-21.  **Meta-#49 P0+P1+P2 line closed (W86).
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W92 post-W91
+> empirical superiority wave V5** on 2026-05-24 — cross-modal
+> role-specialized prong: NEW architecture (VLM-Planner + Code-
+> Implementer×3 + VLM-Verifier) on 7 seeds × 12 × all_docstring
+> × 90B-V + 70B-text gave B 77.4 % vs A1_vlm 88.1 % = **−10.71
+> pp**; B wins 0/7 seeds.  THIRD independent cross-modal team
+> architecture (after split + VLM-in-loop) to DECISIVELY lose
+> to unified-VLM K=5.  HumanEval-Visual at K=5 is now
+> empirically the WRONG battlefield; future cross-modal
+> retirement attempts must change BENCHMARK (MathVista,
+> ChartQA, DocVQA, MMVet candidates) or move to substrate-
+> level cross-modal injection.  Prior: W91 (2026-05-23) cross-
+> modal disconfirmation + MBPP confirmation; W90 (2026-05-23)
+> both partial / tie; W89 (2026-05-22) first retirement.  **Meta-#49 P0+P1+P2 line closed (W86).
 > P3 line (#46/#47/#48) closed (W87).  Meta-#4 closed by
 > supersession (2026-05-22).  W89 RETIRED 2 HumanEval carry-
 > forwards at 70B; W90+W91 added 11 new `W90-L-*` /
@@ -81,6 +82,93 @@ vs. what would constitute solving" bar.
 Any claim in any other doc, paper draft, demo, or external
 pitch that the programme has *solved* multi-agent context is
 overstatement and is rejected by this file.
+
+## TL;DR — W92 post-W91 empirical superiority wave V5 (decisive cross-modal benchmark falsification)
+
+The W92 wave introduces the THIRD independent cross-modal team
+architecture and produces decisive falsifying evidence on the
+HumanEval-Visual + K=5 battlefield.  Pre-committed in
+`docs/RUNBOOK_W92.md`.
+
+### W92 — Cross-modal role-specialized at `all_docstring`, 7 seeds × 12 (DECISIVE NEGATIVE)
+
+NEW architecture: `coordpy.cross_modal_role_specialized_bench_v1`:
+
+```
+Turn 0 (T=0):     VLM-Planner   (image, prompt)           → Plan
+Turn 1 (T=0.7):   Code-Implementer-v1 (text-only)         → code v1
+                    + executor
+Turn 2 (T=0):     VLM-Verifier  (image, prompt, code v1,
+                                  stderr)                 → Critique
+Turn 3 (T=0.7):   Code-Implementer-v2                     → code v2
+                    + executor
+Turn 4 (T=0.7):   Code-Implementer-v3 (cumulative history) → code v3
+                    + executor
+```
+
+5 model calls = same K=5 budget as A1_vlm.  2× VLM (Planner +
+Verifier) + 3× code-LM (Implementer ×3).  B uses LESS total
+compute than A1_vlm (code-LM < VLM in size); a B win would
+have been doubly informative.  But B LOSES.
+
+7 seeds × 12 problems × Llama-3.2-90B-Vision + Llama-3.3-70B-
+Instruct × HumanEval-Visual all_docstring × K=5.  Bench
+Merkle `c511df459a88ba2e…`; audit verifier 4/4 audit PASS.
+
+Result:
+* A0_text 53.6 % | A1_vlm 88.1 % | **B_role_spec 77.4 %**
+* B − A0_text = **+23.81 pp** (image strongly load-bearing)
+* B − A1_vlm = **−10.71 pp** (DECISIVE NEGATIVE)
+* B beats A1_vlm per-seed: **0 of 7** (every per-seed delta
+  in [−16.67, −8.33] pp)
+
+### Cumulative cross-modal evidence after W92 (7 configurations, 3 architectures)
+
+| Architecture | Configurations tested | Best B − A1_vlm | Best per-seed |
+|---|---|---|---|
+| Split (VLM-extract + code-LM-generate) | W88 V1 / W89 P2 / W89 P3 | −5.6 pp | 0/3 |
+| VLM-in-loop (single VLM, image every turn) | W90 P2 / W91 P2 / W91 P2b | +0.0 pp (tie) | 2/3 (3-seed; disconfirmed at 7-seed) |
+| **Role-specialized (VLM-Planner + Code-Implementer×3 + VLM-Verifier)** | **W92** | **−10.71 pp** | **0/7** |
+
+* **Image is load-bearing across all 7 configurations**
+  (B − A0_text always > +5 pp; range +13.9 to +52.8 pp).
+* **Cross-modal team architecture decisively LOSES across 3
+  independent architectures at K=5 on this benchmark family.**
+
+### W92 strategic implication: BENCHMARK PIVOT REQUIRED
+
+`W92-L-CROSS-MODAL-HUMANEVAL-VISUAL-WRONG-BATTLEFIELD-CAP` —
+the cumulative empirical evidence is decisive: HumanEval-Visual
+at K=5 against unified-VLM K=5 is the wrong battlefield for
+proving cross-modal team superiority.  Three architectures
+spanning model scales, strip modes, and seed counts all fail.
+
+**Future cross-modal retirement attempts must:**
+
+1. Choose a benchmark where unified-VLM K=5 does NOT approach
+   ceiling (MathVista, ChartQA, DocVQA, MMVet, SEED-Bench,
+   RealWorldQA candidates).  Cross-modal team needs failure-
+   residual to rescue from.
+2. **Or** develop substrate-level cross-modal injection (the
+   W87-L direction): intervene at hidden-state layer rather
+   than competing at K=5 sampling.
+
+### W92 also pre-empts the "more architecture = better" hypothesis
+
+A frequent counterargument to W91 P2b's disconfirmation was
+that "the architecture wasn't sophisticated enough".  W92's
+role-specialized architecture is genuinely more sophisticated
+than VLM-in-loop (3 distinct roles, vision-grounded Verifier,
+specialist code-LM Implementer).  Result: same outcome, worse
+mean delta.  **Architecture sophistication alone does not
+retire the cross-modal carry-forward on this benchmark
+family.**
+
+See `docs/RUNBOOK_W92.md`,
+`docs/RESULTS_W92_CROSS_MODAL_ROLE_SPECIALIZED_V1.md`, and the
+W92 entries in `docs/THEOREM_REGISTRY.md` /
+`docs/HOW_NOT_TO_OVERSTATE.md`.
+
 
 ## TL;DR — W91 post-W90 empirical superiority wave V4 (cross-modal disconfirmation; MBPP retry running)
 

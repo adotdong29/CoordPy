@@ -13,6 +13,104 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W92 post-W91 empirical superiority wave V5 — decisive cross-modal benchmark falsification: 3rd architecture loses; HumanEval-Visual is now the wrong battlefield (2026-05-24)**
+  — *The W92 cross-modal prong is the THIRD independent
+  architectural attempt in the programme to retire the
+  cross-modal carry-forward.  After W88/W89's split (lossy
+  extraction handoff: −5.6 to −27.8 pp) and W90/W91's
+  VLM-in-loop (single-VLM multi-turn: +0.0 to −7.14 pp), W92
+  introduces a TRUE role-specialized multi-agent team:
+  VLM-Planner reads image+signature → structured plan;
+  Code-Implementer (text-only Llama-3.3-70B-Instruct) generates
+  code from plan; VLM-Verifier reads image+code+stderr →
+  critique; Implementer revises twice with cumulative history.
+  Same K=5 budget as A1_vlm.  Pre-committed in
+  `docs/RUNBOOK_W92.md`.*
+
+  **W92 result: 7 seeds × 12 problems × Llama-3.2-90B-Vision +
+  Llama-3.3-70B-Instruct × HumanEval-Visual all_docstring × K=5,
+  bench Merkle `c511df459a88ba2e…`, audit verifier 4/4 audit
+  PASS, total wall 4h 45min, 336 text + 588 VLM calls.**
+
+  Result:
+  ```
+    A0_text       mean pass@1: 53.57 %
+    A1_vlm        mean pass@1: 88.10 %
+    B_role_spec   mean pass@1: 77.38 %
+
+    B − A0_text:  +23.81 pp  (image strongly load-bearing)
+    B − A1_vlm:   -10.71 pp  (DECISIVE NEGATIVE)
+    B beats A1 per-seed: 0/7  (every seed −8.33 to −16.67 pp)
+  ```
+
+  **Three independent cross-modal architectures, all
+  decisively negative at K=5 on HumanEval-Visual**:
+  - Split (W88 V1, W89 P2, W89 P3): −5.6 to −27.8 pp
+  - VLM-in-loop (W90 P2, W91 P2, W91 P2b): +0.0 to −7.14 pp
+  - Role-specialized (W92): **−10.71 pp; 0/7 seeds**
+
+  **Image is load-bearing across all 7 configurations**
+  (B − A0_text = +13.9 / +16.7 / +52.8 / +16.7 / +41.7 /
+  +34.5 / +23.8 pp; all > +5 pp).
+
+  **HumanEval-Visual at K=5 vs unified-VLM K=5 is now
+  empirically the WRONG battlefield** for proving cross-modal
+  team superiority.  The next retirement attempt must change
+  the benchmark (MathVista, ChartQA, DocVQA, MMVet, SEED-Bench,
+  RealWorldQA candidates where unified VLM doesn't saturate at
+  K=5) OR move to substrate-level cross-modal injection (the
+  W87-L direction).
+
+  **Carry-forwards stay:**
+  `W87-L-MULTI-MODAL-V1-NO-CROSS-MODAL-INJECT-CAP`,
+  `W88-L-CROSS-MODAL-CODE-V1-SPLIT-NOT-LOAD-BEARING-CAP`,
+  plus the W89/W90/W91 cross-modal-cap chain.
+
+  **New W92-L-* carry-forwards:**
+  - `W92-L-CROSS-MODAL-ROLE-SPECIALIZED-V1-DECISIVE-NEGATIVE-CAP`
+    (B 77.4 % loses to A1_vlm 88.1 % by −10.71 pp; 0/7 seeds)
+  - `W92-L-CROSS-MODAL-HUMANEVAL-VISUAL-WRONG-BATTLEFIELD-CAP`
+    (3 architectures all lose; benchmark pivot required)
+  - `W92-L-CROSS-MODAL-ROLE-SPEC-V1-IMPLEMENTER-TEXT-ONLY-CAP`
+    (the Implementer has no direct image access; VLM
+    Implementer is V2)
+
+  **W92-T-IMAGE-LOAD-BEARING-7-CONFIGS:** image is empirically
+  load-bearing across 7 independent cross-modal configurations
+  on HumanEval-Visual.  The W87 multi-modal substrate is
+  PROVEN to carry real image-load-bearing information.
+
+  **Modules added (explicit-import only):**
+  `coordpy/cross_modal_role_specialized_bench_v1.py`.
+
+  **Drivers + verifiers:**
+  `scripts/run_w92_cross_modal_role_specialized_bench.py`,
+  `scripts/verify_w92_cross_modal_role_specialized_audit_chain.py`.
+
+  **Tests (6 new W92 tests; all green):**
+  `tests/test_w92_cross_modal_role_specialized_v1.py`.
+
+  **Documentation:**  `docs/RUNBOOK_W92.md` (pre-commit
+  contract), `docs/RESULTS_W92_CROSS_MODAL_ROLE_SPECIALIZED_V1.md`
+  (decisive negative + benchmark-pivot recommendation).
+  Truth surfaces (`docs/RESEARCH_STATUS.md`,
+  `docs/THEOREM_REGISTRY.md`, `docs/HOW_NOT_TO_OVERSTATE.md`,
+  `docs/HONEST_FRAMING_POST_W87.md`) updated.
+
+  **Bench artifacts:**
+  `results/w92/cross_modal_role_specialized/.../`
+  (336 text + 588 VLM sidecars + bench report + per-seed
+  Merkle roots).
+
+  **Stable boundary unchanged:** `coordpy.__version__` =
+  `0.5.20`; `coordpy.SDK_VERSION` = `coordpy.sdk.v3.43`; no
+  PyPI publish; `coordpy/__init__.py` untouched.
+
+  **Strategic implication: W93+ must pivot to a different
+  benchmark or to substrate-level cross-modal injection.**
+  Continuing to attack the HumanEval-Visual + K=5 battlefield
+  is now positively falsified by 3 independent architectures.
+
 - **W91 post-W90 empirical superiority wave V4 — cross-modal disconfirmation + MBPP 5-seed confirmation (mean robust; per-seed bar still fails) (2026-05-23)**
   — *Cross-modal prong of W91 is the cleanest possible
   disconfirmation of a marginal positive signal under

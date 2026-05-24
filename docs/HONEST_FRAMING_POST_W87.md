@@ -2,19 +2,26 @@
 
 > **Canonical, mandatory honesty surface for any claim that
 > follows from the W87 closure of meta-#49.**  Last touched
-> 2026-05-23 after the W91 post-W90 empirical superiority wave
-> V4 — **no NEW retirements**.  The W89 70B-HumanEval
-> retirement remains.  W91 P2 (3 seeds) showed cross-modal
-> VLM-in-loop at all_docstring beats A1_vlm by +2.78 pp on the
-> mean (5/6 retirement bars met; the +5 pp margin bar fails);
-> the pre-committed conditional W91 P2b (7 seeds) **CLEANLY
-> DISCONFIRMED** the P2 signal — at 7 seeds B is −7.14 pp
-> BELOW A1_vlm.  The +5 pp margin bar correctly rejected the
-> P2 variance-driven positive; the W88 cross-modal carry-
-> forward STAYS with stronger negative evidence now from 7
-> seeds.  Prior touches: W90 (2026-05-23) both partial / tie;
-> W89 (2026-05-22) first retirement; W88 (2026-05-22) both
-> negative; meta-#49 + meta-#4 closed 2026-05-22.
+> 2026-05-24 after the W92 post-W91 empirical superiority wave
+> V5 — **no NEW retirements**.  The W89 70B-HumanEval
+> retirement remains.  W92 introduced a NEW role-specialized
+> cross-modal architecture (VLM-Planner + Code-Implementer×3 +
+> VLM-Verifier) — the THIRD independent cross-modal team
+> architecture in the programme.  At 7 seeds × 12 problems ×
+> Llama-3.2-90B-Vision + Llama-3.3-70B-Instruct ×
+> HumanEval-Visual all_docstring × K=5, B 77.4 % loses to
+> A1_vlm 88.1 % by **−10.71 pp**; B wins **0 of 7 seeds**.
+> Worse than W91 P2b's −7.14 pp.  Across THREE independent
+> architecture families (split, VLM-in-loop, role-specialized),
+> cross-modal team architecture decisively LOSES to unified
+> VLM at K=5 on HumanEval-Visual.  **HumanEval-Visual at K=5
+> is now empirically the WRONG battlefield**: the next
+> cross-modal retirement attempt must change the benchmark
+> (MathVista, ChartQA, etc. where unified VLM does NOT
+> saturate at K=5) or move to substrate-level cross-modal
+> injection.  Prior touches: W91 (2026-05-23) cross-modal
+> disconfirmation + MBPP confirmation; W90 (2026-05-23) both
+> partial / tie; W89 (2026-05-22) first retirement.
 >
 > If this file disagrees with any other doc about whether we
 > *solved multi-agent context*, this file is right and the
@@ -389,6 +396,51 @@ Until that meta issue is closed with the same discipline as
 meta-#49, claims of having solved multi-agent context are
 overstatement and must be rejected by any reader of this
 file.
+
+### W92 cross-modal contribution (2026-05-24)
+
+The W92 wave introduces the THIRD independent cross-modal team
+architecture in the programme and produces decisive falsifying
+evidence on the HumanEval-Visual + K=5 battlefield:
+
+* **W92 (7 seeds × 12 × all_docstring × 90B-V + 70B-text, role-
+  specialized: VLM-Planner + Code-Implementer×3 +
+  VLM-Verifier):** B 77.4 % loses to A1_vlm 88.1 % by
+  **−10.71 pp**; B beats A1_vlm on **0 of 7 seeds**; B beats
+  A0_text by +23.81 pp on 7/7 seeds.  3/6 retirement bars met
+  (image direction); 3/6 fail (team direction).  Bench Merkle
+  `c511df459a88ba2e…`; audit verifier 4/4 audit PASS.
+
+**Three independent cross-modal architectures, all decisive
+negatives**:
+
+| Architecture | Configurations | B − A1_vlm (range) | Best per-seed |
+|---|---|---|---|
+| Split (VLM-extract + code-LM-generate) | W88 V1, W89 P2, W89 P3 | −5.6 to −27.8 pp | 0/3 |
+| VLM-in-loop (single VLM, image every turn) | W90 P2, W91 P2, W91 P2b | +0.0 to −7.14 pp | 2/3 (P2 3-seed; disconfirmed at 7 seeds) |
+| Role-specialized (W92) | W92 | **−10.71 pp** | **0/7** |
+
+The cumulative evidence at this point is **decisive**:
+HumanEval-Visual at K=5 against unified-VLM-K=5 is empirically
+the wrong battlefield for proving cross-modal team
+superiority.  Adding role specialization to the VLM-in-loop
+architecture did NOT help and apparently hurt slightly.  The
+image-load-bearing direction is now PROVEN at 7 independent
+configurations (B − A0_text always > +5 pp).  But the
+team-organisation direction is decisively NEGATIVE.
+
+**Future cross-modal retirement attempts must change the
+benchmark or move to substrate-level cross-modal injection**:
+
+* Candidate benchmarks where unified-VLM K=5 does NOT
+  approach ceiling: MathVista, ChartQA, DocVQA, MMVet,
+  SEED-Bench, RealWorldQA.  Build / adapt benches.
+* Substrate-level cross-modal injection (the W87-L direction):
+  intervene at hidden-state layer to provide signal that pure
+  sampling can't access.  Significant architectural research.
+
+The W92 evidence forces the W93+ research direction to NOT
+continue attacking the current HumanEval-Visual battlefield.
 
 ### W91 cross-modal contribution (2026-05-23)
 
