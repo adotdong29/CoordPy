@@ -1,0 +1,45 @@
+{
+  "candidate": "B4",
+  "n_problems_per_seed": 30,
+  "n_seeds": 1,
+  "schema": "coordpy.w99_pre_committed_slices.v1",
+  "slices": [
+    {
+      "n_problems": 30,
+      "pids": [
+        "rwqa_test_000013",
+        "rwqa_test_000076",
+        "rwqa_test_000094",
+        "rwqa_test_000111",
+        "rwqa_test_000135",
+        "rwqa_test_000155",
+        "rwqa_test_000179",
+        "rwqa_test_000204",
+        "rwqa_test_000207",
+        "rwqa_test_000223",
+        "rwqa_test_000225",
+        "rwqa_test_000246",
+        "rwqa_test_000250",
+        "rwqa_test_000388",
+        "rwqa_test_000403",
+        "rwqa_test_000430",
+        "rwqa_test_000438",
+        "rwqa_test_000441",
+        "rwqa_test_000479",
+        "rwqa_test_000481",
+        "rwqa_test_000518",
+        "rwqa_test_000533",
+        "rwqa_test_000555",
+        "rwqa_test_000615",
+        "rwqa_test_000661",
+        "rwqa_test_000672",
+        "rwqa_test_000679",
+        "rwqa_test_000713",
+        "rwqa_test_000718",
+        "rwqa_test_000733"
+      ],
+      "seed": 96504002,
+      "slice_sha256": "f53c71c2d355ac55f51ace7f3160ef6afcf00ab1c80e7ace4a295bca8e087ea5"
+    }
+  ]
+}

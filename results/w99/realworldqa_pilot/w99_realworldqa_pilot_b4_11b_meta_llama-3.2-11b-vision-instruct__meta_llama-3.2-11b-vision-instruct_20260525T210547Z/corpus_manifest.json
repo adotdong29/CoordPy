@@ -1,0 +1,14 @@
+{
+  "corpus_merkle_root": "dc629acbf88d929d95c4a47c8e553c050eb829aa48ba32ad53ca6283090618ab",
+  "n_problems": 765,
+  "parquet_shard_sha256": [
+    "0ed8b555586923099bd5d6ba5dd8b656b403ccfc418881facd237a6d6fe64952",
+    "7dcb3ac3483362ca082cd4cddd0ab1389e9a276f1aefd4603fde0a2ce6bc74d0"
+  ],
+  "parquet_total_bytes": 678342154,
+  "parquet_urls": [
+    "https://huggingface.co/datasets/lmms-lab/RealWorldQA/resolve/main/data/test-00000-of-00002.parquet",
+    "https://huggingface.co/datasets/lmms-lab/RealWorldQA/resolve/main/data/test-00001-of-00002.parquet"
+  ],
+  "schema": "coordpy.realworldqa_loader_v1.v1"
+}
