@@ -182,6 +182,28 @@
       "carry_forwards_added": [
         "W96-L-CHARTQA-PREFLIGHT-D1-B0-P3-SATURATION-CAP"
       ]
+    },
+    {
+      "id": "W98",
+      "title": "RealWorldQA multi-candidate slate (B1 + B2 preflight earn BOTH at both scales; B1 cheap NIM pilot at 11B FAIL 2/9 gates) - structurally informative; B1 recovers 4/5 W97 unique-A1-rescues on yes/no perception but regresses 5 D2-B0 multi-choice wins; W95-B0 family capped at B-A1 ≈ -6.67pp through two distinct mechanisms; B2 deferred to W99",
+      "outcome": "PHASE 2 FAIL VIA DIFFERENT MECHANISM — A0=36.67% / A1@K=5=86.67% / B1=80.00%; B1-A1=-6.67pp (gate 4 FAIL, IDENTICAL margin to W97 D2-B0); B1 does NOT strictly beat A1 (gate 3 FAIL). Gates 1, 2, 5-9 PASS — notably gate 2 (A1<90% this run; W97's saturation was sampling noise) and gate 6 (B>=A1 on 27/30 = IMPROVED per-problem majority vs W97 D2-B0's 25/30). Per-problem diff vs W97 D2-B0 on same slice: 4 B1-new-rescues on yes/no perception (000135, 000403, 000555, 000718) - EXACTLY the W97 failure cluster the typed schema + question-typed solver was designed to attack (4/5 recovery rate matches AddrP1 + AddrP2 predictions) - BUT 5 B1-regressions on multi-choice/numeric (000013, 000155, 000204, 000225, 000713) via a NEW failure mode: typed solver becomes more confident in reader's (often wrong) direct_answer_hint and stops K=4 reflexion-cycling. Net 4-5 = -1 problem = same architectural cap. W95-B0-derived extract-then-text-reason architecture family empirically capped at B-A1 ≈ -6.67pp at 11B through TWO distinct mechanisms (D2-B0 free text + D2-B1 typed schema). Cross-scale 90B NOT entitled per W96-C rule. B2 (direct-vision final-turn answerer, structurally distinct, no reader-hint dependency) deferred to W99 per runbook. Preflight + addressability probes (AddrP1..AddrP7) earned BOTH candidates at both 11B and 90B at $0 NIM (single pilot per runbook decision logic; tie-break = lower expected NIM cost). Discipline validation #8: W93/W94/W95/W96-A/W96-C/W96-D/W97/W98.",
+      "commits": [
+        "4e77107"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W98.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W98_V1.md",
+        "docs/RESULTS_W98_ARSENAL_MINING_V1.md",
+        "docs/RESULTS_W98_PREFLIGHT_V1.md",
+        "docs/RESULTS_W98_REALWORLDQA_B1_PHASE2_V1.md"
+      ],
+      "linear_issues": [
+        "COO-22"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W98-L-REALWORLDQA-B1-TYPED-SCHEMA-PHASE2-11B-CAP"
+      ]
     }
   ]
 }
