@@ -480,7 +480,7 @@ def main() -> int:
     for probe in verdict.probes:
         d = probe.to_dict()
         summary.append(
-            f"- {d['name']}: "
+            f"- {d.get('probe_id', d.get('description', '?'))}: "
             f"{'PASS' if d['passed'] else 'FAIL'} — "
             f"{d.get('summary', '')}")
     summary.append("")

@@ -119,20 +119,27 @@
     },
     {
       "id": "W96-C",
-      "title": "MathVista C1 (VLM-Verifier-Final-Turn) cheap preflight + cross-scale Phase 2 cheap pilot (pre-NIM lock + 11B Phase 2 in flight; 90B Phase 2 conditional on 11B PASS)",
-      "outcome": "PRE-NIM LOCK + CHEAP PREFLIGHT PASS — V2 bench module forked from V1; vlm_reader + 3 text solver + vlm_verifier_final at byte-exact K=5; selection rule preserves W95-B0 wins (text-only PASS short-circuits) and rescues A1-only territory (verifier ships when text-only all FAIL). Preflight composite PASS at 11B (verdict_cid 29345745...) and 90B (verdict_cid b8c75cfc...). Q4 turn-4 upper-bound 21.79% (low downside; 90 of 413 W95-B0 passes); Q5 A1-only rescue pool 13.0% (sizeable upside; 78 of 600 pairs). 11B Phase 2 pilot in flight at commit time.",
+      "title": "MathVista C1 (VLM-Verifier-Final-Turn) cross-scale Phase 2: 11B FAIL (+0pp; verifier 0/11) + 90B PASS (+13.33pp; verifier 1/7 = mechanism NOT load-bearing); NOT Phase 3 entitled",
+      "outcome": "CROSS-SCALE AMBIGUOUS — 11B Phase 2: A0=36.67% / A1=63.33% / B_v2=63.33%; B_v2-A1=+0.00pp; verifier rescue rate 0/11=0.0%; 2/9 gates FAIL; V2 LOST 13.34pp on B arm vs V1. 90B Phase 2: A0=36.67% / A1=66.67% / B_v2=80.00%; B_v2-A1=+13.33pp; verifier rescue rate 1/7=14.3%; 9/9 gates PASS but verifier mechanism not load-bearing (1 of 5 B-only rescues; rest from text-only chain sampling variance vs A1 K=5). Cross-scale collapse pattern (one-scale-good-one-scale-bad) triggers runbook's 'warning not green light' rule; NOT entitled to Phase 3 in any scenario. Adds two W96-L carry-forwards. Next move per Linear: COO-20 W96-D battlefield pivot.",
       "commits": [
-        "63ccd29"
+        "63ccd29",
+        "080a716",
+        "0b20f19"
       ],
       "docs": [
         "docs/RUNBOOK_W96C.md",
-        "docs/RESULTS_W96C_ARSENAL_MINING_V1.md"
+        "docs/RESULTS_W96C_ARSENAL_MINING_V1.md",
+        "docs/RESULTS_W96C_MATHVISTA_C1_11B_PHASE2_V1.md",
+        "docs/RESULTS_W96C_MATHVISTA_C1_CROSS_SCALE_PHASE2_V1.md"
       ],
       "linear_issues": [
         "COO-19"
       ],
       "carry_forwards_retired": [],
-      "carry_forwards_added": []
+      "carry_forwards_added": [
+        "W96-L-MATHVISTA-V2-C1-VERIFIER-FINAL-11B-PHASE2-CAP",
+        "W96-L-MATHVISTA-V2-C1-VERIFIER-FINAL-90B-PHASE2-SINGLE-SEED-NON-MECHANISM-DRIVEN-CAP"
+      ]
     }
   ]
 }
