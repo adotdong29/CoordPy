@@ -1,0 +1,8 @@
+{
+  "corpus_merkle_root": "e8d0942411e6dd4e70ca9a5a8c0843b6dfd27a6d489d85920faf7dbc9d10a9c9",
+  "n_problems": 2500,
+  "parquet_bytes": 72610993,
+  "parquet_sha256": "165263505f2998aba65d819b44be832edecd92d676fee2c030645f784cd55d06",
+  "parquet_url": "https://huggingface.co/datasets/lmms-lab/ChartQA/resolve/main/data/test-00000-of-00001.parquet",
+  "schema": "coordpy.chartqa_loader_v1.v1"
+}

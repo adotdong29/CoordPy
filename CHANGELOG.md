@@ -13,6 +13,83 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W96-D cross-modal battlefield pivot — ChartQA preflight FAIL at both 11B and 90B by P3 saturation; RealWorldQA preflight PASS at both 11B and 90B with all 9 composite gates clearing; D2 (RealWorldQA) preflight-earned for Phase 2 cheap pilot; no NIM spend (2026-05-25)**
+  — *Post-W96-C battlefield pivot per `COO-20` and the
+  W96-D runbook (`docs/RUNBOOK_W96D.md`).  Arsenal-mining
+  pass (`docs/RESULTS_W96D_ARSENAL_MINING_V1.md`) selected
+  D1-B0 (W95-B0 chart-port) as the lead candidate and
+  documented the rejection of W90 VLM-in-loop, W92 three-
+  role split, and W87 substrate-level patch-payload
+  mechanisms.  **D1 (ChartQA, `lmms-lab/ChartQA` test;
+  2500 problems; parquet SHA
+  `165263505f2998aba65d819b44be832edecd92d676fee2c030645f784cd55d06`)**:
+  P1 corpus integrity PASS, P2 executor self-test PASS
+  (2500/2500 = 100 % gold-as-prediction under W96-D ChartQA
+  relaxed-accuracy executor), P3 A1 saturation **FAIL** at
+  both scales (Llama-3.2-11B published single-shot 83.4 % →
+  A1@K=5 estimate 91.69 % → residual 8.31 pp; 90B
+  single-shot 85.5 % → A1@K=5 92.75 % → residual 7.25 pp;
+  both far below the +20 pp floor), P4 decomposition
+  argument PASS, W93 G1-G5 PASS.  Per the W96-D runbook
+  cross-battlefield pivot rule, D1 is killed cheaply; adds
+  carry-forward `W96-L-CHARTQA-PREFLIGHT-D1-B0-P3-SATURATION-CAP`.
+  **D2 (RealWorldQA, `lmms-lab/RealWorldQA` test; 765
+  problems; 2 SHA-anchored parquet shards;
+  total bytes 678,342,154)**: all 4 composite probes PASS at
+  both scales (11B A1@K=5 estimate 73.44 %, residual
+  26.56 pp; 90B A1@K=5 estimate 79.49 %, residual 20.51 pp —
+  narrow 0.51 pp above the +20 pp floor), W93 G1-G5 PASS;
+  D2-B0 (W95-B0 scene-port) is **preflight-earned** for a
+  NIM smoke test + 1-seed × 30-problem Phase 2 cheap pilot
+  (~330 NIM calls per scale); Phase 2 launch is explicitly
+  out of scope for this milestone unless authorised.  ChartQA
+  preflight verdict CIDs:
+  `e16ab7f53136a852d4d7835a7857037a104ffd7ca8cb5eaff367a60f61377db9`
+  (11B) /
+  `ff0f833bfe864d1a6bbefb6129ed07f0901f23a03784418f01ada296c1e0d8f8`
+  (90B).  RealWorldQA preflight verdict CIDs:
+  `07f9298c613e77653c6c42cc0cd28063c199ea5d8dc157be534135b45a645ccd`
+  (11B) /
+  `1e38d04b97c69d8257d6eff6b30992d5ed57bbac06c1a648178b464951ebe4af`
+  (90B).  Added modules:
+  `coordpy.{chartqa,realworldqa}_{loader,executor,preflight}_v1`
+  (all explicit-import only; not re-exported through
+  `coordpy.__init__`).  Added scripts:
+  `scripts/run_w96d_{chartqa,realworldqa}_preflight.py`.
+  Added tests: `tests/test_w96d_{chartqa,realworldqa}_v1.py`
+  (50 tests, all pass).  Discipline validation: W93 → W94 →
+  W95 → W96-A → W96-C → **W96-D** preflight-first + cross-
+  scale rule now caught a battlefield-level cap (D1
+  saturation) cheaply at the cost of $0 NIM spend.*
+
+- **W96-C MathVista C1 (VLM-Verifier-Final-Turn) cross-scale Phase 2 — 11B FAIL (+0.00 pp; verifier rescue 0/11 = 0.0 %); 90B PASS (+13.33 pp; verifier rescue 1/7 = 14.3 % NOT load-bearing); cross-scale collapse = warning not green light; NOT Phase 3 entitled (2026-05-24)**
+  — *Two cheap Phase 2 pilots on `meta/llama-3.2-{11b,90b}-vision-instruct`
+  via NIM on the W95 / W96-A byte-identical 30-problem
+  slice (seed 95_005_001).  At **11B**:
+  A0 = 36.67 %, A1 = 63.33 %, B_v2 = 63.33 %; B_v2 − A1 =
+  **+0.00 pp** (FAIL bar 4 by 5 pp); B_v2 LOST 13.34 pp on
+  the B arm vs W95-B0 V1 on the same slice; verifier
+  rescue rate 0/11 = 0.0 %; gates 3 and 4 FAIL (2 of 9
+  gates).  At **90B**:
+  A0 = 36.67 %, A1 = 66.67 %, B_v2 = 80.00 %; B_v2 − A1 =
+  **+13.33 pp** (PASS bar 4); B_v2 GAINED 6.67 pp on the
+  B arm vs W96-A V1; verifier rescue rate 1/7 = 14.3 %;
+  all 9 gates PASS.  The architectural addition's
+  load-bearing mechanism (the VLM-verifier rescuing
+  text-only failures) fires on 0/11 = 0.0 % at 11B and
+  1/7 = 14.3 % at 90B — too rare in either case to drive a
+  meaningful margin.  The 90B PASS is most plausibly
+  sampling-variance + slice-luck on the 3-turn text-only
+  chain.  Cross-scale collapse pattern (one-scale-good-
+  one-scale-bad) triggers the W96-C runbook's "warning
+  not green light" rule; C1 is **NOT entitled to Phase 3
+  at any scale**.  Adds carry-forwards
+  `W96-L-MATHVISTA-V2-C1-VERIFIER-FINAL-11B-PHASE2-CAP`
+  and
+  `W96-L-MATHVISTA-V2-C1-VERIFIER-FINAL-90B-PHASE2-SINGLE-SEED-NON-MECHANISM-DRIVEN-CAP`.
+  Next move per Linear `COO-6` ordering: `COO-20` (W96-D
+  battlefield pivot).*
+
 - **W96-A MathVista at Llama-3.2-90B-Vision — Phase 2 cheap pilot 9/9 gates PASS (B − A1 = +10.00 pp, byte-equivalent to W95 11B Phase 2); Phase 3 retirement bench 3/6 W88 bars FAIL (B − A1 = −5.00 pp at 3 × 100 × K=5; scaling the VLM 11B → 90B HURTS the team by an 8.67 pp cross-scale shift); NOT retirement; H2-saturation empirically confirmed at multi-seed (2026-05-24)**
   — *Two runs on `meta/llama-3.2-90b-vision-instruct` via NIM
   on the SAME deterministic slices as W95 (parquet SHA

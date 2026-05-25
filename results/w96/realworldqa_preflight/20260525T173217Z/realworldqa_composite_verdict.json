@@ -1,0 +1,127 @@
+{
+  "corpus_manifest": {
+    "corpus_merkle_root": "dc629acbf88d929d95c4a47c8e553c050eb829aa48ba32ad53ca6283090618ab",
+    "n_problems": 765,
+    "parquet_shard_sha256": [
+      "0ed8b555586923099bd5d6ba5dd8b656b403ccfc418881facd237a6d6fe64952",
+      "7dcb3ac3483362ca082cd4cddd0ab1389e9a276f1aefd4603fde0a2ce6bc74d0"
+    ],
+    "parquet_total_bytes": 678342154,
+    "parquet_urls": [
+      "https://huggingface.co/datasets/lmms-lab/RealWorldQA/resolve/main/data/test-00000-of-00002.parquet",
+      "https://huggingface.co/datasets/lmms-lab/RealWorldQA/resolve/main/data/test-00001-of-00002.parquet"
+    ],
+    "schema": "coordpy.realworldqa_loader_v1.v1"
+  },
+  "overall_passes": true,
+  "probes": [
+    {
+      "description": "All shards SHA-anchored; test decodes to expected size in-range; every problem has image + answer.",
+      "evidence": {
+        "corpus_merkle_root": "dc629acbf88d929d95c4a47c8e553c050eb829aa48ba32ad53ca6283090618ab",
+        "expected_bytes_range": [
+          200000000,
+          900000000
+        ],
+        "expected_n_range": [
+          700,
+          800
+        ],
+        "n_problems": 765,
+        "n_with_answer": 765,
+        "n_with_image": 765,
+        "parquet_shard_sha256": [
+          "0ed8b555586923099bd5d6ba5dd8b656b403ccfc418881facd237a6d6fe64952",
+          "7dcb3ac3483362ca082cd4cddd0ab1389e9a276f1aefd4603fde0a2ce6bc74d0"
+        ],
+        "parquet_total_bytes": 678342154
+      },
+      "evidence_cid": "6e98fda0eed468501876879897c447b0c3e080d8c8eb2bb4c569241fb5a11042",
+      "passed": true,
+      "probe_id": "P1_corpus_integrity",
+      "summary": "parquet_total_bytes=678342154 (range_ok=True); n_problems=765 in [700,800] (ok=True); n_with_image=765; n_with_answer=765"
+    },
+    {
+      "description": "Gold-as-prediction must score \u2265 98 % under the W96-D RealWorldQA executor.",
+      "evidence": {
+        "by_rule": {
+          "multi_choice_letter": 437,
+          "numeric_relaxed": 121,
+          "text_exact": 207
+        },
+        "executor_schema": "coordpy.realworldqa_executor_v1.v1",
+        "failed_sample": [],
+        "min_pass_rate": 0.98,
+        "n_failed": 0,
+        "n_pass": 765,
+        "n_problems": 765,
+        "pass_rate": 1.0
+      },
+      "evidence_cid": "f4dcb4455ae885ced604074f6b0556aa89703e8b8cdf29b432a3e4cd7d555036",
+      "passed": true,
+      "probe_id": "P2_executor_self_test",
+      "summary": "executor self-test on gold: 765/765 = 100.00% (threshold=98.00%)"
+    },
+    {
+      "description": "Estimated A1@K=5 pass rate based on published RealWorldQA SOTA must leave room for B.",
+      "evidence": {
+        "K": 5,
+        "correlation_assumed": 0.5,
+        "estimated_a1_k5_pct": 73.4375,
+        "estimated_residual_pp": 26.5625,
+        "max_acceptable_a1_k5_pct": 80.0,
+        "model": "meta/llama-3.2-11b-vision-instruct",
+        "single_shot_pct": 50.0
+      },
+      "evidence_cid": "6acb825407b6ad8d3875e86a4e55c0b176590e036b4b7400c2d924c9c173d145",
+      "passed": true,
+      "probe_id": "P3_a1_failure_residual",
+      "summary": "published single-shot RealWorldQA for meta/llama-3.2-11b-vision-instruct = 50.00%; estimated A1@K=5 = 73.44%; estimated residual = 26.56 pp (ceiling = 80.00%); pass = True"
+    },
+    {
+      "description": "Written structural argument for B's decomposition exists AND corpus is fully multimodal (image + question + answer present).",
+      "evidence": {
+        "argument_chars": 1083,
+        "argument_sha256": "f03d1cbc5e00ebc0af67e4c3b9f11009fa6b7342086f00cfd2c914b79d04b2f7",
+        "min_argument_chars": 200,
+        "min_multimodal_share": 0.95,
+        "multimodal_share_in_sample": 1.0,
+        "n_multimodal_in_sample": 500,
+        "sample_n": 500,
+        "samples": [
+          {
+            "answer": "C",
+            "pid": "rwqa_test_000000",
+            "question_head": "In which direction is the front wheel of the car on the right side facing?\n\nA. L"
+          },
+          {
+            "answer": "B",
+            "pid": "rwqa_test_000001",
+            "question_head": "How many bars are here?\nA. There are two parallel bars in this photo.\nB. There a"
+          },
+          {
+            "answer": "0",
+            "pid": "rwqa_test_000002",
+            "question_head": "how many pedestrians are there?\nPlease answer directly with a single word or num"
+          },
+          {
+            "answer": "Downhill",
+            "pid": "rwqa_test_000003",
+            "question_head": "Is the road that the vehicle is on uphill, downhill or flat?\nPlease answer direc"
+          },
+          {
+            "answer": "B",
+            "pid": "rwqa_test_000004",
+            "question_head": "What is the speed limit on this road?\n\nA. 25\nB. 35\nC. 45\nPlease answer directly "
+          }
+        ]
+      },
+      "evidence_cid": "528091da9769d018837a24d6a6f46bebc72e83368d09b6ff430f661640b6fa69",
+      "passed": true,
+      "probe_id": "P4_decomposition_argument",
+      "summary": "decomp argument len=1083 (threshold=200; ok=True); multimodal-completeness in sample of 500 = 100.0% (threshold=95.0%; ok=True)"
+    }
+  ],
+  "schema": "coordpy.realworldqa_preflight_v1.v1",
+  "verdict_cid": "07f9298c613e77653c6c42cc0cd28063c199ea5d8dc157be534135b45a645ccd"
+}

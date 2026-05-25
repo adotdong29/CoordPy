@@ -1,0 +1,132 @@
+{
+  "corpus_manifest": {
+    "corpus_merkle_root": "e8d0942411e6dd4e70ca9a5a8c0843b6dfd27a6d489d85920faf7dbc9d10a9c9",
+    "n_problems": 2500,
+    "parquet_bytes": 72610993,
+    "parquet_sha256": "165263505f2998aba65d819b44be832edecd92d676fee2c030645f784cd55d06",
+    "parquet_url": "https://huggingface.co/datasets/lmms-lab/ChartQA/resolve/main/data/test-00000-of-00001.parquet",
+    "schema": "coordpy.chartqa_loader_v1.v1"
+  },
+  "overall_passes": false,
+  "probes": [
+    {
+      "description": "Parquet SHA-anchored; test decodes to expected size in-range; every problem has image + labels.",
+      "evidence": {
+        "corpus_merkle_root": "e8d0942411e6dd4e70ca9a5a8c0843b6dfd27a6d489d85920faf7dbc9d10a9c9",
+        "expected_bytes_range": [
+          50000000,
+          800000000
+        ],
+        "expected_n_range": [
+          2000,
+          3000
+        ],
+        "n_problems": 2500,
+        "n_with_image": 2500,
+        "n_with_labels": 2500,
+        "parquet_bytes": 72610993,
+        "parquet_sha256": "165263505f2998aba65d819b44be832edecd92d676fee2c030645f784cd55d06"
+      },
+      "evidence_cid": "6045e1a9127160b303ae2398fcbc43edbd461b922a84ed7a0435f1b919f16803",
+      "passed": true,
+      "probe_id": "P1_corpus_integrity",
+      "summary": "parquet_bytes=72610993 (range_ok=True); n_problems=2500 in [2000,3000] (ok=True); n_with_image=2500; n_with_labels=2500"
+    },
+    {
+      "description": "Gold-as-prediction must score \u2265 98 % under the W96-D ChartQA executor.",
+      "evidence": {
+        "by_rule": {
+          "numeric_relaxed": 1969,
+          "text_exact": 531
+        },
+        "executor_schema": "coordpy.chartqa_executor_v1.v1",
+        "failed_sample": [],
+        "min_pass_rate": 0.98,
+        "n_failed": 0,
+        "n_pass": 2500,
+        "n_problems": 2500,
+        "pass_rate": 1.0
+      },
+      "evidence_cid": "f34b5111523a1e226405f5aa7e807573ae684c2553b69d868781559bd476812c",
+      "passed": true,
+      "probe_id": "P2_executor_self_test",
+      "summary": "executor self-test on gold: 2500/2500 = 100.00% (threshold=98.00%)"
+    },
+    {
+      "description": "Estimated A1@K=5 pass rate based on published single-shot ChartQA SOTA must leave room for B.",
+      "evidence": {
+        "K": 5,
+        "correlation_assumed": 0.5,
+        "estimated_a1_k5_pct": 91.69369753497121,
+        "estimated_residual_pp": 8.306302465028793,
+        "max_acceptable_a1_k5_pct": 80.0,
+        "model": "meta/llama-3.2-11b-vision-instruct",
+        "single_shot_pct": 83.4
+      },
+      "evidence_cid": "98ebe4ab8ae70ec314a09c508c3003c27764ada93e30e6a2081cfd9e51f8d4f2",
+      "passed": false,
+      "probe_id": "P3_a1_failure_residual",
+      "summary": "published single-shot ChartQA for meta/llama-3.2-11b-vision-instruct = 83.40%; estimated A1@K=5 = 91.69%; estimated residual = 8.31 pp (ceiling = 80.00%); pass = False"
+    },
+    {
+      "description": "Written structural argument for B's decomposition exists AND corpus has \u2265 20 % human-authored ChartQA problems where chart-extract + math-solve is plausibly distinct from unified VLM.",
+      "evidence": {
+        "argument_chars": 1263,
+        "argument_sha256": "b7ff2d55bdfdbc1829566b915d7fe77072f3547b51280847fd26c889da7ec11d",
+        "human_share_in_sample": 1.0,
+        "min_argument_chars": 200,
+        "min_human_share": 0.2,
+        "n_human_in_sample": 500,
+        "sample_n": 500,
+        "samples": [
+          {
+            "human_or_machine": "human",
+            "labels": [
+              "14"
+            ],
+            "pid": "chartqa_test_000000",
+            "query_head": "How many food item is shown in the bar graph?"
+          },
+          {
+            "human_or_machine": "human",
+            "labels": [
+              "0.57"
+            ],
+            "pid": "chartqa_test_000001",
+            "query_head": "What is the difference in value between Lamb and Corn?"
+          },
+          {
+            "human_or_machine": "human",
+            "labels": [
+              "3"
+            ],
+            "pid": "chartqa_test_000002",
+            "query_head": "How many bars are shown in the chart?"
+          },
+          {
+            "human_or_machine": "human",
+            "labels": [
+              "No"
+            ],
+            "pid": "chartqa_test_000003",
+            "query_head": "Is the sum value of Madagascar more then Fiji?"
+          },
+          {
+            "human_or_machine": "human",
+            "labels": [
+              "23"
+            ],
+            "pid": "chartqa_test_000004",
+            "query_head": "What's the value of the lowest bar?"
+          }
+        ]
+      },
+      "evidence_cid": "e37ed160e6a8493dc5db975161214f76bd113bb6af06116e72ae61d69a67bd0b",
+      "passed": true,
+      "probe_id": "P4_decomposition_argument",
+      "summary": "decomp argument len=1263 (threshold=200; ok=True); human-split share in sample of 500 = 100.0% (threshold=20.0%; ok=True)"
+    }
+  ],
+  "schema": "coordpy.chartqa_preflight_v1.v1",
+  "verdict_cid": "e16ab7f53136a852d4d7835a7857037a104ffd7ca8cb5eaff367a60f61377db9"
+}
