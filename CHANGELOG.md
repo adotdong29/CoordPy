@@ -13,6 +13,79 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W101 second-code-benchmark battlefield tournament + MBPP+ lead selection + cheap NIM-free preflight — 5-candidate × 8-criterion battlefield ranking (MBPP+ LEAD + HumanEval+ BACKUP); arsenal mining of W88 + W91 sidecars via 2,640 offline subprocess re-executions (per-seed numbers match published W89 + W91 byte-for-byte); 4 new explicit-import-only `coordpy.*` modules (loader + executor + reflexion-bench + preflight) + 3 driver scripts + 25 unit tests (all PASS); NIM-free preflight verdict 6 / 8 PASS with 2 DEFERRED on operator MBPP+ fetch step; cheap NIM pilot NOT YET earned — conditional on operator MBPP+ download + SHA pin + preflight re-run clean (2026-05-25)**
+  — *Post-W100 code-pivot infrastructure per `COO-9` and the
+  W101 runbook (`docs/RUNBOOK_W101.md`).  W100's pre-committed
+  Part H code-pivot promoted `COO-9` (second code benchmark
+  battlefield) to the lead path when both B2 (frontier lead)
+  and B5 (baseline-only ceiling reference) FAILed 90B Phase 2
+  on RealWorldQA.  W101 executes the COO-9 charter end-to-end
+  with no NIM spend.  **Battlefield selection** (locked BEFORE
+  any code built): 5-candidate × 8-criterion matrix in
+  `docs/RESULTS_W101_BATTLEFIELD_SELECTION_V1.md`; **MBPP+**
+  chosen as LEAD because it surgically attacks the live
+  `W91-L-MBPP-REFLEXION-V2-5SEED-PARTIAL-CAP` via EvalPlus's
+  ~35× more hidden tests per problem; **HumanEval+** kept as
+  BACKUP (built only if MBPP+ preflight FAILs); APPS /
+  LiveCodeBench / SWE-bench-lite explicitly out of scope.
+  **Arsenal mining**: `scripts/run_w101_arsenal_mining.py`
+  re-executes 2,640 W88 + W91 candidate responses offline
+  against the canonical W86 / W90 subprocess executors;
+  produces per-(seed, task_id, arm) cluster surface
+  (a1_only_wins / b_only_wins / shared_wins / shared_fails);
+  per-seed pass rates match published W89 + W91 byte-for-byte
+  (cross-validates the existing audit chain).  Structural
+  findings: reflexion-rescue surface is 2.5× richer on
+  HumanEval (9.76 %) than on base MBPP (3.97 %) — the empirical
+  symptom of the ceiling-saturation cap MBPP+ relieves; MBPP
+  shared-fails cluster (14.0 % of problem-seeds) is 2.5×
+  larger than HumanEval (5.6 %), and many of those will
+  surface to the failure-residual B can attack once EvalPlus
+  extra tests are applied.  **Infrastructure (all explicit-
+  import only)**: `coordpy/mbpp_plus_loader_v1.py` (SHA-pinned
+  canonical EvalPlus release URL; refuses to operate against
+  the all-zeros placeholder pin per the W93 discipline),
+  `coordpy/mbpp_plus_executor_v1.py` (subprocess CPython
+  executor running candidate against base + plus assertions in
+  a single pass; three modes — base_and_plus / base_only /
+  plus_only),  `coordpy/mbpp_plus_reflexion_bench_v1.py`
+  (A0 / A1 / B reflexion bench; W89 sequential-reflexion
+  mechanism byte-identical), `coordpy/mbpp_plus_preflight_v1.py`
+  (W93 5-gate + W101-specific AddrW101 probes).  **NIM-free
+  preflight**: `scripts/run_w101_mbpp_plus_preflight.py` writes
+  structured verdict to `results/w101/mbpp_plus_preflight/<RUN>/verdict.json`;
+  **6 / 8 probes PASS** (P3 predicts MBPP+ A1@K=5 = 69.97 %
+  with saturation margin 20.03 pp; P4 decomposition argument
+  1727 chars; AddrW101-P1 W89 rescue fraction 9.76 % ≥ 5 %
+  threshold; AddrW101-P2 both partitions well-formed;
+  AddrW101-P3 cross-bench margin 20.03 pp ≥ 10 pp floor;
+  AddrW101-P4 no `bounded_window` / `compaction` / `summary`
+  tokens in the W101 bench module); **2 DEFERRED** (P1 corpus
+  integrity + P2 executor self-test on canonical solutions;
+  both gated on operator MBPP+ fetch + SHA pin recording).
+  **Cheap pilot NOT YET earned** — `scripts/run_w101_mbpp_plus_pilot.py`
+  is built and gated on preflight re-run clearing P1 + P2;
+  approximate budget when authorised: 330 NIM calls × 70B;
+  ~2-3 h wall.  **Pre-committed Phase 2 gates** (locked BEFORE
+  any NIM call): W95 9-gate shape + MLB-1 (reflexion-cycle
+  invocation rate ≥ 33 %) + MLB-2 (reflexion rescue rate ≥
+  33 %) sub-gates per the W100 lesson; a B PASS with MLB-2
+  < 33 % is downgraded to `PASS_NON_MECHANISM_DRIVEN` per
+  W96-C / W100 precedent.  **Carry-forwards retired**: NONE;
+  W89 70B HumanEval K=5 remains the only confirmed multi-seed
+  same-budget multi-agent superiority retirement.  **Carry-
+  forwards added**: NONE this milestone (W101 is infrastructure
+  + preflight; no empirical NIM result yet).  **Discipline
+  validation #11**: W93 / W94 / W95 / W96-A / W96-C / W96-D /
+  W97 / W98 / W99 / W100 / **W101**.  Stable boundary
+  preserved: `coordpy.__version__ == 0.5.20`, `coordpy.SDK_VERSION
+  == coordpy.sdk.v3.43`, no PyPI publish, `coordpy/__init__.py`
+  untouched.  All 4 new modules are explicit-import only.  25
+  unit tests added; all PASS.  Linear: created `COO-25`; posted
+  W101 verdict comment to `COO-6`, `COO-9`, `COO-25`; appended
+  W101 entry to `linear_github_mapping.json` (now 12
+  milestones).*
+
 - **W100 RealWorldQA cross-scale 90B Phase 2 confirmation — B2 (frontier lead) FAILS by −3.33 pp with MLB-2 sub-gate also FAILING (clean cross-scale collapse matching W96-C C1); B5 (baseline-only ceiling reference) narrowly MISSES by +1.67 pp; pre-committed Part H code-pivot contingency triggers `COO-9` (second code benchmark) promotion to lead path; cross-modal RealWorldQA arc FROZEN AT 11B; Phase 3 NOT launched; W99 11B carry-forwards STAND unchanged with new W100 cross-scale-bound qualifier carry-forwards added (2026-05-25)**
   — *Post-W99 cross-scale confirmation per `COO-24` and
   the W100 runbook (`docs/RUNBOOK_W100.md`).  The candidate

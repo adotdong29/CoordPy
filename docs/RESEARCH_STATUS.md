@@ -9,7 +9,29 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W100
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W101
+> second-code-benchmark battlefield tournament + MBPP+ lead
+> selection + cheap NIM-free preflight** on 2026-05-25 — per
+> the W100 Part H code-pivot contingency, `COO-9` is now the
+> lead path; W101 executes the COO-9 charter end-to-end
+> (5-candidate × 8-criterion battlefield ranking →
+> **MBPP+ LEAD + HumanEval+ BACKUP**; arsenal mining of W88 +
+> W91 sidecars via offline subprocess re-execution = 2,640
+> calls, per-seed numbers match published W89 + W91 byte-for-
+> byte; MBPP+ loader + executor + reflexion-bench + preflight
+> harness all built as explicit-import-only modules; NIM-free
+> preflight verdict **6 / 8 PASS with 2 DEFERRED** on
+> operator MBPP+ fetch step; cheap NIM pilot NOT YET earned —
+> conditional on operator authorising MBPP+ download + SHA
+> pin then re-running preflight clean).  **No NIM call in
+> W101.**  No version bump; no PyPI publish; `coordpy/__init__.py`
+> untouched; 4 new explicit-import-only modules + 3 new
+> driver scripts + 25 unit tests (all PASS) added.
+> Preflight-first + cross-scale + multi-candidate-tournament-
+> then-confirm + mechanism-load-bearingness discipline
+> validated **11 consecutive times** (W93 / W94 / W95 /
+> W96-A / W96-C / W96-D / W97 / W98 / W99 / W100 /
+> **W101**).  Last empirical NIM-spending verdict: **W100
 > RealWorldQA cross-scale 90B Phase 2 confirmation** on
 > 2026-05-25 — **B2 (frontier lead) FAILS by −3.33 pp AT 90B
 > with mechanism-load-bearingness sub-gate MLB-2 ALSO FAILING
@@ -134,6 +156,142 @@ vs. what would constitute solving" bar.
 Any claim in any other doc, paper draft, demo, or external
 pitch that the programme has *solved* multi-agent context is
 overstatement and is rejected by this file.
+
+## TL;DR — W101 second-code-benchmark battlefield tournament + MBPP+ lead selection + cheap NIM-free preflight (COO-9 charter executed end-to-end; cheap pilot conditional on operator MBPP+ fetch)
+
+W101 is the **post-W100 code-pivot infrastructure** milestone.
+Per the pre-committed Part H of ``docs/RUNBOOK_W100.md``,
+`COO-9` (second code benchmark battlefield) was promoted to the
+lead path when W100 confirmed BOTH B2 (frontier lead) and B5
+(baseline-only ceiling reference) FAIL the +5 pp Phase 2 bar at
+90B on RealWorldQA.  W101 executes the COO-9 charter end-to-end.
+
+**No NIM call in W101.**  The empirical preflight verdict
+(6 / 8 probes PASS; 2 DEFERRED on operator MBPP+ fetch) licenses
+the *next* operator step (fetch the EvalPlus MBPP+ release
+artifact + record its SHA pin + re-run preflight) and the cheap
+NIM pilot is conditional on the preflight re-run clearing
+P1 + P2.
+
+### W101 battlefield-selection ranking (locked BEFORE any code built)
+
+5-candidate × 8-criterion ranking matrix in
+``docs/RESULTS_W101_BATTLEFIELD_SELECTION_V1.md``:
+
+| Candidate | Verdict | Reason |
+|---|---|---|
+| **MBPP+** | **LEAD** | A-grade on every criterion except 1; surgically attacks the live ``W91-L-MBPP-REFLEXION-V2-5SEED-PARTIAL-CAP`` via EvalPlus's ~35× more hidden tests per problem |
+| **HumanEval+** | **BACKUP** | Same EvalPlus family; trivial port; built only if MBPP+ preflight FAILs |
+| APPS | Out of scope | C-grade stack on infra cost; reserved for post-MBPP+ |
+| LiveCodeBench | Out of scope | Time-anchored harness complexity above W101 envelope |
+| SWE-bench-lite | Out of scope | F-grade on decomposition fit + cheap-pilot cost |
+
+### W101 arsenal-mining via offline sidecar re-execution
+
+``scripts/run_w101_arsenal_mining.py`` re-executed 2,640
+candidate responses (W88 70B HumanEval + W91 5-seed 70B MBPP)
+against the canonical W86 / W90 subprocess executors offline.
+Per-seed numbers match the published W89 + W91 result docs
+byte-for-byte.
+
+| Bench | A0 | A1@K=5 | B | B−A1 (pp) | b-only / total B wins | Rescue fraction |
+|---|---:|---:|---:|---:|---:|---:|
+| W89 HumanEval-70B (3×30) | 46.67 % | 85.56 % | 91.11 % | **+5.56** | 8 / 82 | **9.76 %** |
+| W91 MBPP-70B (5×30) | 75.33 % | 82.67 % | 84.00 % | **+1.33** | 5 / 126 | **3.97 %** |
+
+**Structural findings**: reflexion-rescue surface is 2.5×
+richer on HumanEval than on base MBPP (the empirical symptom
+of the ceiling-saturation cap MBPP+ relieves); hard-cluster
+size scales with ceiling-control (MBPP shared-fails 14 % vs
+HumanEval 5.6 %).
+
+### W101 NIM-free preflight verdict (6 / 8 PASS; 2 DEFERRED)
+
+| Probe | Verdict | Summary |
+|---|---|---|
+| P1 corpus integrity | **DEFERRED** | MBPP+ cache absent; operator step |
+| P2 executor self-test | **DEFERRED** | same gate as P1 |
+| P3 A1@K=5 failure-residual | **PASS** | Predicted MBPP+ A1@K=5 = **69.97 %**; saturation margin **20.03 pp** |
+| P4 decomposition argument | **PASS** | 1727 chars; W89 retirement as precedent |
+| AddrW101-P1 mechanism-load-bearing | **PASS** | W89 rescue 9.76 %; threshold ≥ 5 % |
+| AddrW101-P2 cluster structure | **PASS** | Both partitions well-formed |
+| AddrW101-P3 cross-bench stability | **PASS** | Margin 20.03 pp; floor 10 pp |
+| AddrW101-P4 anti-pattern guard | **PASS** | No `bounded_window` / `compaction` / `summary` tokens |
+
+**Decision (per pre-committed runbook branch 1)**: cheap NIM
+pilot NOT YET earned.  Operator step required: fetch MBPP+ +
+record SHA pin + re-run preflight.  When P1 + P2 PASS at
+re-run, launch ``scripts/run_w101_mbpp_plus_pilot.py`` at 1
+seed × 30 problems × K=5 (~ 330 NIM calls; ~ 2-3 h wall at
+70B).
+
+### W101 deliverables (all explicit-import only)
+
+* `coordpy/mbpp_plus_loader_v1.py` — MBPP+ corpus loader with
+  SHA-pinned canonical EvalPlus release URL; refuses to operate
+  against the all-zeros placeholder pin (W93 preflight-first
+  discipline).
+* `coordpy/mbpp_plus_executor_v1.py` — subprocess CPython
+  executor running candidate against (base + plus) assertions;
+  three modes (base_and_plus / base_only / plus_only) for the
+  cross-bench-stability probe.
+* `coordpy/mbpp_plus_reflexion_bench_v1.py` — A0 / A1 / B
+  reflexion bench; W89 sequential-reflexion mechanism byte-
+  identical; per-call sidecars + per-seed Merkle + bench Merkle
+  re-derivation preserved.
+* `coordpy/mbpp_plus_preflight_v1.py` — W93 5-gate + W101-
+  specific AddrW101 probes.
+* `scripts/run_w101_arsenal_mining.py` — offline sidecar
+  re-executor.
+* `scripts/run_w101_mbpp_plus_preflight.py` — preflight runner.
+* `scripts/run_w101_mbpp_plus_pilot.py` — conditional cheap-
+  pilot driver (NIM-spending; gated on preflight P1+P2 PASS at
+  re-run).
+* `tests/test_w101_mbpp_plus_v1.py` — 25 unit tests; all PASS.
+
+### Carry-forwards
+
+**Added**: None this milestone (W101 is infrastructure +
+preflight; no empirical NIM result has been produced yet).  The
+W101 result docs list *candidate* carry-forward IDs that the
+cheap pilot would add: `W101-L-MBPP-PLUS-REFLEXION-PHASE2-70B-CAP`,
+`W101-L-MBPP-PLUS-PREFLIGHT-P3-SATURATION-CAP`,
+`W101-L-MBPP-PLUS-MLB-2-NON-MECHANISM-DRIVEN-CAP`.
+
+**Retired**: None.  W89 70B HumanEval K=5 remains the only
+confirmed multi-seed same-budget multi-agent superiority
+retirement.
+
+### Frontier-audit reclassifications
+
+* **Active frontier (NEWLY added)**: the 4 W101 modules + the
+  W101 arsenal-mining script + the W101 multi-candidate-
+  tournament discipline + ``COO-9`` (NEWLY promoted to lead).
+* **Baseline-only (NEWLY classified)**: base MBPP via
+  ``coordpy.mbpp_reflexion_bench_v1`` (the W91 cap is empirical;
+  MBPP+ is the structural fix).
+* **Dead direction (NEWLY classified)**: base MBPP at K=5 same-
+  budget at 70B for retirement.
+* **Anti-pattern column**: UNCHANGED VERBATIM from W100.
+
+### Discipline status
+
+Preflight-first + cross-scale + multi-candidate-tournament-
+then-confirm + mechanism-load-bearingness discipline validated
+**ELEVEN consecutive times**: W93 / W94 / W95 / W96-A / W96-C /
+W96-D / W97 / W98 / W99 / W100 / **W101**.  W101's distinguishing
+addition is the **codified battlefield-selection matrix** (the
+W94 / W96-D rubric was implicit; W101 makes it explicit) plus
+the **offline-sidecar-re-execution arsenal-mining infrastructure**
+that re-derives the W89 / W91 published per-seed numbers byte-
+for-byte without any new NIM calls.
+
+### Stable boundary preserved
+
+``coordpy.__version__ == 0.5.20``; ``coordpy.SDK_VERSION ==
+coordpy.sdk.v3.43``; no PyPI publish; ``coordpy/__init__.py``
+untouched.  All 4 new ``coordpy.*`` modules are explicit-import
+only.  The 3 new driver scripts are NOT library modules.
 
 ## TL;DR — W100 RealWorldQA cross-scale 90B Phase 2 confirmation (B2 + B5 BOTH FAIL; COO-9 PROMOTED)
 
