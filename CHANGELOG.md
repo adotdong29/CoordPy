@@ -13,6 +13,58 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W97 RealWorldQA D2-B0 Phase 2 cheap pilot — 11B FAILs 3 of 9 gates; informative failure-mode mining; frontier relevance audit + extended arsenal mining + W97 runbook lock + cheap pilot at $1-2 NIM spend; no carry-forward retirement; no Phase 3 launch (2026-05-25)**
+  — *Post-W96-D follow-on per `COO-21` and the
+  W97 runbook (`docs/RUNBOOK_W97.md`).  Frontier-relevance
+  audit (`docs/FRONTIER_RELEVANCE_AUDIT_W97_V1.md`) classified
+  every in-repo mechanism as active-frontier / baseline-only /
+  historical-artifact / dead-direction / anti-pattern;
+  bounded-window baselines, compaction, generic prose
+  summarization, and shallow token compression are explicitly
+  classified as **anti-patterns when promoted to core
+  strategy** (kept in-repo only as falsifier targets).
+  Extended arsenal mining
+  (`docs/RESULTS_W97_ARSENAL_MINING_V1.md`) selected D2-B0
+  (W95-B0 scene-port) as the preflight-earned lead and
+  sketched D2-B1 (structured scene-graph extraction) as the
+  documented architectural refinement, deferred to W97-B.
+  **D2-B0 Phase 2 at 11B** (`lmms-lab/RealWorldQA` test slice
+  seed `96_504_002`; 30 problems × K=5; 330 NIM calls; 584 s
+  wall): A0=36.67 %, A1@K=5=90.00 %, B=83.33 %;
+  **B − A1 = −6.67 pp (gate 4 FAIL)**; A1 saturated at 90 %
+  (gate 2 FAIL); B does not strictly beat A1 (gate 3 FAIL).
+  Gates 1, 5–9 PASS — including B − A0 = +46.67 pp (image
+  extraction is real signal) and B ≥ A1 on 25 / 30 problems
+  (per-problem majority).  Per-problem disagreement structure
+  is structurally informative: 5 unique-A1-rescues on
+  vision-bound yes/no / state / depth questions (e.g., "Is
+  the light green?", "are the cars facing left?", "Is the
+  large truck closer than the pickup?") vs 3 unique-B-rescues
+  on multi-choice spatial questions (e.g., "Which direction
+  is the vehicle traveling?", "Which direction is the gun
+  facing?") — exactly the failure-mode profile the D2-B1
+  scene-graph schema was sketched to attack.  Per the W96-C
+  cross-scale rule, 90B Phase 2 does NOT auto-launch (11B
+  FAIL; 90B A1@K=5 estimated ≥ 90 % on this slice, almost
+  certainly failing gate 2 again).  Adds carry-forward
+  `W97-L-REALWORLDQA-D2-B0-PHASE2-11B-CAP`.  Bench Merkle
+  `c2454c7fee69fec7e5f80efc0dcec9a82b2c2f839186e1d92f0cf4877bb0e234`;
+  Seed Merkle
+  `96c3337354c6522e46c2ddba1ecb6d415d71e4a89de60fa91597b76c7e8efb55`.
+  Added modules: `coordpy.realworldqa_bench_v1`
+  (explicit-import only).  Added scripts:
+  `scripts/run_w97_realworldqa_smoke.py`,
+  `scripts/run_w97_realworldqa_pilot.py`.  Added tests:
+  `tests/test_w97_realworldqa_v1.py` (12 tests, all PASS).
+  Discipline validation #7
+  (W93 / W94 / W95 / W96-A / W96-C / W96-D / W97):
+  preflight-first + cross-scale rule again caught a structural
+  asymmetry at the cheap scale, preventing an estimated $5-10
+  90B Phase 2 spend that was structurally pre-empted.
+  `coordpy.__version__` unchanged at `0.5.20`;
+  `coordpy.SDK_VERSION` unchanged at `coordpy.sdk.v3.43`; no
+  PyPI publish; `coordpy/__init__.py` untouched.*
+
 - **W96-D cross-modal battlefield pivot — ChartQA preflight FAIL at both 11B and 90B by P3 saturation; RealWorldQA preflight PASS at both 11B and 90B with all 9 composite gates clearing; D2 (RealWorldQA) preflight-earned for Phase 2 cheap pilot; no NIM spend (2026-05-25)**
   — *Post-W96-C battlefield pivot per `COO-20` and the
   W96-D runbook (`docs/RUNBOOK_W96D.md`).  Arsenal-mining
