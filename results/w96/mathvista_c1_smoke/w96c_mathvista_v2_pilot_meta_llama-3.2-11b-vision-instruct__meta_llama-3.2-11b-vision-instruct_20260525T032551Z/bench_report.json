@@ -1,0 +1,68 @@
+{
+  "K_multi_sample": 5,
+  "a0_text_mean_pass_at_1": 1.0,
+  "a1_vlm_mean_pass_at_1": 0.0,
+  "b_beats_a0_text_per_seed": [
+    false
+  ],
+  "b_beats_a1_vlm_per_seed": [
+    true
+  ],
+  "b_mean_minus_a0_text_mean_pp": 0.0,
+  "b_mean_minus_a1_vlm_mean_pp": 100.0,
+  "b_mean_strictly_beats_a0_text_mean": false,
+  "b_mean_strictly_beats_a1_vlm_mean": true,
+  "b_vlm_team_v2_mean_pass_at_1": 1.0,
+  "bench_merkle_root": "b7408b15b22eae4d26265e51f7845390d15a40eeaa095adbe6d57544148aa8ee",
+  "corpus_merkle_root": "dea27472fc12e697b1bb708d62dd4072662dcc7edd36bf89c9a9a3c6946101d5",
+  "corpus_parquet_sha256": "373f6c0b412a9be2cec36711cee724e03f4c5db6908f3c13db903aa9694d4f2d",
+  "n_b_ge_a1_problems_per_seed": [
+    1
+  ],
+  "n_problems": 1,
+  "n_seeds": 1,
+  "n_text_only_passes_per_seed": [
+    1
+  ],
+  "n_verifier_rescues_per_seed": [
+    0
+  ],
+  "per_seed": [
+    {
+      "a0_text_pass_at_1": 1.0,
+      "a0_text_total_wall_ms": 484,
+      "a1_vlm_pass_at_1": 0.0,
+      "a1_vlm_total_wall_ms": 7434,
+      "b_vlm_team_pass_at_1": 1.0,
+      "b_vlm_team_total_wall_ms": 16226,
+      "n_problems": 1,
+      "outcome_cids": [
+        "0daf08d2cfb868052d3c8ef64ff6e3142575cd509daddbf7984a24be8282ac8b",
+        "5799e7a611c07e6c7664edb7a695f1ec1ba816a17f43d406fe1d3f6e925bc20a",
+        "9ed5517862fd9f945c28891492cfd72152e3b5afe8d2e1ca47d207af5edf97e4"
+      ],
+      "per_problem_outcomes": [
+        {
+          "a0_outcome_cid": "0daf08d2cfb868052d3c8ef64ff6e3142575cd509daddbf7984a24be8282ac8b",
+          "a0_text_passed": true,
+          "a1_outcome_cid": "5799e7a611c07e6c7664edb7a695f1ec1ba816a17f43d406fe1d3f6e925bc20a",
+          "a1_vlm_passed": false,
+          "answer_type": "integer",
+          "b_outcome_cid": "9ed5517862fd9f945c28891492cfd72152e3b5afe8d2e1ca47d207af5edf97e4",
+          "b_text_only_passed": true,
+          "b_verifier_rescued": false,
+          "b_vlm_team_v2_passed": true,
+          "gold_answer": "3",
+          "pid": "131",
+          "question_type": "free_form"
+        }
+      ],
+      "schema": "coordpy.mathvista_bench_v2.v2",
+      "seed": 95005001,
+      "seed_merkle_root": "59722efaefbab02e926bfdfc65f2b9487e5eff822ec20c97986ebfe0329b867e"
+    }
+  ],
+  "schema": "coordpy.mathvista_bench_v2.v2",
+  "text_model_id": "meta/llama-3.2-11b-vision-instruct",
+  "vlm_model_id": "meta/llama-3.2-11b-vision-instruct"
+}

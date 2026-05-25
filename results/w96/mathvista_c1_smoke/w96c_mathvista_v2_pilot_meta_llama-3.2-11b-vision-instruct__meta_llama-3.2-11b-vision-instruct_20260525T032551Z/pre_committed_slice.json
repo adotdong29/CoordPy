@@ -1,0 +1,15 @@
+{
+  "n_problems_per_seed": 1,
+  "n_seeds": 1,
+  "schema": "coordpy.w96c_pre_committed_slices.v1",
+  "slices": [
+    {
+      "n_problems": 1,
+      "pids": [
+        "131"
+      ],
+      "seed": 95005001,
+      "slice_sha256": "eeca91fd439b6d5e827e8fda7fee35046f2def93508637483f6be8a2df7a4392"
+    }
+  ]
+}
