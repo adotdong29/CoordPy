@@ -13,6 +13,51 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W96-A MathVista at Llama-3.2-90B-Vision — Phase 2 cheap pilot 9/9 gates PASS (B − A1 = +10.00 pp, byte-equivalent to W95 11B Phase 2); Phase 3 retirement bench 3/6 W88 bars FAIL (B − A1 = −5.00 pp at 3 × 100 × K=5; scaling the VLM 11B → 90B HURTS the team by an 8.67 pp cross-scale shift); NOT retirement; H2-saturation empirically confirmed at multi-seed (2026-05-24)**
+  — *Two runs on `meta/llama-3.2-90b-vision-instruct` via NIM
+  on the SAME deterministic slices as W95 (parquet SHA
+  `373f6c0b…`, corpus Merkle `dea27472fc12…`).  Phase 2 at
+  1 seed × 30 problems × K=5 (slice SHA `6d3a07eb2b1dac9d…`,
+  byte-identical to W95 Phase 2): A0 = 33.33 %, A1 = 63.33 %,
+  B = 73.33 %, B − A1 = **+10.00 pp** (bit-equal to W95 11B
+  Phase 2), B − A0 = +40.00 pp, B ≥ A1 on 27 / 30 problems.
+  All 9 pre-committed Phase 2 gates PASS; audit chain
+  re-derives 14 / 14 PASS.  Phase 3 at 3 seeds × 100 problems
+  × K=5 (slice SHAs `1569e2fa65e35cd6…` /
+  `34d14d7496e98e1c…` / `c74e78b87709ad46…`, byte-identical
+  to W95 Phase 3): A0 = 28.00 %, A1 = 71.33 %, B = 66.33 %,
+  **B − A1 = −5.00 pp** (cross-seed mean), B − A0 = +38.33 pp;
+  per-seed B − A1 = +4.00 / −7.00 / −12.00 pp; B beats A1 on
+  1 / 3 seeds.  3 of 6 W88 retirement bars FAIL (bars 2, 4, 6);
+  bars 1, 3, 5, 7, 8, 9 PASS; audit chain re-derives 11 / 14
+  PASS offline.  Bench Merkle root (Phase 3):
+  `899c213a2755b26c…`.  Cross-scale shift on B − A1 from W95
+  Phase 3 at 11B (+3.67 pp) to W96-A Phase 3 at 90B
+  (−5.00 pp) is **−8.67 pp**, uniformly negative across all 3
+  seeds (−2 / −17 / −7 pp per-seed shift).  At 90B, A1
+  unified-VLM K=5 climbs 3.67 pp (67.67 → 71.33 %) and B
+  loses 5.00 pp on the same problems; the 90B-only A1-only-
+  rescue count rises 12 problems while the 90B-only
+  B-only-rescue count falls 14 problems.  Adds carry-
+  forwards `W96-L-MATHVISTA-90B-PILOT-SINGLE-SEED-CAP` and
+  `W96-L-MATHVISTA-90B-RETIREMENT-MARGIN-CAP`; W89
+  70B-HumanEval-K=5 remains the only confirmed multi-seed
+  same-budget multi-agent superiority retirement.  W96-A
+  empirically rules out the "scale the VLM" lever for closing
+  the MathVista margin gap; W96-C (architecture refinement
+  per `COO-19`) becomes the next move.  `coordpy.__version__`
+  unchanged at `0.5.20`; `coordpy.SDK_VERSION` unchanged at
+  `coordpy.sdk.v3.43`; no PyPI publish; no new core modules
+  added; one new ops script `scripts/run_w96a_smoke_test.py`.
+  Docs: `docs/RUNBOOK_W96A.md`,
+  `docs/RESULTS_W96A_MATHVISTA_90B_PILOT_V1.md`,
+  `docs/RESULTS_W96A_MATHVISTA_90B_PHASE3_V1.md`.  Run dirs:
+  `results/w96/mathvista_preflight_90b/20260524T225827Z/`,
+  `results/w96/mathvista_smoke_90b/20260524T230110Z/`,
+  `results/w96/mathvista_90b_phase2/.../20260524T230158Z/`,
+  `results/w96/mathvista_90b_phase3/.../20260524T232931Z/`.
+  Linear: `COO-17` (W96-A) under `COO-6` backlog.*
+
 - **W95 MathVista Phase 3 retirement-grade bench — 5/6 W88 retirement bars PASS; bar 4 narrowly misses (+3.67 pp vs +5 pp margin); NOT retirement; preflight-first discipline validated for the third time (2026-05-24)**
   — *3 seeds × 100 problems × K=5 × `meta/llama-3.2-11b-vision-instruct`
   via NIM on the deterministic pre-committed slices of

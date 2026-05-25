@@ -91,6 +91,29 @@
         "W95-L-MATHVISTA-PILOT-SINGLE-SEED-CAP",
         "W95-L-MATHVISTA-RETIREMENT-MARGIN-CAP"
       ]
+    },
+    {
+      "id": "W96-A",
+      "title": "MathVista at 90B-Vision: preflight + Phase 2 cheap pilot (9/9 gates PASS; +10pp, byte-equiv to 11B) + Phase 3 retirement bench (3/6 W88 bars FAIL; B-A1 = -5.00pp; scaling 11B->90B HURTS the team; NOT retirement)",
+      "outcome": "PHASE 3 DECISIVE NEGATIVE — A0=28.00% / A1=71.33% / B=66.33%; B-A1=-5.00pp (vs +5pp bar); B-A0=+38.33pp; per-seed B-A1=[+4,-7,-12]; B>A1 on 1/3 seeds; B>=A1 on 255/300 problems (85%); 11/14 audit re-derivations PASS offline; only 3 retirement-margin bars FAIL by sign/margin. Cross-scale shift on B-A1 = -8.67pp (11B +3.67pp -> 90B -5.00pp); H2-saturation empirically confirmed at multi-seed retirement scale; scaling the VLM weight class does NOT retire the cross-modal carry-forward.",
+      "commits": [
+        "8b5db54",
+        "1a2522d",
+        "b5778af"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W96A.md",
+        "docs/RESULTS_W96A_MATHVISTA_90B_PILOT_V1.md",
+        "docs/RESULTS_W96A_MATHVISTA_90B_PHASE3_V1.md"
+      ],
+      "linear_issues": [
+        "COO-17"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W96-L-MATHVISTA-90B-PILOT-SINGLE-SEED-CAP",
+        "W96-L-MATHVISTA-90B-RETIREMENT-MARGIN-CAP"
+      ]
     }
   ]
 }
