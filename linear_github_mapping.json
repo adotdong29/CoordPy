@@ -116,6 +116,23 @@
         "W96-L-MATHVISTA-90B-PILOT-SINGLE-SEED-CAP",
         "W96-L-MATHVISTA-90B-RETIREMENT-MARGIN-CAP"
       ]
+    },
+    {
+      "id": "W96-C",
+      "title": "MathVista C1 (VLM-Verifier-Final-Turn) cheap preflight + cross-scale Phase 2 cheap pilot (pre-NIM lock + 11B Phase 2 in flight; 90B Phase 2 conditional on 11B PASS)",
+      "outcome": "PRE-NIM LOCK + CHEAP PREFLIGHT PASS — V2 bench module forked from V1; vlm_reader + 3 text solver + vlm_verifier_final at byte-exact K=5; selection rule preserves W95-B0 wins (text-only PASS short-circuits) and rescues A1-only territory (verifier ships when text-only all FAIL). Preflight composite PASS at 11B (verdict_cid 29345745...) and 90B (verdict_cid b8c75cfc...). Q4 turn-4 upper-bound 21.79% (low downside; 90 of 413 W95-B0 passes); Q5 A1-only rescue pool 13.0% (sizeable upside; 78 of 600 pairs). 11B Phase 2 pilot in flight at commit time.",
+      "commits": [
+        "63ccd29"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W96C.md",
+        "docs/RESULTS_W96C_ARSENAL_MINING_V1.md"
+      ],
+      "linear_issues": [
+        "COO-19"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": []
     }
   ]
 }
