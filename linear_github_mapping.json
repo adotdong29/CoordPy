@@ -234,6 +234,31 @@
         "W99-L-REALWORLDQA-B4-TYPED-SCHEMA-WITHOUT-HINT-PHASE2-11B-FAIL-CAP",
         "W99-L-REALWORLDQA-TYPED-EXTRACT-THEN-REASON-SUBFAMILY-EMPIRICALLY-CAPPED-AT-11B-CAP"
       ]
+    },
+    {
+      "id": "W100",
+      "title": "RealWorldQA cross-scale 90B Phase 2 confirmation: B2 (frontier lead) FAILS by -3.33pp with mechanism-load-bearingness sub-gate MLB-2 also FAILING (clean cross-scale collapse matching W96-C C1); B5 (baseline-only ceiling reference) narrowly MISSES gate 4 by +1.67pp short of bar; pre-committed Part H code-pivot contingency triggers COO-9 (second code benchmark) promotion to lead path; cross-modal RealWorldQA arc FROZEN AT 11B; Phase 3 NOT launched",
+      "outcome": "BOTH 90B Phase 2 pilots FAIL. B2 90B Phase 2: A0=46.67/A1@K=5=76.67/B2=73.33 / B-A1=-3.33pp / gates 3+4 FAIL / MLB-2 FAILS (final-VLM rescue rate 1/9=11.11% vs 11B 3/3=100%); MLB-1 PASS (invocation 30%); cross-scale shift -10pp; 22/30 both-pass with W99 11B, 0 new wins, 8 new losses; clean cross-scale collapse pattern matching W96-C C1 verifier. B5 90B Phase 2: A0=46.67/A1@K=5=80/B5=83.33 / B-A1=+3.33pp / 8/9 gates PASS (gate 4 alone fails); per-route vlm_team_b0(D2-B0) 14/18=77.8% (down from 18/18 at 11B; W95-B0 cross-scale fragility on multi-choice), a1_vlm_k5 11/12=91.7%; cross-scale shift -3.33pp; B5 stays classified baseline-only. NIM-free preflight reused W99 90B verdict cid 0bacd989... at /bin/zsh NIM; AddrW100-B2-P5 + AddrW100-B5-P4 cross-scale-stability probes both PASSed before any 90B NIM call. COO-9 PROMOTED to lead path; W101 charter = COO-9 runbook + corpus selection from {MBPP+, HumanEval+, APPS, LiveCodeBench, SWE-bench-lite}. Discipline validation #10 (W93-W100 preflight-first + cross-scale + new MLB sub-gates + multi-candidate-tournament-then-confirm). Stable boundary preserved. ZERO new coordpy.* modules introduced.",
+      "commits": [
+        "2383e6e"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W100.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W100_V1.md",
+        "docs/RESULTS_W100_REALWORLDQA_B2_PHASE2_90B_V1.md",
+        "docs/RESULTS_W100_REALWORLDQA_B5_PHASE2_90B_V1.md",
+        "docs/RESULTS_W100_MILESTONE_SUMMARY_V1.md"
+      ],
+      "linear_issues": [
+        "COO-24"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W100-L-REALWORLDQA-B2-DIRECT-VISION-FINAL-TURN-PHASE2-90B-CAP",
+        "W100-L-REALWORLDQA-B2-CROSS-SCALE-COLLAPSE-MECHANISM-NON-LOAD-BEARING-AT-90B-CAP",
+        "W100-L-REALWORLDQA-B5-SWITCH-BASELINE-90B-NARROW-MISS-CAP",
+        "W100-L-REALWORLDQA-W95-B0-D2-B0-MULTI-CHOICE-EXTRACTION-DEGRADES-CROSS-SCALE-CAP"
+      ]
     }
   ]
 }
