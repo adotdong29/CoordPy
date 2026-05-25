@@ -259,6 +259,27 @@
         "W100-L-REALWORLDQA-B5-SWITCH-BASELINE-90B-NARROW-MISS-CAP",
         "W100-L-REALWORLDQA-W95-B0-D2-B0-MULTI-CHOICE-EXTRACTION-DEGRADES-CROSS-SCALE-CAP"
       ]
+    },
+    {
+      "id": "W101",
+      "title": "Second-code-benchmark battlefield tournament + MBPP+ lead selection + cheap NIM-free preflight: 5-candidate x 8-criterion battlefield ranking (MBPP+ LEAD + HumanEval+ BACKUP); arsenal mining of W88+W91 sidecars via 2640 offline subprocess re-executions; 4 new explicit-import-only coordpy.* modules (loader+executor+reflexion-bench+preflight) + 3 driver scripts + 25 unit tests (all PASS); NIM-free preflight verdict 6/8 PASS with 2 DEFERRED on operator MBPP+ fetch; cheap NIM pilot NOT YET earned (conditional on operator MBPP+ download + SHA pin + preflight re-run clean)",
+      "outcome": "INFRASTRUCTURE + PREFLIGHT — COO-9 charter executed end-to-end with NO NIM call. Battlefield selection (locked BEFORE any code built): MBPP+ chosen as LEAD (EvalPlus's hardened MBPP; ~35x more hidden tests per problem; surgical attack on W91-L-MBPP-REFLEXION-V2-5SEED-PARTIAL-CAP); HumanEval+ BACKUP (built only if MBPP+ preflight FAILs); APPS/LiveCodeBench/SWE-bench-lite explicitly out of scope. Arsenal mining: 2640 W88+W91 candidate responses re-executed offline; per-seed numbers match published W89+W91 byte-for-byte; reflexion-rescue surface 2.5x richer on HumanEval (9.76%) than on base MBPP (3.97%) = empirical symptom of ceiling-saturation cap MBPP+ relieves; MBPP shared-fails cluster (14.0%) 2.5x larger than HumanEval (5.6%). Preflight 6/8 PASS: P3 predicts MBPP+ A1@K=5=69.97% (saturation margin 20.03pp); P4 decomposition argument 1727 chars; AddrW101-P1 W89 rescue 9.76% >= 5% threshold; AddrW101-P2 both partitions well-formed; AddrW101-P3 cross-bench margin 20.03pp >= 10pp floor; AddrW101-P4 no anti-pattern tokens. 2 DEFERRED: P1 corpus integrity + P2 executor self-test (both gated on operator MBPP+ fetch + SHA pin). Cheap pilot NOT YET earned. Pre-committed Phase 2 gates: W95 9-gate + MLB-1 (reflexion-cycle invocation >=33%) + MLB-2 (reflexion rescue rate >=33%) per W100 lesson. NO carry-forwards retired (W89 70B HumanEval K=5 remains the only confirmed multi-seed same-budget multi-agent superiority retirement); NO carry-forwards added (infrastructure + preflight only; no empirical NIM result yet). Discipline validation #11 (W93-W101). Stable boundary preserved. 4 new modules explicit-import only; 25 unit tests all PASS.",
+      "commits": [
+        "e811893"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W101.md",
+        "docs/RESULTS_W101_BATTLEFIELD_SELECTION_V1.md",
+        "docs/RESULTS_W101_ARSENAL_MINING_V1.md",
+        "docs/RESULTS_W101_PREFLIGHT_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W101_V1.md",
+        "docs/RESULTS_W101_MILESTONE_SUMMARY_V1.md"
+      ],
+      "linear_issues": [
+        "COO-25"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": []
     }
   ]
 }
