@@ -1,0 +1,585 @@
+{
+  "addressability_probes": [
+    {
+      "candidate": "B1",
+      "detail": [
+        {
+          "gold": "Yes",
+          "pid": "rwqa_test_000135",
+          "reader_text_head": "* visible objects:\n\t+ cars\n\t+ trucks\n\t+ trees\n\t+ buildings\n\t+ street signs\n\t+ power lines\n\t+ streetlights\n\t+ crosswalks\n\t+ railroad tracks\n* object counts:\n\t+ 1",
+          "recovered_by_typed_prompt": true
+        },
+        {
+          "gold": "No",
+          "pid": "rwqa_test_000403",
+          "reader_text_head": "* visible objects:\n\t+ streetlight\n\t+ traffic light\n\t+ bus\n\t+ car\n\t+ fire hydrant\n\t+ street sign\n\t+ building\n\t+ trees\n\t+ streetlights\n\t+ street signs\n\t+ vehicles",
+          "recovered_by_typed_prompt": false
+        },
+        {
+          "gold": "No",
+          "pid": "rwqa_test_000555",
+          "reader_text_head": "* a silver car is in the center of the image, facing left.\n* a red truck is on the right side of the image, facing right.\n* a red car is on the far right side o",
+          "recovered_by_typed_prompt": true
+        },
+        {
+          "gold": "No",
+          "pid": "rwqa_test_000615",
+          "reader_text_head": "* a road with a white line down the middle, stretching into the distance.\n\t+ the road is empty, with no cars or pedestrians visible.\n\t+ the road is dark, with s",
+          "recovered_by_typed_prompt": true
+        },
+        {
+          "gold": "Yes",
+          "pid": "rwqa_test_000718",
+          "reader_text_head": "* large truck: \n  * location: center of the image\n  * color: dark green\n  * size: larger than the pickup truck\n  * object count: 1\n  * action: stationary\n* pick",
+          "recovered_by_typed_prompt": false
+        }
+      ],
+      "n_recovered": 3,
+      "n_total": 5,
+      "pass_threshold": 3,
+      "passed": true,
+      "probe_id": "AddrP1_typed_prompt_yes_no_recovery_rate",
+      "summary": "3/5 W97 unique-A1-rescues have answer in prose-extractable form (threshold 3/5)"
+    },
+    {
+      "candidate": "B1",
+      "missing": [],
+      "passed": true,
+      "probe_id": "AddrP2_schema_coverage_of_failure_cluster",
+      "required": [
+        "objects[].depth",
+        "objects[].orientation",
+        "objects[].state",
+        "objects[].text_in_object"
+      ],
+      "schema_version": "coordpy.realworldqa_bench_v2.v1",
+      "summary": "schema contains all required primitives"
+    },
+    {
+      "candidate": "B2",
+      "n_a1_rescues": 5,
+      "pass_threshold": 3,
+      "passed": true,
+      "probe_id": "AddrP3_direct_vision_rescue_prior",
+      "summary": "A1 rescues 5/5 W97 unique-A1-rescues by re-seeing the image; B2 final-turn VLM has equivalent visual access on the failure cluster"
+    },
+    {
+      "candidate": "B1+B2",
+      "passed": true,
+      "probe_id": "AddrP4_short_circuit_preserves_wins",
+      "summary": "V2 short-circuit ok=True; V3 short-circuit ok=True",
+      "v2_short_circuit_ok": true,
+      "v3_short_circuit_ok": true
+    },
+    {
+      "candidate": "B1+B2",
+      "passed": true,
+      "probe_id": "AddrP5_budget_exact",
+      "summary": "V2: 1 reader + 4 text-solver = 5 = K(5). V3: 1 reader + 3 text-solver + 1 final-vlm-or-pad = 5 = K(5).",
+      "v2_K": 5,
+      "v3_K": 5
+    },
+    {
+      "candidate": "B1",
+      "detail": [
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000013",
+          "pred": "multi_choice_letter",
+          "question_head": "Which direction is the vehicle directly in front of us traveling?\n\nA. Straight\nB"
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000076",
+          "pred": "multi_choice_letter",
+          "question_head": "Which is closer?\n\nA. The stop sign\nB. The speed limit sign\nPlease answer directl"
+        },
+        {
+          "gold": "numeric",
+          "ok": true,
+          "pid": "rwqa_test_000094",
+          "pred": "numeric",
+          "question_head": "How many trucks are there within 20 meters from us?\nPlease answer directly with "
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000111",
+          "pred": "multi_choice_letter",
+          "question_head": "From the location of all the vehicles in this image, can we assume that at least"
+        },
+        {
+          "gold": "yes_no",
+          "ok": true,
+          "pid": "rwqa_test_000135",
+          "pred": "yes_no",
+          "question_head": "Are there any stop signs?\nPlease answer directly with a single word or number."
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000155",
+          "pred": "multi_choice_letter",
+          "question_head": "Which direction is the gun facing?\nA. The gun is facing left.\nB. The gun is faci"
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000179",
+          "pred": "multi_choice_letter",
+          "question_head": "In what direction does the current lane take us at the upcoming intersection?\n\nA"
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000204",
+          "pred": "multi_choice_letter",
+          "question_head": "How many lanes can keep going straight?\n\nA. 1 lane\nB. 2 lanes\nC. 3 lanes\nPlease "
+        },
+        {
+          "gold": "short_text",
+          "ok": true,
+          "pid": "rwqa_test_000207",
+          "pred": "short_text",
+          "question_head": "What color is the traffic lights here?\nPlease answer directly with a single word"
+        },
+        {
+          "gold": "numeric",
+          "ok": true,
+          "pid": "rwqa_test_000223",
+          "pred": "numeric",
+          "question_head": "How many cars are white in this picture?\nPlease answer directly with a single wo"
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000225",
+          "pred": "multi_choice_letter",
+          "question_head": "What is the number on the speed limit sign?\n\nA. 15\nB. 25\nC. 35\nD. 45\nPlease answ"
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000246",
+          "pred": "multi_choice_letter",
+          "question_head": "What is under this ramp?\nA. There is a hose under the ramp. the ramp is in place"
+        },
+        {
+          "gold": "yes_no",
+          "ok": true,
+          "pid": "rwqa_test_000250",
+          "pred": "yes_no",
+          "question_head": "Is the person on the side of the road wearing a hoodie?\nPlease answer directly w"
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000388",
+          "pred": "multi_choice_letter",
+          "question_head": "Where is the elephant relative to the bird?\nA. The elephant is above the bird.\nB"
+        },
+        {
+          "gold": "yes_no",
+          "ok": true,
+          "pid": "rwqa_test_000403",
+          "pred": "yes_no",
+          "question_head": "Is the light green?\nPlease answer directly with a single word or number."
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000430",
+          "pred": "multi_choice_letter",
+          "question_head": "How many black dials are on this device?\nA. There are 5 black dials on this devi"
+        },
+        {
+          "gold": "numeric",
+          "ok": true,
+          "pid": "rwqa_test_000438",
+          "pred": "numeric",
+          "question_head": "How many pedestrians are there within 40 meters?\nPlease answer directly with a s"
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000441",
+          "pred": "multi_choice_letter",
+          "question_head": "Where is the letter c relative in the entire word in this image?\nA. There is no "
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000479",
+          "pred": "multi_choice_letter",
+          "question_head": "Is the cup or silver tin bigger?\nA. The cup is larger than the silver tin.\nB. Bo"
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000481",
+          "pred": "multi_choice_letter",
+          "question_head": "Is the keyboard on the top larger than the one on the bottom?\nA. Yes, the keyboa"
+        },
+        {
+          "gold": "numeric",
+          "ok": false,
+          "pid": "rwqa_test_000518",
+          "pred": "multi_choice_letter",
+          "question_head": "How many cars are on the left side over the jersey barrier?\n\nA: 2 cars\nB: 3 cars"
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000533",
+          "pred": "multi_choice_letter",
+          "question_head": "In which direction is the arrow on the construction sign ahead facing?\n\nA. To th"
+        },
+        {
+          "gold": "yes_no",
+          "ok": true,
+          "pid": "rwqa_test_000555",
+          "pred": "yes_no",
+          "question_head": "are the cars facing left?\nPlease answer directly with a single word or number."
+        },
+        {
+          "gold": "yes_no",
+          "ok": true,
+          "pid": "rwqa_test_000615",
+          "pred": "yes_no",
+          "question_head": "Is the traffic light green for us?\nPlease answer directly with a single word or "
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000661",
+          "pred": "multi_choice_letter",
+          "question_head": "What store is close by this location? \n\nA. Walgreens\nB. CVS\nC. Safeway\nPlease an"
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000672",
+          "pred": "multi_choice_letter",
+          "question_head": "What type of traffic control is in the intersection?\nA. Yield\nB. Stop\nC. Traffic"
+        },
+        {
+          "gold": "short_text",
+          "ok": true,
+          "pid": "rwqa_test_000679",
+          "pred": "short_text",
+          "question_head": "What color is the nearest set of traffic lights in this scene?\nPlease answer dir"
+        },
+        {
+          "gold": "numeric",
+          "ok": true,
+          "pid": "rwqa_test_000713",
+          "pred": "numeric",
+          "question_head": "How many cars are waiting at the opposite stop sign?\nPlease answer directly with"
+        },
+        {
+          "gold": "yes_no",
+          "ok": true,
+          "pid": "rwqa_test_000718",
+          "pred": "yes_no",
+          "question_head": "Is the large truck that's closest to us further from the camera than the pickup "
+        },
+        {
+          "gold": "multi_choice_letter",
+          "ok": true,
+          "pid": "rwqa_test_000733",
+          "pred": "multi_choice_letter",
+          "question_head": "Which way are the pink arrows facing?\nA. The pink arrows are facing upward.\nB. T"
+        }
+      ],
+      "n_correct": 29,
+      "n_total": 30,
+      "pass_rate": 0.9666666666666667,
+      "passed": true,
+      "probe_id": "AddrP6_question_type_parser_correctness",
+      "summary": "parser correct on 29/30 = 96.7% (threshold 90%)"
+    },
+    {
+      "candidate": "B2",
+      "n_b_fail": 5,
+      "n_total": 30,
+      "passed": true,
+      "probe_id": "AddrP7_b2_final_vlm_invocation_share",
+      "share": 0.16666666666666666,
+      "summary": "W97 D2-B0 FAILed on 5/30 = 16.7% of slice; upper bound on B2 final-VLM invocation share (threshold \u2264 30%)"
+    }
+  ],
+  "b1_addr_passes": true,
+  "b1_composite": {
+    "corpus_manifest": {
+      "corpus_merkle_root": "dc629acbf88d929d95c4a47c8e553c050eb829aa48ba32ad53ca6283090618ab",
+      "n_problems": 765,
+      "parquet_shard_sha256": [
+        "0ed8b555586923099bd5d6ba5dd8b656b403ccfc418881facd237a6d6fe64952",
+        "7dcb3ac3483362ca082cd4cddd0ab1389e9a276f1aefd4603fde0a2ce6bc74d0"
+      ],
+      "parquet_total_bytes": 678342154,
+      "parquet_urls": [
+        "https://huggingface.co/datasets/lmms-lab/RealWorldQA/resolve/main/data/test-00000-of-00002.parquet",
+        "https://huggingface.co/datasets/lmms-lab/RealWorldQA/resolve/main/data/test-00001-of-00002.parquet"
+      ],
+      "schema": "coordpy.realworldqa_loader_v1.v1"
+    },
+    "overall_passes": true,
+    "probes": [
+      {
+        "description": "All shards SHA-anchored; test decodes to expected size in-range; every problem has image + answer.",
+        "evidence": {
+          "corpus_merkle_root": "dc629acbf88d929d95c4a47c8e553c050eb829aa48ba32ad53ca6283090618ab",
+          "expected_bytes_range": [
+            200000000,
+            900000000
+          ],
+          "expected_n_range": [
+            700,
+            800
+          ],
+          "n_problems": 765,
+          "n_with_answer": 765,
+          "n_with_image": 765,
+          "parquet_shard_sha256": [
+            "0ed8b555586923099bd5d6ba5dd8b656b403ccfc418881facd237a6d6fe64952",
+            "7dcb3ac3483362ca082cd4cddd0ab1389e9a276f1aefd4603fde0a2ce6bc74d0"
+          ],
+          "parquet_total_bytes": 678342154
+        },
+        "evidence_cid": "6e98fda0eed468501876879897c447b0c3e080d8c8eb2bb4c569241fb5a11042",
+        "passed": true,
+        "probe_id": "P1_corpus_integrity",
+        "summary": "parquet_total_bytes=678342154 (range_ok=True); n_problems=765 in [700,800] (ok=True); n_with_image=765; n_with_answer=765"
+      },
+      {
+        "description": "Gold-as-prediction must score \u2265 98 % under the W96-D RealWorldQA executor.",
+        "evidence": {
+          "by_rule": {
+            "multi_choice_letter": 437,
+            "numeric_relaxed": 121,
+            "text_exact": 207
+          },
+          "executor_schema": "coordpy.realworldqa_executor_v1.v1",
+          "failed_sample": [],
+          "min_pass_rate": 0.98,
+          "n_failed": 0,
+          "n_pass": 765,
+          "n_problems": 765,
+          "pass_rate": 1.0
+        },
+        "evidence_cid": "f4dcb4455ae885ced604074f6b0556aa89703e8b8cdf29b432a3e4cd7d555036",
+        "passed": true,
+        "probe_id": "P2_executor_self_test",
+        "summary": "executor self-test on gold: 765/765 = 100.00% (threshold=98.00%)"
+      },
+      {
+        "description": "Estimated A1@K=5 pass rate based on published RealWorldQA SOTA must leave room for B.",
+        "evidence": {
+          "K": 5,
+          "correlation_assumed": 0.5,
+          "estimated_a1_k5_pct": 73.4375,
+          "estimated_residual_pp": 26.5625,
+          "max_acceptable_a1_k5_pct": 80.0,
+          "model": "meta/llama-3.2-11b-vision-instruct",
+          "single_shot_pct": 50.0
+        },
+        "evidence_cid": "6acb825407b6ad8d3875e86a4e55c0b176590e036b4b7400c2d924c9c173d145",
+        "passed": true,
+        "probe_id": "P3_a1_failure_residual",
+        "summary": "published single-shot RealWorldQA for meta/llama-3.2-11b-vision-instruct = 50.00%; estimated A1@K=5 = 73.44%; estimated residual = 26.56 pp (ceiling = 80.00%); pass = True"
+      },
+      {
+        "description": "Written structural argument for B's decomposition exists AND corpus is fully multimodal (image + question + answer present).",
+        "evidence": {
+          "argument_chars": 1607,
+          "argument_sha256": "3c3276b5859fa749c22fe764d1f616f5fc40e985f0a86e3c9c37a75a58a88fcd",
+          "min_argument_chars": 200,
+          "min_multimodal_share": 0.95,
+          "multimodal_share_in_sample": 1.0,
+          "n_multimodal_in_sample": 500,
+          "sample_n": 500,
+          "samples": [
+            {
+              "answer": "C",
+              "pid": "rwqa_test_000000",
+              "question_head": "In which direction is the front wheel of the car on the right side facing?\n\nA. L"
+            },
+            {
+              "answer": "B",
+              "pid": "rwqa_test_000001",
+              "question_head": "How many bars are here?\nA. There are two parallel bars in this photo.\nB. There a"
+            },
+            {
+              "answer": "0",
+              "pid": "rwqa_test_000002",
+              "question_head": "how many pedestrians are there?\nPlease answer directly with a single word or num"
+            },
+            {
+              "answer": "Downhill",
+              "pid": "rwqa_test_000003",
+              "question_head": "Is the road that the vehicle is on uphill, downhill or flat?\nPlease answer direc"
+            },
+            {
+              "answer": "B",
+              "pid": "rwqa_test_000004",
+              "question_head": "What is the speed limit on this road?\n\nA. 25\nB. 35\nC. 45\nPlease answer directly "
+            }
+          ]
+        },
+        "evidence_cid": "6bc5dd899dfa56c589eba399688dcd77f10555b64a6b41ee3ec41c31419abd33",
+        "passed": true,
+        "probe_id": "P4_decomposition_argument",
+        "summary": "decomp argument len=1607 (threshold=200; ok=True); multimodal-completeness in sample of 500 = 100.0% (threshold=95.0%; ok=True)"
+      }
+    ],
+    "schema": "coordpy.realworldqa_preflight_v1.v1",
+    "verdict_cid": "6e7235f0cf5f67effa3c7282a9080c6738c8b487b582457a96fa5a844bb76a55"
+  },
+  "b1_composite_passes": true,
+  "b1_overall_passes": true,
+  "b2_addr_passes": true,
+  "b2_composite": {
+    "corpus_manifest": {
+      "corpus_merkle_root": "dc629acbf88d929d95c4a47c8e553c050eb829aa48ba32ad53ca6283090618ab",
+      "n_problems": 765,
+      "parquet_shard_sha256": [
+        "0ed8b555586923099bd5d6ba5dd8b656b403ccfc418881facd237a6d6fe64952",
+        "7dcb3ac3483362ca082cd4cddd0ab1389e9a276f1aefd4603fde0a2ce6bc74d0"
+      ],
+      "parquet_total_bytes": 678342154,
+      "parquet_urls": [
+        "https://huggingface.co/datasets/lmms-lab/RealWorldQA/resolve/main/data/test-00000-of-00002.parquet",
+        "https://huggingface.co/datasets/lmms-lab/RealWorldQA/resolve/main/data/test-00001-of-00002.parquet"
+      ],
+      "schema": "coordpy.realworldqa_loader_v1.v1"
+    },
+    "overall_passes": true,
+    "probes": [
+      {
+        "description": "All shards SHA-anchored; test decodes to expected size in-range; every problem has image + answer.",
+        "evidence": {
+          "corpus_merkle_root": "dc629acbf88d929d95c4a47c8e553c050eb829aa48ba32ad53ca6283090618ab",
+          "expected_bytes_range": [
+            200000000,
+            900000000
+          ],
+          "expected_n_range": [
+            700,
+            800
+          ],
+          "n_problems": 765,
+          "n_with_answer": 765,
+          "n_with_image": 765,
+          "parquet_shard_sha256": [
+            "0ed8b555586923099bd5d6ba5dd8b656b403ccfc418881facd237a6d6fe64952",
+            "7dcb3ac3483362ca082cd4cddd0ab1389e9a276f1aefd4603fde0a2ce6bc74d0"
+          ],
+          "parquet_total_bytes": 678342154
+        },
+        "evidence_cid": "6e98fda0eed468501876879897c447b0c3e080d8c8eb2bb4c569241fb5a11042",
+        "passed": true,
+        "probe_id": "P1_corpus_integrity",
+        "summary": "parquet_total_bytes=678342154 (range_ok=True); n_problems=765 in [700,800] (ok=True); n_with_image=765; n_with_answer=765"
+      },
+      {
+        "description": "Gold-as-prediction must score \u2265 98 % under the W96-D RealWorldQA executor.",
+        "evidence": {
+          "by_rule": {
+            "multi_choice_letter": 437,
+            "numeric_relaxed": 121,
+            "text_exact": 207
+          },
+          "executor_schema": "coordpy.realworldqa_executor_v1.v1",
+          "failed_sample": [],
+          "min_pass_rate": 0.98,
+          "n_failed": 0,
+          "n_pass": 765,
+          "n_problems": 765,
+          "pass_rate": 1.0
+        },
+        "evidence_cid": "f4dcb4455ae885ced604074f6b0556aa89703e8b8cdf29b432a3e4cd7d555036",
+        "passed": true,
+        "probe_id": "P2_executor_self_test",
+        "summary": "executor self-test on gold: 765/765 = 100.00% (threshold=98.00%)"
+      },
+      {
+        "description": "Estimated A1@K=5 pass rate based on published RealWorldQA SOTA must leave room for B.",
+        "evidence": {
+          "K": 5,
+          "correlation_assumed": 0.5,
+          "estimated_a1_k5_pct": 73.4375,
+          "estimated_residual_pp": 26.5625,
+          "max_acceptable_a1_k5_pct": 80.0,
+          "model": "meta/llama-3.2-11b-vision-instruct",
+          "single_shot_pct": 50.0
+        },
+        "evidence_cid": "6acb825407b6ad8d3875e86a4e55c0b176590e036b4b7400c2d924c9c173d145",
+        "passed": true,
+        "probe_id": "P3_a1_failure_residual",
+        "summary": "published single-shot RealWorldQA for meta/llama-3.2-11b-vision-instruct = 50.00%; estimated A1@K=5 = 73.44%; estimated residual = 26.56 pp (ceiling = 80.00%); pass = True"
+      },
+      {
+        "description": "Written structural argument for B's decomposition exists AND corpus is fully multimodal (image + question + answer present).",
+        "evidence": {
+          "argument_chars": 1354,
+          "argument_sha256": "7764d6b20dffc100659cf7872af631b6b9bb458956715ba388a38a4a778f7f5f",
+          "min_argument_chars": 200,
+          "min_multimodal_share": 0.95,
+          "multimodal_share_in_sample": 1.0,
+          "n_multimodal_in_sample": 500,
+          "sample_n": 500,
+          "samples": [
+            {
+              "answer": "C",
+              "pid": "rwqa_test_000000",
+              "question_head": "In which direction is the front wheel of the car on the right side facing?\n\nA. L"
+            },
+            {
+              "answer": "B",
+              "pid": "rwqa_test_000001",
+              "question_head": "How many bars are here?\nA. There are two parallel bars in this photo.\nB. There a"
+            },
+            {
+              "answer": "0",
+              "pid": "rwqa_test_000002",
+              "question_head": "how many pedestrians are there?\nPlease answer directly with a single word or num"
+            },
+            {
+              "answer": "Downhill",
+              "pid": "rwqa_test_000003",
+              "question_head": "Is the road that the vehicle is on uphill, downhill or flat?\nPlease answer direc"
+            },
+            {
+              "answer": "B",
+              "pid": "rwqa_test_000004",
+              "question_head": "What is the speed limit on this road?\n\nA. 25\nB. 35\nC. 45\nPlease answer directly "
+            }
+          ]
+        },
+        "evidence_cid": "9dd883013633aa6566b8208e728a061731949a771d91086544c7fab9e69f7d0c",
+        "passed": true,
+        "probe_id": "P4_decomposition_argument",
+        "summary": "decomp argument len=1354 (threshold=200; ok=True); multimodal-completeness in sample of 500 = 100.0% (threshold=95.0%; ok=True)"
+      }
+    ],
+    "schema": "coordpy.realworldqa_preflight_v1.v1",
+    "verdict_cid": "db2551fe961ac34d00a8f0dbfac8e7590b2db797be5475b35b9f4cca1a7f7076"
+  },
+  "b2_composite_passes": true,
+  "b2_overall_passes": true,
+  "candidate_model": "meta/llama-3.2-11b-vision-instruct",
+  "corpus_merkle_root": "dc629acbf88d929d95c4a47c8e553c050eb829aa48ba32ad53ca6283090618ab",
+  "decision": "BOTH SURVIVED; cross-candidate decision: promote B1 (typed scene-graph + question-typed solver) to the cheap NIM pilot.  B2 (direct-vision final-turn) is deferred to W99 only if B1 pilot PASSes Phase 2 at both scales and B2's distinct mechanism remains plausibly load-bearing.",
+  "n_w97_slice_problems": 30,
+  "n_w97_unique_a1_rescues": 5,
+  "n_w97_unique_b_rescues": 3,
+  "overall_w98_slate_passes": true,
+  "scale_tag": "11b",
+  "schema": "coordpy.w98_realworldqa_preflight.v1",
+  "verdict_cid": "a5d958506249292c3d88623c73001d819fefdae174fe43c3583d936c67c7bc9e",
+  "w97_pilot_dir": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w97/realworldqa_pilot/w97_realworldqa_pilot_11b_meta_llama-3.2-11b-vision-instruct__meta_llama-3.2-11b-vision-instruct_20260525T182409Z",
+  "winner": "B1"
+}

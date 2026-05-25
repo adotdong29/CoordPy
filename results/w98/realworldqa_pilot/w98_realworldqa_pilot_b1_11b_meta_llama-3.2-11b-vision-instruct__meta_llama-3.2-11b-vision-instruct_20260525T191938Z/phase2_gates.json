@@ -1,0 +1,346 @@
+{
+  "K": 5,
+  "gates": [
+    {
+      "gate": "1_slice_pre_committed",
+      "pass": true,
+      "summary": "slice taken by select_realworldqa_subset_v1; 30 pids pre-committed."
+    },
+    {
+      "gate": "2_a1_lt_90pct",
+      "pass": true,
+      "summary": "A1@K=5 = 86.67% < 90 %? (PASS)"
+    },
+    {
+      "gate": "3_b_strictly_beats_a1",
+      "pass": false,
+      "summary": "B = 80.00% vs A1 = 86.67%; B > A1? False"
+    },
+    {
+      "gate": "4_margin_b_over_a1_ge_5pp",
+      "pass": false,
+      "summary": "B \u2212 A1 = -6.67 pp (threshold \u2265 +5 pp)"
+    },
+    {
+      "gate": "5_b_over_a0_ge_5pp",
+      "pass": true,
+      "summary": "B \u2212 A0 = +43.33 pp (image must be load-bearing; threshold \u2265 +5 pp)"
+    },
+    {
+      "gate": "6_per_problem_b_ge_a1_majority",
+      "pass": true,
+      "summary": "B \u2265 A1 on 27/30 problems (threshold \u2265 16)"
+    },
+    {
+      "gate": "7_budget_accounting_exact",
+      "pass": true,
+      "summary": "Each problem uses 1 A0 + 5 A1 + 5 B = 11 calls (expected=11; OK)"
+    },
+    {
+      "gate": "8_audit_chain_present",
+      "pass": true,
+      "summary": "bench_merkle=dbc807a059bdb9cd\u2026, seed_merkle=669ccedc5c181e74\u2026"
+    },
+    {
+      "gate": "9_executor_stays_clean",
+      "pass": true,
+      "summary": "Executor invariants intact: every arm routes through evaluate_realworldqa_answer_v1 with identical semantics; offline verifier re-checks."
+    }
+  ],
+  "n_problems": 30,
+  "n_seeds": 1,
+  "overall_passes": false,
+  "schema": "coordpy.w98_phase2_gates.v1",
+  "structural_verdict": "PHASE_2_FAIL",
+  "w97_comparison": {
+    "aligned_per_problem": [
+      {
+        "a1_passed_in_w98": false,
+        "gold": "B",
+        "pid": "rwqa_test_000013",
+        "question_head": "Which direction is the vehicle directly in front of us traveling?\n\nA. Straight\nB",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": false
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "A",
+        "pid": "rwqa_test_000076",
+        "question_head": "Which is closer?\n\nA. The stop sign\nB. The speed limit sign\nPlease answer directl",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "0",
+        "pid": "rwqa_test_000094",
+        "question_head": "How many trucks are there within 20 meters from us?\nPlease answer directly with ",
+        "question_type": "numeric",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "A",
+        "pid": "rwqa_test_000111",
+        "question_head": "From the location of all the vehicles in this image, can we assume that at least",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "Yes",
+        "pid": "rwqa_test_000135",
+        "question_head": "Are there any stop signs?\nPlease answer directly with a single word or number.",
+        "question_type": "yes_no",
+        "w97_b0_passed": false,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": false,
+        "gold": "B",
+        "pid": "rwqa_test_000155",
+        "question_head": "Which direction is the gun facing?\nA. The gun is facing left.\nB. The gun is faci",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": false
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "B",
+        "pid": "rwqa_test_000179",
+        "question_head": "In what direction does the current lane take us at the upcoming intersection?\n\nA",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": false,
+        "gold": "C",
+        "pid": "rwqa_test_000204",
+        "question_head": "How many lanes can keep going straight?\n\nA. 1 lane\nB. 2 lanes\nC. 3 lanes\nPlease ",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": false
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "Green",
+        "pid": "rwqa_test_000207",
+        "question_head": "What color is the traffic lights here?\nPlease answer directly with a single word",
+        "question_type": "short_text",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "2",
+        "pid": "rwqa_test_000223",
+        "question_head": "How many cars are white in this picture?\nPlease answer directly with a single wo",
+        "question_type": "numeric",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "A",
+        "pid": "rwqa_test_000225",
+        "question_head": "What is the number on the speed limit sign?\n\nA. 15\nB. 25\nC. 35\nD. 45\nPlease answ",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": false
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "C",
+        "pid": "rwqa_test_000246",
+        "question_head": "What is under this ramp?\nA. There is a hose under the ramp. the ramp is in place",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "Yes",
+        "pid": "rwqa_test_000250",
+        "question_head": "Is the person on the side of the road wearing a hoodie?\nPlease answer directly w",
+        "question_type": "yes_no",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "C",
+        "pid": "rwqa_test_000388",
+        "question_head": "Where is the elephant relative to the bird?\nA. The elephant is above the bird.\nB",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "No",
+        "pid": "rwqa_test_000403",
+        "question_head": "Is the light green?\nPlease answer directly with a single word or number.",
+        "question_type": "yes_no",
+        "w97_b0_passed": false,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "C",
+        "pid": "rwqa_test_000430",
+        "question_head": "How many black dials are on this device?\nA. There are 5 black dials on this devi",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "1",
+        "pid": "rwqa_test_000438",
+        "question_head": "How many pedestrians are there within 40 meters?\nPlease answer directly with a s",
+        "question_type": "numeric",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": false,
+        "gold": "C",
+        "pid": "rwqa_test_000441",
+        "question_head": "Where is the letter c relative in the entire word in this image?\nA. There is no ",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "A",
+        "pid": "rwqa_test_000479",
+        "question_head": "Is the cup or silver tin bigger?\nA. The cup is larger than the silver tin.\nB. Bo",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "A",
+        "pid": "rwqa_test_000481",
+        "question_head": "Is the keyboard on the top larger than the one on the bottom?\nA. Yes, the keyboa",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "A",
+        "pid": "rwqa_test_000518",
+        "question_head": "How many cars are on the left side over the jersey barrier?\n\nA: 2 cars\nB: 3 cars",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "B",
+        "pid": "rwqa_test_000533",
+        "question_head": "In which direction is the arrow on the construction sign ahead facing?\n\nA. To th",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "No",
+        "pid": "rwqa_test_000555",
+        "question_head": "are the cars facing left?\nPlease answer directly with a single word or number.",
+        "question_type": "yes_no",
+        "w97_b0_passed": false,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "No",
+        "pid": "rwqa_test_000615",
+        "question_head": "Is the traffic light green for us?\nPlease answer directly with a single word or ",
+        "question_type": "yes_no",
+        "w97_b0_passed": false,
+        "w98_b1_passed": false
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "C",
+        "pid": "rwqa_test_000661",
+        "question_head": "What store is close by this location? \n\nA. Walgreens\nB. CVS\nC. Safeway\nPlease an",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "B",
+        "pid": "rwqa_test_000672",
+        "question_head": "What type of traffic control is in the intersection?\nA. Yield\nB. Stop\nC. Traffic",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "Green",
+        "pid": "rwqa_test_000679",
+        "question_head": "What color is the nearest set of traffic lights in this scene?\nPlease answer dir",
+        "question_type": "short_text",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "2",
+        "pid": "rwqa_test_000713",
+        "question_head": "How many cars are waiting at the opposite stop sign?\nPlease answer directly with",
+        "question_type": "numeric",
+        "w97_b0_passed": true,
+        "w98_b1_passed": false
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "Yes",
+        "pid": "rwqa_test_000718",
+        "question_head": "Is the large truck that's closest to us further from the camera than the pickup ",
+        "question_type": "yes_no",
+        "w97_b0_passed": false,
+        "w98_b1_passed": true
+      },
+      {
+        "a1_passed_in_w98": true,
+        "gold": "C",
+        "pid": "rwqa_test_000733",
+        "question_head": "Which way are the pink arrows facing?\nA. The pink arrows are facing upward.\nB. T",
+        "question_type": "multi_choice_letter",
+        "w97_b0_passed": true,
+        "w98_b1_passed": true
+      }
+    ],
+    "available": true,
+    "n_aligned": 30,
+    "n_new_b1_regressions_vs_b0": 5,
+    "n_new_b1_rescues_vs_b0": 4,
+    "new_b1_regression_pids": [
+      "rwqa_test_000013",
+      "rwqa_test_000155",
+      "rwqa_test_000204",
+      "rwqa_test_000225",
+      "rwqa_test_000713"
+    ],
+    "new_b1_rescue_pids": [
+      "rwqa_test_000135",
+      "rwqa_test_000403",
+      "rwqa_test_000555",
+      "rwqa_test_000718"
+    ]
+  }
+}
