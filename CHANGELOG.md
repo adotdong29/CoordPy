@@ -13,6 +13,73 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W100 RealWorldQA cross-scale 90B Phase 2 confirmation — B2 (frontier lead) FAILS by −3.33 pp with MLB-2 sub-gate also FAILING (clean cross-scale collapse matching W96-C C1); B5 (baseline-only ceiling reference) narrowly MISSES by +1.67 pp; pre-committed Part H code-pivot contingency triggers `COO-9` (second code benchmark) promotion to lead path; cross-modal RealWorldQA arc FROZEN AT 11B; Phase 3 NOT launched; W99 11B carry-forwards STAND unchanged with new W100 cross-scale-bound qualifier carry-forwards added (2026-05-25)**
+  — *Post-W99 cross-scale confirmation per `COO-24` and
+  the W100 runbook (`docs/RUNBOOK_W100.md`).  The candidate
+  slate was FROZEN by W99: B2 frontier lead + B5 baseline-only
+  ceiling reference; B4 + typed-extract-then-text-reason sub-
+  family dead; no new W100 candidates; no tournament restart.
+  Both 90B Phase 2 pilots ran on the W96-D-earned 96_504_002 /
+  30-problem slice with `meta/llama-3.2-90b-vision-instruct`.
+  **B2 90B Phase 2** (330 NIM calls; 611 s wall): A0=46.67 %,
+  A1@K=5=76.67 %, **B2=73.33 %; B2 − A1 = −3.33 pp**;
+  gates 3 + 4 FAIL.  Gate 2 PASSes cleanly (A1 NOT saturated;
+  matches W96-D residual prediction of ~ 79.49 %; no Option-A
+  relief).  Pre-committed mechanism-load-bearingness sub-gates:
+  **MLB-2 FAILS** (final-VLM rescue rate 1 / 9 = 11.11 %; vs
+  11B's 3 / 3 = 100 %; threshold ≥ 33.33 %); MLB-1 PASSes
+  (invocation rate 9 / 30 = 30 %; threshold ≤ 50 %).  Per-
+  problem mining: 22 / 30 both-pass with W99 11B; 0 new wins
+  at 90B; 8 new losses (5 multi-choice + 2 numeric + 1 yes_no
+  including the `000615` viewer-pov residual that B2's 11B
+  final-VLM uniquely solved).  Cross-scale shift on B − A1 =
+  **−10.00 pp**.  Verdict: `PHASE_2_FAIL` (clean cross-scale
+  collapse matching W96-C C1 verifier).  **B5 90B Phase 2**
+  (330 NIM calls; 557 s wall): A0=46.67 %, A1@K=5=80.00 %,
+  **B5=83.33 %; B5 − A1 = +3.33 pp**; gate 4 FAILs (misses
+  +5 pp by 1.67 pp); gates 3 (B > A1) + 6 (B ≥ A1 on
+  29 / 30 = 97 %) PASS.  Per-route: `vlm_team_b0` (D2-B0 on
+  multi-choice) drops from 18 / 18 = 100 % at 11B to
+  **14 / 18 = 77.8 %** at 90B (W95-B0-shape cross-scale
+  fragility on multi-choice extraction; consistent with
+  MathVista W96-A pattern); `a1_vlm_k5` 12 / 12 → 11 / 12 =
+  91.7 % (flat).  Per-problem mining: 23 / 30 both-pass; 0
+  new wins; 5 new losses (4 multi-choice routed to D2-B0 +
+  1 numeric routed to A1).  Cross-scale shift on B − A1 =
+  **−3.33 pp** (B5 degrades MORE gracefully than B2;
+  empirically at 90B the switch baseline outperforms the
+  structural-mechanism candidate by +10 pp).  Verdict:
+  `PHASE_2_FAIL` (narrow ceiling miss; informative-not-claim).
+  Pre-committed decision logic applied: (1) `COO-9` PROMOTED
+  to lead path per Part H code-pivot contingency; (2) Phase 3
+  retirement bench NOT launched (entitlement required BOTH
+  scales clearing + MLB sub-gates clearing; 90B FAILed); (3)
+  cross-modal RealWorldQA arc FROZEN AT 11B in the W100
+  frontier audit; (4) B5 stays baseline-only; (5) B4 +
+  typed-extract sub-family remain dead.  Discipline validation
+  #10 (preflight-first + cross-scale + new mechanism-load-
+  bearingness sub-gates + multi-candidate-tournament-then-
+  confirm).  W99 11B B2 + B5 carry-forwards STAND unchanged;
+  W100 adds 4 cross-scale-bound qualifier carry-forwards.  No
+  retirement: W89 70B-HumanEval K=5 remains the only confirmed
+  multi-seed same-budget multi-agent superiority retirement.
+  AddrW100 NIM-free probes (AddrW100-B2-P5 + AddrW100-B5-P4)
+  both PASSed before any 90B NIM call; the W99 90B preflight
+  verdict cid `0bacd989850008b5416eaa6c0f4b1bacd88968a03f53d9853f5c2c454af6e907`
+  was reused.  **No new `coordpy.*` modules introduced** —
+  B2 + B5 reuse `coordpy.realworldqa_bench_v3` (W98) +
+  `coordpy.realworldqa_bench_v5` (W99) unchanged; only new code
+  is the W100 pilot driver
+  `scripts/run_w100_realworldqa_pilot.py`.  Stable boundary
+  preserved: `coordpy.__version__ == 0.5.20`;
+  `coordpy.SDK_VERSION == coordpy.sdk.v3.43`; no PyPI publish;
+  `coordpy/__init__.py` untouched.  Anchors:
+  `docs/RUNBOOK_W100.md`,
+  `docs/FRONTIER_RELEVANCE_AUDIT_W100_V1.md`,
+  `docs/RESULTS_W100_REALWORLDQA_B2_PHASE2_90B_V1.md`,
+  `docs/RESULTS_W100_REALWORLDQA_B5_PHASE2_90B_V1.md`,
+  `docs/RESULTS_W100_MILESTONE_SUMMARY_V1.md`.*
+
 - **W97 RealWorldQA D2-B0 Phase 2 cheap pilot — 11B FAILs 3 of 9 gates; informative failure-mode mining; frontier relevance audit + extended arsenal mining + W97 runbook lock + cheap pilot at $1-2 NIM spend; no carry-forward retirement; no Phase 3 launch (2026-05-25)**
   — *Post-W96-D follow-on per `COO-21` and the
   W97 runbook (`docs/RUNBOOK_W97.md`).  Frontier-relevance

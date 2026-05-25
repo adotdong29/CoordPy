@@ -1,0 +1,11 @@
+{
+  "candidate": "B5",
+  "probes": [
+    {
+      "pass": true,
+      "probe": "AddrW100_B5_P4_cross_scale_route_mass",
+      "summary": "Question type distribution on slice = {'multi_choice_letter': 18, 'numeric': 4, 'yes_no': 6, 'short_text': 2}; route distribution = {'vlm_team_b0': 18, 'a1_vlm_k5': 12}; expected = {'vlm_team_b0': 18, 'a1_vlm_k5': 12}; expected_match=True; on-disk match: 30/30 per-pid routes equal W99 11B; mismatches=[]"
+    }
+  ],
+  "schema": "coordpy.w100_addr_probes.v1"
+}

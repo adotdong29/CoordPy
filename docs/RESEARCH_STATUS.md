@@ -9,7 +9,28 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W95
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W100
+> RealWorldQA cross-scale 90B Phase 2 confirmation** on
+> 2026-05-25 — **B2 (frontier lead) FAILS by −3.33 pp AT 90B
+> with mechanism-load-bearingness sub-gate MLB-2 ALSO FAILING
+> (final-VLM rescue rate 1 / 9 = 11.11 % vs 11B 3 / 3 = 100 %);
+> B5 (baseline-only ceiling reference) narrowly MISSES gate 4
+> by 1.67 pp (B − A1 = +3.33 pp; gates 3 + 6 PASS).  Cross-
+> scale collapse pattern at the B2 mechanism matches W96-C C1
+> verifier.  Per the pre-committed Part H code-pivot contingency
+> in ``docs/RUNBOOK_W100.md``, the empirical verdict triggers:
+> (1) `COO-9` (second code benchmark) PROMOTED to lead path,
+> (2) Phase 3 retirement bench NOT launched, (3) cross-modal
+> RealWorldQA arc FROZEN AT 11B in the W100 frontier audit,
+> (4) W99 11B carry-forwards STAND unchanged with new W100
+> cross-scale-bound qualifier carry-forwards added.  Discipline
+> validation #10 (preflight-first + cross-scale + new MLB sub-
+> gates + multi-candidate-tournament-then-confirm).  Prior:
+> **W99 RealWorldQA candidate tournament** on 2026-05-25 — B2 +
+> B5 PASS structural Phase 2 at 11B (both +6.67 pp; 8 / 9 gates;
+> per-problem 30 / 30); B4 FAILS by −16.67 pp; typed-extract-
+> then-text-reason sub-family empirically capped through three
+> mechanisms.  Prior: **W95
 > MathVista Phase 3 retirement-grade bench** on 2026-05-24 —
 > **5 / 6 of the pre-committed W88 retirement bars PASS;
 > bar 4 (B − A1 margin ≥ +5 pp) FAILS at +3.67 pp.  At 3 seeds
@@ -113,6 +134,107 @@ vs. what would constitute solving" bar.
 Any claim in any other doc, paper draft, demo, or external
 pitch that the programme has *solved* multi-agent context is
 overstatement and is rejected by this file.
+
+## TL;DR — W100 RealWorldQA cross-scale 90B Phase 2 confirmation (B2 + B5 BOTH FAIL; COO-9 PROMOTED)
+
+W100 is the cross-scale confirmation step that follows W99's
+multi-candidate tournament (B2 + B4 + B5 at 11B).  Per the
+pre-committed contract in ``docs/RUNBOOK_W100.md``, the
+candidate slate was FROZEN by W99: B2 = frontier lead; B5 =
+baseline-only ceiling reference; B4 + typed-extract-then-text-
+reason sub-family = dead (no re-opens); no new W100-only
+candidates.
+
+Both 90B Phase 2 pilots ran on the same 96_504_002 / 30-problem
+slice used at W97 / W98 / W99 with ``meta/llama-3.2-90b-vision-
+instruct`` and identical W95 9-gate budget shape.
+
+### W100 B2 90B Phase 2 — FAIL by −3.33 pp (mechanism collapse)
+
+* **Per-arm**: A0 = 46.67 %, A1@K=5 = 76.67 %, **B2 = 73.33 %**.
+* **B − A1 = −3.33 pp**; gates 3 + 4 FAIL.  Gate 2 PASSes
+  cleanly (A1 NOT saturated; matches W96-D residual prediction
+  of ~ 79.49 %).  No Option-A relief at 90B.
+* **Mechanism-load-bearingness sub-gate MLB-2 FAILS** (final-
+  VLM rescue rate 1 / 9 = 11.11 %; threshold ≥ 33.33 %; vs
+  11B's 3 / 3 = 100 %); MLB-1 PASSes (invocation rate 30 % ≤
+  50 %).
+* **Per-problem mining vs W99 11B**: 22 / 30 both-pass; 0 new
+  wins at 90B; 8 new losses spanning multi-choice (5) + numeric
+  (2) + yes_no (2).  All 8 regressions fall through to the
+  final-VLM at 90B; the final-VLM PASSes only 1 / 9 of them.
+* Verdict: ``PHASE_2_FAIL`` (clean cross-scale collapse;
+  matches W96-C C1 verifier pattern).
+* Cross-scale shift on B − A1: **−10.00 pp** (W99-11B
+  +6.67 → W100-90B −3.33).
+
+### W100 B5 90B Phase 2 — FAIL by +1.67 pp short of bar (narrow ceiling miss)
+
+* **Per-arm**: A0 = 46.67 %, A1@K=5 = 80.00 %, **B5 = 83.33 %**.
+* **B − A1 = +3.33 pp**; gate 4 FAILs (misses +5 pp threshold
+  by 1.67 pp).  Gates 3 (B > A1) + 6 (B ≥ A1 on 29 / 30 =
+  97 %) PASS.
+* **Per-route**: ``vlm_team_b0`` (D2-B0 on multi-choice) drops
+  from 18 / 18 = 100 % at 11B to **14 / 18 = 77.8 %** at 90B
+  (W95-B0-shape cross-scale fragility on multi-choice
+  extraction; consistent with the MathVista W96-A pattern).
+  ``a1_vlm_k5`` (A1 on yes_no + numeric + short_text) drops
+  from 12 / 12 = 100 % to 11 / 12 = 91.7 %.
+* Verdict: ``PHASE_2_FAIL`` (narrow ceiling miss; informative-
+  not-claim).
+* Cross-scale shift on B − A1: **−3.33 pp** (W99-11B +6.67 →
+  W100-90B +3.33).  B5 degrades MORE gracefully than B2;
+  empirically at 90B the switch baseline outperforms the
+  structural-mechanism candidate by +10 pp.
+
+### Pre-committed decision logic applied
+
+1. **`COO-9` (second code benchmark) PROMOTED to lead path**
+   per Part H of the W100 brief.  The cross-modal RealWorldQA
+   arc is structurally restricted to the 11B regime.
+2. **Phase 3 retirement bench NOT launched.**  Entitlement
+   required BOTH 11B AND 90B Phase 2 PASS with MLB sub-gates
+   clearing; the 90B side FAILed on its own merits AND MLB-2
+   FAILed.
+3. **B5 stays classified baseline-only ceiling reference.**
+   No promotion to frontier.
+4. **B4 + typed-extract-then-text-reason sub-family remain
+   dead.**  W100 did not re-open them.
+5. **W99 11B carry-forwards STAND unchanged** with new W100
+   cross-scale-bound qualifier carry-forwards added.
+
+### Carry-forwards added (4)
+
+* ``W100-L-REALWORLDQA-B2-DIRECT-VISION-FINAL-TURN-PHASE2-90B-CAP``
+* ``W100-L-REALWORLDQA-B2-CROSS-SCALE-COLLAPSE-MECHANISM-NON-LOAD-BEARING-AT-90B-CAP``
+* ``W100-L-REALWORLDQA-B5-SWITCH-BASELINE-90B-NARROW-MISS-CAP``
+* ``W100-L-REALWORLDQA-W95-B0-D2-B0-MULTI-CHOICE-EXTRACTION-DEGRADES-CROSS-SCALE-CAP``
+
+### Carry-forwards retired
+
+**None.**  W89 70B-HumanEval K=5 remains the only confirmed
+multi-seed same-budget multi-agent superiority retirement.
+
+### Discipline status
+
+Preflight-first + cross-scale + multi-candidate-tournament-
+then-confirm discipline validated **TEN consecutive times**:
+W93 / W94 / W95 / W96-A / W96-C / W96-D / W97 / W98 / W99 /
+**W100**.  W100's distinguishing addition is the **mechanism-
+load-bearingness sub-gates (MLB-1 + MLB-2)** for cross-scale
+confirmation of mechanism-driven candidates — these caught the
+B2 mechanism collapse cleanly and explained the FAIL at the
+mechanism level, not just the margin level.
+
+### Stable boundary preserved
+
+``coordpy.__version__ == 0.5.20``; ``coordpy.SDK_VERSION ==
+coordpy.sdk.v3.43``; no PyPI publish; ``coordpy/__init__.py``
+untouched.  **Zero new ``coordpy.*`` modules introduced by
+W100.**  B2 + B5 reuse ``coordpy.realworldqa_bench_v3`` (W98)
+and ``coordpy.realworldqa_bench_v5`` (W99) unchanged.  Only
+new code is the W100 pilot driver script
+``scripts/run_w100_realworldqa_pilot.py``.
 
 ## TL;DR — W94 preflight-earned K=10 pilot + cross-modal battlefield pivot
 

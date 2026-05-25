@@ -1,0 +1,125 @@
+{
+  "K": 5,
+  "addr_w100_probes": [
+    {
+      "pass": true,
+      "probe": "AddrW100_B2_P5_cross_scale_rescue_prior",
+      "summary": "W99 B2 11B per-problem: n=30; B2 PASS=30; final-VLM invoked=3; final-VLM rescued=3.  W96-D 90B residual=20.51 pp; expected unique-A1-rescues at 90B (by residual) \u2265 6 (threshold \u2265 3 for rescue-prior stability)"
+    }
+  ],
+  "candidate": "B2",
+  "cross_scale_comparison": {
+    "candidate": "B2",
+    "w99_11b": {
+      "available": true,
+      "both_pass_pids": [
+        "rwqa_test_000076",
+        "rwqa_test_000094",
+        "rwqa_test_000135",
+        "rwqa_test_000179",
+        "rwqa_test_000204",
+        "rwqa_test_000207",
+        "rwqa_test_000225",
+        "rwqa_test_000246",
+        "rwqa_test_000250",
+        "rwqa_test_000388",
+        "rwqa_test_000403",
+        "rwqa_test_000430",
+        "rwqa_test_000438",
+        "rwqa_test_000441",
+        "rwqa_test_000479",
+        "rwqa_test_000481",
+        "rwqa_test_000518",
+        "rwqa_test_000555",
+        "rwqa_test_000661",
+        "rwqa_test_000672",
+        "rwqa_test_000679",
+        "rwqa_test_000733"
+      ],
+      "n_both_pass": 22,
+      "n_matched": 30,
+      "n_neither_pass": 0,
+      "n_new_losses_at_90b_vs_11b": 8,
+      "n_new_wins_at_90b_vs_11b": 0,
+      "neither_pass_pids": [],
+      "new_loss_pids": [
+        "rwqa_test_000013",
+        "rwqa_test_000111",
+        "rwqa_test_000155",
+        "rwqa_test_000223",
+        "rwqa_test_000533",
+        "rwqa_test_000615",
+        "rwqa_test_000713",
+        "rwqa_test_000718"
+      ],
+      "new_win_pids": [],
+      "path": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/results/w99/realworldqa_pilot/w99_realworldqa_pilot_b2_11b_meta_llama-3.2-11b-vision-instruct__meta_llama-3.2-11b-vision-instruct_20260525T205551Z/per_problem.jsonl"
+    }
+  },
+  "gates": [
+    {
+      "gate": "1_slice_pre_committed",
+      "pass": true,
+      "summary": "slice taken by select_realworldqa_subset_v1; 30 pids pre-committed."
+    },
+    {
+      "gate": "2_a1_lt_90pct",
+      "pass": true,
+      "summary": "A1@K=5 = 76.67% < 90 %? (PASS)"
+    },
+    {
+      "gate": "3_b_strictly_beats_a1",
+      "pass": false,
+      "summary": "B = 73.33% vs A1 = 76.67%; B > A1? False"
+    },
+    {
+      "gate": "4_margin_b_over_a1_ge_5pp",
+      "pass": false,
+      "summary": "B \u2212 A1 = -3.33 pp (threshold \u2265 +5 pp)"
+    },
+    {
+      "gate": "5_b_over_a0_ge_5pp",
+      "pass": true,
+      "summary": "B \u2212 A0 = +26.67 pp (image must be load-bearing; threshold \u2265 +5 pp)"
+    },
+    {
+      "gate": "6_per_problem_b_ge_a1_majority",
+      "pass": true,
+      "summary": "B \u2265 A1 on 27/30 problems (threshold \u2265 16)"
+    },
+    {
+      "gate": "7_budget_accounting_exact",
+      "pass": true,
+      "summary": "Each problem uses 1 A0 + 5 A1 + 5 B = 11 calls (expected=11; OK)"
+    },
+    {
+      "gate": "8_audit_chain_present",
+      "pass": true,
+      "summary": "bench_merkle=e1f9493efb284cf2\u2026, seed_merkle=8bc346bcb57029fa\u2026"
+    },
+    {
+      "gate": "9_executor_stays_clean",
+      "pass": true,
+      "summary": "Executor invariants intact: every arm routes through evaluate_realworldqa_answer_v1 with identical semantics; offline verifier re-checks."
+    }
+  ],
+  "mlb_overall_pass": false,
+  "mlb_subgates": [
+    {
+      "pass": true,
+      "subgate": "MLB_1_invocation_rate_le_50pct",
+      "summary": "Final-VLM invoked on 9/30 = 30.00% of problems (threshold \u2264 50 %)"
+    },
+    {
+      "pass": false,
+      "subgate": "MLB_2_rescue_rate_ge_33pct",
+      "summary": "Final-VLM rescued 1/9 = 11.11% of invocations (threshold \u2265 33.33 %)"
+    }
+  ],
+  "n_problems": 30,
+  "n_seeds": 1,
+  "overall_passes": false,
+  "scale_tag": "90b",
+  "schema": "coordpy.w100_phase2_gates.v1",
+  "structural_verdict": "PHASE_2_FAIL"
+}
