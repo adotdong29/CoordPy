@@ -4,12 +4,12 @@
   "project": "CoordPy",
   "linear_workspace_url": "https://linear.app/coordpy/",
   "github_repo": "adotdong29/CoordPy",
-  "comment": "Canonical mapping of milestone → (commits, docs, Linear issues). Update this file at end-of-milestone; run scripts/sync_linear_github_v1.py to validate and emit Linear-ready summaries. Adding a milestone entry: append to milestones array, list commits + result/runbook docs + Linear issue IDs.",
+  "comment": "Canonical mapping of milestone \u2192 (commits, docs, Linear issues). Update this file at end-of-milestone; run scripts/sync_linear_github_v1.py to validate and emit Linear-ready summaries. Adding a milestone entry: append to milestones array, list commits + result/runbook docs + Linear issue IDs.",
   "milestones": [
     {
       "id": "W89",
       "title": "HumanEval-70B-Reflexion-K=5 same-budget multi-agent superiority retirement",
-      "outcome": "RETIRED — first confirmed same-budget multi-agent superiority retirement (+5.56 pp B over A1, 2-of-3 per-seed majority)",
+      "outcome": "RETIRED \u2014 first confirmed same-budget multi-agent superiority retirement (+5.56 pp B over A1, 2-of-3 per-seed majority)",
       "commits": [],
       "docs": [
         "docs/RESULTS_W89_HUMANEVAL_REFLEXION_V2.md"
@@ -25,7 +25,7 @@
     {
       "id": "W93",
       "title": "Preflight-first empirical superiority wave (5-gate harness; 3 candidate kills; no expensive bench)",
-      "outcome": "DISCIPLINE — preflight infrastructure landed; 3 candidates killed in cheap evidence; no NIM spend",
+      "outcome": "DISCIPLINE \u2014 preflight infrastructure landed; 3 candidates killed in cheap evidence; no NIM spend",
       "commits": [
         "b79cd82"
       ],
@@ -43,7 +43,7 @@
     {
       "id": "W94",
       "title": "Preflight-earned K=10 pilot killed; cross-modal pivot to MathVista documented",
-      "outcome": "KILLED — K=10 pilot ceiling-saturated A1 to 100% on 15-problem slice; 3-of-6 pre-committed gates failed; HumanEval-Visual K=5 retired as cross-modal battlefield; MathVista selected as W95 line",
+      "outcome": "KILLED \u2014 K=10 pilot ceiling-saturated A1 to 100% on 15-problem slice; 3-of-6 pre-committed gates failed; HumanEval-Visual K=5 retired as cross-modal battlefield; MathVista selected as W95 line",
       "commits": [
         "9355b2f"
       ],
@@ -65,7 +65,7 @@
     {
       "id": "W95",
       "title": "MathVista cross-modal: preflight + Phase 2 pilot (9/9 gates PASS; +10pp) + Phase 3 retirement bench (5/6 W88 bars PASS; margin bar misses by 1.33 pp at +3.67 pp; NOT retirement)",
-      "outcome": "PHASE 3 NARROWLY FAILS RETIREMENT — A0=30.33% / A1=67.67% / B=71.33%; B-A1=+3.67pp (vs +5pp bar); B-A0=+41pp; per-seed B-A1=[+6,+10,-5]; B>A1 on 2/3 seeds; B≥A1 on 267/300 problems (89%); 13/14 audit re-derivations PASS offline. Single-seed +10pp pilot narrowed to +3.67pp at multi-seed scale; preflight-first discipline validated for the third time.",
+      "outcome": "PHASE 3 NARROWLY FAILS RETIREMENT \u2014 A0=30.33% / A1=67.67% / B=71.33%; B-A1=+3.67pp (vs +5pp bar); B-A0=+41pp; per-seed B-A1=[+6,+10,-5]; B>A1 on 2/3 seeds; B\u2265A1 on 267/300 problems (89%); 13/14 audit re-derivations PASS offline. Single-seed +10pp pilot narrowed to +3.67pp at multi-seed scale; preflight-first discipline validated for the third time.",
       "commits": [
         "c14a8a1",
         "ab022ce",
@@ -95,7 +95,7 @@
     {
       "id": "W96-A",
       "title": "MathVista at 90B-Vision: preflight + Phase 2 cheap pilot (9/9 gates PASS; +10pp, byte-equiv to 11B) + Phase 3 retirement bench (3/6 W88 bars FAIL; B-A1 = -5.00pp; scaling 11B->90B HURTS the team; NOT retirement)",
-      "outcome": "PHASE 3 DECISIVE NEGATIVE — A0=28.00% / A1=71.33% / B=66.33%; B-A1=-5.00pp (vs +5pp bar); B-A0=+38.33pp; per-seed B-A1=[+4,-7,-12]; B>A1 on 1/3 seeds; B>=A1 on 255/300 problems (85%); 11/14 audit re-derivations PASS offline; only 3 retirement-margin bars FAIL by sign/margin. Cross-scale shift on B-A1 = -8.67pp (11B +3.67pp -> 90B -5.00pp); H2-saturation empirically confirmed at multi-seed retirement scale; scaling the VLM weight class does NOT retire the cross-modal carry-forward.",
+      "outcome": "PHASE 3 DECISIVE NEGATIVE \u2014 A0=28.00% / A1=71.33% / B=66.33%; B-A1=-5.00pp (vs +5pp bar); B-A0=+38.33pp; per-seed B-A1=[+4,-7,-12]; B>A1 on 1/3 seeds; B>=A1 on 255/300 problems (85%); 11/14 audit re-derivations PASS offline; only 3 retirement-margin bars FAIL by sign/margin. Cross-scale shift on B-A1 = -8.67pp (11B +3.67pp -> 90B -5.00pp); H2-saturation empirically confirmed at multi-seed retirement scale; scaling the VLM weight class does NOT retire the cross-modal carry-forward.",
       "commits": [
         "8b5db54",
         "1a2522d",
@@ -120,7 +120,7 @@
     {
       "id": "W96-C",
       "title": "MathVista C1 (VLM-Verifier-Final-Turn) cross-scale Phase 2: 11B FAIL (+0pp; verifier 0/11) + 90B PASS (+13.33pp; verifier 1/7 = mechanism NOT load-bearing); NOT Phase 3 entitled",
-      "outcome": "CROSS-SCALE AMBIGUOUS — 11B Phase 2: A0=36.67% / A1=63.33% / B_v2=63.33%; B_v2-A1=+0.00pp; verifier rescue rate 0/11=0.0%; 2/9 gates FAIL; V2 LOST 13.34pp on B arm vs V1. 90B Phase 2: A0=36.67% / A1=66.67% / B_v2=80.00%; B_v2-A1=+13.33pp; verifier rescue rate 1/7=14.3%; 9/9 gates PASS but verifier mechanism not load-bearing (1 of 5 B-only rescues; rest from text-only chain sampling variance vs A1 K=5). Cross-scale collapse pattern (one-scale-good-one-scale-bad) triggers runbook's 'warning not green light' rule; NOT entitled to Phase 3 in any scenario. Adds two W96-L carry-forwards. Next move per Linear: COO-20 W96-D battlefield pivot.",
+      "outcome": "CROSS-SCALE AMBIGUOUS \u2014 11B Phase 2: A0=36.67% / A1=63.33% / B_v2=63.33%; B_v2-A1=+0.00pp; verifier rescue rate 0/11=0.0%; 2/9 gates FAIL; V2 LOST 13.34pp on B arm vs V1. 90B Phase 2: A0=36.67% / A1=66.67% / B_v2=80.00%; B_v2-A1=+13.33pp; verifier rescue rate 1/7=14.3%; 9/9 gates PASS but verifier mechanism not load-bearing (1 of 5 B-only rescues; rest from text-only chain sampling variance vs A1 K=5). Cross-scale collapse pattern (one-scale-good-one-scale-bad) triggers runbook's 'warning not green light' rule; NOT entitled to Phase 3 in any scenario. Adds two W96-L carry-forwards. Next move per Linear: COO-20 W96-D battlefield pivot.",
       "commits": [
         "63ccd29",
         "080a716",
@@ -143,8 +143,8 @@
     },
     {
       "id": "W97",
-      "title": "RealWorldQA D2-B0 Phase 2 cheap pilot at 11B: FAIL (3 of 9 gates) — structurally informative; +6.67pp shortfall driven by vision-bound yes/no rescue cluster; cross-scale 90B not entitled",
-      "outcome": "PHASE 2 FAIL — A0=36.67% / A1@K=5=90.00% / B=83.33%; B-A1=-6.67 pp (gate 4 FAIL); A1 saturated at 90% (gate 2 FAIL); B does not strictly beat A1 (gate 3 FAIL). Gates 1, 5-9 PASS, including B-A0=+46.67pp (image extraction is real signal) and B>=A1 on 25/30 problems (per-problem majority). Per-problem disagreement structure: 22/30 both pass; 5/30 unique-A1-rescues on vision-bound yes/no questions (existence detection, color/state, orientation, depth ordering); 3/30 unique-B-rescues on multi-choice spatial questions; 0/30 neither pass. Per the W96-C cross-scale rule, 90B Phase 2 is NOT auto-launched (estimated A1@K=5 >= 90% on this saturation-prone slice, almost certainly failing gate 2 again). Adds carry-forward W97-L-REALWORLDQA-D2-B0-PHASE2-11B-CAP. Discipline validation #7: W93/W94/W95/W96-A/W96-C/W96-D/W97.",
+      "title": "RealWorldQA D2-B0 Phase 2 cheap pilot at 11B: FAIL (3 of 9 gates) \u2014 structurally informative; +6.67pp shortfall driven by vision-bound yes/no rescue cluster; cross-scale 90B not entitled",
+      "outcome": "PHASE 2 FAIL \u2014 A0=36.67% / A1@K=5=90.00% / B=83.33%; B-A1=-6.67 pp (gate 4 FAIL); A1 saturated at 90% (gate 2 FAIL); B does not strictly beat A1 (gate 3 FAIL). Gates 1, 5-9 PASS, including B-A0=+46.67pp (image extraction is real signal) and B>=A1 on 25/30 problems (per-problem majority). Per-problem disagreement structure: 22/30 both pass; 5/30 unique-A1-rescues on vision-bound yes/no questions (existence detection, color/state, orientation, depth ordering); 3/30 unique-B-rescues on multi-choice spatial questions; 0/30 neither pass. Per the W96-C cross-scale rule, 90B Phase 2 is NOT auto-launched (estimated A1@K=5 >= 90% on this saturation-prone slice, almost certainly failing gate 2 again). Adds carry-forward W97-L-REALWORLDQA-D2-B0-PHASE2-11B-CAP. Discipline validation #7: W93/W94/W95/W96-A/W96-C/W96-D/W97.",
       "commits": [
         "4693467"
       ],
@@ -164,8 +164,8 @@
     },
     {
       "id": "W96-D",
-      "title": "Cross-modal battlefield pivot — ChartQA preflight FAIL at both 11B and 90B (P3 saturation); RealWorldQA preflight PASS at both 11B and 90B (all 9 composite gates); D2 preflight-earned for Phase 2; no NIM spend",
-      "outcome": "BATTLEFIELD PIVOT D1->D2 — ChartQA (lmms-lab/ChartQA, 2500 problems; parquet SHA 165263505f2998aba65d819b44be832edecd92d676fee2c030645f784cd55d06) FAILS P3 saturation at both Llama-3.2-11B-Vision (A1@K=5 91.69%; residual 8.31pp) and Llama-3.2-90B-Vision (A1@K=5 92.75%; residual 7.25pp) — both far below the W95 +20pp floor; D1 killed cheaply. RealWorldQA (lmms-lab/RealWorldQA, 765 problems; 2 shards SHA-anchored) PASSES all 4 composite probes + W93 G1-G5 at both scales — 11B A1@K=5 73.44% (residual 26.56pp; clean); 90B A1@K=5 79.49% (residual 20.51pp; narrow 0.51pp above floor). D2-B0 (W95-B0 scene-port) is preflight-earned for a NIM smoke test + 1-seed x 30-problem Phase 2 cheap pilot at one or both scales; Phase 2 launch out of scope for this milestone. Adds 1 carry-forward (CHARTQA-PREFLIGHT-D1-B0-P3-SATURATION-CAP); no retirements. Discipline: W93/W94/W95/W96-A/W96-C/W96-D preflight-first + cross-scale rule caught a battlefield-level saturation cap cheaply at $0 NIM spend.",
+      "title": "Cross-modal battlefield pivot \u2014 ChartQA preflight FAIL at both 11B and 90B (P3 saturation); RealWorldQA preflight PASS at both 11B and 90B (all 9 composite gates); D2 preflight-earned for Phase 2; no NIM spend",
+      "outcome": "BATTLEFIELD PIVOT D1->D2 \u2014 ChartQA (lmms-lab/ChartQA, 2500 problems; parquet SHA 165263505f2998aba65d819b44be832edecd92d676fee2c030645f784cd55d06) FAILS P3 saturation at both Llama-3.2-11B-Vision (A1@K=5 91.69%; residual 8.31pp) and Llama-3.2-90B-Vision (A1@K=5 92.75%; residual 7.25pp) \u2014 both far below the W95 +20pp floor; D1 killed cheaply. RealWorldQA (lmms-lab/RealWorldQA, 765 problems; 2 shards SHA-anchored) PASSES all 4 composite probes + W93 G1-G5 at both scales \u2014 11B A1@K=5 73.44% (residual 26.56pp; clean); 90B A1@K=5 79.49% (residual 20.51pp; narrow 0.51pp above floor). D2-B0 (W95-B0 scene-port) is preflight-earned for a NIM smoke test + 1-seed x 30-problem Phase 2 cheap pilot at one or both scales; Phase 2 launch out of scope for this milestone. Adds 1 carry-forward (CHARTQA-PREFLIGHT-D1-B0-P3-SATURATION-CAP); no retirements. Discipline: W93/W94/W95/W96-A/W96-C/W96-D preflight-first + cross-scale rule caught a battlefield-level saturation cap cheaply at $0 NIM spend.",
       "commits": [
         "d14e46d"
       ],
@@ -185,8 +185,8 @@
     },
     {
       "id": "W98",
-      "title": "RealWorldQA multi-candidate slate (B1 + B2 preflight earn BOTH at both scales; B1 cheap NIM pilot at 11B FAIL 2/9 gates) - structurally informative; B1 recovers 4/5 W97 unique-A1-rescues on yes/no perception but regresses 5 D2-B0 multi-choice wins; W95-B0 family capped at B-A1 ≈ -6.67pp through two distinct mechanisms; B2 deferred to W99",
-      "outcome": "PHASE 2 FAIL VIA DIFFERENT MECHANISM — A0=36.67% / A1@K=5=86.67% / B1=80.00%; B1-A1=-6.67pp (gate 4 FAIL, IDENTICAL margin to W97 D2-B0); B1 does NOT strictly beat A1 (gate 3 FAIL). Gates 1, 2, 5-9 PASS — notably gate 2 (A1<90% this run; W97's saturation was sampling noise) and gate 6 (B>=A1 on 27/30 = IMPROVED per-problem majority vs W97 D2-B0's 25/30). Per-problem diff vs W97 D2-B0 on same slice: 4 B1-new-rescues on yes/no perception (000135, 000403, 000555, 000718) - EXACTLY the W97 failure cluster the typed schema + question-typed solver was designed to attack (4/5 recovery rate matches AddrP1 + AddrP2 predictions) - BUT 5 B1-regressions on multi-choice/numeric (000013, 000155, 000204, 000225, 000713) via a NEW failure mode: typed solver becomes more confident in reader's (often wrong) direct_answer_hint and stops K=4 reflexion-cycling. Net 4-5 = -1 problem = same architectural cap. W95-B0-derived extract-then-text-reason architecture family empirically capped at B-A1 ≈ -6.67pp at 11B through TWO distinct mechanisms (D2-B0 free text + D2-B1 typed schema). Cross-scale 90B NOT entitled per W96-C rule. B2 (direct-vision final-turn answerer, structurally distinct, no reader-hint dependency) deferred to W99 per runbook. Preflight + addressability probes (AddrP1..AddrP7) earned BOTH candidates at both 11B and 90B at $0 NIM (single pilot per runbook decision logic; tie-break = lower expected NIM cost). Discipline validation #8: W93/W94/W95/W96-A/W96-C/W96-D/W97/W98.",
+      "title": "RealWorldQA multi-candidate slate (B1 + B2 preflight earn BOTH at both scales; B1 cheap NIM pilot at 11B FAIL 2/9 gates) - structurally informative; B1 recovers 4/5 W97 unique-A1-rescues on yes/no perception but regresses 5 D2-B0 multi-choice wins; W95-B0 family capped at B-A1 \u2248 -6.67pp through two distinct mechanisms; B2 deferred to W99",
+      "outcome": "PHASE 2 FAIL VIA DIFFERENT MECHANISM \u2014 A0=36.67% / A1@K=5=86.67% / B1=80.00%; B1-A1=-6.67pp (gate 4 FAIL, IDENTICAL margin to W97 D2-B0); B1 does NOT strictly beat A1 (gate 3 FAIL). Gates 1, 2, 5-9 PASS \u2014 notably gate 2 (A1<90% this run; W97's saturation was sampling noise) and gate 6 (B>=A1 on 27/30 = IMPROVED per-problem majority vs W97 D2-B0's 25/30). Per-problem diff vs W97 D2-B0 on same slice: 4 B1-new-rescues on yes/no perception (000135, 000403, 000555, 000718) - EXACTLY the W97 failure cluster the typed schema + question-typed solver was designed to attack (4/5 recovery rate matches AddrP1 + AddrP2 predictions) - BUT 5 B1-regressions on multi-choice/numeric (000013, 000155, 000204, 000225, 000713) via a NEW failure mode: typed solver becomes more confident in reader's (often wrong) direct_answer_hint and stops K=4 reflexion-cycling. Net 4-5 = -1 problem = same architectural cap. W95-B0-derived extract-then-text-reason architecture family empirically capped at B-A1 \u2248 -6.67pp at 11B through TWO distinct mechanisms (D2-B0 free text + D2-B1 typed schema). Cross-scale 90B NOT entitled per W96-C rule. B2 (direct-vision final-turn answerer, structurally distinct, no reader-hint dependency) deferred to W99 per runbook. Preflight + addressability probes (AddrP1..AddrP7) earned BOTH candidates at both 11B and 90B at $0 NIM (single pilot per runbook decision logic; tie-break = lower expected NIM cost). Discipline validation #8: W93/W94/W95/W96-A/W96-C/W96-D/W97/W98.",
       "commits": [
         "4e77107"
       ],
@@ -203,6 +203,36 @@
       "carry_forwards_retired": [],
       "carry_forwards_added": [
         "W98-L-REALWORLDQA-B1-TYPED-SCHEMA-PHASE2-11B-CAP"
+      ]
+    },
+    {
+      "id": "W99",
+      "title": "RealWorldQA candidate tournament (B2 + B4 + B5) at 11B: B2 + B5 PASS structural Phase 2 (100%/+6.67pp; Option A slice-saturation); B4 (typed schema sans hint) FAILS (76.67%/-16.67pp); typed-extract-then-text-reason sub-family of W95-B0 capped through THREE mechanisms; only B2 (image at decision boundary) clears Phase 2",
+      "outcome": "2 of 3 PASS STRUCTURAL Phase 2 \u2014 B2 (frontier) + B5 (switch baseline ceiling); B4 (close-cousin repair) FAILS empirically refuting hint-removal-only hypothesis. NIM-free preflight + addressability probes earned all three at both 11B+90B; NIM-free B5 oracle prediction (+10pp) and B2 realistic prediction (+6.67pp) matched empirical to within sampling variance. B2 final-VLM rescued 3/3 invocations including the residual viewer-pov problem (000615) NEITHER W97 D2-B0 NOR W98 B1 could solve. Discipline validation #9 (W93-W99 preflight-first + cross-scale + multi-candidate tournament). Stable boundary preserved.",
+      "commits": [
+        "5526b4e"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W99.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W99_V1.md",
+        "docs/RESULTS_W99_ARSENAL_MINING_V1.md",
+        "docs/RESULTS_W99_PREFLIGHT_V1.md",
+        "docs/RESULTS_W99_REALWORLDQA_B5_PHASE2_V1.md",
+        "docs/RESULTS_W99_REALWORLDQA_B2_PHASE2_V1.md",
+        "docs/RESULTS_W99_REALWORLDQA_B4_PHASE2_V1.md",
+        "docs/RESULTS_W99_MILESTONE_SUMMARY_V1.md"
+      ],
+      "linear_issues": [
+        "COO-23"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W99-L-REALWORLDQA-B5-SWITCH-BASELINE-PASS-11B-SLICE-SATURATION-CAP",
+        "W99-L-REALWORLDQA-B5-SWITCH-IS-BASELINE-NOT-FRONTIER-CAP",
+        "W99-L-REALWORLDQA-B2-DIRECT-VISION-FINAL-TURN-PHASE2-11B-STRUCTURAL-PASS-SLICE-SATURATION-CAP",
+        "W99-L-REALWORLDQA-W95-B0-FAMILY-NOT-STRUCTURALLY-CAPPED-AT-IMAGE-AT-DECISION-BOUNDARY-CAP",
+        "W99-L-REALWORLDQA-B4-TYPED-SCHEMA-WITHOUT-HINT-PHASE2-11B-FAIL-CAP",
+        "W99-L-REALWORLDQA-TYPED-EXTRACT-THEN-REASON-SUBFAMILY-EMPIRICALLY-CAPPED-AT-11B-CAP"
       ]
     }
   ]
