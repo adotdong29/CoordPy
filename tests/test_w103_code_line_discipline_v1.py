@@ -378,3 +378,24 @@ def test_w103_pilot_driver_does_not_import_anti_patterns():
         assert tok not in src, (
             f"W103 pilot driver contains forbidden anti-pattern "
             f"token {tok!r}")
+
+
+def test_w103_pilot_driver_flushes_sidecar_after_each_write():
+    """W102 lesson: Python's text-mode block buffering hides
+    pilot progress on disk during long-running NIM-throttled
+    runs (W102 buffered all 330 sidecar entries until pilot exit
+    via close(); operator audits during the run saw a 0-byte
+    sidecar even though calls had succeeded).  W103 driver MUST
+    flush the sidecar after every write so progress is
+    observable on disk."""
+    src = PILOT_SCRIPT.read_text()
+    sidecar_writer_start = src.index("def sidecar_writer(")
+    # Match anything from def sidecar_writer until the next
+    # blank line followed by a top-level (8-space-indent or
+    # less) statement; the function body itself is at 12-space
+    # indent inside main(), so we just look for the closing.
+    snippet = src[sidecar_writer_start:sidecar_writer_start + 800]
+    assert "sidecar_f.flush()" in snippet, (
+        "W103 pilot driver's sidecar_writer does not flush "
+        "after each write; this re-introduces the W102 "
+        "operator-audit-blindness failure mode")

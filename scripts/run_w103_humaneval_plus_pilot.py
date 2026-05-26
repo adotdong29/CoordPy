@@ -514,8 +514,13 @@ def main() -> int:
     sidecar_f = open(sidecar_path, "w")
 
     def sidecar_writer(rec):
+        # Flush after every write so progress is observable on
+        # disk during long-running pilots; W102 buffered until
+        # pilot exit which made progress audits painful when
+        # NIM throttling stretched the run.
         sidecar_f.write(
             json.dumps(rec, separators=(",", ":")) + "\n")
+        sidecar_f.flush()
 
     print(f"  output: {out_dir}")
     provenance = {
