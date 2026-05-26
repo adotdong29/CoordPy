@@ -280,6 +280,33 @@
       ],
       "carry_forwards_retired": [],
       "carry_forwards_added": []
+    },
+    {
+      "id": "W102",
+      "title": "MBPP+ V2 schema-fix lead lane + HumanEval+ backup lane + COO-14 helper lane + MBPP+ V2 cheap pilot at 70B FAIL (B-A1 = -6.67pp; MLB-1 + MLB-2 both FAIL; carry-forward W102-L-MBPP-PLUS-V2-REFLEXION-PHASE2-70B-CAP added; W103 pivots to HumanEval+ via the W102-built backup-lane infrastructure per pre-committed runbook branch-3 decision logic)",
+      "outcome": "PHASE 2 FAIL — A0=73.33% / A1@K=5=83.33% / B=76.67% / B-A1=-6.67pp / 6 of 9 Phase 2 gates PASS / MLB-1 30% FAIL / MLB-2 22.22% FAIL on the W102-locked seed-101_001 / 30-problem slice at meta/llama-3.3-70b-instruct. Critical W102 finding (lead lane): during the W101 deferred operator step, W102 discovered the W101 V1 loader's schema assumption is wrong (parallel plus_input/plus_output arrays do NOT exist in the actual EvalPlus release; the extra-test surface lives in a single `test` Python program). V1 would have silently degenerated the cheap pilot to a base-MBPP run. W102 fixes this BEFORE any NIM spend by building V2 infrastructure (4 new explicit-import-only coordpy.* modules: mbpp_plus_loader_v2 + executor_v2 + reflexion_bench_v2 + preflight_v2 with NEW P5 silent-degeneration guard + P6 V1-vs-V2 sanity); V2 preflight 10 of 10 PASS (verdict cid aab6d9ab...). HumanEval+ backup lane (4 new explicit-import-only modules): humaneval_plus_loader_v1 + executor_v1 + reflexion_bench_v1 + preflight_v1; HumanEval+ preflight 7 of 7 PASS (verdict cid 4f57a2cf...); cheap pilot NOT launched in W102 — reserved as the W103 immediate pivot. COO-14 helper lane (1 new explicit-import-only module): code_slice_selector_v1 implements the 4-item COO-14 DoD verbatim (rank_candidate_benches + propose_cheap_pilot_slice + format_*_markdown + anti-pattern guard); 15 unit tests PASS. W102 arsenal-mining extension (scripts/run_w102_arsenal_mining.py) re-executes 2640 W88+W91 candidate responses offline against HumanEval+ + MBPP+ V2 surfaces; key empirical finding: MBPP+ V2 cluster surface on the SAME W91 70B responses lifts B-A1 from +1.33pp (base-MBPP cap) to +5.28pp — BUT the empirical W102 cheap pilot at seed 101_001 with FRESH K=5 sampling landed at -6.67pp (11.95pp swing below the arsenal-mining prior). This is added as a NEW W102 anti-pattern: cross-bench arsenal-mining priors are an UPPER BOUND, not cheap-pilot earning evidence. Per-problem cluster on the cheap-pilot slice: 3 a1_only_wins (B regression on problems where i.i.d. K=5 found a passing candidate but reflexion chain didn't — same W97/W98/W99 RealWorldQA-B0 structural pattern), 1 b_only_win (B rescue at attempt index 1), 22 shared_wins, 4 shared_fails. B's first-pass-attempt distribution: 21/23 PASSes came at attempt 0 (reflexion never invoked); 1/23 at attempt 1; 1/23 at attempt 3. MLB-2 rescue rate 22.22% on MBPP+ V2 is well below W89 HumanEval rescue rate of 47% — reflexion-mechanism load-bearingness on MBPP-family at 70B is empirically weaker than on HumanEval-family. Decision applied per pre-committed runbook branch 3: 2 carry-forwards added (W102-L-MBPP-PLUS-V2-REFLEXION-PHASE2-70B-CAP + W102-L-MBPP-PLUS-V2-MECHANISM-LOAD-BEARINGNESS-WEAK-AT-70B-CAP); W103 = HumanEval+ cheap pilot via W102-built backup; COO-9 REMAINS lead path; NO cross-scale MBPP+ V2; NO Phase 3. W101 V1 loader/executor/reflexion-bench DEMOTED to historical artifact + anti-pattern (silent-degeneration failure mode); V1 stays in-repo for the W101 audit trail. Discipline validation #12: W93/W94/W95/W96-A/W96-C/W96-D/W97/W98/W99/W100/W101/W102 with W102 extending the discipline with (a) silent-degeneration-via-schema-assumption anti-pattern guard (P5+P6 probes), (b) cross-bench-arsenal-mining-priors-as-cheap-pilot-earning-evidence anti-pattern guard, (c) mechanism-load-bearingness-varies-by-benchmark-family-at-70B structural lesson. Stable boundary preserved: coordpy.__version__=0.5.20; SDK_VERSION=coordpy.sdk.v3.43; no PyPI publish; coordpy/__init__.py untouched. 9 new explicit-import-only coordpy.* modules + 5 new driver scripts + 3 new unit-test files (67 tests total; all PASS).",
+      "commits": [
+        "55f40cf",
+        "7419a6b"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W102.md",
+        "docs/RESULTS_W102_MBPP_PLUS_LOADER_V2_FIX_V1.md",
+        "docs/RESULTS_W102_HUMANEVAL_PLUS_PREFLIGHT_V1.md",
+        "docs/RESULTS_W102_CODE_SLICE_SELECTOR_V1.md",
+        "docs/RESULTS_W102_ARSENAL_MINING_V1.md",
+        "docs/RESULTS_W102_MBPP_PLUS_V2_PHASE2_70B_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W102_V1.md",
+        "docs/RESULTS_W102_MILESTONE_SUMMARY_V1.md"
+      ],
+      "linear_issues": [
+        "COO-26"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W102-L-MBPP-PLUS-V2-REFLEXION-PHASE2-70B-CAP",
+        "W102-L-MBPP-PLUS-V2-MECHANISM-LOAD-BEARINGNESS-WEAK-AT-70B-CAP"
+      ]
     }
   ]
 }
