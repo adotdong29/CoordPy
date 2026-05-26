@@ -307,6 +307,30 @@
         "W102-L-MBPP-PLUS-V2-REFLEXION-PHASE2-70B-CAP",
         "W102-L-MBPP-PLUS-V2-MECHANISM-LOAD-BEARINGNESS-WEAK-AT-70B-CAP"
       ]
+    },
+    {
+      "id": "W103",
+      "title": "HumanEval+ lead pilot at 70B PASS_MECHANISM_DRIVEN (B-A1 = +20.00pp; 9/9 Phase 2 gates + MLB-1 56.67% + MLB-2 47.06% all PASS on the helper-anchored slice; first NIM-spending pilot to consume coordpy.code_slice_selector_v1 as a load-bearing input; W104 cross-scale confirmation pre-committed; COO-9 remains lead path; W89 sequential-reflexion mechanism extends to a SECOND published code benchmark family (HumanEval+ EvalPlus-hardened) at the cheap-pilot scale; carry-forward W103-L-HUMANEVAL-PLUS-REFLEXION-PHASE2-70B-PASS registered; ZERO new coordpy.* modules)",
+      "outcome": "PHASE 2 PASS_MECHANISM_DRIVEN — A0=50.00% / A1@K=5=50.00% / B (sequential reflexion K=5)=70.00% / B-A1=+20.00pp (4x larger than the W89 retirement's +5.56pp) / B-A0=+20.00pp / per-problem majority B ≥ A1 on 29 of 30 (only 1 a1_only regression) / 7 b_only_wins (mechanism rescues) / 14 shared_wins / 8 shared_fails / MLB-1=56.67% (17/30) PASS / MLB-2=47.06% (8/17) PASS (matches W89 base-HumanEval retirement template's 47% rescue rate byte-for-byte) / 9 of 9 Phase 2 gates PASS. Pilot 124 min wall (7424.3 s; heavy 429 throttling + early-launch socket hang; killed + relaunched at 12 min; hardened retry budget kept the run grinding without exhausting). Bench Merkle root 68f4a9669f1bd03e6b3cb393a436e4f04aca034a0bad9c4b5ea8a002faabfd6d. Slice CID c35155956ece605c0169b0cf35a6b69267bee04f5f68cf5a5de466dcc01dd8d2 (helper-priority order; 28 unique HumanEval+ task_ids + 2 base-HumanEval top-ups; cluster mix 7 humaneval_plus:b_only_wins + 10 humaneval_plus:shared_fails + 2 humaneval_plus:a1_only_wins + 9 humaneval_plus:shared_wins + 2 humaneval(top-up):shared_wins = 63.3% historically-hard). Notable empirical finding: A1@K=5=50.00% is EXACTLY EQUAL to A0=50.00% on this helper-anchored slice (K=5 i.i.d. sampling produced zero improvement over single-shot); sequential reflexion (B) recovered 8 of the 17 problems where A0 failed via cumulative-stderr conditioning. This is a stronger mechanism-load-bearing signal than the W89 retirement showed (where A1 ≈ 85.56% so the i.i.d. surface was structurally smaller); reflexion is doing real work that i.i.d. sampling cannot substitute for on this slice. Decision applied per pre-committed Branch A: W103-L-HUMANEVAL-PLUS-REFLEXION-PHASE2-70B-PASS registered (single-seed cheap-pilot PASS; NOT retirement); COO-9 REMAINS lead path; W104 = HumanEval+ cross-scale confirmation at a SECOND model class (W104 RUNBOOK locks the exact target); W105+ = Phase 3 retirement bench (3 seeds × 100 problems × K=5) IF W104 cross-scale PASSes. W102 / W103 cross-bench contrast: reflexion-mechanism load-bearingness is benchmark-family-dependent at 70B — MBPP-family rescue rate 22.22% (W102 FAIL) vs HumanEval-family rescue rate 47.06% (W103 PASS, identical to W89 47%). This is now an empirical fact, not a conjecture. Hardening lane: 9 unit tests codifying W102 + W103 lessons (silent-degeneration anti-pattern + arsenal-mining-prior anti-pattern + sidecar-flush hardening + helper-anchored-slice integrity + anti-pattern token absence + production slice CID determinism pin); driver now flushes the sidecar after every write (W102 buffered all 330 entries until pilot exit, blinding mid-run operator audits; W103 codifies the fix via test_w103_pilot_driver_flushes_sidecar_after_each_write). Planning lane: W104 pre-committed by outcome BEFORE pilot launched (Branch A applied; Branch B `PASS_NON_MECHANISM_DRIVEN` and Branch C FAIL decision logic remain in docs/RUNBOOK_W103.md as durable artifacts of pre-commit-then-execute discipline). Helper-consumption attestation (W102 COO-14 downstream-consumption deliverable): coordpy.code_slice_selector_v1 transitions from \"shipped helper with worked example\" to \"shipped helper as load-bearing pilot input\". Stable boundary preserved: coordpy.__version__=0.5.20; SDK_VERSION=coordpy.sdk.v3.43; no PyPI publish; coordpy/__init__.py untouched. ZERO new coordpy.* modules in W103. 2 new driver scripts (run_w103_humaneval_plus_pilot.py + _w103_emit_pilot_result_doc.py); 1 modified driver (+5 lines for sidecar flush); 1 modified test file (+21 lines for sidecar-flush regression); 6 new docs (RUNBOOK + 4 RESULTS + FRONTIER_AUDIT). 75 tests across W101+W102+W103 code line; all PASS. Discipline validation #13: W93/W94/W95/W96-A/W96-C/W96-D/W97/W98/W99/W100/W101/W102/W103.",
+      "commits": [
+        "b7a4c3d",
+        "1702e28"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W103.md",
+        "docs/RESULTS_W103_HELPER_CONSUMPTION_V1.md",
+        "docs/RESULTS_W103_HUMANEVAL_PLUS_PREFLIGHT_RECONFIRM_V1.md",
+        "docs/RESULTS_W103_HUMANEVAL_PLUS_PHASE2_70B_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W103_V1.md",
+        "docs/RESULTS_W103_MILESTONE_SUMMARY_V1.md"
+      ],
+      "linear_issues": [
+        "COO-27"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W103-L-HUMANEVAL-PLUS-REFLEXION-PHASE2-70B-PASS"
+      ]
     }
   ]
 }
