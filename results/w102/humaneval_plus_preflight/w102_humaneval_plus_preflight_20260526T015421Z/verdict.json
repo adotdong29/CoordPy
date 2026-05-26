@@ -1,0 +1,114 @@
+{
+  "schema": "coordpy.humaneval_plus_preflight_v1.v1",
+  "candidate": "B (W89 sequential reflexion on HumanEval+)",
+  "candidate_model": "meta/llama-3.3-70b-instruct",
+  "probes": [
+    {
+      "probe_id": "P1",
+      "description": "HumanEval+ corpus integrity (SHA-pinned HF JSONL)",
+      "passed": true,
+      "summary": "HumanEval+ corpus: 164 problems (164 with test; 164 with entry_point).",
+      "evidence_cid": "689fe149df918a3e44e2b3ed85b53d340d6439b9a8728ea3f25247508392fc96",
+      "evidence": {
+        "n_problems": 164,
+        "n_with_test": 164,
+        "n_with_entry_point": 164,
+        "first_task_id": "HumanEval/0",
+        "last_task_id": "HumanEval/163"
+      }
+    },
+    {
+      "probe_id": "P2",
+      "description": "HumanEval+ executor self-test on canonical solutions",
+      "passed": true,
+      "summary": "Canonical-solution executor self-test: 30/30 = 100.00%; floor 98%.",
+      "evidence_cid": "2c6074ef8a94167178b99436e552311c29316629b1023ab7caa3661c4372f4ff",
+      "evidence": {
+        "n_sampled": 30,
+        "n_pass": 30,
+        "pass_rate": 1.0,
+        "failures": [],
+        "executor_schema": "coordpy.humaneval_plus_executor_v1.v1"
+      }
+    },
+    {
+      "probe_id": "P3",
+      "description": "HumanEval+ A1@K=5 failure-residual estimate (extrapolation from W88 + published EvalPlus drop)",
+      "passed": true,
+      "summary": "Predicted HumanEval+ A1@K=5: 72.86%; saturation margin 17.14pp.",
+      "evidence_cid": "4c6dc52df634aa07520ffed4c99d0b173deb8992023604a4dcc1c67f606c2ed3",
+      "evidence": {
+        "source": "extrapolation_from_w88_70b_humaneval",
+        "w88_70b_humaneval_a1_mean_pp": 85.56,
+        "published_drop_min_pp": 12.7,
+        "a1_predicted_humaneval_plus_pp": 72.86,
+        "saturation_threshold_pp": 90.0,
+        "margin_pp": 17.14
+      }
+    },
+    {
+      "probe_id": "P4",
+      "description": "Decomposition argument (W89 sequential reflexion on HumanEval+)",
+      "passed": true,
+      "summary": "Argument written (1528 chars); W89 retirement on base HumanEval is the empirical precedent.",
+      "evidence_cid": "aadad831d27036204157e3d5ef03362b0bf6b731add7d64a5046d816e439f566",
+      "evidence": {
+        "argument": "HumanEval+ differs from base HumanEval primarily by adding ~80x more hidden tests per problem via EvalPlus's generative test-augmentation pipeline (Liu et al. 2023). The W89 sequential-reflexion B-pipeline retired the +5 pp Phase 2 bar on base HumanEval at 70B (+5.56 pp empirical margin; rescue fraction 9.76% across 90 problem-seeds; the only confirmed multi-seed same-budget multi-agent superiority retirement in the programme).  On HumanEval+ the same mechanism reads the EvalPlus extra-test failures from the subprocess's stderr tail (`AssertionError: ...` or numpy-allclose mismatches), giving the reflexion turn structurally informative bug-class signal.  Specifically: (i) under A1's i.i.d. sampling, each of K=5 samples sees only the function signature + docstring; the EvalPlus extra tests are HIDDEN so a candidate that handles the docstring example but fails on edge cases is statistically common; (ii) under B's sequential reflexion, the executor surfaces the FIRST extra-test failure to the next attempt's prompt, which is conditioned on the bug class.  Quantitatively: W88 70B HumanEval A1=85.56% drops to predicted HumanEval+ A1 ~ 72-73% by the published EvalPlus Hoeffding lower bound (12.7 pp); the +5 pp Phase 2 margin bar is reachable if the reflexion mechanism stays load-bearing on the new failure-cluster distribution.  The W89 retirement on base HumanEval is the explicit empirical precedent; HumanEval+ tests cross-bench generalisation of the same mechanism shape with the ceiling structurally relieved.",
+        "argument_length_chars": 1528,
+        "w89_humaneval_retirement_margin_pp": 5.56,
+        "w88_humaneval_a1_mean_pp": 85.56
+      }
+    },
+    {
+      "probe_id": "P5",
+      "description": "Extra-test-surface integrity guard (check(candidate) function present)",
+      "passed": true,
+      "summary": "Extra-test surface: check() function on 164/164 = 100.00% (floor 95%).",
+      "evidence_cid": "ac9787339e847d5ecad02b137850b9dfbb3994c2e267d3f942e3ebdf97ae32c8",
+      "evidence": {
+        "n_problems": 164,
+        "n_with_check_function": 164,
+        "rate": 1.0,
+        "min_required_rate": 0.95
+      }
+    },
+    {
+      "probe_id": "AddrW102-Hplus-AntiPattern",
+      "description": "Anti-pattern guard: no bounded / compaction / summary primitives in HumanEval+ bench module",
+      "passed": true,
+      "summary": "No anti-pattern tokens found",
+      "evidence_cid": "7620c606fc1d2e7f2de1c0a091ed9a55f8bcdeb785ef30c898239eb440abc4be",
+      "evidence": {
+        "bench_module_path": "/Users/qdong/Desktop/Desktop1/Andy/context-zero/coordpy/humaneval_plus_reflexion_bench_v1.py",
+        "module_present": true,
+        "src_chars": 24328,
+        "forbidden_tokens": [
+          "bounded_window",
+          "compaction",
+          "context_compaction",
+          "prose_summary",
+          "context_pruning",
+          "summarizer"
+        ],
+        "hits": []
+      }
+    },
+    {
+      "probe_id": "AddrW102-Hplus-W89-Rescue",
+      "description": "W89 base-HumanEval rescue prior (cross-bench)",
+      "passed": true,
+      "summary": "W89 rescue fraction 9.76% on base HumanEval; floor 5% (PASS).",
+      "evidence_cid": "7418040637cb463633f17fccfcf18a0eb47ea7243b3bcc9830607e5e8fe289c6",
+      "evidence": {
+        "source": "W89 70B HumanEval reflexion bench (3-seed)",
+        "w89_rescue_fraction": 0.0976,
+        "min_required_fraction": 0.05,
+        "comparable_to": "W101 AddrW101-P1 for MBPP+ V2"
+      }
+    }
+  ],
+  "overall_passes": true,
+  "n_passed": 7,
+  "n_required": 7,
+  "verdict_cid": "4f57a2cf60ae6a1bbecf15a3ae6e0a9d68a1f9f52d07abb1eb7c2de72e25f7a4"
+}
