@@ -136,45 +136,66 @@ surface the W89 sequential-reflexion mechanism can attack.
 The W101 V1 silent-degeneration bug would have hidden this
 finding entirely.
 
-## Phase 2 cheap-pilot verdict (MBPP+ V2)
+## Phase 2 cheap-pilot verdict (MBPP+ V2) — **FAIL**
 
-> Populated at pilot completion in
-> `docs/RESULTS_W102_MBPP_PLUS_V2_PHASE2_70B_V1.md` and
-> cross-referenced here once available.
+Full verdict in
+`docs/RESULTS_W102_MBPP_PLUS_V2_PHASE2_70B_V1.md`.  Headline:
+
+| Arm | Pass rate | vs prior |
+|---|---:|---|
+| A0 | 73.33 % (22 / 30) | — |
+| A1 @ K=5 | 83.33 % (25 / 30) | empirical (vs W102 mining prior 77.63 % on W91 historical responses re-graded) |
+| B (sequential reflexion K=5) | 76.67 % (23 / 30) | — |
+| **B − A1** | **−6.67 pp** | **11.95 pp swing below the +5.28 pp arsenal-mining prior** |
+| B − A0 | +3.33 pp | < +5 pp gate-5 floor |
+
+**6 of 9 Phase 2 gates PASS** (gates 3 + 4 + 5 FAIL); **MLB-1
+(30 % invocation rate) FAIL** by 3 pp; **MLB-2 (22.22 % rescue
+rate) FAIL** by 11 pp.  Verdict label: **`FAIL`**.
+
+Per-problem cluster: 3 a1_only_wins (B regression: i.i.d. K=5
+sampling found a PASS, reflexion chain didn't), 1 b_only_win
+(rescue: problem 0 at attempt 1), 22 shared_wins, 4 shared_fails.
+
+Pilot wall: 4 742 s = 79 min (NIM endpoint heavily 429-
+throttled today; hardened retry kept the pilot grinding
+without exhausting budget; total 330 NIM calls landed).
 
 ## Decision logic applied per the pre-committed runbook
 
-### If MBPP+ V2 cheap pilot PASSes 9/9 + MLB sub-gates
+**APPLIED**: cheap pilot FAILed (B − A1 = −6.67 pp; MLB-1 +
+MLB-2 both FAIL).  Per branch 3 of the pre-committed W102
+RUNBOOK § "Lead lane — MBPP+ V2 (CONDITIONAL on preflight)":
 
-* Add carry-forward
-  `W102-L-MBPP-PLUS-V2-REFLEXION-PHASE2-70B-PASS` (a
-  Phase 2 cheap-pilot single-seed PASS, NOT a retirement).
-* W103 = cross-scale MBPP+ V2 confirmation at a SECOND model
-  class (`meta/llama-4-405b-instruct` if available, OR
-  `meta/llama-3.2-90b-vision-instruct` in text-only mode).
-* HumanEval+ cheap pilot DEFERRED to W104+ when cross-bench
-  generalisation becomes the next question.
-* W104+ = MBPP+ V2 Phase 3 retirement bench (3 seeds × 100
-  problems × K=5) IF W103 cross-scale PASSes.
+1. **Add carry-forwards** (done above):
+   `W102-L-MBPP-PLUS-V2-REFLEXION-PHASE2-70B-CAP` +
+   `W102-L-MBPP-PLUS-V2-MECHANISM-LOAD-BEARINGNESS-WEAK-AT-70B-CAP`.
+2. **W103 lead path = HumanEval+ cheap pilot** using the
+   W102-built backup-lane infrastructure (preflight 7/7 PASS;
+   verdict cid
+   `4f57a2cf60ae6a1bbecf15a3ae6e0a9d68a1f9f52d07abb1eb7c2de72e25f7a4`).
+   The HumanEval+ historical rescue fraction (9.21 % on W88
+   responses re-graded against HumanEval+) is materially
+   richer than MBPP+ V2's empirical 22.22 % rescue rate on
+   fresh K=5; HumanEval+ is the right next attack.
+3. **`COO-9` REMAINS the lead path** — EvalPlus-family attack
+   on the W91 base-MBPP cap is still the right direction; the
+   question shifts to which EvalPlus benchmark is the right
+   battlefield.  W103 RUNBOOK pre-commits the HumanEval+
+   attack before any new NIM call.
+4. **NO cross-scale MBPP+ V2** at this time.  Cross-scale
+   confirmation is not entitled when Phase 2 FAILs.
+5. **NO Phase 3 retirement bench** at this time.  Phase 3
+   requires Phase 2 PASS + cross-scale PASS.
 
-### If MBPP+ V2 cheap pilot PASSes 9/9 with MLB-2 FAIL
+### Decision branches NOT taken (pre-committed)
 
-* Mark `PASS_NON_MECHANISM_DRIVEN` per W96-C / W100 / W101
-  precedent.
-* W103 = HumanEval+ cheap pilot using the W102-built backup-
-  lane infrastructure.
-* No cross-scale on MBPP+ V2.
-
-### If MBPP+ V2 cheap pilot FAILS
-
-* Add carry-forward
-  `W102-L-MBPP-PLUS-V2-REFLEXION-PHASE2-70B-CAP`.
-* W103 = HumanEval+ cheap pilot using the W102-built backup-
-  lane infrastructure.
-* `COO-9` remains the lead path (the EvalPlus-family attack
-  on the W91 base-MBPP cap is still the right direction; the
-  question becomes which EvalPlus benchmark is the right
-  battlefield).
+* If pilot had PASSed 9/9 + MLB sub-gates cleared →
+  `W102-L-MBPP-PLUS-V2-REFLEXION-PHASE2-70B-PASS` +
+  W103 = MBPP+ V2 cross-scale confirmation.  Did NOT happen.
+* If pilot had PASSed 9/9 with MLB-2 FAIL →
+  `PASS_NON_MECHANISM_DRIVEN` + W103 = HumanEval+ cheap pilot.
+  Did NOT happen (the pilot also FAILed gates 3 + 4 + 5).
 
 ## Carry-forwards
 
@@ -187,8 +208,21 @@ finding entirely.
 
 ### Added by this milestone
 
-* **NONE empirical yet** until pilot completes.  The verdict
-  doc populates carry-forwards based on the pilot outcome.
+* **`W102-L-MBPP-PLUS-V2-REFLEXION-PHASE2-70B-CAP`** — at
+  Llama-3.3-70B-Instruct, slice seed 101_001, 30 problems,
+  K=5: B − A1 = −6.67 pp; B does NOT strictly beat A1;
+  MLB-1 = 30 % (FAIL); MLB-2 = 22.22 % (FAIL).  Cheap pilot
+  FAILs the Phase 2 +5 pp margin bar by 11.67 pp.  The W102
+  arsenal-mining +5.28 pp prior (re-graded W91 historical
+  responses against MBPP+ V2 test surface) did NOT transfer
+  to fresh K=5 sampling at a new seed.
+* **`W102-L-MBPP-PLUS-V2-MECHANISM-LOAD-BEARINGNESS-WEAK-AT-70B-CAP`**
+  — MLB-2 rescue rate 22.22 % on MBPP+ V2 is well below the
+  W89 HumanEval rescue rate of 47 %.  The reflexion mechanism
+  on this benchmark family produces fewer rescues per
+  invocation than the W89 retirement template, suggesting the
+  structural problem is not solely ceiling-pressure but
+  includes mechanism-fit on MBPP-family problems at 70B.
 
 ### Demoted
 
