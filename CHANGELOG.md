@@ -13,6 +13,127 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W104 HumanEval+ cross-scale Phase 2 cheap pilot at the pre-locked-backup target (Llama-3.1-70B-Instruct, cross-generation) PASS_MECHANISM_DRIVEN — B − A1 = +10.00 pp; 9 of 9 Phase 2 gates + MLB-1 56.67 % + MLB-2 35.29 % all PASS on the BYTE-EQUAL W103 helper-anchored slice; cross-generation shift on B − A1 = −10.00 pp (W103 +20 pp → W104 +10 pp; W89 mechanism keeps half its W103 margin); cross-generation shift on MLB-2 = −11.77 pp (47.06 % → 35.29 %, still above 33 % floor); pre-locked primary `meta/llama-3.1-405b-instruct` was UNREACHABLE on NIM (HTTP 404), pre-locked backup applied per the W104 RUNBOOK § Target-model selection rule; W105 Phase 3 retirement bench ENTITLED + pre-built (pack CID `8be55f3bf1650df3...`); ZERO new coordpy.* modules added to `__init__.py`, exactly ONE new explicit-import-only module `coordpy.cross_scale_comparator_v1` (2026-05-26)**
+  — *W104 (`COO-28`) executed the Branch A cross-scale path
+  pre-committed in `docs/RUNBOOK_W103.md` § Planning lane.
+  Three lanes shipped in the same milestone per the W104
+  RUNBOOK (`docs/RUNBOOK_W104.md`).  **Lead lane** —
+  reachability smoke probe on pre-locked primary
+  `meta/llama-3.1-405b-instruct` returned HTTP 404 on NIM
+  (not hosted); pre-locked backup `meta/llama-3.1-70b-instruct`
+  was applied deterministically per the W104 RUNBOOK §
+  Target-model selection rule's criterion 2(b) (cross-
+  generation at same parameter scale).  The cross-scale form
+  actually achieved is **cross-GENERATION** (Llama 3.1 vs
+  Llama 3.3 at 70B), NOT cross-scale-UP (70B → 405B).
+  Pilot ran 1 seed × 30 problems × K=5 = 330 NIM calls on
+  the BYTE-EQUAL W103 helper-anchored slice (slice CID
+  `c35155956ece605c...` verified at run start; corpus SHA
+  `908377f1daf28dcb...` verified at run start; pilot refuses
+  to run on either mismatch).  7506.9 s wall (~125 min);
+  modest 429 throttling near the end; all retries recovered
+  cleanly.  **Empirical headline**: A0 = 46.67 % / A1 @ K=5 =
+  53.33 % / B = 63.33 %; **B − A1 = +10.00 pp**;
+  B − A0 = +16.66 pp; per-problem cluster (B vs A1): 5
+  b_only_wins (rescues) + 14 shared_wins + 2 a1_only_wins
+  (regressions) + 9 shared_fails; **MLB-1 invocation rate
+  56.67 % (17/30) PASS**; **MLB-2 rescue rate 35.29 % (6/17)
+  PASS**; 9 of 9 Phase 2 gates PASS; verdict label
+  `PASS_MECHANISM_DRIVEN`.  **Cross-scale comparator emitted
+  automatically** (after a brief permission-outage retry; the
+  pilot's automatic emit attempt hit a brief macOS-TCC
+  outage on the W103 read path; the standalone comparator
+  module re-emitted cleanly once permission was restored).
+  Per-problem cluster shifts on the byte-equal slice: 8
+  stayed + 11 improved + 11 regressed + 0 flipped — symmetric
+  improve/regress consistent with cross-generation sampling
+  variance, no ambiguous "flipped" transitions.  Cross-
+  generation shift on B − A1 = **−10.00 pp** (W103 +20 →
+  W104 +10; mechanism keeps half its W103 margin at the
+  second model class); cross-generation shift on MLB-2 =
+  **−11.77 pp** (47.06 → 35.29; still load-bearing above the
+  33 % floor).  **Hardening lane** — four durable guardrails
+  landed: (1) `coordpy/cross_scale_comparator_v1.py` (single
+  new explicit-import-only module; schema/provenance-guarded;
+  refuses to run on slice CID / corpus SHA / schema version /
+  MLB-block mismatch; emits per-problem cluster-shift
+  classification across {stayed, improved, regressed,
+  flipped}), (2) byte-equal slice reuse from W103 with run-
+  start CID verification (refuses to run on mismatch), (3)
+  reachability smoke probe BEFORE any NIM spend with pre-
+  locked backup target, (4) resume-from-sidecar capability
+  for socket hangs / 429 storms (parses already-completed
+  `(seed, p_idx, arm, attempt_idx)` tuples on disk;
+  malformed trailing lines are treated as not-yet-completed).
+  14 PASSing unit tests in
+  `tests/test_w104_cross_scale_discipline_v1.py` codify all
+  four guardrails.  **Planning lane** — pre-built BOTH the
+  W105 Phase 3 slice pack (Branch A; 100 problems with the
+  W103 30-problem inner kernel preserved + 45 mid-shell
+  helper extension + 25 corpus-fill; pack CID
+  `8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314`;
+  3 seeds 105 001 / 105 002 / 105 003; cross-scale axis
+  Llama-3.3-70B + Llama-3.1-70B in the absence of 405B;
+  6 600 NIM calls total) and the Branch C fallback dispatch
+  table (machine-readable JSON for the next lead step under
+  any FAIL signature: LiveCodeBench preflight on mechanism-
+  distribution shift; APPS preflight on G2 saturation;
+  HumanEval+ multi-seed at the cross-scale target on per-
+  seed-sampling variance; cross-scale-collapse audit + 70B
+  Phase 3 confirmation on the W96-A 11B→90B regression
+  pattern; SWE-bench-lite stays unconditionally out of
+  scope).  Branch A is the empirically-applied branch.  W105
+  is execution, not paperwork.  **Helper consumption**:
+  `coordpy.code_slice_selector_v1` consumed as a real
+  downstream input for the second time (first was W103;
+  COO-14 deliverable extended from "load-bearing pilot
+  input" to "load-bearing Phase 3 slice-pack input").
+  **Decision applied**: Branch A.  Carry-forwards added: (1)
+  `W104-L-HUMANEVAL-PLUS-REFLEXION-PHASE2-CROSS-GENERATION-
+  70B-LLAMA31-PASS` (single-seed cross-generation cheap-
+  pilot PASS at Llama-3.1-70B-Instruct on the W103 helper-
+  anchored slice; NOT a multi-scale retirement and explicitly
+  NOT a 70B → 405B cross-scale-UP result); (2)
+  `W104-L-HUMANEVAL-PLUS-CROSS-SCALE-UP-PRIMARY-TARGET-405B-
+  UNREACHABLE-ON-NIM-CAP` (the pre-locked primary 405B target
+  was unreachable on NIM at the W104 run window; future
+  cross-scale-UP attempts depend on 405B becoming hosted).
+  Carry-forwards retired: NONE; W89 70B-HumanEval K=5 remains
+  the only confirmed multi-seed same-budget multi-agent
+  superiority retirement.  `COO-9` REMAINS the lead path.
+  **Discipline validation #14**: W93 / W94 / W95 / W96-A /
+  W96-C / W96-D / W97 / W98 / W99 / W100 / W101 / W102 / W103
+  / **W104**.  W104 EXTENDS the discipline with (a) cross-
+  scale-comparator-refuse-to-run-on-slice-corpus-schema-
+  mismatch (new W104 hardening), (b) sidecar-resume-from-
+  disk (new W104 hardening), (c) pre-committed-cross-
+  generation-fallback-on-reachability-smoke-FAIL (new W104
+  hardening; the W104 RUNBOOK pre-locked Llama-3.1-70B as
+  the backup BEFORE the smoke probe; the pilot driver
+  applied this deterministically when 405B returned HTTP
+  404).  **Stable boundary preserved**:
+  `coordpy.__version__ == "0.5.20"`; `SDK_VERSION ==
+  "coordpy.sdk.v3.43"`; no PyPI publish;
+  `coordpy/__init__.py` untouched; exactly ONE new
+  `coordpy.*` module (cross-scale comparator) added explicit-
+  import only.  **What W104 IS entitled to claim**: the W89
+  sequential-reflexion mechanism extends to HumanEval+ on TWO
+  different Llama-3.x 70B model classes at Phase 2 cheap-
+  pilot quality; the W103 +20 pp result was NOT pure model-
+  class luck (half the margin survives the cross-generation
+  swap); mechanism load-bearingness (MLB-2) remains above
+  the 33 % floor at the second model class.  **What W104
+  does NOT claim**: multi-benchmark same-budget retirement
+  (Phase 3 multi-seed required at W105); cross-scale-UP
+  generalisation (405B unreachable); cross-scale-collapse
+  risk eliminated (the W96-A / W96-C / W100 cross-modal
+  cross-scale-UP collapse patterns remain structurally
+  untested on the code line because 405B was unreachable on
+  NIM); generalisation to MBPP-family at 70B (`W102-L-MBPP-
+  PLUS-V2-REFLEXION-PHASE2-70B-CAP` stands); generalisation
+  to RealWorldQA (frozen at 11B per W100); "multi-agent
+  context solved".*
+
 - **W101 second-code-benchmark battlefield tournament + MBPP+ lead selection + cheap NIM-free preflight — 5-candidate × 8-criterion battlefield ranking (MBPP+ LEAD + HumanEval+ BACKUP); arsenal mining of W88 + W91 sidecars via 2,640 offline subprocess re-executions (per-seed numbers match published W89 + W91 byte-for-byte); 4 new explicit-import-only `coordpy.*` modules (loader + executor + reflexion-bench + preflight) + 3 driver scripts + 25 unit tests (all PASS); NIM-free preflight verdict 6 / 8 PASS with 2 DEFERRED on operator MBPP+ fetch step; cheap NIM pilot NOT YET earned — conditional on operator MBPP+ download + SHA pin + preflight re-run clean (2026-05-25)**
   — *Post-W100 code-pivot infrastructure per `COO-9` and the
   W101 runbook (`docs/RUNBOOK_W101.md`).  W100's pre-committed

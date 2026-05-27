@@ -1,0 +1,485 @@
+{
+  "schema": "coordpy.humaneval_plus_reflexion_bench_v1.v1",
+  "model_id": "meta/llama-3.1-70b-instruct",
+  "n_problems": 30,
+  "n_seeds": 1,
+  "K_multi_sample": 5,
+  "per_seed": [
+    {
+      "schema": "coordpy.humaneval_plus_reflexion_bench_v1.v1",
+      "seed": 104001,
+      "n_problems": 30,
+      "a0_pass_at_1": 0.466667,
+      "a1_pass_at_1": 0.533333,
+      "b_pass_at_1": 0.633333,
+      "a0_total_wall_ms": 710079,
+      "a1_total_wall_ms": 3523152,
+      "b_total_wall_ms": 3272968,
+      "per_problem_a0_passed": [
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        true,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false
+      ],
+      "per_problem_a1_passed": [
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false
+      ],
+      "per_problem_b_passed": [
+        true,
+        false,
+        true,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        false,
+        true,
+        true,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false
+      ],
+      "per_problem_b_first_pass_idx": [
+        1,
+        -1,
+        0,
+        -1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        -1,
+        -1,
+        -1,
+        -1,
+        0,
+        0,
+        0,
+        4,
+        -1,
+        2,
+        0,
+        0,
+        -1,
+        2,
+        -1,
+        0,
+        -1,
+        0,
+        -1
+      ],
+      "outcome_cids": [
+        "c3ab4a87c8a5af893a96fe9523be84ed9570f7e0e137184e80041a84381cd37b",
+        "40f4200d06050517b73cfe3e2b9eddd7dbe68753f6c9e98f045b71bd58036b9e",
+        "b6d9929f6aa22508d3d5b63be655b396b43c26c378fe908c4b89e13f5f0a7b93",
+        "58498d630f31197ef9e12dd228960c9200404759e113160a14cf8dd78dd0d9b1",
+        "85c443fe2fbf34309bae3b5b1e6e1ae484aa7b34bbafd2749c5b4d2917da7d00",
+        "48aba4399d29ebd5c83de91555e5a7feb50dfbf38921849b04ee0e2c9c514894",
+        "e9c5101c3c355135b26f0efa54e2504a78d3128fd35aa10af131c469283b85a6",
+        "9e7c8d172c4053d7d63cede6bf056a99f4b0e557195508967fce938b8b84d54e",
+        "5eda28b470f32edd5b10269df51ea750e481bb34c7824c68cfff51a4bc9a6663",
+        "0c15ad13e84700c3542f13feda72ebadb00fedd35f96e699be5f06ea863404bd",
+        "5c1e065c2c084c855e7f7f71ef9fda926052e68a83f80f49bce1eea76ef47ffc",
+        "7875b08226f043bdfd0ba8eb0c59c46597a8e4335e418ac2fb2f297918ee9c70",
+        "09f48e5e968ca90454b639b105e492cf6dc0f60e4b5f42a50982e070de10871d",
+        "e642c87d0bd84c44c14ee75b6bbef6d134cb92b69e6cf6e82dcb68eaadcb4d99",
+        "cdd4772bb7ef8306c6c8b402cee92ad4c852a3263ece653358ee9d4bdd9f6632",
+        "a5460fd6b20b8c37733880e7bf9ac2afb74b3b7543b6413cb3180442db83497a",
+        "6b1f49f3ec3d89781acb5ddb153a95eefaec6397c652fbccfbdfac7d73556c08",
+        "b154cfdc2fe9143952c4c90479fa12df1d8aaf32e332e1c5fbb848a0779ad167",
+        "ff0f2fddc638541d4d427bd4442047eaca3da07d347ec02623911099b1c0d62f",
+        "a7603792ed90828ea8a1c2366bb70eda446a6eac72ab17ccbca42c4925601066",
+        "d28bfa14e71f0d23a457e51c245c244b6b8deab4f9c7c575f3138b5b7bde0906",
+        "12941cb3c2ba7b342b317eea1794fb56ae5678cacbd07f0253eb9ecceefcd703",
+        "81256a7045b17e7d18b0abedd874e40e13e6601ada7378fee223aefaa7fc159f",
+        "19b8ee37caf6e9c77d90bb53eaac24bdc2ef01c44401b08eb33130a73565da4d",
+        "ff1277a66481391ca098e0de9412a98db2672df88c3ff8ac2a4764761c5f3d7c",
+        "772e04cc4f9818bae298ce61a342d96dfa118a736cce3c9809cea3dd8ec8c1c1",
+        "807a3842dd9a6568889380f2ce1fbe1d521a4c1530806b0f286f2fdfada7ea02",
+        "e871d01fe80123cab2aac2b806c013e95ea777b535a6640988f411a3466e4f34",
+        "75f7f51a0b2e9e90ab7d688af608d57bc9adb7d45a0debb0a6313830ba95f178",
+        "e93ef2039b93e05b60775e4519ce25f01d8be4f42677984cbe31b9d0b25e4f6b",
+        "919505daa3d2c368b628de91d2b313abb90a32e6603f93d4eb2c049b0dbe7209",
+        "f5e6791367c44f49272bf6562a1aca41a1b69766001711d2bff0c483ccae009f",
+        "1aa2a06d6274ecd7fd10e0cb0d819374983d477e0ded77b4fdb4bb499e20dfce",
+        "f7a2cd49b4f73195cc7e55b2e9fe10dad53a2b4f9a25c56ae88d0f7d17b99615",
+        "e3a609a61771d7440713efd16d7f4ff4ca280702b7615a8352c7e2afe795cffe",
+        "806c315d5e06ddde65172265dbfd0dcfdfbe1c050482c61d5bb7d715b32a10f1",
+        "703c0c60448d4fd360124dd33890a58b6b96b13404666857b9fd6db9338fea5f",
+        "5f3cb64a091c679b442a0117f0dd4181e473e33fd81b4e7279c78d756a337f59",
+        "32d707b82c27d1654d9c7f9bd6ab936814b47169b42c6a6cb1eda6483a59fdc6",
+        "a149ba165609b8739e7b50c2b818d33f9340174ca13a1af6dea0b4440f26f32e",
+        "6bfafd6426aa409638bc7028535955a8232b04fc3d11f9180e1cedf428f3e847",
+        "c2406145b27f68c8574651960e64a078cd7e7dc9a0ea8eca679b5e05cb5727a9",
+        "48c9a0b3893090bb28fa903127dc951cf4be2797bcd724533f6c535797e3b682",
+        "1c4c1457ade9248867093c1b433ed28068f75224b3ef61bf3665e1cb5bfa37bd",
+        "dc31e8c18a41041a6ce229951b53e5f91648dfef9f2aef851ce985a45c9e7890",
+        "c49b5df6effcda40dc785a0b08c78d273d0075fd384aa8d3b7679465775bbe23",
+        "1a81057ef04d1da39260063ba406dfb7d146977c3159c136db3039512c505a51",
+        "391707af1c53d6caf2a69f177ed929ef2ea6f5e09bb66a3d54d8f83082257c97",
+        "037050647262e23cd74113dced555b67adc484abe654369f585b7a9e965c2d05",
+        "3a723c296229a9a87ff9a38d6ce03ebae8d6622a4dc789de7c49e3ce8374c3c0",
+        "ab08fcd9bb3f947383e6cd0612ec26063220e92e703e76be1fde8968e561b975",
+        "ae5ff180f77f0687564c023c209a48375d2a3d3d597c43c260baacaca1f145bb",
+        "520c2deddcf1f64d8deb9f481f8540eb2bbb96064ff8ab6ee0a3c817e63b57ee",
+        "504be8ac5226d2cf5e85019917308feb094cf0efb1823e952f528c11c32ad370",
+        "0381c0bfb9cd554107ac9bee641a27fca8a6734f2cef843ee2f3d071a7520338",
+        "25234f5863c332b4b60b4e15dfc021d3175955dd49882cde65349cd75ce6feb6",
+        "da1853a57a19c01e9655878998e0fd77b0c0f5a6a34b13528513933e686b16ec",
+        "b281fad017440022203b41d4e4b4629aea0c44088a7e8e0490e007ec400588df",
+        "ee033a186d09faabf95a23a5b3cc662152c59518fae43537b7d2aaa97a2cf02a",
+        "c6bbd547c5e95aae14b0076e1fa785583a4df4af23dafa0f0e1e2b82f698e7b3",
+        "03dd418a2f64731ca438d6e243b2f760ed9015cf6645e39468c31952b150a9b3",
+        "826892d2ab33e8f22377df65e4f1c1e99ca21b09344aeef8e69d2f7b76d93617",
+        "4f676c98eab0420cebc7fccbeb305f0e803aee2c384a99903927cd233b2bd48c",
+        "94c2f934d5ae58aab2971af5a6f15ed11340ad41c10d76f5a53f5f3beec45ba5",
+        "ffb56c5e700d69990e723f246b43a200d04476af7b128230f01657f37fcac5ed",
+        "4c245cd627a49eb85f0a8765e123ef0b24153aea651bf2bb730ae278e87d9bfd",
+        "99f418c1ea19dec8d215f8852dc5de58227d3404fb318e1b50d49c6ecd5fd744",
+        "cd297bccf5bcea52bc35575b83c3848d9c108c5f8f319c75218bd1ea3a3fb9e1",
+        "4f82a6589917693825e216310ade01f0f2e4617c6328dca5dcd4885e185c1d1f",
+        "79409dace559eecef3e26e0f20e6fa421f2defe766fc1332801160529fc90890",
+        "9431ced4560698056f26e766019acdb3157670badaf6d5d29c62c2b5ba67eafc",
+        "d0e0dee1b11ecd59467b93f90c7749b52125f2af720419c943e25f828bbd2fc0",
+        "be1ee9ca99318be53fb5134060468a104d2b05ea4dd9801506bea13b87d85c54",
+        "694d2116d9241ee961221f18307be13f787d9e6c9ffdd2cb750f59f23b2b6d69",
+        "3ced14c4dc25226edb9ef084ceee5e6565c27646956f045aac2f8f164cbe8ffd",
+        "06c375060b076c0fa47434121a7828077e3a3cfeaace240b9cb28d76bcf03562",
+        "6db467978ccbb82f3217dac4c90a73d4218555f482e83db26dc61bfa2c4aa118",
+        "99cb5b731df69ac34e0257b7fe9a97ece1b70e68e44a4917ef71ff0c3227dc12",
+        "b252e31686a1169227d74d9aae1a218e7ac034bf0aebb5993bfc47a983e8eab1",
+        "8c3e9b6148a3ec9a61b77d5607173c623ecd56a89d0fac902943f8c6e6b87216",
+        "1488b092818656238360a83e18bacbf9edd07f5d1e91c496218fc339fbf7b36a",
+        "37b7d03c3d9245c0516abd4742051c7b07461ac55b345f5c858f9c84286f5bdd",
+        "e096cabc3088f640196001edbd3d9629dff3ba13152b76af00c15bdb42f984cd",
+        "fbe9b26ad4038b7ec3b6c11c3255bb14c1457dd88527a401b5beb77768d79f9d",
+        "132d49b0b499b97bf34cf72f57492151cb5c2c95de74dc1f47f8e2011a94ffda",
+        "0061a08925bf3a01bcf0446daac7abaeeb3bdfc384e8a2c5836901db0bda9d42",
+        "c51b7b85ccc79a7d994c2b0624fae2570242e7c8f86c8b74d5612440cc06079d",
+        "a7ceaba93a91540ed36dbdf21cd987cdaf570294ea42b935b7bc829ea91147d6",
+        "205073c08ae205144b4f5dffcb9e82fd2f15cc15fcf1eeef4dd445a04950a322",
+        "c941ffd9c9671d7621031dda0b1eb98edb8ee7fd2ab7db4bbd6bf45541ea18e5"
+      ],
+      "seed_merkle_root": "4a020fac5394535a96f4fe855afac234f2862ac93035a409aa1a9cb2e53793fc"
+    }
+  ],
+  "a0_mean_pass_at_1": 0.466667,
+  "a1_mean_pass_at_1": 0.533333,
+  "b_mean_pass_at_1": 0.633333,
+  "b_beats_a0_per_seed": [
+    true
+  ],
+  "b_beats_a1_per_seed": [
+    true
+  ],
+  "b_mean_strictly_beats_a0_mean": true,
+  "b_mean_strictly_beats_a1_mean": true,
+  "b_mean_minus_a1_mean_pp": 10.0,
+  "bench_merkle_root": "1a3d93aa5a2119338a9dca94e4d23e9275d921631b9b712c4f13f3e1e99d0171",
+  "wall_s": 7506.92,
+  "provenance": {
+    "schema": "coordpy.w104_humaneval_plus_cross_scale_pilot.v1",
+    "target_selection_rule_version": "coordpy.w104_target_selection_rule.v1",
+    "model_id": "meta/llama-3.1-70b-instruct",
+    "primary_target": "meta/llama-3.1-405b-instruct",
+    "backup_target": "meta/llama-3.1-70b-instruct",
+    "smoke_probe_skipped": false,
+    "seed": 104001,
+    "n_problems": 30,
+    "K_multi_sample": 5,
+    "corpus_path": "/Users/qdong/.cache/coordpy/humaneval-plus.jsonl",
+    "corpus_sha256": "908377f1daf28dcb36846db73a5662b2e05a9907407c2696c89ad9d3b0b04492",
+    "preflight_verdict_cid": "4f57a2cf60ae6a1bbecf15a3ae6e0a9d68a1f9f52d07abb1eb7c2de72e25f7a4",
+    "helper_proposal_cid_humaneval_plus": "a5b3a2c15c4e3a0c3f33a47ed80334b759065b72daf76e2818a230d6a7256327",
+    "mining_report_cid": "63465b7777ed05bda48f9bb02edd4aaa30e6c78315829f7e57b3e80973664dd6",
+    "slice_cid_helper_priority": "c35155956ece605c0169b0cf35a6b69267bee04f5f68cf5a5de466dcc01dd8d2",
+    "slice_cid_bench_order": "d5364a2f5a6ab3d6febe69b99d8424f75a54ad6f1dbde9e5e8e2d7e62c9e3052",
+    "helper_priority_slice": [
+      {
+        "task_id": "HumanEval/118",
+        "source": "humaneval_plus:b_only_wins"
+      },
+      {
+        "task_id": "HumanEval/16",
+        "source": "humaneval_plus:b_only_wins"
+      },
+      {
+        "task_id": "HumanEval/160",
+        "source": "humaneval_plus:b_only_wins"
+      },
+      {
+        "task_id": "HumanEval/163",
+        "source": "humaneval_plus:b_only_wins"
+      },
+      {
+        "task_id": "HumanEval/121",
+        "source": "humaneval_plus:b_only_wins"
+      },
+      {
+        "task_id": "HumanEval/125",
+        "source": "humaneval_plus:b_only_wins"
+      },
+      {
+        "task_id": "HumanEval/84",
+        "source": "humaneval_plus:b_only_wins"
+      },
+      {
+        "task_id": "HumanEval/129",
+        "source": "humaneval_plus:shared_fails"
+      },
+      {
+        "task_id": "HumanEval/76",
+        "source": "humaneval_plus:shared_fails"
+      },
+      {
+        "task_id": "HumanEval/91",
+        "source": "humaneval_plus:shared_fails"
+      },
+      {
+        "task_id": "HumanEval/132",
+        "source": "humaneval_plus:shared_fails"
+      },
+      {
+        "task_id": "HumanEval/137",
+        "source": "humaneval_plus:shared_fails"
+      },
+      {
+        "task_id": "HumanEval/140",
+        "source": "humaneval_plus:shared_fails"
+      },
+      {
+        "task_id": "HumanEval/154",
+        "source": "humaneval_plus:shared_fails"
+      },
+      {
+        "task_id": "HumanEval/32",
+        "source": "humaneval_plus:shared_fails"
+      },
+      {
+        "task_id": "HumanEval/55",
+        "source": "humaneval_plus:shared_fails"
+      },
+      {
+        "task_id": "HumanEval/83",
+        "source": "humaneval_plus:shared_fails"
+      },
+      {
+        "task_id": "HumanEval/17",
+        "source": "humaneval_plus:a1_only_wins"
+      },
+      {
+        "task_id": "HumanEval/122",
+        "source": "humaneval_plus:a1_only_wins"
+      },
+      {
+        "task_id": "HumanEval/100",
+        "source": "humaneval_plus:shared_wins"
+      },
+      {
+        "task_id": "HumanEval/101",
+        "source": "humaneval_plus:shared_wins"
+      },
+      {
+        "task_id": "HumanEval/104",
+        "source": "humaneval_plus:shared_wins"
+      },
+      {
+        "task_id": "HumanEval/111",
+        "source": "humaneval_plus:shared_wins"
+      },
+      {
+        "task_id": "HumanEval/113",
+        "source": "humaneval_plus:shared_wins"
+      },
+      {
+        "task_id": "HumanEval/119",
+        "source": "humaneval_plus:shared_wins"
+      },
+      {
+        "task_id": "HumanEval/14",
+        "source": "humaneval_plus:shared_wins"
+      },
+      {
+        "task_id": "HumanEval/35",
+        "source": "humaneval_plus:shared_wins"
+      },
+      {
+        "task_id": "HumanEval/44",
+        "source": "humaneval_plus:shared_wins"
+      },
+      {
+        "task_id": "HumanEval/49",
+        "source": "humaneval(top-up):shared_wins"
+      },
+      {
+        "task_id": "HumanEval/61",
+        "source": "humaneval(top-up):shared_wins"
+      }
+    ],
+    "bench_iteration_task_ids": [
+      "HumanEval/129",
+      "HumanEval/44",
+      "HumanEval/111",
+      "HumanEval/16",
+      "HumanEval/17",
+      "HumanEval/76",
+      "HumanEval/55",
+      "HumanEval/163",
+      "HumanEval/132",
+      "HumanEval/160",
+      "HumanEval/83",
+      "HumanEval/61",
+      "HumanEval/101",
+      "HumanEval/35",
+      "HumanEval/118",
+      "HumanEval/140",
+      "HumanEval/119",
+      "HumanEval/154",
+      "HumanEval/49",
+      "HumanEval/32",
+      "HumanEval/121",
+      "HumanEval/113",
+      "HumanEval/91",
+      "HumanEval/137",
+      "HumanEval/100",
+      "HumanEval/122",
+      "HumanEval/125",
+      "HumanEval/104",
+      "HumanEval/14",
+      "HumanEval/84"
+    ],
+    "cross_scale_pair_a_run_id": "w103_humaneval_plus_pilot_meta_llama-3.3-70b-instruct_20260526T022037Z",
+    "cross_scale_pair_a_model_id": "meta/llama-3.3-70b-instruct",
+    "cross_scale_pair_a_bench_merkle": "68f4a9669f1bd03e6b3cb393a436e4f04aca034a0bad9c4b5ea8a002faabfd6d",
+    "arsenal_mining_prior_humaneval_plus": {
+      "b_minus_a1_pp": 5.56,
+      "rescue_fraction": 0.0921,
+      "earning_status": "recorded; NOT a Phase 2 gate input (W102 anti-pattern carry-forward)"
+    },
+    "w103_70b_empirical_anchor": {
+      "b_minus_a1_pp": 20.0,
+      "mlb2_rescue_rate": 0.4706,
+      "earning_status": "recorded; NOT a Phase 2 gate input (the W104 fresh-K=5 sampling at the cross-scale target is the authoritative surface)"
+    },
+    "phase2_gate_floors": {
+      "G2_a1_max_pct": 90.0,
+      "G4_margin_min_pp": 5.0,
+      "G5_b_gt_a0_min_pp": 5.0,
+      "G6_per_problem_majority_min": 16,
+      "MLB1_floor": 0.33,
+      "MLB2_floor": 0.33
+    }
+  },
+  "mlb": {
+    "n_problems_total": 30,
+    "n_b_invoked_reflexion": 17,
+    "n_b_rescued_via_reflexion": 6,
+    "mlb1_invocation_rate": 0.5667,
+    "mlb2_rescue_rate": 0.3529,
+    "mlb1_floor": 0.33,
+    "mlb2_floor": 0.33,
+    "mlb1_passes": true,
+    "mlb2_passes": true
+  },
+  "phase2_evaluation": {
+    "a0_pct": 46.6667,
+    "a1_pct": 53.3333,
+    "b_pct": 63.3333,
+    "b_minus_a1_pp": 10.0,
+    "b_minus_a0_pp": 16.6667,
+    "n_problems": 30,
+    "n_b_ge_a1": 30,
+    "phase2_gates": {
+      "G1_slice_pre_committed": true,
+      "G2_a1_lt_90pct": true,
+      "G3_b_gt_a1": true,
+      "G4_margin_geq_5pp": true,
+      "G5_b_gt_a0_by_geq_5pp": true,
+      "G6_per_problem_majority": true,
+      "G7_budget_exact": true,
+      "G8_audit_chain_re_derives": true,
+      "G9_executor_clean": true,
+      "MLB1_invocation_rate_geq_33pct": true,
+      "MLB2_rescue_rate_geq_33pct": true
+    },
+    "n_phase2_passed_of_9": 9,
+    "mlb_subgates_pass": true,
+    "overall_pass_phase2": true,
+    "verdict_label": "PASS_MECHANISM_DRIVEN"
+  }
+}

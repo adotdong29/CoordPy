@@ -1,0 +1,193 @@
+{
+  "schema": "coordpy.w104_humaneval_plus_cross_scale_pilot.v1",
+  "target_selection_rule_version": "coordpy.w104_target_selection_rule.v1",
+  "model_id": "meta/llama-3.1-70b-instruct",
+  "primary_target": "meta/llama-3.1-405b-instruct",
+  "backup_target": "meta/llama-3.1-70b-instruct",
+  "smoke_probe_skipped": false,
+  "seed": 104001,
+  "n_problems": 30,
+  "K_multi_sample": 5,
+  "corpus_path": "/Users/qdong/.cache/coordpy/humaneval-plus.jsonl",
+  "corpus_sha256": "908377f1daf28dcb36846db73a5662b2e05a9907407c2696c89ad9d3b0b04492",
+  "preflight_verdict_cid": "4f57a2cf60ae6a1bbecf15a3ae6e0a9d68a1f9f52d07abb1eb7c2de72e25f7a4",
+  "helper_proposal_cid_humaneval_plus": "a5b3a2c15c4e3a0c3f33a47ed80334b759065b72daf76e2818a230d6a7256327",
+  "mining_report_cid": "63465b7777ed05bda48f9bb02edd4aaa30e6c78315829f7e57b3e80973664dd6",
+  "slice_cid_helper_priority": "c35155956ece605c0169b0cf35a6b69267bee04f5f68cf5a5de466dcc01dd8d2",
+  "slice_cid_bench_order": "d5364a2f5a6ab3d6febe69b99d8424f75a54ad6f1dbde9e5e8e2d7e62c9e3052",
+  "helper_priority_slice": [
+    {
+      "task_id": "HumanEval/118",
+      "source": "humaneval_plus:b_only_wins"
+    },
+    {
+      "task_id": "HumanEval/16",
+      "source": "humaneval_plus:b_only_wins"
+    },
+    {
+      "task_id": "HumanEval/160",
+      "source": "humaneval_plus:b_only_wins"
+    },
+    {
+      "task_id": "HumanEval/163",
+      "source": "humaneval_plus:b_only_wins"
+    },
+    {
+      "task_id": "HumanEval/121",
+      "source": "humaneval_plus:b_only_wins"
+    },
+    {
+      "task_id": "HumanEval/125",
+      "source": "humaneval_plus:b_only_wins"
+    },
+    {
+      "task_id": "HumanEval/84",
+      "source": "humaneval_plus:b_only_wins"
+    },
+    {
+      "task_id": "HumanEval/129",
+      "source": "humaneval_plus:shared_fails"
+    },
+    {
+      "task_id": "HumanEval/76",
+      "source": "humaneval_plus:shared_fails"
+    },
+    {
+      "task_id": "HumanEval/91",
+      "source": "humaneval_plus:shared_fails"
+    },
+    {
+      "task_id": "HumanEval/132",
+      "source": "humaneval_plus:shared_fails"
+    },
+    {
+      "task_id": "HumanEval/137",
+      "source": "humaneval_plus:shared_fails"
+    },
+    {
+      "task_id": "HumanEval/140",
+      "source": "humaneval_plus:shared_fails"
+    },
+    {
+      "task_id": "HumanEval/154",
+      "source": "humaneval_plus:shared_fails"
+    },
+    {
+      "task_id": "HumanEval/32",
+      "source": "humaneval_plus:shared_fails"
+    },
+    {
+      "task_id": "HumanEval/55",
+      "source": "humaneval_plus:shared_fails"
+    },
+    {
+      "task_id": "HumanEval/83",
+      "source": "humaneval_plus:shared_fails"
+    },
+    {
+      "task_id": "HumanEval/17",
+      "source": "humaneval_plus:a1_only_wins"
+    },
+    {
+      "task_id": "HumanEval/122",
+      "source": "humaneval_plus:a1_only_wins"
+    },
+    {
+      "task_id": "HumanEval/100",
+      "source": "humaneval_plus:shared_wins"
+    },
+    {
+      "task_id": "HumanEval/101",
+      "source": "humaneval_plus:shared_wins"
+    },
+    {
+      "task_id": "HumanEval/104",
+      "source": "humaneval_plus:shared_wins"
+    },
+    {
+      "task_id": "HumanEval/111",
+      "source": "humaneval_plus:shared_wins"
+    },
+    {
+      "task_id": "HumanEval/113",
+      "source": "humaneval_plus:shared_wins"
+    },
+    {
+      "task_id": "HumanEval/119",
+      "source": "humaneval_plus:shared_wins"
+    },
+    {
+      "task_id": "HumanEval/14",
+      "source": "humaneval_plus:shared_wins"
+    },
+    {
+      "task_id": "HumanEval/35",
+      "source": "humaneval_plus:shared_wins"
+    },
+    {
+      "task_id": "HumanEval/44",
+      "source": "humaneval_plus:shared_wins"
+    },
+    {
+      "task_id": "HumanEval/49",
+      "source": "humaneval(top-up):shared_wins"
+    },
+    {
+      "task_id": "HumanEval/61",
+      "source": "humaneval(top-up):shared_wins"
+    }
+  ],
+  "bench_iteration_task_ids": [
+    "HumanEval/129",
+    "HumanEval/44",
+    "HumanEval/111",
+    "HumanEval/16",
+    "HumanEval/17",
+    "HumanEval/76",
+    "HumanEval/55",
+    "HumanEval/163",
+    "HumanEval/132",
+    "HumanEval/160",
+    "HumanEval/83",
+    "HumanEval/61",
+    "HumanEval/101",
+    "HumanEval/35",
+    "HumanEval/118",
+    "HumanEval/140",
+    "HumanEval/119",
+    "HumanEval/154",
+    "HumanEval/49",
+    "HumanEval/32",
+    "HumanEval/121",
+    "HumanEval/113",
+    "HumanEval/91",
+    "HumanEval/137",
+    "HumanEval/100",
+    "HumanEval/122",
+    "HumanEval/125",
+    "HumanEval/104",
+    "HumanEval/14",
+    "HumanEval/84"
+  ],
+  "cross_scale_pair_a_run_id": "w103_humaneval_plus_pilot_meta_llama-3.3-70b-instruct_20260526T022037Z",
+  "cross_scale_pair_a_model_id": "meta/llama-3.3-70b-instruct",
+  "cross_scale_pair_a_bench_merkle": "68f4a9669f1bd03e6b3cb393a436e4f04aca034a0bad9c4b5ea8a002faabfd6d",
+  "arsenal_mining_prior_humaneval_plus": {
+    "b_minus_a1_pp": 5.56,
+    "rescue_fraction": 0.0921,
+    "earning_status": "recorded; NOT a Phase 2 gate input (W102 anti-pattern carry-forward)"
+  },
+  "w103_70b_empirical_anchor": {
+    "b_minus_a1_pp": 20.0,
+    "mlb2_rescue_rate": 0.4706,
+    "earning_status": "recorded; NOT a Phase 2 gate input (the W104 fresh-K=5 sampling at the cross-scale target is the authoritative surface)"
+  },
+  "phase2_gate_floors": {
+    "G2_a1_max_pct": 90.0,
+    "G4_margin_min_pp": 5.0,
+    "G5_b_gt_a0_min_pp": 5.0,
+    "G6_per_problem_majority_min": 16,
+    "MLB1_floor": 0.33,
+    "MLB2_floor": 0.33
+  }
+}

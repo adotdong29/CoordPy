@@ -331,6 +331,28 @@
       "carry_forwards_added": [
         "W103-L-HUMANEVAL-PLUS-REFLEXION-PHASE2-70B-PASS"
       ]
+    },
+    {
+      "id": "W104",
+      "title": "HumanEval+ cross-scale Phase 2 cheap pilot at the pre-locked-backup target (Llama-3.1-70B-Instruct, cross-generation) PASS_MECHANISM_DRIVEN + cross-scale-discipline hardening + W105 entitlement pre-built",
+      "outcome": "PHASE 2 PASS_MECHANISM_DRIVEN AT CROSS-GENERATION FORM — A0=46.67% / A1@K=5=53.33% / B=63.33% / B-A1=+10.00pp / B-A0=+16.66pp / 9 of 9 Phase 2 gates PASS / MLB-1=56.67% (17/30) PASS / MLB-2=35.29% (6/17) PASS. Pre-locked primary `meta/llama-3.1-405b-instruct` returned HTTP 404 on NIM (not hosted); pre-locked backup `meta/llama-3.1-70b-instruct` was applied deterministically per the W104 RUNBOOK § Target-model selection rule criterion 2(b). Cross-scale form actually achieved: cross-GENERATION (Llama 3.1 vs Llama 3.3 at 70B), NOT cross-scale-UP (70B → 405B). Pilot ran 1 seed × 30 problems × K=5 = 330 NIM calls on the BYTE-EQUAL W103 helper-anchored slice (slice CID c35155956ece605c0169b0cf35a6b69267bee04f5f68cf5a5de466dcc01dd8d2 verified at run start; corpus SHA 908377f1daf28dcb36846db73a5662b2e05a9907407c2696c89ad9d3b0b04492 verified at run start; pilot refuses to run on either mismatch). 7506.9 s wall (~125 min). Cross-scale comparator emitted (after a brief permission-outage retry): 8 stayed + 11 improved + 11 regressed + 0 flipped on the byte-equal slice; cross-generation shift on B-A1 = -10.00 pp (W103 +20 → W104 +10; mechanism keeps half its W103 margin); cross-generation shift on MLB-2 = -11.77 pp (47.06 → 35.29, still load-bearing above the 33% floor). Hardening lane: 4 durable guardrails landed (cross-scale comparator V1 schema/provenance refuse-to-run; byte-equal W103 slice reuse with run-start CID verification; reachability smoke probe BEFORE NIM spend with pre-locked backup; resume-from-sidecar capability for socket hangs / 429 storms). 14 PASSing unit tests codify all four guardrails. Planning lane: W105 Phase 3 retirement bench slice pack pre-built (pack CID 8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314; 100 problems with W103 30-problem inner kernel preserved + 45 mid-shell helper extension + 25 corpus-fill; 3 seeds 105_001 / 105_002 / 105_003; cross-scale axis Llama-3.3-70B + Llama-3.1-70B; 6 600 NIM calls total). Branch C fallback dispatch table (machine-readable JSON) pre-committed: LiveCodeBench preflight on mechanism-distribution shift; APPS preflight on G2 saturation; HumanEval+ multi-seed at cross-scale target on per-seed-sampling variance; cross-scale-collapse audit + 70B Phase 3 on W96-A regression pattern; SWE-bench-lite stays unconditionally out of scope. Helper consumption: coordpy.code_slice_selector_v1 consumed as a real downstream input for the second time (first was W103; COO-14 deliverable extended from `load-bearing pilot input` to `load-bearing Phase 3 slice-pack input`). Decision applied: Branch A. Carry-forwards added: W104-L-HUMANEVAL-PLUS-REFLEXION-PHASE2-CROSS-GENERATION-70B-LLAMA31-PASS + W104-L-HUMANEVAL-PLUS-CROSS-SCALE-UP-PRIMARY-TARGET-405B-UNREACHABLE-ON-NIM-CAP. Carry-forwards retired: NONE; W89 70B-HumanEval K=5 remains the only confirmed multi-seed same-budget multi-agent superiority retirement. `COO-9` REMAINS the lead path. Discipline validation #14: W93/W94/W95/W96-A/W96-C/W96-D/W97/W98/W99/W100/W101/W102/W103/W104. Stable boundary preserved: coordpy.__version__=0.5.20; SDK_VERSION=coordpy.sdk.v3.43; no PyPI publish; coordpy/__init__.py untouched. Exactly ONE new coordpy.* module added explicit-import only: coordpy.cross_scale_comparator_v1.",
+      "commits": [],
+      "docs": [
+        "docs/RUNBOOK_W104.md",
+        "docs/RESULTS_W104_HUMANEVAL_PLUS_PHASE2_405B_V1.md",
+        "docs/RESULTS_W104_CROSS_SCALE_COMPARATOR_V1.md",
+        "docs/RESULTS_W104_HELPER_W105_PLANNING_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W104_V1.md",
+        "docs/RESULTS_W104_MILESTONE_SUMMARY_V1.md"
+      ],
+      "linear_issues": [
+        "COO-28"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W104-L-HUMANEVAL-PLUS-REFLEXION-PHASE2-CROSS-GENERATION-70B-LLAMA31-PASS",
+        "W104-L-HUMANEVAL-PLUS-CROSS-SCALE-UP-PRIMARY-TARGET-405B-UNREACHABLE-ON-NIM-CAP"
+      ]
     }
   ]
 }
