@@ -9,7 +9,35 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W107 405B
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W108
+> LiveCodeBench real-data bug-fix + cheap-pilot FAIL + APPS backup
+> readiness** on 2026-05-28 — a **gated branch milestone with THREE
+> lanes, NOT a new broad benchmark tournament**.  W108 fixed the
+> partial-scaffold real-data bug (`release_v6` stores `metadata` as a
+> JSON **string** ⇒ the W107 loader left `func_name=""` ⇒ executor
+> ENTRY_NOT_FOUND ⇒ gold-path smoke A0=A1=B=0.0; `_resolve_func_name`
+> now handles both encodings, DISCHARGING the W107 loader-schema +
+> residual-grade caps), EARNED the cheap pilot on the real SHA-pinned
+> (`bb4c364f…`) contamination-resistant corpus (preflight PASS), and
+> ran it (`meta/llama-3.3-70b-instruct`, 1 seed × 30 × K=5 = 330
+> calls): **clean Phase-2 FAIL — A0=43.33 / A1@K=5=63.33 / B=60.00 %;
+> B − A1 = −3.33 pp; 7/9 gates; MLB-1=53.33 % PASS, MLB-2=25 % FAIL**
+> (`W108-L-LIVECODEBENCH-REFLEXION-PHASE2-70B-CAP`).  This is the
+> FIRST contamination-resistant test of the W89 mechanism and it
+> FAILed; both retirements (W89, W105) are contamination-EXPOSED
+> HumanEval-family only
+> (`W108-L-REFLEXION-NOT-DEMONSTRATED-ON-CONTAMINATION-RESISTANT-BENCH-CAP`;
+> contamination-confound = OPEN hypothesis, not a finding).  α: 405B
+> HTTP 404, the 5th consecutive (W104–W108), CLOSED.  γ: real APPS
+> backup scaffolding built + pivot-ready, NOT triggered.  W108 adds
+> NO retirement and retires NO research carry-forward (W89 + W105
+> stand).  `COO-9` REMAINS the lead path; `COO-32` is the W108 issue;
+> **W109 = APPS contaminated-control contrast** or multi-seed LCB
+> de-noise.  graphify refreshed from HEAD at start + close.  18th
+> consecutive preflight-discipline validation (W93–W108).  Stable
+> boundary preserved (no version bump; no PyPI; `coordpy/__init__.py`
+> untouched; 2 new explicit-import-only APPS modules + slice selector;
+> loader fixed in place).  Prior: **W107 405B
 > reachability gate + next-code-battlefield β preflight +
 > publication-grade consolidation** on 2026-05-28 — a **gated
 > branch milestone with THREE lanes, NOT a new broad benchmark

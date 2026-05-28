@@ -2,7 +2,16 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: **W107
+> README-of-README must satisfy these rules. Last touched: **W108
+> LiveCodeBench real-data bug-fix + cheap-pilot FAIL + APPS backup
+> readiness** on 2026-05-28 (W108 fixed the partial-scaffold real-data
+> bug, EARNED the cheap pilot on the real contamination-resistant
+> corpus, and ran it → **clean Phase-2 FAIL** (B − A1 = −3.33 pp;
+> MLB-2 = 25 %); the FIRST contamination-resistant test of the W89
+> mechanism FAILed; adds NO retirement and retires NO research
+> carry-forward; W89 + W105 stand as the TWO confirmed retirements,
+> now explicitly bounded as contamination-EXPOSED-only; see the W108
+> section below).  Prior: **W107
 > 405B reachability gate + next-code-battlefield β preflight +
 > publication-grade consolidation** on 2026-05-28 (W107 re-probed
 > 405B → 4th HTTP 404, gate CLOSED; preflighted LiveCodeBench as the
@@ -102,6 +111,40 @@ GitHub:
   `docs/HONEST_FRAMING_POST_W87.md`.** Any other doc that
   attempts a "we solved it" claim is wrong and must be
   brought into alignment with that file before publishing.
+
+## W108 (LiveCodeBench real-data bug-fix + cheap-pilot FAIL + APPS readiness) — explicit do-not-overstate rules
+
+- **Do say**: W108 ran the LiveCodeBench functional-subset Phase-2 cheap pilot
+  (earned on the real SHA-pinned corpus after fixing a real-data binding bug)
+  and it is a **clean FAIL** — A0=43.33 % / A1@K=5=63.33 % / B=60.00 %; B − A1
+  = −3.33 pp; 7/9 gates; MLB-1=53.33 % PASS, MLB-2=25 % FAIL.
+- **Do say**: this is the **first test of the W89 mechanism on a
+  contamination-resistant benchmark** (LiveCodeBench `release_v6`, all problems
+  dated 2025, post the Llama-3.x cutoff), and it FAILed; both confirmed
+  retirements (W89, W105) are on contamination-EXPOSED HumanEval-family (2021)
+  problems.
+- **Do NOT say** W108 produced a retirement, a third confirmed retirement, or
+  any strengthening of the claim.  It produced a FAIL; the claim is now MORE
+  carefully bounded, not stronger.
+- **Do NOT say** the W89/W105 reflexion advantage is a proven contamination
+  artifact.  W108 RAISES a contamination-confound HYPOTHESIS; with n=30, 1
+  seed, the −3.33 pp is a 1-problem net effect and MLB-2's 25 % is 4/16 — the
+  FAIL is real and load-bearing-floor-missing, but the confound is NOT
+  established (could be benchmark difficulty or single-seed noise).  Resolving
+  it needs a controlled follow-up (W109 APPS contaminated-control contrast, or
+  a multi-seed LiveCodeBench bench).
+- **Do NOT say** the two confirmed retirements are weakened or withdrawn.  W89
+  (+5.56 pp) and W105 (+7.00 pp, 6/6 bars, MLB-2 55.62 %) are real same-budget
+  results on their benchmarks and STAND; W108 only adds the explicit boundary
+  that they have not been shown on contamination-resistant data.
+- **Do NOT say** APPS evidence (if W109 runs it) would be publication-grade.
+  APPS is 2021 vintage = contamination-EXPOSED (C7=C); it is a backup/control
+  surface, never the time-anchored publication-grade claim surface.
+- **Do NOT cite** the LiveCodeBench A1 residual as still "published-baseline-
+  grade".  W108 measured it LIVE (A1@K=5 = 63.33 % on the pinned slice); the
+  W107 residual-grade cap is DISCHARGED for that slice.
+- 405B is unreachable on NIM for the **fifth consecutive time** (W104–W108 all
+  HTTP 404); the cross-scale-UP gate stays CLOSED.
 
 ## W107 (405B gate + next-battlefield β preflight + consolidation) — explicit do-not-overstate rules
 

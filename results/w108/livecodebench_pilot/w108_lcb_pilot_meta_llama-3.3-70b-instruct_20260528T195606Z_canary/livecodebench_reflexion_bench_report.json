@@ -1,0 +1,115 @@
+{
+  "schema": "coordpy.livecodebench_reflexion_bench_v1.v1",
+  "model_id": "meta/llama-3.3-70b-instruct",
+  "n_problems": 2,
+  "n_seeds": 1,
+  "K_multi_sample": 5,
+  "per_seed": [
+    {
+      "schema": "coordpy.livecodebench_reflexion_bench_v1.v1",
+      "seed": 108001,
+      "n_problems": 2,
+      "a0_pass_at_1": 0.0,
+      "a1_pass_at_1": 0.5,
+      "b_pass_at_1": 0.0,
+      "per_problem_a0_passed": [
+        false,
+        false
+      ],
+      "per_problem_a1_passed": [
+        false,
+        true
+      ],
+      "per_problem_b_passed": [
+        false,
+        false
+      ],
+      "per_problem_b_first_pass_idx": [
+        -1,
+        -1
+      ],
+      "question_ids": [
+        "3674",
+        "3677"
+      ],
+      "seed_merkle_root": "a139b8fd10f8a0000da0eda16888e133c442e4778ebe1ad59aaedde9b6414924"
+    }
+  ],
+  "a0_mean_pass_at_1": 0.0,
+  "a1_mean_pass_at_1": 0.5,
+  "b_mean_pass_at_1": 0.0,
+  "b_mean_minus_a1_mean_pp": -50.0,
+  "bench_merkle_root": "29764a2c86f2865be3f21c73414ef237d9c44ac2e7875c3484fc1477429b3d2f",
+  "wall_s": 74.05,
+  "provenance": {
+    "schema": "coordpy.w108_livecodebench_pilot.v1",
+    "model_id": "meta/llama-3.3-70b-instruct",
+    "seed": 108001,
+    "release": "release_v6",
+    "n_problems": 2,
+    "K_multi_sample": 5,
+    "corpus_path": "/Users/qdong/.cache/coordpy/livecodebench-test6.jsonl",
+    "corpus_sha256": "bb4c364f71921c4495a6ad15abe1a927350b720009f4933e2e71f8af0f6fd1f5",
+    "dataset": "livecodebench/code_generation_lite",
+    "preflight_verdict_cid": "61b9961c46943a5db8dbfd66b75844bfa2d092eac5543df2f4a613556e06bf33",
+    "slice_cid": "4e01340e8bad76007be3352e059bd28e0b8655fae0437ba8d96887466b847053",
+    "slice_question_ids": [
+      "3674",
+      "3677"
+    ],
+    "slice_difficulty_mix": {
+      "hard": 1,
+      "medium": 1
+    },
+    "slice_contest_date_min": "2025-01-11",
+    "slice_contest_date_max": "2025-01-11",
+    "contamination_window": "all problems post Llama-3.x 2024-01-01 cutoff",
+    "max_tokens_per_call": 1024,
+    "phase2_gate_floors": {
+      "G2_a1_max_pct": 90.0,
+      "G4_margin_min_pp": 5.0,
+      "G5_b_gt_a0_min_pp": 5.0,
+      "G6_per_problem_majority_min": 16,
+      "MLB1_floor": 0.33,
+      "MLB2_floor": 0.33
+    },
+    "label": "canary"
+  },
+  "mlb": {
+    "n_problems_total": 2,
+    "n_b_invoked_reflexion": 2,
+    "n_b_rescued_via_reflexion": 0,
+    "mlb1_invocation_rate": 1.0,
+    "mlb2_rescue_rate": 0.0,
+    "mlb1_floor": 0.33,
+    "mlb2_floor": 0.33,
+    "mlb1_passes": true,
+    "mlb2_passes": false
+  },
+  "phase2_evaluation": {
+    "a0_pct": 0.0,
+    "a1_pct": 50.0,
+    "b_pct": 0.0,
+    "b_minus_a1_pp": -50.0,
+    "b_minus_a0_pp": 0.0,
+    "n_problems": 2,
+    "n_b_ge_a1": 1,
+    "phase2_gates": {
+      "G1_slice_pre_committed": true,
+      "G2_a1_lt_90pct": true,
+      "G3_b_gt_a1": false,
+      "G4_margin_geq_5pp": false,
+      "G5_b_gt_a0_by_geq_5pp": false,
+      "G6_per_problem_majority": false,
+      "G7_budget_exact": true,
+      "G8_audit_chain_re_derives": true,
+      "G9_executor_clean": true,
+      "MLB1_invocation_rate_geq_33pct": true,
+      "MLB2_rescue_rate_geq_33pct": false
+    },
+    "n_phase2_passed_of_9": 5,
+    "mlb_subgates_pass": false,
+    "overall_pass_phase2": false,
+    "verdict_label": "FAIL"
+  }
+}

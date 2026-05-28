@@ -13,6 +13,33 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W108 LiveCodeBench real-data bug-fix + cheap-pilot FAIL + APPS backup readiness — a gated branch milestone with THREE lanes, NOT a new broad benchmark tournament; the partial LiveCodeBench scaffold's gold-path smoke (A0=A1=B=0.0) was diagnosed to a real-data binding bug (`release_v6` stores `metadata` as a JSON string ⇒ the W107 loader left `func_name=""` ⇒ executor ENTRY_NOT_FOUND), FIXED + locked in 19 tests, the cheap pilot EARNED on the real SHA-pinned contamination-resistant corpus, and RUN ⇒ clean Phase-2 FAIL (B−A1=−3.33 pp; MLB-2=25 %); the FIRST contamination-resistant test of the W89 mechanism FAILed; 405B 5th-consecutive 404 (CLOSED); real APPS backup scaffolding built + pivot-ready (not triggered); adds NO retirement; W89+W105 stand; 2 new explicit-import-only APPS modules + slice selector + loader fix; ZERO additions to `__init__.py` (2026-05-28)**
+  — *W108 (`COO-32`) executed the pre-committed `docs/RUNBOOK_W108.md`
+  three-lane branch logic, locked BEFORE any expensive NIM call.
+  **Lane α (405B gate)** — re-probed `meta/llama-3.1-405b-instruct`
+  → HTTP 404 (163 ms), the FIFTH consecutive 404 (W104–W108);
+  GATE = CLOSED (decision CID `e1af4451…`); $0 expensive 405B.
+  **Lane β (LiveCodeBench, main)** — diagnosed + fixed the
+  metadata-JSON-string loader bug, discharging the W107 loader-schema
+  + residual-grade caps; real-data preflight PASS (SHA pin
+  `bb4c364f…`; 63 functional, all func_name resolved, all plain-arg,
+  all 2025 post-cutoff; slice CID `2afc318c…`; verdict CID `61b9961c…`)
+  ⇒ pilot EARNED; ran 1 seed × 30 × K=5 = 330 NIM calls (~77 min;
+  444 HTTP-429 retries survived): A0=43.33 % / A1@K=5=63.33 % /
+  B=60.00 %; B − A1 = −3.33 pp; 7/9 gates; MLB-1=53.33 % PASS,
+  MLB-2=25 % FAIL ⇒ `FAIL` (NON-mechanism-driven;
+  `W108-L-LIVECODEBENCH-REFLEXION-PHASE2-70B-CAP`).  The W89/W105
+  retirements are contamination-EXPOSED-only; the contamination-
+  confound is an OPEN hypothesis
+  (`W108-L-REFLEXION-NOT-DEMONSTRATED-ON-CONTAMINATION-RESISTANT-BENCH-CAP`).
+  **Lane γ (APPS backup)** — built `coordpy.apps_loader_v1` +
+  `coordpy.apps_executor_v1` + preflight + 7 tests; pivot NOT
+  triggered (LiveCodeBench passed real-data soundness).  graphify
+  refreshed from HEAD at start + close.  18th consecutive
+  preflight-discipline validation (W93–W108).  `COO-9` stays lead;
+  W109 = APPS contaminated-control contrast or multi-seed LCB
+  de-noise.  Stable boundary preserved (no version bump; no PyPI;
+  `coordpy/__init__.py` untouched).*
 - **W107 405B reachability gate + next-code-battlefield β preflight + publication-grade consolidation — a gated branch milestone with THREE lanes, NOT a new broad benchmark tournament; 405B gate CLOSED (4th consecutive HTTP 404) ⇒ LiveCodeBench preflighted as the structurally-sound next battlefield (APPS pivot backup; no pivot) ⇒ W108 cheap pilot after operator corpus-fetch; W89→W106 retirement arc consolidated at publication grade; 2 new explicit-import-only modules + 16 PASSing tests; $0 expensive NIM; ZERO additions to `__init__.py` (2026-05-28)**
   — *W107 (`COO-31`) executed the pre-committed `docs/RUNBOOK_W106.md`
   § 7 branch logic, re-locked in `docs/RUNBOOK_W107.md` BEFORE any

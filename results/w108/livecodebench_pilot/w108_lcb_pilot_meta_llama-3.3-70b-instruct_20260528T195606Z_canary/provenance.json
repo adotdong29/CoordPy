@@ -1,0 +1,34 @@
+{
+  "schema": "coordpy.w108_livecodebench_pilot.v1",
+  "model_id": "meta/llama-3.3-70b-instruct",
+  "seed": 108001,
+  "release": "release_v6",
+  "n_problems": 2,
+  "K_multi_sample": 5,
+  "corpus_path": "/Users/qdong/.cache/coordpy/livecodebench-test6.jsonl",
+  "corpus_sha256": "bb4c364f71921c4495a6ad15abe1a927350b720009f4933e2e71f8af0f6fd1f5",
+  "dataset": "livecodebench/code_generation_lite",
+  "preflight_verdict_cid": "61b9961c46943a5db8dbfd66b75844bfa2d092eac5543df2f4a613556e06bf33",
+  "slice_cid": "4e01340e8bad76007be3352e059bd28e0b8655fae0437ba8d96887466b847053",
+  "slice_question_ids": [
+    "3674",
+    "3677"
+  ],
+  "slice_difficulty_mix": {
+    "hard": 1,
+    "medium": 1
+  },
+  "slice_contest_date_min": "2025-01-11",
+  "slice_contest_date_max": "2025-01-11",
+  "contamination_window": "all problems post Llama-3.x 2024-01-01 cutoff",
+  "max_tokens_per_call": 1024,
+  "phase2_gate_floors": {
+    "G2_a1_max_pct": 90.0,
+    "G4_margin_min_pp": 5.0,
+    "G5_b_gt_a0_min_pp": 5.0,
+    "G6_per_problem_majority_min": 16,
+    "MLB1_floor": 0.33,
+    "MLB2_floor": 0.33
+  },
+  "label": "canary"
+}
