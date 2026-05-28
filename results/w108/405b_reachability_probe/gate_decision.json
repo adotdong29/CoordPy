@@ -1,0 +1,20 @@
+{
+  "schema": "coordpy.w108_405b_reachability_gate.v1",
+  "gate": "CLOSED",
+  "lane": "beta_main",
+  "rationale": "405B unreachable on NIM (HTTP 404); Lane alpha CLOSED for W108 (5th consecutive 404); Lane beta (LiveCodeBench real-data cheap pilot) is the main empirical lane. Refresh W104-L-...-405B-UNREACHABLE-ON-NIM-CAP with this timestamp. Reachable would be signal, not permission (RUNBOOK_W108 \u00a7 2).",
+  "probe_status": "http_error",
+  "probe_http_status": 404,
+  "probe_model": "meta/llama-3.1-405b-instruct",
+  "probe_ts_utc": "2026-05-28T19:50:53.627562+00:00",
+  "probe_wall_ms": 163,
+  "consecutive_404_history": [
+    "W104",
+    "W105",
+    "W106",
+    "W107",
+    "W108"
+  ],
+  "recorded_ts_utc": "2026-05-28T19:51:08.697297+00:00",
+  "decision_cid": "e1af4451e4d15e7038016f7acd50d72560a77fc874470157c88d1426ee370e8d"
+}

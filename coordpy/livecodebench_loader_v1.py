@@ -50,6 +50,23 @@ Honest scope (W107)
   this loader instead validates and REFUSES on mismatch.  Until the
   operator fetch confirms the schema, the loader runs only its
   offline schema-shape self-checks.
+
+  **W108 DISCHARGE (2026-05-28).**  The operator fetched the real
+  ``release_v6`` corpus (``test6.jsonl``; SHA-256
+  ``bb4c364f71921c4495a6ad15abe1a927350b720009f4933e2e71f8af0f6fd1f5``;
+  175 problems, 63 functional).  The confirmed encoding:
+  ``public_test_cases`` and ``metadata`` are BOTH JSON *strings*, and
+  each functional test's ``input`` is one JSON value per newline-
+  separated line (one positional arg, signature order), ``output`` a
+  single JSON value.  The W107 loader unwrapped the test-case string
+  but read ``func_name`` only when ``metadata`` was already a dict —
+  so on real data ``func_name`` was silently ``""``, which made the
+  executor return ``ENTRY_NOT_FOUND`` on every arm (the W108 gold-path
+  smoke A0=A1=B=0.0).  ``_resolve_func_name`` now accepts both metadata
+  encodings (+ a ``starter_code`` fallback); the cap is DISCHARGED for
+  the field-name / encoding surface.  The remaining real-data caps are
+  the EXECUTOR-side plain-arg + exact-match caps
+  (``W108-L-LIVECODEBENCH-EXECUTOR-V2-*``), not the loader.
 * ``W107-L-LIVECODEBENCH-LOADER-V1-FUNCTIONAL-SUBSET-ONLY-CAP`` — only
   the functional (``starter_code``-bearing) subset is loaded for the
   W89 mechanism; stdin/stdout problems are filtered out and counted.
@@ -63,6 +80,7 @@ import dataclasses
 import hashlib
 import json
 import os
+import re
 from typing import Any
 
 W107_LIVECODEBENCH_LOADER_V1_SCHEMA_VERSION: str = (
@@ -187,6 +205,49 @@ def _resolve_testcases_raw(row: dict) -> Any:
     return None
 
 
+# Last-resort entry-point recovery from a LeetCode-style ``starter_code``
+# body (``def <name>(self, ...)``).  Used only when ``metadata`` carries no
+# ``func_name`` — the authoritative source is ``metadata.func_name``.
+_STARTER_DEF_RE = re.compile(r"def\s+([A-Za-z_]\w*)\s*\(")
+
+
+def _resolve_func_name(row: dict) -> str:
+    """Resolve the functional entry-point name for one row.
+
+    W108 real-data confirmation (discharging
+    ``W107-L-LIVECODEBENCH-LOADER-V1-SCHEMA-CONFIRM-AT-FETCH-CAP``): the
+    live ``code_generation_lite`` ``release_v6`` corpus stores ``metadata``
+    as a JSON *string* (e.g. ``'{"func_name": "zigzagTraversal"}'``), NOT a
+    native object — exactly as ``public_test_cases`` is a JSON string.  The
+    W107 loader unwrapped the test-case string but checked
+    ``isinstance(metadata, dict)`` for ``func_name``, which is ``False`` for
+    a string and silently left ``func_name == ""``.  An empty ``func_name``
+    makes the executor's entry resolver return ``None`` → ``ENTRY_NOT_FOUND``
+    → every arm FAILs (the exact W108 gold-path smoke A0=A1=B=0.0).  This
+    resolver accepts BOTH encodings (dict or JSON-string) and adds a
+    ``starter_code`` ``def`` fallback so a malformed/absent-metadata row
+    still resolves its entry rather than degrading silently.
+    """
+    meta = row.get("metadata")
+    if isinstance(meta, str):
+        try:
+            meta = json.loads(meta)
+        except Exception:  # noqa: BLE001
+            meta = None
+    if isinstance(meta, dict):
+        fn = str(meta.get("func_name") or "")
+        if fn:
+            return fn
+    # Fallback: first non-dunder ``def`` in the starter_code (the LeetCode
+    # method); dunder-only ⇒ last def.  metadata.func_name is authoritative,
+    # so this fires only on a metadata-less row.
+    names = _STARTER_DEF_RE.findall(str(row.get("starter_code") or ""))
+    for name in names:
+        if not name.startswith("__"):
+            return name
+    return names[-1] if names else ""
+
+
 def is_livecodebench_cached(
         *, release: str, cache_path: str | None = None) -> bool:
     """Return True iff a candidate LiveCodeBench release JSONL exists
@@ -306,10 +367,7 @@ def parse_functional_subset(
             ))
         if not tests:
             continue
-        meta = row.get("metadata") or {}
-        func_name = ""
-        if isinstance(meta, dict):
-            func_name = str(meta.get("func_name") or "")
+        func_name = _resolve_func_name(row)
         out.append(LiveCodeBenchProblemV1(
             question_id=_resolve_id(row),
             question_content=str(row.get("question_content") or ""),
