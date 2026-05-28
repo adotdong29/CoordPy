@@ -13,6 +13,89 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W105 HumanEval+ Phase 3 retirement bench — SPLIT outcome: `meta/llama-3.3-70b-instruct` RETIRED (6/6 bars; mean B − A1 = +7.00 pp; per-cell +5/+9/+7; MLB-2 = 55.62 % load-bearing) = the SECOND confirmed multi-seed same-budget multi-agent superiority retirement after W89, on a different benchmark family (EvalPlus-hardened HumanEval+); `meta/llama-3.1-70b-instruct` FAIL_MARGIN (5/6 bars; mean B − A1 = +2.33 pp; per-cell +5/+1/+1; only margin fails; MLB-2 = 50.54 % still load-bearing); cross-class retirement NOT entitled (only one class cleared); pre-built slice pack CID `8be55f3bf1650df3...` reused BYTE-FOR-BYTE; 6 600 NIM calls; 405B re-probed HTTP 404 (unchanged); TWO new explicit-import-only modules `coordpy.phase3_retirement_evaluator_v1` + `coordpy.cross_class_comparator_v1`; ZERO additions to `__init__.py` (2026-05-28)**
+  — *W105 (`COO-29`) executed the Branch A Phase 3 retirement
+  bench pre-committed in `docs/RUNBOOK_W104.md` § Planning lane,
+  per the contract locked in `docs/RUNBOOK_W105.md` BEFORE any
+  NIM call.  Three lanes shipped in the same milestone.  **Lead
+  lane** — the pre-built W105 Phase 3 slice pack (pack CID
+  `8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314`;
+  inner-kernel CID `c35155956ece605c...`; corpus SHA
+  `908377f1daf28dcb...`; all verified at every cell's run start)
+  was executed BYTE-FOR-BYTE unchanged: 3 seeds (105 001 /
+  105 002 / 105 003) × 100 problems × K=5 × 2 model classes =
+  6 600 NIM calls.  A canary smoke (66 calls; 1 seed × 3 problems
+  × K=5 × 2 classes) PASSed both classes (B − A1 ≥ −5 pp floor)
+  BEFORE the full launch.  Each class was evaluated INDEPENDENTLY
+  first per the W105 RUNBOOK § "Phase 3 retirement-grade
+  evaluation discipline" (never average a class-specific result
+  into the other).  **Per-class results**: `meta/llama-3.3-70b-instruct`
+  → **RETIRED** (A0 78.00 % / A1@K=5 82.67 % / B 89.67 %; mean
+  B − A1 = +7.00 pp; per-cell +5.00/+9.00/+7.00; per-seed
+  majority 3/3; per-problem majority 295/300; A1 84/82/82 % all
+  < 90 %; audit chain 3/3; executor clean 100 %; MLB-2 = 55.62 %
+  load-bearing) — the SECOND confirmed multi-seed same-budget
+  multi-agent superiority retirement after W89 (base HumanEval at
+  +5.56 pp), now on EvalPlus-hardened HumanEval+ at +7.00 pp.
+  `meta/llama-3.1-70b-instruct` → **FAIL_MARGIN** (A0 79.00 % /
+  A1@K=5 86.33 % / B 88.67 %; mean B − A1 = +2.33 pp; per-cell
+  +5.00/+1.00/+1.00; 5/6 bars — only the margin bar fails;
+  per-seed majority 3/3; MLB-2 = 50.54 % still load-bearing).
+  The W104 cross-generation cheap-pilot +10.00 pp on the
+  30-problem rescue-concentrated slice did NOT survive scale-up
+  to the broad 100-problem Phase 3 slice — Llama-3.1's A1@K=5
+  rose to 86.33 %, compressing reflexion headroom (mechanism
+  invoked on ~23 % of problems, rescuing ~50 % of those → only
+  +2.33 pp net).  This confirms the W102 cheap-pilot-margin-is-an-
+  upper-bound anti-pattern AND the W96-A/W96-C/W100 cross-scale-
+  collapse pattern — the margin can erode on a broader slice even
+  when the mechanism stays load-bearing.  **Cross-class retirement
+  NOT entitled**: the W105 RUNBOOK rule requires BOTH classes to
+  clear all 6 bars; only Llama-3.3-70B did.  The cross-class
+  B − A1 difference (4.67 pp) is within the ± 5 pp envelope but
+  condition (i) (both RETIRED) fails; the bounded claim is
+  single-class.  **Hardening lane** — `coordpy/phase3_retirement_evaluator_v1.py`
+  (per-class 6-bar + cross-class entitlement; refuses to run on
+  slice-pack/corpus/duplicate-seed/schema mismatch),
+  `coordpy/cross_class_comparator_v1.py` (per-seed-aligned;
+  FIXES the W104 V1 cross-scale-comparator row-misalignment by
+  matching seeds; refuses to run on iteration-task-id/slice/
+  corpus/seed-set mismatch), `scripts/run_w105_phase3_retirement_bench.py`
+  (per-(model, seed) cell isolation; canary; resume-safe per-cell
+  skipping via `phase3_cell_verdict.json`; mid-run global +
+  per-cell `progress.json`; automatic per-cell partial audit +
+  partial per-class verdict emission; explicit 429/502/socket-hang
+  handling with per-cell `retry_log.jsonl`),
+  `scripts/run_w105_canary_smoke.py`,
+  `scripts/run_w105_405b_reachability_probe.py`,
+  `scripts/run_w105_consolidate.py`, and 18 PASSing unit tests in
+  `tests/test_w105_phase3_discipline_v1.py`.  The per-seed-aligned
+  cross-class comparator is clean (242 stayed / 27 improved / 28
+  regressed / 3 flipped across 300 problem-seed cells).
+  **Planning lane** — `docs/RESULTS_W105_W106_PLANNING_V1.md`
+  pre-committed W106 under all five verdict shapes BEFORE the W105
+  verdict; the empirical SPLIT maps to Verdict C sub-case C1
+  (Llama-3.3 RETIRED + Llama-3.1 FAIL → bounded claim + W104
+  Branch C dispatch keyed to the Llama-3.1 margin-cap failure
+  mode = HumanEval+ multi-seed cheap confirmation at Llama-3.1 on
+  a rescue-concentrated slice, OR accept the bounded single-class
+  claim).  **405B reachability** re-probed via
+  `scripts/run_w105_405b_reachability_probe.py`: HTTP 404 (still
+  not hosted on NIM); the W104 405B-unreachable cap stands; the
+  core two-class matrix was unaffected.  **Decision applied**:
+  Verdict C sub-case C1.  Carry-forwards added: (1)
+  `W105-T-HUMANEVAL-PLUS-RETIREMENT-LLAMA33-70B` (positive — the
+  second confirmed retirement); (2)
+  `W105-L-HUMANEVAL-PLUS-RETIREMENT-LLAMA31-70B-MARGIN-CAP`; (3)
+  `W105-L-HUMANEVAL-PLUS-CROSS-CLASS-RETIREMENT-NOT-ENTITLED-CAP`.
+  Carry-forwards retired: NONE (W105 ADDS a second retirement; it
+  does not retire any prior cap).  `COO-9` REMAINS the lead path.
+  15th consecutive preflight-discipline validation
+  (W93–W105).  Stable boundary preserved:
+  `coordpy.__version__ == 0.5.20`; `coordpy.SDK_VERSION ==
+  coordpy.sdk.v3.43`; no PyPI publish; `coordpy/__init__.py`
+  untouched; the two new modules are explicit-import only.*
+
 - **W104 HumanEval+ cross-scale Phase 2 cheap pilot at the pre-locked-backup target (Llama-3.1-70B-Instruct, cross-generation) PASS_MECHANISM_DRIVEN — B − A1 = +10.00 pp; 9 of 9 Phase 2 gates + MLB-1 56.67 % + MLB-2 35.29 % all PASS on the BYTE-EQUAL W103 helper-anchored slice; cross-generation shift on B − A1 = −10.00 pp (W103 +20 pp → W104 +10 pp; W89 mechanism keeps half its W103 margin); cross-generation shift on MLB-2 = −11.77 pp (47.06 % → 35.29 %, still above 33 % floor); pre-locked primary `meta/llama-3.1-405b-instruct` was UNREACHABLE on NIM (HTTP 404), pre-locked backup applied per the W104 RUNBOOK § Target-model selection rule; W105 Phase 3 retirement bench ENTITLED + pre-built (pack CID `8be55f3bf1650df3...`); ZERO new coordpy.* modules added to `__init__.py`, exactly ONE new explicit-import-only module `coordpy.cross_scale_comparator_v1` (2026-05-26)**
   — *W104 (`COO-28`) executed the Branch A cross-scale path
   pre-committed in `docs/RUNBOOK_W103.md` § Planning lane.

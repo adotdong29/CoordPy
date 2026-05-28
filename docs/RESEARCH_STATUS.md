@@ -9,29 +9,42 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W101
-> second-code-benchmark battlefield tournament + MBPP+ lead
-> selection + cheap NIM-free preflight** on 2026-05-25 — per
-> the W100 Part H code-pivot contingency, `COO-9` is now the
-> lead path; W101 executes the COO-9 charter end-to-end
-> (5-candidate × 8-criterion battlefield ranking →
-> **MBPP+ LEAD + HumanEval+ BACKUP**; arsenal mining of W88 +
-> W91 sidecars via offline subprocess re-execution = 2,640
-> calls, per-seed numbers match published W89 + W91 byte-for-
-> byte; MBPP+ loader + executor + reflexion-bench + preflight
-> harness all built as explicit-import-only modules; NIM-free
-> preflight verdict **6 / 8 PASS with 2 DEFERRED** on
-> operator MBPP+ fetch step; cheap NIM pilot NOT YET earned —
-> conditional on operator authorising MBPP+ download + SHA
-> pin then re-running preflight clean).  **No NIM call in
-> W101.**  No version bump; no PyPI publish; `coordpy/__init__.py`
-> untouched; 4 new explicit-import-only modules + 3 new
-> driver scripts + 25 unit tests (all PASS) added.
-> Preflight-first + cross-scale + multi-candidate-tournament-
-> then-confirm + mechanism-load-bearingness discipline
-> validated **11 consecutive times** (W93 / W94 / W95 /
-> W96-A / W96-C / W96-D / W97 / W98 / W99 / W100 /
-> **W101**).  Last empirical NIM-spending verdict: **W100
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W105
+> HumanEval+ Phase 3 retirement bench** on 2026-05-28 —
+> **SPLIT outcome**: `meta/llama-3.3-70b-instruct` **RETIRED**
+> (3 seeds × 100 problems × K=5; mean B − A1 = **+7.00 pp**;
+> per-cell +5/+9/+7; per-seed majority 3/3; per-problem
+> 295/300; A1 84/82/82 %; MLB-2 = 55.62 % load-bearing) = the
+> **SECOND confirmed multi-seed same-budget multi-agent
+> superiority retirement after W89**, on a different benchmark
+> family (EvalPlus-hardened HumanEval+); `meta/llama-3.1-70b-instruct`
+> **FAIL_MARGIN** (mean B − A1 = **+2.33 pp**; per-cell
+> +5/+1/+1; 5/6 bars, only margin fails; MLB-2 = 50.54 % still
+> load-bearing — the W104 cheap-pilot +10 pp on the 30-problem
+> rescue-concentrated slice did NOT survive scale-up to the
+> broad 100-problem Phase 3 slice).  **Cross-class retirement
+> NOT entitled** (the W105 RUNBOOK rule requires BOTH classes
+> to clear all 6 bars; only one did); the bounded claim is
+> single-class on Llama-3.3-70B.  6 600 NIM calls; pre-built
+> slice pack CID `8be55f3bf1650df3...` reused BYTE-FOR-BYTE;
+> canary smoke (66 calls) PASSed both classes BEFORE launch;
+> 405B re-probed HTTP 404 (unchanged); per-seed-aligned
+> cross-class comparator clean (242 stayed / 27 improved / 28
+> regressed / 3 flipped across 300 cells).  `COO-9` REMAINS
+> the lead path.  No version bump; no PyPI publish;
+> `coordpy/__init__.py` untouched; 2 new explicit-import-only
+> modules (`phase3_retirement_evaluator_v1` +
+> `cross_class_comparator_v1`) + 4 new driver scripts + 18 new
+> unit tests (all PASS) added.  Preflight-first + cross-scale +
+> multi-candidate-tournament-then-confirm + mechanism-load-
+> bearingness + cross-class-row-alignment discipline validated
+> **15 consecutive times** (W93 / W94 / W95 / W96-A / W96-C /
+> W96-D / W97 / W98 / W99 / W100 / W101 / W102 / W103 / W104 /
+> **W105**).  Carry-forwards added:
+> `W105-T-HUMANEVAL-PLUS-RETIREMENT-LLAMA33-70B` +
+> `W105-L-HUMANEVAL-PLUS-RETIREMENT-LLAMA31-70B-MARGIN-CAP` +
+> `W105-L-HUMANEVAL-PLUS-CROSS-CLASS-RETIREMENT-NOT-ENTITLED-CAP`;
+> none retired.  Prior empirical NIM-spending verdict: **W100
 > RealWorldQA cross-scale 90B Phase 2 confirmation** on
 > 2026-05-25 — **B2 (frontier lead) FAILS by −3.33 pp AT 90B
 > with mechanism-load-bearingness sub-gate MLB-2 ALSO FAILING

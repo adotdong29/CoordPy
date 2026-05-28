@@ -1,0 +1,84 @@
+{
+  "schema": "coordpy.phase3_retirement_evaluator_v1.v1",
+  "slice_pack_cid": "8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314",
+  "corpus_sha256": "908377f1daf28dcb36846db73a5662b2e05a9907407c2696c89ad9d3b0b04492",
+  "per_class": [
+    {
+      "model_class_id": "meta/llama-3.1-70b-instruct",
+      "cells": [
+        {
+          "model_class_id": "meta/llama-3.1-70b-instruct",
+          "seed": 105001,
+          "n_problems": 100,
+          "a0_pct": 79.0,
+          "a1_pct": 85.0,
+          "b_pct": 90.0,
+          "b_minus_a1_pp": 5.0,
+          "n_b_ge_a1": 98,
+          "mlb1_invocation_rate": 0.24,
+          "mlb2_rescue_rate": 0.5833,
+          "a1_lt_saturation_max": true,
+          "bench_merkle_root": "acf956e8d56affd2dd1141f341a06ddabc2d8ae26fed2e1dfa4addba9fe78291",
+          "slice_pack_cid": "8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314",
+          "cell_run_id": "seed_105001"
+        },
+        {
+          "model_class_id": "meta/llama-3.1-70b-instruct",
+          "seed": 105002,
+          "n_problems": 100,
+          "a0_pct": 79.0,
+          "a1_pct": 87.0,
+          "b_pct": 88.0,
+          "b_minus_a1_pp": 1.0,
+          "n_b_ge_a1": 98,
+          "mlb1_invocation_rate": 0.22,
+          "mlb2_rescue_rate": 0.4545,
+          "a1_lt_saturation_max": true,
+          "bench_merkle_root": "3e3c0301dbb3778775b2c834b917bf563d881fd48b68b416ab9a1768ad8eaced",
+          "slice_pack_cid": "8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314",
+          "cell_run_id": "seed_105002"
+        },
+        {
+          "model_class_id": "meta/llama-3.1-70b-instruct",
+          "seed": 105003,
+          "n_problems": 100,
+          "a0_pct": 79.0,
+          "a1_pct": 87.0,
+          "b_pct": 88.0,
+          "b_minus_a1_pp": 1.0,
+          "n_b_ge_a1": 98,
+          "mlb1_invocation_rate": 0.23,
+          "mlb2_rescue_rate": 0.4783,
+          "a1_lt_saturation_max": true,
+          "bench_merkle_root": "1011a848aca8cdb82c3d8c51071b9e2acbca06fedd7f18333faca5dd8852e93a",
+          "slice_pack_cid": "8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314",
+          "cell_run_id": "seed_105003"
+        }
+      ],
+      "bar1_margin_mean_b_minus_a1_pp": 2.3333,
+      "bar1_margin_passes": false,
+      "bar2_per_seed_majority_count": 3,
+      "bar2_per_seed_majority_passes": true,
+      "bar3_per_problem_majority_count": 294,
+      "bar3_per_problem_majority_floor": 159,
+      "bar3_per_problem_majority_passes": true,
+      "bar4_a1_not_saturated_passes": true,
+      "bar4_per_cell_a1_pcts": [
+        85.0,
+        87.0,
+        87.0
+      ],
+      "bar5_audit_chain_passes": true,
+      "bar5_audit_chain_re_derives": 3,
+      "bar5_audit_chain_total": 3,
+      "bar6_executor_clean_passes": true,
+      "bar6_canonical_pass_rate": 1.0,
+      "mean_mlb1_invocation_rate": 0.23,
+      "mean_mlb2_rescue_rate": 0.5054,
+      "mlb2_load_bearing": true,
+      "verdict_label": "FAIL_MARGIN",
+      "n_bars_passed_of_6": 5
+    }
+  ],
+  "cross_class": null
+}

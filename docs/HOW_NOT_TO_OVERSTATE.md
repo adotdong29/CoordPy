@@ -6094,4 +6094,73 @@ non-G2 gates yet died), *"all future hypotheses will die"*
 just prevents weak ones from getting full-bench treatment),
 *"preflight = bureaucracy"* (it saved 4+ hours in W94 alone).
 
-Last touched: W94 K=10 pilot + cross-modal pivot 2026-05-24.
+# W105 HumanEval+ Phase 3 retirement bench — what to say, what not to say
+
+## W105 Llama-3.3-70B HumanEval+ Phase 3 (RETIREMENT)
+
+Acceptable: *"W105 is the SECOND confirmed multi-seed same-
+budget multi-agent superiority retirement in the programme,
+after W89.  The W89 sequential-reflexion mechanism retires on
+HumanEval+ (EvalPlus-hardened) at Phase 3 multi-seed scale on
+`meta/llama-3.3-70b-instruct`: 3 seeds × 100 problems × K=5;
+same-budget byte-exact; mean B − A1 = +7.00 pp (per-cell
++5/+9/+7); per-seed majority 3/3; per-problem majority 295/300;
+A1 < 90 % on every cell; audit chain 3/3; executor clean; MLB-2
+= 55.62 % load-bearing.  This is a different benchmark FAMILY
+from W89's base HumanEval, so it is genuine cross-bench
+generalisation of the mechanism at retirement quality — at ONE
+model class."*
+
+Forbidden phrasing: *"W105 retired HumanEval+ across two model
+classes"* (NO — only Llama-3.3-70B retired; Llama-3.1-70B
+FAILed the margin bar at +2.33 pp), *"W105 proves multi-agent
+context is solved"* (NO — a single benchmark family at a single
+model class at 70B is not "solved"), *"W105 generalises to
+405B"* (NO — 405B was unreachable on NIM; HTTP 404), *"W105
+generalises to MBPP+"* (NO — W102 cap stands), *"W105 retired a
+prior carry-forward"* (NO — W105 ADDS a second retirement; it
+retires nothing prior).
+
+## W105 Llama-3.1-70B HumanEval+ Phase 3 (FAIL_MARGIN — honest)
+
+Acceptable: *"On `meta/llama-3.1-70b-instruct`, the same
+mechanism FAILed the +5 pp Phase 3 margin bar: mean B − A1 =
++2.33 pp (per-cell +5/+1/+1; 5/6 bars; only the margin bar
+fails).  The mechanism stays load-bearing (MLB-2 = 50.54 %) and
+directionally positive (per-seed majority 3/3) — the FAIL is a
+margin-MAGNITUDE failure on the broad Phase 3 slice, not a
+mechanism collapse.  The W104 cross-generation cheap-pilot
++10.00 pp was on the 30-problem rescue-concentrated slice; on
+the broad 100-problem Phase 3 slice Llama-3.1's A1 @ K=5 rises
+to 86.33 %, leaving reflexion little headroom.  This confirms
+the W102 cheap-pilot-margin-is-an-upper-bound anti-pattern and
+the W96-A/W96-C/W100 cross-scale-collapse pattern."*
+
+Forbidden phrasing: *"W105 refutes the W104 Llama-3.1 PASS"*
+(NO — W104 was a different, rescue-concentrated slice; it stands
+as a cheap-pilot result; W105 shows the margin does not
+GENERALISE to the broad slice), *"the mechanism is dead on
+Llama-3.1"* (NO — MLB-2 stays above the floor; the mechanism
+works, the margin is just too small on the broad slice),
+*"averaging the two classes gives +4.67 pp so it retires"* (NO —
+the per-class verdicts are the load-bearing surface; you may NOT
+average a FAIL into a PASS; the cross-class claim requires BOTH
+classes to clear all 6 bars independently).
+
+## W105 cross-class entitlement discipline
+
+Acceptable: *"The W105 RUNBOOK locked the cross-class
+entitlement rule BEFORE the run: the stronger 'across two model
+classes' claim is earned IFF BOTH classes RETIRE independently
+AND the cross-class B − A1 difference stays within ± 5 pp.  Only
+Llama-3.3-70B retired, so the cross-class claim is NOT entitled,
+and the retirement is reported as single-class.  This is the
+per-class-separate discipline working as designed — the SPLIT
+was reported honestly rather than averaged away."*
+
+Forbidden phrasing: *"the cross-class shift was within ± 5 pp so
+the claim holds"* (NO — the envelope is condition (ii); condition
+(i) requires BOTH classes RETIRED, which failed).
+
+Last touched: W105 HumanEval+ Phase 3 retirement bench
+2026-05-28.

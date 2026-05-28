@@ -1,0 +1,16 @@
+{
+  "slice_pack_cid": "8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314",
+  "inner_kernel_cid": "c35155956ece605c0169b0cf35a6b69267bee04f5f68cf5a5de466dcc01dd8d2",
+  "corpus_sha256": "908377f1daf28dcb36846db73a5662b2e05a9907407c2696c89ad9d3b0b04492",
+  "preflight_verdict_cid": "4f57a2cf60ae6a1bbecf15a3ae6e0a9d68a1f9f52d07abb1eb7c2de72e25f7a4",
+  "n_problems_per_cell": 100,
+  "is_canary": false,
+  "seed_list": [
+    105001,
+    105002,
+    105003
+  ],
+  "class_list": [
+    "meta/llama-3.1-70b-instruct"
+  ]
+}

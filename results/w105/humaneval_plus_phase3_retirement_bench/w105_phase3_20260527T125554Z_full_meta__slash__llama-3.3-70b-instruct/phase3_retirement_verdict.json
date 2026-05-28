@@ -1,0 +1,84 @@
+{
+  "schema": "coordpy.phase3_retirement_evaluator_v1.v1",
+  "slice_pack_cid": "8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314",
+  "corpus_sha256": "908377f1daf28dcb36846db73a5662b2e05a9907407c2696c89ad9d3b0b04492",
+  "per_class": [
+    {
+      "model_class_id": "meta/llama-3.3-70b-instruct",
+      "cells": [
+        {
+          "model_class_id": "meta/llama-3.3-70b-instruct",
+          "seed": 105001,
+          "n_problems": 100,
+          "a0_pct": 78.0,
+          "a1_pct": 84.0,
+          "b_pct": 89.0,
+          "b_minus_a1_pp": 5.0,
+          "n_b_ge_a1": 99,
+          "mlb1_invocation_rate": 0.22,
+          "mlb2_rescue_rate": 0.5,
+          "a1_lt_saturation_max": true,
+          "bench_merkle_root": "82ed16f0d3c131c939f4bfdaf0c5ab24d638e68d5b3396f0092d2befd43fcaf4",
+          "slice_pack_cid": "8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314",
+          "cell_run_id": "seed_105001"
+        },
+        {
+          "model_class_id": "meta/llama-3.3-70b-instruct",
+          "seed": 105002,
+          "n_problems": 100,
+          "a0_pct": 78.0,
+          "a1_pct": 82.0,
+          "b_pct": 91.0,
+          "b_minus_a1_pp": 9.0,
+          "n_b_ge_a1": 98,
+          "mlb1_invocation_rate": 0.23,
+          "mlb2_rescue_rate": 0.6087,
+          "a1_lt_saturation_max": true,
+          "bench_merkle_root": "ea4c791c25d43b2a28dee8839b3b4c0ac27cfc86445aea2b48acac7e47cad28f",
+          "slice_pack_cid": "8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314",
+          "cell_run_id": "seed_105002"
+        },
+        {
+          "model_class_id": "meta/llama-3.3-70b-instruct",
+          "seed": 105003,
+          "n_problems": 100,
+          "a0_pct": 78.0,
+          "a1_pct": 82.0,
+          "b_pct": 89.0,
+          "b_minus_a1_pp": 7.0,
+          "n_b_ge_a1": 98,
+          "mlb1_invocation_rate": 0.25,
+          "mlb2_rescue_rate": 0.56,
+          "a1_lt_saturation_max": true,
+          "bench_merkle_root": "d00737d0cb80ea3da966a0cd1d7e3df7ec4464dd12cf6f8917867f78e2704600",
+          "slice_pack_cid": "8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314",
+          "cell_run_id": "seed_105003"
+        }
+      ],
+      "bar1_margin_mean_b_minus_a1_pp": 7.0,
+      "bar1_margin_passes": true,
+      "bar2_per_seed_majority_count": 3,
+      "bar2_per_seed_majority_passes": true,
+      "bar3_per_problem_majority_count": 295,
+      "bar3_per_problem_majority_floor": 159,
+      "bar3_per_problem_majority_passes": true,
+      "bar4_a1_not_saturated_passes": true,
+      "bar4_per_cell_a1_pcts": [
+        84.0,
+        82.0,
+        82.0
+      ],
+      "bar5_audit_chain_passes": true,
+      "bar5_audit_chain_re_derives": 3,
+      "bar5_audit_chain_total": 3,
+      "bar6_executor_clean_passes": true,
+      "bar6_canonical_pass_rate": 1.0,
+      "mean_mlb1_invocation_rate": 0.2333,
+      "mean_mlb2_rescue_rate": 0.5562,
+      "mlb2_load_bearing": true,
+      "verdict_label": "RETIRED",
+      "n_bars_passed_of_6": 6
+    }
+  ],
+  "cross_class": null
+}

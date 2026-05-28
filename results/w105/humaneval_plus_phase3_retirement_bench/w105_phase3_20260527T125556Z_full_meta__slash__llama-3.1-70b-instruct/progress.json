@@ -1,0 +1,16 @@
+{
+  "status": "complete",
+  "ts_utc": "2026-05-28T11:56:22.951068+00:00",
+  "detail": {
+    "wall_s": 82826.82,
+    "class_list": [
+      "meta/llama-3.1-70b-instruct"
+    ],
+    "seed_list": [
+      105001,
+      105002,
+      105003
+    ],
+    "is_canary": false
+  }
+}
