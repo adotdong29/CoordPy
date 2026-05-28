@@ -89,10 +89,20 @@ both on `meta/llama-3.3-70b-instruct`.  That IS stronger.  It is
 NOT a cross-class / cross-scale-UP / multi-benchmark same-budget
 retirement, and W106 deliberately declined to manufacture one.
 
+## 405B reachability side-probe (W106 cheap side-check)
+
+Re-probed `meta/llama-3.1-405b-instruct` on NIM at W106 close
+(authorised cheap side-check per `docs/RUNBOOK_W106.md`
+anti-drift #4): **HTTP 404 (Not Found), 168 ms** — still
+unreachable, confirming the standing W105 result.  Artifact:
+`results/w106/405b_reachability_probe/probe_20260528T173331Z/`.
+**⇒ W107 enters Branch β by default** (the cross-scale-UP path α
+stays blocked).
+
 ## W107 (left obvious)
 
-**405B reachability gate** (decided by a cheap sub-second
-side-probe; standing W105 result = HTTP 404):
+**405B reachability gate** (re-probed at W106 = HTTP 404; α
+blocked ⇒ β is the default branch):
 
 * **W107-α (405B reachable)** — HumanEval+ Phase 2 cheap pilot at
   `meta/llama-3.1-405b-instruct` on the W105 inner-kernel slice
