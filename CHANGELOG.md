@@ -13,6 +13,55 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W106 bounded-retirement registration + Llama-3.1 margin-cap dispatch + graphify truth-sync — a coupled claim-registration + margin-cap-dispatch milestone, NOT a new benchmark tournament; REGISTERS the W105 `meta/llama-3.3-70b-instruct` HumanEval+ retirement as the bounded SECOND confirmed multi-seed same-budget multi-agent superiority retirement after W89, and DECIDES the W105 `meta/llama-3.1-70b-instruct` margin-cap branch NO-GO via a pre-committed two-gate rule (`coordpy.margin_cap_dispatch_v1`); $0 NIM on the Llama-3.1 branch; ONE new explicit-import-only module + 20 PASSing tests; ZERO additions to `__init__.py` (2026-05-28)**
+  — *W106 (`COO-30`) executed the pre-committed
+  `docs/RESULTS_W105_W106_PLANNING_V1.md` Verdict C / sub-case C1
+  (= `docs/RUNBOOK_W105.md` § Planning lane Branch B; retired
+  class = Llama-3.3-70B, failed class = Llama-3.1-70B), per the
+  contract locked in `docs/RUNBOOK_W106.md` BEFORE any NIM call.
+  **Lane 1 (claim/theorem)** — registered the W105 Llama-3.3-70B
+  HumanEval+ Phase 3 retirement (+7.00 pp; 6/6 bars; MLB-2
+  55.62 %) at full strength as the SECOND confirmed multi-seed
+  same-budget multi-agent superiority retirement after W89,
+  BOUNDED to ONE model class / ONE benchmark family (HumanEval+) /
+  ONE parameter scale (70B); updated the theorem registry (banner
+  + canonical claims row + new W106 section with
+  `W106-T-BOUNDED-SECOND-RETIREMENT-REGISTERED` +
+  `W106-T-MARGIN-CAP-DISPATCH-V1-SHIPS` +
+  `W106-L-HUMANEVAL-PLUS-LLAMA31-70B-MARGIN-CAP-CHEAP-CONFIRMATION-NOT-EARNED-CAP`),
+  the research-status banner, and the do-not-overstate rules (new
+  W106 section + meta-rule bullet) — boundedness made impossible
+  to miss.  **Lane 2 (margin-cap dispatch)** — a pre-committed
+  two-gate rule (`coordpy.margin_cap_dispatch_v1`) decided the
+  Llama-3.1-70B `FAIL_MARGIN` branch: GATE 1 (entitlement) =
+  ENTITLED (margin +2.33 ∈ [0,+5); MLB-2 50.54 % ≥ 33 %; A1
+  86.33 % < 90 %; Branch-C cheap-confirmation row; ~990 NIM
+  calls), but GATE 2 (verdict-changing power) = FAIL on all three
+  sub-conditions — (2a) the only confirmation form on offer is a
+  rescue-concentrated slice = an UPPER BOUND (the W102
+  anti-pattern), (2b) the authoritative fair broad-slice
+  multi-seed Phase 3 verdict already ran at W105 (+2.33 pp), (2c)
+  the miss is a CLEAN true magnitude miss (executor clean,
+  byte-exact budget, per-seed majority 3/3, MLB-2 50.54 % healthy)
+  with no confound to fix.  **Decision = NO-GO**; accept the
+  bounded single-class claim; $0 NIM on the Llama-3.1 branch
+  (decision CID `de3dfb02…`).  **Lane 3 (graphify truth-sync)** —
+  `graphify update .` refreshed the graph from HEAD at START
+  (73 026 nodes / 237 304 edges / 2 336 communities; dated backup
+  `graphify-out/2026-05-28/`) and again at CLOSE; `graphify query`
+  / `affected` / `explain` used to confirm the new module sits as
+  a sibling of the W104/W105 evaluators/comparators.  `COO-9`
+  REMAINS the lead path.  W107 left obvious: 405B reachability
+  gate → α cross-scale-UP cheap pilot (if reachable) / β
+  next-code-benchmark NIM-free preflight (LiveCodeBench / APPS) /
+  γ W89→W106 consolidation in parallel.  16th consecutive
+  preflight-discipline validation (W93–W106).  Stable boundary
+  preserved (`coordpy.__version__` = 0.5.20; `SDK_VERSION` =
+  coordpy.sdk.v3.43; no PyPI publish; `coordpy/__init__.py`
+  untouched).  No empirical retirement added or retired in W106;
+  W89 + W105 remain the two confirmed retirements (both
+  Llama-3.3-70B).*
+
 - **W105 HumanEval+ Phase 3 retirement bench — SPLIT outcome: `meta/llama-3.3-70b-instruct` RETIRED (6/6 bars; mean B − A1 = +7.00 pp; per-cell +5/+9/+7; MLB-2 = 55.62 % load-bearing) = the SECOND confirmed multi-seed same-budget multi-agent superiority retirement after W89, on a different benchmark family (EvalPlus-hardened HumanEval+); `meta/llama-3.1-70b-instruct` FAIL_MARGIN (5/6 bars; mean B − A1 = +2.33 pp; per-cell +5/+1/+1; only margin fails; MLB-2 = 50.54 % still load-bearing); cross-class retirement NOT entitled (only one class cleared); pre-built slice pack CID `8be55f3bf1650df3...` reused BYTE-FOR-BYTE; 6 600 NIM calls; 405B re-probed HTTP 404 (unchanged); TWO new explicit-import-only modules `coordpy.phase3_retirement_evaluator_v1` + `coordpy.cross_class_comparator_v1`; ZERO additions to `__init__.py` (2026-05-28)**
   — *W105 (`COO-29`) executed the Branch A Phase 3 retirement
   bench pre-committed in `docs/RUNBOOK_W104.md` § Planning lane,

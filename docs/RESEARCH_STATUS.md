@@ -9,7 +9,43 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W105
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W106
+> bounded-retirement registration + Llama-3.1 margin-cap
+> dispatch + graphify truth-sync** on 2026-05-28 — a **coupled
+> claim-registration + margin-cap-dispatch milestone, NOT a new
+> benchmark tournament**.  W106 (1) REGISTERS the W105
+> `meta/llama-3.3-70b-instruct` HumanEval+ retirement at full
+> strength as the **SECOND confirmed multi-seed same-budget
+> multi-agent superiority retirement after W89** — bounded to
+> ONE model class / ONE benchmark family (HumanEval+) / ONE
+> parameter scale (70B); NOT cross-class, NOT cross-scale-UP
+> (405B HTTP 404), NOT MBPP-family (W102 cap), NOT cross-modal
+> (frozen at 11B), NOT "context solved"; (2) DECIDES the
+> Llama-3.1-70B margin-cap branch via a pre-committed two-gate
+> rule (`coordpy.margin_cap_dispatch_v1`) returning **NO-GO** —
+> the Branch-C table entitles a ~990-call cheap confirmation, but
+> the verdict-changing-power gate VETOES it because a rescue-
+> concentrated cheap confirmation is an UPPER BOUND (W102 anti-
+> pattern), the authoritative fair broad-slice Phase 3 verdict
+> already ran at W105 (+2.33 pp), and the miss is a CLEAN true
+> magnitude miss (executor clean / byte-exact budget / per-seed
+> majority 3/3 / MLB-2 50.54 % healthy) with NO confound — so
+> **$0 NIM** was spent on the Llama-3.1 branch; (3) refreshed
+> `graphify-out/` from HEAD at start AND close.  `COO-9` REMAINS
+> the lead path; `COO-30` is the W106 issue.  W107 left obvious:
+> **405B reachability gate** → α cross-scale-UP cheap pilot (if
+> reachable) / β next-code-benchmark NIM-free preflight
+> (LiveCodeBench / APPS) / γ W89→W106 consolidation in parallel.
+> Discipline validated the **16th consecutive time** (W93–W106).
+> No version bump; no PyPI; `coordpy/__init__.py` untouched; ONE
+> new explicit-import-only module + 20 new PASSing tests.
+> Carry-forwards added: `W106-T-BOUNDED-SECOND-RETIREMENT-
+> REGISTERED` + `W106-T-MARGIN-CAP-DISPATCH-V1-SHIPS` +
+> `W106-L-HUMANEVAL-PLUS-LLAMA31-70B-MARGIN-CAP-CHEAP-
+> CONFIRMATION-NOT-EARNED-CAP`; none retired.  The programme is
+> entitled to a STRONGER claim than before W105 (a SECOND
+> confirmed retirement) but NOT a stronger claim than W105 itself
+> licensed (still single-class).  Prior: **W105
 > HumanEval+ Phase 3 retirement bench** on 2026-05-28 —
 > **SPLIT outcome**: `meta/llama-3.3-70b-instruct` **RETIRED**
 > (3 seeds × 100 problems × K=5; mean B − A1 = **+7.00 pp**;

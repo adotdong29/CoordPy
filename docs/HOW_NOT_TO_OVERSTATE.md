@@ -2,10 +2,14 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: **W87
-> P3 line closures** (multi-modal substrate, observability,
-> formal verification) on 2026-05-21; **post-W87 honest framing
-> consolidated** on 2026-05-22.
+> README-of-README must satisfy these rules. Last touched: **W106
+> bounded-retirement registration + Llama-3.1 margin-cap
+> dispatch** on 2026-05-28 (W106 registers the W105 Llama-3.3-70B
+> HumanEval+ retirement as a BOUNDED second confirmed retirement
+> and decides the Llama-3.1 margin-cap branch NO-GO; see the W106
+> section below).  Prior: **W87 P3 line closures** (multi-modal
+> substrate, observability, formal verification) on 2026-05-21;
+> **post-W87 honest framing consolidated** on 2026-05-22.
 
 ## Post-W87 meta rules (mandatory before ANY repeat of W87 closure claims)
 
@@ -65,10 +69,78 @@ GitHub:
   `W87-L-FORMAL-MERKLE-PYTHON-INCLUSION-PATH-SHAPE-CAP`
   are mandatory.
 
+- **Do NOT inflate the SECOND confirmed retirement (W105/W106)
+  into cross-class, cross-scale, or multi-benchmark
+  generalisation.** W105 retired the W89 sequential-reflexion
+  mechanism on HumanEval+ at Phase 3 on `meta/llama-3.3-70b-instruct`
+  (+7.00 pp; 6/6 bars; MLB-2 = 55.62 %), and W106 registers it as
+  a genuine SECOND confirmed multi-seed same-budget multi-agent
+  superiority retirement after W89 — but it is BOUNDED to ONE
+  model class, ONE benchmark family (HumanEval+), ONE parameter
+  scale (70B). The SAME mechanism FAILed the +5 pp margin bar on
+  `meta/llama-3.1-70b-instruct` at Phase 3 (+2.33 pp), so the
+  cross-class "two model classes" claim is NOT earned
+  (`W105-L-HUMANEVAL-PLUS-CROSS-CLASS-RETIREMENT-NOT-ENTITLED-CAP`),
+  and W106 explicitly DECLINED to buy a rescue-concentrated cheap
+  confirmation that could only produce an upper bound
+  (`W106-L-HUMANEVAL-PLUS-LLAMA31-70B-MARGIN-CAP-CHEAP-CONFIRMATION-NOT-EARNED-CAP`).
+  405B cross-scale-UP is blocked (HTTP 404); MBPP-family is
+  capped (W102); cross-modal is frozen at 11B (W100). Reports
+  that say "multi-agent teams beat single-agent baselines
+  generally / across model classes / across benchmarks" are
+  overstatement. The honest claim is exactly two confirmed
+  retirements: W89 (base HumanEval) + W105 (HumanEval+), both on
+  Llama-3.3-70B at 70B.
+
 - **The canonical "did we solve it?" surface is
   `docs/HONEST_FRAMING_POST_W87.md`.** Any other doc that
   attempts a "we solved it" claim is wrong and must be
   brought into alignment with that file before publishing.
+
+## W106 (bounded-retirement registration + Llama-3.1 margin-cap dispatch) — explicit do-not-overstate rules
+
+W106 is a registration + dispatch milestone, NOT a new run. It
+registers the W105 result and decides the W105 Llama-3.1 branch.
+The rules:
+
+- **Do say**: there are now **TWO** confirmed multi-seed
+  same-budget multi-agent superiority retirements — W89 (base
+  HumanEval, +5.56 pp) and W105 (HumanEval+, +7.00 pp) — **both on
+  `meta/llama-3.3-70b-instruct` at 70B**. The W105 retirement is a
+  genuine extension of the W89 mechanism to a different,
+  EvalPlus-hardened benchmark family at Phase 3 multi-seed
+  retirement quality with the mechanism load-bearing (MLB-2 =
+  55.62 %).
+
+- **Do NOT say** the mechanism retires "across two model
+  classes". `meta/llama-3.1-70b-instruct` FAILed the +5 pp Phase 3
+  margin bar (+2.33 pp; 5/6 bars). The cross-class claim is NOT
+  entitled (`W105-L-HUMANEVAL-PLUS-CROSS-CLASS-RETIREMENT-NOT-ENTITLED-CAP`).
+
+- **Do NOT spin the W106 NO-GO as a Llama-3.1 success-in-waiting.**
+  W106 declined a cheap confirmation because it is structurally
+  incapable of changing the verdict: a rescue-concentrated slice
+  is an UPPER BOUND (the W102 anti-pattern), the authoritative
+  fair broad-slice multi-seed Phase 3 verdict already ran at W105
+  (+2.33 pp), and the miss is a CLEAN true magnitude miss (no
+  confound). The Llama-3.1 branch is CLOSED, not pending
+  (`W106-L-HUMANEVAL-PLUS-LLAMA31-70B-MARGIN-CAP-CHEAP-CONFIRMATION-NOT-EARNED-CAP`).
+  Do NOT cite the W104 +10 pp cheap-pilot margin as evidence the
+  class "nearly retired" — it was a rescue-concentrated upper
+  bound that did NOT survive to the broad slice.
+
+- **Do NOT imply cross-scale-UP, MBPP-family, or cross-modal
+  generalisation.** 405B is unreachable on NIM (HTTP 404; W104/W105
+  cap); MBPP+ V2 is capped (W102); cross-modal RealWorldQA is
+  frozen at 11B (W100). W106 ran NO expensive bench and opened NO
+  new battlefield.
+
+- **Do NOT claim W106 strengthened the empirical bar beyond what
+  W105 already licensed.** W106 changed the *registration* and the
+  *dispatch decision*, not the *evidence*. The programme is
+  entitled to a stronger claim than before W105 (a SECOND
+  confirmed retirement exists) but NOT a stronger claim than W105
+  itself produced.
 
 ## W87 (P3 line closures — multi-modal / observability / formal verification) — explicit do-not-overstate rules
 
