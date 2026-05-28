@@ -355,6 +355,32 @@
         "W104-L-HUMANEVAL-PLUS-REFLEXION-PHASE2-CROSS-GENERATION-70B-LLAMA31-PASS",
         "W104-L-HUMANEVAL-PLUS-CROSS-SCALE-UP-PRIMARY-TARGET-405B-UNREACHABLE-ON-NIM-CAP"
       ]
+    },
+    {
+      "id": "W105",
+      "title": "HumanEval+ Phase 3 retirement bench (the earned 6,600-call run) + run-hardening + W106 contingency \u2014 SPLIT outcome: meta/llama-3.3-70b-instruct RETIRED (second confirmed multi-seed same-budget multi-agent superiority retirement after W89); meta/llama-3.1-70b-instruct FAIL_MARGIN; cross-class retirement NOT entitled",
+      "outcome": "SPLIT \u2014 meta/llama-3.3-70b-instruct RETIRED (6/6 W88/W89/W95 retirement bars; 3 seeds x 100 problems x K=5; mean B-A1=+7.00pp; per-cell +5.00/+9.00/+7.00; per-seed majority 3/3; per-problem majority 295/300; A1 84/82/82% all <90%; audit chain 3/3; executor clean 100%; MLB-2=55.62% load-bearing) = the SECOND confirmed multi-seed same-budget multi-agent superiority retirement after W89, on a different benchmark family (EvalPlus-hardened HumanEval+) at +7.00pp vs W89's base-HumanEval +5.56pp. meta/llama-3.1-70b-instruct FAIL_MARGIN (5/6 bars; mean B-A1=+2.33pp; per-cell +5.00/+1.00/+1.00; only the margin bar fails; per-seed majority 3/3; MLB-2=50.54% still load-bearing). The W104 cross-generation cheap-pilot +10.00pp on the 30-problem rescue-concentrated slice did NOT survive scale-up to the broad 100-problem Phase 3 slice for Llama-3.1 (A1 rose to 86.33%, compressing reflexion headroom) \u2014 confirms the W102 cheap-pilot-margin-is-an-upper-bound anti-pattern + the W96-A/W96-C/W100 cross-scale-collapse pattern. CROSS-CLASS RETIREMENT NOT ENTITLED: the W105 RUNBOOK rule requires BOTH classes to clear all 6 bars; only Llama-3.3-70B did (cross-class B-A1 diff 4.67pp is within the +-5pp envelope but condition (i) both-RETIRED fails); bounded claim is single-class on Llama-3.3-70B. Executed the pre-built slice pack (pack CID 8be55f3bf1650df397cb875543c69a48473483de8089dc3c40be45cc635a1314) BYTE-FOR-BYTE unchanged; 6600 NIM calls; canary smoke (66 calls) PASSed both classes before launch; 405B re-probed HTTP 404 (still unreachable; W104 cap stands; core two-class matrix unaffected); per-seed-aligned cross-class comparator clean (242 stayed / 27 improved / 28 regressed / 3 flipped across 300 cells). Three lanes: lead (Phase 3 execution) + hardening (phase3_retirement_evaluator_v1 + cross_class_comparator_v1, both explicit-import-only; 18 unit tests; 79 PASS across W101-W105) + planning (W106 pre-committed under all 5 verdict shapes; empirical SPLIT maps to Verdict C sub-case C1). COO-9 REMAINS lead path. 15th consecutive preflight-discipline validation (W93-W105). Stable boundary preserved: coordpy.__version__=0.5.20; SDK_VERSION=coordpy.sdk.v3.43; no PyPI publish; coordpy/__init__.py untouched; 2 new explicit-import-only coordpy.* modules.",
+      "commits": [
+        "d5f9133"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W105.md",
+        "docs/RESULTS_W105_HUMANEVAL_PLUS_PHASE3_LLAMA33_V1.md",
+        "docs/RESULTS_W105_HUMANEVAL_PLUS_PHASE3_LLAMA31_V1.md",
+        "docs/RESULTS_W105_CROSS_CLASS_COMPARATOR_V1.md",
+        "docs/RESULTS_W105_W106_PLANNING_V1.md",
+        "docs/RESULTS_W105_MILESTONE_SUMMARY_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W105_V1.md"
+      ],
+      "linear_issues": [
+        "COO-29"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W105-T-HUMANEVAL-PLUS-RETIREMENT-LLAMA33-70B",
+        "W105-L-HUMANEVAL-PLUS-RETIREMENT-LLAMA31-70B-MARGIN-CAP",
+        "W105-L-HUMANEVAL-PLUS-CROSS-CLASS-RETIREMENT-NOT-ENTITLED-CAP"
+      ]
     }
   ]
 }
