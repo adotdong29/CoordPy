@@ -9,7 +9,31 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W106
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W107 405B
+> reachability gate + next-code-battlefield β preflight +
+> publication-grade consolidation** on 2026-05-28 — a **gated
+> branch milestone with THREE lanes, NOT a new broad benchmark
+> tournament**.  W107 (α) re-probed `meta/llama-3.1-405b-instruct`
+> on NIM AFTER locking `docs/RUNBOOK_W107.md` → **HTTP 404, the
+> FOURTH consecutive 404** (W104–W107); the cross-scale-UP gate is
+> **CLOSED** (CID `332d4ef9…`), no 405B pilot earned, $0 expensive
+> NIM.  W107 (β, the main empirical lane) shipped a NIM-free
+> preflight for the next code battlefield under `COO-9`:
+> **LiveCodeBench is the structurally-sound PRIMARY** (time-anchored
+> contamination resistance; functional-subset executor proven clean
+> offline; S1∧S2∧S3 all hold), **APPS the structural-pivot backup**
+> (no pivot); loader+executor+preflight built explicit-import-only
+> (16 PASSing tests); the A1 residual is honestly published-baseline-
+> grade pending operator corpus-fetch.  W107 (γ) shipped
+> `docs/CONSOLIDATED_CODE_RETIREMENT_NARRATIVE_V1.md`.  W107 adds NO
+> empirical retirement and retires NO cap; W89 + W105 remain the TWO
+> confirmed retirements (both Llama-3.3-70B @ 70B).  `COO-9` REMAINS
+> the lead path; `COO-31` is the W107 issue; W108 = LiveCodeBench
+> functional-subset Phase 2 cheap pilot after operator corpus-fetch
+> (or the APPS pivot, or an honest no-go).  17th consecutive
+> preflight-discipline validation (W93–W107).  Stable boundary
+> preserved (no version bump; no PyPI; `coordpy/__init__.py`
+> untouched; 2 new explicit-import-only modules).  Prior: **W106
 > bounded-retirement registration + Llama-3.1 margin-cap
 > dispatch + graphify truth-sync** on 2026-05-28 — a **coupled
 > claim-registration + margin-cap-dispatch milestone, NOT a new

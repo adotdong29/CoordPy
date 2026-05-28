@@ -1,0 +1,9 @@
+{
+  "status": "http_error",
+  "http_status": 404,
+  "reason": "Not Found",
+  "model": "meta/llama-3.1-405b-instruct",
+  "wall_ms": 183,
+  "ts_utc": "2026-05-28T18:03:35.440971+00:00",
+  "schema": "coordpy.w105_405b_reachability_probe.v1"
+}

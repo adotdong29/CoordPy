@@ -2,7 +2,13 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: **W106
+> README-of-README must satisfy these rules. Last touched: **W107
+> 405B reachability gate + next-code-battlefield β preflight +
+> publication-grade consolidation** on 2026-05-28 (W107 re-probed
+> 405B → 4th HTTP 404, gate CLOSED; preflighted LiveCodeBench as the
+> structurally-sound next battlefield with APPS as the pivot backup;
+> consolidated the W89→W106 narrative; adds NO retirement and retires
+> NO cap; see the W107 section below).  Prior: **W106
 > bounded-retirement registration + Llama-3.1 margin-cap
 > dispatch** on 2026-05-28 (W106 registers the W105 Llama-3.3-70B
 > HumanEval+ retirement as a BOUNDED second confirmed retirement
@@ -96,6 +102,39 @@ GitHub:
   `docs/HONEST_FRAMING_POST_W87.md`.** Any other doc that
   attempts a "we solved it" claim is wrong and must be
   brought into alignment with that file before publishing.
+
+## W107 (405B gate + next-battlefield β preflight + consolidation) — explicit do-not-overstate rules
+
+W107 is a gated branch milestone with three lanes, NOT a new run and
+NOT a new retirement. It re-probed the 405B gate, preflighted the next
+code battlefield, and consolidated the W89→W106 narrative. The rules:
+
+- **Do say**: 405B is unreachable on NIM for the **fourth consecutive
+  time** (W104–W107 all HTTP 404); the cross-scale-UP gate is CLOSED;
+  no 405B pilot was earned or launched; $0 expensive NIM was spent.
+- **Do say**: LiveCodeBench is the **preflighted, structurally-sound
+  next battlefield** (functional-subset executor proven clean offline;
+  W89 decomposition fits; time-anchored contamination resistance is
+  the reason it leads APPS), with APPS as the pre-committed
+  structural-pivot backup.
+- **Do NOT say** LiveCodeBench has produced ANY empirical result. It
+  has NOT. W107-β is a NIM-free preflight + scaffolding only; the
+  cheap pilot is W108 work, gated on operator corpus-fetch.
+- **Do NOT cite the LiveCodeBench A1 residual as measured.** It is
+  **published-baseline-grade** (leaderboard pass@1, not a re-executed
+  local sidecar) and must be operator-verified for the exact pinned
+  release window before any pilot
+  (`W107-L-LIVECODEBENCH-RESIDUAL-PUBLISHED-BASELINE-GRADE-CAP`).
+- **Do NOT claim the schema is confirmed.** The loader REFUSES on
+  schema mismatch precisely because the live release_vN field names
+  must be confirmed at operator-fetch time (the W102 lesson;
+  `W107-L-LIVECODEBENCH-LOADER-V1-SCHEMA-CONFIRM-AT-FETCH-CAP`).
+- **Do NOT say W107 strengthened the claim.** It did not. W107 adds NO
+  empirical retirement and retires NO cap. The strongest claim is
+  unchanged from W105/W106: TWO confirmed retirements, both
+  Llama-3.3-70B @ 70B, bounded on three axes.
+- **Do NOT re-introduce the closed Llama-3.1 rescue-slice branch under
+  any label.** W106 closed it NO-GO; W107 honored that.
 
 ## W106 (bounded-retirement registration + Llama-3.1 margin-cap dispatch) — explicit do-not-overstate rules
 

@@ -13,6 +13,52 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W107 405B reachability gate + next-code-battlefield β preflight + publication-grade consolidation — a gated branch milestone with THREE lanes, NOT a new broad benchmark tournament; 405B gate CLOSED (4th consecutive HTTP 404) ⇒ LiveCodeBench preflighted as the structurally-sound next battlefield (APPS pivot backup; no pivot) ⇒ W108 cheap pilot after operator corpus-fetch; W89→W106 retirement arc consolidated at publication grade; 2 new explicit-import-only modules + 16 PASSing tests; $0 expensive NIM; ZERO additions to `__init__.py` (2026-05-28)**
+  — *W107 (`COO-31`) executed the pre-committed `docs/RUNBOOK_W106.md`
+  § 7 branch logic, re-locked in `docs/RUNBOOK_W107.md` BEFORE any
+  NIM call (including the sub-second 405B side-probe).
+  **Lane α (405B gate)** — re-probed `meta/llama-3.1-405b-instruct`
+  on NIM → HTTP 404 (183 ms), the FOURTH consecutive 404
+  (W104/W105/W106/W107); GATE = CLOSED (decision CID `332d4ef9…`);
+  no 405B cheap pilot earned or launched; `W104-L-...-405B-UNREACHABLE-ON-NIM-CAP`
+  refreshed; the cross-scale-UP § 3 cheap-pilot rule was NOT
+  exercised.  **Lane β (next-code-battlefield, the main empirical
+  lane)** — applied the W101 C1–C8 rubric + the W107 S1∧S2∧S3
+  structural-soundness pivot test: **LiveCodeBench is the
+  structurally-sound PRIMARY** (time-anchored contamination
+  resistance is the decisive publication-grade property; the
+  functional `starter_code` subset has a clean deterministic
+  subprocess executor proven offline — gold PASS / wrong FAIL /
+  infinite-loop TIMEOUT; the W89 decomposition fits), **APPS the
+  structural-pivot backup (no pivot triggered)**; shipped
+  `coordpy.livecodebench_loader_v1` (SHA-pinnable functional-subset
+  loader; refuses unpinned/mismatched corpus — the W102
+  silent-degeneration guard) + `coordpy.livecodebench_executor_v1`
+  (clean functional-form subprocess executor) +
+  `scripts/run_w107_livecodebench_preflight.py` (verdict CID
+  `55910d11…`; 16 PASSing tests); the A1 residual is honestly
+  recorded as published-baseline-grade pending operator corpus-fetch
+  (`W107-T-LIVECODEBENCH-PREFLIGHT-V1-SHIPS` +
+  `W107-L-LIVECODEBENCH-LOADER-V1-SCHEMA-CONFIRM-AT-FETCH-CAP` +
+  `W107-L-LIVECODEBENCH-RESIDUAL-PUBLISHED-BASELINE-GRADE-CAP` +
+  `W107-L-LIVECODEBENCH-FUNCTIONAL-SUBSET-ONLY-CAP`).  **Lane γ
+  (consolidation)** — shipped `docs/CONSOLIDATED_CODE_RETIREMENT_NARRATIVE_V1.md`
+  (the publication-grade W89→W106 arc:
+  TWO confirmed retirements, both Llama-3.3-70B @ 70B, bounded on
+  three axes) and harmonized the claim surface across the theorem
+  registry (banner + `W107-T-405B-GATE-FOURTH-404-CLOSED` +
+  `W107-T-CODE-RETIREMENT-NARRATIVE-CONSOLIDATED` section), the
+  research-status banner, and the do-not-overstate rules (new W107
+  section).  graphify refreshed from HEAD `a560202` at start + close.
+  W107 adds NO empirical retirement and retires NO cap; W89 + W105
+  remain the two confirmed retirements.  `COO-9` stays the lead path;
+  W108 = LiveCodeBench functional-subset Phase 2 cheap pilot after
+  operator corpus-fetch (or the APPS pivot, or an honest no-go).
+  17th consecutive preflight-discipline validation (W93–W107).
+  Stable boundary preserved: `coordpy.__version__` = `0.5.20`,
+  `coordpy.SDK_VERSION` = `coordpy.sdk.v3.43`, no PyPI publish,
+  `coordpy/__init__.py` untouched.*
+
 - **W106 bounded-retirement registration + Llama-3.1 margin-cap dispatch + graphify truth-sync — a coupled claim-registration + margin-cap-dispatch milestone, NOT a new benchmark tournament; REGISTERS the W105 `meta/llama-3.3-70b-instruct` HumanEval+ retirement as the bounded SECOND confirmed multi-seed same-budget multi-agent superiority retirement after W89, and DECIDES the W105 `meta/llama-3.1-70b-instruct` margin-cap branch NO-GO via a pre-committed two-gate rule (`coordpy.margin_cap_dispatch_v1`); $0 NIM on the Llama-3.1 branch; ONE new explicit-import-only module + 20 PASSing tests; ZERO additions to `__init__.py` (2026-05-28)**
   — *W106 (`COO-30`) executed the pre-committed
   `docs/RESULTS_W105_W106_PLANNING_V1.md` Verdict C / sub-case C1
