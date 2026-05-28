@@ -433,6 +433,36 @@
         "W107-L-LIVECODEBENCH-RESIDUAL-PUBLISHED-BASELINE-GRADE-CAP",
         "W107-L-LIVECODEBENCH-FUNCTIONAL-SUBSET-ONLY-CAP"
       ]
+    },
+    {
+      "id": "W108",
+      "title": "LiveCodeBench real-data bug-fix + cheap-pilot FAIL (B-A1=-3.33pp; MLB-2=25%) + APPS backup readiness + 405B 5th-404",
+      "outcome": "Gated branch milestone with THREE lanes, NOT a new broad benchmark tournament. docs/RUNBOOK_W108.md locked BEFORE any expensive NIM call; the one expensive run was the EARNED 330-call cheap pilot ($0 expensive 405B). Lane alpha (405B gate): re-probed meta/llama-3.1-405b-instruct -> HTTP 404 (163ms), the FIFTH consecutive 404 (W104-W108); GATE=CLOSED (decision CID e1af4451e4d15e7038016f7acd50d72560a77fc874470157c88d1426ee370e8d); W104-L-...-405B-UNREACHABLE-ON-NIM-CAP refreshed. Lane beta (LiveCodeBench, main): diagnosed + fixed the partial-scaffold gold-path smoke (A0=A1=B=0.0) -> root cause was the real release_v6 corpus storing metadata as a JSON STRING, so the W107 loader left func_name='' -> executor ENTRY_NOT_FOUND on every arm; livecodebench_loader_v1._resolve_func_name now handles both encodings (+starter_code fallback); 19 regression tests lock it. Real-data preflight PASS (SHA pin bb4c364f...; 63 functional, all func_name resolved, all plain-arg, all dated 2025 post-cutoff; slice CID 2afc318c...; verdict CID 61b9961c...) -> pilot EARNED. Cheap pilot (meta/llama-3.3-70b-instruct; 1 seed x 30 x K=5 = 330 NIM calls; ~77min; 444 HTTP-429 retries survived): A0=43.33% / A1@K5=63.33% / B=60.00% / B-A1=-3.33pp; 7/9 gates (G3+G4 fail); MLB-1=53.33% PASS, MLB-2=25% FAIL -> FAIL (NON-mechanism-driven). FIRST contamination-resistant test of the W89 mechanism, and it FAILed. Lane gamma (APPS backup): real coordpy.apps_loader_v1 + apps_executor_v1 + preflight + 7 tests + codified in-milestone pivot conditions; pivot NOT triggered (LiveCodeBench passed real-data soundness); APPS is 2021 contamination-exposed (C7=C), backup/control only. Truth surface: the TWO confirmed retirements (W89 +5.56pp; W105 +7.00pp, both Llama-3.3-70B @ 70B) STAND unchanged; W108 adds NO retirement and retires NO research carry-forward; both retirements are on contamination-EXPOSED HumanEval-family (2021) problems and the contamination-confound is an OPEN hypothesis (not a finding). The two carry_forwards_retired below are W107 INFRASTRUCTURE caps discharged by the real-data fetch (schema confirmed; live A1 measured), NOT research retirements. graphify refreshed from HEAD at start + close. 18th consecutive preflight-discipline validation (W93-W108). COO-9 stays lead; W109 = APPS contaminated-control contrast or multi-seed LCB de-noise. Stable boundary preserved (no version bump; no PyPI; coordpy/__init__.py untouched; 2 new explicit-import-only APPS modules + slice selector; loader fixed in place).",
+      "commits": [
+        "9b1b29a",
+        "e1c0ea7"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W108.md",
+        "docs/RESULTS_W108_LIVECODEBENCH_PHASE2_70B_V1.md",
+        "docs/RESULTS_W108_MILESTONE_SUMMARY_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W108_V1.md"
+      ],
+      "linear_issues": [
+        "COO-32"
+      ],
+      "carry_forwards_retired": [
+        "W107-L-LIVECODEBENCH-LOADER-V1-SCHEMA-CONFIRM-AT-FETCH-CAP",
+        "W107-L-LIVECODEBENCH-RESIDUAL-PUBLISHED-BASELINE-GRADE-CAP"
+      ],
+      "carry_forwards_added": [
+        "W108-T-LIVECODEBENCH-REAL-DATA-BUGFIX-METADATA-JSON-STRING",
+        "W108-T-LIVECODEBENCH-REAL-DATA-PREFLIGHT-EARNED",
+        "W108-T-405B-GATE-FIFTH-404-CLOSED",
+        "W108-T-APPS-BACKUP-SCAFFOLDING-REAL-PIVOT-READY",
+        "W108-L-LIVECODEBENCH-REFLEXION-PHASE2-70B-CAP",
+        "W108-L-REFLEXION-NOT-DEMONSTRATED-ON-CONTAMINATION-RESISTANT-BENCH-CAP"
+      ]
     }
   ]
 }
