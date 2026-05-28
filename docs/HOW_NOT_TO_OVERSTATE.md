@@ -2,7 +2,21 @@
 
 > Canonical do-not-overstate rules for the Context Zero / CoordPy
 > programme. Every milestone note, paper draft, README claim, or
-> README-of-README must satisfy these rules. Last touched: **W108
+> README-of-README must satisfy these rules. Last touched: **W109 APPS
+> contaminated-control contrast + LiveCodeBench de-noise decision +
+> claim tightening** on 2026-05-28 (W109 fetched the REAL `codeparrot/apps`
+> corpus, EARNED + ran the contamination-control cheap pilot → on
+> contamination-EXPOSED APPS the W89 mechanism RECOVERED a large
+> same-budget win (B − A1 = **+16.67 pp**; 9/9 gates; MLB-2 = 57 %; 0
+> regressions; `PASS_NON_MECHANISM_DRIVEN` — MLB-1 invocation 23 % FAILs
+> only because A0 = 73 % is high) where it FAILed on contamination-RESISTANT
+> LiveCodeBench (−3.33 pp; W108) — a **double dissociation by vintage**
+> (+ A0 73.33 % exposed vs 43.33 % resistant) that moves the
+> contamination-confound from OPEN to **SUPPORTED but NOT established**
+> (one single-seed control pair; APPS contamination-EXPOSED ⇒ CONTROL
+> evidence only, NOT a third retirement, NOT publication-grade); LiveCodeBench
+> de-noise NOT WARRANTED ($0 NIM); adds NO retirement; W89 + W105 stand,
+> boundary now SHARPER; see the W109 section below).  Prior: **W108
 > LiveCodeBench real-data bug-fix + cheap-pilot FAIL + APPS backup
 > readiness** on 2026-05-28 (W108 fixed the partial-scaffold real-data
 > bug, EARNED the cheap pilot on the real contamination-resistant
@@ -111,6 +125,40 @@ GitHub:
   `docs/HONEST_FRAMING_POST_W87.md`.** Any other doc that
   attempts a "we solved it" claim is wrong and must be
   brought into alignment with that file before publishing.
+
+## W109 (APPS contaminated-control contrast + LCB de-noise decision) — explicit do-not-overstate rules
+
+- **Do say**: W109 ran a contamination-control cheap pilot on the REAL
+  `codeparrot/apps` call-based subset (38 problems; SHA-pinned; earned via a
+  real-data preflight) and the W89 mechanism **RECOVERED a large same-budget
+  win on contamination-EXPOSED APPS** — A0=73.33 / A1@K=5=73.33 / B=90.00 %;
+  **B − A1 = +16.67 pp**; 9/9 Phase-2 gates; MLB-2 = 57.14 % (load-bearing
+  when invoked); B regressed on 0 problems.
+- **Do say**: this is the OPPOSITE of W108's contamination-RESISTANT
+  LiveCodeBench FAIL (−3.33 pp), i.e. a **double dissociation by vintage**,
+  reinforced by an A0 single-shot gap (73.33 % exposed vs 43.33 % resistant) —
+  **evidence CONSISTENT with a contamination-confound**.
+- **Do say**: the formal verdict is `PASS_NON_MECHANISM_DRIVEN` — MLB-1
+  invocation (23.33 %) fails the 33 % floor because A0 is high (the model
+  solves most exposed-2021 problems first-shot, itself a memorization signal).
+- **Do NOT say** W109 PROVES contamination. The confound is now **SUPPORTED,
+  NOT established** — one single-seed control pair (n=30 each); APPS and
+  HumanEval may share a property orthogonal to contamination; the APPS PASS is
+  non-mechanism-driven on invocation.
+- **Do NOT say** W109 is a THIRD retirement or publication-grade. APPS is 2021
+  vintage = contamination-EXPOSED (C7=C) ⇒ CONTROL evidence only. A retirement
+  needs a contamination-RESISTANT PASS at Phase-3 multi-seed (which does not
+  exist — LiveCodeBench FAILed).
+- **Do NOT say** W109 overwrites the W108 LiveCodeBench FAIL — both STAND as
+  the two halves of the dissociation.
+- **Do NOT say** the two retirements (W89, W105) are weakened. They STAND; what
+  changed is the BOUNDARY around them — it is now SHARPER (positive control
+  evidence that the same-budget advantage may be contamination-linked).
+- **Do NOT cite** the LiveCodeBench multi-seed de-noise as pending or planned —
+  a falsifiable two-gate rule found it **NOT WARRANTED** (negative margin +
+  weak MLB-2; $0 further LCB NIM; does NOT re-open the closed Llama-3.1 branch).
+- 405B was NOT re-probed at W109; the cross-scale-UP gate stays CLOSED (5th 404
+  at W108).
 
 ## W108 (LiveCodeBench real-data bug-fix + cheap-pilot FAIL + APPS readiness) — explicit do-not-overstate rules
 

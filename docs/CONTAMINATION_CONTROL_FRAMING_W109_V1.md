@@ -36,10 +36,11 @@ cells. The only axes are **benchmark vintage** (exposed vs resistant) and the
 
 | | contamination-EXPOSED (≤ 2024 cutoff) | contamination-RESISTANT (≥ 2025) |
 |---|---|---|
-| **mechanism PASSes** | HumanEval (W89 ✅), HumanEval+ (W105 ✅), **APPS (W109 — this milestone)** | *(none yet — the genuinely strong cell)* |
-| **mechanism FAILs** | MBPP+ V2 (W102 ❌ — same-family-adjacent) | **LiveCodeBench 2025 (W108 ❌)** |
+| **mechanism PASSes** | HumanEval (W89 ✅ +5.56 pp), HumanEval+ (W105 ✅ +7.00 pp), **APPS (W109 ✅ on margin +16.67 pp; PASS-non-mechanism-driven)** | *(none yet — the genuinely strong cell; W108's one attempt FAILed)* |
+| **mechanism FAILs** | MBPP+ V2 (W102 ❌ — same-family-adjacent) | **LiveCodeBench 2025 (W108 ❌ −3.33 pp)** |
 
-Reading the grid:
+**W109 filled the top-left cell with a third exposed PASS, deepening the
+exposed/resistant dissociation.** Reading the grid:
 
 * **The only publication-grade-strong cell is top-right** (PASS on
   contamination-resistant data). It is currently **empty**, and W108's one
@@ -99,12 +100,31 @@ claim surface that only a contamination-RESISTANT PASS could provide.
 
 ## W109 empirical result (APPS contaminated-control cheap pilot)
 
-*(This section is finalized after the earned cheap pilot completes; see
-`docs/RESULTS_W109_APPS_CONTROL_PHASE2_70B_V1.md` for the full verdict + the
-locked pre-commit `docs/RUNBOOK_W109.md`. Corpus: `codeparrot/apps`
-refs/convert/parquet @ `0f10e424…`, call-based subset 38 problems, JSONL SHA
-`f6c44d76…`; slice CID `783687d6…`; 1 seed × 30 × K=5 = 330 NIM calls at
-`meta/llama-3.3-70b-instruct`.)*
+**`PASS_NON_MECHANISM_DRIVEN`. A0 = 73.33 % / A1@K=5 = 73.33 % / B = 90.00 %;
+B − A1 = +16.67 pp; 9/9 Phase-2 gates; MLB-2 = 57.14 % PASS, MLB-1 = 23.33 %
+FAIL.** (Corpus: `codeparrot/apps` refs/convert/parquet @ `0f10e424…`,
+call-based subset 38 problems, JSONL SHA `f6c44d76…`; slice CID `783687d6…`;
+1 seed × 30 × K=5 = 330 NIM calls at `meta/llama-3.3-70b-instruct`; bench
+Merkle `a571c08b…`.)
+
+The mechanism RECOVERED a large same-budget win on contamination-EXPOSED APPS
+(B beat A1 by +16.67 pp; **0 regressions**; 4 of 5 B-wins are genuine reflexion
+rescues; MLB-2 = 57 % — HumanEval-family-like), the exact OPPOSITE of its W108
+FAIL on contamination-RESISTANT LiveCodeBench (−3.33 pp; MLB-2 = 25 %). The
+double dissociation holds, and a **secondary memorization-consistent signal**
+reinforces it: **A0 (single-shot) = 73.33 % on exposed APPS vs 43.33 % on
+resistant LiveCodeBench** — a +30 pp first-shot gap that also explains why
+reflexion was invoked rarely on APPS (MLB-1 fails: the model often already
+"knows" the 2021 answer, so it seldom needs to repair).
+
+**Reading per the rules above:** this is **evidence CONSISTENT with the
+contamination-confound — the hypothesis is now SUPPORTED, NOT established**
+(one single-seed control pair; the APPS PASS is non-mechanism-driven on
+invocation; APPS/HumanEval may share an orthogonal property). It is NOT a third
+retirement (APPS exposed), NOT publication-grade, and does NOT overwrite the
+W108 FAIL. The two confirmed retirements (W89, W105) STAND; their boundary is
+now SHARPER. Full verdict + carry-forwards:
+`docs/RESULTS_W109_APPS_CONTROL_PHASE2_70B_V1.md`.
 
 ## Anchors
 

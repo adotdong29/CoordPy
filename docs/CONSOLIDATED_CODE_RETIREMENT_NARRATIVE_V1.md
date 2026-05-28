@@ -156,6 +156,31 @@ gate closed at the fourth 404).
    decomposition fits, so W108 is a cheap pilot (after operator
    corpus-fetch) or an honest no-go — not paperwork.
 
+## Post-W106 update — the third-code-family path was executed (W108 + W109)
+
+Path #2 above (a third code-benchmark family) has now been RUN, and it
+delivered a contamination boundary rather than a third retirement:
+
+* **W108 — LiveCodeBench (contamination-RESISTANT 2025)**: the first test of
+  the W89 mechanism on contamination-resistant data **FAILed** (B − A1 =
+  −3.33 pp; MLB-2 = 25 %).
+* **W109 — APPS (contamination-EXPOSED 2021), as a control**: the SAME
+  mechanism **RECOVERED** a large same-budget win (B − A1 = +16.67 pp; 9/9
+  gates; MLB-2 = 57 %; 0 regressions; `PASS_NON_MECHANISM_DRIVEN`), reinforced
+  by an A0 single-shot gap (73.33 % exposed vs 43.33 % resistant).
+
+This **double dissociation by vintage** is evidence CONSISTENT with a
+**contamination-confound**: the same-budget reflexion advantage replicates on
+contamination-EXPOSED code (APPS, like the W89/W105 HumanEval-family) but not
+on contamination-RESISTANT code. The confound is now **SUPPORTED but NOT
+established** (one single-seed control pair; the APPS PASS is
+non-mechanism-driven on invocation; APPS is contamination-EXPOSED ⇒ control
+evidence only, never a third retirement). Net effect on this narrative: the
+two confirmed retirements (W89, W105) **STAND**, but they are now explicitly
+bounded as **contamination-EXPOSED HumanEval-family**, and a contamination-
+RESISTANT same-budget code superiority remains **unproven** (the only attempt
+FAILed). See `docs/CONTAMINATION_CONTROL_FRAMING_W109_V1.md`.
+
 ## How to cite this honestly (for any external write-up)
 
 * DO say: "two confirmed same-budget multi-agent-superiority

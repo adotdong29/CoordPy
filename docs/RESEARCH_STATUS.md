@@ -9,7 +9,46 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W108
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W109 APPS
+> contaminated-control contrast + LiveCodeBench de-noise decision +
+> claim tightening** on 2026-05-28 — a **gated branch milestone with
+> THREE lanes, NOT a new broad benchmark tournament**.  W109 fetched the
+> REAL `codeparrot/apps` corpus (refs/convert/parquet @ `0f10e424`;
+> SHA-verified shards → call-based subset 38 problems; JSONL SHA
+> `f6c44d76…`), EARNED the cheap pilot (real-data preflight P1∧P2∧P3∧P4
+> PASS; verdict CID `0cf1a8e2…`), and ran it (`meta/llama-3.3-70b-instruct`,
+> 1 seed × 30 × K=5 = 330 calls): **A0=73.33 / A1@K=5=73.33 / B=90.00 %;
+> B − A1 = +16.67 pp; 9/9 gates; MLB-2 = 57.14 % PASS, MLB-1 = 23.33 %
+> FAIL ⇒ `PASS_NON_MECHANISM_DRIVEN`** (B regressed on 0 problems; 4 of 5
+> B-wins are reflexion rescues; MLB-1 fails only because A0 is high —
+> the model solves most exposed-2021 problems first-shot)
+> (`W109-L-APPS-CONTROL-PHASE2-70B-PASS-NON-MECHANISM-DRIVEN-CAP`).  This
+> is the **contamination-control counterpart** to W108: the SAME
+> mechanism RECOVERS a large same-budget win on contamination-EXPOSED
+> APPS (+16.67 pp) where it FAILed on contamination-RESISTANT
+> LiveCodeBench (−3.33 pp) — a **double dissociation by vintage**
+> reinforced by an A0 memorization gap (73.33 % exposed vs 43.33 %
+> resistant).  This is **evidence CONSISTENT with the
+> contamination-confound — the hypothesis is now SUPPORTED, NOT
+> established** (one single-seed control pair; APPS PASS
+> non-mechanism-driven; APPS is contamination-EXPOSED ⇒ CONTROL evidence
+> only, NOT a retirement, NOT publication-grade) (`W109-T-CONTAMINATION-
+> CONFOUND-SUPPORTED-NOT-PROVEN`).  W109 adds NO retirement and retires
+> NO research carry-forward (W89 + W105 STAND; their boundary is now
+> SHARPER, not weaker).  β: the LiveCodeBench multi-seed de-noise is
+> **NOT WARRANTED** by a falsifiable two-gate rule
+> (`coordpy.livecodebench_denoise_decision_v1`; W108's −3.33 pp + weak
+> MLB-2 need a +8.33 pp mean shift multi-seed cannot supply; decision CID
+> `290afa46…`; $0 further LCB NIM; does NOT re-open the closed Llama-3.1
+> branch).  405B NOT re-probed (gate stays CLOSED at the 5th 404).  `COO-9`
+> REMAINS the lead path; `COO-33` is the W109 issue; **W110 = a SECOND
+> contamination-RESISTANT benchmark** (is the LiveCodeBench FAIL
+> LCB-specific or general to resistant data? — the verdict-changing move
+> for the now-live confound question).  graphify refreshed from HEAD at
+> start + close.  19th consecutive preflight-discipline validation
+> (W93–W109).  Stable boundary preserved (no version bump; no PyPI;
+> `coordpy/__init__.py` untouched; 2 new explicit-import-only modules +
+> 3 scripts; APPS loader/executor reused unchanged).  Prior: **W108
 > LiveCodeBench real-data bug-fix + cheap-pilot FAIL + APPS backup
 > readiness** on 2026-05-28 — a **gated branch milestone with THREE
 > lanes, NOT a new broad benchmark tournament**.  W108 fixed the

@@ -13,6 +13,20 @@ re-exported through `coordpy.__init__` or
 `coordpy.SDK_VERSION == "coordpy.sdk.v3.43"`, the smoke driver,
 the public symbols) is byte-for-byte unchanged.
 
+- **W109 APPS contaminated-control contrast + LiveCodeBench de-noise decision + claim tightening — a gated branch milestone with THREE lanes, NOT a new broad benchmark tournament; fetched the REAL `codeparrot/apps` corpus (refs/convert/parquet @ `0f10e424`; SHA-verified shards → 38 call-based problems; JSONL SHA `f6c44d76…`), EARNED the cheap pilot (real-data preflight PASS), and RAN it (`meta/llama-3.3-70b-instruct`, 1 seed × 30 × K=5 = 330 calls) ⇒ A0=73.33 / A1@K5=73.33 / B=90.00 %; B−A1=+16.67 pp; 9/9 gates; MLB-2=57.14 % PASS, MLB-1=23.33 % FAIL ⇒ `PASS_NON_MECHANISM_DRIVEN` (0 regressions; 4/5 B-wins are reflexion rescues); the W89 mechanism RECOVERED a large same-budget win on contamination-EXPOSED APPS where it FAILed on contamination-RESISTANT LiveCodeBench (−3.33 pp; W108) — a double dissociation by vintage (+ A0 73.33 % exposed vs 43.33 % resistant) that moves the contamination-confound from OPEN to SUPPORTED but NOT established (APPS is contamination-EXPOSED ⇒ CONTROL evidence only, NOT a third retirement); LiveCodeBench multi-seed de-noise NOT WARRANTED ($0 NIM; falsifiable two-gate rule); 405B not re-probed (gate CLOSED at 5th 404); adds NO retirement; W89+W105 stand, boundary now SHARPER; 2 new explicit-import-only modules (`apps_reflexion_bench_v1` + `livecodebench_denoise_decision_v1`) + 3 scripts; ZERO additions to `__init__.py` (2026-05-28)**
+  — *W109 (`COO-33`) executed the pre-committed `docs/RUNBOOK_W109.md`
+  three-lane branch logic, locked BEFORE any expensive NIM call. Lane α
+  (APPS contaminated-control, MAIN) fetched + pinned the real corpus, built
+  `coordpy.apps_reflexion_bench_v1` (A0/A1/B byte-identical in shape to
+  W89/W105/W108), earned the pilot (preflight verdict CID `0cf1a8e2…`; slice
+  CID `783687d6…`) and ran it (bench Merkle `a571c08b…`). Lane β decided the
+  LiveCodeBench de-noise NOT WARRANTED via `coordpy.livecodebench_denoise_
+  decision_v1` (decision CID `290afa46…`). Lane γ added
+  `docs/CONTAMINATION_CONTROL_FRAMING_W109_V1.md` and tightened the claim
+  surface across the status / registry / honesty docs. See
+  `docs/RESULTS_W109_APPS_CONTROL_PHASE2_70B_V1.md` +
+  `docs/RESULTS_W109_MILESTONE_SUMMARY_V1.md`.*
+
 - **W108 LiveCodeBench real-data bug-fix + cheap-pilot FAIL + APPS backup readiness — a gated branch milestone with THREE lanes, NOT a new broad benchmark tournament; the partial LiveCodeBench scaffold's gold-path smoke (A0=A1=B=0.0) was diagnosed to a real-data binding bug (`release_v6` stores `metadata` as a JSON string ⇒ the W107 loader left `func_name=""` ⇒ executor ENTRY_NOT_FOUND), FIXED + locked in 19 tests, the cheap pilot EARNED on the real SHA-pinned contamination-resistant corpus, and RUN ⇒ clean Phase-2 FAIL (B−A1=−3.33 pp; MLB-2=25 %); the FIRST contamination-resistant test of the W89 mechanism FAILed; 405B 5th-consecutive 404 (CLOSED); real APPS backup scaffolding built + pivot-ready (not triggered); adds NO retirement; W89+W105 stand; 2 new explicit-import-only APPS modules + slice selector + loader fix; ZERO additions to `__init__.py` (2026-05-28)**
   — *W108 (`COO-32`) executed the pre-committed `docs/RUNBOOK_W108.md`
   three-lane branch logic, locked BEFORE any expensive NIM call.
