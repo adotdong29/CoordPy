@@ -52,6 +52,15 @@ DEFAULT_VENV = os.path.expanduser("~/.cache/coordpy/bcb_venv/bin/python")
 OUT_DIR = "results/w110/bigcodebench_preflight"
 MISSING_RE = re.compile(r"No module named '([^']+)'")
 
+# Gold-green stability guard: a handful of BigCodeBench golds are
+# pathologically slow (e.g. BigCodeBench/0 ~ itertools.permutations over
+# range(1,10) takes 22-45s), so their pass/fail flickers around the executor
+# timeout under load. Excluding golds whose runtime is >= this bound makes the
+# gold-green pool (and therefore the slice CID) REPRODUCIBLE, and keeps the
+# cheap pilot tractable. Fast-stable golds run in <6s, far below this bound.
+# Cap: W110-L-BIGCODEBENCH-GOLD-GREEN-WALL-STABILITY-GUARD-CAP.
+STABLE_WALL_MS = 20_000
+
 
 def _canon(payload) -> bytes:
     return json.dumps(payload, sort_keys=True, separators=(",", ":"),
@@ -129,7 +138,7 @@ def _gold_green_scan(py: str, probs, workers: int) -> dict:
         mm = MISSING_RE.search(r.stderr_tail)
         return p.task_id, {
             "passed": bool(r.passed), "rc": int(r.returncode),
-            "timed_out": bool(r.timed_out),
+            "timed_out": bool(r.timed_out), "wall_ms": int(r.wall_ms),
             "missing_module": (mm.group(1).split(".")[0] if mm else "")}
 
     with ThreadPoolExecutor(max_workers=workers) as ex:
@@ -169,7 +178,13 @@ def main() -> int:
     print(f"P3 gold-green scan over {len(probs)} problems "
           f"(workers={args.workers})…")
     scan = _gold_green_scan(py, probs, args.workers)
-    gold_green = [p for p in probs if scan[p.task_id]["passed"]]
+    # gold-green = gold passes AND runs fast/stably (wall < STABLE_WALL_MS) so
+    # the pool + slice CID are reproducible (excludes timeout-boundary flakies).
+    gold_green = [p for p in probs if scan[p.task_id]["passed"]
+                  and scan[p.task_id]["wall_ms"] < STABLE_WALL_MS]
+    n_passed_total = sum(1 for r in scan.values() if r["passed"])
+    n_passed_too_slow = sum(1 for r in scan.values()
+                            if r["passed"] and r["wall_ms"] >= STABLE_WALL_MS)
     missing_hist: dict[str, int] = {}
     nondep_fail = 0
     for tid, rec in scan.items():
@@ -183,6 +198,9 @@ def main() -> int:
     p3 = {
         "pass": len(gold_green) >= args.n_slice,
         "n_gold_green": len(gold_green),
+        "n_gold_pass_total": n_passed_total,
+        "n_gold_pass_excluded_too_slow": n_passed_too_slow,
+        "stable_wall_ms_bound": STABLE_WALL_MS,
         "n_dropped_missing_dep": sum(missing_hist.values()),
         "n_dropped_nondep": nondep_fail,
         "missing_module_histogram": dict(sorted(

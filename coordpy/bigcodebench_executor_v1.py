@@ -28,11 +28,20 @@ BigCodeBench-specific harness (differs from the call-based APPS executor):
   signal: 2 = candidate import error, 3 = entry point missing, 4 = test import
   error, 5 = no TestCase found, 1 = test failures.
 
-Honest scope (W110): ``W110-L-BIGCODEBENCH-EXECUTOR-V1-SUBPROCESS-SITE-CAP`` —
-isolation is by process boundary + ``-I`` (no user-site), NOT by capability;
-BigCodeBench tasks legitimately touch the filesystem (tempfiles) and use
-``unittest.mock`` — that is the benchmark's design and is run faithfully, not
-sandbox-escaped.
+Honest scope (W110):
+
+* ``W110-L-BIGCODEBENCH-EXECUTOR-V1-SUBPROCESS-SITE-CAP`` — isolation is by
+  process boundary + ``-I`` (no user-site), NOT by capability; BigCodeBench
+  tasks legitimately touch the filesystem (tempfiles) and use ``unittest.mock``
+  — that is the benchmark's design and is run faithfully, not sandbox-escaped.
+  The ``-I`` flag drops only the USER site, so deps must live in the venv/main
+  site (W110 uses a ``--system-site-packages`` venv; see RUNBOOK_W110 § 3).
+* ``W110-L-BIGCODEBENCH-EXECUTOR-V1-EXEC-NAMESPACE-NOT-FILE-MODULE-CAP`` — the
+  candidate + ``test`` are exec'd into ONE in-memory namespace, not written as
+  an importable file module. The handful of BigCodeBench tasks whose tests
+  re-import the solution by module name (or spawn a subprocess that does) fail
+  here and are DROPPED by the gold-green filter — they never false-PASS. (At
+  the W110 preflight: ~4 of 1140.)
 """
 from __future__ import annotations
 
@@ -67,6 +76,18 @@ def _sha256_hex(payload: Any) -> str:
 # combined suite is successful. Source strings are embedded as JSON literals
 # (valid Python string literals; non-ASCII becomes \uXXXX).
 _HARNESS_TEMPLATE = r'''
+import os as _os
+# Headless: never pop a GUI chart window, and never let plt.show() block (which
+# would hit the wall timeout and FALSELY fail a correct chart solution). Set
+# BEFORE the candidate imports matplotlib/seaborn so they pick up the Agg backend.
+_os.environ["MPLBACKEND"] = "Agg"
+_os.environ.pop("DISPLAY", None)
+try:
+    import matplotlib as _mpl
+    _mpl.use("Agg", force=True)
+except Exception:
+    pass
+
 import io, sys, unittest, traceback
 
 _ns = {"__name__": "_bcb_solution_mod"}
@@ -174,10 +195,15 @@ def run_bigcodebench_executor_v1(
     rc = -1
     out_b = b""
     err_b = b""
+    import os as _os
+    child_env = dict(_os.environ)
+    child_env["MPLBACKEND"] = "Agg"   # headless matplotlib (no GUI windows)
+    child_env.pop("DISPLAY", None)
     try:
         proc = subprocess.run(
             [py, "-I", "-c", program], input=b"",
-            capture_output=True, timeout=float(kill_after_s), check=False)
+            capture_output=True, timeout=float(kill_after_s), check=False,
+            env=child_env)
         rc = int(proc.returncode)
         out_b = proc.stdout or b""
         err_b = proc.stderr or b""

@@ -258,16 +258,28 @@ NO NIM is spent until ALL hold (verdict at
    (C7 = A-grade release-date resistance, 2024-06; the second resistant
    benchmark).
 5. **P4** deterministic outcome-blind 30-slice from `gold_green` reproduces the
-   pinned slice CID `b69b5d0add23d7946ade81513dec4b44a9ae3487a042357aa3a1f166e115fc23`;
+   pinned slice CID `b69bf3a0999f0cdc2ccb097d2a67e3100095fda07bce47d4da8a7e840bbfd66a`;
    the pilot `--dry-run` reproduces it.
 
 **RESULT (FILLED — NIM-free; `results/w110/bigcodebench_preflight/preflight_verdict.json`,
-verdict CID `322a94db24a242d849dbd511228ecb28bff9195812cddac2bafb89cf7433ab82`):
+verdict CID `6be9fc8e4b674f955471a6e6d3b2337d0e5faf1aa3dbb1f15a6b7af84db1d8dd`):
 OVERALL PASS — pilot EARNED.** P1 1140 problems; P2 all five executor
 self-tests pass (synthetic gold PASS / wrong FAIL / infinite-loop TIMEOUT /
 REAL gold PASS / corrupted gold FAIL — no false-pass on real data);
-P3 **gold_green = 936/1140** (dropped 97 missing-dep + 107 non-dep; ≫ the 30
-needed); P4 30-slice (buckets libs2:13 / libs3plus:17) deterministic.
+P3 **gold_green = 968/1140** (971 gold-pass, 3 excluded ≥20 s by the
+wall-stability guard; dropped 99 missing-dep + 70 non-dep; ≫ the 30 needed);
+P4 30-slice (buckets libs2:13 / libs3plus:17) deterministic.
+
+**Executor headlessness (corrected after a window-popping iteration):** an
+initial run used the macOS *interactive* matplotlib backend (360 of 1140
+BigCodeBench tasks plot), which popped GUI windows AND risked a blocking
+`plt.show()` falsely TIMING-OUT correct chart solutions. The executor now
+forces the headless **`Agg`** backend (`MPLBACKEND=Agg` in-process + in the
+subprocess env). Re-preflighting under Agg recovered **+32 gold-green** (936 →
+968) — confirming the interactive backend had been falsely failing chart
+solutions — and the wall-stability guard (drop golds ≥ 20 s) made the slice CID
+**reproducible** across runs (`b69bf3a0…`; the flaky-slow BigCodeBench/0 is
+correctly excluded). Cap `W110-L-BIGCODEBENCH-EXECUTOR-V1-HEADLESS-AGG-FIX`.
 
 If any regress, the pilot is NOT launched; pivot per § 2.4 or honest no-go.
 
@@ -278,7 +290,7 @@ If any regress, the pilot is NOT launched; pivot per § 2.4 or honest no-go.
 **Slice (G1, pre-committed):** the deterministic outcome-blind `n_libs`-
 stratified 30-problem slice from `select_bigcodebench_slice_v1` over
 `gold_green`; slice CID
-`b69b5d0add23d7946ade81513dec4b44a9ae3487a042357aa3a1f166e115fc23` (FILLED;
+`b69bf3a0999f0cdc2ccb097d2a67e3100095fda07bce47d4da8a7e840bbfd66a` (FILLED;
 buckets libs2:13 / libs3plus:17). The pilot consumes the EXACT
 `slice_task_ids` from the preflight verdict.
 
