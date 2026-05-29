@@ -113,11 +113,35 @@ contamination-EXPOSED control-only; the boundary gets SHARPER, not fuzzier.
 * **DO NOT say:** multi-agent context is solved, or that the mechanism
   generalises across code benchmarks broadly (MBPP+ ❌, and at least LCB ❌).
 
-## § W110 empirical result (FILLED AT PILOT VERDICT)
+## § W110 empirical result (FILLED)
 
-<!-- PILOT_RESULT_PLACEHOLDER: filled from
-results/w110/bigcodebench_pilot/.../bigcodebench_reflexion_bench_report.json
-after the 1 seed × 30 × K=5 = 330-call run completes. -->
+**`FAIL` (clean, NON-mechanism-driven). A0 = 63.33% / A1@K=5 = 70.00% /
+B = 70.00%; B − A1 = +0.00 pp; 7/9 Phase-2 gates; MLB-1 = 40.00% PASS,
+MLB-2 = 25.00% < 33% FAIL.** (1 seed × 30 × K=5 = 330 NIM calls at
+`meta/llama-3.3-70b-instruct`; slice CID `b69bf3a0…`; bench Merkle
+`128dfb19…`.)
+
+The realized branch is **W110 resistant FAIL ⇒ contamination-confound
+STRENGTHENS toward a finding.** The mechanism now FAILs on TWO
+genuinely-different contamination-RESISTANT code benchmarks (LiveCodeBench 2025
+B−A1=−3.33 pp; BigCodeBench 2024 B−A1=+0.00 pp; **both MLB-2 = 25%**) while
+PASSing on THREE contamination-EXPOSED ones (HumanEval +5.56, HumanEval+ +7.00,
+APPS +16.67). The 2×2 resistant column is now **2 FAIL, 0 PASS**. The W108
+FAIL is shown **GENERAL, not LCB-specific**, so the boundary tightens to
+**contamination-EXPOSED-specific at 70B**.
+
+Crucially, W110 is a STRONGER resistant FAIL than W108: MLB-1 PASSES (40%
+invocation — reflexion WAS genuinely exercised, unlike W109 APPS where the high
+A0 suppressed it), and it STILL only rescued 25% — so the FAIL is not a
+"mechanism not tested" artifact. Reflexion fires at a healthy rate on resistant
+code but its rescues (1 unique-over-A1) are cancelled by its regressions (1),
+net +0.00 pp.
+
+**Still NOT proof** (single-seed each; two resistant points; the resistant
+benchmarks could share an orthogonal difficulty property). The two confirmed
+retirements (W89, W105) STAND; APPS stays exposed-control; W110 adds NO
+retirement. The boundary is SHARPER, exactly as the pre-commit promised for
+either outcome. Full verdict: `docs/RESULTS_W110_BIGCODEBENCH_PHASE2_70B_V1.md`.
 
 ## Anchors
 

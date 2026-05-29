@@ -9,7 +9,40 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W109 APPS
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W110 second
+> contamination-RESISTANT benchmark (BigCodeBench) Phase-2 FAIL + claim
+> tightening** on 2026-05-29 — a **gated branch milestone with THREE lanes,
+> NOT a new broad benchmark tournament**.  W110 selected **BigCodeBench 2024**
+> as the SECOND contamination-RESISTANT benchmark (REJECTING SWE-bench-lite
+> [synthetic in-repo scaffolding; Docker/per-repo-env; multi-file patches break
+> the K=5 byte-exact budget] and LiveBench-coding [= LiveCodeBench repackaged,
+> `task: LCB_generation`] on real-data probes at $0), fetched + SHA-pinned it
+> (JSONL SHA `ca4f352e…`; 1140 problems), EARNED the cheap pilot (headless-Agg
+> real-data preflight P1∧P2∧P3∧P4 PASS; gold-green 968/1140; slice CID
+> `b69bf3a0…`; verdict CID `6be9fc8e…`), and ran it
+> (`meta/llama-3.3-70b-instruct`, 1 seed × 30 × K=5 = 330 calls): **A0=63.33 /
+> A1@K=5=70.00 / B=70.00 %; B − A1 = +0.00 pp; 7/9 gates; MLB-1=40 % PASS,
+> MLB-2=25 % FAIL ⇒ `FAIL`** (B rescued 1 / regressed 1, net 0; reflexion
+> genuinely invoked but rescue collapses to 25 %, = the W108 rate)
+> (`W110-L-BIGCODEBENCH-REFLEXION-PHASE2-70B-CAP`).  This is the **SECOND
+> contamination-RESISTANT FAIL**, so the W108 LiveCodeBench FAIL is **NOT
+> LCB-specific** — the W89 mechanism fails on contamination-resistant code
+> GENERALLY at 70B (`W110-L-REFLEXION-FAILS-ON-CONTAMINATION-RESISTANT-CODE-GENERALLY-CAP`).
+> The contamination-confound moves **SUPPORTED → STRENGTHENED toward a finding,
+> NOT proven** (`W110-T-CONTAMINATION-CONFOUND-STRENGTHENED-NOT-PROVEN`; two
+> single-seed resistant points; orthogonal difficulty not excluded).  The two
+> confirmed retirements (W89, W105) STAND; the boundary is now
+> **contamination-EXPOSED-specific at 70B**.  W110 also caught + fixed an
+> in-milestone executor bug (interactive matplotlib backend popped GUI windows
+> AND falsely timed-out chart solutions → forced headless Agg → +32 gold-green;
+> `W110-T-BIGCODEBENCH-EXECUTOR-V1-HEADLESS-AGG-FIX`).  $0 on
+> SWE-bench-lite/LiveBench/APPS/LCB-de-noise/405B.  graphify refreshed from HEAD
+> at start + close.  `COO-9` REMAINS lead; `COO-34` is the W110 issue; **W111 =
+> register the tightened boundary + decide a DIFFERENT mechanism vs accept the
+> bounded two-retirement contamination-EXPOSED claim**.  20th consecutive
+> preflight-discipline validation (W93–W110).  Stable boundary preserved (no
+> version bump; no PyPI; `coordpy/__init__.py` untouched; 4 new
+> explicit-import-only modules + 3 scripts).  Prior: **W109 APPS
 > contaminated-control contrast + LiveCodeBench de-noise decision +
 > claim tightening** on 2026-05-28 — a **gated branch milestone with
 > THREE lanes, NOT a new broad benchmark tournament**.  W109 fetched the
