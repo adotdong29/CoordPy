@@ -1,0 +1,31 @@
+{
+  "schema": "coordpy.w111_m3_probe.v1",
+  "mechanism": "M3 executor-grounded structured-failure patcher",
+  "model_id": "meta/llama-3.3-70b-instruct",
+  "seed": 111001,
+  "n_problems": 2,
+  "K_multi_sample": 5,
+  "corpus_path": "/Users/qdong/.cache/coordpy/bigcodebench-v0_1_4.jsonl",
+  "corpus_sha256": "ca4f352e68ec06111ba807f55802914339f4d23a90eb71989126359cefb3b018",
+  "dataset": "bigcode/bigcodebench v0.1.4 (the W110 pinned corpus)",
+  "probe_slice_kind": "RESCUE-CONCENTRATED hard-core-focused (NOT a fair slice => UPPER BOUND, never a PASS claim; KILL/EARN decision only)",
+  "slice_cid": "fe06714f3bde5dd3bfc146d4dec1d0dcc0823e16cf85c8b7a8599332bae67a94",
+  "slice_task_ids": [
+    "BigCodeBench/1",
+    "BigCodeBench/2"
+  ],
+  "m3_output_value_targets": [
+    "BigCodeBench/15",
+    "BigCodeBench/20"
+  ],
+  "controls": [
+    "BigCodeBench/1",
+    "BigCodeBench/2",
+    "BigCodeBench/3"
+  ],
+  "hold_check": "BigCodeBench/51",
+  "venv_python": "/Users/qdong/.cache/coordpy/bcb_venv/bin/python",
+  "max_tokens_per_call": 1024,
+  "runbook": "docs/RUNBOOK_W111.md \u00a7 4.3",
+  "label": "canary"
+}

@@ -9,7 +9,48 @@
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
-> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W110 second
+> `docs/HONEST_FRAMING_POST_W87.md`. Last touched: **W111 different-MECHANISM
+> tournament on contamination-resistant code + bounded-claim fallback EARNED**
+> on 2026-05-29 — a **gated branch milestone with THREE lanes, NOT a new
+> benchmark tournament and NOT a reflexion rerun**.  After W110's resistant FAIL
+> (reflexion 0/2), W111 asked the sharper question: is the resistant ceiling
+> *reflexion-specific*, or does it hold for *any* same-budget mechanism at 70B?
+> A $0-NIM re-execution census of all 300 W110 BigCodeBench candidates
+> (`scripts/mine_w111_resistant_failure_modes_v1.py`) localised the resistant
+> failure to **81.6 % SEMANTIC hidden-test-coupling / 1.8 % API-grounding**
+> (`W111-T-RESISTANT-FAILURE-IS-SEMANTIC-HIDDEN-TEST-COUPLING`), which **KILLED
+> M2 (local symbol/doc introspection; attacks 1.8 %) and M1 (library/spec
+> planner; attacks comprehension, sacrifices a self-consistency sample, no
+> executor grounding) at $0 NIM** and admitted **M3 — an executor-grounded
+> structured-failure patcher** (typed expected/actual contract + minimal-patch,
+> materially different from prose reflexion, NEVER the hidden test source;
+> `W111-T-EXECUTOR-GROUNDED-PATCHER-V1-SHIPS`; 9 tests incl. a
+> test-source-non-leak fairness guard).  The one earned NIM run was a
+> smallest-decisive 143-call M3 probe on the pinned rescue-concentrated
+> 13-problem hard-core slice (CID `b611fae0…`): **A0=30.77 / A1=30.77 /
+> M3=46.15 %; M3−A1=+15.38 pp (rescue-concentrated UPPER BOUND); MLB-1=61.5 %,
+> MLB-2=12.5 %**.  M3's patch loop rescued ONE hard-core problem reflexion
+> failed (`/13`) but at **12.5 % (1/8) — BELOW reflexion's 25 % and the 33 %
+> floor**; one of its two wins (`/20`) is an attempt-0 sampling win, not the
+> mechanism; it did not hold reflexion's `/51` rescue.  So M3 did **NOT earn a
+> fair pilot** (pre-committed EARN bar not met + W104→W105 rescue-concentrated
+> erosion + W106 margin-cap discipline ⇒ NOT WARRANTED;
+> `W111-L-NO-DIFFERENT-MECHANISM-BEATS-A1-ON-RESISTANT-CODE-AT-70B-CHEAP-CAP`,
+> `W111-L-M3-PATCHER-SUB-REFLEXION-ON-RESISTANT-HARD-CORE-CAP`).
+> **BOUNDED-CLAIM FALLBACK EARNED**: the resistant ceiling is **NOT
+> reflexion-specific** (two mechanisms now fail to beat A1 on resistant code at
+> 70B — reflexion 0/2 + M3 sub-reflexion); the bounded two-retirement
+> **contamination-EXPOSED-HumanEval-family-at-70B** claim is the honest code
+> ceiling.  W111 adds NO retirement, retires NO carry-forward, and proves
+> NOTHING about the confound (it tests a mechanism, not the confound); honest
+> positive: M3 is not vacuous (it rescued `/13`), just sub-reflexion.  W89 +
+> W105 STAND.  `COO-9` REMAINS lead; `COO-35` is the W111 issue; **W112 =
+> cross-scale-UP probe on a stronger code model if reachable / a NIM-free-earned
+> M3 strengthening that clears the 33 % floor / acceptance of the bounded
+> claim**.  graphify refreshed from HEAD at start + close.  21st consecutive
+> preflight-discipline validation (W93–W111).  Stable boundary preserved (no
+> version bump; no PyPI; `coordpy/__init__.py` untouched; 1 new
+> explicit-import-only module + 2 scripts).  Prior: **W110 second
 > contamination-RESISTANT benchmark (BigCodeBench) Phase-2 FAIL + claim
 > tightening** on 2026-05-29 — a **gated branch milestone with THREE lanes,
 > NOT a new broad benchmark tournament**.  W110 selected **BigCodeBench 2024**
