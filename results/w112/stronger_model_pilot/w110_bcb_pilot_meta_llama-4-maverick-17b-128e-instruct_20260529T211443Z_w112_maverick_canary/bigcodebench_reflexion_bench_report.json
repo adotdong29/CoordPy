@@ -1,0 +1,116 @@
+{
+  "schema": "coordpy.bigcodebench_reflexion_bench_v1.v1",
+  "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+  "n_problems": 2,
+  "n_seeds": 1,
+  "K_multi_sample": 5,
+  "per_seed": [
+    {
+      "schema": "coordpy.bigcodebench_reflexion_bench_v1.v1",
+      "seed": 110001,
+      "n_problems": 2,
+      "a0_pass_at_1": 1.0,
+      "a1_pass_at_1": 1.0,
+      "b_pass_at_1": 1.0,
+      "per_problem_a0_passed": [
+        true,
+        true
+      ],
+      "per_problem_a1_passed": [
+        true,
+        true
+      ],
+      "per_problem_b_passed": [
+        true,
+        true
+      ],
+      "per_problem_b_first_pass_idx": [
+        0,
+        0
+      ],
+      "problem_ids": [
+        "BigCodeBench/1",
+        "BigCodeBench/2"
+      ],
+      "seed_merkle_root": "41763b8401bb2de9dff17b271763d927114c7b27afd29e2a08024c69e570c98f"
+    }
+  ],
+  "a0_mean_pass_at_1": 1.0,
+  "a1_mean_pass_at_1": 1.0,
+  "b_mean_pass_at_1": 1.0,
+  "b_mean_minus_a1_mean_pp": 0.0,
+  "bench_merkle_root": "f4fb7b52a1308c8768845233154acf99c80d2dadf2d4897c87793f13893fbeff",
+  "wall_s": 186.68,
+  "provenance": {
+    "schema": "coordpy.w110_bigcodebench_pilot.v1",
+    "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+    "seed": 110001,
+    "n_problems": 2,
+    "K_multi_sample": 5,
+    "corpus_path": "/Users/qdong/.cache/coordpy/bigcodebench-v0_1_4.jsonl",
+    "corpus_sha256": "ca4f352e68ec06111ba807f55802914339f4d23a90eb71989126359cefb3b018",
+    "dataset": "bigcode/bigcodebench v0.1.4 (refs/convert/parquet)",
+    "contamination_status": "RESISTANT \u2014 BigCodeBench 2024-06 release, post Llama-3.x ~2024-01 cutoff (C7 = A release-date anchoring); SECOND contamination-resistant benchmark",
+    "resistant_contrast": "vs W108 LiveCodeBench 2025 resistant FAIL (B-A1=-3.33pp) \u2014 tests whether that FAIL is LCB-specific or general",
+    "preflight_verdict_cid": "6be9fc8e4b674f955471a6e6d3b2337d0e5faf1aa3dbb1f15a6b7af84db1d8dd",
+    "slice_cid": "477507e0e6eadba20c6d4337f3aadb085c901e0b17929867d6a2ed04d0521bcd",
+    "slice_task_ids": [
+      "BigCodeBench/1",
+      "BigCodeBench/2"
+    ],
+    "slice_n_libs_mix": {
+      "libs3plus": 1,
+      "libs2": 1
+    },
+    "venv_python": "/Users/qdong/.cache/coordpy/bcb_venv/bin/python",
+    "max_tokens_per_call": 1024,
+    "phase2_gate_floors": {
+      "G2_a1_max_pct": 90.0,
+      "G4_margin_min_pp": 5.0,
+      "G5_b_gt_a0_min_pp": 5.0,
+      "G6_per_problem_majority_min": 2,
+      "MLB1_floor": 0.33,
+      "MLB2_floor": 0.33
+    },
+    "label": "w112_maverick_canary"
+  },
+  "mlb": {
+    "n_problems_total": 2,
+    "n_b_invoked_reflexion": 0,
+    "n_b_rescued_via_reflexion": 0,
+    "mlb1_invocation_rate": 0.0,
+    "mlb2_rescue_rate": 0.0,
+    "mlb1_passes": false,
+    "mlb2_passes": false
+  },
+  "phase2_evaluation": {
+    "schema": "coordpy.contamination_resistant_interpretation_v1.v1",
+    "gates": {
+      "G1_slice_pre_committed": true,
+      "G2_a1_below_saturation": false,
+      "G3_b_gt_a1": false,
+      "G4_margin_ge_5pp": false,
+      "G5_vs_a0_ge_5pp": false,
+      "G6_per_problem_majority": true,
+      "G7_budget_byte_exact": true,
+      "G8_audit_chain_ok": true,
+      "G9_executor_clean": true
+    },
+    "mlb1_invocation_rate": 0.0,
+    "mlb2_rescue_rate": 0.0,
+    "verdict_label": "FAIL",
+    "n_core_gates_pass": 5
+  },
+  "lane_beta_interpretation": {
+    "schema": "coordpy.contamination_resistant_interpretation_v1.v1",
+    "second_resistant_benchmark": "BigCodeBench",
+    "verdict_label": "FAIL",
+    "b_minus_a1_pp": 0.0,
+    "mlb2_rescue_rate": 0.0,
+    "confound_direction": "STRENGTHENS",
+    "boundary_after_w110": "contamination-EXPOSED-specific at 70B: the mechanism now FAILs on TWO genuinely-different contamination-RESISTANT code benchmarks (LiveCodeBench 2025 + BigCodeBench 2024) while PASSing on contamination-EXPOSED HumanEval-family + APPS",
+    "earns_phase3_retirement_bench": false,
+    "w111_branch": "W111 = register the tightened contamination-EXPOSED-specific boundary; honest next move is a DIFFERENT mechanism or acceptance of the bounded two-retirement contamination-exposed claim",
+    "claim_implication": "Contamination-confound STRENGTHENS toward a finding (still not proof \u2014 single-seed each; two resistant points). The W108 FAIL is shown GENERAL, not LCB-specific. COO-9's code-superiority GENERALISATION charter is substantially answered negatively for contamination-resistant code."
+  }
+}

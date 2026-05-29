@@ -1,3 +1,21 @@
+## W112 (stronger-model resistant-code gate + NIM-free M3 strengthening) — explicit do-not-overstate rules
+
+**DO say:** "W112 took the honest aggressive move: it found a genuinely STRONGER, same-budget-comparable code model reachable on NIM (`meta/llama-4-maverick-17b-128e-instruct`; 405B was 404 for the 6th time) and ran the earned BigCodeBench pilot on the EXACT W110 30-slice. The reflexion margin REOPENED to B − A1 = +10.00 pp (9/9 core gates; MLB-2 = 37.5 % PASS) where 70B was +0.00 pp — BUT BigCodeBench (2024-06) is contamination-RESISTANT only relative to Llama-3.3-70B's ~2024-01 cutoff; Llama-4's pretraining cutoff is Aug-2024, which post-dates the benchmark, so BigCodeBench is plausibly EXPOSED for Maverick. The result is a structural twin of the W109 APPS exposed control (A0 = 73.33 % identical; PASS_NON_MECHANISM_DRIVEN; MLB-1 sub-floor), so it is most parsimoniously an EXPOSED-column result, NOT a clean reopening of contamination-RESISTANT superiority. Separately, a NIM-free harder mining showed the fair M3-strengthening design space is structurally sub-floor (reliably fair-reachable ceiling 8.3 %; 58 % of invoked failures mock/fixture-coupled), so no fair strengthening earns NIM. W112 adds NO retirement; the contamination-confound is STRENGTHENED a third time (first within-benchmark resistant→exposed flip)."
+
+**DO NOT say:**
+
+* That a stronger model reopened contamination-RESISTANT superiority — the benchmark is UNVERIFIED-resistant (Aug-2024 cutoff > 2024-06 release ⇒ plausibly EXPOSED) for the tested model; the verdict is PASS_NON_MECHANISM_DRIVEN (MLB-1 26.67 % sub-floor); single-seed; capability-vs-contamination unresolved.
+* That the +10.00 pp is a clean mechanism-driven win — it is rescue-driven (3 clean rescues, 0 regressions, MLB-2 37.5 %) but NON-mechanism-driven on invocation (the strong model triggers reflexion on only 8/30 problems).
+* That W112 is a 70B rerun or defeat-by-default — it ran a genuinely stronger model; the gate was LIVE.
+* That the +10 pp proves the 70B resistant ceiling was purely a capability limit — the most parsimonious reading is benchmark exposure for the newer model (exact W109 APPS signature; within-benchmark +0.00 → +10.00 flip with model cutoff).
+* That the contamination-confound is now PROVEN — it is STRENGTHENED (third dissociation; cleaner mechanism = model-cutoff-relativity), still single-seed each, capability not fully excluded.
+* That a fair M3 strengthening is worth future spend — the fair design space is structurally capped at the 33 % floor by BigCodeBench's hidden-test-coupling (8.3 % reliably reachable).
+* That W112 retires anything or weakens W89/W105 (it adds none; they STAND, contamination-EXPOSED-HumanEval-family-at-70B).
+* That contamination-resistance is a fixed benchmark property — it is MODEL-CUTOFF-RELATIVE (a benchmark resistant for an older model can be exposed for a newer one).
+* That multi-agent context is "solved".
+
+Anchors: `docs/RESULTS_W112_STRONGER_MODEL_BIGCODEBENCH_PILOT_V1.md`; `docs/RESULTS_W112_STRONGER_MODEL_GATE_AND_SELECTION_V1.md`; `docs/RESULTS_W112_FAIR_REACHABILITY_M3_STRENGTHENING_V1.md`; `docs/CONTAMINATION_CONTROL_FRAMING_W112_V1.md`; `docs/RUNBOOK_W112.md`.
+
 ## W111 (different-MECHANISM tournament on contamination-resistant code — bounded-claim fallback earned) — explicit do-not-overstate rules
 
 **DO say:** "W111 tested whether a genuinely DIFFERENT mechanism beats same-budget self-consistency (A1) on contamination-resistant code at 70B. A NIM-free re-execution census localised the resistant failure to 81.6 % SEMANTIC hidden-test coupling / 1.8 % API-grounding, which killed M1 (planner) and M2 (introspection) at $0; the one aligned candidate, M3 (executor-grounded structured-failure patcher), earned a smallest-decisive 143-call probe and its patch mechanism was measured SUB-reflexion (rescue rate 12.5 % < reflexion's 25 % < the 33 % floor), so it did NOT earn a fair pilot. The bounded two-retirement contamination-EXPOSED-HumanEval-family-at-70B claim is the honest code ceiling; the resistant ceiling is NOT specific to the reflexion mechanism."
