@@ -616,6 +616,33 @@
         "W113-L-TIER2-NO-CERTIFIABLE-RESISTANT-SLICE-ON-PINNED-CORPUS-CAP"
       ],
       "carry_forwards_retired": []
+    },
+    {
+      "id": "W114",
+      "title": "Bounded-ceiling registration + newer-certifiable-post-cutoff-instrument attempt + per-model certification layer => NO stronger-than-Maverick model certifiable on the latest real data ($0 NIM); W89+W105 stand; no retirement added",
+      "outcome": "Gated branch milestone with THREE lanes, NOT another exposed rerun and NOT another same-scale resistant reflexion rerun. docs/RUNBOOK_W114.md locked BEFORE any NIM (the no-go branch is pre-committed by the rule => $0 spend is discipline, not omission). ultracode OFF; COO-9 stays lead. Lane alpha (bounded-ceiling registration, NIM-free): registered the W113 outcome as the honest code-superiority FLOOR across the canonical truth surfaces (RESEARCH_STATUS Last-touched; THEOREM_REGISTRY Last-touched/claim-row/new W114 section; CONSOLIDATED narrative; HOW_NOT_TO_OVERSTATE; new CONTAMINATION_CONTROL_FRAMING_W114; CHANGELOG) -- exactly TWO retirements (W89 +5.56pp, W105 +7.00pp), both meta/llama-3.3-70b-instruct @ 70B contamination-EXPOSED-HumanEval-family; resistant superiority 0 clean across BOTH 70B and Maverick scales; the W112 +10pp was EXPOSURE (W114-T-BOUNDED-EXPOSED-CODE-CEILING-REGISTERED); the truth floor a new axis must beat, NOT surrender (README untouched -- no per-milestone research claims). Lane beta (genuinely different axis = certification-supply analysis): verified from PRIMARY sources (2026-05-29) the latest LiveCodeBench release (HF file tree: test6.jsonl is the highest-numbered => release_v6 latest, no test7+; FUNCTIONAL subset 63 problems, all 2025-01-11..2025-04-05, frontier 2025-04-05) AND official model cutoffs (Llama-4-Maverick = Aug-2024 KNOWN per the official Llama-4 model card; Qwen3-Coder-480B = NO CUTOFF STATED on the official HF card + Qwen blog; DeepSeek-V4-pro = none disclosed; Mistral-Small-4-2603 = none in official Mistral docs, 2026-03 release post-dates the whole window) => verdict NO_CERTIFIABLE_STRONGER_MODEL, $0 NIM: a >=30 functional resistant slice requires a KNOWN cutoff <= ~Jan-2025; Maverick (the only reachable KNOWN cutoff) is already SETTLED (W113 resistant FAIL => redundant); every stronger-than-Maverick frontier model has an OFFICIALLY UNDISCLOSED cutoff (C1) and, where estimable, a cutoff at/after the Apr-2025 frontier (C2) => the resistant-instrument frontier has AGED OUT relative to the reachable model frontier (W114-L-RESISTANT-INSTRUMENT-FRONTIER-LAGS-MODEL-FRONTIER-CAP + W114-T-STRONGER-MODEL-CUTOFFS-OFFICIALLY-UNDISCLOSED). Lane gamma (per-model certification layer + graphify): built coordpy.stronger_model_cutoff_certification_v1 (explicit-import-only; imports the W113 registry + partition_resistant_v1 + ranking, no duplication; C1^C2^C3^C4 gate; verified instrument-frontier record + per-model official-source provenance + W113<->W114 confidence-consistency guard) + scripts/run_w114_stronger_model_certification_v1.py (re-verifies the month histogram against the SHA-pinned bb4c364f corpus: sha_ok + histogram_match; decision CID 258b6ed7); graphify refreshed from HEAD at start + close (76,573 nodes); explain/path/affected/query used for file selection + dependency checks. NET: W89 + W105 STAND, W114 adds NO retirement + retires NO carry-forward; contamination-confound UNCHANGED (W114 tests certification supply, not the confound); reachability NOT re-probed (not the binding gate; W112 facts carried); COO-9 stays lead; W115 = fires only when a resistant FUNCTIONAL instrument with >=30 problems dated strictly after a reachable frontier model's KNOWN cutoff exists. 1 new explicit-import-only module + 1 script + 12 new tests (+ 30 W113 regression tests pass); ZERO additions to coordpy/__init__.py; no version bump; no PyPI; 24th consecutive preflight/earn-discipline validation (W93-W114).",
+      "commits": [
+        "76f8b0a"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W114.md",
+        "docs/RESULTS_W114_STRONGER_MODEL_CERTIFICATION_V1.md",
+        "docs/RESULTS_W114_MILESTONE_SUMMARY_V1.md",
+        "docs/CONTAMINATION_CONTROL_FRAMING_W114_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W114_V1.md",
+        "results/w114/certification/certification_verdict.json"
+      ],
+      "linear_issues": [
+        "COO-38"
+      ],
+      "carry_forwards_added": [
+        "W114-T-BOUNDED-EXPOSED-CODE-CEILING-REGISTERED",
+        "W114-T-STRONGER-MODEL-CUTOFFS-OFFICIALLY-UNDISCLOSED",
+        "W114-T-STRONGER-MODEL-CERTIFICATION-V1-SHIPS",
+        "W114-L-RESISTANT-INSTRUMENT-FRONTIER-LAGS-MODEL-FRONTIER-CAP",
+        "W114-L-NO-NEW-STRONGER-MODEL-RESISTANT-PILOT-EARNED-CAP"
+      ],
+      "carry_forwards_retired": []
     }
   ]
 }
