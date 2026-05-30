@@ -643,6 +643,31 @@
         "W114-L-NO-NEW-STRONGER-MODEL-RESISTANT-PILOT-EARNED-CAP"
       ],
       "carry_forwards_retired": []
+    },
+    {
+      "id": "W115",
+      "title": "External-frontier refresh (LIVE) + durable future-fire certification/instrument-supply pipeline => external frontier UNCHANGED, NO certifiable stronger model ($0 NIM); DeepSeek V4 card now exists (2026-04-27) but discloses no cutoff; W89+W105 stand",
+      "outcome": "Gated branch milestone with THREE lanes, NOT another exposed rerun and NOT another same-scale resistant reflexion rerun on the same release_v6 slice. Executes the W114 RUNBOOK_W114.md s9 NO_CERTIFIABLE_STRONGER_MODEL branch (COO-38 close). docs/RUNBOOK_W115.md locked BEFORE any NIM (the no-go branch is pre-committed by the rule => $0 spend is discipline, not omission). ultracode OFF; COO-9 stays lead. Lane alpha (LIVE external-frontier refresh): re-verified from PRIMARY sources (2026-05-29; WebSearch/WebFetch against official HF dataset/model cards + vendor PDFs) that the latest LiveCodeBench release is STILL release_v6 (HF file tree highest = test6.jsonl, 'add v6' ~1yr ago; NO test7+; functional frontier 2025-04-05 UNCHANGED) and that NO reachable model stronger than Maverick has a KNOWN cutoff <= ~Jan-2025 (Qwen3-Coder-480B official HF card states NO cutoff; the DeepSeek V4 official model card NOW EXISTS [published 2026-04-27, Pro=1.6T/49B] but contains NO 'cutoff' string and no training-data date => still UNKNOWN; Mistral-Small-4 UNKNOWN; Maverick Aug-2024 KNOWN but already SETTLED at W113). Both binding conditions still fail => verdict re-derives NO_CERTIFIABLE_STRONGER_MODEL (decision CID 258b6ed7, byte-identical to W114), $0 NIM; the one external change since W114 (DeepSeek V4 card publication) does NOT move the verdict (W115-L-EXTERNAL-FRONTIER-UNCHANGED-NO-CERTIFIABLE-SLICE-REVERIFIED-CAP). Reachability NOT re-probed (not the binding gate; W112 facts carried). Lane beta (future-fire certification/instrument-supply pipeline): shipped coordpy.frontier_certification_pipeline_v1 (explicit-import-only; reuses the W113 registry + the W114 certify_model_v1/decide_certification_v1 gate + the loader's LIVECODEBENCH_KNOWN_RELEASES, no duplication -- graphify-confirmed 2-hop reuse chain run_frontier_certification_v1 -> decide_certification_v1 -> certify_model_v1) + scripts/run_w115_frontier_certification_v1.py: a latest-official-release detector (newer_release_available=False), a generalised frontier-date summary + threshold table (max KNOWN cutoff month admitting a >=30 slice = 2025-01), a per-model go/no-go matrix, a disclosure-consistency guard (live disclosures vs the encoded registry -- a divergence is the W116 update signal), and a structured W116FireConditionV1 -- all driven by a FrontierSnapshotV1 (external state as DATA) so W116 is push-button (W115-T-FUTURE-FIRE-CERTIFICATION-PIPELINE-SHIPS); the script re-verifies the histogram against the SHA-pinned bb4c364f corpus (sha_ok + histogram_match); result CID 6890419c; artifact results/w115/frontier_certification/frontier_certification_verdict.json. Lane gamma (claim/graphify/readiness): graphify refreshed from HEAD at start (f8b085d) + re-ingested the new module/script (76,727 nodes) + close; explain/path/affected/query used for file selection + dependency checks; truth surfaces tightened (RESEARCH_STATUS Last-touched; THEOREM_REGISTRY Last-touched/claim-row/new W115 section; CONSOLIDATED narrative; HOW_NOT_TO_OVERSTATE; new CONTAMINATION_CONTROL_FRAMING_W115; new FRONTIER_RELEVANCE_AUDIT_W115; CHANGELOG). NET: W89 + W105 STAND, W115 adds NO retirement + retires NO carry-forward; contamination-confound UNCHANGED (W115 tests certification supply, not the confound); COO-9 stays lead; COO-39; W116 fires when the pipeline trigger flips (a newer admitted release_v7+ with >=30 post-frontier functional problems for a KNOWN-cutoff stronger model, OR a reachable stronger-than-Maverick model disclosing a KNOWN cutoff month <= 2025-01). 1 new explicit-import-only module + 1 script + 10 new tests (+ 42 W113/W114 regression tests pass); ZERO additions to coordpy/__init__.py; no version bump; no PyPI; 25th consecutive preflight/earn-discipline validation (W93-W115).",
+      "commits": [
+        "84a9009"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W115.md",
+        "docs/RESULTS_W115_FRONTIER_CERTIFICATION_V1.md",
+        "docs/RESULTS_W115_MILESTONE_SUMMARY_V1.md",
+        "docs/CONTAMINATION_CONTROL_FRAMING_W115_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W115_V1.md",
+        "results/w115/frontier_certification/frontier_certification_verdict.json"
+      ],
+      "linear_issues": [
+        "COO-39"
+      ],
+      "carry_forwards_added": [
+        "W115-T-FUTURE-FIRE-CERTIFICATION-PIPELINE-SHIPS",
+        "W115-L-EXTERNAL-FRONTIER-UNCHANGED-NO-CERTIFIABLE-SLICE-REVERIFIED-CAP",
+        "W115-L-NO-NEW-PILOT-EARNED-FRONTIER-UNCHANGED-CAP"
+      ],
+      "carry_forwards_retired": []
     }
   ]
 }
