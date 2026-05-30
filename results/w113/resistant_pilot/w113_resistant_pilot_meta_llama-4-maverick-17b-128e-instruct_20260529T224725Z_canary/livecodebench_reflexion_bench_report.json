@@ -1,0 +1,139 @@
+{
+  "schema": "coordpy.livecodebench_reflexion_bench_v1.v1",
+  "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+  "n_problems": 2,
+  "n_seeds": 1,
+  "K_multi_sample": 5,
+  "per_seed": [
+    {
+      "schema": "coordpy.livecodebench_reflexion_bench_v1.v1",
+      "seed": 113001,
+      "n_problems": 2,
+      "a0_pass_at_1": 0.5,
+      "a1_pass_at_1": 0.5,
+      "b_pass_at_1": 1.0,
+      "per_problem_a0_passed": [
+        false,
+        true
+      ],
+      "per_problem_a1_passed": [
+        false,
+        true
+      ],
+      "per_problem_b_passed": [
+        true,
+        true
+      ],
+      "per_problem_b_first_pass_idx": [
+        2,
+        0
+      ],
+      "question_ids": [
+        "3674",
+        "3677"
+      ],
+      "seed_merkle_root": "d7c6a58dd1c96f5747e704eb3a78e47187a884920a745571ade5e811508cd683"
+    }
+  ],
+  "a0_mean_pass_at_1": 0.5,
+  "a1_mean_pass_at_1": 0.5,
+  "b_mean_pass_at_1": 1.0,
+  "b_mean_minus_a1_mean_pp": 50.0,
+  "bench_merkle_root": "3fe9261611519e9884247b3cbbc81ba2bb8f2b3f562b766ae0d467fb90132883",
+  "wall_s": 652.93,
+  "provenance": {
+    "schema": "coordpy.w113_resistant_pilot.v1",
+    "milestone": "W113-alpha",
+    "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+    "seed": 113001,
+    "release": "release_v6",
+    "n_problems": 2,
+    "K_multi_sample": 5,
+    "corpus_path": "/Users/qdong/.cache/coordpy/livecodebench-test6.jsonl",
+    "corpus_sha256": "bb4c364f71921c4495a6ad15abe1a927350b720009f4933e2e71f8af0f6fd1f5",
+    "dataset": "livecodebench/code_generation_lite",
+    "preflight_verdict_cid": "6f30990c042593cd6c26290f54ec254472a369d7887b21ca86fed04c797f6ac8",
+    "resistant_slice_cid": "4e01340e8bad76007be3352e059bd28e0b8655fae0437ba8d96887466b847053",
+    "equals_w108_slice_cid": false,
+    "w108_slice_cid": "2afc318cb9a24d9a52b8914082cfbddaa8e941ef85d77be5382981621f43aa82",
+    "slice_question_ids": [
+      "3674",
+      "3677"
+    ],
+    "slice_difficulty_mix": {
+      "hard": 1,
+      "medium": 1
+    },
+    "slice_contest_date_min": "2025-01-11",
+    "slice_contest_date_max": "2025-01-11",
+    "resistant_benchmark": "LiveCodeBench release_v6 functional, date-filtered RESISTANT-for-Llama-4 (contest_date > 2024-08-31; all 2025-01..04)",
+    "cutoff_boundary": "2024-08-31",
+    "cutoff_confidence": "KNOWN",
+    "contamination_window": "RESISTANT for Llama-4-Maverick: every problem dated strictly after the August-2024 cutoff (all 2025-01..04)",
+    "fixed_priors": {
+      "w108_70b_resistant_lcb_b_minus_a1_pp": -3.33,
+      "w112_maverick_exposed_bcb_b_minus_a1_pp": 10.0
+    },
+    "max_tokens_per_call": 1024,
+    "clean_reopening_bar": "verdict_label == PASS_MECHANISM_DRIVEN",
+    "label": "canary"
+  },
+  "mlb": {
+    "n_problems_total": 2,
+    "n_b_invoked_reflexion": 1,
+    "n_b_rescued_via_reflexion": 1,
+    "mlb1_invocation_rate": 0.5,
+    "mlb2_rescue_rate": 1.0,
+    "mlb1_floor": 0.33,
+    "mlb2_floor": 0.33,
+    "mlb1_passes": true,
+    "mlb2_passes": true
+  },
+  "phase2_evaluation": {
+    "a0_pct": 50.0,
+    "a1_pct": 50.0,
+    "b_pct": 100.0,
+    "b_minus_a1_pp": 50.0,
+    "b_minus_a0_pp": 50.0,
+    "n_problems": 2,
+    "n_b_ge_a1": 2,
+    "phase2_gates": {
+      "G1_slice_pre_committed": true,
+      "G2_a1_lt_90pct": true,
+      "G3_b_gt_a1": true,
+      "G4_margin_geq_5pp": true,
+      "G5_b_gt_a0_by_geq_5pp": true,
+      "G6_per_problem_majority": false,
+      "G7_budget_exact": true,
+      "G8_audit_chain_re_derives": true,
+      "G9_executor_clean": true,
+      "MLB1_invocation_rate_geq_33pct": true,
+      "MLB2_rescue_rate_geq_33pct": true
+    },
+    "n_phase2_passed_of_9": 8,
+    "mlb_subgates_pass": true,
+    "overall_pass_phase2": false,
+    "verdict_label": "FAIL"
+  },
+  "cross_scale_interpretation": {
+    "schema": "coordpy.cross_scale_resistant_interpretation_v1.v1",
+    "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+    "resistant_benchmark": "LiveCodeBench release_v6 functional, date-filtered RESISTANT-for-Llama-4 (contest_date > 2024-08-31; all 2025-01..04)",
+    "verdict_label": "FAIL",
+    "b_minus_a1_pp": 50.0,
+    "mlb2_rescue_rate": 1.0,
+    "outcome": "EXPOSURE_CONFIRMED",
+    "clean_resistant_reopening": false,
+    "confound_direction": "STRENGTHENS",
+    "entitled_stronger_superiority_claim": false,
+    "boundary_after_w113": "Maverick COLLAPSES on resistant LiveCodeBench (B-A1 < +5pp / regression / failed core gate) just as 70B did (W108 -3.33pp) \u2014 the W112 +10pp on EXPOSED BigCodeBench is shown to be CONTAMINATION EXPOSURE. The bounded two-retirement contamination-EXPOSED-at-70B claim is HARDENED, now with a same-model exposed/resistant dissociation at the stronger scale",
+    "w114_branch": "W114 = accept the bounded contamination-EXPOSED claim as the honest code ceiling and pursue a GENUINELY DIFFERENT axis (not another exposed rerun, not another resistant reflexion pilot at the same scale); or a tier-2 follow-up ONLY if a per-model-resistant slice is fetched + certified",
+    "claim_implication": "DECISIVE NEGATIVE: the W112 +10pp WAS exposure. Within the SAME model + SAME mechanism, the margin flips +10.00pp (exposed BCB) -> FAIL (resistant LCB) purely on slice resistance \u2014 the SHARPEST contamination dissociation in the programme and a direct confirmation of W112's model-cutoff-relativity finding at scale. Resistant superiority remains 0 clean demonstrations across BOTH scales. W89 + W105 STAND (still exactly two, both exposed-HumanEval-family). The contamination-confound STRENGTHENS (still not proof \u2014 single-seed cells; capability-scale not excluded as a co-driver).",
+    "fixed_priors": {
+      "maverick_exposed_bcb_pp": 10.0,
+      "llama33_resistant_lcb_pp": -3.33,
+      "w108_resistant_lcb_slice_cid": "2afc318cb9a24d9a52b8914082cfbddaa8e941ef85d77be5382981621f43aa82"
+    }
+  },
+  "cross_scale_interpretation_cid": "35c4dac38734deb72f00655b21314cb46d7c38841048af3106d6cb3e5776a360"
+}

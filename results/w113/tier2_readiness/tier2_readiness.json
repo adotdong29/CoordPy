@@ -1,0 +1,180 @@
+{
+  "schema": "coordpy.w113_tier2_readiness.v1",
+  "milestone": "W113-beta",
+  "slice_date_min": "2025-01-11",
+  "ranking": [
+    {
+      "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+      "family": "qwen",
+      "rank_tier": 2,
+      "rank_within_tier": 1,
+      "note": "STRONGEST reachable CODE-specialized frontier (480B-A35B MoE); preferred tier-2 IF a certifiably-resistant slice exists"
+    },
+    {
+      "model_id": "deepseek-ai/deepseek-v4-pro",
+      "family": "deepseek",
+      "rank_tier": 2,
+      "rank_within_tier": 2,
+      "note": "frontier chat non-reasoning; strong code; cross-vendor"
+    },
+    {
+      "model_id": "mistralai/mistral-small-4-119b-2603",
+      "family": "mistral",
+      "rank_tier": 2,
+      "rank_within_tier": 3,
+      "note": "119B non-reasoning instruct; > 70B scale; cross-vendor"
+    }
+  ],
+  "applicability": [
+    {
+      "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+      "rank_tier": 2,
+      "rank_within_tier": 1,
+      "cutoff_boundary": "2025-07-01",
+      "cutoff_confidence": "UNKNOWN",
+      "slice_certifiably_resistant": false,
+      "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482025-07-01; released 2025-07-22; cutoff UNDOCUMENTED; ESTIMATE only \u2014 not certification-grade; likely exposed on a 2025-01..04 slice)"
+    },
+    {
+      "model_id": "deepseek-ai/deepseek-v4-pro",
+      "rank_tier": 2,
+      "rank_within_tier": 2,
+      "cutoff_boundary": "2025-01-01",
+      "cutoff_confidence": "UNKNOWN",
+      "slice_certifiably_resistant": false,
+      "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482025-01-01; V4 post-dates V3 (2024-12); cutoff UNDOCUMENTED; likely overlaps the 2025-01..04 slice)"
+    },
+    {
+      "model_id": "mistralai/mistral-small-4-119b-2603",
+      "rank_tier": 2,
+      "rank_within_tier": 3,
+      "cutoff_boundary": "2026-03-01",
+      "cutoff_confidence": "UNKNOWN",
+      "slice_certifiably_resistant": false,
+      "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482026-03-01; '2603' release tag => 2026-03; cutoff UNDOCUMENTED but POST-dates the entire test6 window => test6 slice EXPOSED for it)"
+    }
+  ],
+  "spend_decision_by_outcome": {
+    "RESISTANT_SUPERIORITY_REOPENS": {
+      "schema": "coordpy.tier2_readiness_v1.v1",
+      "main_lane_outcome": "RESISTANT_SUPERIORITY_REOPENS",
+      "main_lane_earns_escalation": true,
+      "slice_date_min": "2025-01-11",
+      "applicability": [
+        {
+          "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+          "rank_tier": 2,
+          "rank_within_tier": 1,
+          "cutoff_boundary": "2025-07-01",
+          "cutoff_confidence": "UNKNOWN",
+          "slice_certifiably_resistant": false,
+          "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482025-07-01; released 2025-07-22; cutoff UNDOCUMENTED; ESTIMATE only \u2014 not certification-grade; likely exposed on a 2025-01..04 slice)"
+        },
+        {
+          "model_id": "deepseek-ai/deepseek-v4-pro",
+          "rank_tier": 2,
+          "rank_within_tier": 2,
+          "cutoff_boundary": "2025-01-01",
+          "cutoff_confidence": "UNKNOWN",
+          "slice_certifiably_resistant": false,
+          "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482025-01-01; V4 post-dates V3 (2024-12); cutoff UNDOCUMENTED; likely overlaps the 2025-01..04 slice)"
+        },
+        {
+          "model_id": "mistralai/mistral-small-4-119b-2603",
+          "rank_tier": 2,
+          "rank_within_tier": 3,
+          "cutoff_boundary": "2026-03-01",
+          "cutoff_confidence": "UNKNOWN",
+          "slice_certifiably_resistant": false,
+          "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482026-03-01; '2603' release tag => 2026-03; cutoff UNDOCUMENTED but POST-dates the entire test6 window => test6 slice EXPOSED for it)"
+        }
+      ],
+      "n_certifiable_targets": 0,
+      "top_eligible_target": "",
+      "spend_eligible": false,
+      "spend_rule": "Tier-2 NIM is spent iff (a) the W113 main-lane verdict earns escalation [RESISTANT_SUPERIORITY_REOPENS -> True] AND (b) >= 1 tier-2 model has a CERTIFIABLY resistant slice [n_certifiable=0], with the same cheap K=5 single-seed budget. Top eligible by ranking = NONE.",
+      "next_instrument_if_blocked": "All tier-2 cutoffs are UNKNOWN/post-2025 relative to the test6 slice (2025-01..04), so NONE is certifiably resistant on the pinned corpus. The next instrument for any tier-2 follow-up is a LATER date-filtered LiveCodeBench slice (release_v7+) with problems strictly after that model's (first KNOWN) cutoff \u2014 operator-fetched + SHA-pinned. Until then, tier-2 spend is BLOCKED on the missing instrument, independent of the main-lane outcome."
+    },
+    "RESISTANT_MARGIN_NON_MECHANISM": {
+      "schema": "coordpy.tier2_readiness_v1.v1",
+      "main_lane_outcome": "RESISTANT_MARGIN_NON_MECHANISM",
+      "main_lane_earns_escalation": false,
+      "slice_date_min": "2025-01-11",
+      "applicability": [
+        {
+          "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+          "rank_tier": 2,
+          "rank_within_tier": 1,
+          "cutoff_boundary": "2025-07-01",
+          "cutoff_confidence": "UNKNOWN",
+          "slice_certifiably_resistant": false,
+          "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482025-07-01; released 2025-07-22; cutoff UNDOCUMENTED; ESTIMATE only \u2014 not certification-grade; likely exposed on a 2025-01..04 slice)"
+        },
+        {
+          "model_id": "deepseek-ai/deepseek-v4-pro",
+          "rank_tier": 2,
+          "rank_within_tier": 2,
+          "cutoff_boundary": "2025-01-01",
+          "cutoff_confidence": "UNKNOWN",
+          "slice_certifiably_resistant": false,
+          "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482025-01-01; V4 post-dates V3 (2024-12); cutoff UNDOCUMENTED; likely overlaps the 2025-01..04 slice)"
+        },
+        {
+          "model_id": "mistralai/mistral-small-4-119b-2603",
+          "rank_tier": 2,
+          "rank_within_tier": 3,
+          "cutoff_boundary": "2026-03-01",
+          "cutoff_confidence": "UNKNOWN",
+          "slice_certifiably_resistant": false,
+          "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482026-03-01; '2603' release tag => 2026-03; cutoff UNDOCUMENTED but POST-dates the entire test6 window => test6 slice EXPOSED for it)"
+        }
+      ],
+      "n_certifiable_targets": 0,
+      "top_eligible_target": "",
+      "spend_eligible": false,
+      "spend_rule": "Tier-2 NIM is spent iff (a) the W113 main-lane verdict earns escalation [RESISTANT_MARGIN_NON_MECHANISM -> False] AND (b) >= 1 tier-2 model has a CERTIFIABLY resistant slice [n_certifiable=0], with the same cheap K=5 single-seed budget. Top eligible by ranking = NONE.",
+      "next_instrument_if_blocked": "All tier-2 cutoffs are UNKNOWN/post-2025 relative to the test6 slice (2025-01..04), so NONE is certifiably resistant on the pinned corpus. The next instrument for any tier-2 follow-up is a LATER date-filtered LiveCodeBench slice (release_v7+) with problems strictly after that model's (first KNOWN) cutoff \u2014 operator-fetched + SHA-pinned. Until then, tier-2 spend is BLOCKED on the missing instrument, independent of the main-lane outcome."
+    },
+    "EXPOSURE_CONFIRMED": {
+      "schema": "coordpy.tier2_readiness_v1.v1",
+      "main_lane_outcome": "EXPOSURE_CONFIRMED",
+      "main_lane_earns_escalation": true,
+      "slice_date_min": "2025-01-11",
+      "applicability": [
+        {
+          "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+          "rank_tier": 2,
+          "rank_within_tier": 1,
+          "cutoff_boundary": "2025-07-01",
+          "cutoff_confidence": "UNKNOWN",
+          "slice_certifiably_resistant": false,
+          "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482025-07-01; released 2025-07-22; cutoff UNDOCUMENTED; ESTIMATE only \u2014 not certification-grade; likely exposed on a 2025-01..04 slice)"
+        },
+        {
+          "model_id": "deepseek-ai/deepseek-v4-pro",
+          "rank_tier": 2,
+          "rank_within_tier": 2,
+          "cutoff_boundary": "2025-01-01",
+          "cutoff_confidence": "UNKNOWN",
+          "slice_certifiably_resistant": false,
+          "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482025-01-01; V4 post-dates V3 (2024-12); cutoff UNDOCUMENTED; likely overlaps the 2025-01..04 slice)"
+        },
+        {
+          "model_id": "mistralai/mistral-small-4-119b-2603",
+          "rank_tier": 2,
+          "rank_within_tier": 3,
+          "cutoff_boundary": "2026-03-01",
+          "cutoff_confidence": "UNKNOWN",
+          "slice_certifiably_resistant": false,
+          "applicability_reason": "CUTOFF_UNKNOWN: cannot certify resistance against a non-KNOWN cutoff (boundary\u22482026-03-01; '2603' release tag => 2026-03; cutoff UNDOCUMENTED but POST-dates the entire test6 window => test6 slice EXPOSED for it)"
+        }
+      ],
+      "n_certifiable_targets": 0,
+      "top_eligible_target": "",
+      "spend_eligible": false,
+      "spend_rule": "Tier-2 NIM is spent iff (a) the W113 main-lane verdict earns escalation [EXPOSURE_CONFIRMED -> True] AND (b) >= 1 tier-2 model has a CERTIFIABLY resistant slice [n_certifiable=0], with the same cheap K=5 single-seed budget. Top eligible by ranking = NONE.",
+      "next_instrument_if_blocked": "All tier-2 cutoffs are UNKNOWN/post-2025 relative to the test6 slice (2025-01..04), so NONE is certifiably resistant on the pinned corpus. The next instrument for any tier-2 follow-up is a LATER date-filtered LiveCodeBench slice (release_v7+) with problems strictly after that model's (first KNOWN) cutoff \u2014 operator-fetched + SHA-pinned. Until then, tier-2 spend is BLOCKED on the missing instrument, independent of the main-lane outcome."
+    }
+  },
+  "ts_utc": "2026-05-29T22:50:05.676002+00:00"
+}
