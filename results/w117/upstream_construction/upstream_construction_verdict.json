@@ -1,0 +1,534 @@
+{
+  "schema": "coordpy.w117_upstream_construction.v1",
+  "milestone": "W117-alpha-beta-gamma",
+  "result": {
+    "schema": "coordpy.upstream_derived_instrument_construction_v1.v1",
+    "verified_on": "2026-05-30",
+    "construction_rule": {
+      "min_slice": 30,
+      "A1..A5": {
+        "min_slice": 30,
+        "A1_authoritative_source": "authoritative source (official HF livecodebench/* dataset OR the official LiveCodeBench GitHub repo; NOT an aggregator / mirror / leaderboard-site intro / blog rumor / 'planned' announcement)",
+        "A2_dated_problems": "dated problems (each carries a contest_date time-anchor)",
+        "A3_functional_compatible": "functional/code-generation-compatible (has a starter_code FUNCTIONAL subset the W89 mechanism can attack)",
+        "A4_sha_pinnable_admittable": "machine-checkable provenance (a SHA-256-pinnable JSONL artifact that can be operator-fetched + pinned + admitted to LIVECODEBENCH_KNOWN_RELEASES)",
+        "A5_reproducible_histogram": "reproducible date histogram (the functional month histogram can be re-derived from the pinned bytes)"
+      },
+      "B1_authoritative_construction_provenance": "authoritative construction provenance: the candidate's problem set is fully defined by an LCB-PUBLISHED artifact (a livecodebench/* HF dataset revision/commit/PR OR the official LCB GitHub data-generation pipeline + a published problem-id/URL manifest); a raw-contest-site scrape / operator hand-selection / non-LCB-published assembly is NOT",
+      "B2_no_operator_curation": "no operator curation (reproducibility): the selection AND ordering of problems is fully determined by the published provenance, so anyone re-running it obtains the byte-identical set; the operator contributes NO discretionary choice (the anti-cherry-pick / no-vibes criterion)"
+    },
+    "provenance_surfaces": [
+      {
+        "surface_kind": "hf_dataset_commit_log",
+        "source_ref": "hf api datasets/livecodebench/code_generation_lite/commits/main",
+        "finding": "20 commits; latest data-bearing = 'add v6' 2025-04-21; HEAD = 'fix typos (#4)' 2025-06-05.",
+        "has_post_frontier_lcb_artifact": false,
+        "note": "No post-v6 data commit/revision; no test7. The revision history itself (not just the file tree) confirms v6 is the newest data."
+      },
+      {
+        "surface_kind": "hf_dataset_refs",
+        "source_ref": "hf api datasets/livecodebench/code_generation_lite/refs",
+        "finding": "1 branch (main), 0 tags.",
+        "has_post_frontier_lcb_artifact": false,
+        "note": "No staging / preview / v7 branch or tag carrying newer data."
+      },
+      {
+        "surface_kind": "hf_dataset_discussions",
+        "source_ref": "hf datasets/livecodebench/code_generation_lite/discussions",
+        "finding": "Newest threads = 'LCB pull request' #14 + 'Clarification on v6 size (454 vs 175)' #13; older = parquet/loader-script issues.",
+        "has_post_frontier_lcb_artifact": false,
+        "note": "No v7 / newer-data / post-Apr-2025 discussion or PR proposing new problems."
+      },
+      {
+        "surface_kind": "lcb_github_commits",
+        "source_ref": "github api repos/LiveCodeBench/LiveCodeBench/commits",
+        "finding": "Newest 2025-07-16 ('fix: typo in Explorer URL'); recent activity = runner maintenance (model infos, gemini, ERRATA, util fixes).",
+        "has_post_frontier_lcb_artifact": false,
+        "note": "No data-collection commit; no v7. The repo is the runner/eval harness, not a data-collection pipeline."
+      },
+      {
+        "surface_kind": "lcb_github_tags",
+        "source_ref": "github api repos/LiveCodeBench/LiveCodeBench/tags",
+        "finding": "Empty (0 tags).",
+        "has_post_frontier_lcb_artifact": false,
+        "note": "No release_v7 / dated release tag."
+      },
+      {
+        "surface_kind": "lcb_github_pipeline_structure",
+        "source_ref": "github repo root contents (LiveCodeBench/LiveCodeBench)",
+        "finding": "Top-level = lcb_runner/ + assets/ + configs (pyproject, uv.lock, ...); NO scraper / data / collect / contest directory.",
+        "has_post_frontier_lcb_artifact": false,
+        "note": "The public repo publishes NO data-generation/collection pipeline => no published mechanism from which a post-v6 slice could be reproducibly CONSTRUCTED."
+      },
+      {
+        "surface_kind": "dataset_readme_provenance",
+        "source_ref": "hf datasets/livecodebench/code_generation_lite/raw/main/README.md",
+        "finding": "Provenance = LeetCode / AtCoder / Codeforces contests; each release_vN a temporal snapshot (README prose lags at v5). Documents ONLY loading published releases.",
+        "has_post_frontier_lcb_artifact": false,
+        "note": "No generation tool / script / problem-id manifest documented for collecting NEW problems => the published releases ARE the provenance."
+      },
+      {
+        "surface_kind": "runner_loader_path",
+        "source_ref": "github raw lcb_runner/benchmarks/code_generation.py",
+        "finding": "Loads EXCLUSIVELY via load_dataset('livecodebench/code_generation_lite', version_tag=...); no local scraping.",
+        "has_post_frontier_lcb_artifact": false,
+        "note": "The provenance flows contest-sites -> LCB's (private, unpublished) collection -> HF release -> runner. Construction can only enter at the HF-release level, which requires LCB to publish it."
+      }
+    ],
+    "n_surfaces_with_post_frontier_artifact": 0,
+    "construction_attempt": {
+      "constructed": false,
+      "n_construction_admissible_new": 0,
+      "n_construction_admissible_in_principle": 1,
+      "proposal_admissibility": [
+        {
+          "label": "raw-contest hand-assembly (post-2025-04)",
+          "a1_authoritative": false,
+          "a2_dated": true,
+          "a3_functional": true,
+          "a4_sha_pinnable": true,
+          "a5_histogram": true,
+          "a_admissible": false,
+          "b1_authoritative_provenance": false,
+          "b2_no_operator_curation": false,
+          "construction_admissible": false,
+          "newer_than_admitted": true,
+          "artifact_exists": true,
+          "realizable": false,
+          "reason": "CONSTRUCTION_INADMISSIBLE [A1_authoritative fail]: The ONLY post-v6 path that exists today. A SHA-pinnable, dated, functional JSONL CAN be assembled from raw contests \u2014 but it is REFUSED: not an LCB-published provenance artifact (B1) and operator-curated / not reproducible from a published manifest (B2); also not the official livecodebench/* source (A1). Selling it as a LiveCodeBench-grade resistant instrument would be exactly the vibes-based cherry-picking the discipline forbids."
+        },
+        {
+          "label": "LCB-published collection pipeline + manifest (template)",
+          "a1_authoritative": true,
+          "a2_dated": true,
+          "a3_functional": true,
+          "a4_sha_pinnable": true,
+          "a5_histogram": true,
+          "a_admissible": true,
+          "b1_authoritative_provenance": true,
+          "b2_no_operator_curation": true,
+          "construction_admissible": true,
+          "newer_than_admitted": true,
+          "artifact_exists": false,
+          "realizable": false,
+          "reason": "CONSTRUCTION_ADMISSIBLE_BUT_ARTIFACT_ABSENT: LCB-published collection pipeline + manifest (template) WOULD be construction-admissible (A1..A5 \u2227 B1 \u2227 B2, post-frontier) \u2014 but its LCB-published provenance artifact does not exist on the live surface ((hypothetical) official LCB GitHub data-generation pipeline + a published post-2025-04 problem-id/URL manifest). This names the exact missing upstream artifact (RUNBOOK \u00a7 3 + \u00a7 7); not buildable now."
+        }
+      ],
+      "surfaces_with_post_frontier_artifact": [],
+      "derived_observation": null,
+      "missing_artifact": "An LCB-published post-v6 provenance artifact: a livecodebench/code_generation(_lite) dataset revision/commit/PR adding functional problems dated strictly after 2025-04-05, OR the official LCB GitHub data-generation pipeline + a published problem-id/URL manifest enabling reproducible (B1 \u2227 B2) construction. Verified ABSENT at all eight provenance surfaces (commit log / refs / discussions / GitHub commits / GitHub tags / repo pipeline structure / README / runner loader). The only post-v6 path (raw-contest hand-assembly) is refused by A1 \u2227 B1 \u2227 B2."
+    },
+    "upstream_admission": {
+      "schema": "coordpy.upstream_instrument_admission_v1.v1",
+      "verified_on": "2026-05-30",
+      "admissibility_rule": {
+        "min_slice": 30,
+        "A1_authoritative_source": "authoritative source (official HF livecodebench/* dataset OR the official LiveCodeBench GitHub repo; NOT an aggregator / mirror / leaderboard-site intro / blog rumor / 'planned' announcement)",
+        "A2_dated_problems": "dated problems (each carries a contest_date time-anchor)",
+        "A3_functional_compatible": "functional/code-generation-compatible (has a starter_code FUNCTIONAL subset the W89 mechanism can attack)",
+        "A4_sha_pinnable_admittable": "machine-checkable provenance (a SHA-256-pinnable JSONL artifact that can be operator-fetched + pinned + admitted to LIVECODEBENCH_KNOWN_RELEASES)",
+        "A5_reproducible_histogram": "reproducible date histogram (the functional month histogram can be re-derived from the pinned bytes)"
+      },
+      "instrument_admissibility": [
+        {
+          "label": "release_v6 (admitted instrument)",
+          "a1_authoritative": true,
+          "a2_dated": true,
+          "a3_functional": true,
+          "a4_sha_pinnable": true,
+          "a5_histogram": true,
+          "admissible": true,
+          "newer_than_admitted": false,
+          "admissible_new_instrument": false,
+          "reason": "ADMISSIBLE_BUT_NOT_NEWER: release_v6 (admitted instrument) is A1..A5-admissible but does not post-date the admitted instrument (version<= 6 and frontier<= 2025-04-05). The current admitted instrument: admissible but NOT new (functional frontier 2025-04-05, already the certification base)."
+        },
+        {
+          "label": "full code_generation dataset",
+          "a1_authoritative": true,
+          "a2_dated": true,
+          "a3_functional": true,
+          "a4_sha_pinnable": true,
+          "a5_histogram": true,
+          "admissible": true,
+          "newer_than_admitted": false,
+          "admissible_new_instrument": false,
+          "reason": "ADMISSIBLE_BUT_NOT_NEWER: full code_generation dataset is A1..A5-admissible but does not post-date the admitted instrument (version<= 6 and frontier<= 2025-04-05). The full (non-lite) dataset: authoritative + dated + functional, but its README frontier is the SAME Apr-2025 => admissible-as-source but NOT newer than the admitted lite v6."
+        },
+        {
+          "label": "release_latest alias",
+          "a1_authoritative": true,
+          "a2_dated": true,
+          "a3_functional": true,
+          "a4_sha_pinnable": true,
+          "a5_histogram": true,
+          "admissible": true,
+          "newer_than_admitted": false,
+          "admissible_new_instrument": false,
+          "reason": "ADMISSIBLE_BUT_NOT_NEWER: release_latest alias is A1..A5-admissible but does not post-date the admitted instrument (version<= 6 and frontier<= 2025-04-05). The upstream loader's 'latest' alias resolves to the SAME six files as release_v6 => no hidden newer-than-v6 supply."
+        },
+        {
+          "label": "planned release_v7 (search rumor)",
+          "a1_authoritative": false,
+          "a2_dated": false,
+          "a3_functional": false,
+          "a4_sha_pinnable": false,
+          "a5_histogram": false,
+          "admissible": false,
+          "newer_than_admitted": true,
+          "admissible_new_instrument": false,
+          "reason": "NOT_ADMISSIBLE [A1_authoritative,A2_dated,A3_functional,A4_sha_pinnable,A5_histogram fail]: A 'planned v7' mentioned only by a non-primary summary; contradicted by all four authoritative surfaces; no artifact, no SHA => REFUSED by A1 + A4. Recorded as the W117 watch signal."
+        }
+      ],
+      "n_admissible_new_instruments": 0,
+      "upstream_change": {
+        "new_numbered_release": false,
+        "release_latest_repointed": false,
+        "full_dataset_frontier_advanced": false,
+        "lite_last_modified_changed": false,
+        "loader_versions_extended": false,
+        "new_admissible_instrument": false,
+        "any_change": false,
+        "notes": [
+          "no upstream change vs baseline (frontier unchanged)"
+        ]
+      },
+      "disclosure_matrix": [
+        {
+          "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+          "primary_status": "KNOWN",
+          "primary_source": "Official Llama 4 model card (reconfirmed 2026-05-30)",
+          "aggregator_signal": "Aug-2024 (corroborated)",
+          "stronger_than_70b": true,
+          "certifiable_blocker": "C4 (already SETTLED on release_v6; W113 FAIL)",
+          "note": "KNOWN Aug-2024 but redundant on release_v6 => no new pilot here."
+        },
+        {
+          "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+          "primary_status": "UNKNOWN",
+          "primary_source": "Official HF model card (Qwen/Qwen3-Coder-480B-A35B-Instruct) \u2014 reconfirmed 2026-05-30: NO CUTOFF STATED",
+          "aggregator_signal": "(none usable; released 2025-07)",
+          "stronger_than_70b": true,
+          "certifiable_blocker": "C1 (UNKNOWN cutoff); C2-exposed if estimated ~2025",
+          "note": "Reconfirmed UNKNOWN from the official card."
+        },
+        {
+          "model_id": "deepseek-ai/deepseek-v4-pro",
+          "primary_status": "UNKNOWN",
+          "primary_source": "Official DeepSeek-V4-Pro HF card + V4 model-card PDF \u2014 reconfirmed 2026-05-30: NO CUTOFF STATED",
+          "aggregator_signal": "(none usable; 1.6T/49B; 2026 release)",
+          "stronger_than_70b": true,
+          "certifiable_blocker": "C1 (UNKNOWN cutoff); a 2026 release => C2-exposed",
+          "note": "Reconfirmed UNKNOWN; the V4 card exists (W115) but states no cutoff."
+        },
+        {
+          "model_id": "mistralai/mistral-small-4-119b-2603",
+          "primary_status": "UNKNOWN",
+          "primary_source": "Official Mistral docs model card (mistral-small-4-0-26-03) + official announcement (mistral.ai/news/mistral-small-4) \u2014 2026-05-30: NO CUTOFF STATED",
+          "aggregator_signal": "OpenRouter '2025-06' (non-primary; also a stale '2023-10' system-prompt carryover) => CONTRADICTORY",
+          "stronger_than_70b": true,
+          "certifiable_blocker": "C1 (UNKNOWN from primary); even the 2025-06 aggregator estimate post-dates the Apr-2025 frontier => C2-exposed",
+          "note": "SHARPENED vs W115: CONFIRMED REAL (119B MoE, released 2026-03-16); primary card discloses NO cutoff; the only cutoff figure is a non-primary aggregator (2025-06) that is itself C2-exposed."
+        },
+        {
+          "model_id": "mistralai/mistral-small-3.2-24b-instruct-2506",
+          "primary_status": "KNOWN",
+          "primary_source": "HF discussion / aggregator (~Oct-2023)",
+          "aggregator_signal": "2023-10",
+          "stronger_than_70b": false,
+          "certifiable_blocker": "C3 (24B; NOT strictly stronger than 70B)",
+          "note": "Context only: a KNOWN-cutoff Mistral exists but it is sub-70B (C3 fails); deprecated 2026-04-30, replaced by Small 4."
+        }
+      ],
+      "disclosure_summary": {
+        "counts": {
+          "KNOWN": 2,
+          "UNKNOWN": 3
+        },
+        "n_models": 5,
+        "usable_new_known_cutoff_targets": [],
+        "any_usable_new_known_cutoff_target": false
+      },
+      "frontier_certification": {
+        "schema": "coordpy.frontier_certification_pipeline_v1.v1",
+        "verified_on": "2026-05-29",
+        "release_detection": {
+          "admitted_releases": [
+            "release_v1",
+            "release_v2",
+            "release_v3",
+            "release_v4",
+            "release_v5",
+            "release_v6"
+          ],
+          "observed_releases": [
+            "release_v1",
+            "release_v2",
+            "release_v3",
+            "release_v4",
+            "release_v5",
+            "release_v6"
+          ],
+          "latest_admitted": "release_v6",
+          "latest_admitted_num": 6,
+          "latest_observed": "release_v6",
+          "latest_observed_num": 6,
+          "newer_release_available": false,
+          "observed_not_admitted": []
+        },
+        "frontier_summary": {
+          "release": "release_v6",
+          "n_functional": 63,
+          "functional_date_min": "2025-01-11",
+          "functional_date_max": "2025-04-05",
+          "month_histogram": {
+            "2025-01": 14,
+            "2025-02": 20,
+            "2025-03": 27,
+            "2025-04": 2
+          },
+          "min_slice": 30,
+          "threshold_table": {
+            "2025-01": 49,
+            "2025-02": 29,
+            "2025-03": 2,
+            "2025-04": 0,
+            "<before-all>": 63
+          },
+          "max_cutoff_month_for_min_slice": "2025-01"
+        },
+        "decision": {
+          "schema": "coordpy.stronger_model_cutoff_certification_v1.v1",
+          "instrument": {
+            "release": "release_v6",
+            "jsonl_sha256": "bb4c364f71921c4495a6ad15abe1a927350b720009f4933e2e71f8af0f6fd1f5",
+            "n_functional": 63,
+            "functional_date_min": "2025-01-11",
+            "functional_date_max": "2025-04-05",
+            "functional_month_histogram": {
+              "2025-01": 14,
+              "2025-02": 20,
+              "2025-03": 27,
+              "2025-04": 2
+            },
+            "note": "LCB code_generation_lite release_v6 (HF file tree: test6.jsonl is the highest-numbered => latest; no test7+ as of 2026-05-29). Full release May-2023..Apr-2025; the FUNCTIONAL/lite subset attacked by the W89 mechanism is 63 problems, all 2025-01..04. Instrument frontier date 2025-04-05."
+          },
+          "min_resistant_slice": 30,
+          "per_model": [
+            {
+              "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+              "rank_tier": 1,
+              "rank_within_tier": 1,
+              "cutoff_boundary": "2024-08-31",
+              "cutoff_confidence": "KNOWN",
+              "verified_confidence": "KNOWN",
+              "confidence_consistent": true,
+              "primary_source": "Official Llama 4 model card (llama.com / Meta GitHub llama-models MODEL_CARD.md; NVIDIA build modelcard)",
+              "n_functional_resistant": 63,
+              "c1_cutoff_known": true,
+              "c2_enough_resistant": true,
+              "c3_reachable_stronger_comparable": true,
+              "c4_not_already_settled": false,
+              "certifiable_for_new_pilot": false,
+              "reason": "NOT_CERTIFIABLE_FOR_NEW_PILOT [C4 already settled]: W113 resistant pilot on release_v6 (CID 2afc318c): B-A1=+0.00pp FAIL => EXPOSURE_CONFIRMED. Settled cell. A second pilot on the same instrument has no verdict-changing power (redundant)."
+            },
+            {
+              "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+              "rank_tier": 2,
+              "rank_within_tier": 1,
+              "cutoff_boundary": "2025-07-01",
+              "cutoff_confidence": "UNKNOWN",
+              "verified_confidence": "UNKNOWN",
+              "confidence_consistent": true,
+              "primary_source": "Official HF model card (Qwen/Qwen3-Coder-480B-A35B-Instruct) + Qwen blog (qwenlm.github.io/blog/qwen3-coder)",
+              "n_functional_resistant": 0,
+              "c1_cutoff_known": false,
+              "c2_enough_resistant": false,
+              "c3_reachable_stronger_comparable": true,
+              "c4_not_already_settled": true,
+              "certifiable_for_new_pilot": false,
+              "reason": "NOT_CERTIFIABLE [C1 cutoff UNKNOWN]: cannot certify resistance against a non-KNOWN cutoff. Official HF model card (Qwen/Qwen3-Coder-480B-A35B-Instruct) + Qwen blog (qwenlm.github.io/blog/qwen3-coder) => UNKNOWN. Both primary sources state NO knowledge/data cutoff ('NO CUTOFF STATED'). Released 2025-07; an estimable cutoff would be ~2025, at/after the Apr-2025 functional frontier => UNKNOWN and almost certainly C2-exposed even if disclosed."
+            },
+            {
+              "model_id": "deepseek-ai/deepseek-v4-pro",
+              "rank_tier": 2,
+              "rank_within_tier": 2,
+              "cutoff_boundary": "2025-01-01",
+              "cutoff_confidence": "UNKNOWN",
+              "verified_confidence": "UNKNOWN",
+              "confidence_consistent": true,
+              "primary_source": "DeepSeek official sources (no V4 cutoff disclosed; V3 system-prompt extraction ~Jul-2024 is non-official)",
+              "n_functional_resistant": 49,
+              "c1_cutoff_known": false,
+              "c2_enough_resistant": true,
+              "c3_reachable_stronger_comparable": true,
+              "c4_not_already_settled": true,
+              "certifiable_for_new_pilot": false,
+              "reason": "NOT_CERTIFIABLE [C1 cutoff UNKNOWN]: cannot certify resistance against a non-KNOWN cutoff. DeepSeek official sources (no V4 cutoff disclosed; V3 system-prompt extraction ~Jul-2024 is non-official) => UNKNOWN. No official V4 training cutoff published. V4 post-dates V3 (2024-12), so an estimable cutoff is >= early-2025 => UNKNOWN."
+            },
+            {
+              "model_id": "mistralai/mistral-small-4-119b-2603",
+              "rank_tier": 2,
+              "rank_within_tier": 3,
+              "cutoff_boundary": "2026-03-01",
+              "cutoff_confidence": "UNKNOWN",
+              "verified_confidence": "UNKNOWN",
+              "confidence_consistent": true,
+              "primary_source": "Official Mistral docs/model card (mistral-small-4-0-26-03) + HF (mistralai/Mistral-Small-4-119B-2603)",
+              "n_functional_resistant": 0,
+              "c1_cutoff_known": false,
+              "c2_enough_resistant": false,
+              "c3_reachable_stronger_comparable": true,
+              "c4_not_already_settled": true,
+              "certifiable_for_new_pilot": false,
+              "reason": "NOT_CERTIFIABLE [C1 cutoff UNKNOWN]: cannot certify resistance against a non-KNOWN cutoff. Official Mistral docs/model card (mistral-small-4-0-26-03) + HF (mistralai/Mistral-Small-4-119B-2603) => UNKNOWN. No training cutoff stated. Released 2026-03-16, which post-dates the ENTIRE release_v6 window => exposed even if a cutoff were disclosed => UNKNOWN."
+            }
+          ],
+          "verdict": "NO_CERTIFIABLE_STRONGER_MODEL",
+          "target_model": "",
+          "maverick_certifiable_but_settled": true,
+          "w115_blocker": "The latest resistant FUNCTIONAL instrument (release_v6; functional 2025-01-11..2025-04-05) does not post-date a single reachable stronger-than-Maverick model's VERIFIABLE cutoff. A >= 30 functional resistant slice requires a KNOWN cutoff <= ~2025-01; the reachable frontier models (Qwen3-Coder-480B 2025-07, DeepSeek-V4-pro 2025+, Mistral-Small-4 2026-03) have OFFICIALLY UNDISCLOSED cutoffs (C1) and, where estimable, cutoffs at/after the Apr-2025 frontier (C2) \u2014 the gaps COMPOUND. Maverick is the only KNOWN cutoff and is already SETTLED here (W113). => NO new stronger-model resistant pilot is certifiable on the latest real data.",
+          "next_instrument_requirement": "A resistant FUNCTIONAL instrument with >= 30 problems dated strictly after a reachable frontier model's KNOWN cutoff. Concretely: (a) a future LCB release_v7+ (or equivalent freshly-dated functional benchmark) with post-2025-04 functional problems, operator-fetched + SHA-pinned AND admitted to the loader; AND (b) a reachable stronger-than-Maverick model whose cutoff is officially DISCLOSED (KNOWN) and earlier than those problems. Neither holds as of 2026-05-29."
+        },
+        "disclosure_consistency": [
+          {
+            "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+            "snapshot_confidence": "KNOWN",
+            "registry_confidence": "KNOWN",
+            "provenance_confidence": "KNOWN",
+            "consistent": true,
+            "note": "live disclosure matches the encoded W113 registry + W114 provenance"
+          },
+          {
+            "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+            "snapshot_confidence": "UNKNOWN",
+            "registry_confidence": "UNKNOWN",
+            "provenance_confidence": "UNKNOWN",
+            "consistent": true,
+            "note": "live disclosure matches the encoded W113 registry + W114 provenance"
+          },
+          {
+            "model_id": "deepseek-ai/deepseek-v4-pro",
+            "snapshot_confidence": "UNKNOWN",
+            "registry_confidence": "UNKNOWN",
+            "provenance_confidence": "UNKNOWN",
+            "consistent": true,
+            "note": "live disclosure matches the encoded W113 registry + W114 provenance"
+          },
+          {
+            "model_id": "mistralai/mistral-small-4-119b-2603",
+            "snapshot_confidence": "UNKNOWN",
+            "registry_confidence": "UNKNOWN",
+            "provenance_confidence": "UNKNOWN",
+            "consistent": true,
+            "note": "live disclosure matches the encoded W113 registry + W114 provenance"
+          }
+        ],
+        "disclosure_consistency_ok": true,
+        "verdict": "NO_CERTIFIABLE_STRONGER_MODEL",
+        "target_model": "",
+        "w116_fire_condition": {
+          "instrument_trigger": "A newer official LCB release (release_v7+) is observed on the source, operator-fetched + SHA-pinned + admitted to LIVECODEBENCH_KNOWN_RELEASES, with >= 30 functional problems dated strictly after a reachable stronger-than-Maverick model's KNOWN cutoff.",
+          "cutoff_trigger": "A reachable stronger-than-Maverick model discloses a KNOWN cutoff month <= 2025-01 (so the current release_v6 admits a >= 30 resistant slice for it); update MODEL_TRAINING_CUTOFFS + W114_CUTOFF_PROVENANCE, then re-run.",
+          "instrument_trigger_met": false,
+          "cutoff_trigger_met": false,
+          "fires_now": false
+        }
+      },
+      "verdict": "NO_CERTIFIABLE_STRONGER_MODEL",
+      "target_model": "",
+      "w117_fire_condition": {
+        "instrument_trigger": "An admissible NEW upstream instrument (a release_v7+ on the lite tree, OR release_latest re-pointing past release_v6, OR a distinct upstream functional dataset with post-2025-04 dated problems) is observed, operator-fetched + SHA-pinned + admitted to LIVECODEBENCH_KNOWN_RELEASES, with >= 30 functional problems dated strictly after a reachable stronger-than-Maverick model's primary-KNOWN cutoff (RUNBOOK \u00a7 3 + \u00a7 5).",
+        "cutoff_trigger": "A reachable stronger-than-Maverick model discloses, from a PRIMARY source, a KNOWN cutoff month <= 2025-01 (so the current release_v6 admits a >= 30 resistant slice for it); update MODEL_TRAINING_CUTOFFS + W114_CUTOFF_PROVENANCE, then re-run.",
+        "instrument_trigger_met": false,
+        "cutoff_trigger_met": false,
+        "fires_now": false
+      }
+    },
+    "disclosure_matrix": [
+      {
+        "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+        "primary_status": "KNOWN",
+        "primary_source": "Official Meta Llama 4 MODEL_CARD.md (meta-llama/llama-models) \u2014 2026-05-30: 'Knowledge cutoff' = 'August 2024' VERBATIM",
+        "aggregator_signal": "Aug-2024 (corroborated)",
+        "stronger_than_70b": true,
+        "certifiable_blocker": "C4 (already SETTLED on release_v6; W113 FAIL)",
+        "note": "Re-confirmed verbatim from the primary model card. KNOWN Aug-2024 but redundant on release_v6 => no new pilot here."
+      },
+      {
+        "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+        "primary_status": "UNKNOWN",
+        "primary_source": "Official HF model card raw README (Qwen/Qwen3-Coder-480B-A35B-Instruct) \u2014 2026-05-30: NO CUTOFF STATED",
+        "aggregator_signal": "(none usable; tech report arXiv:2505.09388, 2025)",
+        "stronger_than_70b": true,
+        "certifiable_blocker": "C1 (UNKNOWN cutoff); C2-exposed if estimated ~2025",
+        "note": "Reconfirmed UNKNOWN from the official card raw markdown."
+      },
+      {
+        "model_id": "deepseek-ai/deepseek-v4-pro",
+        "primary_status": "UNKNOWN",
+        "primary_source": "Official DeepSeek V4 model-card PDF (fe-static.deepseek.com/.../deepseek-V4-model-card-EN.pdf) \u2014 2026-05-30: NO CUTOFF STATED",
+        "aggregator_signal": "non-primary blogs say 'Apr 2026' (C2-exposed; a year past the Apr-2025 frontier) => CONTRADICTORY-with-primary",
+        "stronger_than_70b": true,
+        "certifiable_blocker": "C1 (UNKNOWN from primary); the aggregator 'Apr 2026' figure post-dates the frontier => C2-exposed",
+        "note": "SHARPENED vs W116: the official V4 PDF re-checked at primary still states no cutoff; the only figure is a non-primary aggregator (Apr-2026) that is itself C2-exposed => now the SAME pattern as Mistral Small 4 (UNKNOWN-primary + C2-exposed-aggregator)."
+      },
+      {
+        "model_id": "mistralai/mistral-small-4-119b-2603",
+        "primary_status": "UNKNOWN",
+        "primary_source": "Official Mistral docs models overview (docs.mistral.ai/.../models_overview) \u2014 2026-05-30: NO CUTOFF STATED",
+        "aggregator_signal": "OpenRouter '2025-06' (non-primary; post-dates frontier => C2-exposed)",
+        "stronger_than_70b": true,
+        "certifiable_blocker": "C1 (UNKNOWN from primary); the 2025-06 aggregator estimate post-dates the Apr-2025 frontier => C2-exposed",
+        "note": "CONFIRMED REAL (119B MoE, 2026-03-16); primary docs disclose NO cutoff. Same UNKNOWN-primary + C2-exposed-aggregator pattern as DeepSeek V4."
+      },
+      {
+        "model_id": "mistralai/mistral-small-3.2-24b-instruct-2506",
+        "primary_status": "KNOWN",
+        "primary_source": "HF discussion / aggregator (~Oct-2023)",
+        "aggregator_signal": "2023-10",
+        "stronger_than_70b": false,
+        "certifiable_blocker": "C3 (24B; NOT strictly stronger than 70B)",
+        "note": "Context only: a KNOWN-cutoff Mistral exists but is sub-70B (C3); deprecated 2026-04-30, replaced by Small 4."
+      }
+    ],
+    "disclosure_summary": {
+      "counts": {
+        "KNOWN": 2,
+        "UNKNOWN": 3
+      },
+      "n_models": 5,
+      "usable_new_known_cutoff_targets": [],
+      "any_usable_new_known_cutoff_target": false,
+      "newly_disclosed_since_w116": [],
+      "any_newly_disclosed_since_w116": false
+    },
+    "verdict": "NO_CERTIFIABLE_STRONGER_MODEL",
+    "target_model": "",
+    "w118_fire_condition": {
+      "packaged_release_trigger": "A newer PACKAGED LCB release (release_v7+ on the lite tree, OR release_latest re-pointing past release_v6) is observed, operator-fetched + SHA-pinned + admitted to LIVECODEBENCH_KNOWN_RELEASES, with >= 30 functional problems dated strictly after a reachable stronger-than-Maverick model's primary-KNOWN cutoff (RUNBOOK \u00a7 3 + \u00a7 5).",
+      "construction_provenance_trigger": "An LCB-PUBLISHED post-v6 CONSTRUCTION provenance appears \u2014 a livecodebench/* dataset revision/commit/PR adding post-2025-04 functional problems, OR the official LCB GitHub collection pipeline + a published problem-id/URL manifest \u2014 enabling a B1 \u2227 B2 reproducible >= 30 functional post-cutoff slice (RUNBOOK \u00a7 3 B1/B2). Missing artifact: An LCB-published post-v6 provenance artifact: a livecodebench/code_generation(_lite) dataset revision/commit/PR adding functional problems dated strictly after 2025-04-05, OR the official LCB GitHub data-generation pipeline + a published problem-id/URL manifest enabling reproducible (B1 \u2227 B2) construction. Verified ABSENT at all eight provenance surfaces (commit log / refs / discussions / GitHub commits / GitHub tags / repo pipeline structure / README / runner loader). The only post-v6 path (raw-contest hand-assembly) is refused by A1 \u2227 B1 \u2227 B2.",
+      "cutoff_trigger": "A reachable stronger-than-Maverick model discloses, from a PRIMARY source, a KNOWN cutoff month <= 2025-01 (so the current release_v6 admits a >= 30 resistant slice for it); update MODEL_TRAINING_CUTOFFS + W114_CUTOFF_PROVENANCE, then re-run.",
+      "packaged_release_trigger_met": false,
+      "construction_provenance_trigger_met": false,
+      "cutoff_trigger_met": false,
+      "fires_now": false
+    }
+  },
+  "result_cid": "c3c60483c636cf3c338afa8ff4539f9f63cf173001e9e02b34f5b1addb5e7b57",
+  "decision_cid": "258b6ed794b45a18a94829e7f86000dbea8cfd662692425f0188a2e04d7fd1bc",
+  "admission_result_cid": "193164c427007bb3e8ad772c72200cad358e41c168c5d0d2d04e4bdc25b7fed6",
+  "corpus_reverification": {
+    "available": true,
+    "path": "/Users/qdong/.cache/coordpy/livecodebench-test6.jsonl",
+    "sha_ok": true,
+    "n_functional": 63,
+    "histogram": {
+      "2025-01": 14,
+      "2025-02": 20,
+      "2025-03": 27,
+      "2025-04": 2
+    },
+    "histogram_match": true
+  },
+  "ts_utc": "2026-05-30T22:40:26.859179+00:00"
+}
