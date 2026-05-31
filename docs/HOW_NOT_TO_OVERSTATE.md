@@ -1,3 +1,44 @@
+## W121 (matched EXPOSED ICPC control built + Maverick pilot RAN — +3.33pp FAIL; contamination-confound WEAKENED) — explicit do-not-overstate
+
+**DO say:** "W121 ran the matched-family within-model exposure control the programme had
+not yet done. It built an EXPOSED ICPC battlefield from the SAME two official
+`github.com/icpc` surface families W120 used (pre-Aug-2024 editions of the same RMRC +
+ECNA regionals — RMRC 2021 + ECNA 2022-2023 + RMRC 2022-2023 + ECNA 2023-2024) ⇒ **42
+tier-1 pure pass-fail ≥ 30**, grader self-test 30 all-pass / 637 official secret cases each
+surface; certified Maverick on the EXPOSED side (C2 flipped to count problems at/before the
+cutoff); LOCKED `docs/RUNBOOK_W121.md`; ran a clean canary; and RAN the earned pilot
+(Maverick × exposed 30-slice, 330 calls, ~70 min): **EXPOSED B−A1 = +3.33 pp, FAIL** (8/9;
+MLB-1 93.33% PASS / MLB-2 25.00% FAIL). Contrasted with the LOCKED W120 RESISTANT +0.00 pp
+through the pre-committed three-branch interpreter: both within the ±3.34 pp null band ⇒
+`CONFOUND_WEAKENS / bounded ceiling HARDENS`, paired seed NOT earned. The matched-family
+exposure flip did NOT reproduce the retirement-grade HumanEval-family margins (+5.56 /
++7.00, clean PASS): exposure within ICPC produced at most a sub-floor +3.33 pp one-problem
+nudge. So the STRONG contamination reading WEAKENS and difficulty/family-ease is implicated
+as the driver of the W89/W105 margins."
+
+**Do NOT say:**
+* That W121 closed the loophole with an exposed WIN — it did NOT; the exposed pilot FAILED
+  (+3.33 pp, MLB-2 25% < 33%). It did not produce a clean exposed margin.
+* That contamination is REFUTED — it is WEAKENED, not refuted: a faint contamination-
+  consistent gradient remains (exposed +3.33 > resistant +0.00; exposed rescue 25% >
+  resistant 8%), sub-floor and single-seed; contamination is demoted from dominant driver
+  to at-most-minor contributor.
+* That contamination is PROVEN or that the prior "STRENGTHENED" read still stands — W121
+  REVISES it down: the prior cross-family dissociation was confounded with family/
+  difficulty, and the matched control weakens it.
+* That W121 is a third retirement or any ICPC win (it is a +3.33 pp FAIL). W89 + W105
+  remain the only two.
+* That the exposed slice was easier (it was NOT: exposed A0 6.67% ≤ resistant A0 20.00%) —
+  the +3.33 is not a difficulty artifact and the matched-difficulty design held.
+* That a paired seed was run (it was NOT earned: the result is on the null side of the
+  pre-committed band; a future paired seed is the optional W122 tightening).
+* That this proves the retirements are PURELY HumanEval-family-ease — it IMPLICATES ease/
+  structure over exposure (single seed each side; ICPC≠HumanEval cross-family inference).
+
+Anchors: `docs/RESULTS_W121_EXPOSED_CONTROL_V1.md`; `docs/RESULTS_W121_MILESTONE_SUMMARY_V1.md`;
+`docs/CONTAMINATION_CONTROL_FRAMING_W121_V1.md`; `docs/FRONTIER_RELEVANCE_AUDIT_W121_V1.md`;
+`docs/RUNBOOK_W121.md`; `results/w121/`.
+
 ## W120 (official-ICPC ≥30 resistant battlefield built + Maverick pilot RAN — clean FAIL) — explicit do-not-overstate
 
 **DO say:** "W120 CLOSED the W119 count gap on official `github.com/icpc` surfaces only — a

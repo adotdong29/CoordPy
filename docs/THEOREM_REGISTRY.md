@@ -3536,6 +3536,36 @@ or `docs/archive/pre-coordpy-theory/PROOFS.md`.
   confound STRENGTHENED, NOT proven (single seed; difficulty + Python-TLE floor unexcluded).
   *Anchors:* `docs/RESULTS_W120_ICPC_BATTLEFIELD_V1.md`, `docs/RUNBOOK_W120.md`.
 
+* **W121-T-MATCHED-EXPOSED-ICPC-CONTROL-CONSTRUCTIBLE.** A ≥30 matched-family EXPOSED
+  control IS constructible from the SAME two official `github.com/icpc` surface families
+  W120 used, on the pre-Aug-2024 editions of the same regionals (RMRC 2021 + ECNA 2022-2023
+  + RMRC 2022-2023 + ECNA 2023-2024) ⇒ **42 tier-1 pure pass-fail** (50 seen, 48 admitted;
+  +5 float +1 custom; 2 custom-no-validator excluded), all dated ≤ 2024-08-31 (EXPOSED),
+  deterministic, SHA `653e3682`, manifest CID `8acbc7cc`, 30-slice CID `32d15db5`; grader
+  self-test 30 all-pass / 637 official secret cases each surface. `MatchedFamilyComparisonV1`
+  asserts it `differs_only_in_cutoff_side` from the W120 resistant battlefield (same org /
+  format / grader / tiers / difficulty / model). RMRC 2023-2024 excluded (typed: minimal
+  package, no shipped statement). *Module* `coordpy_icpc_exposed_control_v1`.
+* **W121-T-MAVERICK-EXPOSED-CERTIFIABLE.** The W114 gate with C2 flipped to C2e (≥30
+  problems in months AT OR BEFORE the cutoff) certifies Maverick on the EXPOSED side
+  (C1 KNOWN Aug-2024 ∧ C2e 48 ≥ 30 ∧ C3 ∧ C4-new-instrument); tier-2 (Qwen/DeepSeek/Mistral)
+  all UNKNOWN ⇒ not exposed-certifiable (mirrors the resistant side).
+* **W121-L-MATCHED-FAMILY-EXPOSURE-DOES-NOT-REPRODUCE-MARGIN-CAP.** The earned exposed-control
+  pilot (Maverick × tier-1 exposed 30-slice, 330 NIM calls, 1 seed) returns **B−A1 = +3.33 pp,
+  FAIL** (A0 6.67 / A1 26.67 / B 30.00 %; MLB-1 93.33% PASS / MLB-2 25.00% FAIL; 8/9). Against
+  the LOCKED W120 resistant +0.00 pp, both lie within the pre-committed ±3.34 pp null band ⇒
+  the matched-family exposure flip does **NOT** reproduce the retirement-grade HumanEval-family
+  margins (+5.56 / +7.00). With family fixed (ICPC) and difficulty comparable (exposed A0
+  6.67% ≤ resistant A0 20.00%, so exposed is not easier), exposure produced at most a sub-floor
+  one-problem nudge ⇒ the STRONG contamination reading **WEAKENS** and difficulty/family-ease
+  is implicated. **Falsifier:** a clean `PASS_MECHANISM_DRIVEN` (≥+5 pp, 9/9 ∧ MLB-1 ∧ MLB-2)
+  on the matched EXPOSED ICPC battlefield (this seed or a paired seed) would instead CLOSE the
+  loophole toward contamination. Contamination not refuted (faint sub-floor exposure-consistent
+  gradient: exposed +3.33 > resistant +0.00; exposed rescue 25% > resistant 8%; single seed).
+  W89+W105 STAND (the only two retirements); paired seed NOT earned (null-side of band; W106
+  margin-cap discipline). *Anchors:* `docs/RESULTS_W121_EXPOSED_CONTROL_V1.md`,
+  `docs/CONTAMINATION_CONTROL_FRAMING_W121_V1.md`, `docs/RUNBOOK_W121.md`.
+
 ## How to add a claim
 
 1. Pick the lowest unused W3-* / W3-C* number in the appropriate

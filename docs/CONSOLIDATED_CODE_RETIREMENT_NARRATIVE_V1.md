@@ -99,3 +99,36 @@ strictly stronger statement of the bounded ceiling. Contamination-confound STREN
 (cleanest resistant null), NOT proven (single seed; difficulty + Python-TLE floor). decision
 CID `258b6ed7` invariant. COO-9 lead; W121 = accept the bounded claim / different axis
 (optional multi-seed) or a primary-KNOWN stronger-than-Maverick cutoff.
+
+## Post-W120 update — W121 ran the matched-family exposure control; exposure within ICPC did NOT reproduce the margin
+
+W120's resistant null left ONE confound: the EXPOSED retirements (W89/W105) are on EASY
+HumanEval-family code while the resistant nulls are on HARD ICPC code, so "exposed vs
+resistant" across the programme was entangled with "easy vs hard / HumanEval-family vs
+other". **W121 removed the confound the only clean way — it held the family + difficulty
+FIXED (official ICPC, same regional series) and flipped ONLY exposure.** It built a matched
+EXPOSED battlefield from the SAME two `github.com/icpc` families W120 used, on the
+pre-Aug-2024 editions of the same regionals (RMRC 2021 + ECNA 2022-2023 + RMRC 2022-2023 +
+ECNA 2023-2024) ⇒ **42 tier-1 pure pass-fail ≥ 30**, grader self-test 30 all-pass / 637
+official secret cases each surface; certified Maverick on the EXPOSED side (W114 gate, C2→
+C2e); and ran the earned same-model same-mechanism pilot (330 NIM calls):
+
+**EXPOSED B − A1 = +3.33 pp, FAIL** (A0 6.67 / A1 26.67 / B 30.00; MLB-1 93.33% PASS /
+MLB-2 25.00% FAIL; 8/9) **vs the LOCKED RESISTANT +0.00 pp (W120)** — both within the
+pre-committed ±3.34 pp null band.
+
+**Net:** the matched-family exposure flip did **NOT** reproduce the retirement-grade
+HumanEval-family margins (+5.56 / +7.00). The contamination hypothesis predicted a clean
+exposed margin (it did not appear); the difficulty/family-ease hypothesis predicted a null
+even when exposed (it matched) ⇒ the **strong contamination reading WEAKENS**, difficulty/
+family-ease is implicated, and the bounded ceiling **HARDENS** to
+**HumanEval-family-(ease/structure)-specific @ 70B**. NOT refuted (faint sub-floor
+exposure-consistent gradient: exposed +3.33 > resistant +0.00; exposed reflexion-rescue
+25% > resistant 8%; single seed each side). Difficulty comparability is empirically
+supported (exposed A0 6.67% ≤ resistant A0 20.00% ⇒ exposed not easier). **W89 (+5.56) +
+W105 (+7.00) remain the only two retirements**; W121 adds none; the mechanism gets a clean
+retirement-grade margin ONLY on HumanEval-family code and FAILS on official ICPC code
+regardless of exposure. Paired seed NOT earned (null-side of band; W106 discipline).
+Decision CID `258b6ed7` invariant. COO-9 lead; W122 = accept the hardened bounded ceiling /
+genuinely different axis, OR a primary-KNOWN stronger-than-Maverick model on BOTH matched
+ICPC battlefields, OR (optional) one paired seed on BOTH battlefields.
