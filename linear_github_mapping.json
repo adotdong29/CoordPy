@@ -805,6 +805,37 @@
         "W120-L-RESISTANT-SUPERIORITY-0-CLEAN-ON-OFFICIAL-ICPC->=30-CAP"
       ],
       "carry_forwards_retired": []
+    },
+    {
+      "id": "W121",
+      "title": "matched EXPOSED official-ICPC control on the SAME package family as W120 (RMRC 2021 + ECNA 2022-2023 + RMRC 2022-2023 + ECNA 2023-2024, pre-Aug-2024) + Maverick same-model same-mechanism contrast RAN => coordpy_icpc_exposed_control_v1 = 42 tier-1 pure pass-fail >= 30; grader self-test 30 all-pass / 637 official secret cases each surface; Maverick EXPOSED-certifiable (W114 gate C2->C2e); LOCKED runbook + clean canary, then RAN the EARNED pilot (Maverick x exposed 30-slice, 330 NIM calls): A0 6.67 / A1 26.67 / B 30.00 %; B-A1 = +3.33 pp; MLB-1 93.33% PASS / MLB-2 25.00% FAIL; 8/9; verdict FAIL => the matched-family exposure flip did NOT reproduce the retirement-grade HumanEval-family margins (+5.56/+7.00) => contamination-confound WEAKENED, difficulty/family-ease implicated, bounded ceiling HARDENS to HumanEval-family-(ease/structure)-specific @ 70B; NOT refuted (faint sub-floor exposure-consistent gradient; single seed); NO third retirement (W89+W105 stand); paired seed NOT earned",
+      "outcome": "Gated branch milestone with THREE lanes executing docs/RUNBOOK_W121.md (LOCKED before any NIM; the W120 section-10 FAIL-branch 'genuinely different axis'). Removed the last loophole on the W120 resistant null by holding family+difficulty FIXED and flipping ONLY exposure. LANE alpha: SAME two official github.com/icpc families W120 used (na-ecna-archive + na-rocky-mountain-*-public), pre-cutoff editions of the same regionals; byte-identical R1/R2/R4..R8 with the date rule FLIPPED (E3: date <= 2024-08-31 = EXPOSED) => 50 seen, 48 admitted, 42 tier-1 pure pass-fail >= 30 (+5 float +1 custom; 2 custom-no-validator excluded); SHA 653e3682; manifest CID 8acbc7cc; 30-slice CID 32d15db5; grader self-test 30 all-pass / 637 cases each surface; RMRC 2023-2024 excluded (typed: minimal package, no shipped problem_statement). LANE beta: W114 gate with C2->C2e (>=30 problems at/before cutoff) certifies Maverick on the EXPOSED side; tier-2 all UNKNOWN; EARNED pilot RAN (Maverick x exposed 30-slice, 1 seed x 30 x K=5 = 330 NIM calls, ~70 min): A0 6.67 / A1 26.67 / B 30.00 %; B-A1 = +3.33 pp; MLB-1 93.33% PASS / MLB-2 25.00% FAIL; 8/9; FAIL (net +1 problem: rescues rsamistake+isbnconversion, regression icouldhavewon; bench merkle 618e270a). LANE gamma: shipped coordpy.coordpy_icpc_exposed_control_v1 (reuses W120 classifier/oracle/slice-selector + W114 cutoff registry + W117 run_upstream_construction_v1 => decision CID 258b6ed7 invariant) + MatchedFamilyComparisonV1 (differs_only_in_cutoff_side=True; same org/format/grader/tiers/difficulty/model) + the pre-committed three-branch interpret_exposed_vs_resistant_v1 + W122FireConditionV1 + 3 scripts + 17 tests. THE ANSWER: EXPOSED +3.33pp vs RESISTANT +0.00pp (W120) both within the +-3.34pp null band => the contamination hypothesis predicted a clean exposed margin (absent), difficulty/family-ease predicted a null even when exposed (matched) => contamination-confound WEAKENED (first within-family within-model exposure control), difficulty/family-ease implicated, bounded ceiling HARDENS; NOT refuted (faint sub-floor gradient: exposed +3.33 > resistant +0.00, exposed rescue 25% > resistant 8%; single seed); difficulty comparability supported (exposed A0 6.67% <= resistant A0 20.00%). NO third retirement (W89+W105 STAND); paired seed NOT earned (null-side of band; W106 discipline); COO-9 lead; COO-45; W122 = accept hardened bounded ceiling / different axis OR primary-KNOWN stronger-than-Maverick on BOTH battlefields OR (optional) one paired seed on BOTH. 31st preflight/earn-discipline validation (W93-W121). No version bump; no PyPI; coordpy/__init__.py untouched.",
+      "commits": [
+        "d49237a"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W121.md",
+        "docs/RESULTS_W121_EXPOSED_CONTROL_V1.md",
+        "docs/RESULTS_W121_MILESTONE_SUMMARY_V1.md",
+        "docs/CONTAMINATION_CONTROL_FRAMING_W121_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W121_V1.md",
+        "results/w121/exposed_control/exposed_control_verdict.json",
+        "results/w121/exposed_control/exposed_listing_live.json",
+        "coordpy/coordpy_icpc_exposed_control_v1.py",
+        "scripts/build_w121_exposed_listing_v1.py",
+        "scripts/run_w121_exposed_control_v1.py",
+        "scripts/run_w121_exposed_pilot.py",
+        "tests/test_w121_exposed_control_v1.py"
+      ],
+      "linear_issues": [
+        "COO-45"
+      ],
+      "carry_forwards_added": [
+        "W121-T-MATCHED-EXPOSED-ICPC-CONTROL-CONSTRUCTIBLE",
+        "W121-T-MAVERICK-EXPOSED-CERTIFIABLE",
+        "W121-L-MATCHED-FAMILY-EXPOSURE-DOES-NOT-REPRODUCE-MARGIN-CAP"
+      ],
+      "carry_forwards_retired": []
     }
   ]
 }
