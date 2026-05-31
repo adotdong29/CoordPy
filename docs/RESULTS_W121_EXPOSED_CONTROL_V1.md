@@ -91,7 +91,7 @@ and the W120 resistant battlefield **differ only in cutoff side**:
 | model / evaluator | Maverick / verbatim W108 gates | same |
 | tier-1 core | 42 | 45 |
 | dates | 2022-03-14..2023-11-11 | 2024-11-11..2025-11-13 |
-| core 30-slice CID | `32d15db5…` | `f7cdc917…` |
+| core 30-slice CID | `32d15db5…` | `01bf9ef8…` |
 | cutoff side | **EXPOSED** (≤ 2024-08-31) | **RESISTANT** (> 2024-08-31) |
 
 `differs_only_in_cutoff_side = True`; the LCB-inherited decision CID re-derives

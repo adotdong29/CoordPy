@@ -1,3 +1,53 @@
+## W122 (matched-family multi-seed paired seed — FINAL 3-seed AMBIGUOUS [B4]; closure NOT achieved; BOTH fields spiked) — explicit do-not-overstate
+
+**DO say:** "W122 attacked the one live statistical caveat on the matched-family ICPC
+contrast — single seed each side — by running the pre-committed paired-seed closure (seed
+120002, then the earned tiebreaker seed 120003) on BOTH the EXACT W120 resistant 30-slice
+(CID `01bf9ef8…`) and the EXACT W121 exposed 30-slice (CID `32d15db5…`), under a SYMMETRIC
+rule locked before any NIM (1320 NIM calls total). The FINAL 3-seed aggregate is
+`AMBIGUOUS_THIRD_PAIRED_SEED_EARNED` (B4): seed 120003 produced +10.00 pp on BOTH fields
+(`PASS_NON_MECHANISM_DRIVEN`), so the 3-seed means are RESISTANT +4.44 pp (in the 3.34–5.00
+gap, out of band) and EXPOSED +8.89 pp (out of band), neither field clean (no
+`PASS_MECHANISM_DRIVEN` seed anywhere) ⇒ B1/B2/B3 all off ⇒ B4. Closure was NOT achieved: the
+2-seed 'resistant null vs exposed popped' asymmetry DISSOLVED — the resistant field also
+spiked +10.00 — revealing the matched contrast is unresolvable at n=30 (±10 pp variance from
+~3 rescues). No 4th seed (the rule caps at three). In parallel: the strongest non-reflexion
+mechanism (M3) was KILLED NIM-free (ICPC secret-grading denies its expected/actual
+differentiator; `m3_exclusive_signal_fraction = 0.000`) ⇒ the ceiling is mechanism-robust;
+and the stronger-model gate is structurally closed. Both $0 NIM. W89 + W105 remain the only
+two retirements; W122 adds none."
+
+**Do NOT say:**
+* That W122 CLOSED the caveat or that the matched-family null SURVIVED multi-seed — it did
+  NOT: at 3 seeds neither field is in the null band (resistant +4.44, exposed +8.89). The
+  branch is B4 (ambiguous), not B1.
+* That "resistant ICPC stays null" — it did NOT across seeds: the resistant field spiked
+  +10.00 on seed 120003 (`PASS_NON_MECHANISM_DRIVEN`). The robust claim is only "no CLEAN
+  mechanism margin on either field, any seed".
+* That any +10/+13 spike is a win, a margin, a retirement, or contamination "re-strengthened"
+  — every non-FAIL seed is `PASS_NON_MECHANISM_DRIVEN` (MLB-2 < 33%; rescue-concentrated), the
+  W109/W112 exposed-control signature on BOTH fields. B2 explicitly did NOT fire (it requires
+  a clean exposed margin AND a resistant null; resistant is +4.44, not null). **W89 + W105
+  remain the only two retirements;** W122 adds none.
+* That contamination is now established / strengthened — both fields spike, including the
+  contamination-RESISTANT one, so the spikes are sampling variance, not exposure. The faint
+  exposed > resistant ordering (+8.89 > +4.44) is exposure-CONSISTENT but non-mechanism-driven
+  and noisy.
+* That contamination is weakened-multi-seed (the W121 read) — NOT confirmed either; the
+  exposed field did not stay flat. The honest read is "unresolvable at n=30", not "weakened"
+  or "strengthened" multi-seed.
+* That the 3rd seed was seed-chasing, or that a 4th is warranted — it was the pre-committed B4
+  tiebreaker and is the LAST seed (rule caps at three); W123 escalates n PER FIELD, not more
+  n=30 seeds.
+* That M3 was run / spent NIM — it was KILLED NIM-free ($0); the kill is machine-checkable
+  and falsifiable.
+* That a stronger model was tested — none was; none is even resistant-certifiable on the
+  matched battlefields. $0 NIM.
+
+Anchors: `docs/RESULTS_W122_PAIRED_SEED_CLOSURE_V1.md`; `docs/RESULTS_W122_MILESTONE_SUMMARY_V1.md`;
+`docs/RESULTS_W122_MECHANISM_AUDIT_V1.md`; `docs/CONTAMINATION_CONTROL_FRAMING_W122_V1.md`;
+`docs/FRONTIER_RELEVANCE_AUDIT_W122_V1.md`; `docs/RUNBOOK_W122.md`; `results/w122/`.
+
 ## W121 (matched EXPOSED ICPC control built + Maverick pilot RAN — +3.33pp FAIL; contamination-confound WEAKENED) — explicit do-not-overstate
 
 **DO say:** "W121 ran the matched-family within-model exposure control the programme had

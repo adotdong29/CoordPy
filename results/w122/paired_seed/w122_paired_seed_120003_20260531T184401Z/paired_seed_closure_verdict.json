@@ -1,0 +1,129 @@
+{
+  "schema": "coordpy.w122_paired_seed_closure_verdict.v1",
+  "provenance": {
+    "schema": "coordpy.w122_paired_seed_pilot.v1",
+    "milestone": "W122-alpha",
+    "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+    "paired_new_seed": 120003,
+    "existing_seed": 120001,
+    "n_problems": 30,
+    "K_multi_sample": 5,
+    "resistant_slice_cid": "01bf9ef869a56e20420ec6e52864853eba40aac055fa7a03fa50a154542e9160",
+    "exposed_slice_cid": "32d15db5b66e1e1245c171076a317921a8e1def86dd59622bebc808649d0f7e6",
+    "resistant_instrument": "coordpy_icpc_battlefield_v1 (W120)",
+    "exposed_instrument": "coordpy_icpc_exposed_control_v1 (W121)",
+    "grader": "official secret cases (data/secret); token-diff oracle; NO LLM judge",
+    "reflexion_feedback": "public samples + judge verdict + stderr ONLY (no secret leak)",
+    "max_tokens_per_call": 1536,
+    "executor_timeout_s": 15.0,
+    "label": "",
+    "closure_rule": "RUNBOOK_W122 \u00a72 (symmetric; B1..B4; null band 3.34; margin 5.00)"
+  },
+  "resistant_aggregate": {
+    "field": "resistant",
+    "seeds": [
+      120001,
+      120002,
+      120003
+    ],
+    "per_seed_b_minus_a1_pp": [
+      0.0,
+      3.3333,
+      9.999999999999998
+    ],
+    "mean_b_minus_a1_pp": 4.4444,
+    "n_seeds": 3,
+    "all_seeds_clean_pass": false,
+    "per_seed_a0_pct": [
+      20.0,
+      16.666700000000002,
+      23.333333333333332
+    ]
+  },
+  "exposed_aggregate": {
+    "field": "exposed",
+    "seeds": [
+      120001,
+      120002,
+      120003
+    ],
+    "per_seed_b_minus_a1_pp": [
+      3.3333,
+      13.3333,
+      10.0
+    ],
+    "mean_b_minus_a1_pp": 8.8889,
+    "n_seeds": 3,
+    "all_seeds_clean_pass": false,
+    "per_seed_a0_pct": [
+      6.6667000000000005,
+      6.6667000000000005,
+      6.666666666666667
+    ]
+  },
+  "closure_verdict": {
+    "schema": "coordpy.coordpy_icpc_paired_seed_closure_v1.v1",
+    "resistant": {
+      "field": "resistant",
+      "seeds": [
+        120001,
+        120002,
+        120003
+      ],
+      "per_seed_b_minus_a1_pp": [
+        0.0,
+        3.3333,
+        9.999999999999998
+      ],
+      "mean_b_minus_a1_pp": 4.4444,
+      "n_seeds": 3,
+      "all_seeds_clean_pass": false,
+      "per_seed_a0_pct": [
+        20.0,
+        16.666700000000002,
+        23.333333333333332
+      ]
+    },
+    "exposed": {
+      "field": "exposed",
+      "seeds": [
+        120001,
+        120002,
+        120003
+      ],
+      "per_seed_b_minus_a1_pp": [
+        3.3333,
+        13.3333,
+        10.0
+      ],
+      "mean_b_minus_a1_pp": 8.8889,
+      "n_seeds": 3,
+      "all_seeds_clean_pass": false,
+      "per_seed_a0_pct": [
+        6.6667000000000005,
+        6.6667000000000005,
+        6.666666666666667
+      ]
+    },
+    "null_band_pp": 3.34,
+    "margin_pass_pp": 5.0,
+    "resistant_mean_pp": 4.4444,
+    "exposed_mean_pp": 8.8889,
+    "resistant_in_null_band": false,
+    "exposed_in_null_band": false,
+    "resistant_shows_margin": false,
+    "exposed_shows_margin": false,
+    "branch": "AMBIGUOUS_THIRD_PAIRED_SEED_EARNED",
+    "caveat_closed": false,
+    "third_seed_earned": true,
+    "w121_delta": "AMBIGUOUS at this seed count: a mean lands in the (3.34, 5.00) gap, or a >=5 mean lacks clean per-seed gates, or the fields disagree in direction. Earn EXACTLY ONE more paired seed on BOTH fields; do NOT buy a 4th.",
+    "interpretation": "RESISTANT mean +4.44 pp, EXPOSED mean +8.89 pp: not jointly decisive under the +-3.34/+5.00 rule. Third paired seed earned.",
+    "multiseed_exposed_vs_resistant_outcome": "EXPOSED_MARGIN_VS_RESISTANT_NULL_DIFFICULTY_LOOPHOLE_CLOSED"
+  },
+  "w123_fire_condition": {
+    "schema": "coordpy.coordpy_icpc_paired_seed_closure_v1.v1",
+    "closure_branch": "AMBIGUOUS_THIRD_PAIRED_SEED_EARNED",
+    "fires_on": "ambiguous after the 3rd seed => register the residual ambiguity; W123 = accept the bounded claim or escalate to a larger n PER FIELD (not more seeds at n=30)."
+  },
+  "ts_utc": "2026-05-31T20:33:12.142778+00:00"
+}

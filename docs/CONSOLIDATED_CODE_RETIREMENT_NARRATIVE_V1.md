@@ -132,3 +132,46 @@ regardless of exposure. Paired seed NOT earned (null-side of band; W106 discipli
 Decision CID `258b6ed7` invariant. COO-9 lead; W122 = accept the hardened bounded ceiling /
 genuinely different axis, OR a primary-KNOWN stronger-than-Maverick model on BOTH matched
 ICPC battlefields, OR (optional) one paired seed on BOTH battlefields.
+
+## Post-W121 update — W122 ran the FULL paired-seed closure; FINAL 3-seed aggregate = B4 AMBIGUOUS (both fields spiked); closure NOT achieved
+
+W121 left exactly one live caveat: both the resistant (+0.00) and exposed (+3.33) ICPC
+results were single-seed (120001). **W122 took the optional paired-seed tightening as its
+MAIN lane.** It ran the pre-committed paired-seed closure — seed 120002, then the earned
+tiebreaker seed 120003 — on BOTH the EXACT W120 resistant 30-slice and the EXACT W121 exposed
+30-slice (CID-guarded, re-derived NIM-free == provenance), under a SYMMETRIC rule
+(`interpret_paired_closure_v1`) locked before any NIM — 1320 NIM calls total, Maverick, same
+grader/evaluator/K, only the seed changed.
+
+* **Seed 120002, BOTH fields:** RESISTANT B−A1 +3.33 pp (FAIL; 8/9; MLB-2 8.7%); EXPOSED B−A1
+  **+13.33 pp** (`PASS_NON_MECHANISM_DRIVEN`; 9/9; MLB-2 28.6%; 4 rescues / 0 regr; A1 dipped
+  to 20%). 2-seed aggregate = B4 ⇒ earned the 3rd paired seed.
+* **Seed 120003, BOTH fields:** RESISTANT B−A1 **+10.00 pp** (`PASS_NON_MECHANISM_DRIVEN`;
+  9/9; MLB-2 16.7%; 3 rescues / 0 regr) and EXPOSED B−A1 **+10.00 pp**
+  (`PASS_NON_MECHANISM_DRIVEN`; 9/9; MLB-2 18.5%; 3 rescues / 0 regr). **FINAL 3-seed means:
+  RESISTANT +4.44 (from [+0.00, +3.33, +10.00], OUT of band, in the 3.34–5.00 gap), EXPOSED
+  +8.89 (from [+3.33, +13.33, +10.00], OUT of band)**; both `all_seeds_clean_pass=false` ⇒
+  B1/B2/B3 all off ⇒ **`AMBIGUOUS_THIRD_PAIRED_SEED_EARNED` (B4)**; `caveat_closed=false`.
+  B4-after-the-3rd-seed is terminal (no 4th).
+
+The single-seed caveat is **NOT closed by a clean resolution**. The literal "single seed"
+objection is retired (3 seeds each side), but it is replaced by a small-n-variance limitation:
+at the 3rd seed the RESISTANT field also spiked +10.00 pp (non-mechanism-driven), so the
+2-seed "resistant null vs exposed popped" asymmetry **dissolved** and both fields now carry
+the same rescue-concentrated `PASS_NON_MECHANISM_DRIVEN` signature (no `PASS_MECHANISM_DRIVEN`
+seed anywhere). At n=30, K=5 the per-field B−A1 swings ±10 pp on ~3 rescues, so the matched
+contrast is **unresolvable at this n**. The W121 single-seed "weakened" read is NOT
+multi-seed-confirmed (the exposed field did not stay flat) AND contamination is NOT
+established — in fact the 3-seed data **further undercuts** a clean contamination read, since
+contamination-RESISTANT code spiked just like exposed code (the spikes are sampling variance,
+not exposure); the faint exposed > resistant ordering (+8.89 > +4.44) is exposure-CONSISTENT
+but non-mechanism-driven and noisy. In parallel, W122 KILLED the strongest non-reflexion
+mechanism (M3) NIM-free — ICPC's SECRET token-diff grading denies M3 its expected/actual
+differentiator (`m3_exclusive_signal_fraction = 0.000`) ⇒ the ceiling is **mechanism-robust**,
+not merely reflexion-specific — and confirmed the stronger-model gate is **structurally
+closed** (no reachable stronger-than-Maverick model has a primary-KNOWN cutoff ≤ ~Aug-2024).
+**W89 (+5.56) + W105 (+7.00) remain the only two retirements;** W122 adds none (every non-FAIL
+seed is non-mechanism-driven). Decision CID `258b6ed7` invariant. COO-9 lead; W123 =
+B4-after-3rd-seed ⇒ accept the bounded HumanEval-family ceiling OR escalate to larger n PER
+FIELD (≥100/field; not more n=30 seeds; no 4th). See
+`docs/RESULTS_W122_PAIRED_SEED_CLOSURE_V1.md` + `docs/CONTAMINATION_CONTROL_FRAMING_W122_V1.md`.

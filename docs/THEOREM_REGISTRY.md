@@ -3515,6 +3515,57 @@ notes. They are inputs to W3-11 (capsule subsumption) but are
 not maintained in this registry — see `vision_mvp/RESULTS_PHASE*.md`
 or `docs/archive/pre-coordpy-theory/PROOFS.md`.
 
+## W122 — matched-family multi-seed paired seed on official ICPC (FINAL 3-seed AMBIGUOUS [B4]) + ICPC mechanism probe + stronger-model gate (W122-T-* / W122-L-*)
+
+* **W122-T-PAIRED-SEED-CLOSURE-RULE-PRECOMMITTED.** A symmetric 4-branch (B1..B4)
+  paired-seed closure rule over the multi-seed (2/3-seed) mean B−A1 per field, LOCKED before any NIM
+  (`docs/RUNBOOK_W122.md` §2); precedence B3>B2>B1>B4; a ≥+5 mean counts as a clean rise
+  (B3/B2) ONLY if every seed on that field is `PASS_MECHANISM_DRIVEN`, else it falls to B4.
+  *Module* `coordpy_icpc_paired_seed_closure_v1.interpret_paired_closure_v1`; 17 tests
+  (falsifiability-first). Status: mechanically-checked.
+* **W122-T-PAIRED-SEED-3SEED-AMBIGUOUS-B4.** Paired seeds 120002 + 120003 on BOTH fields ⇒
+  FINAL 3-seed means RESISTANT **+4.44** (OUT of ±3.34 band, in the 3.34–5.00 gap) / EXPOSED
+  **+8.89** (out of band); `all_seeds_clean_pass=false` on BOTH fields (no
+  `PASS_MECHANISM_DRIVEN` seed anywhere) and resistant not null ⇒ B3, B2, B1 all fail ⇒
+  code-emitted **`AMBIGUOUS_THIRD_PAIRED_SEED_EARNED`** (B4), `caveat_closed=false`; B4 AFTER
+  the 3rd seed is terminal (no 4th). Status: empirical / mechanically-checked. *Anchor*
+  `results/w122/paired_seed/w122_paired_seed_120003_20260531T184401Z/paired_seed_closure_verdict.json`.
+* **W122-T-BOTH-FIELDS-NONMECHANISM-SPIKE.** Large B−A1 spikes are seed-dependent and appear
+  on BOTH fields: EXPOSED 120002 +13.33 (9/9, MLB-2 28.6%, 4 rescues/0 regr, A1 dipped 20%)
+  and 120003 +10.00 (9/9, MLB-2 18.5%, 3 rescues/0 regr); RESISTANT 120003 +10.00 (9/9, MLB-2
+  16.7%, 3 rescues/0 regr) — ALL `PASS_NON_MECHANISM_DRIVEN` (MLB-2 < 33%; rescue-concentrated;
+  the W109/W112 exposed-control signature), NONE a mechanism win or retirement. The resistant
+  field is NOT reliably null (it spiked just like exposed) ⇒ the spikes are sampling variance
+  at n=30, not exposure. Status: empirical.
+* **W122-T-THIRD-PAIRED-SEED-RAN-RESOLVED-B4.** The 2-seed B4 earned exactly one more paired
+  seed (no 4th); seed 120003 RAN on BOTH fields (660 calls) and the 3-seed aggregate resolved
+  to **B4 again** (resistant +4.44 / exposed +8.89). The driver was fixed first so the 3-seed
+  aggregate gathers ALL prior seeds keyed by seed (NIM-free verified). Status: empirical /
+  mechanically-checked. *Anchor* `scripts/run_w122_paired_seed_pilot.py`
+  (`_collect_prior_field_seeds`).
+* **W122-T-ICPC-CEILING-MECHANISM-ROBUST.** On official ICPC the hidden oracle is SECRET
+  token-diff, so M3's expected/actual differentiator is structurally absent
+  (`m3_exclusive_signal_fraction = 0.000` < 0.33) ⇒ the same-family ceiling is
+  mechanism-robust, not merely reflexion-specific; the M3 lane is KILLED NIM-free ($0).
+  Status: empirical / mechanically-checked. *Anchor* `audit_icpc_mechanism_signal_v1`;
+  `results/w122/mechanism_audit/mechanism_audit_verdict.json`.
+* **W122-T-STRONGER-MODEL-GATE-STRUCTURALLY-CLOSED.** The resistant field (2024-11..2025-11)
+  is anchored to Maverick Aug-2024; only a primary-KNOWN cutoff ≤ ~Aug-2024 could be
+  resistant-certified on it, and Maverick is the unique such reachable model ⇒ no stronger
+  model can open the gate (re-verified LIVE incl. direct DeepSeek-V4 PDF = no cutoff);
+  decision CID `258b6ed7…` invariant. Status: empirical.
+* **W122-L-NO-THIRD-RETIREMENT-CAP.** W122 adds NO retirement; W89 + W105 remain the only
+  two; every non-FAIL seed on both fields (+13.33 / +10.00 / +10.00) is
+  `PASS_NON_MECHANISM_DRIVEN` (not a mechanism win). Status: code-backed limitation.
+* **W122-L-MATCHED-CONTRAST-UNRESOLVABLE-AT-N30-CAP.** The literal single-seed caveat is
+  retired (3 seeds each side) but REPLACED by a small-n-variance limitation: at n=30, K=5 the
+  per-field B−A1 swings ±10 pp on ~3 rescues, so the 3-seed aggregate is B4 (resistant +4.44 /
+  exposed +8.89, both out of band, neither clean). Neither the W121 "weakened" read
+  (multi-seed) nor contamination is established; closure requires larger n PER FIELD, not more
+  n=30 seeds. Status: code-backed limitation. *Anchors:*
+  `docs/RESULTS_W122_PAIRED_SEED_CLOSURE_V1.md`, `docs/CONTAMINATION_CONTROL_FRAMING_W122_V1.md`,
+  `docs/RUNBOOK_W122.md`.
+
 ## W120 — official-ICPC ≥30 resistant battlefield + earned Maverick pilot (count-gap closure)
 
 * **W120-T-OFFICIAL-ICPC-MULTI-SURFACE-≥30-BATTLEFIELD-CONSTRUCTIBLE.** A ≥30 post-cutoff
