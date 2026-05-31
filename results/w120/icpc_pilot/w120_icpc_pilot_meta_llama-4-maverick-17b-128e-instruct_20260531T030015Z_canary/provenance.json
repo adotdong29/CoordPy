@@ -1,0 +1,30 @@
+{
+  "schema": "coordpy.w120_icpc_pilot.v1",
+  "milestone": "W120-alpha",
+  "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+  "seed": 120001,
+  "n_problems": 2,
+  "K_multi_sample": 5,
+  "battlefield_instrument": "coordpy_icpc_battlefield_v1",
+  "battlefield_manifest_cid": "bf55bb6c71a5e45a5333f66a9733132f5ef0785219ad246e6142c74e2510fcc5",
+  "battlefield_surfaces": [
+    "ECNA",
+    "RMRC"
+  ],
+  "core_slice_cid": "01bf9ef869a56e20420ec6e52864853eba40aac055fa7a03fa50a154542e9160",
+  "slice_problem_ids": [
+    "icpc_na-ecna-archive_astackofgold",
+    "icpc_na-ecna-archive_averagesubstringvalue"
+  ],
+  "slice_contest_date_min": "2024-11-11",
+  "slice_contest_date_max": "2024-11-11",
+  "cutoff_boundary": "2024-08-31",
+  "cutoff_confidence": "KNOWN",
+  "contamination_window": "RESISTANT for Maverick: every problem dated strictly after the Aug-2024 cutoff (NA East Div 2024/2025 + RMRC 2024-25/2025-26)",
+  "grader": "official secret cases (data/secret); token-diff oracle; NO LLM judge",
+  "reflexion_feedback": "public samples + judge verdict + stderr ONLY (no secret leak)",
+  "max_tokens_per_call": 1536,
+  "executor_timeout_s": 15.0,
+  "clean_reopening_bar": "verdict_label == PASS_MECHANISM_DRIVEN",
+  "label": "canary"
+}

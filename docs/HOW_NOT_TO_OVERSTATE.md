@@ -1,3 +1,31 @@
+## W120 (official-ICPC ≥30 resistant battlefield built + Maverick pilot RAN — clean FAIL) — explicit do-not-overstate
+
+**DO say:** "W120 CLOSED the W119 count gap on official `github.com/icpc` surfaces only — a
+problem-by-problem RMRC exclusion audit (correcting `draftlottery` to float) plus a NEW
+official surface (`icpc/na-ecna-archive`, NA East Division 2024+2025) ⇒ **45 tier-1 pure
+pass-fail resistant tasks ≥ 30**, grader self-test 165/165 each surface. That made Maverick
+(KNOWN Aug-2024, reachable) certifiable (C2 flips 24→45). The runbook was locked, a canary
+validated the harness, and the **earned pilot RAN** (330 NIM calls): **B − A1 = +0.00 pp,
+FAIL**. The same-budget multi-agent mechanism was genuinely invoked (25/30) but did NOT beat
+the single agent on contamination-resistant official ICPC code at the certified scale. The
+bounded contamination-EXPOSED-HumanEval-family-at-70B ceiling HOLDS; resistant superiority is
+now 0 clean across FOUR settings; and the W114–W119 'no certifiable resistant instrument'
+escape is CLOSED (we built it, certified Maverick, ran it, and it did not transfer)."
+
+**Do NOT say:**
+* That W120 is a third retirement, or any resistant win (it is a clean +0.00 pp FAIL).
+* That contamination is PROVEN (single seed 120001; ICPC-vs-HumanEval difficulty not
+  separated; a Python-under-time-limit floor depresses absolute pass — conservative, but
+  it lowers power; this is observational, not interventional).
+* That the mechanism "does not work" (it retired two exposed benchmarks; it was invoked on
+  25/30 here, just net-zero rescues).
+* That the battlefield was loosened to reach 30 (the STRICT tier-1 pure-pass-fail tier alone
+  = 45 ≥ 30; float/custom tiers are documented breadth, not load-bearing for the gate).
+* That this is cross-class, MBPP-family, cross-modal, or "context solved".
+
+Anchors: `docs/RESULTS_W120_ICPC_BATTLEFIELD_V1.md`; `docs/RESULTS_W120_MILESTONE_SUMMARY_V1.md`;
+`docs/CONTAMINATION_CONTROL_FRAMING_W120_V1.md`; `docs/RUNBOOK_W120.md`.
+
 ## W119 (official ICPC public-package pivot DISSOLVES the W118 grader blocker; slice count 24 < 30 blocks the pilot; $0 NIM) — explicit do-not-overstate rules
 
 **DO say:** "W119 made the aggressive pivot W118 set up — off the grader-LESS LiveCodeBench

@@ -78,3 +78,24 @@ W116 attacked the *packaged-release* supply; **W117** escalated to the *construc
 * **Lane γ:** shipped the durable constructor/admission/pilot-readiness pipeline (O1..O7 rule + official-source-family grader registry + reused C1..C4 + O7 gate + W119 fire condition + falsifiability test), reusing the W113/W114/W116/W117 chain with NO duplication (LCB decision CID `258b6ed7…` re-derives byte-identically).
 
 **The blocker MOVED** — from W117's "no post-v6 problem identities can be constructed" to W118's "**abundant official post-v6 identities (894), no official executable grader**". The two confirmed retirements (W89, W105) **STAND**; W118 adds NONE and retires NONE; the contamination-confound is UNCHANGED. **W119 fires the moment** an OFFICIAL executable per-problem test suite for ≥30 post-v6 functional problems appears on a clean official surface (Maverick is already identity-certifiable ⇒ a grader alone unlocks the cheapest honest verdict-changing pilot), OR a packaged `release_v7`+ / LCB-published construction provenance appears, OR a reachable stronger-than-Maverick model discloses a primary-KNOWN cutoff ≤ the manifest frontier. See `docs/RESULTS_W118_FRONTIER_FUNCTIONAL_CONSTRUCTION_V1.md` + `docs/CONTAMINATION_CONTROL_FRAMING_W118_V1.md`.
+
+## Post-W119 update — W120 CLOSED the count gap, certified Maverick, ran the earned pilot (clean FAIL)
+
+W119 dissolved the grader blocker but left a count-only gap (24 < 30 from one surface).
+**W120 closed it on official surfaces only** — a problem-by-problem RMRC exclusion audit
+(correcting `draftlottery` → float) **plus a NEW official surface** (`icpc/na-ecna-archive`,
+NA East Division 2024+2025) ⇒ **45 tier-1 pure pass-fail ≥ 30** (49 gradeable), grader
+self-test 165/165 each surface. That made **Maverick certifiable** (C2 flips 24→45). With
+`docs/RUNBOOK_W120.md` locked and a clean canary, the **earned pilot RAN** (330 NIM calls):
+**B − A1 = +0.00 pp, FAIL** (A0 20.00 / A1 23.33 / B 23.33; MLB-1 83.33% PASS / MLB-2 8.00%
+FAIL; 6/9). 
+
+**Net:** no third retirement — **W89 (+5.56) + W105 (+7.00) remain the only two**, both
+contamination-EXPOSED-HumanEval-family @ 70B. Resistant superiority is now **0 clean across
+FOUR settings** (W108/W110/W113/W120). The decisive advance over W114–W119 is that the
+resistant column is no longer *untestable*: W120 BUILT the certifiable ≥30 grader-clean
+instrument, certified Maverick, ran the pilot, and the mechanism **did not transfer** — a
+strictly stronger statement of the bounded ceiling. Contamination-confound STRENGTHENED
+(cleanest resistant null), NOT proven (single seed; difficulty + Python-TLE floor). decision
+CID `258b6ed7` invariant. COO-9 lead; W121 = accept the bounded claim / different axis
+(optional multi-seed) or a primary-KNOWN stronger-than-Maverick cutoff.
