@@ -1,0 +1,323 @@
+{
+  "schema": "coordpy.w119_icpc_public_construction.v1",
+  "milestone": "W119-alpha-beta-gamma",
+  "result": {
+    "schema": "coordpy.coordpy_icpc_public_functional_v1.v1",
+    "verified_on": "2026-05-30",
+    "instrument_rule": {
+      "min_slice": 30,
+      "P1_official_icpc_package_source": "official ICPC public-package source: a repository of the official ICPC organization (github.com/icpc) or official ICPC Foundation archive surface, following the ICPC/Kattis Problem Package Format \u2014 NOT a mirror, aggregator, or third-party scraper",
+      "P2_dated_contest": "dated contest: each problem carries an official contest date (time-anchor from the package/repo metadata)",
+      "P3_post_cutoff_resistant": "post-cutoff resistant: the contest date is STRICTLY AFTER the target model's KNOWN cutoff (Maverick Aug-2024 => 2024-08-31)",
+      "P4_functional_compatible": "functional / code-generation-compatible: a stdin->stdout programming problem the W89 mechanism can attack",
+      "P5_deterministic_no_operator_curation": "deterministic inclusion/exclusion (no operator curation): the selection AND ordering are fully determined by a total machine rule over the official package payload \u2014 NO hand-picking / vibes",
+      "P6_machine_generated_manifest": "machine-generated manifest: a reproducible fetch + a SHA-256 pin of the official package listing + a content-addressed manifest CID + a re-derivable date histogram",
+      "P7_official_executable_grader_present": "official executable GRADER PRESENT: the package ships a per-problem hidden-test suite (data/secret/*.in + *.ans) gradeable by a clean diff oracle (pass-fail) or a shipped output_validator. THIS IS THE ARTIFACT W118 PROVED ABSENT IN THE LCB FAMILY \u2014 present here.",
+      "P8_grader_verifiably_executable": "grader is verifiably EXECUTABLE: an official accepted reference solution runs in a fresh isolated subprocess against the official secret cases and PASSES (the grader self-test). Sample-only / operator-synthesised graders are refused; an interactive problem is excluded (P4)."
+    },
+    "source_family": [
+      {
+        "repo": "icpc/na-rocky-mountain-2025-2026-public",
+        "default_branch": "main",
+        "contest_date": "2025-11-13",
+        "n_problems": 13,
+        "n_passfail": 11,
+        "n_custom_with_validator": 1,
+        "n_custom_no_validator": 0,
+        "n_interactive": 1,
+        "ships_secret_grader": true,
+        "ships_reference_solutions": true,
+        "note": "Rocky Mountain Regional 2025-2026; COMPLETE packages (558 secret .in/.ans, 119 accepted reference solutions, 8 output validators). poetictournament is interactive (excluded); corporateretreat is custom-with-validator (included). Grader self-test 2/2 default-diff problems (videogames, whattimeisitmrfox) = 16/16 cases PASS."
+      },
+      {
+        "repo": "icpc/na-rocky-mountain-2024-2025-public",
+        "default_branch": "main",
+        "contest_date": "2024-12-03",
+        "n_problems": 13,
+        "n_passfail": 12,
+        "n_custom_with_validator": 0,
+        "n_custom_no_validator": 1,
+        "n_interactive": 0,
+        "ships_secret_grader": true,
+        "ships_reference_solutions": false,
+        "note": "Rocky Mountain Regional 2024-2025; ships 548 secret .in/.ans (grader present) but NO accepted reference solutions. alwaysknowwhereyourtowelis is custom WITHOUT a shipped output validator (excluded). 12 pass-fail gradeable; grader self-test transfers from the 2025-2026 harness."
+      },
+      {
+        "repo": "icpc/na-rocky-mountain-2023-2024-public",
+        "default_branch": "main",
+        "contest_date": "2024-01-16",
+        "n_problems": 13,
+        "n_passfail": 13,
+        "n_custom_with_validator": 0,
+        "n_custom_no_validator": 0,
+        "n_interactive": 0,
+        "ships_secret_grader": true,
+        "ships_reference_solutions": false,
+        "note": "Rocky Mountain Regional 2023-2024; grader present (708 secret) BUT contest date PRE Aug-2024 => EXPOSED for Maverick (not resistant)."
+      }
+    ],
+    "family_grader_summary": {
+      "n_sources": 3,
+      "sources_with_official_grader": [
+        "icpc/na-rocky-mountain-2025-2026-public",
+        "icpc/na-rocky-mountain-2024-2025-public",
+        "icpc/na-rocky-mountain-2023-2024-public"
+      ],
+      "any_source_has_official_grader": true,
+      "post_cutoff_grader_repos": [
+        "icpc/na-rocky-mountain-2025-2026-public",
+        "icpc/na-rocky-mountain-2024-2025-public"
+      ],
+      "n_post_cutoff_gradeable_passfail": 24,
+      "n_post_cutoff_pure_passfail": 23,
+      "boundary": "2024-08-31"
+    },
+    "grader_selftest_summary": {
+      "n_problems_self_tested": 2,
+      "n_cases_run": 16,
+      "n_cases_passed": 16,
+      "grader_proven_executable": true
+    },
+    "manifest": {
+      "schema": "coordpy.coordpy_icpc_public_functional_v1.v1",
+      "instrument_id": "coordpy_icpc_public_functional_v1",
+      "boundary": "2024-08-31",
+      "fetched_on": "2026-05-30",
+      "raw_fetch_sha256": "da091afb60f75c37eed8a740bdf3a90abd95471eafb8f69445f7cdd169a647f7",
+      "n_candidates_seen": 26,
+      "n_admitted": 24,
+      "n_excluded_pre_cutoff": 0,
+      "n_excluded_interactive": 1,
+      "n_excluded_no_grader": 1,
+      "admitted_problem_ids": [
+        "icpc_na-rocky-mountain-2024-2025-public_airfaregrants",
+        "icpc_na-rocky-mountain-2024-2025-public_bigand",
+        "icpc_na-rocky-mountain-2024-2025-public_emoticons",
+        "icpc_na-rocky-mountain-2024-2025-public_enchantedmaze",
+        "icpc_na-rocky-mountain-2024-2025-public_garagedoorcode",
+        "icpc_na-rocky-mountain-2024-2025-public_palindromicwordsearch",
+        "icpc_na-rocky-mountain-2024-2025-public_pillowstacking",
+        "icpc_na-rocky-mountain-2024-2025-public_rectangletiling",
+        "icpc_na-rocky-mountain-2024-2025-public_rockymountain",
+        "icpc_na-rocky-mountain-2024-2025-public_sandwichart",
+        "icpc_na-rocky-mountain-2024-2025-public_sauna",
+        "icpc_na-rocky-mountain-2024-2025-public_spaceelevator",
+        "icpc_na-rocky-mountain-2025-2026-public_adriftatsea",
+        "icpc_na-rocky-mountain-2025-2026-public_buyingjerseys",
+        "icpc_na-rocky-mountain-2025-2026-public_conveyorbeltsushi",
+        "icpc_na-rocky-mountain-2025-2026-public_corporateretreat",
+        "icpc_na-rocky-mountain-2025-2026-public_draftlottery",
+        "icpc_na-rocky-mountain-2025-2026-public_energyusage",
+        "icpc_na-rocky-mountain-2025-2026-public_genies",
+        "icpc_na-rocky-mountain-2025-2026-public_hexadecimalconfusion",
+        "icpc_na-rocky-mountain-2025-2026-public_spiesvsspies",
+        "icpc_na-rocky-mountain-2025-2026-public_teampractice",
+        "icpc_na-rocky-mountain-2025-2026-public_videogames",
+        "icpc_na-rocky-mountain-2025-2026-public_whattimeisitmrfox"
+      ],
+      "date_min": "2024-12-03",
+      "date_max": "2025-11-13",
+      "n_repos": 2,
+      "month_histogram": {
+        "2024-12": 12,
+        "2025-11": 12
+      },
+      "n_with_reference_solution": 12
+    },
+    "manifest_cid": "2b3373770c961f81f11df32e48b4666af68982e87b85d5af26667a1509681392",
+    "admissibility": {
+      "instrument_id": "coordpy_icpc_public_functional_v1",
+      "p1_official_source": true,
+      "p2_dated": true,
+      "p3_post_cutoff": true,
+      "p4_functional": true,
+      "p5_deterministic": true,
+      "p6_machine_manifest": true,
+      "p7_grader_present": true,
+      "p8_grader_executable": true,
+      "n_admitted": 24,
+      "meets_min_slice": false,
+      "identity_admissible": false,
+      "grader_admissible": true,
+      "pilot_admissible": false,
+      "missing_artifact": "An additional 6 post-cutoff (>2024-08-31, Maverick-resistant) pass-fail problems WITH a shipped executable grader, to reach MIN_RESISTANT_SLICE=30 from the cleanest single official surface (the icpc GitHub org currently yields 24: RMRC-2024-2025 + RMRC-2025-2026), OR one clean official second-surface aggregation (e.g. an official NWERC/regional DOMjudge package \u2014 the NWERC-2024 static zip 404s as of 2026-05-30), OR the next official ICPC regional package drop. The grader itself is PRESENT + self-test-passing (P7+P8 hold) \u2014 only the SLICE COUNT blocks.",
+      "reason": "GRADER_ADMISSIBLE_BUT_SLICE_SHORT: the official grader is PRESENT (P7) and self-test-PASSES (P8: 16/16 cases) \u2014 the W118 grader blocker is DISSOLVED \u2014 but only 24 post-cutoff resistant pass-fail problems are available from the cleanest single official surface (6 short of MIN_RESISTANT_SLICE=30). NOT pilot-admissible on the COUNT gate."
+    },
+    "per_model": [
+      {
+        "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+        "identity_certification": {
+          "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+          "rank_tier": 1,
+          "rank_within_tier": 1,
+          "cutoff_boundary": "2024-08-31",
+          "cutoff_confidence": "KNOWN",
+          "verified_confidence": "KNOWN",
+          "confidence_consistent": true,
+          "primary_source": "Official Llama 4 model card (llama.com / Meta GitHub llama-models MODEL_CARD.md; NVIDIA build modelcard)",
+          "n_functional_resistant": 24,
+          "c1_cutoff_known": true,
+          "c2_enough_resistant": false,
+          "c3_reachable_stronger_comparable": true,
+          "c4_not_already_settled": true,
+          "certifiable_for_new_pilot": false,
+          "reason": "NOT_CERTIFIABLE [C2 instrument too old]: KNOWN cutoff 2024-08-31 leaves only 24 functional resistant problems on coordpy_icpc_public_functional_v1 (< 30); the instrument frontier 2025-11-13 does not post-date the cutoff by enough."
+        },
+        "identity_certifiable": false,
+        "grader_admissible": true,
+        "slice_admissible": false,
+        "pilot_admissible": false,
+        "blocker": "CERT_BLOCKED: NOT_CERTIFIABLE [C2 instrument too old]: KNOWN cutoff 2024-08-31 leaves only 24 functional resistant problems on coordpy_icpc_public_functional_v1 (< 30); the instrument frontier 2025-11-13 does not post-date the cutoff by enough."
+      },
+      {
+        "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+        "identity_certification": {
+          "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+          "rank_tier": 2,
+          "rank_within_tier": 1,
+          "cutoff_boundary": "2025-07-01",
+          "cutoff_confidence": "UNKNOWN",
+          "verified_confidence": "UNKNOWN",
+          "confidence_consistent": true,
+          "primary_source": "Official HF model card (Qwen/Qwen3-Coder-480B-A35B-Instruct) + Qwen blog (qwenlm.github.io/blog/qwen3-coder)",
+          "n_functional_resistant": 12,
+          "c1_cutoff_known": false,
+          "c2_enough_resistant": false,
+          "c3_reachable_stronger_comparable": true,
+          "c4_not_already_settled": true,
+          "certifiable_for_new_pilot": false,
+          "reason": "NOT_CERTIFIABLE [C1 cutoff UNKNOWN]: cannot certify resistance against a non-KNOWN cutoff. Official HF model card (Qwen/Qwen3-Coder-480B-A35B-Instruct) + Qwen blog (qwenlm.github.io/blog/qwen3-coder) => UNKNOWN. Both primary sources state NO knowledge/data cutoff ('NO CUTOFF STATED'). Released 2025-07; an estimable cutoff would be ~2025, at/after the Apr-2025 functional frontier => UNKNOWN and almost certainly C2-exposed even if disclosed."
+        },
+        "identity_certifiable": false,
+        "grader_admissible": true,
+        "slice_admissible": false,
+        "pilot_admissible": false,
+        "blocker": "CERT_BLOCKED: NOT_CERTIFIABLE [C1 cutoff UNKNOWN]: cannot certify resistance against a non-KNOWN cutoff. Official HF model card (Qwen/Qwen3-Coder-480B-A35B-Instruct) + Qwen blog (qwenlm.github.io/blog/qwen3-coder) => UNKNOWN. Both primary sources state NO knowledge/data cutoff ('NO CUTOFF STATED'). Released 2025-07; an estimable cutoff would be ~2025, at/after the Apr-2025 functional frontier => UNKNOWN and almost certainly C2-exposed even if disclosed."
+      },
+      {
+        "model_id": "deepseek-ai/deepseek-v4-pro",
+        "identity_certification": {
+          "model_id": "deepseek-ai/deepseek-v4-pro",
+          "rank_tier": 2,
+          "rank_within_tier": 2,
+          "cutoff_boundary": "2025-01-01",
+          "cutoff_confidence": "UNKNOWN",
+          "verified_confidence": "UNKNOWN",
+          "confidence_consistent": true,
+          "primary_source": "DeepSeek official sources (no V4 cutoff disclosed; V3 system-prompt extraction ~Jul-2024 is non-official)",
+          "n_functional_resistant": 12,
+          "c1_cutoff_known": false,
+          "c2_enough_resistant": false,
+          "c3_reachable_stronger_comparable": true,
+          "c4_not_already_settled": true,
+          "certifiable_for_new_pilot": false,
+          "reason": "NOT_CERTIFIABLE [C1 cutoff UNKNOWN]: cannot certify resistance against a non-KNOWN cutoff. DeepSeek official sources (no V4 cutoff disclosed; V3 system-prompt extraction ~Jul-2024 is non-official) => UNKNOWN. No official V4 training cutoff published. V4 post-dates V3 (2024-12), so an estimable cutoff is >= early-2025 => UNKNOWN."
+        },
+        "identity_certifiable": false,
+        "grader_admissible": true,
+        "slice_admissible": false,
+        "pilot_admissible": false,
+        "blocker": "CERT_BLOCKED: NOT_CERTIFIABLE [C1 cutoff UNKNOWN]: cannot certify resistance against a non-KNOWN cutoff. DeepSeek official sources (no V4 cutoff disclosed; V3 system-prompt extraction ~Jul-2024 is non-official) => UNKNOWN. No official V4 training cutoff published. V4 post-dates V3 (2024-12), so an estimable cutoff is >= early-2025 => UNKNOWN."
+      },
+      {
+        "model_id": "mistralai/mistral-small-4-119b-2603",
+        "identity_certification": {
+          "model_id": "mistralai/mistral-small-4-119b-2603",
+          "rank_tier": 2,
+          "rank_within_tier": 3,
+          "cutoff_boundary": "2026-03-01",
+          "cutoff_confidence": "UNKNOWN",
+          "verified_confidence": "UNKNOWN",
+          "confidence_consistent": true,
+          "primary_source": "Official Mistral docs/model card (mistral-small-4-0-26-03) + HF (mistralai/Mistral-Small-4-119B-2603)",
+          "n_functional_resistant": 0,
+          "c1_cutoff_known": false,
+          "c2_enough_resistant": false,
+          "c3_reachable_stronger_comparable": true,
+          "c4_not_already_settled": true,
+          "certifiable_for_new_pilot": false,
+          "reason": "NOT_CERTIFIABLE [C1 cutoff UNKNOWN]: cannot certify resistance against a non-KNOWN cutoff. Official Mistral docs/model card (mistral-small-4-0-26-03) + HF (mistralai/Mistral-Small-4-119B-2603) => UNKNOWN. No training cutoff stated. Released 2026-03-16, which post-dates the ENTIRE release_v6 window => exposed even if a cutoff were disclosed => UNKNOWN."
+        },
+        "identity_certifiable": false,
+        "grader_admissible": true,
+        "slice_admissible": false,
+        "pilot_admissible": false,
+        "blocker": "CERT_BLOCKED: NOT_CERTIFIABLE [C1 cutoff UNKNOWN]: cannot certify resistance against a non-KNOWN cutoff. Official Mistral docs/model card (mistral-small-4-0-26-03) + HF (mistralai/Mistral-Small-4-119B-2603) => UNKNOWN. No training cutoff stated. Released 2026-03-16, which post-dates the ENTIRE release_v6 window => exposed even if a cutoff were disclosed => UNKNOWN."
+      }
+    ],
+    "disclosure_matrix": [
+      {
+        "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+        "primary_status": "KNOWN",
+        "primary_source": "Official Meta llama-models llama4/MODEL_CARD.md (re-fetched 2026-05-30): 'Knowledge cutoff: August 2024' + 'The pretraining data has a cutoff of August 2024' VERBATIM",
+        "aggregator_signal": "Aug-2024 (corroborated)",
+        "stronger_than_70b": true,
+        "certifiable_blocker": "C4 on release_v6 (settled, W113); on coordpy_frontier_functional_v1 it is identity-CERTIFIABLE but O7-grader-BLOCKED",
+        "note": "KNOWN Aug-2024, re-confirmed verbatim. On the CoordPy-owned manifest ALL 903 problems are resistant for Maverick and it never ran this slice => identity-certifiable; the ONLY blocker is the missing official grader (O7)."
+      },
+      {
+        "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+        "primary_status": "UNKNOWN",
+        "primary_source": "Official HF card raw README (Qwen/Qwen3-Coder-480B-A35B-Instruct), re-fetched 2026-05-30: NO CUTOFF STATED",
+        "aggregator_signal": "(none usable; tech report 2025)",
+        "stronger_than_70b": true,
+        "certifiable_blocker": "C1 (UNKNOWN cutoff) \u2014 even on the post-v6 manifest, no KNOWN boundary to certify resistance against",
+        "note": "Reconfirmed UNKNOWN from the official card raw markdown."
+      },
+      {
+        "model_id": "deepseek-ai/deepseek-v4-pro",
+        "primary_status": "UNKNOWN",
+        "primary_source": "Official DeepSeek V4 model-card PDF (fe-static.deepseek.com/.../deepseek-V4-model-card-EN.pdf), re-fetched DIRECTLY 2026-05-30: NO CUTOFF STATED",
+        "aggregator_signal": "non-primary blogs 'Apr 2026' (C2-exposed; post-frontier)",
+        "stronger_than_70b": true,
+        "certifiable_blocker": "C1 (UNKNOWN from primary); aggregator figure post-dates the frontier => C2-exposed",
+        "note": "DEEPER pass: the official V4 PDF re-fetched directly still states no cutoff; only a non-primary aggregator figure exists (C2-exposed)."
+      },
+      {
+        "model_id": "mistralai/mistral-small-4-119b-2603",
+        "primary_status": "UNKNOWN",
+        "primary_source": "Official Mistral docs models_overview (re-fetched 2026-05-30): lists 'Mistral Small 4' v26.03, NO CUTOFF STATED",
+        "aggregator_signal": "OpenRouter '2025-06' (non-primary; post-frontier => C2-exposed)",
+        "stronger_than_70b": true,
+        "certifiable_blocker": "C1 (UNKNOWN from primary); aggregator estimate post-dates the frontier => C2-exposed",
+        "note": "Re-confirmed REAL (v26.03) with primary docs disclosing NO cutoff."
+      },
+      {
+        "model_id": "zai-org/glm-5",
+        "primary_status": "UNKNOWN",
+        "primary_source": "Z.ai GLM-5 docs / GitHub (zai-org/GLM-5), surfaced 2026-05-30: NO PRIMARY CUTOFF STATED",
+        "aggregator_signal": "listicle 'training ~Feb 2026' (non-primary; ~10 months past the Apr-2025 frontier => C2-exposed)",
+        "stronger_than_70b": true,
+        "certifiable_blocker": "C1 (UNKNOWN from primary) + C2 (aggregator date post-frontier) + reachability UNVERIFIED (not in the W112 reachable NIM catalogue)",
+        "note": "NEWLY NOTED since W117 (a strong 2026 open coder, SWE-bench 77.8%). But its only date is a non-primary post-frontier figure and reachability is unverified => NOT a primary-KNOWN <=2025-01 cutoff; does not move the verdict."
+      }
+    ],
+    "disclosure_summary": {
+      "counts": {
+        "KNOWN": 1,
+        "UNKNOWN": 4
+      },
+      "n_models": 5,
+      "usable_new_known_cutoff_targets": [],
+      "any_usable_new_known_cutoff_target": false,
+      "newly_disclosed_since_w118": [],
+      "any_newly_disclosed_since_w118": false
+    },
+    "lcb_inherited_verdict": "NO_CERTIFIABLE_STRONGER_MODEL",
+    "lcb_inherited_decision_cid": "258b6ed794b45a18a94829e7f86000dbea8cfd662692425f0188a2e04d7fd1bc",
+    "verdict": "NO_CERTIFIABLE_STRONGER_MODEL",
+    "pilot_earned": false,
+    "n_identity_certifiable_models": 0,
+    "w120_fire_condition": {
+      "slice_trigger": "The post-cutoff (>2024-08-31) resistant pass-fail count reaches MIN_RESISTANT_SLICE=30 on a clean official surface \u2014 the next official ICPC regional package drop, OR one clean official second-surface aggregation (e.g. an official NWERC/regional DOMjudge package). The grader is ALREADY present + self-test-passing, so a slice alone unlocks the cheapest honest verdict-changing Maverick pilot.",
+      "cutoff_trigger": "A reachable stronger-than-Maverick model discloses, from a PRIMARY source, a KNOWN cutoff (widening the resistant set / strengthening the target); update MODEL_TRAINING_CUTOFFS + provenance, then re-run.",
+      "nim_trigger": "A reachable NIM endpoint (NVIDIA_API_KEY) is available in the run environment so the earned pilot can actually execute (absent here).",
+      "slice_trigger_met": false,
+      "cutoff_trigger_met": false,
+      "fires_now": false
+    }
+  },
+  "result_cid": "9a1bcc8f4e6bf732fa38580c68c982da809ea4bfebcc90441e7fb142e7234d08",
+  "lcb_inherited_decision_cid": "258b6ed794b45a18a94829e7f86000dbea8cfd662692425f0188a2e04d7fd1bc",
+  "ts_utc": "2026-05-31T02:01:03.097590+00:00"
+}

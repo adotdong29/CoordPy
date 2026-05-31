@@ -1,3 +1,58 @@
+## W119 (official ICPC public-package pivot DISSOLVES the W118 grader blocker; slice count 24 < 30 blocks the pilot; $0 NIM) — explicit do-not-overstate rules
+
+**DO say:** "W119 made the aggressive pivot W118 set up — off the grader-LESS LiveCodeBench
+source family (Codeforces/AtCoder/LeetCode) onto the official ICPC problem-package family
+(`github.com/icpc`) that already ships the executable grader. A REAL constructor
+(`coordpy.coordpy_icpc_public_functional_v1`) enumerated the official ICPC GitHub org and
+verified the post-cutoff Rocky Mountain Regional 2024-2025 (2024-12-03) + 2025-2026
+(2025-11-13) packages ship **real (non-Git-LFS) `data/secret/*.in`+`*.ans` + shipped output
+validators + 119 accepted reference solutions**; a NIM-free grader self-test ran official
+accepted Python solutions against the official secret cases = **16/16 cases PASS** ⇒ the
+executable functional grader W118 proved ABSENT is now PRESENT and verified — the W118
+family-wide grader blocker is DISSOLVED. It re-checked primary cutoffs (reused W118 matrix:
+Maverick KNOWN Aug-2024; Qwen3-Coder-480B / DeepSeek-V4-pro / Mistral-Small-4 / GLM-5 all
+NO CUTOFF STATED) and shipped a durable package-to-pilot pipeline (P1..P8 rule + official
+ICPC source-family grader registry + deterministic manifest constructor + thin live fetch +
+real stdin/stdout executor + reused C1..C4 + grader + slice gates + W120 fire condition + 2
+falsifiability tests). The binding finding: the post-cutoff resistant pass-fail count from
+the cleanest single official surface is 24 < MIN_RESISTANT_SLICE = 30, which blocks BOTH
+slice-admissibility AND the reused C2 certification gate, so 0 models certify (even
+KNOWN-cutoff Maverick is C2-blocked by the count) ⇒ NO pilot earned, $0 NIM. Verdict
+`NO_CERTIFIABLE_STRONGER_MODEL` (decision CID `258b6ed7…`, byte-identical to W114–W118). The
+blocker MOVED from W118's 'abundant official identities, no official grader' to W119's
+'official grader present + self-test-passing, +6 post-cutoff resistant pass-fail tasks short
+of a clean pilot' (`W119-T-OFFICIAL-ICPC-PACKAGE-FAMILY-SHIPS-EXECUTABLE-GRADER` +
+`W119-T-ICPC-GRADER-SELF-TEST-PASSES` + `W119-L-OFFICIAL-ICPC-RESISTANT-PASSFAIL-SLICE-COUNT-CAP`
++ `W119-T-ICPC-PUBLIC-FUNCTIONAL-CONSTRUCTION-PIPELINE-SHIPS`)."
+
+**Do NOT say / claim:**
+
+* That W119 ran a pilot or spent NIM — it did NOT; the slice is 24 < 30 ⇒ no certifiable
+  model ⇒ $0 NIM (the pre-committed no-go branch of `docs/RUNBOOK_W119.md` § 6/§ 7).
+  `NVIDIA_API_KEY` IS present, so the no-pilot is a clean COUNT-gate no-go, not a
+  reachability excuse.
+* That W119 built a *pilot-runnable* benchmark — it built a grader-admissible but
+  count-short instrument (24 < 30). The grader is real; the slice is 6 tasks short.
+* That a 24-task pilot would have been acceptable — running below the 30-slice bar yields an
+  under-powered, uninterpretable B−A1 and is refused.
+* That Maverick is certifiable on this instrument — on the actual 24-slice it is NOT (the
+  reused C2 gate needs ≥30 resistant after the cutoff). A synthetic ≥30 grader-clean slice
+  WOULD make it certifiable (the falsifiability test) — that proves the count is the sole
+  gate, it does not mean a pilot was earned.
+* That W119 reopened resistant superiority — it ran no pilot; resistant superiority is still
+  0 clean across both scales.
+* That the contamination-confound moved — W119 tests grader supply + slice count, not the
+  confound; status UNCHANGED (STRENGTHENED-not-proven, per W113).
+* That `coordpy_icpc_public_functional_v1` is "LCB v7" or the W118 Codeforces line — it is a
+  distinct CoordPy-OWNED official-ICPC-package line.
+* That W119 retires anything or weakens W89/W105 — it adds none; they STAND
+  (contamination-EXPOSED-HumanEval-family at 70B).
+
+Anchors: `docs/RESULTS_W119_ICPC_PUBLIC_CONSTRUCTION_V1.md`;
+`docs/RESULTS_W119_MILESTONE_SUMMARY_V1.md`; `docs/CONTAMINATION_CONTROL_FRAMING_W119_V1.md`;
+`docs/FRONTIER_RELEVANCE_AUDIT_W119_V1.md`; `docs/RUNBOOK_W119.md`;
+`results/w119/icpc_public/icpc_public_verdict.json`.
+
 ## W118 (CoordPy-OWNED post-v6 functional-instrument CONSTRUCTION + deeper primary-source cutoff ATTACK + construction/admission/pilot-readiness pipeline → 894 official post-v6 functional IDENTITIES constructed, executable GRADER absent family-wide, no certifiable stronger model) — explicit do-not-overstate rules
 
 **DO say:** "W118 stopped waiting for a packaged `release_v7` and did the honest aggressive construction move W117 set up: it (α) ran a REAL CoordPy-OWNED constructor (`coordpy.coordpy_frontier_functional_v1`) LIVE against the official Codeforces API and built — deterministically, reproducibly, SHA + CID-pinned — a post-v6 functional problem-IDENTITY manifest of **894 problems** (2025-04-07..2026-05-30, 130 contests; manifest CID `fb4185a6…`), proving the date/identity axis (O1..O6) is officially constructible at scale (894 ≫ 30); (β) re-checked primary cutoffs DEEPER (DeepSeek V4 PDF re-fetched directly — no cutoff; Maverick 'August 2024' verbatim; Qwen3-Coder-480B + Mistral-Small-4-v26.03 no cutoff) and noted the new GLM-5 as UNKNOWN-from-primary + C2-exposed + reachability-unverified ⇒ nothing newly primary-disclosed since W117; and (γ) shipped a durable construction/admission/pilot-readiness pipeline (the O1..O7 instrument rule, the official-source-family grader registry, the deterministic manifest constructor + thin live fetch, the reused C1..C4 + O7 certification, the W118 disclosure matrix, and a structured W119 fire condition with a falsifiability test) — reusing the W113/W114/W116/W117 chain with NO duplication (LCB decision CID `258b6ed7…` re-derives byte-identically). The binding finding: the executable functional GRADER (O7) is ABSENT family-wide (Codeforces API has no test field; LeetCode hidden tests deliberately private; AtCoder system tests Dropbox-only) ⇒ the instrument is IDENTITY-admissible but NOT pilot-admissible; Maverick is even identity-CERTIFIABLE on it, blocked ONLY by the missing grader. Verdict `NO_CERTIFIABLE_STRONGER_MODEL`, $0 NIM, no pilot. The blocker MOVED from W117's 'no post-v6 identities' to W118's 'abundant official identities, no official grader' (`W118-T-COORDPY-OWNED-POST-V6-FUNCTIONAL-IDENTITY-CONSTRUCTIBLE` + `W118-L-OFFICIAL-SOURCE-FAMILY-NO-EXECUTABLE-GRADER-CAP` + `W118-T-MAVERICK-IDENTITY-CERTIFIABLE-GRADER-BLOCKED` + `W118-T-FRONTIER-FUNCTIONAL-CONSTRUCTION-PIPELINE-SHIPS` + `W118-T-GLM5-NEWLY-NOTED-UNCERTIFIABLE`)."

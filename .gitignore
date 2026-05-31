@@ -49,3 +49,5 @@ TODO.md
 *.private.md
 *.scratch.md
 .private/
+.w119_scratch/
+.w119_tmp/
