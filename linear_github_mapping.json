@@ -961,6 +961,28 @@
         "W126-T-SYNTHESIS-OF-CAPABILITY-FAILURES-IS-DEAD-NOT-BLIND-CAPPED"
       ],
       "carry_forwards_retired": []
+    },
+    {
+      "id": "W127",
+      "title": "resistant capability atlas + family-specific algorithm-scaffold GENERATION + targeted resistant fresh-generation probe (operator-greenlit dev spend; coordpy.resistant_capability_atlas_v1 + coordpy.family_scaffold_generation_v1 wired onto the official-ICPC path under a no-leakage rule)",
+      "outcome": "atlas (22 resistant failures = 95% wrong-algorithm + algorithmically DIVERSE, no dominant cluster, surface labels 47% concordant) + scaffold line REAL; EXPOSED dev bench EARNED (scaffold 3/8 vs baseline 1/8, net +2 / 2 families / 0 regressions / leakage-clean after a documented boilerplate-FP recalibration to a contiguous-block tripwire, positive control preserved) but the earned R1 and R2 targeted resistant probe = 0/6 new solves => RESISTANT_SCAFFOLD_FRESH_GEN_CAP (the exposed +2 did NOT transfer to the non-memorizable resistant field; most parsimoniously memorization/variance/framing, not scaffold-taught algorithm); stronger-model gate CLOSED 258b6ed7 {KNOWN:1,UNKNOWN:4}; exposed control NOT bought; $0 beyond authorized dev(80)+probe(30)=110 NIM; W89+W105 STAND (no third retirement); COO-9 lead; no version bump; no PyPI; coordpy/__init__.py untouched",
+      "commits": [
+        "95f55a8"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W127.md",
+        "docs/RESULTS_W127_CAPABILITY_ATLAS_AND_SCAFFOLD_GENERATION_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W127_V1.md"
+      ],
+      "linear_issues": [
+        "COO-52"
+      ],
+      "carry_forwards_added": [
+        "W127-L-RESISTANT-SCAFFOLD-FRESH-GEN-CAP",
+        "W127-T-RESISTANT-FAILURES-ARE-DIVERSE-WRONG-ALGORITHM-NOT-SURFACE",
+        "W127-T-EXPOSED-SCAFFOLD-DEV-BENCH-EARNS-WEAKLY-CONFOUNDED"
+      ],
+      "carry_forwards_retired": []
     }
   ]
 }
