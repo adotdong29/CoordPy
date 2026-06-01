@@ -940,6 +940,27 @@
         "W125-L-NO-THIRD-RETIREMENT-CAP"
       ],
       "carry_forwards_retired": []
+    },
+    {
+      "id": "W126",
+      "title": "family-adapted repair SYNTHESIS on the official RESISTANT ICPC family (adversarial_consensus_repair_v1.trust_weighted_consensus_v1 + executor_grounded_patcher_v1 digest bridged onto the official-ICPC code path) + resistant-first $0 synthesis precursor + stronger-model gate",
+      "outcome": "synthesis slate REAL + arsenal-native + contract/leakage-clean (mechanism question YES) but the resistant field is SYNTHESIS-CAPPED for $0 NEW-trajectory creation (oracle ceiling 0/22; spend question NOT earned); FRESH_RESISTANT_PILOT_NOT_EARNED_SYNTHESIS_DEAD; $0 NIM; W89+W105 STAND (no third retirement)",
+      "commits": [
+        "01b456a"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W126.md",
+        "docs/RESULTS_W126_FAMILY_ADAPTED_REPAIR_SYNTHESIS_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W126_V1.md"
+      ],
+      "linear_issues": [
+        "COO-51"
+      ],
+      "carry_forwards_added": [
+        "W126-L-RESISTANT-SYNTHESIS-CAP",
+        "W126-T-SYNTHESIS-OF-CAPABILITY-FAILURES-IS-DEAD-NOT-BLIND-CAPPED"
+      ],
+      "carry_forwards_retired": []
     }
   ]
 }
