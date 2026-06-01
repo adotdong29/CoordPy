@@ -1029,6 +1029,29 @@
         "W129-L-HARD-CLUSTER-GENERATION-CEILING-CAPS-SELECTION-EARN"
       ],
       "carry_forwards_retired": []
+    },
+    {
+      "id": "W130",
+      "title": "generation-ceiling attack on the hard ICPC clusters + same-family EXPOSED dev bench + targeted resistant probe only if earned (operator-greenlit EXPOSED dev spend; 275 NIM dev; coordpy.generator_failure_atlas_v1 generator-failure atlas + coordpy.stronger_generator_slate_v1 GG1 complexity-gated handoff / GG2 counterexample-to-rewrite / GG3 family anti-pattern coach / GG4 budget router / GGLEAD, W129 selector held FIXED downstream)",
+      "outcome": "the generator-failure atlas decomposed the 8/11 pool-DEAD set (3 WRONG_ALGORITHM_ADMISSIBLE + 2 HIDDEN_EDGE_STATE_MISS + 2 WRONG_ALGORITHM_NO_SKETCH capability + 1 PARSE_IO_FAILURE; 2 pool-bearing misses SELECTION_FIXABLE); the stronger same-budget generator slate created exactly 1 NEW pool solve (GG2 cracked doubleup, a HIDDEN_EDGE problem the entire old W128/W129 pool missed = FIRST W120-W130 generation crack of a pool-DEAD problem) but NOT EARNED (1 < the +2 earn bar, does not span >=2 families/modes); the dominant WRONG_ALGORITHM_ADMISSIBLE mode cracked by no arm (admissible idiom-overlap = UPPER BOUND, capability-bound); stored regression trio PRESERVED (0 new mis-commits); GG3 killed (boilerplate leakage); T1 FALSE => $0 resistant NIM; stronger-model gate CLOSED 258b6ed7 {KNOWN:1,UNKNOWN:4}; W89+W105 STAND (no third retirement)",
+      "commits": [
+        "cccc56a"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W130.md",
+        "docs/RESULTS_W130_GENERATION_CEILING_ATTACK_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W130_V1.md"
+      ],
+      "linear_issues": [
+        "COO-55"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W130-L-GENERATION-CEILING-DEV-BENCH-CAP",
+        "W130-T-COUNTEREXAMPLE-REWRITE-LIFTS-ONE-HIDDEN-EDGE",
+        "W130-T-ADMISSIBLE-SKETCH-IS-CAPABILITY-NOT-GENERATION-FIXABLE",
+        "W130-T-ANTI-PATTERN-COACH-RISKS-BOILERPLATE-LEAKAGE"
+      ]
     }
   ]
 }
