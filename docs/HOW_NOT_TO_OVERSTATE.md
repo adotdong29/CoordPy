@@ -1,3 +1,46 @@
+## W125 (hosted controller-native code mechanism on resistant ICPC — REAL + contract-clean but the field is generation-capped; fresh pilot NOT earned; $0; no third retirement) — explicit do-not-overstate
+
+**DO say:** "W125 mined the repo's unused hosted/controller arsenal as a real code
+mechanism (`coordpy.controller_native_code_mechanism_v1`, the first module bridging
+the hosted-controller stack to the audited tool-call substrate). The mechanism is
+**genuinely controller-native** — the structural fake-different test bites (reflexion
+B and a C0 negative control classify FAKE_DIFFERENT; C1/C2/C3 classify REAL; lead C3)
+and all four NIM-free contract checks pass — so the controller stack is NOT
+fake-different. But a $0 replay over the 330 already-paid Maverick generations on the
+W120 resistant 30-slice shows the field is **generation-capped**: the entire pool
+reaches only 8/30, A1 captures 7, and a hidden-test-blind controller recovers ZERO
+additional problems (`blind_selection_headroom = 0`); reflexion is stuck on 23/30 but
+the public-sample signal is non-discriminating (10 looks-right-fails-hidden), so there
+is nothing to route to. The fresh hosted pilot is therefore NOT earned ($0 NIM). W89 +
+W105 remain the only two retirements; W125 adds none."
+
+**DO NOT say / claims W125 does NOT support:**
+
+* That the hosted controller stack BEATS self-consistency on resistant ICPC — W125
+  never ran a fresh pilot. The $0 replay shows a controller *cannot* beat A1 by
+  re-routing the existing generations (pool ⊆ A1∪B, both scored as oracle pass@K), and
+  there is no precursor signal that *new* trajectories would crack the 22
+  uniformly-unsolved problems (reflexion, the closest measurable mechanism, gave +0.00).
+* That the controller mechanism is "fake-different" / not worth anything — it is NOT
+  fake-different: it is genuinely controller-native and contract-clean. What is NOT
+  earned is the **NIM spend**, on a $0 precursor that shows no headroom. State both
+  halves: the mechanism is real; the resistant field offers it no $0-measurable edge.
+* That `blind_selection_headroom = 0` proves no controller can EVER win on resistant
+  code — it proves a $0 re-routing over the EXISTING pool cannot; a fresh hosted pilot
+  funding new trajectories is an untested HOPE (deliberately not bought without a
+  precursor), and a stronger model / a code-competent local encoder is untested.
+* That `reflexion_divergence = 23/30` is a positive signal for the controller — it is
+  necessary but not sufficient: the router would diverge, but `looks_right_fails_hidden
+  = 10` and pool-union 8/30 mean there is nothing correct to diverge *to*.
+* That W125 retires anything, weakens W89/W105, or proves the contamination confound —
+  it touches none of these; it tests a MECHANISM (the hosted controller stack) and a
+  SPEND gate, not the confound.
+* That the exposed control was skipped by omission — it was pre-committed NOT to be
+  bought unless the resistant line earned interpretive value (RUNBOOK §8); it did not.
+* That multi-agent context is "solved".
+
+Anchors: `docs/RESULTS_W125_CONTROLLER_NATIVE_CODE_MECHANISM_V1.md`; `docs/RUNBOOK_W125.md`; `docs/FRONTIER_RELEVANCE_AUDIT_W125_V1.md`.
+
 ## W124 (transformer-native code-intervention arsenal run locally on matched ICPC — M4 no signal beyond surface; learned-memory at chance; $0; no third retirement) — explicit do-not-overstate
 
 **DO say:** "W124 ran the repo's unused transformer/substrate arsenal against the

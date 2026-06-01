@@ -204,3 +204,42 @@ if a code-competent local model becomes loadable / accept the bounded ceiling +
 encoder-supply limitation / a primary-KNOWN reachable stronger model. See
 `docs/RESULTS_W123_LARGEN_SUPPLY_CENSUS_V1.md` +
 `docs/RESULTS_W124_TRANSFORMER_NATIVE_CODE_INTERVENTION_V1.md`.
+
+## Post-W124 update — W125 (hosted controller arsenal is REAL but the resistant field is generation-capped) — still exactly two retirements
+
+W124 localised the local-encoder blocker; **W125** mined the **third, unused
+lever** — the hosted/controller arsenal — and asked the sharpest version of the
+question: *can our own hosted controller stack beat same-budget self-consistency
+(A1) on the official resistant ICPC family where reflexion (B) failed?* It built
+`coordpy.controller_native_code_mechanism_v1`, the first module to bridge the
+hosted-controller stack (`hosted_router_controller_v12` / `hosted_logprob_router_v12`
+/ `hosted_cache_aware_planner_v12`) to the audited `tool_call_substrate_v1` plane
+and the `executor_grounded_patcher_v1` digest, promoting the W124 M6
+PATCH/REPLAN/ABSTAIN contract into an executable C1/C2/C3 slate. **On the mechanism
+question the answer is YES**: the pre-committed structural fake-different test bites
+(reflexion B and a deliberately-degenerate C0 control classify `FAKE_DIFFERENT`;
+C1/C2/C3 classify `REAL`; lead C3) and all four NIM-free contract checks pass
+(audit-chain re-hash + tamper, idempotency, never-reads-secret, routing
+determinism, same-budget) — the controller stack is a real new mechanism on code,
+not fake-different. **On the spend question the answer is NOT EARNED**: a $0 replay
+over the 330 already-paid Maverick generations on the W120 resistant 30-slice,
+re-graded on the official secret/sample cases, finds A1 = **7/30**, the **entire**
+generation pool reaches only **8/30** (oracle ceiling +1, inside the ±3.34 null
+band), and a hidden-test-blind controller (C2 selection + C3 digest-routed walk)
+recovers **zero** A1-fail problems (`blind_selection_headroom = 0`). The two
+diagnostics that explain it: reflexion is **stuck** on **23/30** problems (a
+digest-router would diverge) but **10** generations pass all public samples yet
+fail the hidden cases (the only blind in-loop signal is **non-discriminating**) —
+so there is **nothing to route to**. The resistant field is **generation-capped**
+for $0 controller re-routing (`W125-L-RESISTANT-GENERATION-CAP`, the mechanism-lever
+sibling of W123's battlefield-supply cap and W124's local-encoder-supply cap); the
+controller's value lives only in **new trajectories** on the 22 uniformly-unsolved
+problems, unfundable without a precursor signal. The fresh hosted pilot is therefore
+**not earned** (`$0 NIM`); the exposed control is not bought (resistant-first). The
+stronger-model gate is unchanged (`NO_CERTIFIABLE_STRONGER_MODEL`; decision CID
+`258b6ed7` invariant). **W89 (+5.56) + W105 (+7.00) remain the only two
+retirements;** W125 adds none. COO-9 lead; W126 = accept the bounded ceiling + the
+generation-cap / an operator-greenlit fresh controller pilot on the unsolved
+problems (NOT precursor-earned) / a code-competent local model / a primary-KNOWN
+stronger model. See `docs/RESULTS_W125_CONTROLLER_NATIVE_CODE_MECHANISM_V1.md` +
+`docs/RUNBOOK_W125.md`.
