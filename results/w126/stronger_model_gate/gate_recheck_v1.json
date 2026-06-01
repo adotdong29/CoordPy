@@ -1,0 +1,52 @@
+{
+  "schema": "coordpy.w126_stronger_model_gate_recheck.v1",
+  "lane": "gamma_stronger_model_gate",
+  "verified_on": "2026-05-31",
+  "decision_verdict": "NO_CERTIFIABLE_STRONGER_MODEL",
+  "maverick_certifiable_but_settled": true,
+  "decision_cid": "258b6ed7",
+  "decision_cid_full": "258b6ed794b45a18a94829e7f86000dbea8cfd662692425f0188a2e04d7fd1bc",
+  "decision_cid_invariant": true,
+  "registry_split": {
+    "KNOWN": 1,
+    "UNKNOWN": 3
+  },
+  "split_including_glm5": {
+    "KNOWN": 1,
+    "UNKNOWN": 4
+  },
+  "per_model": [
+    {
+      "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+      "verified_confidence": "KNOWN",
+      "cutoff_boundary": "2024-08-31"
+    },
+    {
+      "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": "2025-07-01"
+    },
+    {
+      "model_id": "deepseek-ai/deepseek-v4-pro",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": "2025-01-01"
+    },
+    {
+      "model_id": "mistralai/mistral-small-4-119b-2603",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": "2026-03-01"
+    },
+    {
+      "model_id": "zai/glm-5",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": null
+    }
+  ],
+  "hosted_target": "meta/llama-4-maverick-17b-128e-instruct (KNOWN Aug-2024, certifiable-but-settled)",
+  "gate_state": "CLOSED \u2014 no primary-KNOWN stronger-than-Maverick model certifiable on the matched ICPC family",
+  "w126_spend_gate_is_lane_beta_synthesis_not_gamma": true,
+  "w123_battlefield_supply_cap_closed": true,
+  "w124_local_encoder_cap_closed": true,
+  "nim_spend": 0,
+  "generated_at": "2026-06-01T04:41:51.035572+00:00"
+}

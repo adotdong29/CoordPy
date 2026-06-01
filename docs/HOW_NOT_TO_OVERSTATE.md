@@ -1,3 +1,25 @@
+## W126 (family-adapted repair SYNTHESIS on resistant ICPC — REAL + arsenal-native + leakage-clean but oracle ceiling 0/22; fresh pilot NOT earned; $0; no third retirement) — explicit do-not-overstate
+
+**DO say:** "W126 pulled the only honest lever W125 left open — genuinely NEW-trajectory
+synthesis (not re-routing): it wired the unused repair/consensus arsenal
+(`trust_weighted_consensus_v1`, the executor digest) onto the resistant ICPC code path, ran
+a 4-operator slate (S1 splice / S2 digest-repair / S3 exposed-motif harden / S-CONS
+trust-weighted output-consensus), synthesized 894 leakage-clean candidate programs on the 22
+uniformly-unsolved problems, and found an ORACLE ceiling of 0/22 ⇒ the resistant field is
+SYNTHESIS-capped for $0; a fresh pilot is NOT precursor-earned; $0 NIM; W89+W105 stand as the
+only two retirements."
+
+**DO NOT say:** "synthesis failed because the selector was blind" (it failed under ORACLE
+selection — there is no headroom to miss); "the arsenal doesn't work" (the consensus
+mechanism is real and load-bearing — it recovers a minority-correct generation in a control;
+it simply has nothing correct to recombine here); "the resistant problems are unsolvable"
+(they are unsolved by *Maverick-17B at $0 deterministic synthesis* — a stronger or
+code-competent model, or operator-greenlit NIM, is the untested path); "we proved
+contamination" or "we earned/should-have-earned a pilot"; "this is a third retirement". The
+emoticons leakage flag was a corrected FALSE POSITIVE (provenance-clean coincidence), not a
+real leak — do not cite it as evidence of leakage. Bounded-context / compaction /
+summarization remain anti-patterns, explicitly not pursued.
+
 ## W125 (hosted controller-native code mechanism on resistant ICPC — REAL + contract-clean but the field is generation-capped; fresh pilot NOT earned; $0; no third retirement) — explicit do-not-overstate
 
 **DO say:** "W125 mined the repo's unused hosted/controller arsenal as a real code
