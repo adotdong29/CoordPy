@@ -898,7 +898,9 @@
       "id": "W124",
       "title": "transformer-native code-intervention line on matched ICPC (M4 AST-boundary hidden-state probe on distilgpt2) + learned-memory/controller line + hosted gate",
       "outcome": "M4_CLOSE_BLIP_NOT_A_GAIN — distilgpt2 AST-boundary hidden state adds nothing over surface (AUC_hidden 0.6345 ≈ AUC_surface 0.6343, Δ=+0.0001 ≪ +0.05); transformer-native hidden-state line BLOCKED AT THE PRECURSOR on local code-model-encoder supply (no code-competent local model; tf 4.28.1 too old + repo transformers_runtime_v1 needs ≥~4.36); learned-memory controller at chance 0.502 (TOO_SYNTHETIC_NOT_WARRANTED); stronger-model gate CLOSED, decision CID 258b6ed7 invariant {KNOWN:1,UNKNOWN:4}; M6 tool-substrate controller contract shipped (text-translatable, contract-only); NO hosted Maverick probe earned ($0 NIM); W89+W105 STAND (no third retirement); ultracode OFF; no version bump; no PyPI; coordpy/__init__.py untouched",
-      "commits": [],
+      "commits": [
+        "e3348fd"
+      ],
       "docs": [
         "docs/RUNBOOK_W124.md",
         "docs/RESULTS_W124_TRANSFORMER_NATIVE_CODE_INTERVENTION_V1.md"
