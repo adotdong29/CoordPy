@@ -1,0 +1,49 @@
+{
+  "any_usable_new_known_cutoff_target": false,
+  "decision_cid": "258b6ed7",
+  "decision_cid_invariant": true,
+  "disclosure_counts_w120": {
+    "KNOWN": 1,
+    "UNKNOWN": 4
+  },
+  "disclosure_counts_w121": {
+    "KNOWN": 1,
+    "UNKNOWN": 4
+  },
+  "gate_moot_because_largen_unreachable": true,
+  "gate_structurally_closed": true,
+  "gate_unchanged_vs_w120_w121": true,
+  "lane": "gamma",
+  "milestone": "W123",
+  "note": "Only meta/llama-4-maverick (Aug-2024) is primary-KNOWN. Qwen3-Coder-480B / DeepSeek-V4-pro / Mistral-Small-4-119B-2603 / GLM-5 remain UNKNOWN from primary sources. Even a primary-KNOWN stronger model could not run a large-n matched pilot: Lane \u03b1 proved the \u2265100 battlefield is supply-unreachable from the official ICPC family.",
+  "per_model": [
+    {
+      "blocker": "C4 on release_v6 (settled, W113); on coordpy_frontier_functional_v1 it is identity-CERTIFIABLE but O7-grader-BLOCKED",
+      "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+      "primary_status": "KNOWN"
+    },
+    {
+      "blocker": "C1 (UNKNOWN cutoff) \u2014 even on the post-v6 manifest, no KNOWN boundary to certify resistance against",
+      "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+      "primary_status": "UNKNOWN"
+    },
+    {
+      "blocker": "C1 (UNKNOWN from primary); aggregator figure post-dates the frontier => C2-exposed",
+      "model_id": "deepseek-ai/deepseek-v4-pro",
+      "primary_status": "UNKNOWN"
+    },
+    {
+      "blocker": "C1 (UNKNOWN from primary); aggregator estimate post-dates the frontier => C2-exposed",
+      "model_id": "mistralai/mistral-small-4-119b-2603",
+      "primary_status": "UNKNOWN"
+    },
+    {
+      "blocker": "C1 (UNKNOWN from primary) + C2 (aggregator date post-frontier) + reachability UNVERIFIED (not in the W112 reachable NIM catalogue)",
+      "model_id": "zai-org/glm-5",
+      "primary_status": "UNKNOWN"
+    }
+  ],
+  "primary_sources_last_direct_refetch": "2026-05-30 (W120)",
+  "schema": "coordpy.w123_stronger_model_gate_recheck.v1",
+  "verdict": "STRONGER_MODEL_GATE_CLOSED_AND_MOOT"
+}

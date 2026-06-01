@@ -1,0 +1,153 @@
+{
+  "binding_blocker": "RESISTANT supply hard-capped at 51 raw (~45 tier-1) across 4 post-cutoff official package surfaces, ALL already mined by W120; below 100 even at a 100% tier-1 yield; no fifth post-cutoff github.com/icpc package surface exists (deficit >= 49 raw). EXPOSED scales fine (135 raw / ~113 tier-1 >= 100) \u2014 the cap is SOLELY post-cutoff. Only a FUTURE official regional drop (RMRC/ECNA 2026-2027+) or a newly published official region lifts it.",
+  "both_fields_reach_target_estimated": false,
+  "both_fields_reach_target_upper_bound": false,
+  "boundary": "2024-08-31",
+  "census_cid": "bf7b2efbc724",
+  "census_provenance": {
+    "all_match": true,
+    "mismatches": [],
+    "rows": [
+      {
+        "key": "RMRC:2024-2025",
+        "live": 13,
+        "match": true,
+        "pinned": 13
+      },
+      {
+        "key": "RMRC:2025-2026",
+        "live": 13,
+        "match": true,
+        "pinned": 13
+      },
+      {
+        "key": "ECNA:2024-2025",
+        "live": 13,
+        "match": true,
+        "pinned": 13
+      },
+      {
+        "key": "ECNA:2025-2026",
+        "live": 12,
+        "match": true,
+        "pinned": 12
+      },
+      {
+        "key": "RMRC:2017",
+        "live": 11,
+        "match": true,
+        "pinned": 11
+      },
+      {
+        "key": "RMRC:2018",
+        "live": 10,
+        "match": true,
+        "pinned": 10
+      },
+      {
+        "key": "RMRC:2019",
+        "live": 11,
+        "match": true,
+        "pinned": 11
+      },
+      {
+        "key": "RMRC:2020",
+        "live": 11,
+        "match": true,
+        "pinned": 11
+      },
+      {
+        "key": "RMRC:2021",
+        "live": 14,
+        "match": true,
+        "pinned": 14
+      },
+      {
+        "key": "RMRC:2022-2023",
+        "live": 12,
+        "match": true,
+        "pinned": 12
+      },
+      {
+        "key": "ECNA:2019-2020",
+        "live": 17,
+        "match": true,
+        "pinned": 17
+      },
+      {
+        "key": "ECNA:2020-2021",
+        "live": 12,
+        "match": true,
+        "pinned": 12
+      },
+      {
+        "key": "ECNA:2021-2022",
+        "live": 13,
+        "match": true,
+        "pinned": 13
+      },
+      {
+        "key": "ECNA:2022-2023",
+        "live": 12,
+        "match": true,
+        "pinned": 12
+      },
+      {
+        "key": "ECNA:2023-2024",
+        "live": 12,
+        "match": true,
+        "pinned": 12
+      }
+    ],
+    "verified_live": true
+  },
+  "exposed": {
+    "deficit_vs_target_estimated": 0,
+    "est_tier1": 113,
+    "n_surfaces": 11,
+    "raw_problem_packages": 135,
+    "raw_upper_bound": 135,
+    "reaches_target_estimated": true,
+    "reaches_target_even_at_upper_bound": true,
+    "surface_keys": [
+      "RMRC:2017",
+      "RMRC:2018",
+      "RMRC:2019",
+      "RMRC:2020",
+      "RMRC:2021",
+      "RMRC:2022-2023",
+      "ECNA:2019-2020",
+      "ECNA:2020-2021",
+      "ECNA:2021-2022",
+      "ECNA:2022-2023",
+      "ECNA:2023-2024"
+    ]
+  },
+  "lane": "alpha",
+  "largen_matched_battlefield_constructible": false,
+  "largen_spend_gate_open": false,
+  "milestone": "W123",
+  "n_non_package_org_repos": 2,
+  "non_package_org_repos": [
+    "icpc/na-rocky-mountain-2023-2024-public",
+    "icpc/na-mid-atlantic-public"
+  ],
+  "resistant": {
+    "deficit_vs_target_estimated": 55,
+    "est_tier1": 45,
+    "n_surfaces": 4,
+    "raw_problem_packages": 51,
+    "raw_upper_bound": 51,
+    "reaches_target_estimated": false,
+    "reaches_target_even_at_upper_bound": false,
+    "surface_keys": [
+      "RMRC:2024-2025",
+      "RMRC:2025-2026",
+      "ECNA:2024-2025",
+      "ECNA:2025-2026"
+    ]
+  },
+  "schema": "coordpy.icpc_largen_supply_census_v1.v1",
+  "target_per_field": 100,
+  "verdict": "LARGEN_MATCHED_BATTLEFIELD_UNREACHABLE_OFFICIAL_FAMILY"
+}
