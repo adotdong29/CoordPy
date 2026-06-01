@@ -1,0 +1,22 @@
+{
+  "schema": "coordpy.w128_targeted_resistant_probe.v1",
+  "lane": "gamma_targeted_probe",
+  "verified_on": "2026-06-01",
+  "t1_dev_earned": false,
+  "t2_named_hard_match": true,
+  "earned_families": [
+    "simulation_grid"
+  ],
+  "t2_target_families": [
+    "simulation_grid"
+  ],
+  "named_hard_families": [
+    "graph_flow",
+    "simulation_grid"
+  ],
+  "probe_launched": false,
+  "nim_spend": 0,
+  "blocker": "T1 FAIL \u2014 EXPOSED hard-cluster dev bench NOT earned (ROLE_DIVERSE_HARD_CLUSTER_DEV_BENCH_NOT_EARNED, net +0)",
+  "carry_forward": "W128-L-ROLE-DIVERSE-HARD-CLUSTER-DEV-BENCH-CAP",
+  "generated_at": "2026-06-01T19:09:55.220394+00:00"
+}

@@ -1,3 +1,58 @@
+## W128 (role-diverse algorithm SEARCH on the non-scaffoldable resistant clusters — mechanism REAL + lifts the generation ceiling but NOT EARNED on the EXPOSED hard-cluster dev bench [net +0]; selection-layer cap; $0 resistant NIM; no third retirement) — explicit do-not-overstate
+
+**DO say:** "W128 refused to stop at the W127 scaffold miss. LANE α built a genuinely DIFFERENT
+mechanism — `coordpy.role_diverse_algorithm_search_v1`, a role-diverse algorithm SEARCH
+(generate → verify → select → abstain at the SAME K=5 budget: 1 ANALYZE producing
+materially-different role artifacts [spec / invariants / complexity / 4 distinct algorithm
+sketches / derived counterexamples] + 4 IMPLEMENT calls, then a NIM-free RDA1–RDA4
+selection/abstain). It is the FIRST module to bridge the role-diverse SYNTHESIS stack
+(`integrated_synthesis` / `role_invariant_synthesis`) to the ICPC resistant-code path; the
+W41/W42 abstain-on-divergence decisions are a REAL load-bearing bridge; the W79 substrate
+controllers were examined and the literal bridge KILLED as fake-inapplicable
+(`examine_substrate_controller_applicability_v1`); a fake-diversity detector + positive control
+give it a NIM-free realness surface. LANE β validated it on a disjoint same-family EXPOSED
+hard-cluster dev bench (11 targets: simulation_grid 4 / adhoc_math 6 / greedy_scheduling 1;
+graph_flow EXPOSED supply = 0 ⇒ resistant-probe-only). The mechanism is REAL (all 11 runs
+classify genuine REAL-diversity after a transparently-documented sketch-parser-bug recalibration)
+and the diverse SEARCH **lifts the generation ceiling** (pool 3/11 > plain baseline 2/11 —
+reaching a simulation_grid program i.i.d. sampling missed) — **but it is NOT EARNED**: RDA4
+commits 2/11 (net +0 over baseline: +1 unique `blueberrywaffle` − 1 regression `pawnshop`),
+tying both plain baseline and the W127 scaffold line. The bottleneck is the verification-based
+SELECTION layer, not generation — without a hidden-test oracle the public/derived signal cannot
+convert the lifted ceiling into committed wins (abstains 7/11; mis-commits `pawnshop` where the
+pool HAD a correct program). LANE γ: T1 (dev EARNED) is FALSE ⇒ no targeted resistant probe ⇒
+$0 resistant NIM; stronger-model gate CLOSED (`258b6ed7` invariant, {KNOWN:1, UNKNOWN:4}). New
+carry-forwards `W128-L-ROLE-DIVERSE-HARD-CLUSTER-DEV-BENCH-CAP` +
+`W128-T-ROLE-DIVERSE-SEARCH-LIFTS-GENERATION-CEILING-BUT-SELECTION-CAPPED` +
+`W128-L-GRAPH-FLOW-EXPOSED-SUPPLY-CAP`. $0 resistant NIM (360 EXPOSED dev calls across one
+validation + one parser-bug-invalidated run + one valid run). W89 (+5.56) + W105 (+7.00) STAND
+as the only two retirements; W128 adds none."
+
+**DO NOT say:** "the role-diverse mechanism works / is validated" — it is REAL but NOT validated:
+it does not beat plain hosted generation on the EXPOSED hard clusters (net +0; RDA4 2/11 =
+baseline 2/11 = scaffold 2/11), so it earns no resistant spend. "the pool ceiling 3/11 > 2/11 is
+a win" — the pool ceiling is a GENERATION-ceiling diagnostic (the search reaches a correct
+program), NOT a committed win and NOT a mechanism validation; the SELECTION layer caps it at
+committed 2/11. "the mechanism is fake / fake-different" — it is NOT fake: all 11 dev runs
+classify genuine REAL-diversity, blueberrywaffle is a genuine role-diverse unique solve, and the
+fake-diversity positive control + the W41/W42 bridge tests + the substrate-controller kill all
+pass; the honest finding is that a REAL mechanism does not EARN here, with the cap precisely
+localized to SELECTION. "the model can't produce diverse algorithms on hard clusters" — the
+FIRST run's 9/11 FAKE_DIVERSE was a SKETCH-PARSER BUG (markdown `#### SKETCH A:` headers); after
+the fix all 11 are REAL (the model DOES produce distinct algorithms: Greedy / DP / Binary
+Search). "W128 ran a resistant probe / proved the resistant field resists role-diverse search" —
+NO resistant probe was run (T1 failed) ⇒ $0 resistant NIM; the resistant role-diverse behaviour
+is UNTESTED (the cap is on the EXPOSED dev bench). "the W79 controllers were used / were
+worthless" — they were examined and the LITERAL code-consensus bridge killed as
+substrate-specific (fake-different); the consensus role is genuinely filled by W41/W42 — both
+halves stated. "this is a third retirement / weakens W89/W105 / proves the contamination
+confound / solves multi-agent context" — none of these; W128 tests a fresh-generation MECHANISM
++ a SPEND gate. Bounded-context / compaction / summarization remain anti-patterns, explicitly
+not pursued.
+
+Anchors: `docs/RESULTS_W128_ROLE_DIVERSE_ALGORITHM_SEARCH_V1.md`; `docs/RUNBOOK_W128.md`;
+`docs/FRONTIER_RELEVANCE_AUDIT_W128_V1.md`; `results/w128/`.
+
 ## W127 (resistant capability atlas + family-specific scaffold GENERATION — atlas built + scaffold line REAL + EXPOSED dev bench EARNED-but-weak/confounded, but the earned resistant probe = 0/6 new solves; $0 beyond authorized dev+probe; no third retirement) — explicit do-not-overstate
 
 **DO say:** "W127 stopped treating W126's 'capability failure' as the end. LANE α built a

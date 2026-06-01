@@ -1,0 +1,1046 @@
+{
+  "schema": "coordpy.w128_hard_cluster_dev_bench.v1",
+  "lane": "beta_hard_cluster_dev_bench",
+  "verified_on": "2026-06-01",
+  "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+  "K": 5,
+  "n_sketches": 4,
+  "temperature": 0.7,
+  "analyze_temp": 0.5,
+  "impl_temp": 0.2,
+  "timeout_s": 10.0,
+  "nim_calls": 165,
+  "wall_s": 403.5,
+  "exposed_root": "/tmp/w121_icpc",
+  "hard_families": [
+    "graph_flow",
+    "simulation_grid",
+    "adhoc_math",
+    "search_enumeration",
+    "greedy_scheduling"
+  ],
+  "dev_family_counts": {
+    "simulation_grid": 4,
+    "adhoc_math": 6,
+    "greedy_scheduling": 1
+  },
+  "hard_dev_target_cid": "546c146624b14d4ea796f4d23c490b57c3b9471a7e13cc264b59df4adfce79f3",
+  "teacher_corpus_cid": "ffa027dbee2a6cb254321a18c9560387658e2182350200d5c94ccc7473760e47",
+  "library": {
+    "n_scaffolds": 27,
+    "n_source_problems": 27,
+    "by_family": {
+      "graph_flow": 1,
+      "dp_optimization": 5,
+      "geometry": 8,
+      "number_theory_math": 2,
+      "string_processing": 8,
+      "adhoc_math": 3
+    },
+    "library_cid": "08b6732eb5900459b7ffef8cb0c2f7c88d3a4d63e6481affa78fb8c685476f82"
+  },
+  "variant_pass": {
+    "RDA1": 1,
+    "RDA2": 1,
+    "RDA3": 1,
+    "RDA4": 1
+  },
+  "variant_abstain": {
+    "RDA1": 0,
+    "RDA2": 8,
+    "RDA3": 8,
+    "RDA4": 8
+  },
+  "rda_pool_total_pass": 1,
+  "per_target": [
+    {
+      "short_name": "amazingpuzzle",
+      "family": "simulation_grid",
+      "baseline_pass": false,
+      "scaffold_pass": false,
+      "rda_committed_pass": false,
+      "rda_pool_pass": false,
+      "rda_abstained": true,
+      "diversity_real": false,
+      "leakage_clean": true,
+      "failure_was_trivial": false
+    },
+    {
+      "short_name": "blueberrywaffle",
+      "family": "simulation_grid",
+      "baseline_pass": false,
+      "scaffold_pass": false,
+      "rda_committed_pass": true,
+      "rda_pool_pass": true,
+      "rda_abstained": false,
+      "diversity_real": true,
+      "leakage_clean": true,
+      "failure_was_trivial": false
+    },
+    {
+      "short_name": "colortubes",
+      "family": "simulation_grid",
+      "baseline_pass": false,
+      "scaffold_pass": false,
+      "rda_committed_pass": false,
+      "rda_pool_pass": false,
+      "rda_abstained": true,
+      "diversity_real": false,
+      "leakage_clean": true,
+      "failure_was_trivial": false
+    },
+    {
+      "short_name": "doubleup",
+      "family": "adhoc_math",
+      "baseline_pass": false,
+      "scaffold_pass": false,
+      "rda_committed_pass": false,
+      "rda_pool_pass": false,
+      "rda_abstained": true,
+      "diversity_real": false,
+      "leakage_clean": true,
+      "failure_was_trivial": false
+    },
+    {
+      "short_name": "electionparadox",
+      "family": "adhoc_math",
+      "baseline_pass": false,
+      "scaffold_pass": true,
+      "rda_committed_pass": false,
+      "rda_pool_pass": false,
+      "rda_abstained": true,
+      "diversity_real": false,
+      "leakage_clean": true,
+      "failure_was_trivial": false
+    },
+    {
+      "short_name": "familyvisits",
+      "family": "greedy_scheduling",
+      "baseline_pass": false,
+      "scaffold_pass": false,
+      "rda_committed_pass": false,
+      "rda_pool_pass": false,
+      "rda_abstained": false,
+      "diversity_real": false,
+      "leakage_clean": true,
+      "failure_was_trivial": false
+    },
+    {
+      "short_name": "foodprocessor",
+      "family": "adhoc_math",
+      "baseline_pass": false,
+      "scaffold_pass": false,
+      "rda_committed_pass": false,
+      "rda_pool_pass": false,
+      "rda_abstained": true,
+      "diversity_real": false,
+      "leakage_clean": true,
+      "failure_was_trivial": false
+    },
+    {
+      "short_name": "hilbertshedgemaze",
+      "family": "simulation_grid",
+      "baseline_pass": false,
+      "scaffold_pass": false,
+      "rda_committed_pass": false,
+      "rda_pool_pass": false,
+      "rda_abstained": true,
+      "diversity_real": false,
+      "leakage_clean": true,
+      "failure_was_trivial": false
+    },
+    {
+      "short_name": "pawnshop",
+      "family": "adhoc_math",
+      "baseline_pass": false,
+      "scaffold_pass": true,
+      "rda_committed_pass": false,
+      "rda_pool_pass": false,
+      "rda_abstained": true,
+      "diversity_real": false,
+      "leakage_clean": true,
+      "failure_was_trivial": false
+    },
+    {
+      "short_name": "slidecount",
+      "family": "adhoc_math",
+      "baseline_pass": false,
+      "scaffold_pass": false,
+      "rda_committed_pass": false,
+      "rda_pool_pass": false,
+      "rda_abstained": false,
+      "diversity_real": false,
+      "leakage_clean": true,
+      "failure_was_trivial": false
+    },
+    {
+      "short_name": "sunandmoon",
+      "family": "adhoc_math",
+      "baseline_pass": true,
+      "scaffold_pass": true,
+      "rda_committed_pass": false,
+      "rda_pool_pass": false,
+      "rda_abstained": true,
+      "diversity_real": true,
+      "leakage_clean": true,
+      "failure_was_trivial": false
+    }
+  ],
+  "per_target_detail": {
+    "electionparadox": {
+      "short_name": "electionparadox",
+      "family": "adhoc_math",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 0,
+        "max_sketch_jaccard": 0.0,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": false,
+        "classify": "FAKE_DIVERSE"
+      },
+      "pool_pass": false,
+      "pool_first_label": null,
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "NO_PUBLIC_SURVIVOR_FALLBACK",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": "a73251069c60ce75"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": true,
+        "RDA3": true,
+        "RDA4": true
+      },
+      "n_public_survivors": 0,
+      "n_impls_parse": 4,
+      "leakage_clean": true,
+      "notes": "n_sketches_parsed=0 n_cx=4"
+    },
+    "doubleup": {
+      "short_name": "doubleup",
+      "family": "adhoc_math",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 0,
+        "max_sketch_jaccard": 0.0,
+        "n_distinct_impls": 3,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": false,
+        "classify": "FAKE_DIVERSE"
+      },
+      "pool_pass": false,
+      "pool_first_label": null,
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "NO_PUBLIC_SURVIVOR_FALLBACK",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": "4545d1c568d92b40"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": true,
+        "RDA3": true,
+        "RDA4": true
+      },
+      "n_public_survivors": 0,
+      "n_impls_parse": 4,
+      "leakage_clean": true,
+      "notes": "n_sketches_parsed=0 n_cx=5"
+    },
+    "familyvisits": {
+      "short_name": "familyvisits",
+      "family": "greedy_scheduling",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 0,
+        "max_sketch_jaccard": 0.0,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": false,
+        "classify": "FAKE_DIVERSE"
+      },
+      "pool_pass": false,
+      "pool_first_label": null,
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "SINGLE_OR_NAIVE",
+          "n_public_survivors": 2,
+          "consensus_fraction": 0.5,
+          "committed_code_sha": "5045abe5c958a141"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "MAJORITY_2_OF_2",
+          "n_public_survivors": 2,
+          "consensus_fraction": 1.0,
+          "committed_code_sha": "5045abe5c958a141"
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "RI_RATIFIED",
+          "n_public_survivors": 2,
+          "consensus_fraction": 1.0,
+          "committed_code_sha": "5045abe5c958a141"
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "INTEGRATED_integrated_producer_only",
+          "n_public_survivors": 2,
+          "consensus_fraction": 1.0,
+          "committed_code_sha": "5045abe5c958a141"
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "n_public_survivors": 2,
+      "n_impls_parse": 4,
+      "leakage_clean": true,
+      "notes": "n_sketches_parsed=0 n_cx=5"
+    },
+    "blueberrywaffle": {
+      "short_name": "blueberrywaffle",
+      "family": "simulation_grid",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 4,
+        "max_sketch_jaccard": 0.4681,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": true,
+        "classify": "REAL"
+      },
+      "pool_pass": true,
+      "pool_first_label": "A0",
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "SINGLE_OR_NAIVE",
+          "n_public_survivors": 3,
+          "consensus_fraction": 0.3333333333333333,
+          "committed_code_sha": "a4e4f69f160965b2"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "MAJORITY_2_OF_3",
+          "n_public_survivors": 3,
+          "consensus_fraction": 0.6666666666666666,
+          "committed_code_sha": "a4e4f69f160965b2"
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "RI_QUORUM",
+          "n_public_survivors": 3,
+          "consensus_fraction": 0.6666666666666666,
+          "committed_code_sha": "a4e4f69f160965b2"
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "INTEGRATED_integrated_producer_only",
+          "n_public_survivors": 3,
+          "consensus_fraction": 0.6666666666666666,
+          "committed_code_sha": "a4e4f69f160965b2"
+        }
+      },
+      "committed_pass": {
+        "RDA1": true,
+        "RDA2": true,
+        "RDA3": true,
+        "RDA4": true
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "n_public_survivors": 3,
+      "n_impls_parse": 4,
+      "leakage_clean": true,
+      "notes": "n_sketches_parsed=4 n_cx=6"
+    },
+    "foodprocessor": {
+      "short_name": "foodprocessor",
+      "family": "adhoc_math",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 0,
+        "max_sketch_jaccard": 0.0,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": false,
+        "classify": "FAKE_DIVERSE"
+      },
+      "pool_pass": false,
+      "pool_first_label": null,
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "NO_PUBLIC_SURVIVOR_FALLBACK",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": "089c2040833dd9b2"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": true,
+        "RDA3": true,
+        "RDA4": true
+      },
+      "n_public_survivors": 0,
+      "n_impls_parse": 4,
+      "leakage_clean": true,
+      "notes": "n_sketches_parsed=0 n_cx=6"
+    },
+    "hilbertshedgemaze": {
+      "short_name": "hilbertshedgemaze",
+      "family": "simulation_grid",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 0,
+        "max_sketch_jaccard": 0.0,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": false,
+        "classify": "FAKE_DIVERSE"
+      },
+      "pool_pass": false,
+      "pool_first_label": null,
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "NO_PUBLIC_SURVIVOR_FALLBACK",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": "8f12dbaccb4e509a"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": true,
+        "RDA3": true,
+        "RDA4": true
+      },
+      "n_public_survivors": 0,
+      "n_impls_parse": 4,
+      "leakage_clean": true,
+      "notes": "n_sketches_parsed=0 n_cx=5"
+    },
+    "colortubes": {
+      "short_name": "colortubes",
+      "family": "simulation_grid",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 0,
+        "max_sketch_jaccard": 0.0,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": false,
+        "classify": "FAKE_DIVERSE"
+      },
+      "pool_pass": false,
+      "pool_first_label": null,
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "NO_PUBLIC_SURVIVOR_FALLBACK",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": "1d555438e85d4072"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": true,
+        "RDA3": true,
+        "RDA4": true
+      },
+      "n_public_survivors": 0,
+      "n_impls_parse": 4,
+      "leakage_clean": true,
+      "notes": "n_sketches_parsed=0 n_cx=4"
+    },
+    "amazingpuzzle": {
+      "short_name": "amazingpuzzle",
+      "family": "simulation_grid",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 0,
+        "max_sketch_jaccard": 0.0,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": false,
+        "classify": "FAKE_DIVERSE"
+      },
+      "pool_pass": false,
+      "pool_first_label": null,
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "NO_PUBLIC_SURVIVOR_FALLBACK",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": "58cecff2fda8fb61"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": true,
+        "RDA3": true,
+        "RDA4": true
+      },
+      "n_public_survivors": 0,
+      "n_impls_parse": 4,
+      "leakage_clean": true,
+      "notes": "n_sketches_parsed=0 n_cx=4"
+    },
+    "pawnshop": {
+      "short_name": "pawnshop",
+      "family": "adhoc_math",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 0,
+        "max_sketch_jaccard": 0.0,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": false,
+        "classify": "FAKE_DIVERSE"
+      },
+      "pool_pass": false,
+      "pool_first_label": null,
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "NO_PUBLIC_SURVIVOR_FALLBACK",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": "fb3391450aa12ae6"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": true,
+        "RDA3": true,
+        "RDA4": true
+      },
+      "n_public_survivors": 0,
+      "n_impls_parse": 4,
+      "leakage_clean": true,
+      "notes": "n_sketches_parsed=0 n_cx=5"
+    },
+    "slidecount": {
+      "short_name": "slidecount",
+      "family": "adhoc_math",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 0,
+        "max_sketch_jaccard": 0.0,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": false,
+        "classify": "FAKE_DIVERSE"
+      },
+      "pool_pass": false,
+      "pool_first_label": null,
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A2",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "SINGLE_OR_NAIVE",
+          "n_public_survivors": 1,
+          "consensus_fraction": 1.0,
+          "committed_code_sha": "99cc895f18d707dc"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": "A2",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "SINGLE_OR_NAIVE",
+          "n_public_survivors": 1,
+          "consensus_fraction": 1.0,
+          "committed_code_sha": "99cc895f18d707dc"
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": "A2",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "SINGLE_OR_NAIVE",
+          "n_public_survivors": 1,
+          "consensus_fraction": 1.0,
+          "committed_code_sha": "99cc895f18d707dc"
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": "A2",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "SINGLE_OR_NAIVE",
+          "n_public_survivors": 1,
+          "consensus_fraction": 1.0,
+          "committed_code_sha": "99cc895f18d707dc"
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "n_public_survivors": 1,
+      "n_impls_parse": 4,
+      "leakage_clean": true,
+      "notes": "n_sketches_parsed=0 n_cx=4"
+    },
+    "sunandmoon": {
+      "short_name": "sunandmoon",
+      "family": "adhoc_math",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 4,
+        "max_sketch_jaccard": 0.2603,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": true,
+        "classify": "REAL"
+      },
+      "pool_pass": false,
+      "pool_first_label": null,
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "NO_PUBLIC_SURVIVOR_FALLBACK",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": "50b6bdcc956abcc8"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": true,
+        "RDA3": true,
+        "RDA4": true
+      },
+      "n_public_survivors": 0,
+      "n_impls_parse": 4,
+      "leakage_clean": true,
+      "notes": "n_sketches_parsed=4 n_cx=6"
+    }
+  },
+  "earn_gate": {
+    "schema": "coordpy.w128_rda_dev_bench_earn.v1",
+    "n_targets": 11,
+    "baseline_total_pass": 1,
+    "scaffold_total_pass": 3,
+    "rda_total_pass": 1,
+    "rda_pool_total_pass": 1,
+    "rda_unique_solves": 1,
+    "rda_regressions": 1,
+    "net_rda_gain": 0,
+    "net_vs_scaffold": -2,
+    "gain_families": [
+      "simulation_grid"
+    ],
+    "gain_distinct_families": 1,
+    "gain_includes_named_cluster": true,
+    "gain_is_nontrivial": true,
+    "winners_diversity_real": true,
+    "all_leakage_clean": true,
+    "r1a_net_gain": false,
+    "r1b_cluster_spread": true,
+    "r1c_clean_and_real": true,
+    "r1d_nontrivial": true,
+    "r1e_beats_scaffold": false,
+    "earned": false,
+    "verdict_label": "ROLE_DIVERSE_HARD_CLUSTER_DEV_BENCH_NOT_EARNED",
+    "rationale": "net role-diverse gain +0 (need >= +2); failed gates: ['R1a_net', 'R1e_beats_scaffold']; baseline 1/11 -> rda 1/11 (pool ceiling 1/11); scaffold net +2."
+  },
+  "dev_min_net_gain": 2,
+  "generated_at": "2026-06-01T18:54:13.853683+00:00"
+}

@@ -1,0 +1,260 @@
+{
+  "schema": "coordpy.w128_hard_cluster_dev_bench.v1",
+  "lane": "beta_hard_cluster_dev_bench",
+  "verified_on": "2026-06-01",
+  "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+  "K": 5,
+  "n_sketches": 4,
+  "temperature": 0.7,
+  "analyze_temp": 0.5,
+  "impl_temp": 0.2,
+  "timeout_s": 10.0,
+  "nim_calls": 30,
+  "wall_s": 168.4,
+  "exposed_root": "/tmp/w121_icpc",
+  "hard_families": [
+    "graph_flow",
+    "simulation_grid",
+    "adhoc_math",
+    "search_enumeration",
+    "greedy_scheduling"
+  ],
+  "dev_family_counts": {
+    "simulation_grid": 2
+  },
+  "hard_dev_target_cid": "18d050e055feb753f4bf0a4e794df9e0919b9250453e505bbd209cc80290b9ea",
+  "teacher_corpus_cid": "50b93110472b3c059ee9c72b4c7ca7ba1fd1deccf9817c35d9c77815575c6798",
+  "library": {
+    "n_scaffolds": 36,
+    "n_source_problems": 36,
+    "by_family": {
+      "graph_flow": 1,
+      "dp_optimization": 6,
+      "geometry": 8,
+      "number_theory_math": 2,
+      "string_processing": 8,
+      "simulation_grid": 1,
+      "adhoc_math": 10
+    },
+    "library_cid": "3581709109f7a60b2504c4f4833884dfb9a04efd322e196431ceec520f8e769e"
+  },
+  "variant_pass": {
+    "RDA1": 0,
+    "RDA2": 0,
+    "RDA3": 0,
+    "RDA4": 0
+  },
+  "variant_abstain": {
+    "RDA1": 0,
+    "RDA2": 1,
+    "RDA3": 2,
+    "RDA4": 1
+  },
+  "rda_pool_total_pass": 1,
+  "per_target": [
+    {
+      "short_name": "amazingpuzzle",
+      "family": "simulation_grid",
+      "baseline_pass": false,
+      "scaffold_pass": false,
+      "rda_committed_pass": false,
+      "rda_pool_pass": false,
+      "rda_abstained": true,
+      "diversity_real": false,
+      "leakage_clean": false,
+      "failure_was_trivial": false
+    },
+    {
+      "short_name": "blueberrywaffle",
+      "family": "simulation_grid",
+      "baseline_pass": false,
+      "scaffold_pass": false,
+      "rda_committed_pass": false,
+      "rda_pool_pass": true,
+      "rda_abstained": false,
+      "diversity_real": true,
+      "leakage_clean": false,
+      "failure_was_trivial": false
+    }
+  ],
+  "per_target_detail": {
+    "blueberrywaffle": {
+      "short_name": "blueberrywaffle",
+      "family": "simulation_grid",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 4,
+        "max_sketch_jaccard": 0.3396,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": true,
+        "classify": "REAL"
+      },
+      "pool_pass": true,
+      "pool_first_label": "C2",
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "B1",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "SINGLE_OR_NAIVE",
+          "n_public_survivors": 2,
+          "consensus_fraction": 0.5,
+          "committed_code_sha": "448626bb52719e7b"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": "B1",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "MAJORITY_1_OF_2",
+          "n_public_survivors": 2,
+          "consensus_fraction": 0.5,
+          "committed_code_sha": "448626bb52719e7b"
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "RI_DIVERGED_ABSTAINED",
+          "n_public_survivors": 2,
+          "consensus_fraction": 0.5,
+          "committed_code_sha": null
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": "B1",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "INTEGRATED_integrated_producer_only",
+          "n_public_survivors": 2,
+          "consensus_fraction": 0.5,
+          "committed_code_sha": "448626bb52719e7b"
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": true,
+        "RDA4": false
+      },
+      "n_public_survivors": 2,
+      "n_impls_parse": 4,
+      "leakage_clean": false,
+      "notes": "n_sketches_parsed=4 n_cx=6"
+    },
+    "amazingpuzzle": {
+      "short_name": "amazingpuzzle",
+      "family": "simulation_grid",
+      "n_calls": 5,
+      "diversity": {
+        "n_sketches": 0,
+        "max_sketch_jaccard": 0.0,
+        "n_distinct_impls": 4,
+        "n_impls": 4,
+        "counterexamples_new": true,
+        "invariants_nonempty": true,
+        "diversity_real": false,
+        "classify": "FAKE_DIVERSE"
+      },
+      "pool_pass": false,
+      "pool_first_label": null,
+      "selections": {
+        "RDA1": {
+          "variant": "RDA1",
+          "committed_label": "A0",
+          "committed_code": true,
+          "abstained": false,
+          "branch": "NO_PUBLIC_SURVIVOR_FALLBACK",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": "6aa2bb291cbd9138"
+        },
+        "RDA2": {
+          "variant": "RDA2",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA3": {
+          "variant": "RDA3",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        },
+        "RDA4": {
+          "variant": "RDA4",
+          "committed_label": null,
+          "committed_code": false,
+          "abstained": true,
+          "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+          "n_public_survivors": 0,
+          "consensus_fraction": 0.0,
+          "committed_code_sha": null
+        }
+      },
+      "committed_pass": {
+        "RDA1": false,
+        "RDA2": false,
+        "RDA3": false,
+        "RDA4": false
+      },
+      "abstained": {
+        "RDA1": false,
+        "RDA2": true,
+        "RDA3": true,
+        "RDA4": true
+      },
+      "n_public_survivors": 0,
+      "n_impls_parse": 4,
+      "leakage_clean": false,
+      "notes": "n_sketches_parsed=0 n_cx=3"
+    }
+  },
+  "earn_gate": {
+    "schema": "coordpy.w128_rda_dev_bench_earn.v1",
+    "n_targets": 2,
+    "baseline_total_pass": 0,
+    "scaffold_total_pass": 0,
+    "rda_total_pass": 0,
+    "rda_pool_total_pass": 1,
+    "rda_unique_solves": 0,
+    "rda_regressions": 0,
+    "net_rda_gain": 0,
+    "net_vs_scaffold": 0,
+    "gain_families": [],
+    "gain_distinct_families": 0,
+    "gain_includes_named_cluster": false,
+    "gain_is_nontrivial": false,
+    "winners_diversity_real": false,
+    "all_leakage_clean": false,
+    "r1a_net_gain": false,
+    "r1b_cluster_spread": false,
+    "r1c_clean_and_real": false,
+    "r1d_nontrivial": false,
+    "r1e_beats_scaffold": true,
+    "earned": false,
+    "verdict_label": "ROLE_DIVERSE_HARD_CLUSTER_DEV_BENCH_NOT_EARNED",
+    "rationale": "net role-diverse gain +0 (need >= +2); failed gates: ['R1a_net', 'R1b_spread', 'R1c_clean_real', 'R1d_nontrivial']; baseline 0/2 -> rda 0/2 (pool ceiling 1/2); scaffold net +0."
+  },
+  "dev_min_net_gain": 2,
+  "generated_at": "2026-06-01T18:44:31.481488+00:00"
+}
