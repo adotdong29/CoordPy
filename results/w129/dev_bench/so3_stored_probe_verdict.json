@@ -1,0 +1,193 @@
+{
+  "schema": "coordpy.w129_so3_stored_probe.v1",
+  "lane": "beta0_so3_stored_probe",
+  "verified_on": "2026-06-01",
+  "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+  "nim_calls": 3,
+  "n_targets": 11,
+  "committed_pass": 2,
+  "mis_commits": 1,
+  "pawnshop_cashed_out_B1": true,
+  "pawnshop_no_miscommit": true,
+  "keep_blueberrywaffle": true,
+  "keep_sunandmoon": false,
+  "b0_pass": false,
+  "verdict_label": "SO3_VERIFIER_CANNOT_BREAK_UNDER_DETERMINED_TIE",
+  "regression_pair": {
+    "pawnshop": {
+      "short_name": "pawnshop",
+      "family": "adhoc_math",
+      "n_public_survivors": 2,
+      "committed_label": "B1",
+      "abstained": false,
+      "branch": "VERIFIER_CHOSE",
+      "committed_pass": true,
+      "mis_commit": false,
+      "verifier_detail": {
+        "choice": "B1",
+        "verifier_raw": "To determine the most likely correct candidate, let's analyze the given problem and the provided candidate solutions.\n\nThe problem requires partitioning a rearranged sequence `b` into the maximum poss"
+      }
+    },
+    "blueberrywaffle": {
+      "short_name": "blueberrywaffle",
+      "family": "simulation_grid",
+      "n_public_survivors": 3,
+      "committed_label": "C2",
+      "abstained": false,
+      "branch": "VERIFIER_CHOSE",
+      "committed_pass": true,
+      "mis_commit": false,
+      "verifier_detail": {
+        "choice": "C2",
+        "verifier_raw": "To determine the most likely correct candidate, let's analyze each candidate based on the problem statement, the provided public samples, and the checkable invariants.\n\n### Candidate A0\nCandidate A0 c"
+      }
+    },
+    "sunandmoon": {
+      "short_name": "sunandmoon",
+      "family": "adhoc_math",
+      "n_public_survivors": 2,
+      "committed_label": null,
+      "abstained": true,
+      "branch": "VERIFIER_ABSTAIN",
+      "committed_pass": false,
+      "mis_commit": false,
+      "verifier_detail": {
+        "verifier_raw": "To determine the most likely correct candidate, let's analyze the problem and the given candidates.\n\nThe problem requires finding the next eclipse time when both the sun and the moon are in the right "
+      }
+    }
+  },
+  "per_target": [
+    {
+      "short_name": "amazingpuzzle",
+      "family": "simulation_grid",
+      "n_public_survivors": 0,
+      "committed_label": null,
+      "abstained": true,
+      "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+      "committed_pass": false,
+      "mis_commit": false,
+      "verifier_detail": {}
+    },
+    {
+      "short_name": "blueberrywaffle",
+      "family": "simulation_grid",
+      "n_public_survivors": 3,
+      "committed_label": "C2",
+      "abstained": false,
+      "branch": "VERIFIER_CHOSE",
+      "committed_pass": true,
+      "mis_commit": false,
+      "verifier_detail": {
+        "choice": "C2",
+        "verifier_raw": "To determine the most likely correct candidate, let's analyze each candidate based on the problem statement, the provided public samples, and the checkable invariants.\n\n### Candidate A0\nCandidate A0 c"
+      }
+    },
+    {
+      "short_name": "colortubes",
+      "family": "simulation_grid",
+      "n_public_survivors": 0,
+      "committed_label": null,
+      "abstained": true,
+      "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+      "committed_pass": false,
+      "mis_commit": false,
+      "verifier_detail": {}
+    },
+    {
+      "short_name": "doubleup",
+      "family": "adhoc_math",
+      "n_public_survivors": 1,
+      "committed_label": "C2",
+      "abstained": false,
+      "branch": "SINGLE_SURVIVOR",
+      "committed_pass": false,
+      "mis_commit": true,
+      "verifier_detail": {
+        "note": "only one public survivor"
+      }
+    },
+    {
+      "short_name": "electionparadox",
+      "family": "adhoc_math",
+      "n_public_survivors": 0,
+      "committed_label": null,
+      "abstained": true,
+      "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+      "committed_pass": false,
+      "mis_commit": false,
+      "verifier_detail": {}
+    },
+    {
+      "short_name": "familyvisits",
+      "family": "greedy_scheduling",
+      "n_public_survivors": 0,
+      "committed_label": null,
+      "abstained": true,
+      "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+      "committed_pass": false,
+      "mis_commit": false,
+      "verifier_detail": {}
+    },
+    {
+      "short_name": "foodprocessor",
+      "family": "adhoc_math",
+      "n_public_survivors": 0,
+      "committed_label": null,
+      "abstained": true,
+      "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+      "committed_pass": false,
+      "mis_commit": false,
+      "verifier_detail": {}
+    },
+    {
+      "short_name": "hilbertshedgemaze",
+      "family": "simulation_grid",
+      "n_public_survivors": 0,
+      "committed_label": null,
+      "abstained": true,
+      "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+      "committed_pass": false,
+      "mis_commit": false,
+      "verifier_detail": {}
+    },
+    {
+      "short_name": "pawnshop",
+      "family": "adhoc_math",
+      "n_public_survivors": 2,
+      "committed_label": "B1",
+      "abstained": false,
+      "branch": "VERIFIER_CHOSE",
+      "committed_pass": true,
+      "mis_commit": false,
+      "verifier_detail": {
+        "choice": "B1",
+        "verifier_raw": "To determine the most likely correct candidate, let's analyze the given problem and the provided candidate solutions.\n\nThe problem requires partitioning a rearranged sequence `b` into the maximum poss"
+      }
+    },
+    {
+      "short_name": "slidecount",
+      "family": "adhoc_math",
+      "n_public_survivors": 0,
+      "committed_label": null,
+      "abstained": true,
+      "branch": "NO_PUBLIC_SURVIVOR_ABSTAIN",
+      "committed_pass": false,
+      "mis_commit": false,
+      "verifier_detail": {}
+    },
+    {
+      "short_name": "sunandmoon",
+      "family": "adhoc_math",
+      "n_public_survivors": 2,
+      "committed_label": null,
+      "abstained": true,
+      "branch": "VERIFIER_ABSTAIN",
+      "committed_pass": false,
+      "mis_commit": false,
+      "verifier_detail": {
+        "verifier_raw": "To determine the most likely correct candidate, let's analyze the problem and the given candidates.\n\nThe problem requires finding the next eclipse time when both the sun and the moon are in the right "
+      }
+    }
+  ],
+  "generated_at": "2026-06-01T20:16:04.963218+00:00"
+}

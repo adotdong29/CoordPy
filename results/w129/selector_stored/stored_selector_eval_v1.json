@@ -1,0 +1,504 @@
+{
+  "schema": "coordpy.w129_selector_stored_eval.v1",
+  "lane": "alpha_selector_stored",
+  "nim_spend": 0,
+  "method": "analytic-over-recon (selection logic replayed on recon-graded candidates; subprocess-free; stress not load-bearing)",
+  "n_targets": 11,
+  "w128_baseline_pass": 2,
+  "w128_rda4_pass": 2,
+  "w128_pool_pass": 3,
+  "aggregate": {
+    "SO1": {
+      "committed_pass": 2,
+      "mis_commits": 2,
+      "abstains": 7,
+      "unique_vs_baseline": 1,
+      "regressions_vs_baseline": 1,
+      "net_vs_baseline": 0
+    },
+    "SO2": {
+      "committed_pass": 1,
+      "mis_commits": 1,
+      "abstains": 9,
+      "unique_vs_baseline": 1,
+      "regressions_vs_baseline": 2,
+      "net_vs_baseline": -1
+    },
+    "SO4": {
+      "committed_pass": 0,
+      "mis_commits": 1,
+      "abstains": 10,
+      "unique_vs_baseline": 0,
+      "regressions_vs_baseline": 2,
+      "net_vs_baseline": -2
+    },
+    "SOLEAD": {
+      "committed_pass": 1,
+      "mis_commits": 1,
+      "abstains": 9,
+      "unique_vs_baseline": 1,
+      "regressions_vs_baseline": 2,
+      "net_vs_baseline": -1
+    }
+  },
+  "regression_pair": {
+    "pawnshop": {
+      "SO1": {
+        "committed_label": "A0",
+        "abstained": false,
+        "committed_pass": false,
+        "mis_commit": true
+      },
+      "SO2": {
+        "committed_label": null,
+        "abstained": true,
+        "committed_pass": false,
+        "mis_commit": false
+      },
+      "SO4": {
+        "committed_label": null,
+        "abstained": true,
+        "committed_pass": false,
+        "mis_commit": false
+      },
+      "SOLEAD": {
+        "committed_label": null,
+        "abstained": true,
+        "committed_pass": false,
+        "mis_commit": false
+      }
+    },
+    "blueberrywaffle": {
+      "SO1": {
+        "committed_label": "A0",
+        "abstained": false,
+        "committed_pass": true,
+        "mis_commit": false
+      },
+      "SO2": {
+        "committed_label": "A0",
+        "abstained": false,
+        "committed_pass": true,
+        "mis_commit": false
+      },
+      "SO4": {
+        "committed_label": null,
+        "abstained": true,
+        "committed_pass": false,
+        "mis_commit": false
+      },
+      "SOLEAD": {
+        "committed_label": "A0",
+        "abstained": false,
+        "committed_pass": true,
+        "mis_commit": false
+      }
+    },
+    "sunandmoon": {
+      "SO1": {
+        "committed_label": "B1",
+        "abstained": false,
+        "committed_pass": true,
+        "mis_commit": false
+      },
+      "SO2": {
+        "committed_label": null,
+        "abstained": true,
+        "committed_pass": false,
+        "mis_commit": false
+      },
+      "SO4": {
+        "committed_label": null,
+        "abstained": true,
+        "committed_pass": false,
+        "mis_commit": false
+      },
+      "SOLEAD": {
+        "committed_label": null,
+        "abstained": true,
+        "committed_pass": false,
+        "mis_commit": false
+      }
+    }
+  },
+  "fake_selection_control": {
+    "schema": "coordpy.w129_fake_selection_control.v1",
+    "so2_abstained_on_tie": true,
+    "so2_evidence_used": false,
+    "so4_abstained_on_tie": true,
+    "so4_evidence_used": false,
+    "control_passes": true
+  },
+  "trust_machinery_examination": {
+    "schema": "coordpy.w129_trust_machinery_applicability.v1",
+    "modules": {
+      "trust_weighted_consensus_controller": {
+        "latent_specific": true,
+        "code_candidate_applicable": false,
+        "literal_bridge_would_be_fake": true
+      },
+      "integrity_trust_coupled_consensus_v1": {
+        "latent_specific": false,
+        "code_candidate_applicable": false,
+        "literal_bridge_would_be_fake": false
+      }
+    },
+    "substrate_controller_literal_bridge_killed": true,
+    "so4_trust_signal": "falsifier_survival_fraction + format/crash integrity (honest code-correctness proxy); integrity-penalty + trust-weighted-quorum + ABSTAIN concept realized natively",
+    "concept_source": "integrity_trust_coupled_consensus_v1 (integrity-adjusted trust)"
+  },
+  "per_target": [
+    {
+      "short_name": "amazingpuzzle",
+      "family": "simulation_grid",
+      "baseline_pass": false,
+      "rda4_pass_w128": false,
+      "sels": {
+        "SO1": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO2": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO4": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SOLEAD": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        }
+      }
+    },
+    {
+      "short_name": "blueberrywaffle",
+      "family": "simulation_grid",
+      "baseline_pass": false,
+      "rda4_pass_w128": true,
+      "sels": {
+        "SO1": {
+          "committed_label": "A0",
+          "abstained": false,
+          "committed_pass": true,
+          "mis_commit": false
+        },
+        "SO2": {
+          "committed_label": "A0",
+          "abstained": false,
+          "committed_pass": true,
+          "mis_commit": false
+        },
+        "SO4": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SOLEAD": {
+          "committed_label": "A0",
+          "abstained": false,
+          "committed_pass": true,
+          "mis_commit": false
+        }
+      }
+    },
+    {
+      "short_name": "colortubes",
+      "family": "simulation_grid",
+      "baseline_pass": false,
+      "rda4_pass_w128": false,
+      "sels": {
+        "SO1": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO2": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO4": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SOLEAD": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        }
+      }
+    },
+    {
+      "short_name": "doubleup",
+      "family": "adhoc_math",
+      "baseline_pass": false,
+      "rda4_pass_w128": false,
+      "sels": {
+        "SO1": {
+          "committed_label": "C2",
+          "abstained": false,
+          "committed_pass": false,
+          "mis_commit": true
+        },
+        "SO2": {
+          "committed_label": "C2",
+          "abstained": false,
+          "committed_pass": false,
+          "mis_commit": true
+        },
+        "SO4": {
+          "committed_label": "C2",
+          "abstained": false,
+          "committed_pass": false,
+          "mis_commit": true
+        },
+        "SOLEAD": {
+          "committed_label": "C2",
+          "abstained": false,
+          "committed_pass": false,
+          "mis_commit": true
+        }
+      }
+    },
+    {
+      "short_name": "electionparadox",
+      "family": "adhoc_math",
+      "baseline_pass": false,
+      "rda4_pass_w128": false,
+      "sels": {
+        "SO1": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO2": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO4": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SOLEAD": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        }
+      }
+    },
+    {
+      "short_name": "familyvisits",
+      "family": "greedy_scheduling",
+      "baseline_pass": false,
+      "rda4_pass_w128": false,
+      "sels": {
+        "SO1": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO2": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO4": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SOLEAD": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        }
+      }
+    },
+    {
+      "short_name": "foodprocessor",
+      "family": "adhoc_math",
+      "baseline_pass": false,
+      "rda4_pass_w128": false,
+      "sels": {
+        "SO1": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO2": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO4": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SOLEAD": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        }
+      }
+    },
+    {
+      "short_name": "hilbertshedgemaze",
+      "family": "simulation_grid",
+      "baseline_pass": false,
+      "rda4_pass_w128": false,
+      "sels": {
+        "SO1": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO2": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO4": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SOLEAD": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        }
+      }
+    },
+    {
+      "short_name": "pawnshop",
+      "family": "adhoc_math",
+      "baseline_pass": true,
+      "rda4_pass_w128": false,
+      "sels": {
+        "SO1": {
+          "committed_label": "A0",
+          "abstained": false,
+          "committed_pass": false,
+          "mis_commit": true
+        },
+        "SO2": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO4": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SOLEAD": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        }
+      }
+    },
+    {
+      "short_name": "slidecount",
+      "family": "adhoc_math",
+      "baseline_pass": false,
+      "rda4_pass_w128": false,
+      "sels": {
+        "SO1": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO2": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO4": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SOLEAD": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        }
+      }
+    },
+    {
+      "short_name": "sunandmoon",
+      "family": "adhoc_math",
+      "baseline_pass": true,
+      "rda4_pass_w128": true,
+      "sels": {
+        "SO1": {
+          "committed_label": "B1",
+          "abstained": false,
+          "committed_pass": true,
+          "mis_commit": false
+        },
+        "SO2": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SO4": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        },
+        "SOLEAD": {
+          "committed_label": null,
+          "abstained": true,
+          "committed_pass": false,
+          "mis_commit": false
+        }
+      }
+    }
+  ]
+}

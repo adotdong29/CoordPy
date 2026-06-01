@@ -1,3 +1,56 @@
+## W129 (public-signal SELECTION ORACLE on the W128 hard-cluster miss — the pawnshop "selection cap" is a COMPLEXITY bug a verifier breaks, but the binding cap is GENERATION not selection [committed ≤ pool ceiling = baseline+1 < +2]; 3 NIM; no third retirement) — explicit do-not-overstate
+
+**DO say:** "W129 attacked the SELECTOR directly instead of accepting W128's selection cap. A $0
+recon reconstructed the W128 pools by replaying the stored generations and graded every candidate
+on PUBLIC + SECRET, localizing the miss: on `pawnshop` the hidden-correct `B1` and hidden-wrong
+`A0` are byte-identical on every public sample AND every model-derived case
+(`separable_on_derived=False`), with no brute-force sketch — but A0 is `O(N²)` (recomputes a
+`Counter` slice each step) and B1 is `O(N)`, and the statement bounds `N ≤ 300000`, so A0 fails
+secret by TLE (verified: A0 times out, B1 finishes in 0.10s on a large instance). LANE α built
+`coordpy.public_signal_selection_oracle_v1` (SO1 falsifier stack / SO2 differential-disagreement
+via `integrated_synthesis` / SO3 verifier-final mined from `mathvista_bench_v2` / SO4
+trust-weighted-abstain realizing the `integrity_trust_coupled_consensus_v1` concept natively, with
+the substrate `TrustWeightedConsensusController` literal bridge KILLED as latent-specific
+fake-different; a fake-selection positive control PASSES; 29/29 tests). The NIM-free selectors are
+ABSTAIN-DISCIPLINED: they KEEP the separable `blueberrywaffle` win (SO2 majority) and ABSTAIN the
+under-determined `pawnshop` and `sunandmoon` ties rather than mis-commit — converting W128's
+pawnshop MIS-COMMIT into a safe abstain (0 SELECTION mis-commits). The generic NIM-free stress
+scale-up does NOT crack pawnshop (exposing A0's worst case needs an adversarially-structured input
+a generic format-preserving scale-up does not construct ≈ solving the problem); we did NOT
+hand-tune a bespoke worst-case. LANE β0: the SO3 verifier-final (3 NIM, reads the CODE) CHOSE
+pawnshop `B1` citing the O(N²)-vs-O(N)-vs-constraint argument — **refuting** the prior that the
+in-loop signal is non-discriminating even for a model judge — and kept `blueberrywaffle` (chose a
+correct candidate); it over-abstained `sunandmoon` (a both-correct tie), so it committed 2/11 with
+0 selection mis-commits, the same committed COUNT as W128 (it traded the sunandmoon win for the
+pawnshop cash-out). The binding finding: committed ≤ the GENERATION pool ceiling (3/11 =
+baseline+1), which is BELOW the locked +2 earn bar regardless of selector quality ⇒ R2′ is
+structurally UNREACHABLE by a selection oracle ⇒ T1 FALSE ⇒ $0 resistant NIM ⇒ the cap MOVED from
+W128's SELECTION to W129's GENERATION ceiling. Stronger-model gate CLOSED (`258b6ed7` invariant,
+{KNOWN:1, UNKNOWN:4}). 3 NIM total. W89 (+5.56) + W105 (+7.00) STAND as the only two retirements;
+W129 adds none."
+
+**DO NOT say:** "W129 cashed out the W128 selection cap / earned a third retirement" — it did NOT
+earn: the verifier cashes the pawnshop tie but committed stays ≤ the +1 generation ceiling
+(< +2), and the locked β0 gate FAILED (sunandmoon over-abstain). "the selection cap is refuted /
+selection was never the problem" — half true: the SPECIFIC pawnshop miss is verifier-breakable
+(complexity), but the over-abstention on both-correct ties is a real verifier-CALIBRATION limit;
+the honest statement is the CAP MOVED to generation, not that selection is solved. "a NIM-free
+oracle cashes out pawnshop at $0" — it does NOT: generic stress-testing cannot construct the
+adversarial worst-case; only the model verifier (1 NIM call, code-reading) breaks it; the NIM-free
+layer ABSTAINS (safe, not a cash-out). "the verifier is a validated selector" — it is REAL
+(breaks the hard tie) but INCONSISTENT (over-abstains sunandmoon) and net-committed-unchanged vs
+W128, so NOT validated; and even a perfect selector is generation-capped here. "W129 ran a fresh
+dev bench / a resistant probe" — NO: β1 was NOT fired (R2′ unreachable by selection on a
+generation-bound bench ⇒ hope-funded), and T1 FALSE ⇒ $0 resistant NIM. "the substrate trust
+controller was used / was worthless" — its LITERAL bridge was killed as latent-specific
+fake-different (machine-checkable), while the integrity-trust-coupled ABSTAIN concept is realized
+natively over honest code-correctness trust — both halves stated. "this weakens W89/W105 / proves
+the contamination confound / solves multi-agent context" — none; W129 tests a SELECTOR + a SPEND
+gate. Bounded-context / compaction / summarization remain anti-patterns, explicitly not pursued.
+
+Anchors: `docs/RESULTS_W129_PUBLIC_SIGNAL_SELECTION_ORACLE_V1.md`; `docs/RUNBOOK_W129.md`;
+`results/w129/`.
+
 ## W128 (role-diverse algorithm SEARCH on the non-scaffoldable resistant clusters — mechanism REAL + lifts the generation ceiling but NOT EARNED on the EXPOSED hard-cluster dev bench [net +0]; selection-layer cap; $0 resistant NIM; no third retirement) — explicit do-not-overstate
 
 **DO say:** "W128 refused to stop at the W127 scaffold miss. LANE α built a genuinely DIFFERENT
