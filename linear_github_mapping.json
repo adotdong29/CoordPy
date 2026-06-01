@@ -875,10 +875,24 @@
     },
     {
       "id": "W123",
-      "title": "large-n matched ICPC closure ATTEMPT (>=100/field) => official-family supply census (live-verified all_match=true, census_cid 4d6f4e8f1a2c): RESISTANT hard-capped 4 post-cutoff surfaces 51 raw/~45 tier-1 (51==W120 n_seen, all mined by W120, no 5th, <100 even at 100% yield) vs EXPOSED 11 pre-cutoff surfaces 135 raw/~113 tier-1 (REACHES >=100) => >=100 MATCHED battlefield UNREACHABLE, blocked SOLELY on the post-cutoff axis; Lane-beta large-n spend gate stayed shut ($0 NIM, no pilot, no n=30 seeds); Lane-gamma stronger-model gate CLOSED+MOOT {KNOWN:1,UNKNOWN:4}; decision CID 258b6ed7 invariant; n=30 caveat registered POST-CUTOFF-SUPPLY-BOUND (W123-L); W89+W105 stand (only two retirements); coordpy.icpc_largen_supply_census_v1 + 2 scripts + 7 tests; no version bump; no PyPI; coordpy/__init__.py untouched; COO-9 lead",
-      "commit": "4e8a1f9",
-      "linear_issue": "PENDING_LINEAR_MCP_UNAVAILABLE_THIS_SESSION",
-      "github_pushed": true
+      "title": "large-n matched ICPC closure ATTEMPT (>=100/field): official-family supply census",
+      "outcome": "alpha-CAP — the >=100/field matched battlefield is UNREACHABLE from the official github.com/icpc family, blocked SOLELY on the post-cutoff axis. Lane-alpha (NIM-free, live gh-API-verified all_match=true, census_cid bf7b2efbc724): RESISTANT 4 post-cutoff surfaces 51 raw/~45 tier-1 (51==W120 n_seen; all mined by W120; no 5th; <100 even at 100% yield = HARD CAP) vs EXPOSED 11 pre-cutoff surfaces 135 raw/~113 tier-1 (REACHES >=100). Lane-beta NOT earned (needs BOTH>=100) => $0 NIM, no pilot, no n=30 seeds. Lane-gamma stronger-model gate CLOSED+MOOT {KNOWN:1,UNKNOWN:4}; decision CID 258b6ed7 invariant. n=30 caveat now POST-CUTOFF-SUPPLY-BOUND (W123-L). W89+W105 STAND (only two retirements). No version bump; no PyPI; coordpy/__init__.py untouched. Self-caught + corrected a phantom-output census-count error mid-milestone.",
+      "commits": [
+        "c023599",
+        "388032b"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W123.md",
+        "docs/RESULTS_W123_LARGEN_SUPPLY_CENSUS_V1.md"
+      ],
+      "linear_issues": [
+        "COO-48"
+      ],
+      "carry_forwards_added": [
+        "W123-L-LARGEN-MATCHED-BATTLEFIELD-SUPPLY-UNREACHABLE",
+        "W123-T-STRONGER-MODEL-GATE-CLOSED-AND-MOOT"
+      ],
+      "carry_forwards_retired": []
     }
   ]
 }

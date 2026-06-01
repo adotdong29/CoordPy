@@ -1,6 +1,6 @@
 # RESULTS — W123 Lane-α: official ICPC large-n supply census
 
-**Date:** 2026-05-31 · **Verdict:** `LARGEN_MATCHED_BATTLEFIELD_UNREACHABLE_OFFICIAL_FAMILY` · **census_cid** `4d6f4e8f1a2c`
+**Date:** 2026-05-31 · **Verdict:** `LARGEN_MATCHED_BATTLEFIELD_UNREACHABLE_OFFICIAL_FAMILY` · **census_cid** `bf7b2efbc724`
 **Spend:** $0 NIM (Lane β gate did not open). Decision CID `258b6ed7` invariant. No version bump, no PyPI, `coordpy/__init__.py` untouched.
 
 ## What W123 attempted
