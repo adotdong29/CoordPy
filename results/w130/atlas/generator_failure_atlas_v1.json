@@ -1,0 +1,465 @@
+{
+  "schema": "coordpy.w130_generator_failure_atlas.v1",
+  "lane": "alpha_generator_atlas",
+  "nim_spend": 0,
+  "verified_on": "2026-06-01",
+  "exposed_root": "/tmp/w121_icpc",
+  "calls": "results/w128/dev_bench/w128_dev_bench_20260601T185815Z_fixed/dev_bench_calls.jsonl",
+  "replay_misses": 0,
+  "taxonomy": [
+    "SOLVED",
+    "SELECTION_FIXABLE",
+    "HIDDEN_EDGE_STATE_MISS",
+    "COMPLEXITY_BLIND",
+    "WRONG_ALGORITHM_ADMISSIBLE",
+    "WRONG_ALGORITHM_NO_SKETCH",
+    "PARSE_IO_FAILURE"
+  ],
+  "generator_fixable_modes": [
+    "COMPLEXITY_BLIND",
+    "HIDDEN_EDGE_STATE_MISS",
+    "PARSE_IO_FAILURE",
+    "WRONG_ALGORITHM_ADMISSIBLE"
+  ],
+  "atlas": {
+    "n_problems": 11,
+    "pool_bearing": [
+      "blueberrywaffle",
+      "pawnshop",
+      "sunandmoon"
+    ],
+    "pool_dead": [
+      "amazingpuzzle",
+      "colortubes",
+      "doubleup",
+      "electionparadox",
+      "familyvisits",
+      "foodprocessor",
+      "hilbertshedgemaze",
+      "slidecount"
+    ],
+    "mode_histogram": {
+      "PARSE_IO_FAILURE": 1,
+      "SELECTION_FIXABLE": 2,
+      "WRONG_ALGORITHM_NO_SKETCH": 2,
+      "HIDDEN_EDGE_STATE_MISS": 2,
+      "WRONG_ALGORITHM_ADMISSIBLE": 3,
+      "SOLVED": 1
+    },
+    "selector_fixable": [
+      "blueberrywaffle",
+      "pawnshop"
+    ],
+    "generator_fixable": [
+      "amazingpuzzle",
+      "doubleup",
+      "familyvisits",
+      "foodprocessor",
+      "hilbertshedgemaze",
+      "slidecount"
+    ],
+    "capability_failures": [
+      "colortubes",
+      "electionparadox"
+    ],
+    "top_generator_modes": [
+      [
+        "WRONG_ALGORITHM_ADMISSIBLE",
+        3
+      ],
+      [
+        "HIDDEN_EDGE_STATE_MISS",
+        2
+      ],
+      [
+        "WRONG_ALGORITHM_NO_SKETCH",
+        2
+      ],
+      [
+        "PARSE_IO_FAILURE",
+        1
+      ]
+    ],
+    "records": [
+      {
+        "short_name": "amazingpuzzle",
+        "family": "simulation_grid",
+        "surface": "2022-2023",
+        "date": "<=2024-08-31",
+        "n_candidates": 15,
+        "n_parse": 15,
+        "n_public_survivors": 0,
+        "n_pub_correct": 0,
+        "n_pub_wrong": 0,
+        "counts": {
+          "PASS": 0,
+          "HIDDEN_FAIL": 0,
+          "WRONG_ANSWER": 5,
+          "TLE": 1,
+          "CRASH": 9,
+          "PARSE_ERR": 0
+        },
+        "pool_bearing": false,
+        "accepted_specific": [
+          "graph_search"
+        ],
+        "sketch_specific": [
+          "graph_search",
+          "dynamic_programming",
+          "two_pointer",
+          "recursion_backtrack"
+        ],
+        "matched_specific": [
+          "graph_search"
+        ],
+        "sketch_admissible": true,
+        "dominant_mode": "PARSE_IO_FAILURE",
+        "selector_fixable": false,
+        "generator_fixable": true,
+        "committed_w128": false,
+        "note": "parse/crash dominates (9) -> trivial IO/format bug"
+      },
+      {
+        "short_name": "blueberrywaffle",
+        "family": "simulation_grid",
+        "surface": "problems",
+        "date": "<=2024-08-31",
+        "n_candidates": 14,
+        "n_parse": 14,
+        "n_public_survivors": 12,
+        "n_pub_correct": 2,
+        "n_pub_wrong": 10,
+        "counts": {
+          "PASS": 2,
+          "HIDDEN_FAIL": 10,
+          "WRONG_ANSWER": 2,
+          "TLE": 0,
+          "CRASH": 0,
+          "PARSE_ERR": 0
+        },
+        "pool_bearing": true,
+        "accepted_specific": [],
+        "sketch_specific": [
+          "number_theory"
+        ],
+        "matched_specific": [],
+        "sketch_admissible": false,
+        "dominant_mode": "SELECTION_FIXABLE",
+        "selector_fixable": true,
+        "generator_fixable": false,
+        "committed_w128": true,
+        "note": "pool-bearing; 2 hidden-correct + 10 hidden-wrong public survivor(s) -> a selection tie (W129 domain), not generation"
+      },
+      {
+        "short_name": "colortubes",
+        "family": "simulation_grid",
+        "surface": "problems",
+        "date": "<=2024-08-31",
+        "n_candidates": 14,
+        "n_parse": 14,
+        "n_public_survivors": 0,
+        "n_pub_correct": 0,
+        "n_pub_wrong": 0,
+        "counts": {
+          "PASS": 0,
+          "HIDDEN_FAIL": 0,
+          "WRONG_ANSWER": 7,
+          "TLE": 3,
+          "CRASH": 4,
+          "PARSE_ERR": 0
+        },
+        "pool_bearing": false,
+        "accepted_specific": [],
+        "sketch_specific": [
+          "graph_search"
+        ],
+        "matched_specific": [],
+        "sketch_admissible": false,
+        "dominant_mode": "WRONG_ALGORITHM_NO_SKETCH",
+        "selector_fixable": false,
+        "generator_fixable": false,
+        "committed_w128": false,
+        "note": "0 public survivors; no sketch matches the accepted approach -> capability failure (the hardest mode; a same-budget generator is unlikely to crack it)"
+      },
+      {
+        "short_name": "doubleup",
+        "family": "adhoc_math",
+        "surface": "2023-2024",
+        "date": "<=2024-08-31",
+        "n_candidates": 14,
+        "n_parse": 14,
+        "n_public_survivors": 1,
+        "n_pub_correct": 0,
+        "n_pub_wrong": 1,
+        "counts": {
+          "PASS": 0,
+          "HIDDEN_FAIL": 1,
+          "WRONG_ANSWER": 12,
+          "TLE": 0,
+          "CRASH": 1,
+          "PARSE_ERR": 0
+        },
+        "pool_bearing": false,
+        "accepted_specific": [],
+        "sketch_specific": [
+          "graph_search",
+          "dynamic_programming",
+          "greedy_heap",
+          "recursion_backtrack"
+        ],
+        "matched_specific": [],
+        "sketch_admissible": false,
+        "dominant_mode": "HIDDEN_EDGE_STATE_MISS",
+        "selector_fixable": false,
+        "generator_fixable": true,
+        "committed_w128": false,
+        "note": "1 candidate(s) pass ALL public but fail secret -> near-correct algorithm with a state/invariant/edge bug (generator-fixable)"
+      },
+      {
+        "short_name": "electionparadox",
+        "family": "adhoc_math",
+        "surface": "problems",
+        "date": "<=2024-08-31",
+        "n_candidates": 14,
+        "n_parse": 14,
+        "n_public_survivors": 0,
+        "n_pub_correct": 0,
+        "n_pub_wrong": 0,
+        "counts": {
+          "PASS": 0,
+          "HIDDEN_FAIL": 0,
+          "WRONG_ANSWER": 13,
+          "TLE": 1,
+          "CRASH": 0,
+          "PARSE_ERR": 0
+        },
+        "pool_bearing": false,
+        "accepted_specific": [],
+        "sketch_specific": [
+          "binary_search",
+          "greedy_heap"
+        ],
+        "matched_specific": [],
+        "sketch_admissible": false,
+        "dominant_mode": "WRONG_ALGORITHM_NO_SKETCH",
+        "selector_fixable": false,
+        "generator_fixable": false,
+        "committed_w128": false,
+        "note": "0 public survivors; no sketch matches the accepted approach -> capability failure (the hardest mode; a same-budget generator is unlikely to crack it)"
+      },
+      {
+        "short_name": "familyvisits",
+        "family": "greedy_scheduling",
+        "surface": "problems",
+        "date": "<=2024-08-31",
+        "n_candidates": 24,
+        "n_parse": 24,
+        "n_public_survivors": 0,
+        "n_pub_correct": 0,
+        "n_pub_wrong": 0,
+        "counts": {
+          "PASS": 0,
+          "HIDDEN_FAIL": 0,
+          "WRONG_ANSWER": 24,
+          "TLE": 0,
+          "CRASH": 0,
+          "PARSE_ERR": 0
+        },
+        "pool_bearing": false,
+        "accepted_specific": [
+          "dynamic_programming",
+          "binary_search",
+          "recursion_backtrack"
+        ],
+        "sketch_specific": [
+          "dynamic_programming",
+          "binary_search",
+          "greedy_heap",
+          "recursion_backtrack"
+        ],
+        "matched_specific": [
+          "binary_search",
+          "dynamic_programming",
+          "recursion_backtrack"
+        ],
+        "sketch_admissible": true,
+        "dominant_mode": "WRONG_ALGORITHM_ADMISSIBLE",
+        "selector_fixable": false,
+        "generator_fixable": true,
+        "committed_w128": false,
+        "note": "0 public survivors; >=1 sketch matches the accepted approach -> idea proposed, derivation/impl wrong (generator-fixable)"
+      },
+      {
+        "short_name": "foodprocessor",
+        "family": "adhoc_math",
+        "surface": "problems",
+        "date": "<=2024-08-31",
+        "n_candidates": 14,
+        "n_parse": 14,
+        "n_public_survivors": 0,
+        "n_pub_correct": 0,
+        "n_pub_wrong": 0,
+        "counts": {
+          "PASS": 0,
+          "HIDDEN_FAIL": 0,
+          "WRONG_ANSWER": 13,
+          "TLE": 1,
+          "CRASH": 0,
+          "PARSE_ERR": 0
+        },
+        "pool_bearing": false,
+        "accepted_specific": [
+          "greedy_heap"
+        ],
+        "sketch_specific": [
+          "graph_search",
+          "dynamic_programming",
+          "greedy_heap"
+        ],
+        "matched_specific": [
+          "greedy_heap"
+        ],
+        "sketch_admissible": true,
+        "dominant_mode": "WRONG_ALGORITHM_ADMISSIBLE",
+        "selector_fixable": false,
+        "generator_fixable": true,
+        "committed_w128": false,
+        "note": "0 public survivors; >=1 sketch matches the accepted approach -> idea proposed, derivation/impl wrong (generator-fixable)"
+      },
+      {
+        "short_name": "hilbertshedgemaze",
+        "family": "simulation_grid",
+        "surface": "2022-2023",
+        "date": "<=2024-08-31",
+        "n_candidates": 14,
+        "n_parse": 14,
+        "n_public_survivors": 0,
+        "n_pub_correct": 0,
+        "n_pub_wrong": 0,
+        "counts": {
+          "PASS": 0,
+          "HIDDEN_FAIL": 0,
+          "WRONG_ANSWER": 13,
+          "TLE": 0,
+          "CRASH": 1,
+          "PARSE_ERR": 0
+        },
+        "pool_bearing": false,
+        "accepted_specific": [
+          "graph_search",
+          "recursion_backtrack"
+        ],
+        "sketch_specific": [
+          "graph_search",
+          "dynamic_programming",
+          "recursion_backtrack"
+        ],
+        "matched_specific": [
+          "graph_search",
+          "recursion_backtrack"
+        ],
+        "sketch_admissible": true,
+        "dominant_mode": "WRONG_ALGORITHM_ADMISSIBLE",
+        "selector_fixable": false,
+        "generator_fixable": true,
+        "committed_w128": false,
+        "note": "0 public survivors; >=1 sketch matches the accepted approach -> idea proposed, derivation/impl wrong (generator-fixable)"
+      },
+      {
+        "short_name": "pawnshop",
+        "family": "adhoc_math",
+        "surface": "problems",
+        "date": "<=2024-08-31",
+        "n_candidates": 14,
+        "n_parse": 14,
+        "n_public_survivors": 7,
+        "n_pub_correct": 6,
+        "n_pub_wrong": 1,
+        "counts": {
+          "PASS": 6,
+          "HIDDEN_FAIL": 1,
+          "WRONG_ANSWER": 5,
+          "TLE": 0,
+          "CRASH": 2,
+          "PARSE_ERR": 0
+        },
+        "pool_bearing": true,
+        "accepted_specific": [],
+        "sketch_specific": [
+          "dynamic_programming",
+          "two_pointer"
+        ],
+        "matched_specific": [],
+        "sketch_admissible": false,
+        "dominant_mode": "SELECTION_FIXABLE",
+        "selector_fixable": true,
+        "generator_fixable": false,
+        "committed_w128": false,
+        "note": "pool-bearing; 6 hidden-correct + 1 hidden-wrong public survivor(s) -> a selection tie (W129 domain), not generation"
+      },
+      {
+        "short_name": "slidecount",
+        "family": "adhoc_math",
+        "surface": "problems",
+        "date": "<=2024-08-31",
+        "n_candidates": 14,
+        "n_parse": 14,
+        "n_public_survivors": 6,
+        "n_pub_correct": 0,
+        "n_pub_wrong": 6,
+        "counts": {
+          "PASS": 0,
+          "HIDDEN_FAIL": 6,
+          "WRONG_ANSWER": 8,
+          "TLE": 0,
+          "CRASH": 0,
+          "PARSE_ERR": 0
+        },
+        "pool_bearing": false,
+        "accepted_specific": [],
+        "sketch_specific": [
+          "two_pointer"
+        ],
+        "matched_specific": [],
+        "sketch_admissible": false,
+        "dominant_mode": "HIDDEN_EDGE_STATE_MISS",
+        "selector_fixable": false,
+        "generator_fixable": true,
+        "committed_w128": false,
+        "note": "6 candidate(s) pass ALL public but fail secret -> near-correct algorithm with a state/invariant/edge bug (generator-fixable)"
+      },
+      {
+        "short_name": "sunandmoon",
+        "family": "adhoc_math",
+        "surface": "problems",
+        "date": "<=2024-08-31",
+        "n_candidates": 14,
+        "n_parse": 14,
+        "n_public_survivors": 8,
+        "n_pub_correct": 8,
+        "n_pub_wrong": 0,
+        "counts": {
+          "PASS": 8,
+          "HIDDEN_FAIL": 0,
+          "WRONG_ANSWER": 2,
+          "TLE": 0,
+          "CRASH": 4,
+          "PARSE_ERR": 0
+        },
+        "pool_bearing": true,
+        "accepted_specific": [],
+        "sketch_specific": [
+          "number_theory"
+        ],
+        "matched_specific": [],
+        "sketch_admissible": false,
+        "dominant_mode": "SOLVED",
+        "selector_fixable": false,
+        "generator_fixable": false,
+        "committed_w128": true,
+        "note": "pool-bearing; the committed candidate is correct (no generation gap)"
+      }
+    ]
+  },
+  "generated_at": "2026-06-01T22:06:33.243600+00:00"
+}

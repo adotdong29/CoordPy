@@ -243,3 +243,44 @@ generation-cap / an operator-greenlit fresh controller pilot on the unsolved
 problems (NOT precursor-earned) / a code-competent local model / a primary-KNOWN
 stronger model. See `docs/RESULTS_W125_CONTROLLER_NATIVE_CODE_MECHANISM_V1.md` +
 `docs/RUNBOOK_W125.md`.
+
+## Post-W125 update — the resistant-generation cap chain (W126 → W130), still exactly two retirements
+
+W125 localized the resistant field as **generation-capped for $0 re-routing**. W126–W130 attacked
+the generation lever directly, in escalating ways, all ending **$0 resistant** with **no third
+retirement** (W89 + W105 remain the only two):
+
+* **W126** — $0 deterministic SYNTHESIS over the already-paid pool on the 22 uniformly-unsolved
+  resistant problems: 894 leakage-clean candidates, **oracle ceiling 0/22** ⇒ `SYNTHESIS-CAP`
+  (capability failures, not blind-selection).
+* **W127** — family-SCAFFOLD fresh generation: EXPOSED dev EARNED +2 (weak/confounded) but the
+  earned resistant probe = **0/6** ⇒ `RESISTANT_SCAFFOLD_FRESH_GEN_CAP` (the exposed signal did
+  not transfer).
+* **W128** — role-diverse algorithm SEARCH on the non-scaffoldable clusters: REAL + LIFTS the
+  generation ceiling (pool 3/11 > plain 2/11) but RDA4 committed only 2/11 (net +0) ⇒ the cap is
+  the verification-based SELECTION layer.
+* **W129** — attacked the SELECTOR directly: the pawnshop "selection miss" is a COMPLEXITY bug a
+  code-reading verifier breaks, but committed ≤ pool ceiling (baseline+1) < +2 regardless of
+  selector quality ⇒ **the binding cap MOVED from SELECTION to GENERATION**.
+
+* **W130 — the GENERATOR attacked directly (the W129 selector held FIXED downstream).** A
+  generator-failure atlas decomposed the 11-target hard-cluster pool: **8/11 pool-DEAD** (3
+  `WRONG_ALGORITHM_ADMISSIBLE` + 2 `HIDDEN_EDGE` + 2 capability `NO_SKETCH` + 1 `PARSE_IO`; the 2
+  pool-bearing misses are `SELECTION_FIXABLE`). A stronger same-budget generator slate (GG1
+  complexity-gated handoff / GG2 counterexample-to-rewrite / GG3 family anti-pattern coach / GG4
+  budget router / GGLEAD), run on the SAME 11 targets at MATCHED K=5 (275 NIM), created **exactly
+  1 NEW pool solve**: GG2's in-loop public-digest rewrite cracked `doubleup` (HIDDEN_EDGE) the
+  ENTIRE old W128/W129 pool missed — the **first W120–W130 GENERATION crack of a pool-DEAD
+  problem** — committed by the fixed selector, leakage-clean. But it is **NOT EARNED** (1 < the +2
+  earn bar, does not span ≥2 families/modes). The dominant `WRONG_ALGORITHM_ADMISSIBLE` mode (3
+  problems) was cracked by **no** arm, confirming the atlas idiom-overlap "admissible" is an UPPER
+  BOUND (a named technique ≠ a correct algorithm = capability-bound). GG1/GG3/GG4/GGLEAD added 0;
+  GG3 was killed (boilerplate-leakage risk). T1 FALSE ⇒ **$0 resistant NIM**; stronger-model gate
+  CLOSED.
+
+**Net across W126–W130:** the resistant/hard-cluster generation ceiling is **partially liftable**
+(W130's GG2 counterexample-rewrite cracked one HIDDEN_EDGE problem) but **not to the earn bar** —
+the dominant failures are capability-bound, needing real model capability, not more same-budget
+generator engineering. The two confirmed retirements (W89, W105) **STAND**, bounded as
+contamination-EXPOSED HumanEval-family at 70B. See
+`docs/RESULTS_W130_GENERATION_CEILING_ATTACK_V1.md` + `docs/RUNBOOK_W130.md`.

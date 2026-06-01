@@ -1,3 +1,50 @@
+## W130 (generation-ceiling attack on the hard ICPC clusters — a stronger same-budget generator cracks ONE pool-dead HIDDEN_EDGE problem by counterexample-rewrite but is NOT EARNED [1 < +2 spanning]; the dominant admissible-wrong-algorithm mode is capability-bound; 275 NIM dev; no third retirement) — explicit do-not-overstate
+
+**DO say:** "W129 proved the binding cap is GENERATION not selection, so W130 attacked the
+GENERATOR directly. LANE α built `coordpy.generator_failure_atlas_v1` ($0): it reconstructed the
+FULL old W128/W129 candidate pool (plain∪scaffold∪rda; replay_misses=0) and classified each
+hard-cluster problem's dominant GENERATOR-failure mode — 8/11 are pool-DEAD (3
+WRONG_ALGORITHM_ADMISSIBLE + 2 HIDDEN_EDGE_STATE_MISS + 2 WRONG_ALGORITHM_NO_SKETCH capability + 1
+PARSE_IO_FAILURE), the 2 pool-bearing misses are SELECTION_FIXABLE (W129's domain); implementation
+is NOT the bottleneck (every candidate parses; 7/8 pool-dead have ZERO public survivors = wrong
+algorithm). LANE β built `coordpy.stronger_generator_slate_v1` — a stronger SAME-BUDGET generator
+slate (GG1 complexity-gated handoff / GG2 counterexample-to-rewrite / GG3 family anti-pattern
+coach / GG4 budget router / GGLEAD) where EVERY arm spends exactly K=5 model calls and the W129
+selector is held FIXED downstream (NIM-free SOLEAD), so GENERATION is the only variable. On the
+SAME 11 EXPOSED hard-cluster targets (275 NIM) the slate created EXACTLY 1 NEW pool solve: GG2's
+in-loop, PUBLIC-digest-driven REWRITE cracked `doubleup` (HIDDEN_EDGE) — a problem the ENTIRE old
+W128/W129 pool missed — and the fixed selector committed it, leakage-clean. This is the FIRST
+W120–W130 mechanism to crack a pool-DEAD problem by GENERATION. But it is NOT EARNED: 1 < the +2
+earn bar, and it does not span ≥2 families/modes. The dominant generator-fixable mode (the 3
+WRONG_ALGORITHM_ADMISSIBLE problems) was cracked by NO arm — confirming the atlas idiom-overlap
+'admissible' is an UPPER BOUND (a named technique ≠ a correct algorithm = capability-bound). GG1,
+GG3, GG4, GGLEAD added 0; GG3's coach additionally tripped the boilerplate leakage guard (killed).
+The stored regression trio (blueberrywaffle/pawnshop/sunandmoon) is PRESERVED (0 new mis-commits).
+Controls pass; the hosted-controller literal bridge is killed (the cache planner is efficiency-only
+KV-prefix savings, not a capability lever). LANE γ: T1 FALSE ⇒ $0 resistant NIM; stronger-model
+gate CLOSED (258b6ed7, {KNOWN:1, UNKNOWN:4}). W89 (+5.56) + W105 (+7.00) STAND as the only two
+retirements; W130 adds none."
+
+**DO NOT say:** "W130 earned a third retirement / cleared the +2 bar / validated the generator" —
+it did NOT: 1 new solve < 2, and it does not span ≥2 families/modes. "the stronger generator lifts
+the generation ceiling" (unqualified) — it cracked EXACTLY ONE HIDDEN_EDGE problem via the rewrite
+lever; the dominant WRONG_ALGORITHM_ADMISSIBLE mode is capability-bound and was cracked by no arm.
+"the atlas says 6/8 pool-dead are generator-fixable, so the generator should fix 6" — 'admissible'
+is an idiom-overlap UPPER BOUND (named technique ≠ correct algorithm); the dev bench empirically
+showed it over-counts (the 3 admissible problems were NOT cracked). "GG2's rewrite is a validated
+mechanism" — it is REAL and load-bearing on ONE problem, but 1 crack is below the earn bar; it is
+not validated. "GG3's anti-pattern coach or GG4's router helped" — both added 0 new solves, and
+GG3 carries a boilerplate-leakage risk (caught + dropped by the guard) ⇒ GG3 killed. "the hosted
+planner gives a capability budget policy" — the hosted cache-aware planner is EFFICIENCY-only
+(KV-prefix savings); the substrate handoff/coordinator literal bridges are killed as fake-different.
+"W130 ran a resistant probe / spent resistant NIM" — NO: T1 FALSE ⇒ $0 resistant NIM, no probe,
+exposed control not bought. "this weakens W89/W105 / proves the contamination confound / solves
+multi-agent context" — none; W130 tests a GENERATOR mechanism + a SPEND gate. Bounded-context /
+compaction / summarization remain anti-patterns, explicitly not pursued.
+
+Anchors: `docs/RESULTS_W130_GENERATION_CEILING_ATTACK_V1.md`; `docs/RUNBOOK_W130.md`;
+`docs/FRONTIER_RELEVANCE_AUDIT_W130_V1.md`; `results/w130/`.
+
 ## W129 (public-signal SELECTION ORACLE on the W128 hard-cluster miss — the pawnshop "selection cap" is a COMPLEXITY bug a verifier breaks, but the binding cap is GENERATION not selection [committed ≤ pool ceiling = baseline+1 < +2]; 3 NIM; no third retirement) — explicit do-not-overstate
 
 **DO say:** "W129 attacked the SELECTOR directly instead of accepting W128's selection cap. A $0
