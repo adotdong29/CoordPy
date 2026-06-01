@@ -3558,6 +3558,8 @@ or `docs/archive/pre-coordpy-theory/PROOFS.md`.
   two; every non-FAIL seed on both fields (+13.33 / +10.00 / +10.00) is
   `PASS_NON_MECHANISM_DRIVEN` (not a mechanism win). Status: code-backed limitation.
 * **W122-L-MATCHED-CONTRAST-UNRESOLVABLE-AT-N30-CAP.** The literal single-seed caveat is
+- **W123-L-LARGEN-MATCHED-BATTLEFIELD-SUPPLY-UNREACHABLE** · the >=100/field matched ICPC battlefield cannot be built from the official `github.com/icpc` family, blocked SOLELY on the post-cutoff axis: resistant hard-capped at 51 raw / ~45 tier-1 (exactly 4 post-cutoff package surfaces — RMRC 2024-25/2025-26 + ECNA 2024-25/2025-26 — all already mined by W120; no 5th; <100 even at 100% yield), while exposed scales past 100 (135 raw / ~113 tier-1, 11 surfaces). Census live-verified (`census_cid bf7b2efbc724`, all_match=True; resistant raw 51 == W120 n_seen). The n=30 caveat is post-cutoff-supply-bound, not method-bound · **registered** · W123.
+- **W123-T-STRONGER-MODEL-GATE-CLOSED-AND-MOOT** · stronger-model gate unchanged {KNOWN:1, UNKNOWN:4} AND moot — even a primary-KNOWN stronger model could not run a large-n matched pilot (battlefield supply-unreachable); decision CID 258b6ed7 invariant · **empirical** · W123.
   retired (3 seeds each side) but REPLACED by a small-n-variance limitation: at n=30, K=5 the
   per-field B−A1 swings ±10 pp on ~3 rescues, so the 3-seed aggregate is B4 (resistant +4.44 /
   exposed +8.89, both out of band, neither clean). Neither the W121 "weakened" read
