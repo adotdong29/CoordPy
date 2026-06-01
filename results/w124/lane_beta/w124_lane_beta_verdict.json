@@ -1,0 +1,18 @@
+{
+  "schema": "coordpy.w124_lane_beta_controller_probe.v1",
+  "lane": "beta_learned_memory_controller",
+  "question": "Is there a learned-controller line in differentiable_memory_substrate_v1 / composed_learned_memory_v1 actually relevant to ICPC code repair here?",
+  "decision_problem": "predict reflexion-rescue of an A1-failed problem from pre-decision trace features",
+  "n_a1_failed_decisions": 139,
+  "n_rescue_events": 14,
+  "rescue_base_rate": 0.10071942446043165,
+  "majority_balanced_accuracy": 0.5,
+  "learned_balanced_accuracy_cv": 0.502,
+  "earn_margin_required": 0.05,
+  "controller_line_earned": false,
+  "structural_assessment": "differentiable_memory_substrate_v1 + composed_learned_memory_v1 are sequence-memory models trained on SYNTHETIC content-addressed-recall / long-horizon datasets (build_content_addressed_recall_dataset_v1 / build_composed_long_horizon_dataset_v1). The ICPC reflexion-rescue decision is a small tabular classification (n=139 A1-failed problems, 14 rescue events across 6 runs) \u2014 architecturally mismatched and data-starved; a heavyweight learned-memory controller is not warranted even before training it.",
+  "verdict": "TOO_SYNTHETIC_NOT_WARRANTED",
+  "note": "",
+  "nim_spend": 0,
+  "generated_at": "2026-06-01T01:49:50.045529+00:00"
+}

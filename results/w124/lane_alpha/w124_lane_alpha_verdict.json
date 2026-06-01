@@ -1,0 +1,135 @@
+{
+  "schema": "coordpy.transformer_native_code_intervention_v1.v1",
+  "lane": "alpha_local_transformer_native_code_intervention",
+  "dataset_manifest": {
+    "matched_core_slices": {
+      "resistant_30slice_cid": "01bf9ef8",
+      "exposed_30slice_cid": "32d15db5"
+    },
+    "runs": {
+      "results/w120/icpc_pilot/w120_icpc_pilot_meta_llama-4-maverick-17b-128e-instruct_20260531T030343Z:resistant": {
+        "n_rows": 263,
+        "n_pos": 8
+      },
+      "results/w121/exposed_pilot/w121_exposed_pilot_meta_llama-4-maverick-17b-128e-instruct_20260531T132231Z:exposed": {
+        "n_rows": 256,
+        "n_pos": 9
+      },
+      "results/w122/paired_seed/w122_paired_seed_120002_20260531T155909Z:resistant": {
+        "n_rows": 250,
+        "n_pos": 7
+      },
+      "results/w122/paired_seed/w122_paired_seed_120002_20260531T155909Z:exposed": {
+        "n_rows": 270,
+        "n_pos": 10
+      },
+      "results/w122/paired_seed/w122_paired_seed_120003_20260531T184401Z:resistant": {
+        "n_rows": 256,
+        "n_pos": 11
+      },
+      "results/w122/paired_seed/w122_paired_seed_120003_20260531T184401Z:exposed": {
+        "n_rows": 275,
+        "n_pos": 7
+      }
+    },
+    "label_mode": "offline_official_grader_reports",
+    "model": "distilbert/distilgpt2",
+    "n_rows": 312,
+    "n_pos": 52,
+    "subsample": {
+      "neg_per_field_cap": 130,
+      "n_before": 1570,
+      "n_pos_all": 52,
+      "n_neg_all": 1518,
+      "n_after": 312,
+      "subsample_seed": 124000
+    }
+  },
+  "m4_separability": {
+    "schema": "coordpy.transformer_native_code_intervention_v1.v1",
+    "n_rows": 312,
+    "n_pos": 52,
+    "n_groups": 60,
+    "encoder_id": "hf_causal_lm_direct:distilbert/distilgpt2",
+    "auc_hidden": 0.6344674556213019,
+    "auc_surface": 0.6343195266272189,
+    "auc_hidden_resistant": 0.6991124260355029,
+    "auc_hidden_exposed": 0.5751479289940828,
+    "auc_surface_resistant": 0.7639053254437871,
+    "auc_surface_exposed": 0.32041420118343195,
+    "n_splits": 5,
+    "label_source_counts": {
+      "report_failed_arm": 230,
+      "report_a0": 52,
+      "report_b_firstpass": 28,
+      "report_b_pre_firstpass": 2
+    }
+  },
+  "m4_cid": "2fc8fa9b2be689f7f317727e536e58ff149f846e4efd7172095115eb0a4e1bb4",
+  "m4_gate": {
+    "verdict": "M4_CLOSE_BLIP_NOT_A_GAIN",
+    "auc_hidden": 0.6344674556213019,
+    "auc_surface": 0.6343195266272189,
+    "margin_over_surface": 0.00014792899408300197,
+    "auc_floor": 0.6,
+    "margin_floor": 0.05,
+    "floor_ok": true,
+    "margin_ok": false,
+    "sign_consistent": false,
+    "real_signal": false
+  },
+  "m5_projector": {
+    "status": "NOT_RUN_M4_SIGNAL_POOR",
+    "reason": "M5 gated on M4 real signal; M4 did not earn it.",
+    "hosted_translatable": false
+  },
+  "m6_controller_contract": {
+    "controller": "M6ToolSubstrateCodeControllerV1",
+    "hosted_translatable": true,
+    "local_gain_demonstrated": false,
+    "deterministic_routes": [
+      "PATCH",
+      "REPLAN",
+      "PATCH",
+      "ABSTAIN"
+    ],
+    "route_reasons": [
+      "typed runtime error => targeted patch",
+      "timeout => algorithmic; reprompt fresh",
+      "typed runtime error => targeted patch",
+      "no actionable signal + no budget => abstain"
+    ],
+    "materially_different_from_reflexion": true,
+    "reads_hidden_test_source": false
+  },
+  "candidates_survived": [],
+  "hosted_maverick_probe_earned": false,
+  "interpretation": "M4 SIGNAL-POOR: distilgpt2 (82M general LM) hidden state does not separate accepted-vs-failed ICPC code beyond surface features. The transformer-native hidden-state line is BLOCKED AT THE PRECURSOR on this host (no code-competent local encoder; transformers 4.28.1 too old for modern code models) \u2014 NOT a refutation of the mechanism idea. No hosted Maverick probe earned ($0 NIM). M5 not run; M6 stays contract-only.",
+  "generated_at": "2026-06-01T02:09:09.164910+00:00",
+  "per_run": {
+    "results/w120/icpc_pilot/w120_icpc_pilot_meta_llama-4-maverick-17b-128e-instruct_20260531T030343Z:resistant": {
+      "n_rows": 263,
+      "n_pos": 8
+    },
+    "results/w121/exposed_pilot/w121_exposed_pilot_meta_llama-4-maverick-17b-128e-instruct_20260531T132231Z:exposed": {
+      "n_rows": 256,
+      "n_pos": 9
+    },
+    "results/w122/paired_seed/w122_paired_seed_120002_20260531T155909Z:resistant": {
+      "n_rows": 250,
+      "n_pos": 7
+    },
+    "results/w122/paired_seed/w122_paired_seed_120002_20260531T155909Z:exposed": {
+      "n_rows": 270,
+      "n_pos": 10
+    },
+    "results/w122/paired_seed/w122_paired_seed_120003_20260531T184401Z:resistant": {
+      "n_rows": 256,
+      "n_pos": 11
+    },
+    "results/w122/paired_seed/w122_paired_seed_120003_20260531T184401Z:exposed": {
+      "n_rows": 275,
+      "n_pos": 7
+    }
+  }
+}

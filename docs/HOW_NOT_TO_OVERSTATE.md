@@ -1,3 +1,45 @@
+## W124 (transformer-native code-intervention arsenal run locally on matched ICPC — M4 no signal beyond surface; learned-memory at chance; $0; no third retirement) — explicit do-not-overstate
+
+**DO say:** "W124 ran the repo's unused transformer/substrate arsenal against the
+code-closure problem for the first time. On the only locally-loadable real
+transformer (`distilbert/distilgpt2`, 82M general LM; no code-fine-tuned model is
+present and transformers 4.28.1 is too old for one), the M4 AST-boundary
+hidden-state probe over 1,570 official-grader-labelled Maverick ICPC generations
+scored AUC 0.6345 — essentially IDENTICAL to an 11-feature surface baseline
+(0.6343; Δ=+0.0001 ≪ +0.05) — so the transformer's hidden state adds NOTHING
+beyond surface confounds for code-correctness (`M4_CLOSE_BLIP_NOT_A_GAIN`). The
+learned-memory controller line scored at chance (0.502) on the reflexion-rescue
+decision. No hosted Maverick probe was earned ($0 NIM). W89 + W105 remain the
+only two retirements; W124 adds none."
+
+**DO NOT say / claims W124 does NOT support:**
+
+* That a transformer-native intervention BEATS self-consistency on ICPC — W124
+  never got there: it is the PRECURSOR test (is there any usable hidden-state
+  signal?) and the answer on this host is NO.
+* That the mechanism IDEA is refuted — it is NOT. The blocker is **hardware/model
+  supply**: there is no code-COMPETENT local encoder, and distilgpt2's hidden
+  state simply does not encode ICPC code-correctness. A real code model (newer
+  transformers + a small code model, or a GPU) is the prerequisite to even
+  re-test the precursor.
+* That the M4 ~0.63 AUC is a "weak positive" — it is NOT a mechanism signal: the
+  surface baseline matches it (and on the resistant slice surface 0.76 > hidden
+  0.70), so the separability is a length/structure confound, not the transformer.
+* That the learned-memory arsenal is relevant to code repair — it is at chance
+  here; the modules are synthetic-recall models, architecturally mismatched and
+  data-starved (139 A1-failed problems, 14 rescues).
+* That W124 is a retirement, a hosted result, or a stronger claim than before. It
+  is a $0-NIM honest NEGATIVE with a precisely-localized blocker (local
+  code-model-encoder supply — the model-axis sibling of W123's battlefield-supply
+  cap). **W89 + W105 remain the only two retirements.**
+* That M6 (the tool-call-substrate controller) demonstrated a gain — it ships as
+  an EXECUTABLE, text-translatable CONTRACT only; with no competent local
+  generator it was never shown to beat reflexion.
+
+Anchors: `docs/RESULTS_W124_TRANSFORMER_NATIVE_CODE_INTERVENTION_V1.md`;
+`docs/RUNBOOK_W124.md`; `results/w124/`;
+`coordpy/transformer_native_code_intervention_v1.py`.
+
 ## W122 (matched-family multi-seed paired seed — FINAL 3-seed AMBIGUOUS [B4]; closure NOT achieved; BOTH fields spiked) — explicit do-not-overstate
 
 **DO say:** "W122 attacked the one live statistical caveat on the matched-family ICPC

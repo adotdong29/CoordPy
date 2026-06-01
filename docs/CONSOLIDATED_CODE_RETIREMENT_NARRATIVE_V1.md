@@ -175,3 +175,32 @@ seed is non-mechanism-driven). Decision CID `258b6ed7` invariant. COO-9 lead; W1
 B4-after-3rd-seed ⇒ accept the bounded HumanEval-family ceiling OR escalate to larger n PER
 FIELD (≥100/field; not more n=30 seeds; no 4th). See
 `docs/RESULTS_W122_PAIRED_SEED_CLOSURE_V1.md` + `docs/CONTAMINATION_CONTROL_FRAMING_W122_V1.md`.
+
+## Post-W122 update — W123 (battlefield supply-capped) + W124 (transformer-native arsenal signal-poor) — still exactly two retirements
+
+W122's "unresolvable at n=30" set up two honest follow-ups, both NIM-free and both
+ending **$0** with **no third retirement**. **W123** proved the obvious escalation
+(≥100 problems PER FIELD) is **supply-UNREACHABLE** from the official
+`github.com/icpc` family: the resistant (post-cutoff) side is hard-capped at 51
+raw / ~45 tier-1 (exactly 4 post-cutoff package surfaces, all already mined by
+W120; no 5th), so the n=30 caveat is **post-cutoff-supply-bound, not
+method-bound**. **W124** then stopped treating the saturated battlefield as the
+only lever and, for the first time, ran the repo's **transformer/substrate/
+learned-memory arsenal** against the code-closure problem locally. On the only
+locally-loadable real transformer (`distilgpt2`, a tiny general LM — no
+code-competent model is available), an AST-boundary **hidden-state probe** over
+1,570 official-grader-labelled Maverick ICPC generations scored AUC **0.6345 ≈**
+the surface-feature baseline **0.6343** (Δ=+0.0001 ≪ +0.05): the transformer's
+hidden state adds **nothing** beyond surface confounds for code-correctness
+(`M4_CLOSE_BLIP_NOT_A_GAIN`), so the transformer-native line is **blocked at the
+precursor** by **local code-model-encoder supply** (the model-axis sibling of
+W123's battlefield-supply cap) — not a refutation of the idea. The learned-memory
+controller line scored **at chance** (0.502) on the reflexion-rescue decision
+(`TOO_SYNTHETIC_NOT_WARRANTED`). No hosted Maverick probe was earned. The
+stronger-model gate is unchanged (`NO_CERTIFIABLE_STRONGER_MODEL`; decision CID
+`258b6ed7` invariant). **W89 (+5.56) + W105 (+7.00) remain the only two
+retirements;** W123 + W124 add none. COO-9 lead; W125 = re-test the M4 precursor
+if a code-competent local model becomes loadable / accept the bounded ceiling +
+encoder-supply limitation / a primary-KNOWN reachable stronger model. See
+`docs/RESULTS_W123_LARGEN_SUPPLY_CENSUS_V1.md` +
+`docs/RESULTS_W124_TRANSFORMER_NATIVE_CODE_INTERVENTION_V1.md`.
