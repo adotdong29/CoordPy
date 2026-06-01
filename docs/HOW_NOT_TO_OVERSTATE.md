@@ -1,3 +1,52 @@
+## W127 (resistant capability atlas + family-specific scaffold GENERATION — atlas built + scaffold line REAL + EXPOSED dev bench EARNED-but-weak/confounded, but the earned resistant probe = 0/6 new solves; $0 beyond authorized dev+probe; no third retirement) — explicit do-not-overstate
+
+**DO say:** "W127 stopped treating W126's 'capability failure' as the end. LANE α built a
+machine-checkable resistant capability atlas (`coordpy.resistant_capability_atlas_v1`): the 22
+uniformly-unsolved resistant problems are 95% wrong-algorithm generations (19 visible / 3
+hidden; ≈0 TLE/crash) that are algorithmically DIVERSE (top-2 family concentration ≈ 45–50% in
+both label spaces — NO single dominant cluster), and the statement-surface family classifier is
+THEME-biased (47% concordant with the actual-algorithm reference signal). LANE β built a real
+family-specific algorithm-scaffold generation line (`coordpy.family_scaffold_generation_v1`: G1
+de-identified scaffold library / G2 family-group retriever / G3 scaffolded FRESH generation / G4
+policy) and validated it on a disjoint same-family EXPOSED dev bench: scaffold beat plain hosted
+generation +2 net over baseline across 2 capability families, leakage-clean, 0 regressions ⇒
+`EXPOSED_SCAFFOLD_DEV_BENCH_EARNED` (R1). That earn required correcting a boilerplate
+leakage-guard FALSE POSITIVE (the guard flagged universal idioms like
+`n, k = map(int, input().split())` as 'accepted-solution lines'; the winning candidates were
+verified to be structurally DIFFERENT correct derivations sharing only boilerplate — a
+documented, outcome-relevant recalibration to a contiguous-block tripwire, positive control
+preserved). LANE γ: R1∧R2 (string_processing scaffoldable cluster) earned the smallest honest
+targeted resistant probe — G3 scaffolded FRESH generation on the 6 string_processing
+scaffoldable resistant problems (old pool 0/6) — which created **0/6** new solves ⇒
+`RESISTANT_SCAFFOLD_FRESH_GEN_CAP`. The exposed-EARN → resistant-0 dissociation is the clean
+finding: the exposed +2 did NOT transfer to the non-memorizable resistant field. Stronger-model
+gate CLOSED (decision CID `258b6ed7` invariant, {KNOWN:1, UNKNOWN:4}). $0 beyond the authorized
+EXPOSED dev bench (80 calls) + the earned targeted probe (30 calls). W89 (+5.56) + W105 (+7.00)
+STAND as the only two retirements; W127 adds none."
+
+**DO NOT say:** "the scaffold mechanism works / is validated" — it EARNED a WEAK, CONFOUNDED
+exposed-bench signal (+2 net is the locked MINIMUM on n=8/K=5; the wins are on exposed/pre-cutoff
+problems where algorithm-level memorization + a longer-prompt framing effect + sampling variance
+cannot be excluded), and it created ZERO new solves on the non-memorizable resistant cluster, so
+it is NOT a validated mechanism. "the exposed wins prove fresh generation is real" — the
+resistant 0/6 is the clean test and it says the exposed signal did not transfer. "the leakage
+correction manufactured the win" — the flags were demonstrable universal-boilerplate false
+positives (the winning code is a different correct derivation, not the accepted solution); the
+correction is principled (contiguous-block, positive control still bites) and was applied
+transparently as outcome-relevant, NOT to manufacture a result — and it changed the dev verdict,
+not the milestone conclusion (the resistant probe still capped). "the atlas family labels are
+ground truth" — they are a transparent, theme-biased heuristic (47% reference-concordant); the
+robust atlas claims are the hard wrong-algorithm decomposition + the DIVERSITY of the failures.
+"we proved memorization drove the exposed wins" — that is the most parsimonious reading of the
+dissociation, not proven (single small bench). "this is a third retirement / weakens W89/W105 /
+proves the contamination confound / solves multi-agent context" — none of these; W127 tests a
+fresh-generation MECHANISM + a SPEND gate. "emoticons leaked" — one resistant-probe candidate
+tripped the contiguous-block guard but solved nothing (moot for the cap). Bounded-context /
+compaction / summarization remain anti-patterns, explicitly not pursued.
+
+Anchors: `docs/RESULTS_W127_CAPABILITY_ATLAS_AND_SCAFFOLD_GENERATION_V1.md`; `docs/RUNBOOK_W127.md`;
+`docs/FRONTIER_RELEVANCE_AUDIT_W127_V1.md`; `results/w127/`.
+
 ## W126 (family-adapted repair SYNTHESIS on resistant ICPC — REAL + arsenal-native + leakage-clean but oracle ceiling 0/22; fresh pilot NOT earned; $0; no third retirement) — explicit do-not-overstate
 
 **DO say:** "W126 pulled the only honest lever W125 left open — genuinely NEW-trajectory

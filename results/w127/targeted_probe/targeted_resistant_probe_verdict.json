@@ -1,0 +1,96 @@
+{
+  "schema": "coordpy.w127_targeted_resistant_probe.v1",
+  "lane": "gamma_targeted_probe",
+  "verified_on": "2026-06-01",
+  "r1_dev_earned": true,
+  "r2_cluster_match": true,
+  "earned_families": [
+    "adhoc_math",
+    "string_processing"
+  ],
+  "scaffoldable_resistant_clusters": {
+    "dp_optimization": 2,
+    "geometry": 3,
+    "string_processing": 6
+  },
+  "r2_target_families": [
+    "string_processing"
+  ],
+  "r2_min_cluster": 3,
+  "probe_launched": true,
+  "nim_spend": 30,
+  "wall_s": 325.2,
+  "slice_cid": "01bf9ef869a56e20420ec6e52864853eba40aac055fa7a03fa50a154542e9160",
+  "subset": [
+    "leapfrogencryption",
+    "letterballoons",
+    "marchingorders",
+    "emoticons",
+    "palindromicwordsearch",
+    "pillowstacking"
+  ],
+  "teacher_library": {
+    "n_scaffolds": 38,
+    "n_source_problems": 38,
+    "by_family": {
+      "graph_flow": 1,
+      "dp_optimization": 6,
+      "geometry": 8,
+      "number_theory_math": 2,
+      "string_processing": 8,
+      "simulation_grid": 3,
+      "adhoc_math": 10
+    },
+    "library_cid": "24e25e5af51ff1497aec0bb8425f4b216982d75ebf44aed98af321cbf4016bdf"
+  },
+  "per_problem": [
+    {
+      "short_name": "leapfrogencryption",
+      "family": "string_processing",
+      "n_scaffolds": 2,
+      "leakage_clean": true,
+      "new_solve": false
+    },
+    {
+      "short_name": "letterballoons",
+      "family": "string_processing",
+      "n_scaffolds": 2,
+      "leakage_clean": true,
+      "new_solve": false
+    },
+    {
+      "short_name": "marchingorders",
+      "family": "string_processing",
+      "n_scaffolds": 2,
+      "leakage_clean": true,
+      "new_solve": false
+    },
+    {
+      "short_name": "emoticons",
+      "family": "string_processing",
+      "n_scaffolds": 2,
+      "leakage_clean": false,
+      "new_solve": false
+    },
+    {
+      "short_name": "palindromicwordsearch",
+      "family": "string_processing",
+      "n_scaffolds": 2,
+      "leakage_clean": true,
+      "new_solve": false
+    },
+    {
+      "short_name": "pillowstacking",
+      "family": "string_processing",
+      "n_scaffolds": 2,
+      "leakage_clean": true,
+      "new_solve": false
+    }
+  ],
+  "targeted_new_solves": 0,
+  "all_leakage_clean": false,
+  "verdict_label": "RESISTANT_SCAFFOLD_FRESH_GEN_CAP",
+  "carry_forward": "W127-L-RESISTANT-SCAFFOLD-FRESH-GEN-CAP",
+  "broader_pilot_decision": "NOT earned",
+  "generated_at": "2026-06-01T17:45:29.897917+00:00"
+}
