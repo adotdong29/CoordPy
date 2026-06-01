@@ -917,6 +917,29 @@
         "W124-L-NO-THIRD-RETIREMENT-CAP"
       ],
       "carry_forwards_retired": []
+    },
+    {
+      "id": "W125",
+      "title": "hosted controller-native code mechanism on the official RESISTANT ICPC family (router/logprob-router/cache-aware-planner v12 + tool_call_substrate_v1 + executor_grounded_patcher_v1) + resistant-first $0 headroom replay + stronger-model gate",
+      "outcome": "controller arsenal is REAL + contract-clean (mechanism question YES) but the resistant field is GENERATION-CAPPED for $0 re-routing (spend question NOT earned). Lane alpha: controller_native_code_mechanism_v1 (first bridge of the hosted-controller stack to the audited tool-call substrate; graphify-confirmed 6 hops apart, no edge); structural fake-different test BITES (reflexion B + C0 control => FAKE_DIFFERENT; C1/C2/C3 => REAL; lead C3 cid 7989655f); all 4 NIM-free contract checks PASS. Lane beta ($0 replay over 330 already-paid Maverick gens on the W120 resistant 30-slice CID 01bf9ef8): A1 7/30, pool-union 8/30, oracle_headroom +1 (in null band), C2 7/30 + C3 7/30 => blind_selection_headroom=0; reflexion_divergence 23/30 but looks_right_fails_hidden 10 (public-sample signal non-discriminating) => FRESH_RESISTANT_PILOT_NOT_EARNED_HEADROOM_CAP; $0 NIM; exposed control NOT bought (resistant-first). Lane gamma: NO_CERTIFIABLE_STRONGER_MODEL, decision CID 258b6ed7 invariant, {KNOWN:1,UNKNOWN:4}; local transformer-native line CLOSED. W89+W105 STAND (no third retirement). ultracode OFF; no version bump; no PyPI; coordpy/__init__.py untouched",
+      "commits": [
+        "97232eb"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W125.md",
+        "docs/RESULTS_W125_CONTROLLER_NATIVE_CODE_MECHANISM_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W125_V1.md"
+      ],
+      "linear_issues": [
+        "COO-50"
+      ],
+      "carry_forwards_added": [
+        "W125-T-CONTROLLER-NATIVE-MECHANISM-REAL-NOT-FAKE-DIFFERENT",
+        "W125-L-RESISTANT-GENERATION-CAP",
+        "W125-T-RESISTANT-PUBLIC-SAMPLE-SIGNAL-NON-DISCRIMINATING",
+        "W125-L-NO-THIRD-RETIREMENT-CAP"
+      ],
+      "carry_forwards_retired": []
     }
   ]
 }
