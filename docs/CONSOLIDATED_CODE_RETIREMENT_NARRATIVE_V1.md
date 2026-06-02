@@ -278,9 +278,22 @@ retirement** (W89 + W105 remain the only two):
   GG3 was killed (boilerplate-leakage risk). T1 FALSE ⇒ **$0 resistant NIM**; stronger-model gate
   CLOSED.
 
-**Net across W126–W130:** the resistant/hard-cluster generation ceiling is **partially liftable**
+* **W131 — the MODEL-capability axis attacked directly (the W129 selector still held FIXED).** A $0
+  supply census found the local-HF runtime DEAD (no torch/transformers under Python 3.14.5) but **13
+  reachable STRONGER-than-Maverick code models** on the NIM catalogue — all UNKNOWN-cutoff ⇒
+  DEV_ONLY, `FRONTIER_ELIGIBLE=NONE`. Swapping the strongest, **Qwen3-Coder-480B** (~28× Maverick's
+  active params), through the FULL B1_PLAIN/B2_RDIV/B3_GG2/B4_GGLEAD slate at MATCHED K=5 created **0
+  genuinely-new** solves (only the W130 `doubleup`, via plain generation); the method arms added 0
+  ⇒ **NOT EARNED** ⇒ `W131-L-MODEL-AXIS-GENERATION-CEILING-DEV-BENCH-CAP` (the MODEL-axis sibling of
+  the W123→W130 cap taxonomy). The model-axis supply gap MOVED from W124's "no strong model exists"
+  to "no PRIMARY-KNOWN-cutoff stronger model on the ICPC family" (disclosure, not existence;
+  `W131-T-FRONTIER-ELIGIBLE-SUPPLY-IS-CUTOFF-DISCLOSURE-BOUND`). T1 FALSE ⇒ **$0 resistant NIM**;
+  gate CLOSED `258b6ed7`.
+
+**Net across W126–W131:** the resistant/hard-cluster generation ceiling is **partially liftable**
 (W130's GG2 counterexample-rewrite cracked one HIDDEN_EDGE problem) but **not to the earn bar** —
-the dominant failures are capability-bound, needing real model capability, not more same-budget
-generator engineering. The two confirmed retirements (W89, W105) **STAND**, bounded as
+even a ~28× larger frontier code model (W131) adds 0 genuinely-new solves — the dominant failures
+are capability-bound, needing a PRIMARY-KNOWN-cutoff stronger model on the ICPC family (none
+currently reachable — the gap is now cutoff DISCLOSURE), not more same-budget generator engineering. The two confirmed retirements (W89, W105) **STAND**, bounded as
 contamination-EXPOSED HumanEval-family at 70B. See
 `docs/RESULTS_W130_GENERATION_CEILING_ATTACK_V1.md` + `docs/RUNBOOK_W130.md`.

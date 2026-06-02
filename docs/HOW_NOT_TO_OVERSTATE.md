@@ -1,3 +1,16 @@
+## W131 (code-competent MODEL supply census + stronger-generator hard-cluster dev bench [W129 selector FIXED] — the strongest reachable code model adds 0 genuinely-new solves; FRONTIER_ELIGIBLE=NONE; no third retirement) — explicit do-not-overstate
+
+**DO say:** "W130 found the hard-cluster ceiling generation-bound + capability-bound, so W131 attacked the MODEL-capability axis. It censused the reachable code-competent model supply (local-HF DEAD; Ollama + a 118-model NIM catalogue live; 13 reachable STRONGER-than-Maverick code models) and swapped the strongest one — Qwen3-Coder-480B (~28x Maverick's active params) — through the FULL B1_PLAIN/B2_RDIV/B3_GG2/B4_GGLEAD generator slate at MATCHED K=5 with the W129 NIM-free SOLEAD selector held FIXED downstream. Result: the strongest reachable code model reproduces exactly the W130 `doubleup` solve and creates 0 genuinely-new EXPOSED hard-cluster solves => NOT EARNED => the generation ceiling is not model-axis-liftable at the reachable rungs (`W131-L-MODEL-AXIS-GENERATION-CEILING-DEV-BENCH-CAP`). Every reachable stronger model is UNKNOWN-cutoff => DEV_ONLY; FRONTIER_ELIGIBLE=NONE => no resistant probe is earnable (T1 FALSE; T2 moot) => $0 resistant NIM. The model-axis supply gap is now cutoff DISCLOSURE, not model existence (`W131-T-FRONTIER-ELIGIBLE-SUPPLY-IS-CUTOFF-DISCLOSURE-BOUND`). W89 + W105 remain the only two retirements."
+
+**DO NOT say:**
+
+* "a stronger model solved new problems / lifted the hard-cluster ceiling" — it solved ONLY the W130 `doubleup` (the SAME problem) and 0 genuinely-new; the +2 spanning bar was not met; the method arms (B2/B3/B4) added 0.
+* "W131 ran a resistant probe / tested the resistant field with a stronger model" — NO resistant probe was run (T1 FALSE; FRONTIER_ELIGIBLE=NONE). Running a DEV_ONLY UNKNOWN-cutoff model on the post-cutoff resistant set would be a dirty exposed benchmark sold as a frontier win — explicitly NOT done.
+* "the model axis is exhausted / a frontier code model is too weak" — the hosted 480B ran cleanly and is the decisive test; the local 32B is throughput-capped on THIS host (CPU-bound ~1 tok/s), a hardware limit, NOT a capability verdict; the binding gap is the ABSENCE of a primary-KNOWN-cutoff stronger model, which a future disclosure could change.
+* "this weakens or strengthens the contamination confound, or proves multi-agent context" — W131 tests model CAPABILITY on the EXPOSED dev bench + the cutoff-disclosure gate; it neither retires nor reopens anything; an EXPOSED earn by a DEV_ONLY model would be memorization-confounded (the W127 lesson) and resistant-ineligible regardless.
+* "`normalize_fence_v1` is a capability gain" — it is a parsing-fairness fix (it removes an UNDER-statement of capability for fence-quirk models), transparently reported, with the raw model output preserved in the sidecar.
+* "W89/W105 changed" — they STAND as the only two confirmed retirements; W131 adds none.
+
 ## W130 (generation-ceiling attack on the hard ICPC clusters — a stronger same-budget generator cracks ONE pool-dead HIDDEN_EDGE problem by counterexample-rewrite but is NOT EARNED [1 < +2 spanning]; the dominant admissible-wrong-algorithm mode is capability-bound; 275 NIM dev; no third retirement) — explicit do-not-overstate
 
 **DO say:** "W129 proved the binding cap is GENERATION not selection, so W130 attacked the
