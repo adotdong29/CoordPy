@@ -1,0 +1,274 @@
+================ graphify explain generator_failure_atlas_v1 ================
+Node: generator_failure_atlas_v1.py
+  ID:        coordpy_generator_failure_atlas_v1_py
+  Source:    coordpy/generator_failure_atlas_v1.py L1
+  Type:      code
+  Community: 136
+  Degree:    18
+
+Connections (18):
+  --> IcpcPilotProblemV1 [imports] [EXTRACTED]
+  --> SketchV1 [imports] [EXTRACTED]
+  --> grade_on_secret_v1() [imports] [EXTRACTED]
+  --> _run_capture_stdout_v1() [imports] [EXTRACTED]
+  --> _parses() [imports] [EXTRACTED]
+  --> _sha() [imports] [EXTRACTED]
+  --> _norm_out() [imports] [EXTRACTED]
+  --> classify_candidate_v1() [contains] [EXTRACTED]
+  --> build_problem_record_v1() [contains] [EXTRACTED]
+  --> _first_public_fail_type() [contains] [EXTRACTED]
+  --> CandidateSignatureV1 [contains] [EXTRACTED]
+  --> classify_problem_failure_v1() [contains] [EXTRACTED]
+  --> ProblemFailureRecordV1 [contains] [EXTRACTED]
+  --> sketch_admissible_v1() [contains] [EXTRACTED]
+  --> GeneratorFailureAtlasV1 [contains] [EXTRACTED]
+  --> algorithm_signature_v1() [contains] [EXTRACTED]
+  --> build_atlas_v1() [contains] [EXTRACTED]
+  <-- W130 Lane α — generator-failure atlas (NIM-free diagnosis; explicit-import only) [rationale_for] [EXTRACTED]
+
+================ graphify explain public_signal_selection_oracle_v1 ================
+Node: public_signal_selection_oracle_v1.py
+  ID:        coordpy_public_signal_selection_oracle_v1_py
+  Source:    coordpy/public_signal_selection_oracle_v1.py L1
+  Type:      code
+  Community: 136
+  Degree:    32
+
+Connections (32):
+  --> IcpcPilotProblemV1 [imports] [EXTRACTED]
+  --> role_diverse_algorithm_search_v1.py [imports_from] [EXTRACTED]
+  --> CandidateImplV1 [imports] [EXTRACTED]
+  --> extract_candidate_code_v1() [imports] [EXTRACTED]
+  --> RoleArtifactsV1 [imports] [EXTRACTED]
+  --> integrated_synthesis.py [imports_from] [EXTRACTED]
+  --> icpc_reflexion_bench_v1.py [imports_from] [EXTRACTED]
+  --> select_so_v1() [contains] [EXTRACTED]
+  --> _run_capture_stdout_v1() [imports] [EXTRACTED]
+  --> _parses() [imports] [EXTRACTED]
+  --> grade_candidates_v1() [contains] [EXTRACTED]
+  --> fake_selection_control_v1() [contains] [EXTRACTED]
+  --> _sha() [imports] [EXTRACTED]
+  --> _norm_code() [imports] [EXTRACTED]
+  --> _norm_out() [imports] [EXTRACTED]
+  --> select_integrated_synthesis_decision() [imports] [EXTRACTED]
+  --> build_verifier_final_prompt_v1() [contains] [EXTRACTED]
+  --> parse_max_constraint_v1() [contains] [EXTRACTED]
+  --> _public_survivors() [imports] [EXTRACTED]
+  --> CandidateGradeV1 [contains] [EXTRACTED]
+  ... and 12 more
+
+================ graphify explain stronger_generator_slate_v1 ================
+Node: stronger_generator_slate_v1.py
+  ID:        coordpy_stronger_generator_slate_v1_py
+  Source:    coordpy/stronger_generator_slate_v1.py L1
+  Type:      code
+  Community: 136
+  Degree:    46
+
+Connections (46):
+  --> IcpcPilotProblemV1 [imports] [EXTRACTED]
+  --> FailureDigestV1 [imports] [EXTRACTED]
+  --> CandidateImplV1 [imports] [EXTRACTED]
+  --> extract_candidate_code_v1() [imports] [EXTRACTED]
+  --> SketchV1 [imports] [EXTRACTED]
+  --> RoleArtifactsV1 [imports] [EXTRACTED]
+  --> grade_on_secret_v1() [imports] [EXTRACTED]
+  --> run_gglead_v1() [contains] [EXTRACTED]
+  --> select_so_v1() [imports] [EXTRACTED]
+  --> parse_failure_digest_v1() [imports] [EXTRACTED]
+  --> run_gg1_v1() [contains] [EXTRACTED]
+  --> run_gg2_v1() [contains] [EXTRACTED]
+  --> run_gg4_v1() [contains] [EXTRACTED]
+  --> run_gg3_v1() [contains] [EXTRACTED]
+  --> _run_capture_stdout_v1() [imports] [EXTRACTED]
+  --> _finalize_arm() [contains] [EXTRACTED]
+  --> _parses() [imports] [EXTRACTED]
+  --> GenCandidateV1 [contains] [EXTRACTED]
+  --> parse_role_artifacts_v1() [imports] [EXTRACTED]
+  --> _find_failing_case() [contains] [EXTRACTED]
+  ... and 26 more
+
+================ graphify explain role_diverse_algorithm_search_v1 ================
+Node: role_diverse_algorithm_search_v1.py
+  ID:        coordpy_role_diverse_algorithm_search_v1_py
+  Source:    coordpy/role_diverse_algorithm_search_v1.py L1
+  Type:      code
+  Community: 136
+  Degree:    49
+
+Connections (49):
+  --> IcpcPilotProblemV1 [imports] [EXTRACTED]
+  --> FailureDigestV1 [imports] [EXTRACTED]
+  --> coordpy_icpc_battlefield_v1.py [imports_from] [EXTRACTED]
+  --> extract_candidate_code_v1() [imports] [EXTRACTED]
+  --> CandidateImplV1 [contains] [EXTRACTED]
+  --> SketchV1 [contains] [EXTRACTED]
+  --> RoleArtifactsV1 [contains] [EXTRACTED]
+  --> grade_on_secret_v1() [imports] [EXTRACTED]
+  --> role_invariant_synthesis.py [imports_from] [EXTRACTED]
+  <-- public_signal_selection_oracle_v1.py [imports_from] [EXTRACTED]
+  --> integrated_synthesis.py [imports_from] [EXTRACTED]
+  --> executor_grounded_patcher_v1.py [imports_from] [EXTRACTED]
+  --> icpc_reflexion_bench_v1.py [imports_from] [EXTRACTED]
+  --> parse_failure_digest_v1() [imports] [EXTRACTED]
+  --> run_role_diverse_search_v1() [contains] [EXTRACTED]
+  --> grade_icpc_candidate_case_v1() [imports] [EXTRACTED]
+  --> _run_capture_stdout_v1() [contains] [EXTRACTED]
+  --> _parses() [contains] [EXTRACTED]
+  --> resistant_capability_atlas_v1.py [imports_from] [EXTRACTED]
+  --> parse_role_artifacts_v1() [contains] [EXTRACTED]
+  ... and 29 more
+
+================ graphify explain resistant_capability_atlas_v1 ================
+Node: resistant_capability_atlas_v1.py
+  ID:        coordpy_resistant_capability_atlas_v1_py
+  Source:    coordpy/resistant_capability_atlas_v1.py L1
+  Type:      code
+  Community: 174
+  Degree:    15
+
+Connections (15):
+  <-- role_diverse_algorithm_search_v1.py [imports_from] [EXTRACTED]
+  <-- family_scaffold_generation_v1.py [imports_from] [EXTRACTED]
+  --> classify_family_v1() [contains] [EXTRACTED]
+  --> build_atlas_entry_v1() [contains] [EXTRACTED]
+  --> build_capability_atlas_v1() [contains] [EXTRACTED]
+  --> classify_reference_family_v1() [contains] [EXTRACTED]
+  --> _extract_max_constraint() [contains] [EXTRACTED]
+  --> CapabilityAtlasEntryV1 [contains] [EXTRACTED]
+  --> _gen_failure_category() [contains] [EXTRACTED]
+  --> _sha256_hex() [contains] [EXTRACTED]
+  --> _strip_latex() [contains] [EXTRACTED]
+  --> CapabilityAtlasV1 [contains] [EXTRACTED]
+  --> _surface_of() [contains] [EXTRACTED]
+  --> FamilyClassificationV1 [contains] [EXTRACTED]
+  <-- W127 Lane α — Resistant Capability Atlas V1 (COO-9 sibling).  W126 proved the 22 [rationale_for] [EXTRACTED]
+
+================ graphify explain family_scaffold_generation_v1 ================
+Node: family_scaffold_generation_v1.py
+  ID:        coordpy_family_scaffold_generation_v1_py
+  Source:    coordpy/family_scaffold_generation_v1.py L1
+  Type:      code
+  Community: 174
+  Degree:    41
+
+Connections (41):
+  --> IcpcPilotProblemV1 [imports] [EXTRACTED]
+  --> SynthesisLeakageGuardV1 [imports] [EXTRACTED]
+  --> coordpy_icpc_battlefield_v1.py [imports_from] [EXTRACTED]
+  --> family_adapted_repair_synthesis_v1.py [imports_from] [EXTRACTED]
+  --> extract_candidate_code_v1() [imports] [EXTRACTED]
+  --> grade_on_secret_v1() [imports] [EXTRACTED]
+  --> icpc_reflexion_bench_v1.py [imports_from] [EXTRACTED]
+  --> resistant_capability_atlas_v1.py [imports_from] [EXTRACTED]
+  --> sample_feedback_v1() [imports] [EXTRACTED]
+  --> AST [imports] [EXTRACTED]
+  --> reproduces_accepted_block_v1() [contains] [EXTRACTED]
+  --> _Sanitizer [contains] [EXTRACTED]
+  --> classify_family_v1() [imports] [EXTRACTED]
+  --> build_scaffold_library_v1() [contains] [EXTRACTED]
+  --> retrieve_scaffolds_v1() [contains] [EXTRACTED]
+  --> scaffolded_generate_v1() [contains] [EXTRACTED]
+  --> ScaffoldLibraryV1 [contains] [EXTRACTED]
+  --> AlgorithmScaffoldV1 [contains] [EXTRACTED]
+  --> _extract_skeleton_v1() [contains] [EXTRACTED]
+  --> assert_scaffold_pipeline_clean_v1() [contains] [EXTRACTED]
+  ... and 21 more
+
+================ graphify explain icpc_reflexion_bench_v1 ================
+Node: icpc_reflexion_bench_v1.py
+  ID:        coordpy_icpc_reflexion_bench_v1_py
+  Source:    coordpy/icpc_reflexion_bench_v1.py L1
+  Type:      code
+  Community: 260
+  Degree:    26
+
+Connections (26):
+  --> IcpcPilotProblemV1 [contains] [EXTRACTED]
+  <-- controller_native_code_mechanism_v1.py [imports_from] [EXTRACTED]
+  --> coordpy_icpc_battlefield_v1.py [imports_from] [EXTRACTED]
+  <-- role_diverse_algorithm_search_v1.py [imports_from] [EXTRACTED]
+  <-- family_adapted_repair_synthesis_v1.py [imports_from] [EXTRACTED]
+  --> extract_candidate_code_v1() [contains] [EXTRACTED]
+  <-- family_scaffold_generation_v1.py [imports_from] [EXTRACTED]
+  --> grade_on_secret_v1() [contains] [EXTRACTED]
+  <-- public_signal_selection_oracle_v1.py [imports_from] [EXTRACTED]
+  --> IcpcBenchConfigV1 [contains] [EXTRACTED]
+  --> run_icpc_reflexion_bench_v1() [contains] [EXTRACTED]
+  --> grade_icpc_candidate_case_v1() [imports] [EXTRACTED]
+  --> sample_feedback_v1() [contains] [EXTRACTED]
+  --> _run_b() [contains] [EXTRACTED]
+  --> _initial_prompt() [contains] [EXTRACTED]
+  --> _reflexion_prompt() [contains] [EXTRACTED]
+  --> _sha256_hex() [contains] [EXTRACTED]
+  --> IcpcArmOutcomeV1 [contains] [EXTRACTED]
+  --> _run_a0() [contains] [EXTRACTED]
+  --> _run_a1() [contains] [EXTRACTED]
+  ... and 6 more
+
+================ graphify explain coordpy_icpc_battlefield_v1 ================
+Node: coordpy_icpc_battlefield_v1.py
+  ID:        coordpy_coordpy_icpc_battlefield_v1_py
+  Source:    coordpy/coordpy_icpc_battlefield_v1.py L1
+  Type:      code
+  Community: 323
+  Degree:    50
+
+Connections (50):
+  --> StrongerModelCandidateV1 [imports] [EXTRACTED]
+  --> LatestResistantInstrumentV1 [imports] [EXTRACTED]
+  --> DisclosureStatusV1 [imports] [EXTRACTED]
+  --> UpstreamConstructionResultV1 [imports] [EXTRACTED]
+  --> ModelCertificationV1 [imports] [EXTRACTED]
+  <-- controller_native_code_mechanism_v1.py [imports_from] [EXTRACTED]
+  <-- role_diverse_algorithm_search_v1.py [imports_from] [EXTRACTED]
+  <-- family_adapted_repair_synthesis_v1.py [imports_from] [EXTRACTED]
+  <-- coordpy_icpc_exposed_control_v1.py [imports_from] [EXTRACTED]
+  <-- family_scaffold_generation_v1.py [imports_from] [EXTRACTED]
+  --> coordpy_icpc_public_functional_v1.py [imports_from] [EXTRACTED]
+  --> coordpy_frontier_functional_v1.py [imports_from] [EXTRACTED]
+  --> upstream_instrument_admission_v1.py [imports_from] [EXTRACTED]
+  --> core_slice_cid_v1() [contains] [EXTRACTED]
+  --> upstream_derived_instrument_construction_v1.py [imports_from] [EXTRACTED]
+  --> BattlefieldProblemV1 [contains] [EXTRACTED]
+  --> classify_battlefield_listing_v1() [contains] [EXTRACTED]
+  --> IcpcExecutorResultV1 [imports] [EXTRACTED]
+  --> run_battlefield_construction_v1() [contains] [EXTRACTED]
+  --> ExclusionAuditV1 [contains] [EXTRACTED]
+  ... and 30 more
+
+================ graphify path stronger_generator_slate_v1 public_signal_selection_oracle_v1 ================
+Shortest path (2 hops):
+  stronger_generator_slate_v1.py --imports [EXTRACTED]--> _run_capture_stdout_v1() <--imports [EXTRACTED]-- public_signal_selection_oracle_v1.py
+
+================ graphify path generator_failure_atlas_v1 resistant_capability_atlas_v1 ================
+warning: source match was ambiguous (top score 974.813, runner-up 974.813)
+No path found between 'generator_failure_atlas_v1' and 'resistant_capability_atlas_v1'.
+
+================ graphify affected stronger_generator_slate_v1 ================
+Affected nodes for stronger_generator_slate_v1.py
+Relations: calls, references, imports, imports_from, re_exports, inherits, extends, implements, uses, mixes_in, embeds
+Depth: 2
+- _sha() [imports] coordpy/role_diverse_algorithm_search_v1.py:L111
+- _parses() [imports] coordpy/role_diverse_algorithm_search_v1.py:L115
+- _norm_code() [imports] coordpy/role_diverse_algorithm_search_v1.py:L125
+- _run_capture_stdout_v1() [imports] coordpy/role_diverse_algorithm_search_v1.py:L160
+- SketchV1 [imports] coordpy/role_diverse_algorithm_search_v1.py:L191
+- RoleArtifactsV1 [imports] coordpy/role_diverse_algorithm_search_v1.py:L202
+- CandidateImplV1 [imports] coordpy/role_diverse_algorithm_search_v1.py:L220
+- build_analyze_prompt_v1() [imports] coordpy/role_diverse_algorithm_search_v1.py:L229
+- build_implement_prompt_v1() [imports] coordpy/role_diverse_algorithm_search_v1.py:L255
+- parse_role_artifacts_v1() [imports] coordpy/role_diverse_algorithm_search_v1.py:L285
+- reproduces_accepted_block_v1() [imports] coordpy/family_scaffold_generation_v1.py:L611
+- _canon() [calls] coordpy/role_diverse_algorithm_search_v1.py:L106
+- Any [references] coordpy/role_diverse_algorithm_search_v1.py:L106
+- str [references] coordpy/role_diverse_algorithm_search_v1.py:L111
+- float [references] coordpy/role_diverse_algorithm_search_v1.py:L149
+- _norm_out() [calls] coordpy/role_diverse_algorithm_search_v1.py:L156
+- IcpcPilotProblemV1 [references] coordpy/role_diverse_algorithm_search_v1.py:L229
+- int [references] coordpy/role_diverse_algorithm_search_v1.py:L229
+- _slice_sections() [calls] coordpy/role_diverse_algorithm_search_v1.py:L268
+- str [references] coordpy/family_scaffold_generation_v1.py:L62
+- bool [references] coordpy/family_scaffold_generation_v1.py:L101
+- int [references] coordpy/family_scaffold_generation_v1.py:L192
+- _norm_code_lines() [calls] coordpy/family_scaffold_generation_v1.py:L607
