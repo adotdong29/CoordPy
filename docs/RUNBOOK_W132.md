@@ -200,6 +200,24 @@ guard).
 **No retirement is registered by W132 on a single seed** regardless of branch. W89 + W105
 remain the only two unless a clean multi-seed mechanism-driven pass is later earned.
 
+**§ 8d — Infra-forced model substitution (LOCKED PRE-SPEND, amended 2026-06-02).** The
+locked target Maverick (`meta/llama-4-maverick-17b-128e-instruct`) is **infra-down this
+session** — machine-checked, not assumed: `GET /v1/models` returns 200 in 0.15 s and lists
+maverick, and `meta/llama-3.1-8b-instruct` returns in 0.42 s with the SAME key/endpoint/
+request shape, but every maverick chat/completions call (streaming AND non-streaming, 8 and
+16 tokens) returns **0 bytes** and times out (45–75 s, `time_starttransfer=0`) ⇒ a
+model-specific server-side outage (NOT auth, NOT the endpoint, NOT our code; a new key
+cannot fix it). Therefore the frontier target is substituted **pre-spend** to
+**`meta/llama-3.3-70b-instruct`** — which is (a) reachable (HTTP 200, ~7 s for a 512-token
+code generation), (b) **primary-KNOWN cutoff (~Dec-2023)** so the 2026-06-02 mint date
+strictly post-dates it (resistant by date AND construction), and (c) **the exact model that
+earned the W105 retirement (+7.00 pp on EXPOSED HumanEval+)** — making this the MOST
+on-target transfer test (does the W105-retiring same-budget mechanism beat A1 on a
+resistant-by-construction field at its own 70B scale?). The substitution is forced by infra
+and made BEFORE any pilot result; the locked core 30-slice (`f6a2ebed…`), the § 6 quality
+gates, the § 7 same-budget eval rule, and the § 8c outcome mapping are UNCHANGED. Maverick
+remains the eventual push-button cross-scale check when its deployment recovers.
+
 ---
 
 ## § 9 — Frontier-eligible vs dev-only rule (Lane γ, LOCKED)

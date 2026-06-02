@@ -298,7 +298,7 @@ currently reachable — the gap is now cutoff DISCLOSURE), not more same-budget 
 contamination-EXPOSED HumanEval-family at 70B. See
 `docs/RESULTS_W130_GENERATION_CEILING_ATTACK_V1.md` + `docs/RUNBOOK_W130.md`.
 
-## Post-W131 update — W132 MINTED a resistant-by-construction battlefield (the supply/disclosure escape closed); the Maverick pilot is earned but NIM-infra-blocked
+## Post-W131 update — W132 MINTED a resistant-by-construction battlefield AND ran the frontier pilot (Llama-3.3-70B; Maverick infra-down): clean FAIL closes the "wrong-test" escape
 
 W123 bounded the OFFICIAL resistant-package supply; W131 found the model axis blocked on
 cutoff DISCLOSURE. Both share one upstream dependency: a contamination-RESISTANT
@@ -317,19 +317,27 @@ battlefield we either inherit (supply-capped) or certify against a disclosed cut
   CONSTRUCTION (fresh instances ⇒ resistant for ANY cutoff). This is
   `W132-T-RESISTANT-BY-CONSTRUCTION-BATTLEFIELD-MINTABLE` — the EXISTENCE of a resistant
   instrument is no longer supply- or disclosure-bound.
-* **Lane β:** the battlefield EARNED the Maverick pilot (>=30 + all gates + resistant +
-  eval rule locked, run by the *already-validated* W120 A0/A1/B reflexion bench + the
-  verbatim W108 evaluator). But the NVIDIA NIM endpoint was unreachable this session (even
-  a 16-token Maverick call timed out at 90s) ⇒ the frontier pilot is **NIM-INFRA-BLOCKED /
-  push-button** (`W132-L-MAVERICK-FRONTIER-PILOT-NIM-INFRA-BLOCKED`), an infra outage, NOT
-  a `FAIL`. A clearly-labelled DEV_ONLY local-Ollama run validated the pipeline end-to-end.
-* **Lane γ:** stronger-model gate re-derived CLOSED (`258b6ed7` invariant); W132 newly shows
-  resistance-by-construction removes the W131 cutoff-disclosure dependency (Maverick stays
-  the frontier target because its cutoff is KNOWN).
+* **Lane β:** the battlefield EARNED the pilot (>=30 + all gates + resistant + eval rule
+  locked, run by the *already-validated* W120 A0/A1/B bench + the verbatim W108 evaluator).
+  The locked target Maverick was infra-down this session (machine-checked: same key,
+  `llama-3.1-8b`/`llama-3.3-70b` respond instantly, maverick chat hangs 0-bytes), so the
+  frontier target was substituted PRE-SPEND (RUNBOOK §8d) to **`meta/llama-3.3-70b-instruct`
+  — the EXACT model that earned the W105 retirement** (KNOWN cutoff ~Dec-2023). The executed
+  pilot (30-slice, 1 seed, K=5, 330 calls) is a **clean FAIL: A0=A1=76.67% B=80.00% B−A1 =
+  +3.33 pp** (< +5 pp; 7/9 gates; MLB-1 26.7% / MLB-2 25% both FAIL) ⇒
+  `W132-L-RESISTANT-BY-CONSTRUCTION-PILOT-CAP`. The +3.33 pp is exactly ONE B-unique
+  complexity rescue (reflexion O(N²)→efficient after a hidden-test rejection), 0 regressions;
+  6 capability-bound traps resist all arms. (DEV_ONLY local-Ollama retained only as
+  pipeline-execution evidence.)
+* **Lane γ:** stronger-model gate re-derived CLOSED (`258b6ed7` invariant); resistance-by-
+  construction removes the W131 cutoff-disclosure dependency (resistant for ANY cutoff;
+  Maverick stays the push-button CROSS-SCALE check on the same slice when it recovers).
 
-**Net:** no third retirement — **W89 (+5.56) + W105 (+7.00) remain the only two**. The
-decisive advance is that a resistant instrument can now be MINTED at scale and verified
-(exact oracles, novelty guards, determinism), so the resistant-side line is no longer
-blocked on instrument SUPPLY or cutoff DISCLOSURE; the remaining gate is simply running the
-earned Maverick pilot once the NIM endpoint recovers. See
+**Net:** no third retirement — **W89 (+5.56) + W105 (+7.00) remain the only two**. Two
+advances: (1) a resistant instrument can now be MINTED at scale and verified (exact oracles,
+novelty guards, determinism), removing the SUPPLY/DISCLOSURE blockers on its existence; and
+(2) on that minted field, at the exact W105 retirement model, the same-budget mechanism gets
+only +3.33 pp (FAIL, MLB sub-floor, = the W121 matched-exposed-ICPC control) — so the bounded
+ceiling HOLDS and is STRENGTHENED: the "maybe the official benchmarks were the wrong test"
+escape is closed. See
 `docs/RESULTS_W132_RESISTANT_BY_CONSTRUCTION_BATTLEFIELD_V1.md` + `docs/RUNBOOK_W132.md`.

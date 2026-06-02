@@ -16,8 +16,11 @@ minted-battlefield artifacts.
 * **`coordpy.resistant_by_construction_slate_v1`** — the 33-template slate (9/8/8/8 across
   the four targeted failure families). A reusable corpus; re-mintable at fresh seeds for
   multi-seed confirmation.
-* **`scripts/run_w132_calibration_and_pilot_v1.py`** — the earned Maverick frontier pilot
-  (push-button; slice-CID-guarded; NIM-infra-blocked this session, re-runs on recovery).
+* **`scripts/run_w132_calibration_and_pilot_v1.py`** — the earned frontier pilot
+  (slice-CID-guarded; `--model` swappable). EXECUTED this session on
+  `meta/llama-3.3-70b-instruct` (the W105 retirement model; Maverick infra-down) ⇒ B−A1 =
+  +3.33 pp FAIL. Maverick is the push-button CROSS-SCALE re-run on the same slice when its
+  deployment recovers.
 * The validated W120 bench (`icpc_reflexion_bench_v1`) + the audited grader
   (`coordpy_icpc_battlefield_v1.grade_icpc_candidate_case_v1`) + the verbatim W108 evaluator
   — consumed UNCHANGED; the minted battlefield bridges onto them (no mechanism drift).
@@ -58,13 +61,18 @@ pilot milestone, not a context-compression milestone.
 ## Do not claim (W132)
 
 * That W132 retired anything (it did not; W89 + W105 remain the only two).
-* That the Maverick frontier pilot RAN or produced a margin (it is NIM-infra-blocked this
-  session; push-button). The "+pp" of a frontier claim does not exist yet.
+* That **Maverick** was tested or that this is a Maverick/cross-scale result — Maverick's
+  deployment was infra-down (0-bytes hang while `llama-3.1-8b`/`llama-3.3-70b` responded);
+  the pilot ran on `llama-3.3-70b` (the W105 retirement model), substituted PRE-SPEND.
+* That the executed pilot's +3.33 pp is a margin / a win / mechanism-driven — it is a clean
+  FAIL (< +5 pp; MLB-1 26.7%, MLB-2 25%, both FAIL): a single isolated complexity rescue, 0
+  regressions, the mechanism is NOT load-bearing on the minted resistant field.
 * That the DEV_ONLY local-7B characterization is a frontier or retirement result (it is
   neither; it characterizes the instrument on a weak local model).
 * That the minted problems are "novel algorithms" (they are textbook algorithm FAMILIES;
   what is novel + resistant is the freshly-minted INSTANCE set + statements + case data,
   guarded against official reuse).
-* That resistance-by-construction proves the mechanism works on resistant code (it removes
-  the *instrument-supply* and *cutoff-disclosure* blockers; whether the mechanism beats A1
-  on the minted field is the push-button Maverick pilot, not yet run).
+* That resistance-by-construction proves the mechanism works on resistant code — it removes
+  the *instrument-supply* and *cutoff-disclosure* blockers on the instrument's EXISTENCE; the
+  executed pilot then shows the mechanism does NOT beat A1 on the minted field at the W105
+  retirement model (+3.33 pp FAIL), STRENGTHENING the bounded ceiling (single seed).

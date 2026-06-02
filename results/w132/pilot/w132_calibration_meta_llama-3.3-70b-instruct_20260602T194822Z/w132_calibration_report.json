@@ -1,0 +1,138 @@
+{
+  "schema": "coordpy.icpc_reflexion_bench_v1.v1",
+  "model_id": "meta/llama-3.3-70b-instruct",
+  "n_problems": 6,
+  "n_seeds": 1,
+  "K_multi_sample": 5,
+  "per_seed": [
+    {
+      "schema": "coordpy.icpc_reflexion_bench_v1.v1",
+      "seed": 132001,
+      "n_problems": 6,
+      "a0_pass_at_1": 0.666667,
+      "a1_pass_at_1": 0.666667,
+      "b_pass_at_1": 0.666667,
+      "per_problem_a0_passed": [
+        true,
+        true,
+        true,
+        false,
+        false,
+        true
+      ],
+      "per_problem_a1_passed": [
+        true,
+        true,
+        true,
+        false,
+        false,
+        true
+      ],
+      "per_problem_b_passed": [
+        true,
+        true,
+        true,
+        false,
+        false,
+        true
+      ],
+      "per_problem_b_first_pass_idx": [
+        0,
+        0,
+        0,
+        -1,
+        -1,
+        0
+      ],
+      "question_ids": [
+        "rbc_cb_count_inversions",
+        "rbc_he_balanced_brackets",
+        "rbc_se_binary_no_adjacent_ones",
+        "rbc_wa_knapsack_01",
+        "rbc_cb_distinct_in_windows",
+        "rbc_he_circular_max_subarray"
+      ],
+      "seed_merkle_root": "7e180774c4011f24ea6cdea51aac056719bcaa34de37a90e2729f49fff6904ba"
+    }
+  ],
+  "a0_mean_pass_at_1": 0.666667,
+  "a1_mean_pass_at_1": 0.666667,
+  "b_mean_pass_at_1": 0.666667,
+  "b_mean_minus_a1_mean_pp": 0.0,
+  "bench_merkle_root": "a8cc055a72a78d653c9d68714085392a61053011ee3fc4688986fc30b33f9a69",
+  "mode": "calibration",
+  "wall_s": 976.37,
+  "battlefield_manifest_cid": "562aafbd62f550d140076cd936c9940dfb41ec7fef21af7e7ad00f8eb0f4e47c",
+  "core_slice_cid": "f6a2ebed3da2f13bc4847ed7cd1d746a8dac68e24208c9be1071131d7a6f6fbf",
+  "minted_date": "2026-06-02",
+  "resistance_cert": {
+    "model_id": "meta/llama-3.3-70b-instruct",
+    "minted_date": "2026-06-02",
+    "model_cutoff_boundary": "2024-08-31",
+    "minted_after_cutoff": true,
+    "novel_by_construction": true,
+    "reused_gate_certifiable": false,
+    "resistant": true,
+    "note": "RESISTANT_BY_CONSTRUCTION: minted 2026-06-02 > cutoff 2024-08-31 (date) AND freshly-minted instances (construction)"
+  },
+  "slice_problem_ids": [
+    "rbc_cb_count_inversions",
+    "rbc_he_balanced_brackets",
+    "rbc_se_binary_no_adjacent_ones",
+    "rbc_wa_knapsack_01",
+    "rbc_cb_distinct_in_windows",
+    "rbc_he_circular_max_subarray"
+  ],
+  "slice_modes": {
+    "COMPLEXITY_BLIND": 2,
+    "HIDDEN_EDGE_STATE_MISS": 2,
+    "SEARCH_ENUM": 1,
+    "WRONG_ALGORITHM_ADMISSIBLE": 1
+  },
+  "mlb": {
+    "n_problems_total": 6,
+    "n_b_invoked_reflexion": 2,
+    "n_b_rescued_via_reflexion": 0,
+    "mlb1_invocation_rate": 0.3333,
+    "mlb2_rescue_rate": 0.0,
+    "mlb1_floor": 0.33,
+    "mlb2_floor": 0.33,
+    "mlb1_passes": true,
+    "mlb2_passes": false
+  },
+  "phase2_evaluation": {
+    "a0_pct": 66.6667,
+    "a1_pct": 66.6667,
+    "b_pct": 66.6667,
+    "b_minus_a1_pp": 0.0,
+    "b_minus_a0_pp": 0.0,
+    "n_problems": 6,
+    "n_b_ge_a1": 6,
+    "phase2_gates": {
+      "G1_slice_pre_committed": true,
+      "G2_a1_lt_90pct": true,
+      "G3_b_gt_a1": false,
+      "G4_margin_geq_5pp": false,
+      "G5_b_gt_a0_by_geq_5pp": false,
+      "G6_per_problem_majority": false,
+      "G7_budget_exact": true,
+      "G8_audit_chain_re_derives": true,
+      "G9_executor_clean": true,
+      "MLB1_invocation_rate_geq_33pct": true,
+      "MLB2_rescue_rate_geq_33pct": false
+    },
+    "n_phase2_passed_of_9": 5,
+    "mlb_subgates_pass": false,
+    "overall_pass_phase2": false,
+    "verdict_label": "FAIL"
+  },
+  "w132_interpretation": {
+    "outcome": "RESISTANT_BY_CONSTRUCTION_PILOT_CAP",
+    "verdict_label": "FAIL",
+    "b_minus_a1_pp": 0.0,
+    "mlb2_rescue_rate": 0.0,
+    "w133_branch": "FAIL on the minted resistant-by-construction field => the bounded contamination-EXPOSED-HumanEval-family-at-70B ceiling STANDS; resistant superiority still 0 clean; the 'wrong-test' escape is closed. W133 = different axis / DEV_ONLY characterization on the minted field."
+  },
+  "calibration_non_degenerate": true,
+  "calibration_rule": "0 < A1 < 0.90 and at least one attempt-0 failure (MLB invocable)"
+}

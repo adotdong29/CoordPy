@@ -1,18 +1,25 @@
-# RESULTS W132 — resistant-by-construction hard-family battlefield + exact-oracle gates + Maverick pilot (NIM-infra-blocked) + DEV_ONLY local characterization
+# RESULTS W132 — resistant-by-construction hard-family battlefield + exact-oracle gates + executed frontier pilot (Llama-3.3-70B; Maverick infra-down) — clean FAIL
 
 **One line.** W123 bounded the OFFICIAL resistant-package supply and W131 found the model
 axis blocked on cutoff DISCLOSURE; both share one upstream dependency — a contamination-
 RESISTANT battlefield we either inherit or certify against a disclosed cutoff. **W132
-removes that dependency by MINTING the battlefield ourselves**: a CoordPy-owned, exact-
+removes that dependency by MINTING the battlefield ourselves** (a CoordPy-owned, exact-
 oracle, novelty-guarded, deterministic battlefield of **33 admitted** resistant-by-
-construction algorithmic problems, targeted at the failure families that actually beat the
-mechanism stack. The battlefield **earned the Maverick pilot cleanly** (≥30, all gates,
-resistance-certified). The Maverick frontier pilot is **NIM-infra-blocked this session**
-(the NVIDIA endpoint was unreachable — even a 16-token Maverick call timed out at 90 s),
-so it is registered as a **push-button** re-run, NOT a science result. A clearly-labelled
-**DEV_ONLY** local-Ollama characterization validated the β pipeline end-to-end on the
-minted field. **W89 (+5.56) + W105 (+7.00) remain the only two retirements; W132 retires
-none.**
+construction problems targeted at the failure families that actually beat the mechanism
+stack) **and RAN the frontier pilot on it**. The locked target Maverick was infra-down
+this session (machine-checked: same key, `llama-3.1-8b`/`llama-3.3-70b` respond instantly,
+maverick chat hangs 0-bytes), so the frontier target was substituted **pre-spend** to
+**`meta/llama-3.3-70b-instruct` — the exact model that earned the W105 retirement** (KNOWN
+cutoff ~Dec-2023; the minted field is resistant for it by date AND construction). The
+executed pilot is a **clean FAIL**: **A0 = A1 = 76.67%, B = 80.00%, B − A1 = +3.33 pp**
+(< the +5 pp bar; 7/9 Phase-2 gates; MLB-1 = 26.7% FAIL, MLB-2 = 25.0% FAIL) ⇒
+`VERDICT = FAIL` ⇒ **`W132-L-RESISTANT-BY-CONSTRUCTION-PILOT-CAP`**. **This closes the
+"maybe the official benchmarks were the wrong test" escape**: on a battlefield minted
+specifically in the failure families that beat the stack, at the exact retirement model +
+scale, the same-budget mechanism still does NOT clear the retirement bar (+3.33 pp — the
+SAME sub-floor one-problem nudge as the W121 matched-exposed-ICPC control). **W89 (+5.56) +
+W105 (+7.00) remain the only two retirements; W132 retires none.** Maverick stays the
+push-button cross-scale check when its deployment recovers.
 
 All numbers below are filled ONLY from emitted verdict JSON
 (`results/w132/**`).
@@ -84,40 +91,64 @@ model-facing payload contains no solver token tells.
 
 ---
 
-## Lane β — generated-family mechanism validation + Maverick pilot
+## Lane β — generated-family mechanism validation + executed frontier pilot — **clean FAIL**
 
 **Earn check (RUNBOOK §8b): the battlefield EARNED the pilot** — ≥30 admitted ✓, all
-quality gates pass ✓, Maverick resistance-certified ✓, evaluation rule locked before spend
-✓. The arms are the *already-validated* W88/W89 three-arm same-budget mechanism (A0 single-
-shot / A1 self-consistency-pass@K / B sequential reflexion) at K=5, 1 seed (132001), graded
-by the audited oracle, scored by the verbatim W108 `_mlb_rates` + `_evaluate_phase2_gates`
-— the SAME code that scored W89/W105/W120.
+quality gates pass ✓, resistance-certified ✓, A0/A1/B same-budget eval rule locked before
+spend ✓. Arms = the *already-validated* W88/W89 three-arm mechanism (A0 single-shot / A1
+self-consistency-pass@K / B sequential reflexion) at K=5, 1 seed (132001), graded by the
+audited oracle, scored by the verbatim W108 `_mlb_rates` + `_evaluate_phase2_gates` — the
+SAME code that scored W89/W105/W120.
 
-**Maverick frontier pilot = NIM-INFRA-BLOCKED this session (operational, NOT a science
-result).** The NVIDIA NIM endpoint was unreachable: the background calibration completed
-exactly 1 of 66 calls before repeated 240 s read-timeouts, and two isolated probes (a
-32-token and a 16-token Maverick chat) both timed out (120 s / 90 s). This is a hardware/
-infra outage (the throughput-sibling of W131's CPU-bound local 32B), reported AS such — it
-is **not** a `FAIL` and does **not** register `W132-L-RESISTANT-BY-CONSTRUCTION-PILOT-CAP`
-(that cap is reserved for an executed `FAIL`). The pilot is fully wired + slice-CID-guarded
-+ push-button (`scripts/run_w132_calibration_and_pilot_v1.py --mode pilot`); it re-runs the
-instant the endpoint recovers.
+**Infra-forced model substitution (RUNBOOK §8d, locked PRE-SPEND).** The locked target
+Maverick was infra-down this session — machine-checked: `GET /v1/models` returns 200 in
+0.15 s and lists maverick, and `meta/llama-3.1-8b-instruct` returns in 0.42 s with the SAME
+key, but every maverick chat/completions call (streaming + non-streaming, 8/16 tokens) returns
+**0 bytes** and times out (45–75 s, `time_starttransfer=0`) ⇒ a model-specific server-side
+outage. So the frontier target was substituted pre-spend to **`meta/llama-3.3-70b-instruct`
+— the exact model that earned the W105 retirement** (primary-KNOWN cutoff ~Dec-2023;
+reachable at ~7 s/call), making this the MOST on-target transfer test. Same core 30-slice
+(`f6a2ebed…`), same gates, same eval rule.
 
-**DEV_ONLY local-Ollama characterization (`scripts/run_w132_dev_only_local_characterization_v1.py`;
-`results/w132/dev_only_local/`) — STRICTLY NOT a frontier/retirement claim.** Because the
-field is resistant *by construction*, an UNKNOWN-cutoff LOCAL model is a legitimate non-
-contaminated test (the W132 γ payoff) — but `qwen2.5-coder:7b` is far weaker than the
-Maverick target, so this characterizes the INSTRUMENT + the mechanism on a weak local model
-and CANNOT retire anything. It confirmed the β pipeline executes end-to-end on the minted
-field. **Status: `PARTIAL_THROUGHPUT_LIMITED`** (`results/w132/dev_only_local/.../dev_only_status.json`):
-the run completed **8 clean Ollama generation→code-extraction→subprocess-exact-oracle-
-grading→A0/A1/B-arm-outcome cycles** on the minted field before it was stopped — concrete
-evidence the β pipeline executes end-to-end on the minted corpus. But `qwen2.5-coder:7b`
-runs at **~100 s/call** on this host (the throughput-sibling of W131's CPU-bound local 32B),
-so a full 6-problem characterization is ~1.8 h and the 30-slice ~9 h — throughput-
-impractical. The DEV characterization is therefore bounded; it is NOT a frontier or
-retirement result (every field tagged `frontier_claim=false`, `can_retire=false`), and the
-Maverick frontier pilot stays the primary (NIM-infra-blocked, push-button).
+**Calibration (RUNBOOK §8a) cleared non-degenerate** (6 mode-spanning problems, 66 calls):
+A0 = A1 = B = 66.7%, A1 in the useful band, 2/6 attempt-0 failures (MLB invocable).
+
+**Executed pilot (Llama-3.3-70B × minted resistant-by-construction core 30-slice, 1 seed ×
+K=5 = 330 calls, 80.3 min, 429-throttled but completed via backoff)
+(`results/w132/pilot/.../w132_pilot_report.json`):**
+
+| metric | value |
+|---|---|
+| A0 / A1 / B (pass@1) | 76.67% / 76.67% / 80.00% |
+| **B − A1** | **+3.33 pp** (< the +5 pp bar; **G4 FAIL**) |
+| B − A0 | +3.33 pp (G5 FAIL) |
+| Phase-2 gates | **7/9** (G4, G5 fail; G1–G3, G6–G9 pass; per-problem majority 30/30) |
+| MLB-1 invocation | 8/30 = **26.7% FAIL** (reflexion genuinely invoked on the hard quarter) |
+| MLB-2 rescue | 2/8 = **25.0% FAIL** (sub-floor; reflexion not load-bearing) |
+| **verdict** | **`FAIL` ⇒ `RESISTANT_BY_CONSTRUCTION_PILOT_CAP`** |
+
+**Per-mode pass counts (A0 / A1 / B):** COMPLEXITY_BLIND 4/4/**5**, HIDDEN_EDGE_STATE_MISS
+7/7/7, SEARCH_ENUM 6/6/6, WRONG_ALGORITHM_ADMISSIBLE 6/6/6. **B − A1 = +3.33 pp is exactly 1
+B-unique rescue, 0 regressions:** reflexion rescued exactly ONE problem A1 missed —
+`cb_pairs_absdiff_le_d` (COMPLEXITY: after the judge returned "rejected on hidden tests",
+reflexion switched the O(N²) attempt to the efficient two-pointer) — a REAL but isolated
+mechanism win, the only complexity rescue. The **6 problems unsolved by ALL arms** are the
+capability-bound traps the 70B cannot crack even with reflexion (3 COMPLEXITY +
+`he_interval_union_length` [overlap double-count] + `se_lattice_paths_blocked` [binomial-
+ignores-blocks] + `wa_knapsack_01` [ratio-greedy]); reflexion-on-public-feedback cannot fix
+a wrong algorithm whose public samples pass.
+
+**This is the strongest possible statement of the bounded ceiling.** On a battlefield minted
+SPECIFICALLY in the failure families that beat the stack, with exact oracles + novelty
+guards, at the EXACT W105 retirement model and 70B scale, the same-budget mechanism gets
+**+3.33 pp — below the +5 pp bar, MLB sub-floor** — the SAME margin as the W121 matched-
+exposed-ICPC control (+3.33 pp). The "maybe the official benchmarks were the wrong test"
+escape is **closed**: we built the right test and the mechanism still does not transfer.
+
+**DEV_ONLY local-Ollama characterization** (`qwen2.5-coder:7b`, run while NIM was fully
+down) is retained only as pipeline-execution evidence: `PARTIAL_THROUGHPUT_LIMITED`, 8 clean
+end-to-end cycles, ~100 s/call throughput-impractical; `frontier_claim=false`,
+`can_retire=false` — NOT a frontier or retirement result.
 
 ---
 
@@ -147,20 +178,34 @@ bridge from a minted-task GENERATOR to BOTH the validated bench (`icpc_reflexion
 ## Net + carry-forward
 
 * **W89 (+5.56) + W105 (+7.00) remain the only two confirmed retirements.** W132 retires
-  none (no single-seed retirement; and the Maverick frontier pilot did not execute).
+  none (executed FAIL, +3.33 pp < +5 pp, MLB sub-floor).
 * **NEW `W132-T-RESISTANT-BY-CONSTRUCTION-BATTLEFIELD-MINTABLE`** — CoordPy CAN mint a
   genuinely-new, exact-oracle, post-cutoff, novelty-clean, deterministic resistant
   battlefield (33 ≥ 30) targeted at the failure families that beat the stack; this removes
   the W123 official-supply cap and the W131 cutoff-disclosure dependency as blockers on the
-  EXISTENCE of a resistant instrument. The instrument STANDS as a reusable, push-button
-  resistant battlefield.
-* **`W132-L-MAVERICK-FRONTIER-PILOT-NIM-INFRA-BLOCKED`** — operational, not science; the
-  earned pilot is push-button and re-runs when the NIM endpoint recovers.
+  EXISTENCE of a resistant instrument. The instrument STANDS as a reusable resistant
+  battlefield.
+* **NEW `W132-L-RESISTANT-BY-CONSTRUCTION-PILOT-CAP`** (the EXECUTED FAIL) — on the minted
+  resistant-by-construction field, at the exact W105 retirement model (Llama-3.3-70B) and
+  70B scale, the same-budget mechanism gets B − A1 = +3.33 pp (< +5 pp; MLB-1 26.7%, MLB-2
+  25%, both FAIL): a single isolated complexity rescue, 0 regressions, 6 capability-bound
+  traps unsolved by all arms. The bounded contamination-EXPOSED-HumanEval-family-at-70B
+  ceiling HOLDS — and is now STRENGTHENED, because the "wrong test" escape is closed (the
+  field was built specifically in the failure families and the mechanism still did not
+  transfer). +3.33 pp matches the W121 matched-exposed-ICPC control exactly.
+* **`W132-T-RESISTANT-BY-CONSTRUCTION-MINTABLE-FOR-ANY-CUTOFF`** (γ) — resistance-by-
+  construction removes the W131 cutoff-disclosure dependency (resistant for ANY model);
+  Maverick stays the eventual push-button CROSS-SCALE check (deployment infra-down this
+  session; `--model meta/llama-4-maverick-17b-128e-instruct` re-runs on the same slice when
+  it recovers).
 * W123→W131 caps carried forward unchanged; decision CID `258b6ed7…` invariant.
 
-**W133** (per RUNBOOK §12): run the earned Maverick frontier pilot when NIM recovers
-(push-button), OR an operator-greenlit DEV_ONLY stronger-model characterization on the
-minted field; a retirement is registered ONLY on a later clean multi-seed
-`PASS_MECHANISM_DRIVEN`.
+**W133** (per RUNBOOK §12): the executed pilot FAILed, so W133 = accept the registered
+resistant-by-construction pilot cap (the minted instrument STANDS as a reusable resistant
+battlefield); the remaining levers are the Maverick CROSS-SCALE check on the SAME slice
+(push-button when its deployment recovers), an operator-greenlit multi-seed confirmation of
+the +3.33 pp on the minted field, or a genuinely different axis. A retirement is registered
+ONLY on a later clean multi-seed `PASS_MECHANISM_DRIVEN`. Bounded-context / compaction
+remain anti-patterns. COO-9 stays lead.
 
 **No version bump (0.5.20 / coordpy.sdk.v3.43); no PyPI; `coordpy/__init__.py` untouched.**
