@@ -1077,10 +1077,12 @@
     },
     {
       "id": "W132",
-      "title": "resistant-by-construction hard-family battlefield + exact-oracle quality gates + earned Maverick pilot (NIM-infra-blocked, push-button) + DEV_ONLY local characterization (coordpy.resistant_by_construction_battlefield_v1 framework + coordpy.resistant_by_construction_slate_v1 33-template slate)",
-      "outcome": "W123 bounded official resistant-package SUPPLY and W131 found the model axis blocked on cutoff DISCLOSURE; both share one upstream dependency (a resistant battlefield we inherit or certify against a disclosed cutoff). W132 REMOVES it by MINTING the battlefield: 33 admitted (>=30) resistant-by-construction problems (COMPLEXITY_BLIND 9 / HIDDEN_EDGE_STATE_MISS 8 / WRONG_ALGORITHM_ADMISSIBLE 8 / SEARCH_ENUM 8, 33 distinct families) each with an exact ref_source answer-key oracle cross-checked by an INDEPENDENT exhaustive brute_source, an admissible-wrong naive_source trap (looks-right-on-public / fails-hidden discriminating gate), a near-dup+official-identity novelty guard, deterministic regeneration, content-addressed manifest (manifest_cid 562aafbd, core 30-slice f6a2ebed); emitted as IcpcPilotProblemV1 for the already-validated W120 bench. Maverick resistance-certified by date AND construction. The battlefield EARNED the Maverick pilot, but the NVIDIA NIM endpoint was unreachable this session (1/66 calls; 240s read-timeouts; 16-token probe timed out) => Maverick frontier pilot NIM-INFRA-BLOCKED / push-button (NOT a FAIL, NOT a science cap). DEV_ONLY local-Ollama run (qwen2.5-coder:7b, throughput-limited) proved the beta pipeline executes end-to-end (8 clean cycles; frontier_claim=false). Stronger-model gate CLOSED (258b6ed7 invariant). No third retirement \u2014 W89 (+5.56) + W105 (+7.00) STILL the only two.",
+      "title": "resistant-by-construction hard-family battlefield + exact-oracle quality gates + EXECUTED frontier pilot on Llama-3.3-70B (Maverick infra-down) = clean FAIL B-A1=+3.33pp (coordpy.resistant_by_construction_battlefield_v1 framework + _slate_v1 33-template slate)",
+      "outcome": "W123 bounded official resistant-package SUPPLY and W131 found the model axis blocked on cutoff DISCLOSURE; both share one upstream dependency (a resistant battlefield we inherit or certify against a disclosed cutoff). W132 REMOVED it by MINTING the battlefield AND RAN the frontier pilot. Lane alpha ($0): 33 admitted (>=30) resistant-by-construction problems (COMPLEXITY_BLIND 9 / HIDDEN_EDGE_STATE_MISS 8 / WRONG_ALGORITHM_ADMISSIBLE 8 / SEARCH_ENUM 8, 33 distinct families) each with an exact ref_source answer-key oracle cross-checked by an INDEPENDENT exhaustive brute_source, an admissible-wrong naive_source trap (looks-right-on-public / fails-hidden discriminating gate), a near-dup+official-identity novelty guard, deterministic regeneration, manifest_cid 562aafbd / core 30-slice f6a2ebed; emitted as IcpcPilotProblemV1 for the already-validated W120 bench. Resistance-certified by date AND construction => W132-T-RESISTANT-BY-CONSTRUCTION-BATTLEFIELD-MINTABLE. Lane beta: battlefield EARNED the pilot; the locked target Maverick was INFRA-DOWN (machine-checked: same key, llama-3.1-8b 0.42s / llama-3.3-70b 7s respond, maverick chat hangs 0-bytes 45-75s) => frontier target substituted PRE-SPEND (RUNBOOK 8d) to meta/llama-3.3-70b-instruct, the EXACT W105 retirement model (KNOWN cutoff ~Dec-2023, resistant by date AND construction). Executed pilot (30-slice, 1 seed, K=5, 330 calls, 80min): A0=A1=76.67% B=80.00% B-A1=+3.33pp (< +5pp; 7/9 gates; MLB-1 26.7% FAIL, MLB-2 25% FAIL) => VERDICT FAIL => W132-L-RESISTANT-BY-CONSTRUCTION-PILOT-CAP; +3.33pp = 1 B-unique COMPLEXITY rescue / 0 regressions, 6 capability-bound traps resist all arms; CLOSES the 'wrong-test' escape (+3.33pp = SAME as the W121 matched-exposed-ICPC control). Stronger-model gate CLOSED (258b6ed7 invariant); Maverick = push-button CROSS-SCALE check on the same slice. No third retirement \u2014 W89 (+5.56) + W105 (+7.00) STILL the only two.",
       "commits": [
-        "1dd9582"
+        "1dd9582",
+        "517b015",
+        "0dfa7f6"
       ],
       "docs": [
         "docs/RUNBOOK_W132.md",
@@ -1094,7 +1096,7 @@
       "carry_forwards_retired": [],
       "carry_forwards_added": [
         "W132-T-RESISTANT-BY-CONSTRUCTION-BATTLEFIELD-MINTABLE",
-        "W132-L-MAVERICK-FRONTIER-PILOT-NIM-INFRA-BLOCKED"
+        "W132-L-RESISTANT-BY-CONSTRUCTION-PILOT-CAP"
       ]
     }
   ]
