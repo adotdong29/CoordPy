@@ -1,0 +1,19 @@
+{
+  "curriculum_cid": "e5e44a4393d7a2416b475796720bac90524574aa824079fe31cfc70166b66a15",
+  "seeds": {
+    "train": 133001,
+    "dev": 133002,
+    "eval": 133003
+  },
+  "split_cids": {
+    "train": "e548287bf3814822c3f0792ede9a2b9d403094e7b66d1ed8eba110107daedf9b",
+    "dev": "804976ce59f7e14361fd4a57482a744eddf9956611648eb9774878354f3120c0",
+    "eval": "88b9b79a7389711b374d50b08107d7aef62308045ee56ccc4f8138867a8ccb7a"
+  },
+  "n_admitted": {
+    "train": 33,
+    "dev": 33,
+    "eval": 33
+  },
+  "lane_alpha_success": true
+}
