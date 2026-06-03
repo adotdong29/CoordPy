@@ -1,7 +1,7 @@
 {
   "schema": "coordpy.w133_stronger_model_gate_recheck.v1",
   "lane": "gamma_stronger_model_gate",
-  "verified_on": "2026-06-02",
+  "verified_on": "2026-06-03",
   "decision_verdict": "NO_CERTIFIABLE_STRONGER_MODEL",
   "decision_cid": "258b6ed7",
   "decision_cid_full": "258b6ed794b45a18a94829e7f86000dbea8cfd662692425f0188a2e04d7fd1bc",
@@ -42,12 +42,12 @@
   "w133_witness_curriculum": {
     "minted_date": "2026-06-02",
     "resistant_for_any_cutoff_by_construction": true,
-    "curriculum_cid": null,
-    "lane_alpha_success": null,
+    "curriculum_cid": "e5e44a4393d7a2416b475796720bac90524574aa824079fe31cfc70166b66a15",
+    "lane_alpha_success": true,
     "note": "The witness curriculum inherits the resistant-by-construction property; the frontier claim stays on the KNOWN-cutoff Llama-3.3-70B (W105 model)."
   },
   "w123_through_w132_caps_closed": true,
   "no_405b_run": true,
   "nim_spend": 0,
-  "generated_at": "2026-06-02T22:53:07.216213+00:00"
+  "generated_at": "2026-06-03T18:14:57.115286+00:00"
 }

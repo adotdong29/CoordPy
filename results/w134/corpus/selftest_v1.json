@@ -1,0 +1,32 @@
+{
+  "g1_witness_reproducible": true,
+  "g2_ladder_deterministic": true,
+  "g3_public_spec_consistent": true,
+  "g4_naive_ref_separation_all": true,
+  "g5_split_regen_deterministic": true,
+  "regression_fixtures": {
+    "cb_pairs_absdiff_le_d": {
+      "present": true,
+      "naive_fires": true,
+      "reason": "LADDER_TLE"
+    },
+    "cb_distinct_in_windows": {
+      "present": true,
+      "naive_fires": true,
+      "reason": "SUPERLINEAR_FIT"
+    },
+    "cb_pairs_sum_eq_t": {
+      "present": true,
+      "naive_fires": true,
+      "reason": "LADDER_TLE"
+    },
+    "cb_subarrays_sum_eq_k": {
+      "present": true,
+      "naive_fires": true,
+      "reason": "LADDER_TLE"
+    }
+  },
+  "regression_fixtures_all_fire": true,
+  "negative_control_fast_wrong_silent": true,
+  "all_pass": true
+}
