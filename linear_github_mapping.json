@@ -1098,6 +1098,30 @@
         "W132-T-RESISTANT-BY-CONSTRUCTION-BATTLEFIELD-MINTABLE",
         "W132-L-RESISTANT-BY-CONSTRUCTION-PILOT-CAP"
       ]
+    },
+    {
+      "id": "W133",
+      "title": "exact-oracle WITNESS curriculum + held-out witness-guided mechanism bench on Llama-3.3-70B (Maverick infra-down) \u2014 a REAL but SINGLE-MODE complexity-witness gain; frontier rerun NOT earned (coordpy.exact_oracle_witness_v1 + witness_curriculum_corpus_v1)",
+      "outcome": "W132 closed the 'wrong-test' escape but left the BLIND reject bit un-pulled; W133 turned the owned battlefield into a TEACHER. Lane alpha ($0): exact_oracle_witness_v1 (EW1 minimal-counterexample / EW2 complexity-timing / EW3 edge / EW4 search-enum slate + same-budget witness arm + fake-different test) + witness_curriculum_corpus_v1 (seed-disjoint train/dev/eval over RBC_SLATE_V1) => 99 admitted = 33/33/33 (>=96; curriculum_cid e5e44a43; eval split CID 88b9b79a LOCKED before any eval spend); witnesses fire leakage-clean + genuinely-new on every admitted problem AND all six W132 traps; no-leakage enforced BY WITNESS TYPE (EW1 disjoint-from-graded, EW2 size/timing-only), graded on a DISJOINT hidden bank (generalisation not memorisation); 9 tests incl. a positive control => W133-T-EXACT-ORACLE-WITNESS-INSTRUMENT-MINTABLE. Lane beta (held-out dev spend; meta/llama-3.3-70b-instruct, Maverick infra-down): same-budget A0/A1/B0 + C1/C2/C3, 858 NIM, A0=72.73 A1=75.76 B0=81.82 (B0-A1=+6.06); C1=81.82 (arm-B0=+0.00, 0 rescues vs B0); C2=C3=87.88 (arm-A1=+12.12 arm-B0=+6.06, MLB-2 60%, 4 ALGORITHMIC complexity rescues). The EW2 complexity witness is REAL + load-bearing (cracks O(N^2) COMPLEXITY traps B0 + counterexample-only C1 cannot) => W133-T-COMPLEXITY-WITNESS-IS-REAL-AND-LOAD-BEARING-ON-HELD-OUT-DEV; but the EW1 counterexample witness adds +0.00 over blind reflexion (wrong-algorithm capability ceiling). SINGLE-MODE gain => meets -A1>=+5 + -B0>+3.33 but FAILS the >=2-mode condition => \u00a77a dev gate FAILS => $0 eval, $0 frontier (NOT earned) => W133-L-WITNESS-FEEDBACK-SINGLE-MODE-CAP; LOCALISES the W132 cap (part feedback-fixable complexity + part capability-bound value/algorithm). Lane gamma ($0): primary-source research confirms the mechanism EXECUTABLE-HERE + PREDICTED the two limits; stronger-model gate NO_CERTIFIABLE_STRONGER_MODEL, decision CID 258b6ed7 invariant {KNOWN:1,UNKNOWN:4}; graphify START 66c0b38 + END (exact_oracle_witness_v1 = first bridge to battlefield + bench + grader); no 405B. W89 (+5.56) + W105 (+7.00) STILL the only two retirements; W133 retires none. COO-9 stays lead. No version bump (0.5.20 / coordpy.sdk.v3.43); no PyPI; coordpy/__init__.py untouched.",
+      "commits": [
+        "39ab1a0"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W133.md",
+        "docs/RESULTS_W133_WITNESS_FEEDBACK_BENCH_V1.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W133_V1.md"
+      ],
+      "linear_issues": [
+        "COO-58",
+        "COO-9",
+        "COO-6"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W133-T-EXACT-ORACLE-WITNESS-INSTRUMENT-MINTABLE",
+        "W133-T-COMPLEXITY-WITNESS-IS-REAL-AND-LOAD-BEARING-ON-HELD-OUT-DEV",
+        "W133-L-WITNESS-FEEDBACK-SINGLE-MODE-CAP"
+      ]
     }
   ]
 }
