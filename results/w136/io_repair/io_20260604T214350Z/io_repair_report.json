@@ -1,0 +1,112 @@
+{
+  "schema": "coordpy.w136_io_grounded_repair_probe_v1",
+  "model_id": "meta/llama-3.3-70b-instruct",
+  "wall_s": 1701.5,
+  "results": {
+    "rbc_se_lattice_paths_blocked": {
+      "mode": "SEARCH_ENUM",
+      "passed": true,
+      "per_call": [
+        false,
+        true,
+        false,
+        true,
+        true
+      ],
+      "io_directive_fired": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "is_trap": true
+    },
+    "rbc_wa_knapsack_01": {
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "passed": true,
+      "per_call": [
+        false,
+        true,
+        true,
+        false,
+        true
+      ],
+      "io_directive_fired": [
+        true,
+        false,
+        false,
+        true
+      ],
+      "is_trap": true
+    },
+    "rbc_wa_weighted_interval_scheduling": {
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "passed": true,
+      "per_call": [
+        false,
+        true,
+        false,
+        true,
+        true
+      ],
+      "io_directive_fired": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "is_trap": true
+    },
+    "rbc_se_count_bsts_catalan": {
+      "mode": "SEARCH_ENUM",
+      "passed": true,
+      "per_call": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "io_directive_fired": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "is_trap": false
+    },
+    "rbc_wa_max_nonadjacent_sum": {
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "passed": true,
+      "per_call": [
+        true,
+        false,
+        true,
+        true,
+        true
+      ],
+      "io_directive_fired": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "is_trap": false
+    }
+  },
+  "traps_cracked": [
+    "rbc_se_lattice_paths_blocked",
+    "rbc_wa_knapsack_01",
+    "rbc_wa_weighted_interval_scheduling"
+  ],
+  "n_traps_cracked": 3,
+  "modes_cracked": [
+    "SEARCH_ENUM",
+    "WRONG_ALGORITHM_ADMISSIBLE"
+  ],
+  "controls_ok": true,
+  "implied_T_IO_pct": 100.0,
+  "implied_T_IO_minus_B0_pp": 18.75,
+  "dev_gate_pass": true,
+  "note": "execution-grounded I/O-format repair; the algorithm hints (T1) addressed the wrong bug \u2014 the true discriminator is the whitespace-flattened input format (confirmed $0: same DP passes 7/7 robust / fails 7/7 per-line)."
+}

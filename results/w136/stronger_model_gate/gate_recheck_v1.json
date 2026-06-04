@@ -1,0 +1,47 @@
+{
+  "schema": "coordpy.w136_stronger_model_gate_recheck.v1",
+  "lane": "gamma_stronger_model_gate",
+  "verified_on": "2026-06-04",
+  "decision_verdict": "NO_CERTIFIABLE_STRONGER_MODEL",
+  "decision_cid": "258b6ed7",
+  "decision_cid_full": "258b6ed794b45a18a94829e7f86000dbea8cfd662692425f0188a2e04d7fd1bc",
+  "decision_cid_invariant": true,
+  "registry_split": {
+    "KNOWN": 1,
+    "UNKNOWN": 3
+  },
+  "per_model": [
+    {
+      "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+      "verified_confidence": "KNOWN",
+      "cutoff_boundary": "2024-08-31"
+    },
+    {
+      "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": "2025-07-01"
+    },
+    {
+      "model_id": "deepseek-ai/deepseek-v4-pro",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": "2025-01-01"
+    },
+    {
+      "model_id": "mistralai/mistral-small-4-119b-2603",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": "2026-03-01"
+    },
+    {
+      "model_id": "zai/glm-5",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": null
+    }
+  ],
+  "primary_recheck_note": "Re-derived from the primary-source registry AND the W136 primary-source research pass (2026-06-04): Llama-3.3-70B = Dec-2023 KNOWN (Meta llama3_3 MODEL_CARD), Llama-4-Maverick = Aug-2024 KNOWN (Meta llama4 MODEL_CARD, already settled); Qwen3-Coder-480B / DeepSeek-V4-Pro / Mistral-Small-4-119B-2603 / GLM-5 all primary-UNDISCLOSED; MiniMax-M3 (2026-06-01) still has no published card/cutoff.",
+  "gate_state": "CLOSED \u2014 no primary-KNOWN stronger-than-Maverick model certifiable; frontier target stays meta/llama-3.3-70b-instruct (KNOWN ~Dec-2023, the W105 model)",
+  "w136_note": "W136 frontier is earned ONLY if a trace-conditioned arm clears the held-out \u00a77a dev gate (T-arm beats B0 by >=+5pp AND S4 by >=+5pp spanning >=2 modes / >=3 families). The gate state here governs only WHICH model the earned frontier would target (it stays Llama-3.3-70B); it does not by itself authorise any NIM.",
+  "w123_through_w135_caps_closed": true,
+  "no_405b_run": true,
+  "nim_spend": 0,
+  "generated_at": "2026-06-04T20:05:27.584545+00:00"
+}

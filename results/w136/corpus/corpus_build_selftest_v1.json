@@ -1,0 +1,91 @@
+{
+  "schema": "coordpy.w136_corpus_selftest_v1",
+  "corpus_cid": "ce1a6bc6541250ee98dd97be631c02da957734844c06c53c67412ad68b31a68a",
+  "eval_split_cid": "135193533d6b57335c421514b96929bfeebbfab505dd3f55f273c98e1e3314c7",
+  "frontier_slice_cid": "3f75b3020271ada89c99a7b7b47c210fc9cc200a0920c37e5b6ff61c92f8f756",
+  "admitted": {
+    "train": 80,
+    "dev": 79,
+    "eval": 79,
+    "frontier": 78
+  },
+  "meets_floors": true,
+  "held_out_integrity": true,
+  "naive_ref_separation": {
+    "observed_partial": {
+      "n_train_processed": 75,
+      "naive_fires_genuinely_new": 70,
+      "ref_silent_none": 75,
+      "note": "representative partial pass (75/80 before the slow subprocess-bound run was stopped); the one non-firing family = longest_common_subseq (string-pair input, no numeric/grid sub-instance ladder)"
+    },
+    "full_instrument_validation": "18/18 tests/test_w136_algorithm_state_trace_v1.py"
+  },
+  "regression_traps": {
+    "rbc_wa_knapsack_01": {
+      "kind": "DECISION_PATH",
+      "has_grid": true,
+      "n_rows": 3,
+      "n_grid_cells": 12,
+      "optimal_trajectory": [
+        "120",
+        "320",
+        "440"
+      ],
+      "naive_trajectory": [
+        "120",
+        "320",
+        "320"
+      ],
+      "trace_genuinely_new": true,
+      "s4_ladder_genuinely_new": false,
+      "leakage_clean": true
+    },
+    "rbc_wa_weighted_interval_scheduling": {
+      "kind": "DECISION_PATH",
+      "has_grid": false,
+      "n_rows": 6,
+      "n_grid_cells": 0,
+      "optimal_trajectory": [
+        "10",
+        "10",
+        "10",
+        "10",
+        "10",
+        "10"
+      ],
+      "naive_trajectory": [
+        "10",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "trace_genuinely_new": true,
+      "s4_ladder_genuinely_new": false,
+      "leakage_clean": true
+    },
+    "rbc_se_lattice_paths_blocked": {
+      "kind": "SEARCH_FRONTIER",
+      "has_grid": false,
+      "n_rows": 3,
+      "n_grid_cells": 0,
+      "optimal_trajectory": [
+        "1",
+        "1",
+        "0"
+      ],
+      "naive_trajectory": [
+        "1",
+        "1",
+        "1"
+      ],
+      "trace_genuinely_new": true,
+      "s4_ladder_genuinely_new": false,
+      "leakage_clean": true
+    }
+  },
+  "negative_control_complexity_silent": true,
+  "positive_control_ref_silent": true,
+  "all_traps_fire_genuinely_new": true
+}

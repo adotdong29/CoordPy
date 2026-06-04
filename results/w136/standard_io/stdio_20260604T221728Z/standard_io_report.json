@@ -1,0 +1,29 @@
+{
+  "schema": "coordpy.w136_standard_io_confirm_v1",
+  "model_id": "meta/llama-3.3-70b-instruct",
+  "wall_s": 72.17,
+  "results": {
+    "rbc_se_lattice_paths_blocked": {
+      "mode": "SEARCH_ENUM",
+      "ref_still_passes_reformatted": true,
+      "A0_single_shot_passed": true
+    },
+    "rbc_wa_knapsack_01": {
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "ref_still_passes_reformatted": true,
+      "A0_single_shot_passed": true
+    },
+    "rbc_wa_weighted_interval_scheduling": {
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "ref_still_passes_reformatted": true,
+      "A0_single_shot_passed": true
+    }
+  },
+  "traps_one_shot_with_standard_io": [
+    "rbc_se_lattice_paths_blocked",
+    "rbc_wa_knapsack_01",
+    "rbc_wa_weighted_interval_scheduling"
+  ],
+  "n_one_shot": 3,
+  "note": "A0 = single shot, NO feedback, NO mechanism. If the traps one-shot with standard one-per-line I/O, the apparent 'wrong-algorithm ceiling' was PURELY the whitespace-flattened input format \u2014 the model's algorithm was always correct."
+}

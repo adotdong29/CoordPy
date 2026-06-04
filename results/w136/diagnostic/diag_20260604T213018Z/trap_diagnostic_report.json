@@ -1,0 +1,663 @@
+{
+  "schema": "coordpy.w136_trap_diagnostic_v1",
+  "model_id": "meta/llama-3.3-70b-instruct",
+  "wall_s": 518.89,
+  "report": {
+    "rbc_se_lattice_paths_blocked": {
+      "mode": "SEARCH_ENUM",
+      "any_passed": false,
+      "attempts": [
+        {
+          "k": 0,
+          "passed": false,
+          "code_len": 488,
+          "code_head": "MOD = 1000000007\n\ndef main():\n    R, C = map(int, input().split())\n    grid = [list(input()) for _ in range(R)]\n    dp = [[0] * C for _ in range(R)]\n\n    dp[0][0] = 1\n    for r in range(R):\n        for c in range(C):\n            if grid[r][c] == '.':\n                if r > 0:\n                    dp[r][c] = (dp[r][c] + dp[r-1][c]) % MOD\n                if c > 0:\n                    dp[r][c] = (dp[r][c] + dp[r][c-1]) % MOD\n\n    print(dp[R-1][C-1])\n\nif __name__ == \"__main__\":\n    main()",
+          "first_failing_secret": {
+            "input": "4 4\n.... .... .... ....",
+            "expected": "20\n",
+            "observed": "",
+            "observed_kind": "RUNTIME_ERROR"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 2,
+            "first_wrong_sub": {
+              "sub": "2 2\n.. ..",
+              "optimal": "2",
+              "model": "CRASH"
+            },
+            "rows": [
+              {
+                "sub_tokens": 3,
+                "optimal": "1",
+                "model": "1",
+                "ok": true
+              },
+              {
+                "sub_tokens": 4,
+                "optimal": "2",
+                "model": "CRASH",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "HAS_NESTED_LOOP_DP",
+            "CRASH_ON_HIDDEN",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 1,
+          "passed": false,
+          "code_len": 785,
+          "code_head": "MOD = 1000000007\n\ndef main():\n    R, C = map(int, input().split())\n    grid = [list(input()) for _ in range(R)]\n\n    # Initialize dp table with -1 to indicate unvisited cells\n    dp = [[-1] * C for _ in range(R)]\n\n    def dfs(r, c):\n        # Base case: out of bounds or blocked cell\n        if r < 0 or r >= R or c < 0 or c >= C or grid[r][c] == '#':\n            return 0\n        # Base case: destination cell\n        if r == R - 1 and c == C - 1:\n            return 1\n\n        # If cell has been visited before, return the stored result\n        if dp[r][c] != -1:\n            return dp[r][c]\n\n     ",
+          "first_failing_secret": {
+            "input": "4 4\n.... .... .... ....",
+            "expected": "20\n",
+            "observed": "",
+            "observed_kind": "RUNTIME_ERROR"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 2,
+            "first_wrong_sub": {
+              "sub": "2 2\n.. ..",
+              "optimal": "2",
+              "model": "CRASH"
+            },
+            "rows": [
+              {
+                "sub_tokens": 3,
+                "optimal": "1",
+                "model": "1",
+                "ok": true
+              },
+              {
+                "sub_tokens": 4,
+                "optimal": "2",
+                "model": "CRASH",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "CRASH_ON_HIDDEN",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 2,
+          "passed": false,
+          "code_len": 710,
+          "code_head": "MOD = 1000000007\n\ndef main():\n    R, C = map(int, input().split())\n    grid = [list(input()) for _ in range(R)]\n\n    # Initialize dp table with 0\n    dp = [[0] * C for _ in range(R)]\n\n    # Initialize base cases\n    dp[0][0] = 1\n\n    # Fill the first row\n    for c in range(1, C):\n        if grid[0][c] == '.':\n            dp[0][c] = dp[0][c-1]\n\n    # Fill the first column\n    for r in range(1, R):\n        if grid[r][0] == '.':\n            dp[r][0] = dp[r-1][0]\n\n    # Fill the rest of the table\n    for r in range(1, R):\n        for c in range(1, C):\n            if grid[r][c] == '.':\n            ",
+          "first_failing_secret": {
+            "input": "4 4\n.... .... .... ....",
+            "expected": "20\n",
+            "observed": "",
+            "observed_kind": "RUNTIME_ERROR"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 2,
+            "first_wrong_sub": {
+              "sub": "2 2\n.. ..",
+              "optimal": "2",
+              "model": "CRASH"
+            },
+            "rows": [
+              {
+                "sub_tokens": 3,
+                "optimal": "1",
+                "model": "1",
+                "ok": true
+              },
+              {
+                "sub_tokens": 4,
+                "optimal": "2",
+                "model": "CRASH",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "HAS_NESTED_LOOP_DP",
+            "CRASH_ON_HIDDEN",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 3,
+          "passed": false,
+          "code_len": 648,
+          "code_head": "MOD = 1000000007\n\ndef main():\n    R, C = map(int, input().split())\n    grid = [list(input()) for _ in range(R)]\n\n    dp = [[0] * C for _ in range(R)]\n    dp[0][0] = 1\n\n    # Fill the first row\n    for c in range(1, C):\n        if grid[0][c] == '.':\n            dp[0][c] = dp[0][c-1]\n\n    # Fill the first column\n    for r in range(1, R):\n        if grid[r][0] == '.':\n            dp[r][0] = dp[r-1][0]\n\n    # Fill the rest of the table\n    for r in range(1, R):\n        for c in range(1, C):\n            if grid[r][c] == '.':\n                dp[r][c] = (dp[r-1][c] + dp[r][c-1]) % MOD\n\n    print(dp[R",
+          "first_failing_secret": {
+            "input": "4 4\n.... .... .... ....",
+            "expected": "20\n",
+            "observed": "",
+            "observed_kind": "RUNTIME_ERROR"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 2,
+            "first_wrong_sub": {
+              "sub": "2 2\n.. ..",
+              "optimal": "2",
+              "model": "CRASH"
+            },
+            "rows": [
+              {
+                "sub_tokens": 3,
+                "optimal": "1",
+                "model": "1",
+                "ok": true
+              },
+              {
+                "sub_tokens": 4,
+                "optimal": "2",
+                "model": "CRASH",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "HAS_NESTED_LOOP_DP",
+            "CRASH_ON_HIDDEN",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 4,
+          "passed": false,
+          "code_len": 710,
+          "code_head": "MOD = 1000000007\n\ndef main():\n    R, C = map(int, input().split())\n    grid = [list(input()) for _ in range(R)]\n\n    # Initialize dp table with 0\n    dp = [[0] * C for _ in range(R)]\n\n    # Initialize base cases\n    dp[0][0] = 1\n\n    # Fill the first row\n    for c in range(1, C):\n        if grid[0][c] == '.':\n            dp[0][c] = dp[0][c-1]\n\n    # Fill the first column\n    for r in range(1, R):\n        if grid[r][0] == '.':\n            dp[r][0] = dp[r-1][0]\n\n    # Fill the rest of the table\n    for r in range(1, R):\n        for c in range(1, C):\n            if grid[r][c] == '.':\n            ",
+          "first_failing_secret": {
+            "input": "4 4\n.... .... .... ....",
+            "expected": "20\n",
+            "observed": "",
+            "observed_kind": "RUNTIME_ERROR"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 2,
+            "first_wrong_sub": {
+              "sub": "2 2\n.. ..",
+              "optimal": "2",
+              "model": "CRASH"
+            },
+            "rows": [
+              {
+                "sub_tokens": 3,
+                "optimal": "1",
+                "model": "1",
+                "ok": true
+              },
+              {
+                "sub_tokens": 4,
+                "optimal": "2",
+                "model": "CRASH",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "HAS_NESTED_LOOP_DP",
+            "CRASH_ON_HIDDEN",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        }
+      ]
+    },
+    "rbc_wa_knapsack_01": {
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "any_passed": false,
+      "attempts": [
+        {
+          "k": 0,
+          "passed": false,
+          "code_len": 713,
+          "code_head": "import sys\n\ndef knapsack(N, W, weights, values):\n    dp = [[0 for _ in range(W + 1)] for _ in range(N + 1)]\n\n    for i in range(1, N + 1):\n        for j in range(1, W + 1):\n            if weights[i - 1] <= j:\n                dp[i][j] = max(values[i - 1] + dp[i - 1][j - weights[i - 1]], dp[i - 1][j])\n            else:\n                dp[i][j] = dp[i - 1][j]\n\n    return dp[N][W]\n\ndef main():\n    N, W = map(int, sys.stdin.readline().split())\n    weights = []\n    values = []\n\n    for _ in range(N):\n        w, v = map(int, sys.stdin.readline().split())\n        weights.append(w)\n        values.appen",
+          "first_failing_secret": {
+            "input": "4 15\n5 3 2 2 3 7 5 4",
+            "expected": "16\n",
+            "observed": "",
+            "observed_kind": "RUNTIME_ERROR"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 3,
+            "first_wrong_sub": {
+              "sub": "2 10\n1 2 3 3",
+              "optimal": "5",
+              "model": "CRASH"
+            },
+            "rows": [
+              {
+                "sub_tokens": 4,
+                "optimal": "2",
+                "model": "2",
+                "ok": true
+              },
+              {
+                "sub_tokens": 6,
+                "optimal": "5",
+                "model": "CRASH",
+                "ok": false
+              },
+              {
+                "sub_tokens": 8,
+                "optimal": "11",
+                "model": "CRASH",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "HAS_NESTED_LOOP_DP",
+            "CRASH_ON_HIDDEN",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 1,
+          "passed": false,
+          "code_len": 1587,
+          "code_head": "import sys\n\ndef knapsack(N, W, weights, values):\n    \"\"\"\n    0/1 Knapsack problem solution using dynamic programming.\n\n    Parameters:\n    N (int): Number of items.\n    W (int): Maximum weight capacity.\n    weights (list): List of weights of items.\n    values (list): List of values of items.\n\n    Returns:\n    int: Maximum value that can be achieved without exceeding the weight capacity.\n    \"\"\"\n    # Initialize a 2D table to store the maximum value for each subproblem\n    dp = [[0 for _ in range(W + 1)] for _ in range(N + 1)]\n\n    # Fill the table in a bottom-up manner\n    for i in range(1, N ",
+          "first_failing_secret": {
+            "input": "4 15\n5 3 2 2 3 7 5 4",
+            "expected": "16\n",
+            "observed": "",
+            "observed_kind": "RUNTIME_ERROR"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 3,
+            "first_wrong_sub": {
+              "sub": "2 10\n1 2 3 3",
+              "optimal": "5",
+              "model": "CRASH"
+            },
+            "rows": [
+              {
+                "sub_tokens": 4,
+                "optimal": "2",
+                "model": "2",
+                "ok": true
+              },
+              {
+                "sub_tokens": 6,
+                "optimal": "5",
+                "model": "CRASH",
+                "ok": false
+              },
+              {
+                "sub_tokens": 8,
+                "optimal": "11",
+                "model": "CRASH",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "HAS_NESTED_LOOP_DP",
+            "CRASH_ON_HIDDEN",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 2,
+          "passed": false,
+          "code_len": 948,
+          "code_head": "import sys\n\ndef knapsack(N, W, weights, values):\n    dp = [[0 for _ in range(W + 1)] for _ in range(N + 1)]\n    for i in range(1, N + 1):\n        for j in range(1, W + 1):\n            if weights[i - 1] <= j:\n                dp[i][j] = max(values[i - 1] + dp[i - 1][j - weights[i - 1]], dp[i - 1][j])\n            else:\n                dp[i][j] = dp[i - 1][j]\n    return dp[N][W]\n\ndef main():\n    try:\n        N, W = map(int, sys.stdin.readline().split())\n        weights = []\n        values = []\n        for _ in range(N):\n            line = sys.stdin.readline().split()\n            if len(line) != 2:",
+          "first_failing_secret": {
+            "input": "4 15\n5 3 2 2 3 7 5 4",
+            "expected": "16\n",
+            "observed": "",
+            "observed_kind": "WRONG_ANSWER"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 3,
+            "first_wrong_sub": {
+              "sub": "2 10\n1 2 3 3",
+              "optimal": "5",
+              "model": ""
+            },
+            "rows": [
+              {
+                "sub_tokens": 4,
+                "optimal": "2",
+                "model": "2",
+                "ok": true
+              },
+              {
+                "sub_tokens": 6,
+                "optimal": "5",
+                "model": "",
+                "ok": false
+              },
+              {
+                "sub_tokens": 8,
+                "optimal": "11",
+                "model": "",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "HAS_NESTED_LOOP_DP",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 3,
+          "passed": false,
+          "code_len": 1765,
+          "code_head": "import sys\n\ndef knapsack(N, W, weights, values):\n    \"\"\" 0/1 Knapsack problem solution using dynamic programming.\n    \n    Parameters:\n    N (int): Number of items.\n    W (int): Maximum weight capacity.\n    weights (list): List of weights of items.\n    values (list): List of values of items.\n    \n    Returns:\n    int: Maximum value that can be achieved without exceeding the weight capacity.\n    \"\"\"\n    # Initialize a 2D table to store the maximum value for each subproblem\n    dp = [[0 for _ in range(W + 1)] for _ in range(N + 1)]\n    \n    # Fill the table in a bottom-up manner\n    for i in ran",
+          "first_failing_secret": {
+            "input": "4 15\n5 3 2 2 3 7 5 4",
+            "expected": "16\n",
+            "observed": "",
+            "observed_kind": "WRONG_ANSWER"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 3,
+            "first_wrong_sub": {
+              "sub": "2 10\n1 2 3 3",
+              "optimal": "5",
+              "model": ""
+            },
+            "rows": [
+              {
+                "sub_tokens": 4,
+                "optimal": "2",
+                "model": "2",
+                "ok": true
+              },
+              {
+                "sub_tokens": 6,
+                "optimal": "5",
+                "model": "",
+                "ok": false
+              },
+              {
+                "sub_tokens": 8,
+                "optimal": "11",
+                "model": "",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "HAS_NESTED_LOOP_DP",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 4,
+          "passed": false,
+          "code_len": 1747,
+          "code_head": "import sys\n\ndef knapsack(N, W, weights, values):\n    \"\"\" 0/1 Knapsack problem solution using dynamic programming.\n    Parameters:\n    N (int): Number of items.\n    W (int): Maximum weight capacity.\n    weights (list): List of weights of items.\n    values (list): List of values of items.\n    Returns:\n    int: Maximum value that can be achieved without exceeding the weight capacity.\n    \"\"\"\n    # Initialize a 2D table to store the maximum value for each subproblem\n    dp = [[0 for _ in range(W + 1)] for _ in range(N + 1)]\n\n    # Fill the table in a bottom-up manner\n    for i in range(1, N + 1):\n",
+          "first_failing_secret": {
+            "input": "4 15\n5 3 2 2 3 7 5 4",
+            "expected": "16\n",
+            "observed": "",
+            "observed_kind": "WRONG_ANSWER"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 3,
+            "first_wrong_sub": {
+              "sub": "2 10\n1 2 3 3",
+              "optimal": "5",
+              "model": ""
+            },
+            "rows": [
+              {
+                "sub_tokens": 4,
+                "optimal": "2",
+                "model": "2",
+                "ok": true
+              },
+              {
+                "sub_tokens": 6,
+                "optimal": "5",
+                "model": "",
+                "ok": false
+              },
+              {
+                "sub_tokens": 8,
+                "optimal": "11",
+                "model": "",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "HAS_NESTED_LOOP_DP",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        }
+      ]
+    },
+    "rbc_wa_weighted_interval_scheduling": {
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "any_passed": false,
+      "attempts": [
+        {
+          "k": 0,
+          "passed": false,
+          "code_len": 653,
+          "code_head": "import sys\n\ndef max_weight(jobs):\n    jobs.sort(key=lambda x: x[1])\n    n = len(jobs)\n    dp = [0] * n\n    dp[0] = jobs[0][2]\n    for i in range(1, n):\n        incl = jobs[i][2]\n        last_non_conflicting = -1\n        for j in range(i-1, -1, -1):\n            if jobs[j][1] <= jobs[i][0]:\n                last_non_conflicting = j\n                break\n        if last_non_conflicting != -1:\n            incl += dp[last_non_conflicting]\n        dp[i] = max(incl, dp[i-1])\n    return dp[-1]\n\nn = int(sys.stdin.readline())\njobs = []\nfor _ in range(n):\n    s, e, w = map(int, sys.stdin.readline().split(",
+          "first_failing_secret": {
+            "input": "3\n1 3 1 5 8 1 9 12 1",
+            "expected": "3\n",
+            "observed": "",
+            "observed_kind": "RUNTIME_ERROR"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 3,
+            "first_wrong_sub": {
+              "sub": "2\n0 2 1 2 3 1",
+              "optimal": "2",
+              "model": "CRASH"
+            },
+            "rows": [
+              {
+                "sub_tokens": 4,
+                "optimal": "1",
+                "model": "1",
+                "ok": true
+              },
+              {
+                "sub_tokens": 7,
+                "optimal": "2",
+                "model": "CRASH",
+                "ok": false
+              },
+              {
+                "sub_tokens": 10,
+                "optimal": "3",
+                "model": "CRASH",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "MAYBE_GREEDY",
+            "CRASH_ON_HIDDEN",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 1,
+          "passed": false,
+          "code_len": 1393,
+          "code_head": "import sys\n\ndef max_weight(jobs):\n    \"\"\"\n    This function calculates the maximum total pay for a set of non-overlapping jobs.\n    \n    Parameters:\n    jobs (list): A list of jobs, where each job is a tuple of (start_time, end_time, pay).\n    \n    Returns:\n    int: The maximum total pay.\n    \"\"\"\n    # Sort the jobs by their end times\n    jobs.sort(key=lambda x: x[1])\n    \n    # Initialize the dp array\n    n = len(jobs)\n    dp = [0] * n\n    \n    # Base case: the maximum total pay for the first job is its pay\n    dp[0] = jobs[0][2]\n    \n    # Fill the dp array using the recurrence relation\n    ",
+          "first_failing_secret": {
+            "input": "3\n1 3 1 5 8 1 9 12 1",
+            "expected": "3\n",
+            "observed": "",
+            "observed_kind": "RUNTIME_ERROR"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 3,
+            "first_wrong_sub": {
+              "sub": "2\n0 2 1 2 3 1",
+              "optimal": "2",
+              "model": "CRASH"
+            },
+            "rows": [
+              {
+                "sub_tokens": 4,
+                "optimal": "1",
+                "model": "1",
+                "ok": true
+              },
+              {
+                "sub_tokens": 7,
+                "optimal": "2",
+                "model": "CRASH",
+                "ok": false
+              },
+              {
+                "sub_tokens": 10,
+                "optimal": "3",
+                "model": "CRASH",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "MAYBE_GREEDY",
+            "CRASH_ON_HIDDEN",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 2,
+          "passed": false,
+          "code_len": 1292,
+          "code_head": "import sys\n\ndef max_weight(jobs):\n    \"\"\"\n    This function calculates the maximum total pay for a set of non-overlapping jobs.\n    \n    Parameters:\n    jobs (list): A list of jobs, where each job is a tuple of (start_time, end_time, pay).\n    \n    Returns:\n    int: The maximum total pay.\n    \"\"\"\n    # Sort the jobs by their end times\n    jobs.sort(key=lambda x: x[1])\n    \n    # Initialize the dp array\n    n = len(jobs)\n    dp = [0] * n\n    \n    # Base case: the maximum total pay for the first job is its pay\n    dp[0] = jobs[0][2]\n    \n    # Fill the dp array using the recurrence relation\n    ",
+          "first_failing_secret": {
+            "input": "3\n1 3 1 5 8 1 9 12 1",
+            "expected": "3\n",
+            "observed": "Invalid input\n0",
+            "observed_kind": "WRONG_ANSWER"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 3,
+            "first_wrong_sub": {
+              "sub": "2\n0 2 1 2 3 1",
+              "optimal": "2",
+              "model": "Invalid input\n0"
+            },
+            "rows": [
+              {
+                "sub_tokens": 4,
+                "optimal": "1",
+                "model": "1",
+                "ok": true
+              },
+              {
+                "sub_tokens": 7,
+                "optimal": "2",
+                "model": "Invalid input\n0",
+                "ok": false
+              },
+              {
+                "sub_tokens": 10,
+                "optimal": "3",
+                "model": "Invalid input\n0",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "MAYBE_GREEDY",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 3,
+          "passed": false,
+          "code_len": 1310,
+          "code_head": "import sys\n\ndef max_weight(jobs):\n    \"\"\"\n    This function calculates the maximum total pay for a set of non-overlapping jobs.\n    \n    Parameters:\n    jobs (list): A list of jobs, where each job is a tuple of (start_time, end_time, pay).\n    \n    Returns:\n    int: The maximum total pay.\n    \"\"\"\n    # Sort the jobs by their end times\n    jobs.sort(key=lambda x: x[1])\n    \n    # Initialize the dp array\n    n = len(jobs)\n    dp = [0] * n\n    \n    # Base case: the maximum total pay for the first job is its pay\n    if n > 0:\n        dp[0] = jobs[0][2]\n    \n    # Fill the dp array using the recurr",
+          "first_failing_secret": {
+            "input": "3\n1 3 1 5 8 1 9 12 1",
+            "expected": "3\n",
+            "observed": "Invalid input\n0",
+            "observed_kind": "WRONG_ANSWER"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 3,
+            "first_wrong_sub": {
+              "sub": "2\n0 2 1 2 3 1",
+              "optimal": "2",
+              "model": "Invalid input\n0"
+            },
+            "rows": [
+              {
+                "sub_tokens": 4,
+                "optimal": "1",
+                "model": "1",
+                "ok": true
+              },
+              {
+                "sub_tokens": 7,
+                "optimal": "2",
+                "model": "Invalid input\n0",
+                "ok": false
+              },
+              {
+                "sub_tokens": 10,
+                "optimal": "3",
+                "model": "Invalid input\n0",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "MAYBE_GREEDY",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        },
+        {
+          "k": 4,
+          "passed": false,
+          "code_len": 1310,
+          "code_head": "import sys\n\ndef max_weight(jobs):\n    \"\"\"\n    This function calculates the maximum total pay for a set of non-overlapping jobs.\n    \n    Parameters:\n    jobs (list): A list of jobs, where each job is a tuple of (start_time, end_time, pay).\n    \n    Returns:\n    int: The maximum total pay.\n    \"\"\"\n    # Sort the jobs by their end times\n    jobs.sort(key=lambda x: x[1])\n    \n    # Initialize the dp array\n    n = len(jobs)\n    dp = [0] * n\n    \n    # Base case: the maximum total pay for the first job is its pay\n    if n > 0:\n        dp[0] = jobs[0][2]\n    \n    # Fill the dp array using the recurr",
+          "first_failing_secret": {
+            "input": "3\n1 3 1 5 8 1 9 12 1",
+            "expected": "3\n",
+            "observed": "Invalid input\n0",
+            "observed_kind": "WRONG_ANSWER"
+          },
+          "exec_diff_vs_oracle": {
+            "n_sub": 3,
+            "first_wrong_sub": {
+              "sub": "2\n0 2 1 2 3 1",
+              "optimal": "2",
+              "model": "Invalid input\n0"
+            },
+            "rows": [
+              {
+                "sub_tokens": 4,
+                "optimal": "1",
+                "model": "1",
+                "ok": true
+              },
+              {
+                "sub_tokens": 7,
+                "optimal": "2",
+                "model": "Invalid input\n0",
+                "ok": false
+              },
+              {
+                "sub_tokens": 10,
+                "optimal": "3",
+                "model": "Invalid input\n0",
+                "ok": false
+              }
+            ]
+          },
+          "bug_tags": [
+            "MAYBE_GREEDY",
+            "WRONG_ON_SMALL_SUBINSTANCE"
+          ]
+        }
+      ]
+    }
+  }
+}
