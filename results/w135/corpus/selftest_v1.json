@@ -1,0 +1,47 @@
+{
+  "g1_witness_reproducible": true,
+  "g2_shrink_ladder_deterministic": true,
+  "g3_naive_ref_separation_all": true,
+  "g4_genuinely_new_vs_ew1": true,
+  "g5_split_regen_deterministic": true,
+  "struct_genuinely_new_pass": 54,
+  "ew1_genuinely_new_pass": 80,
+  "regression_fixtures": {
+    "wa_max_nonadjacent_sum": {
+      "present": true,
+      "fires": true,
+      "genuinely_new": true,
+      "kind": "SEARCH_FRONTIER",
+      "n_ladder_rungs": 4,
+      "leakage_clean": true
+    },
+    "wa_min_coins": {
+      "present": true,
+      "fires": true,
+      "genuinely_new": true,
+      "kind": "SEARCH_FRONTIER",
+      "n_ladder_rungs": 3,
+      "leakage_clean": true
+    },
+    "se_count_stair_climbings": {
+      "present": true,
+      "fires": true,
+      "genuinely_new": true,
+      "kind": "SEARCH_FRONTIER",
+      "n_ladder_rungs": 5,
+      "leakage_clean": true
+    },
+    "se_count_bsts_catalan": {
+      "present": true,
+      "fires": true,
+      "genuinely_new": true,
+      "kind": "SEARCH_FRONTIER",
+      "n_ladder_rungs": 4,
+      "leakage_clean": true
+    }
+  },
+  "regression_fixtures_all_genuinely_new": true,
+  "negative_control_complexity_silent": true,
+  "positive_control_ref_silent": true,
+  "all_pass": true
+}
