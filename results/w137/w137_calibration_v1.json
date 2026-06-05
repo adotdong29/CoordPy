@@ -1,0 +1,700 @@
+{
+  "schema": "coordpy.model_ladder_calibration_v1.v1",
+  "ladder": [
+    "meta/llama-3.1-8b-instruct",
+    "meta/llama-3.3-70b-instruct"
+  ],
+  "hc3_ceiling": 0.8,
+  "n_admitted": 1,
+  "surviving": [
+    "cb_count_pairs_sum_le_t_v2"
+  ],
+  "calibration_cid": "8b0f6231366cbccfb7a58041bbe7a6e2f44096653654aafacd5c88bfd97b3a63",
+  "per_template": [
+    {
+      "template_name": "cb_count_inversions_v2",
+      "family": "count_inversions",
+      "mode": "COMPLEXITY_BLIND",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [],
+          "a0_rate": 1.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": false,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    },
+    {
+      "template_name": "cb_longest_subarray_sum_le_s_v2",
+      "family": "longest_bounded_subarray",
+      "mode": "COMPLEXITY_BLIND",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [],
+          "a0_rate": 1.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": false,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    },
+    {
+      "template_name": "cb_count_pairs_sum_le_t_v2",
+      "family": "count_pairs_sum_le_t",
+      "mode": "COMPLEXITY_BLIND",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            true,
+            false,
+            false
+          ],
+          "a1_passed": [],
+          "a0_rate": 0.3333,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 0.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": true,
+      "hc4_not_dead": true,
+      "discriminates": true,
+      "admitted": true,
+      "reason": "ADMITTED_HEADROOM_BAND"
+    },
+    {
+      "template_name": "cb_count_pairs_absdiff_le_d_v2",
+      "family": "count_pairs_absdiff_le_d",
+      "mode": "COMPLEXITY_BLIND",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [
+            false
+          ],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": true,
+      "hc4_not_dead": false,
+      "discriminates": false,
+      "admitted": false,
+      "reason": "HC4_DEAD(strong_best=0.00==0)"
+    },
+    {
+      "template_name": "cb_sum_nearest_smaller_left_v2",
+      "family": "sum_nearest_smaller_left",
+      "mode": "COMPLEXITY_BLIND",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [
+            false
+          ],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": true,
+      "hc4_not_dead": false,
+      "discriminates": false,
+      "admitted": false,
+      "reason": "HC4_DEAD(strong_best=0.00==0)"
+    },
+    {
+      "template_name": "cb_count_subarrays_sum_le_s_v2",
+      "family": "count_subarrays_sum_le_s",
+      "mode": "COMPLEXITY_BLIND",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [
+            false
+          ],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": true,
+      "hc4_not_dead": false,
+      "discriminates": false,
+      "admitted": false,
+      "reason": "HC4_DEAD(strong_best=0.00==0)"
+    },
+    {
+      "template_name": "cb_max_j_minus_i_le_v2",
+      "family": "max_j_minus_i_le",
+      "mode": "COMPLEXITY_BLIND",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [
+            false
+          ],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": true,
+      "hc4_not_dead": false,
+      "discriminates": false,
+      "admitted": false,
+      "reason": "HC4_DEAD(strong_best=0.00==0)"
+    },
+    {
+      "template_name": "wa_house_robber_circular_v2",
+      "family": "house_robber_circular",
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": true,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    },
+    {
+      "template_name": "wa_min_coins_arbitrary_v2",
+      "family": "min_coins_arbitrary",
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [],
+          "a0_rate": 1.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": false,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    },
+    {
+      "template_name": "wa_weighted_interval_scheduling_v2",
+      "family": "weighted_interval_scheduling",
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [],
+          "a0_rate": 1.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": false,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    },
+    {
+      "template_name": "wa_knapsack_01_v2",
+      "family": "knapsack_01",
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [],
+          "a0_rate": 1.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": false,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    },
+    {
+      "template_name": "wa_min_subset_diff_v2",
+      "family": "min_partition_diff",
+      "mode": "WRONG_ALGORITHM_ADMISSIBLE",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": true,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    },
+    {
+      "template_name": "he_max_subarray_kadane_v2",
+      "family": "max_subarray",
+      "mode": "HIDDEN_EDGE_STATE_MISS",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [],
+          "a0_rate": 1.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": false,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    },
+    {
+      "template_name": "he_longest_subarray_sum_k_v2",
+      "family": "longest_subarray_sum_k",
+      "mode": "HIDDEN_EDGE_STATE_MISS",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": true,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    },
+    {
+      "template_name": "se_climb_stairs_123_v2",
+      "family": "climb_stairs_123",
+      "mode": "SEARCH_ENUM",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            true,
+            true,
+            false
+          ],
+          "a1_passed": [],
+          "a0_rate": 0.6667,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": true,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    },
+    {
+      "template_name": "se_lattice_paths_blocked_nf_v2",
+      "family": "grid_path_count",
+      "mode": "SEARCH_ENUM",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            false,
+            false,
+            false
+          ],
+          "a1_passed": [],
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": true,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    },
+    {
+      "template_name": "se_compositions_1234_v2",
+      "family": "compositions_1234",
+      "mode": "SEARCH_ENUM",
+      "per_model": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "a0_passed": [
+            true,
+            false,
+            true
+          ],
+          "a1_passed": [],
+          "a0_rate": 0.6667,
+          "a1_rate": 0.0,
+          "n_calls": 3
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "a0_passed": [
+            true,
+            true,
+            true
+          ],
+          "a1_passed": [
+            true
+          ],
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "n_calls": 6
+        }
+      ],
+      "hc3_has_headroom": false,
+      "hc4_not_dead": true,
+      "discriminates": true,
+      "admitted": false,
+      "reason": "HC3_SATURATED(strong_a0=1.00>=0.8)"
+    }
+  ],
+  "slate_fingerprint_cid": "2ce207c567324e4322f308e58a1fc2c88a8d4bdd0e340d2ec8a1b867d82b3f70",
+  "wall_s": 2735.5,
+  "n_a0": 3,
+  "n_a1": 1,
+  "k_a1": 3
+}
