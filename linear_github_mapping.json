@@ -1202,6 +1202,33 @@
         "W136-T-STANDARD-IO-A0-ONESHOTS-ALL-TRAPS",
         "W136-L-GENERATED-WA-SE-BATTLEFIELD-IS-IO-CONFOUNDED-AND-ALGORITHM-LOW-HEADROOM"
       ]
+    },
+    {
+      "id": "W137",
+      "title": "parser-neutral HARD battlefield v2 + model-ladder hardness calibration + bounded complexity-mechanism diagnostic (coordpy.parser_neutral_io_v1 + hard_battlefield_slate_v2 + model_ladder_calibration_v1 + hard_battlefield_corpus_v2 + repaired_field_mechanism_bench_v1)",
+      "outcome": "Lane alpha ($0 build SUCCESS): the parser-neutral I/O kernel (canonical one-item-per-line normal form + HC1 dual-parser-agreement gate => the W136 confound is machine-impossible to recur; confound-regression fixture BITES) + 17 parser-neutral templates / 4 modes (slate_fingerprint_cid 2ce207c5; all 17 pass HC1+HC2+HC5; deterministic + timeout-invariant) + the model-ladder hardness-calibration harness (HC3/HC4) + corpus assembler. Lane alpha-CALIBRATION (NIM; ladder llama-3.1-8b + llama-3.3-70b; calibration_cid 8b0f6231; wall 2735s) -- DECISIVE: at 70B the field's difficulty is BIMODAL, every template's strong pass@5 (A1) is EXACTLY 1.00 or 0.00: 12/17 HC3-SATURATED (one-shot; ALL wrong-algorithm+hidden-edge+search-enum modes), 4/17 HC4-DEAD (A0=A1=0), 1/17 band => 1/17 surviving << 40/40/40/30 floors = THRESHOLD MISS; no template has 0<A1<1. GENERALIZES W136. Lane beta (bounded complexity-mechanism diagnostic, n=3; A0=0.00 A1=B0=33.33% M1[complexity witness]=66.67%, M1-B0=+33.33pp): M1 RESCUED a dead complexity template reconfirming the W133 complexity witness on a PARSER-NEUTRAL field, but SINGLE-MODE => §7a FAILS by SPAN => NOT earned, $0 frontier (small-N). Lane gamma: stronger-model gate re-derived IN CODE => NO_CERTIFIABLE_STRONGER_MODEL, decision CID 258b6ed7 byte-identical. NET: at 70B clean algorithmic difficulty is BIMODAL (one-shot or impossible), leaving NO mechanism-sensitive multi-mode headroom -- the structural reason resistant code superiority is 0-clean; W89 (+5.56) + W105 (+7.00) STAND BECAUSE HumanEval(+) HAS a middle band. W89 + W105 remain the only two retirements; W137 retires none. No version bump; no PyPI; coordpy/__init__.py untouched.",
+      "commits": [
+        "7bed040"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W137.md",
+        "docs/RESULTS_W137_PARSER_NEUTRAL_BATTLEFIELD_V2.md",
+        "docs/FRONTIER_RELEVANCE_AUDIT_W137_V1.md"
+      ],
+      "linear_issues": [
+        "COO-62",
+        "COO-9",
+        "COO-6"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W137-T-PARSER-NEUTRAL-IO-KERNEL-MINTABLE",
+        "W137-T-HARD-BATTLEFIELD-SLATE-V2-MINTABLE",
+        "W137-T-MODEL-LADDER-CALIBRATION-INSTRUMENT-MINTABLE",
+        "W137-T-REPAIRED-FIELD-DIFFICULTY-IS-BIMODAL-AT-70B",
+        "W137-T-COMPLEXITY-WITNESS-IS-REAL-BUT-SINGLE-MODE-ON-PARSER-NEUTRAL-FIELD",
+        "W137-L-REPAIRED-FIELD-NO-MECHANISM-HEADROOM-BAND-AT-70B"
+      ]
     }
   ]
 }
