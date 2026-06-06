@@ -1,0 +1,352 @@
+{
+  "schema": "w138_mechanism_bench_v1",
+  "mode": "dev",
+  "model": "meta/llama-3.3-70b-instruct",
+  "n_problems": 15,
+  "modes": {
+    "COMPLEXITY_BLIND": 15
+  },
+  "family_histogram": {
+    "count_pairs_absdiff_le_d": 3,
+    "count_pairs_sum_le_t": 3,
+    "count_subarrays_sum_le_s": 3,
+    "max_j_minus_i_le": 3,
+    "sum_nearest_smaller_left": 3
+  },
+  "arms": [
+    "C0"
+  ],
+  "surviving_families": [
+    "count_pairs_sum_le_t",
+    "subarrays_sum_and_range",
+    "sum_nearest_smaller_left"
+  ],
+  "surviving_modes": [
+    "COMPLEXITY_BLIND",
+    "HIDDEN_EDGE_STATE_MISS"
+  ],
+  "n_per_cell": 3,
+  "slate_fingerprint_cid": "8676f28302b5b269677e9d60f1ca714a1009a01f367e3bc873bd36a82a55c342",
+  "calibration_cid": "ff87cb6041e8cfa8088762d99c1c1873477a11c1a592f74bf6610cd1a3a6e25b",
+  "split_cid": "1eb4eb1f1439aa10715ca9a6811b7d7c25d87ff6194dfca01cfa71c8a2e9a031",
+  "baseline": {
+    "a0": 0.0,
+    "a1": 0.26666666666666666,
+    "b0": 0.3333333333333333,
+    "b0_gates": {
+      "a0_pct": 0.0,
+      "a1_pct": 26.6667,
+      "b_pct": 33.3333,
+      "b_minus_a1_pp": 6.6667,
+      "b_minus_a0_pp": 33.3333,
+      "n_problems": 15,
+      "n_b_ge_a1": 13,
+      "phase2_gates": {
+        "G1_slice_pre_committed": true,
+        "G2_a1_lt_90pct": true,
+        "G3_b_gt_a1": true,
+        "G4_margin_geq_5pp": true,
+        "G5_b_gt_a0_by_geq_5pp": true,
+        "G6_per_problem_majority": false,
+        "G7_budget_exact": true,
+        "G8_audit_chain_re_derives": true,
+        "G9_executor_clean": true,
+        "MLB1_invocation_rate_geq_33pct": true,
+        "MLB2_rescue_rate_geq_33pct": false
+      },
+      "n_phase2_passed_of_9": 8,
+      "mlb_subgates_pass": false,
+      "overall_pass_phase2": false,
+      "verdict_label": "FAIL"
+    }
+  },
+  "per_problem": {
+    "cell": [
+      "b_count_pairs_absdiff_le_d_n20000",
+      "b_count_pairs_absdiff_le_d_n20000",
+      "b_count_pairs_absdiff_le_d_n20000",
+      "b_count_pairs_sum_le_t_n20000",
+      "b_count_pairs_sum_le_t_n20000",
+      "b_count_pairs_sum_le_t_n20000",
+      "b_count_subarrays_sum_le_s_n20000",
+      "b_count_subarrays_sum_le_s_n20000",
+      "b_count_subarrays_sum_le_s_n20000",
+      "b_max_j_minus_i_le_n20000",
+      "b_max_j_minus_i_le_n20000",
+      "b_max_j_minus_i_le_n20000",
+      "b_sum_nearest_smaller_left_n50000",
+      "b_sum_nearest_smaller_left_n50000",
+      "b_sum_nearest_smaller_left_n50000"
+    ],
+    "mode": [
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND",
+      "COMPLEXITY_BLIND"
+    ],
+    "family": [
+      "count_pairs_absdiff_le_d",
+      "count_pairs_absdiff_le_d",
+      "count_pairs_absdiff_le_d",
+      "count_pairs_sum_le_t",
+      "count_pairs_sum_le_t",
+      "count_pairs_sum_le_t",
+      "count_subarrays_sum_le_s",
+      "count_subarrays_sum_le_s",
+      "count_subarrays_sum_le_s",
+      "max_j_minus_i_le",
+      "max_j_minus_i_le",
+      "max_j_minus_i_le",
+      "sum_nearest_smaller_left",
+      "sum_nearest_smaller_left",
+      "sum_nearest_smaller_left"
+    ],
+    "a0": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    "a1": [
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false
+    ],
+    "b0": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true
+    ],
+    "C0": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "arms_result": {
+    "C0": {
+      "phase2": {
+        "a0_pct": 0.0,
+        "a1_pct": 26.6667,
+        "b_pct": 80.0,
+        "b_minus_a1_pp": 53.3333,
+        "b_minus_a0_pp": 80.0,
+        "n_problems": 15,
+        "n_b_ge_a1": 15,
+        "phase2_gates": {
+          "G1_slice_pre_committed": true,
+          "G2_a1_lt_90pct": true,
+          "G3_b_gt_a1": true,
+          "G4_margin_geq_5pp": true,
+          "G5_b_gt_a0_by_geq_5pp": true,
+          "G6_per_problem_majority": false,
+          "G7_budget_exact": true,
+          "G8_audit_chain_re_derives": true,
+          "G9_executor_clean": true,
+          "MLB1_invocation_rate_geq_33pct": true,
+          "MLB2_rescue_rate_geq_33pct": true
+        },
+        "n_phase2_passed_of_9": 8,
+        "mlb_subgates_pass": true,
+        "overall_pass_phase2": false,
+        "verdict_label": "FAIL"
+      },
+      "mlb": {
+        "n_problems_total": 15,
+        "n_b_invoked_reflexion": 13,
+        "n_b_rescued_via_reflexion": 10,
+        "mlb1_invocation_rate": 0.8667,
+        "mlb2_rescue_rate": 0.7692,
+        "mlb1_floor": 0.33,
+        "mlb2_floor": 0.33,
+        "mlb1_passes": true,
+        "mlb2_passes": true
+      },
+      "per_problem_passed": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        true,
+        false,
+        false,
+        true,
+        true,
+        true
+      ]
+    }
+  },
+  "fake_different": {
+    "real_arms": [
+      "C0",
+      "M1",
+      "M2"
+    ],
+    "fake_arms": [
+      "M3",
+      "B0"
+    ],
+    "bites": true
+  },
+  "novelty": {
+    "n_families": 5,
+    "worst_cross_family_jaccard": 0.372,
+    "worst_pair": [
+      "count_pairs_absdiff_le_d",
+      "count_pairs_sum_le_t"
+    ],
+    "cross_family_distinct": true
+  },
+  "gate": {
+    "name": "dev_gate",
+    "lead_minus_a1_pp": 53.33,
+    "lead_minus_b0_pp": 46.67,
+    "n_rescues_vs_b0": 8,
+    "rescue_modes": [
+      "COMPLEXITY_BLIND"
+    ],
+    "rescue_families": [
+      "count_pairs_absdiff_le_d",
+      "count_pairs_sum_le_t",
+      "count_subarrays_sum_le_s",
+      "max_j_minus_i_le",
+      "sum_nearest_smaller_left"
+    ],
+    "span_ok": true,
+    "all_structural": true,
+    "no_net_regression": true,
+    "two_tier_same_sign": null,
+    "passed": true,
+    "reason": "PASS"
+  },
+  "cross_tier": null,
+  "arm_slate": [
+    {
+      "arm_id": "A0",
+      "label": "plain single-shot",
+      "consumes": "statement + public samples",
+      "hypothesis": "baseline pass@1; no feedback",
+      "scored_on": "all",
+      "is_lead": false,
+      "is_negative_control": false
+    },
+    {
+      "arm_id": "A1",
+      "label": "same-budget self-consistency",
+      "consumes": "statement + public samples (K i.i.d.)",
+      "hypothesis": "headroom baseline; beatable in principle iff 0<A1<1 (arXiv:2203.11171)",
+      "scored_on": "all",
+      "is_lead": false,
+      "is_negative_control": false
+    },
+    {
+      "arm_id": "B0",
+      "label": "blind reflexion",
+      "consumes": "judge-reject bit + stderr + public-sample results",
+      "hypothesis": "2nd baseline; excludes 'any feedback helps'",
+      "scored_on": "all",
+      "is_lead": false,
+      "is_negative_control": false
+    },
+    {
+      "arm_id": "C0",
+      "label": "exact-oracle COMPLEXITY witness",
+      "consumes": "owned-oracle timing curve on FRESH probes",
+      "hypothesis": "W133 proved REAL+load-bearing on complexity; clean parser-neutral field",
+      "scored_on": "complexity",
+      "is_lead": false,
+      "is_negative_control": false
+    },
+    {
+      "arm_id": "N0",
+      "label": "exact-oracle COUNTEREXAMPLE witness",
+      "consumes": "minimal counterexample on FRESH probes",
+      "hypothesis": "the 2nd-mode arm: W133 EW1 +0 was on a bimodal field; tests a designed-fixable band",
+      "scored_on": "noncomplexity",
+      "is_lead": false,
+      "is_negative_control": false
+    },
+    {
+      "arm_id": "X1",
+      "label": "family-routed counterexample-else-complexity controller",
+      "consumes": "owned-oracle counterexample OR timing curve, routed per candidate failure",
+      "hypothesis": "the M1 controller (W137 +33pp); tests whether it SPANS modes/families",
+      "scored_on": "all",
+      "is_lead": true,
+      "is_negative_control": false
+    },
+    {
+      "arm_id": "X2",
+      "label": "relabeled-reflexion NEGATIVE CONTROL",
+      "consumes": "B0 signal + a structurally-empty label",
+      "hypothesis": "must classify FAKE_DIFFERENT; proves the bench rewards real signal not decoration",
+      "scored_on": "all",
+      "is_lead": false,
+      "is_negative_control": true
+    }
+  ],
+  "wall_s": 6113.6
+}
