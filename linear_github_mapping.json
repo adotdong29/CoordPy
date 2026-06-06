@@ -1229,6 +1229,32 @@
         "W137-T-COMPLEXITY-WITNESS-IS-REAL-BUT-SINGLE-MODE-ON-PARSER-NEUTRAL-FIELD",
         "W137-L-REPAIRED-FIELD-NO-MECHANISM-HEADROOM-BAND-AT-70B"
       ]
+    },
+    {
+      "id": "W138",
+      "title": "headroom-band battlefield search + cross-scale mechanism validation + architecture-requirements extraction (coordpy.headroom_band_slate_v3 + headroom_band_calibration_v2 + headroom_band_corpus_v3 + band_mechanism_bench_v1)",
+      "outcome": "REVISES W137. The W137 'BIMODAL field / no mechanism-headroom band at 70B' reading was an ARTIFACT: A1 was measured with n_a1=1 (a single any-of-K draw => a1_rate in {0,1} by construction) and the hidden-N knob was pinned past the complexity cliff. Lane alpha (4 new leaf modules reusing the W137/W120 machinery verbatim): measuring A1 as a POPULATION RATE over n_a1=8 + Wilson + HB3 intermediate-band + HB4 cross-scale-discrimination, over a CONTINUOUS hidden-N grid (metabench arXiv:2407.12844 / CLRS-Text arXiv:2406.04229). Calibration (8b+70b; 180 NIM; calibration_cid ff87cb60) lands a REAL 0<A1<1 band: 5/18 cells => 3 families / 2 modes (count_pairs_sum_le_t@20000 a1=0.60 -- it read A1=1 SATURATED in W137) => REVISES W137-T-REPAIRED-FIELD-DIFFICULTY-IS-BIMODAL-AT-70B + W137-L (the field is NOT inherently no-headroom). Lane beta: a $0 de-risk found the counterexample witness (EW1) cannot fire on functional families (small-probe-only search) => the 2nd mode is firing-bound (mechanistically explains W133's EW1 +0; R3/R7/R9); operative lead = complexity witness C0 (the X1 controller is DOMINATED by C0). On the FRONTIER ANCHOR (llama-3.3-70b): §7a dev (5 complexity families, n=3) C0-A1=+53.33, C0-B0=+46.67, rescues span ALL 5 families, PASS; §7b HELD-OUT eval (n=4) C0-A1=+40.00, C0-B0=+25.00, span >=3 families = the FIRST time the W133/W137 single-family complexity witness clears the §7a/§7b SPAN gate (multi-FAMILY). BUT the §7b two-tier robustness check FAILS: the witness HURTS the small tier (llama-3.1-8b C0-A1=-25.00, capability-gated; arXiv:2404.17140/arXiv:2310.01798) AND the witness-over-REFLEXION edge does NOT reproduce on a capable proxy (llama-3.1-70b near-saturated A1=70 => C0-B0=+0.00) => CAPABILITY-GATED + ANCHOR-SPECIFIC => per the discipline NO frontier rerun (§7c not run), NO third retirement. Lane gamma: docs/ARCHITECTURE_REQUIREMENTS_W138_V1.md (R1-R12); stronger-model gate re-derived CLOSED (258b6ed7 invariant). W89 (+5.56) + W105 (+7.00) STAND as the only two retirements; W138 retires none but REVISES W137-L. W139 = per-model band recalibration + capability-matched abstain/KEEP controller. No version bump (0.5.20 / coordpy.sdk.v3.43); no PyPI; coordpy/__init__.py untouched.",
+      "commits": [
+        "ed52f58"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W138.md",
+        "docs/RESULTS_W138_HEADROOM_BAND_V1.md",
+        "docs/ARCHITECTURE_REQUIREMENTS_W138_V1.md"
+      ],
+      "linear_issues": [
+        "COO-63",
+        "COO-9",
+        "COO-6"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W138-T-RESISTANT-HEADROOM-BAND-IS-CONSTRUCTIBLE-AT-70B",
+        "W138-T-COMPLEXITY-WITNESS-EARNS-MULTI-FAMILY-AT-THE-ANCHOR",
+        "W138-T-WITNESS-GAIN-IS-CAPABILITY-GATED-AND-ANCHOR-SPECIFIC",
+        "W138-T-COUNTEREXAMPLE-2ND-MODE-IS-FIRING-BOUND-AT-70B",
+        "W138-L-RESISTANT-BAND-WITNESS-NOT-CROSS-TIER-ROBUST"
+      ]
     }
   ]
 }
