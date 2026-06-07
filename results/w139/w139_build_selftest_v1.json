@@ -1,0 +1,454 @@
+{
+  "schema": "w139_build_selftest_v1",
+  "slate_fingerprint_cid": "e3a11d2f1220b727886b622636dae55373def2705ccde38a195a1b1d3e23d143",
+  "cx_knobs": [
+    2000,
+    6000,
+    20000,
+    50000
+  ],
+  "func_knobs": [
+    1500,
+    4000,
+    12000,
+    30000
+  ],
+  "families": [
+    "count_pairs_sum_le_t",
+    "sum_nearest_smaller_left",
+    "count_subarrays_sum_le_s",
+    "count_pairs_absdiff_le_d",
+    "max_j_minus_i_le",
+    "subarrays_sum_and_range"
+  ],
+  "n_cells": 24,
+  "n_cells_admitted": 19,
+  "hc1_universal": true,
+  "grid_spans_3fam_2mode": true,
+  "legit_culls": true,
+  "admitted_families": [
+    "count_pairs_absdiff_le_d",
+    "count_pairs_sum_le_t",
+    "count_subarrays_sum_le_s",
+    "max_j_minus_i_le",
+    "subarrays_sum_and_range",
+    "sum_nearest_smaller_left"
+  ],
+  "admitted_modes": [
+    "COMPLEXITY_BLIND",
+    "HIDDEN_EDGE_STATE_MISS"
+  ],
+  "slate_cid_stable": true,
+  "content_cid_stable": true,
+  "confound_fixture": {
+    "normal_form_passes_hc1": true,
+    "flattened_fails_hc1": true,
+    "all_tokens_recovers_flattened": true,
+    "bites": true
+  },
+  "per_tier_band_detector_fixture": {
+    "saturated_a1": 1.0,
+    "saturated_culled": true,
+    "dead_a1": 0.0,
+    "dead_culled": true,
+    "intermediate_a1": 0.5,
+    "intermediate_admitted": true,
+    "intermediate_wilson": [
+      0.215,
+      0.785
+    ],
+    "bites": true
+  },
+  "capability_gate_fixture": {
+    "weak_rate": 0.2,
+    "weak_eligible": false,
+    "strong_rate": 0.8,
+    "strong_eligible": true,
+    "bites": true
+  },
+  "large_probe_revival_fixture": {
+    "n_small_probes": 48,
+    "n_large_probes": 96,
+    "small_finds_counterexample": false,
+    "large_finds_counterexample": true,
+    "large_leakage_clean": true,
+    "large_probe_tokens": 1354,
+    "bites": true
+  },
+  "fake_different": {
+    "real_arms": [
+      "Cm",
+      "Nb",
+      "C0"
+    ],
+    "fake_arms": [
+      "M3",
+      "B0"
+    ],
+    "bites": true
+  },
+  "per_cell": [
+    {
+      "cell_id": "count_pairs_sum_le_t@2000",
+      "family": "count_pairs_sum_le_t",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 2000,
+      "ok": false,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": false,
+          "reason": "NOT_DISCRIMINATING(naive_pub_ok=True,fail=0,want=TIMEOUT,got=[])",
+          "ok": false
+        }
+      ]
+    },
+    {
+      "cell_id": "count_pairs_sum_le_t@6000",
+      "family": "count_pairs_sum_le_t",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 6000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "count_pairs_sum_le_t@20000",
+      "family": "count_pairs_sum_le_t",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 20000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "count_pairs_sum_le_t@50000",
+      "family": "count_pairs_sum_le_t",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 50000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "count_pairs_absdiff_le_d@2000",
+      "family": "count_pairs_absdiff_le_d",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 2000,
+      "ok": false,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": false,
+          "reason": "NOT_DISCRIMINATING(naive_pub_ok=True,fail=0,want=TIMEOUT,got=[])",
+          "ok": false
+        }
+      ]
+    },
+    {
+      "cell_id": "count_pairs_absdiff_le_d@6000",
+      "family": "count_pairs_absdiff_le_d",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 6000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "count_pairs_absdiff_le_d@20000",
+      "family": "count_pairs_absdiff_le_d",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 20000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "count_pairs_absdiff_le_d@50000",
+      "family": "count_pairs_absdiff_le_d",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 50000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "sum_nearest_smaller_left@2000",
+      "family": "sum_nearest_smaller_left",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 2000,
+      "ok": false,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": false,
+          "reason": "NOT_DISCRIMINATING(naive_pub_ok=True,fail=0,want=TIMEOUT,got=[])",
+          "ok": false
+        }
+      ]
+    },
+    {
+      "cell_id": "sum_nearest_smaller_left@6000",
+      "family": "sum_nearest_smaller_left",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 6000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "sum_nearest_smaller_left@20000",
+      "family": "sum_nearest_smaller_left",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 20000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "sum_nearest_smaller_left@50000",
+      "family": "sum_nearest_smaller_left",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 50000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "count_subarrays_sum_le_s@2000",
+      "family": "count_subarrays_sum_le_s",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 2000,
+      "ok": false,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": false,
+          "reason": "NOT_DISCRIMINATING(naive_pub_ok=True,fail=0,want=TIMEOUT,got=[])",
+          "ok": false
+        }
+      ]
+    },
+    {
+      "cell_id": "count_subarrays_sum_le_s@6000",
+      "family": "count_subarrays_sum_le_s",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 6000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "count_subarrays_sum_le_s@20000",
+      "family": "count_subarrays_sum_le_s",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 20000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "count_subarrays_sum_le_s@50000",
+      "family": "count_subarrays_sum_le_s",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 50000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "max_j_minus_i_le@2000",
+      "family": "max_j_minus_i_le",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 2000,
+      "ok": false,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": false,
+          "reason": "NOT_DISCRIMINATING(naive_pub_ok=True,fail=0,want=TIMEOUT,got=[])",
+          "ok": false
+        }
+      ]
+    },
+    {
+      "cell_id": "max_j_minus_i_le@6000",
+      "family": "max_j_minus_i_le",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 6000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "max_j_minus_i_le@20000",
+      "family": "max_j_minus_i_le",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 20000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "max_j_minus_i_le@50000",
+      "family": "max_j_minus_i_le",
+      "mode": "COMPLEXITY_BLIND",
+      "knob": 50000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "subarrays_sum_and_range@1500",
+      "family": "subarrays_sum_and_range",
+      "mode": "HIDDEN_EDGE_STATE_MISS",
+      "knob": 1500,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "subarrays_sum_and_range@4000",
+      "family": "subarrays_sum_and_range",
+      "mode": "HIDDEN_EDGE_STATE_MISS",
+      "knob": 4000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "subarrays_sum_and_range@12000",
+      "family": "subarrays_sum_and_range",
+      "mode": "HIDDEN_EDGE_STATE_MISS",
+      "knob": 12000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "cell_id": "subarrays_sum_and_range@30000",
+      "family": "subarrays_sum_and_range",
+      "mode": "HIDDEN_EDGE_STATE_MISS",
+      "knob": 30000,
+      "ok": true,
+      "recs": [
+        {
+          "hc1": true,
+          "hc2": true,
+          "reason": "ADMITTED",
+          "ok": true
+        }
+      ]
+    }
+  ],
+  "passed": true,
+  "wall_s": 100.8
+}

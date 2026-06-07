@@ -1,0 +1,317 @@
+{
+  "schema": "coordpy.per_tier_band_calibration_v1.v1",
+  "ladder": [
+    "meta/llama-3.1-8b-instruct",
+    "meta/llama-3.1-70b-instruct",
+    "meta/llama-3.3-70b-instruct"
+  ],
+  "n_cal": 4,
+  "K": 4,
+  "band_lo": 0.15,
+  "band_hi": 0.85,
+  "a0_ceil": 0.8,
+  "anchor_tier": "strong",
+  "shared_families": [
+    "count_pairs_sum_le_t",
+    "subarrays_sum_and_range"
+  ],
+  "band_for_tier": {
+    "small": {
+      "count_pairs_sum_le_t": {
+        "cell_id": "count_pairs_sum_le_t@50000",
+        "knob_value": 50000,
+        "a1_rate": 0.5,
+        "a0_rate": 0.0,
+        "mode": "COMPLEXITY_BLIND"
+      },
+      "subarrays_sum_and_range": {
+        "cell_id": "subarrays_sum_and_range@1500",
+        "knob_value": 1500,
+        "a1_rate": 0.5,
+        "a0_rate": 0.0,
+        "mode": "HIDDEN_EDGE_STATE_MISS"
+      }
+    },
+    "mid": {
+      "subarrays_sum_and_range": {
+        "cell_id": "subarrays_sum_and_range@1500",
+        "knob_value": 1500,
+        "a1_rate": 0.75,
+        "a0_rate": 0.0,
+        "mode": "HIDDEN_EDGE_STATE_MISS"
+      }
+    },
+    "strong": {
+      "count_pairs_sum_le_t": {
+        "cell_id": "count_pairs_sum_le_t@50000",
+        "knob_value": 50000,
+        "a1_rate": 0.5,
+        "a0_rate": 0.0,
+        "mode": "COMPLEXITY_BLIND"
+      },
+      "subarrays_sum_and_range": {
+        "cell_id": "subarrays_sum_and_range@1500",
+        "knob_value": 1500,
+        "a1_rate": 0.25,
+        "a0_rate": 0.0,
+        "mode": "HIDDEN_EDGE_STATE_MISS"
+      }
+    }
+  },
+  "per_tier_calibration_cid": "72c4a4f197cac826b54387be57450ab14258d1298c7e1199c4d256a304151f51",
+  "per_cell": [
+    {
+      "cell_id": "count_pairs_sum_le_t@20000",
+      "family": "count_pairs_sum_le_t",
+      "mode": "COMPLEXITY_BLIND",
+      "knob_value": 20000,
+      "in_band_tiers": [
+        "small",
+        "strong"
+      ],
+      "per_tier": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "is_anchor": false,
+          "a0_rate": 0.0,
+          "a1_rate": 0.75,
+          "a1_passes": 3,
+          "n_a1": 4,
+          "wilson_lo": 0.3006,
+          "wilson_hi": 0.9544,
+          "in_band": true,
+          "n_calls": 20
+        },
+        {
+          "model_id": "meta/llama-3.1-70b-instruct",
+          "tier": "mid",
+          "is_anchor": false,
+          "a0_rate": 0.75,
+          "a1_rate": 1.0,
+          "a1_passes": 4,
+          "n_a1": 4,
+          "wilson_lo": 0.5101,
+          "wilson_hi": 1.0,
+          "in_band": false,
+          "n_calls": 20
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "is_anchor": true,
+          "a0_rate": 0.25,
+          "a1_rate": 0.75,
+          "a1_passes": 3,
+          "n_a1": 4,
+          "wilson_lo": 0.3006,
+          "wilson_hi": 0.9544,
+          "in_band": true,
+          "n_calls": 20
+        }
+      ]
+    },
+    {
+      "cell_id": "count_pairs_sum_le_t@50000",
+      "family": "count_pairs_sum_le_t",
+      "mode": "COMPLEXITY_BLIND",
+      "knob_value": 50000,
+      "in_band_tiers": [
+        "small",
+        "strong"
+      ],
+      "per_tier": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "is_anchor": false,
+          "a0_rate": 0.0,
+          "a1_rate": 0.5,
+          "a1_passes": 2,
+          "n_a1": 4,
+          "wilson_lo": 0.15,
+          "wilson_hi": 0.85,
+          "in_band": true,
+          "n_calls": 20
+        },
+        {
+          "model_id": "meta/llama-3.1-70b-instruct",
+          "tier": "mid",
+          "is_anchor": false,
+          "a0_rate": 1.0,
+          "a1_rate": 1.0,
+          "a1_passes": 4,
+          "n_a1": 4,
+          "wilson_lo": 0.5101,
+          "wilson_hi": 1.0,
+          "in_band": false,
+          "n_calls": 20
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "is_anchor": true,
+          "a0_rate": 0.0,
+          "a1_rate": 0.5,
+          "a1_passes": 2,
+          "n_a1": 4,
+          "wilson_lo": 0.15,
+          "wilson_hi": 0.85,
+          "in_band": true,
+          "n_calls": 20
+        }
+      ]
+    },
+    {
+      "cell_id": "subarrays_sum_and_range@1500",
+      "family": "subarrays_sum_and_range",
+      "mode": "HIDDEN_EDGE_STATE_MISS",
+      "knob_value": 1500,
+      "in_band_tiers": [
+        "small",
+        "mid",
+        "strong"
+      ],
+      "per_tier": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "is_anchor": false,
+          "a0_rate": 0.0,
+          "a1_rate": 0.5,
+          "a1_passes": 2,
+          "n_a1": 4,
+          "wilson_lo": 0.15,
+          "wilson_hi": 0.85,
+          "in_band": true,
+          "n_calls": 20
+        },
+        {
+          "model_id": "meta/llama-3.1-70b-instruct",
+          "tier": "mid",
+          "is_anchor": false,
+          "a0_rate": 0.0,
+          "a1_rate": 0.75,
+          "a1_passes": 3,
+          "n_a1": 4,
+          "wilson_lo": 0.3006,
+          "wilson_hi": 0.9544,
+          "in_band": true,
+          "n_calls": 20
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "is_anchor": true,
+          "a0_rate": 0.0,
+          "a1_rate": 0.25,
+          "a1_passes": 1,
+          "n_a1": 4,
+          "wilson_lo": 0.0456,
+          "wilson_hi": 0.6994,
+          "in_band": true,
+          "n_calls": 20
+        }
+      ]
+    },
+    {
+      "cell_id": "subarrays_sum_and_range@4000",
+      "family": "subarrays_sum_and_range",
+      "mode": "HIDDEN_EDGE_STATE_MISS",
+      "knob_value": 4000,
+      "in_band_tiers": [
+        "strong"
+      ],
+      "per_tier": [
+        {
+          "model_id": "meta/llama-3.1-8b-instruct",
+          "tier": "small",
+          "is_anchor": false,
+          "a0_rate": 0.0,
+          "a1_rate": 0.0,
+          "a1_passes": 0,
+          "n_a1": 4,
+          "wilson_lo": 0.0,
+          "wilson_hi": 0.4899,
+          "in_band": false,
+          "n_calls": 20
+        },
+        {
+          "model_id": "meta/llama-3.1-70b-instruct",
+          "tier": "mid",
+          "is_anchor": false,
+          "a0_rate": 0.0,
+          "a1_rate": 1.0,
+          "a1_passes": 4,
+          "n_a1": 4,
+          "wilson_lo": 0.5101,
+          "wilson_hi": 1.0,
+          "in_band": false,
+          "n_calls": 20
+        },
+        {
+          "model_id": "meta/llama-3.3-70b-instruct",
+          "tier": "strong",
+          "is_anchor": true,
+          "a0_rate": 0.0,
+          "a1_rate": 0.25,
+          "a1_passes": 1,
+          "n_a1": 4,
+          "wilson_lo": 0.0456,
+          "wilson_hi": 0.6994,
+          "in_band": true,
+          "n_calls": 20
+        }
+      ]
+    }
+  ],
+  "slate_fingerprint_cid": "6ad6771b939e09a1306a0bc1fa08442f155eedf1d82f87678f3cafe5ca7e48fa",
+  "cx_knobs": [
+    20000,
+    50000
+  ],
+  "func_knobs": [
+    1500,
+    4000
+  ],
+  "witness_usability": {
+    "small": {
+      "model_id": "meta/llama-3.1-8b-instruct",
+      "tier": "small",
+      "n_probed": 5,
+      "n_eligible": 5,
+      "n_flipped": 0,
+      "witness_usability_rate": 0.0,
+      "tau": 0.34,
+      "witness_eligible": false,
+      "probe_cell": "count_pairs_sum_le_t@50000"
+    },
+    "mid": {
+      "model_id": "meta/llama-3.1-70b-instruct",
+      "tier": "mid",
+      "n_probed": 5,
+      "n_eligible": 5,
+      "n_flipped": 0,
+      "witness_usability_rate": 0.0,
+      "tau": 0.34,
+      "witness_eligible": false,
+      "probe_cell": "subarrays_sum_and_range@1500"
+    },
+    "strong": {
+      "model_id": "meta/llama-3.3-70b-instruct",
+      "tier": "strong",
+      "n_probed": 5,
+      "n_eligible": 4,
+      "n_flipped": 2,
+      "witness_usability_rate": 0.5,
+      "tau": 0.34,
+      "witness_eligible": true,
+      "probe_cell": "count_pairs_sum_le_t@50000"
+    }
+  },
+  "witness_eligible_tiers": [
+    "strong"
+  ],
+  "wall_s": 1919.5,
+  "n_nim_calls": 48
+}
