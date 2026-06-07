@@ -1255,6 +1255,32 @@
         "W138-T-COUNTEREXAMPLE-2ND-MODE-IS-FIRING-BOUND-AT-70B",
         "W138-L-RESISTANT-BAND-WITNESS-NOT-CROSS-TIER-ROBUST"
       ]
+    },
+    {
+      "id": "W139",
+      "title": "per-tier band recalibration + capability-matched witness compiler + cross-tier mechanism validation (coordpy.per_tier_band_calibration_v1 + capability_matched_witness_compiler_v1)",
+      "outcome": "W138 found the complexity witness earns multi-family AT THE ANCHOR but is capability-gated (8B -25) + anchor-specific (mid +0). W139 attacked both. Lane alpha (per_tier_band_calibration_v1 measures A1-as-a-RATE at EVERY tier; ladder V2 8b/3.1-70b/3.3-70b; 221 NIM; per_tier_calibration_cid 72c4a4f1) ROOT-CAUSES the mid +0: llama-3.1-70b is SATURATED on the complexity family (a1=1.00 at N=20000 AND 50000) => STRONGER than the anchor => no headroom (R4' per-ability; Fluid Benchmarking arXiv:2509.11106); witness-eligible: strong only. Lane beta (capability_matched_witness_compiler_v1; dev n_per_cell=2, diagnostics all tiers, 210 NIM): the capability-matched controller ACHIEVES NON-NEGATIVITY on every tier (KEEP on the ineligible 8B+mid => Cm-A1=+0 on the 8B, the W138 -25 harm ELIMINATED; also protects the 8B from blind reflexion's harm B0 25%->0%, Cm held 25%); R2'/R5'. The large-probe counterexample (build_large_probe_set_v1, cap 400->6000) REVIVES the W138-dead 2nd mode (Nb=75% at the anchor; W138 N0=0 was a probe-budget artifact). BUT the §7a dev gate FAILS by SPAN_FAIL (anchor Cm-A1=+75, Cm-B0=+25 margins pass but rescues over strong blind reflexion span 1 mode/1 family); the apparent 2nd positive tier (mid Cm-A1=+50) is KEEP-tier SAMPLING NOISE (n=2; Cm==plain self-consistency; Nb=0). Structural cause: NO second tier on this ladder has BOTH headroom AND witness-usability (mid saturated, 8B capability-bound) => $0 eval, $0 frontier, NO third retirement. Sample sizes tiny (n=2-4) => noisy DEV signals. Lane gamma: ARCHITECTURE_REQUIREMENTS_W139_V2 (R2'/R4'/R5'); stronger-model gate re-derived CLOSED (258b6ed7 invariant {KNOWN:1,UNKNOWN:4}). 431 total NIM. W89 (+5.56) + W105 (+7.00) STAND as the only two retirements; W139 retires none but eliminates the W138 harm, root-causes the mid +0, revives the 2nd mode. W140 = a denser/different model ladder (a tier between 8B and 70B with both headroom and usability) / a mechanism independent of the single-tier headroom-and-usability coincidence / a primary-KNOWN stronger model when the gate opens. No version bump (0.5.20 / coordpy.sdk.v3.43); no PyPI; coordpy/__init__.py untouched.",
+      "commits": [
+        "a13189d"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W139.md",
+        "docs/RESULTS_W139_CROSS_TIER_V1.md",
+        "docs/ARCHITECTURE_REQUIREMENTS_W139_V2.md"
+      ],
+      "linear_issues": [
+        "COO-64",
+        "COO-9",
+        "COO-6"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W139-T-PER-TIER-BAND-CALIBRATION-MINTABLE",
+        "W139-T-MID-TIER-SATURATED-ON-COMPLEXITY-ROOT-CAUSES-W138-MID-PLUS-ZERO",
+        "W139-T-CAPABILITY-MATCHED-CONTROLLER-ACHIEVES-NON-NEGATIVITY",
+        "W139-T-LARGE-PROBE-REVIVES-COUNTEREXAMPLE-2ND-MODE",
+        "W139-L-CAPABILITY-MATCHED-NON-NEGATIVITY-ACHIEVED-BUT-WITNESS-GAIN-STAYS-ANCHOR-CONCENTRATED"
+      ]
     }
   ]
 }
