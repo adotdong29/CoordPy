@@ -1,0 +1,77 @@
+{
+  "schema": "coordpy.w142_family_screen.v1",
+  "model": "meta/llama-3.3-70b-instruct",
+  "slate_cid": "9b8cf758f538613fbd2355ad3a3ce074cc1f0778616488febbe113ef83e81c58",
+  "band": [
+    0.1,
+    0.5
+  ],
+  "dollar0_only": false,
+  "K_screen": 12,
+  "prompt_indices": [
+    0
+  ],
+  "results": [
+    {
+      "family": "subarrays_sum_and_range",
+      "vein": "two_deque_sliding_window",
+      "mode": "HIDDEN_EDGE_STATE_MISS",
+      "knob": 30000,
+      "gates": {
+        "g1_parser_neutral": true,
+        "g2_discriminating": true,
+        "g3_extractable": true,
+        "g4_novel": true,
+        "n_pred_holes": 1,
+        "n_add_holes": 1,
+        "g3_reason": "compiled_n_pred=1",
+        "all_pass": true
+      },
+      "per_prompt": [
+        {
+          "prompt_idx": 0,
+          "n": 12,
+          "passes": 2,
+          "pass_flags": [
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false
+          ]
+        }
+      ],
+      "p_median": 0.1667,
+      "p_min": 0.1667,
+      "p_max": 0.1667,
+      "wilson_lo": 0.047,
+      "wilson_hi": 0.448,
+      "n_total": 12,
+      "passes_total": 2,
+      "in_band": true,
+      "admitted": true,
+      "expect_extractable": true
+    }
+  ],
+  "verdict": {
+    "n_admitted": 1,
+    "admitted_families": [
+      "subarrays_sum_and_range"
+    ],
+    "admitted_veins": [
+      "two_deque_sliding_window"
+    ],
+    "admitted_modes": [
+      "HIDDEN_EDGE_STATE_MISS"
+    ],
+    "span_ok_>=3fam_OR_>=2mode": false,
+    "lane_alpha_success": false
+  }
+}
