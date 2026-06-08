@@ -1,0 +1,47 @@
+{
+  "schema": "coordpy.w140_stronger_model_gate_recheck.v1",
+  "lane": "gamma_stronger_model_gate",
+  "verified_on": "2026-06-07",
+  "decision_verdict": "NO_CERTIFIABLE_STRONGER_MODEL",
+  "decision_cid": "258b6ed7",
+  "decision_cid_full": "258b6ed794b45a18a94829e7f86000dbea8cfd662692425f0188a2e04d7fd1bc",
+  "decision_cid_invariant": true,
+  "registry_split": {
+    "KNOWN": 1,
+    "UNKNOWN": 3
+  },
+  "per_model": [
+    {
+      "model_id": "meta/llama-4-maverick-17b-128e-instruct",
+      "verified_confidence": "KNOWN",
+      "cutoff_boundary": "2024-08-31"
+    },
+    {
+      "model_id": "qwen/qwen3-coder-480b-a35b-instruct",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": "2025-07-01"
+    },
+    {
+      "model_id": "deepseek-ai/deepseek-v4-pro",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": "2025-01-01"
+    },
+    {
+      "model_id": "mistralai/mistral-small-4-119b-2603",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": "2026-03-01"
+    },
+    {
+      "model_id": "zai/glm-5",
+      "verified_confidence": "UNKNOWN",
+      "cutoff_boundary": null
+    }
+  ],
+  "w140_primary_recheck_note": "Re-verified from PRIMARY official sources in the W140 research lane (invariant W114->W139): Llama-4-Maverick = Aug-2024 KNOWN (official Llama-4 card; settled W113); Qwen3-Coder-480B (Qwen HF/blog/arXiv 2505.09388) / DeepSeek-V4-Pro (official V4 card PDF) / Mistral-Small-4-119B-2603 (Mistral docs/HF/news) / GLM-5 (zai-org HF + arXiv 2602.15763) all primary-UNDISCLOSED. NEW: Gemma 4 (ai.google.dev) discloses a Jan-2025 cutoff \u2014 AT, not before, the ~Jan-2025 resistant-instrument boundary, code-competence unestablished => NOT a qualifying certifiable-stronger model; the gate stays {KNOWN:1, UNKNOWN:4}.",
+  "gate_state": "CLOSED \u2014 no primary-KNOWN stronger-than-Maverick model certifiable; the W140 tutor field is resistant BY CONSTRUCTION so it does not require a stronger model; an EARNED frontier rerun targets meta/llama-3.3-70b-instruct (KNOWN ~Dec-2023)",
+  "w140_note": "W140's weak-model lift is on freshly-minted needed-and-unknown-technique cells; the gate governs only the frontier TARGET if a strict \u00a77b anchor\u2227weak earn is met \u2014 it does not by itself authorise NIM.",
+  "w123_through_w139_caps_closed": true,
+  "no_405b_run": true,
+  "nim_spend": 0,
+  "generated_at": "2026-06-08T00:21:10.931916+00:00"
+}
