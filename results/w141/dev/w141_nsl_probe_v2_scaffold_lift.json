@@ -1,0 +1,29 @@
+{
+  "schema": "coordpy.w141_offline_scaffold_lift.v1",
+  "family": "sum_nearest_smaller_left",
+  "knob": 20000,
+  "raw_rate_p": 0.8333,
+  "raw_pass": 30,
+  "raw_n": 36,
+  "scaffold_rate_q": 1.0,
+  "scaffold_pass": 27,
+  "scaffold_n": 27,
+  "scaffold_lift_pp": 16.67,
+  "per_member": [
+    {
+      "seed": 100,
+      "plain": "10/12",
+      "scaffold": "9/9"
+    },
+    {
+      "seed": 101,
+      "plain": "10/12",
+      "scaffold": "9/9"
+    },
+    {
+      "seed": 102,
+      "plain": "10/12",
+      "scaffold": "9/9"
+    }
+  ]
+}

@@ -567,13 +567,19 @@ def _ref_statement_count(ref_source: str) -> int:
 
 def tutor_leak_gate_v1(tutor: FamilyTutorV1, template: ParserNeutralTemplateV2,
                        problem: MintedProblemV1, *, timeout_s: float = 8.0,
-                       max_ref_run: int = MAX_VERBATIM_REF_RUN_TOKENS) -> TutorLeakReportV1:
+                       max_ref_run: int = MAX_VERBATIM_REF_RUN_TOKENS,
+                       spec_override: Optional[TechniqueSpecV1] = None) -> TutorLeakReportV1:
     """Deterministic $0 no-leakage gate.  The DECISIVE guarantee is behavioral (grading on the
-    disjoint hidden bank); this gate is the corroborating text+structure audit (§3 RUNBOOK_W140)."""
+    disjoint hidden bank); this gate is the corroborating text+structure audit (§3 RUNBOOK_W140).
+
+    ``spec_override`` (W141): for a SELF-EXTRACTED scaffold there is no predefined library spec, so
+    the caller passes the extracted ``TechniqueSpecV1`` (its own correct_fill / trivial_fill) and the
+    two DECISIVE checks (no_discriminator_leak + holes_are_substantive) run against it.  Default None
+    preserves the W140 ``_spec_for(template)`` behavior byte-for-byte."""
     text = tutor.model_facing_text()
     ttoks = _norm_tokens(text)
     ref = template.minted.ref_source
-    spec = _spec_for(template)
+    spec = spec_override if spec_override is not None else _spec_for(template)
 
     # (DECISIVE 1) no discriminator leak — the tutor must NOT contain any DISCRIMINATING expression
     # (the spec's correct hole-fills: the exact predicate/aggregation that separates the correct

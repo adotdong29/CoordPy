@@ -1,0 +1,110 @@
+{
+  "schema": "coordpy.w141_self_tutoring_dev_probe.v1",
+  "model": "meta/llama-3.3-70b-instruct",
+  "knob": 20000,
+  "K": 3,
+  "K_re": 3,
+  "members": 3,
+  "mock": false,
+  "families": [
+    "sum_nearest_smaller_left"
+  ],
+  "n_families_earned": 0,
+  "families_earned": [],
+  "earned_modes": [],
+  "span_ok_>=3_families_OR_>=2_modes": false,
+  "results": [
+    {
+      "family": "sum_nearest_smaller_left",
+      "knob": 20000,
+      "discover": {
+        "discovered": true,
+        "n_gen_calls": 4,
+        "selection": {
+          "winner_idx": 0,
+          "abstained": false,
+          "reason": "committed",
+          "consensus_fraction": 1.0,
+          "n_candidates": 3,
+          "n_winners": 3,
+          "verdicts": [
+            {
+              "idx": 0,
+              "passes_public": true,
+              "agrees_with_brute": true,
+              "n_brute_cases": 16,
+              "efficient": true,
+              "witness_kind": "FAST_OK",
+              "is_winner": true
+            },
+            {
+              "idx": 1,
+              "passes_public": true,
+              "agrees_with_brute": true,
+              "n_brute_cases": 16,
+              "efficient": true,
+              "witness_kind": "FAST_OK",
+              "is_winner": true
+            },
+            {
+              "idx": 2,
+              "passes_public": true,
+              "agrees_with_brute": true,
+              "n_brute_cases": 16,
+              "efficient": true,
+              "witness_kind": "FAST_OK",
+              "is_winner": true
+            }
+          ]
+        },
+        "compile": {
+          "compiled": true,
+          "reason": "ok",
+          "n_holes": 1,
+          "leaked": false,
+          "completable": true,
+          "stub_fails_secret": true
+        },
+        "winner_passes_secret": true
+      },
+      "members": [
+        {
+          "member": "m0",
+          "a1_pool_pass": true,
+          "b_selected_pass": true,
+          "st_selected_pass": true,
+          "n_gen_a1": 3,
+          "n_gen_st": 3
+        },
+        {
+          "member": "m1",
+          "a1_pool_pass": true,
+          "b_selected_pass": true,
+          "st_selected_pass": true,
+          "n_gen_a1": 3,
+          "n_gen_st": 3
+        },
+        {
+          "member": "m2",
+          "a1_pool_pass": true,
+          "b_selected_pass": true,
+          "st_selected_pass": true,
+          "n_gen_a1": 3,
+          "n_gen_st": 3
+        }
+      ],
+      "verdict": {
+        "family": "sum_nearest_smaller_left",
+        "n_members": 3,
+        "a1_solved": 3,
+        "b_solved": 3,
+        "st_solved": 3,
+        "discovered": true,
+        "st_minus_b": 0,
+        "st_minus_a1": 0,
+        "earned": false,
+        "non_negative": true
+      }
+    }
+  ]
+}
