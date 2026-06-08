@@ -1287,7 +1287,8 @@
       "title": "teacher-compiled family-level witness tutors + weak-model lift + cross-tier usefulness (coordpy.family_tutor_compiler_v1 + cross_tier_tutor_bench_v1)",
       "outcome": "W139 left the blocker as weak-model witness USABILITY (8B raw-witness usability 0.00). W140 compiled the anchor's witness into a family-LEVEL holed-skeleton TUTOR and ACHIEVED the milestone's stated goal: a same-budget WEAK-MODEL lift of +75-100pp on 3 needed-and-unknown-technique families (subarrays_sum_and_range@30000 two-deque 25->100, sum_nearest_smaller_left@50000 monotonic-stack 0->100, kth_smallest_pair_distance@20000 binary-search-on-answer 0->75; max_j@50000 A1=50% substitute DROPPED). The tutor REVERSES the W139 usability floor (all tiers eligible vs 0.00; tutor_usability_cid 849f1ebf). The dev TIE was a SUBSTITUTE regime (a $0 failure analysis proved the tutor genuinely shifts the 8B's distribution to the technique, two-deque 0/60->24/24 public; the lift hides where A1~=0). LEAD re-identified as T2 always-apply-scaffold (the W139-style controller T4 is dominated - its public-revert can't see a hidden-only bug, W125/W129). The mechanism is ADDITIVE iff A1~=0, SUBSTITUTIVE otherwise. Anchor (frontier target) ALSO qualifies on cell-1 (A1=25%) so a strict anchor^weak earn is PLAUSIBLE but the NIM endpoint degraded mid-run => PARTIAL/endpoint-blocked. Lane gamma: ARCHITECTURE_REQUIREMENTS_W140_V3 adds R6' (cross-capability teaching-compilation); stronger-model gate 258b6ed7 invariant {KNOWN:1,UNKNOWN:4}; graphify START+END. W89(+5.56)+W105(+7.00) STAND as the only two retirements (a retirement is multi-agent frontier superiority; W140's win is a teacher-compiled weak-model lift, distinct+complementary). 2 modules + 5 scripts + 27 tests; no version bump; no PyPI; coordpy/__init__.py untouched.",
       "commits": [
-        "225784b"
+        "225784b",
+        "2a28d61"
       ],
       "docs": [
         "docs/RUNBOOK_W140.md",
@@ -1312,7 +1313,8 @@
         "W140-T-COMPILED-TUTOR-LIFTS-WEAK-TIER-+75-100PP-IN-NEEDED-UNKNOWN-REGIME",
         "W140-T-TUTOR-GAIN-ADDITIVE-IN-NEEDED-UNKNOWN-SUBSTITUTIVE-OTHERWISE",
         "W140-T-ALWAYS-APPLY-SCAFFOLD-BEATS-PUBLIC-REVERT-CONTROLLER-ON-HIDDEN-FAILURE",
-        "W140-L-STRICT-ANCHOR-WEAK-FRONTIER-EARN-PARTIALLY-CONFIRMED-ENDPOINT-BLOCKED"
+        "W140-T-CROSS-TIER-USEFULNESS-IS-FAMILY-DEPENDENT-CONFIRMED-ON-THE-SHARED-DIFFICULTY-TECHNIQUE",
+        "W140-L-STRICT-ANCHOR-WEAK-\u22652-SHARED-FAMILY-EARN-1-OF-2-CONFIRMED-CELL4-ENDPOINT-BLOCKED"
       ]
     }
   ]
