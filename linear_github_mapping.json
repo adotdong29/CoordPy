@@ -1316,6 +1316,34 @@
         "W140-T-CROSS-TIER-USEFULNESS-IS-FAMILY-DEPENDENT-CONFIRMED-ON-THE-SHARED-DIFFICULTY-TECHNIQUE",
         "W140-L-STRICT-ANCHOR-WEAK-\u22652-SHARED-FAMILY-EARN-1-OF-2-CONFIRMED-CELL4-ENDPOINT-BLOCKED"
       ]
+    },
+    {
+      "id": "W141",
+      "title": "emergent no-oracle self-tutoring (self-derived scaffold from the team's own verified-correct sample) (coordpy.self_tutoring_technique_extractor_v1 + no_oracle_verifier_v1 + self_tutoring_controller_v1)",
+      "outcome": "W140 lifted the frontier with an EXACT-ORACLE-compiled scaffold (teaching). W141 removes the oracle: the team generates K diverse -> a NO-ORACLE verifier (S1 self-written-brute agreement on a constraint-adversarial bank AND S2 worst-case dual-large-input timeout, oracle-free) picks the correct+efficient winner -> the holed-skeleton scaffold is SELF-DERIVED from that winner (AST blanks the discriminating decision; correct_fill = the winner's own expressions => completable by construction; needs INTER-PROCEDURAL return-tracing for real models' helper-fn shape; 8/9 real 70B programs self-derive a clean leak-passing scaffold; buggy DISCARDED -> KEEP==A1) -> amortized. THREE established: (1) DISCOVER runs end-to-end on the live frontier 70B with ZERO oracle (first oracle-free technique mint on a frontier model); (2) the verifier is BYTE-IDENTICAL to the hidden grader (0 FP/0 FN on 115 REAL 70B samples; S1 catches 8/8 real fast-but-wrong the efficiency signal alone accepts = W125 escape; adversarial bank 28/30 vs public 0/30); (3) the scaffold lifts generation to q=100%. WIN: on count_pairs_sum_le_t (p=0.08, a family the 70B LACKS) the scaffold lifts 8%->100% = +70.6pp per-problem same-budget superiority over no-oracle verified-selection (ST 3/3 vs B 1/3), the FIRST clean resistant same-budget win (W125-W130 got zero). WALL: NOT a \u00a77b retirement -- the amortization win needs a MODERATE-p band but the frontier's generation is BIMODAL (W137 wall at generation level): 70B KNOWS the technique (high-p, verified-selection saturates) or is CLUELESS (0-supply); exactly 1 of the tested slate is moderate-p => >=3-family span UNMET; advantage concentrates at low per-problem budget (ST-B=(1-p)^K). W89+W105 STAND as the only two retirements. 3 modules + 2 scripts + offline analyzer + 10 tests; no version bump; no PyPI; coordpy/__init__.py untouched (one additive spec_override).",
+      "commits": [
+        "21f61f8"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W141.md",
+        "docs/RESULTS_W141_SELF_TUTORING_V1.md"
+      ],
+      "linear_issues": [
+        "COO-66",
+        "COO-9",
+        "COO-6"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W141-T-NO-ORACLE-SELF-TUTORING-DISCOVER-WORKS-ON-THE-FRONTIER",
+        "W141-T-NO-ORACLE-VERIFIER-IS-BYTE-IDENTICAL-TO-THE-HIDDEN-GRADER",
+        "W141-T-SELF-DERIVED-SCAFFOLD-LIFTS-GENERATION-TO-Q-100PCT",
+        "W141-T-EXTRACTOR-REQUIRES-INTERPROCEDURAL-RETURN-TRACING",
+        "W141-T-FIRST-CLEAN-NO-ORACLE-RESISTANT-SAME-BUDGET-SUPERIORITY",
+        "W141-T-SELF-TUTORING-IS-SUPPLY-LIMITED-NOT-VERIFIER-LIMITED",
+        "W141-T-NEUTRAL-BASELINE-REQUIRED",
+        "W141-L-RESISTANT-RETIREMENT-BLOCKED-BY-BIMODAL-FRONTIER-GENERATION"
+      ]
     }
   ]
 }
