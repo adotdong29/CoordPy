@@ -116,9 +116,22 @@ def main() -> int:
     small_t = _build_small_bank_v1(tp, template, gen, timeout_s=to)
     sel = _select(cands_t, tp, teacher, template, brutes_t, small_t, to)
     scaffold = None; comp = None; win_secret = None
-    if not sel.abstained and sel.winner_code:
-        win_secret = _passes_secret(teacher, sel.winner_code, to)
-        scaffold, comp = compile_tutor_from_winner_v1(sel.winner_code, template, teacher, timeout_s=to)
+    # W142b-2: try EVERY verified-correct winner for extraction (not just the committed one) — the
+    # winner's code SHAPE is stochastic; ~5/24 correct subarrays candidates extract, so iterating the
+    # ref-cluster winners (committed first) finds an extractable one reliably. No extra NIM (candidates
+    # already generated). Each tried winner is itself verified-correct (in the brute-anchored cluster).
+    if not sel.abstained:
+        winners = [cands_t[v.idx] for v in sel.verdicts if v.is_winner]
+        if sel.winner_code:
+            winners = [sel.winner_code] + [w for w in winners if w != sel.winner_code]
+        for w in winners:
+            ws = _passes_secret(teacher, w, to)
+            scf, cr = compile_tutor_from_winner_v1(w, template, teacher, timeout_s=to)
+            if win_secret is None:
+                win_secret, comp = ws, cr
+            if scf is not None:
+                scaffold, comp, win_secret = scf, cr, ws
+                break
     n_correct_brute = sum(1 for b in brutes_t if _passes_secret_brute(b, teacher, to))
     print(f"[{args.family}] discover: reason={sel.reason} winner_idx={sel.winner_idx} "
           f"winner_secret={win_secret} compiled={(comp.compiled if comp else None)} "

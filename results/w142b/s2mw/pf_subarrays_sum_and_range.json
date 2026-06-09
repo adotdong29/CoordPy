@@ -1,0 +1,59 @@
+{
+  "schema": "coordpy.w142b_pilot_family_v2.achieved_m",
+  "family": "subarrays_sum_and_range",
+  "mode": "HIDDEN_EDGE_STATE_MISS",
+  "K_brutes": 12,
+  "multi_winner_extraction": true,
+  "members": 6,
+  "planned_members": 10,
+  "endpoint_truncated": true,
+  "discovered": true,
+  "A1": 2,
+  "B0": 2,
+  "ST": 6,
+  "NEG": 1,
+  "per_member": [
+    {
+      "m": 0,
+      "a1": 1,
+      "b0": 1,
+      "st": 1,
+      "neg": 0
+    },
+    {
+      "m": 1,
+      "a1": 0,
+      "b0": 0,
+      "st": 1,
+      "neg": 0
+    },
+    {
+      "m": 2,
+      "a1": 0,
+      "b0": 0,
+      "st": 1,
+      "neg": 0
+    },
+    {
+      "m": 3,
+      "a1": 1,
+      "b0": 1,
+      "st": 1,
+      "neg": 0
+    },
+    {
+      "m": 4,
+      "a1": 0,
+      "b0": 0,
+      "st": 1,
+      "neg": 1
+    },
+    {
+      "m": 5,
+      "a1": 0,
+      "b0": 0,
+      "st": 1,
+      "neg": 0
+    }
+  ]
+}
