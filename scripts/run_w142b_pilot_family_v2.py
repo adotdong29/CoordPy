@@ -86,6 +86,7 @@ def main() -> int:
     ap.add_argument("--K-amortize", type=int, default=4)
     ap.add_argument("--K-discover", type=int, default=24)
     ap.add_argument("--K-brutes", type=int, default=5)
+    ap.add_argument("--max-disc-tries", type=int, default=4)
     ap.add_argument("--members", type=int, default=4)
     ap.add_argument("--teacher-seed", type=int, default=1)
     ap.add_argument("--member-seed-base", type=int, default=100)
@@ -113,14 +114,22 @@ def main() -> int:
     brutes_t = _gen_brutes(gen, tp, K_b, args.max_tokens, args.brute_temp, to)
     cands_t = [extract_candidate_code_v1(response_text=_gen_text(gen, _efficient_prompt(tp), args.max_tokens, args.temperature))
                for _ in range(K_d)]
-    small_t = _build_small_bank_v1(tp, template, gen, timeout_s=to)
-    sel = _select(cands_t, tp, teacher, template, brutes_t, small_t, to)
-    scaffold = None; comp = None; win_secret = None
-    # W142b-2: try EVERY verified-correct winner for extraction (not just the committed one) — the
-    # winner's code SHAPE is stochastic; ~5/24 correct subarrays candidates extract, so iterating the
-    # ref-cluster winners (committed first) finds an extractable one reliably. No extra NIM (candidates
-    # already generated). Each tried winner is itself verified-correct (in the brute-anchored cluster).
-    if not sel.abstained:
+    small_t = []  # v2 clusters on public+aug only (ignores small_inputs) — skip the NIM bank-gen calls
+    # W142b-3: DISCOVERY-RETRY loop — discovery is the one-time amortized cost, so make it DETERMINISTIC
+    # not lucky: keep generating fresh brute+candidate batches until select_winner_v2 commits a winner
+    # that EXTRACTS a clean scaffold (multi-winner: try EVERY verified-correct winner per batch). This
+    # removes the per-seed discovery stochasticity (the s2f disc=False failure). All generation is the
+    # teacher-side amortized cost; correctness is still no-oracle (brute-anchored cluster).
+    scaffold = None; comp = None; win_secret = None; sel = None; n_disc_tries = 0
+    while scaffold is None and n_disc_tries < args.max_disc_tries:
+        n_disc_tries += 1
+        if n_disc_tries > 1:
+            brutes_t = _gen_brutes(gen, tp, K_b, args.max_tokens, args.brute_temp, to)
+            cands_t = cands_t + [extract_candidate_code_v1(response_text=_gen_text(gen, _efficient_prompt(tp), args.max_tokens, args.temperature))
+                                 for _ in range(K_d)]
+        sel = _select(cands_t, tp, teacher, template, brutes_t, small_t, to)
+        if sel.abstained:
+            continue
         winners = [cands_t[v.idx] for v in sel.verdicts if v.is_winner]
         if sel.winner_code:
             winners = [sel.winner_code] + [w for w in winners if w != sel.winner_code]
@@ -133,6 +142,7 @@ def main() -> int:
                 scaffold, comp, win_secret = scf, cr, ws
                 break
     n_correct_brute = sum(1 for b in brutes_t if _passes_secret_brute(b, teacher, to))
+    print(f"[{args.family}] discover_tries={n_disc_tries} scaffold={'YES' if scaffold else 'NO'}", flush=True)
     print(f"[{args.family}] discover: reason={sel.reason} winner_idx={sel.winner_idx} "
           f"winner_secret={win_secret} compiled={(comp.compiled if comp else None)} "
           f"K_b={K_b} correct_brutes={n_correct_brute} alien=...", flush=True)
@@ -143,7 +153,7 @@ def main() -> int:
     for s in range(M):
         m = mint_problem_v1(template.minted, global_seed=args.member_seed_base + s)
         mp = m.to_pilot_problem(minted_date=MINTED_DATE)
-        small = _build_small_bank_v1(mp, template, gen, timeout_s=to)
+        small = []  # v2 clusters on public+aug only — skip the NIM bank-gen calls
         brutes = _gen_brutes(gen, mp, K_b, args.max_tokens, args.brute_temp, to)
         plain = [extract_candidate_code_v1(response_text=_gen_text(gen, _efficient_prompt(mp), args.max_tokens, args.temperature))
                  for _ in range(K_a)]
