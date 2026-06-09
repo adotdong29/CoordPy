@@ -177,8 +177,15 @@ def derive_holes_from_ast_v1(code: str) -> ExtractedSkeletonV1:
         if not (is_acc_aug or is_acc_set):
             continue
         val = node.value
-        # require the aggregation to be a non-trivial decision (not a bare constant)
+        # W142b — counting-by-accept-predicate shape (`count += 1` per item that SATISFIES the
+        # condition): the contribution is a bare constant, so the discriminating DECISION is the
+        # controlling ACCEPT predicate (which items count), not the +1.  Blank the predicate, NOT the
+        # constant add (additive: count_pairs/NSL have non-constant adds and are unaffected; this only
+        # rescues the constant-add case v1 dropped as `no_accumulator_update`).
         if isinstance(val, ast.Constant):
+            pred = _controlling_predicate(node, par)
+            if pred is not None and not _is_trivial_test(pred):
+                pred_nodes.append(pred)
             continue
         if len(ast.dump(val)) > 0 and len(_unparse(val).split()) > _MAX_HOLE_EXPR_TOKENS:
             continue
@@ -188,7 +195,7 @@ def derive_holes_from_ast_v1(code: str) -> ExtractedSkeletonV1:
         if pred is not None and not _is_trivial_test(pred):
             pred_nodes.append(pred)
 
-    if not add_nodes:
+    if not add_nodes and not pred_nodes:
         return ExtractedSkeletonV1("", {}, {}, 0, 0, False, "no_accumulator_update")
 
     # dedupe predicate nodes by identity
