@@ -224,7 +224,7 @@ def _build_nim_gen(*, model: str, max_retries: int = 12,
                 return str(text), int(wall_ms)
             except urllib.error.HTTPError as e:
                 last_err = e
-                if e.code in (429, 502, 503, 504):
+                if e.code in (429, 500, 502, 503, 504):
                     backoff = min(float(2 ** attempt)
                                   + (_random.random() * 5.0), 300.0)
                     print(f"  [nim retry] HTTP {e.code} attempt "
