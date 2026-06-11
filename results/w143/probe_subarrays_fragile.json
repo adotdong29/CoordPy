@@ -1,0 +1,131 @@
+{
+  "schema": "coordpy.w143_team_bench_v1.probe",
+  "model": "meta/llama-3.3-70b-instruct",
+  "family": "subarrays_sum_and_range",
+  "vein": "two_deque_sliding_window",
+  "mode_label": "HIDDEN_EDGE_STATE_MISS",
+  "K_discover": 4,
+  "K_brutes": 5,
+  "fragile_budget": {
+    "K_d": 4,
+    "K_b": 5,
+    "max_disc_tries": 1
+  },
+  "discover_seeds": 6,
+  "disc_rate": {
+    "ST": 0.0,
+    "MA_FULL": 0.1667
+  },
+  "dpi_band_ok_st_disc_rate_lt_1": true,
+  "team_lifts_disc_rate": true,
+  "rows": [
+    {
+      "seed": 1,
+      "arm": "ST",
+      "discovered": false,
+      "diversity": "NA",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 9
+    },
+    {
+      "seed": 1,
+      "arm": "MA_FULL",
+      "discovered": false,
+      "diversity": "REAL",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 9
+    },
+    {
+      "seed": 2,
+      "arm": "ST",
+      "discovered": false,
+      "diversity": "NA",
+      "winner_secret": false,
+      "reason": "committed_v2",
+      "n_model_calls": 9
+    },
+    {
+      "seed": 2,
+      "arm": "MA_FULL",
+      "discovered": true,
+      "diversity": "REAL",
+      "winner_secret": true,
+      "reason": "committed_v2",
+      "n_model_calls": 9
+    },
+    {
+      "seed": 3,
+      "arm": "ST",
+      "discovered": false,
+      "diversity": "NA",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 9
+    },
+    {
+      "seed": 3,
+      "arm": "MA_FULL",
+      "discovered": false,
+      "diversity": "REAL",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 9
+    },
+    {
+      "seed": 4,
+      "arm": "ST",
+      "discovered": false,
+      "diversity": "NA",
+      "winner_secret": false,
+      "reason": "committed_v2",
+      "n_model_calls": 9
+    },
+    {
+      "seed": 4,
+      "arm": "MA_FULL",
+      "discovered": false,
+      "diversity": "REAL",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 9
+    },
+    {
+      "seed": 5,
+      "arm": "ST",
+      "discovered": false,
+      "diversity": "NA",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 9
+    },
+    {
+      "seed": 5,
+      "arm": "MA_FULL",
+      "discovered": false,
+      "diversity": "REAL",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 9
+    },
+    {
+      "seed": 6,
+      "arm": "ST",
+      "discovered": false,
+      "diversity": "NA",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 9
+    },
+    {
+      "seed": 6,
+      "arm": "MA_FULL",
+      "discovered": false,
+      "diversity": "REAL",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 9
+    }
+  ]
+}

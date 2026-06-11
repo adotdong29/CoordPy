@@ -1,0 +1,3 @@
+{"seed": 7, "arm": "ST", "discovered": false, "diversity": "NA", "winner_secret": null, "reason": "no_efficient_winner_in_ref_cluster", "n_model_calls": 9}
+{"seed": 7, "arm": "MA_FULL", "discovered": true, "diversity": "REAL", "winner_secret": true, "reason": "committed_v2", "n_model_calls": 9}
+{"seed": 8, "arm": "ST", "discovered": false, "diversity": "NA", "winner_secret": null, "reason": "no_efficient_winner_in_ref_cluster", "n_model_calls": 9}

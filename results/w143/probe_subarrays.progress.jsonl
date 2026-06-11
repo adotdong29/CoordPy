@@ -1,0 +1,6 @@
+{"seed": 1, "arm": "ST", "discovered": false, "diversity": "NA", "winner_secret": null, "reason": "no_efficient_winner_in_ref_cluster", "n_model_calls": 15}
+{"seed": 1, "arm": "MA_FULL", "discovered": false, "diversity": "REAL", "winner_secret": null, "reason": "no_efficient_winner_in_ref_cluster", "n_model_calls": 15}
+{"seed": 2, "arm": "ST", "discovered": false, "diversity": "NA", "winner_secret": null, "reason": "no_efficient_winner_in_ref_cluster", "n_model_calls": 15}
+{"seed": 2, "arm": "MA_FULL", "discovered": false, "diversity": "FAKE_DIVERSE", "winner_secret": null, "reason": "no_efficient_winner_in_ref_cluster", "n_model_calls": 15}
+{"seed": 3, "arm": "ST", "discovered": false, "diversity": "NA", "winner_secret": null, "reason": "no_efficient_winner_in_ref_cluster", "n_model_calls": 15}
+{"seed": 3, "arm": "MA_FULL", "discovered": false, "diversity": "REAL", "winner_secret": null, "reason": "no_efficient_winner_in_ref_cluster", "n_model_calls": 15}

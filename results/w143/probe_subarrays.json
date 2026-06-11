@@ -1,0 +1,77 @@
+{
+  "schema": "coordpy.w143_team_bench_v1.probe",
+  "model": "meta/llama-3.3-70b-instruct",
+  "family": "subarrays_sum_and_range",
+  "vein": "two_deque_sliding_window",
+  "mode_label": "HIDDEN_EDGE_STATE_MISS",
+  "K_discover": 10,
+  "K_brutes": 5,
+  "fragile_budget": {
+    "K_d": 10,
+    "K_b": 5,
+    "max_disc_tries": 1
+  },
+  "discover_seeds": 3,
+  "disc_rate": {
+    "ST": 0.0,
+    "MA_FULL": 0.0
+  },
+  "dpi_band_ok_st_disc_rate_lt_1": true,
+  "team_lifts_disc_rate": false,
+  "rows": [
+    {
+      "seed": 1,
+      "arm": "ST",
+      "discovered": false,
+      "diversity": "NA",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 15
+    },
+    {
+      "seed": 1,
+      "arm": "MA_FULL",
+      "discovered": false,
+      "diversity": "REAL",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 15
+    },
+    {
+      "seed": 2,
+      "arm": "ST",
+      "discovered": false,
+      "diversity": "NA",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 15
+    },
+    {
+      "seed": 2,
+      "arm": "MA_FULL",
+      "discovered": false,
+      "diversity": "FAKE_DIVERSE",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 15
+    },
+    {
+      "seed": 3,
+      "arm": "ST",
+      "discovered": false,
+      "diversity": "NA",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 15
+    },
+    {
+      "seed": 3,
+      "arm": "MA_FULL",
+      "discovered": false,
+      "diversity": "REAL",
+      "winner_secret": null,
+      "reason": "no_efficient_winner_in_ref_cluster",
+      "n_model_calls": 15
+    }
+  ]
+}
