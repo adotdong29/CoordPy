@@ -10496,6 +10496,19 @@ for theorems W3-1..W3-6 and conjectures W3-C1..W3-C3.
 | **GitHub Actions release on tag** | Slice 3 ops target | **Declared** (workflow file checked in); **not yet fired on a real tag** | `.github/workflows/coordpy-ci.yml` |
 | **Research shards** — Phases 1–44 RESULTS_*, EXTENDED_MATH_*, per-phase scripts, 72-framework survey | Research programme | **Research-grade** (empirical/proved per shard; no product-API guarantee) | `vision_mvp.experiments.*`, `vision_mvp.tasks.*`, docs |
 
+> **W144 note — executable view of this matrix.** The package now lives at
+> top-level `coordpy/` (read the `vision_mvp.*` import paths above with that
+> mapping: `vision_mvp.coordpy.<x>` → `coordpy.<x>`). W144 extended this
+> stability matrix into a finer-grained, falsifiable **S1..S5 tier map**
+> (S1 stable-core / S2 canonical-experimental / S3 benchmark-support / S4
+> historical-archive / S5 blocked-dead-keep-for-record) and made it
+> **executable**: run `coordpy-subject` (or `python -m coordpy.subject`) to
+> print the tier map and run a hermetic stable-contract harness, or read the
+> machine-readable registry at `docs/W144_COORDPY_SUBJECT_REGISTRY.json`.
+> W144 is a consolidation milestone — it adds the orientation surface
+> additively, retires nothing, and does not bump the version (0.5.20 /
+> coordpy.sdk.v3.43).
+
 ### 10.2 Slice 1 (this milestone) — completed
 
 | Item | Status | Anchor |

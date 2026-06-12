@@ -43,6 +43,18 @@ In short: the architectural shift is from **attention over sequence** to
 > has solved multi-agent context** (it has not — but the
 > empirical bar is now PARTIALLY met on HumanEval at 70B and
 > directionally on MBPP at 70B), see
+> **Consolidation marker (W144, 2026-06-12):** CoordPy was consolidated into
+> one coherent, testable subject — a context-capsule runtime (the C1..C6
+> Capsule Contract is the centre of gravity). An S1..S5 tier map now
+> classifies every surface (stable-core / canonical-experimental /
+> benchmark-support / historical / blocked-dead), and a new ORIENTATION
+> front door — `coordpy-subject` (also `python -m coordpy.subject`) — runs a
+> hermetic stable-contract harness and prints the tier map in one run.
+> Registry: `docs/W144_COORDPY_SUBJECT_REGISTRY.json`. W144 is a
+> consolidation milestone: it retires NOTHING and earns no new empirical
+> claim; no version bump (0.5.20 / coordpy.sdk.v3.43); no PyPI. The
+> separate `Latent State Transition` architecture branch was intentionally
+> NOT started.
 > **Current top marker:** **W143** closed the multi-agent composition
 > branch sharply. The team mechanism is real and load-bearing, but its
 > gain is anti-correlation-capped, so there is no honest third

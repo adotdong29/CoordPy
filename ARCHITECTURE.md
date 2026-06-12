@@ -28,6 +28,23 @@ canonical theorem registry see
 do-not-overstate rule book see
 [`docs/HOW_NOT_TO_OVERSTATE.md`](docs/HOW_NOT_TO_OVERSTATE.md).
 
+> **Package-path note (W144).** This document was written when the SDK
+> lived under `vision_mvp/`. The shipped package is now the **top-level
+> `coordpy/`** package, and tests live in the top-level `tests/`. Read
+> every historical `vision_mvp/coordpy/<x>.py` path below as
+> **`coordpy/<x>.py`**, and every `vision_mvp/tests/<t>.py` as
+> **`tests/<t>.py`** (e.g. `vision_mvp/coordpy/capsule.py` → `coordpy/capsule.py`;
+> `vision_mvp/tests/test_coordpy_capsules.py` → `tests/test_coordpy_capsules.py`).
+> The phase-by-phase callouts further down are kept verbatim for
+> provenance and are **not** rewritten.
+>
+> **Orientation front door (W144).** To see what CoordPy *is*, what is
+> stable vs experimental vs historical (the S1..S5 tier map), and to run
+> the hermetic stable-contract harness in one shot, run
+> **`coordpy-subject`** (or `python -m coordpy.subject`). The machine-
+> readable tier map is `docs/W144_COORDPY_SUBJECT_REGISTRY.json`. The
+> recommended door for *using* CoordPy remains **`coordpy-team`**.
+
 ## The Capsule Contract (SDK v3 centre of gravity)
 
 CoordPy's durable top-level description is:

@@ -1,9 +1,13 @@
 """CoordPy console entry points.
 
-Five scripts, wired into ``pyproject.toml`` ``[project.scripts]``:
+Six scripts, wired into ``pyproject.toml`` ``[project.scripts]``:
 
     coordpy-team    — run / replay / sweep / compare an AgentTeam preset
-                      (the recommended front-door CLI for new users)
+                      (the recommended USAGE front-door CLI for new users)
+    coordpy-subject — print the canonical subject + S1..S5 tier map and run
+                      the hermetic stable-contract harness (the ORIENTATION
+                      front door: what CoordPy is / what is stable vs
+                      experimental vs historical / does the contract hold)
     coordpy-capsule — view / verify / verify-view / audit a sealed
                       capsule chain (works on both team and RunSpec runs)
     coordpy         — run a profile, emit a provenance-stamped report
@@ -898,6 +902,18 @@ def main_capsule() -> int:
 
 def main_team() -> int:
     return _cmd_team()
+
+
+def _cmd_subject(argv: list[str] | None = None) -> int:
+    # The orientation front door lives in ``coordpy.subject`` so it is also
+    # importable / runnable as ``python -m coordpy.subject``. This wrapper
+    # keeps the console-script surface uniform with the other five commands.
+    from .subject import main as _subject_main
+    return _subject_main(argv if argv is not None else sys.argv[1:])
+
+
+def main_subject() -> int:
+    return _cmd_subject()
 
 
 if __name__ == "__main__":

@@ -105,8 +105,12 @@ coordpy-ci = "coordpy._cli:main_ci"
 # both RunSpec runs and AgentTeam runs).
 coordpy-capsule = "coordpy._cli:main_capsule"
 # Run / replay / sweep / compare a lightweight AgentTeam preset
-# from the CLI. The recommended front door for new users.
+# from the CLI. The recommended USAGE front door for new users.
 coordpy-team = "coordpy._cli:main_team"
+# Orientation front door: print the canonical subject + the S1..S5
+# stable/experimental/historical tier map and run the hermetic
+# stable-contract harness (also `python -m coordpy.subject`).
+coordpy-subject = "coordpy._cli:main_subject"
 
 [tool.setuptools.dynamic]
 version = { attr = "coordpy._version.__version__" }

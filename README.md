@@ -142,11 +142,18 @@ runs because provenance includes a wall-clock timestamp.
 
 | Command | Purpose |
 |---|---|
-| `coordpy-team run / replay / sweep / compare` | Drive an `AgentTeam` preset from the CLI; dump or replay a sealed bundle. The recommended front door for new users. |
+| `coordpy-team run / replay / sweep / compare` | Drive an `AgentTeam` preset from the CLI; dump or replay a sealed bundle. The recommended **usage** front door for new users. |
+| `coordpy-subject report / check / registry / tiers` | **Orientation** front door: print what CoordPy is, the stable-vs-experimental-vs-historical tier map, and run the hermetic stable-contract harness in one shot (also `python -m coordpy.subject`). |
 | `coordpy-capsule view / verify / verify-view / audit` | Summarise / re-hash a sealed capsule chain (works on both team and `RunSpec` runs). |
 | `coordpy --profile <name> --out-dir <dir>` | Run a research profile end to end and write the seven artefacts. |
 | `coordpy-ci --report <product_report.json>` | Apply the CI pass/fail gate to a finished report. |
 | `coordpy-import --jsonl <file>` | Audit a SWE-bench-Lite-style JSONL for compatibility. |
+
+New to this repo? `coordpy-subject` is the fastest way to learn what is
+stable (the SDK/CLI), what is canonical-experimental (the architecture
+north-star lineage + the most recent research chain), and what is
+historical — without reading the milestone archive. See
+[`docs/W144_COORDPY_SUBJECT_REGISTRY.json`](docs/W144_COORDPY_SUBJECT_REGISTRY.json).
 
 The research-profile chain is still useful for the structured
 `RunSpec → RunReport` path:

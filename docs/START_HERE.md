@@ -130,6 +130,18 @@ export COORDPY_API_KEY=...
 
 ## Stable vs experimental
 
+> **Run it, don't read it.** `coordpy-subject` (or `python -m
+> coordpy.subject`) prints this boundary as a live **S1..S5 tier map** and
+> runs a hermetic harness over the stable contract. The five tiers:
+> **S1 stable-core** (the SDK/CLI below), **S2 canonical-experimental**
+> (the architecture north-star lineage `product_manifold` →
+> `learned_manifold` → `shared_state_proxy`, plus the most recent
+> W140..W143 discover-then-amortize chain), **S3 benchmark/research-support**
+> (the eval machinery), **S4 historical/archive** (the W22..W42 dense-control
+> and W49..W139 substrate version ladders, kept for provenance), and
+> **S5 blocked/dead/keep-for-record**. Machine-readable:
+> [`docs/W144_COORDPY_SUBJECT_REGISTRY.json`](W144_COORDPY_SUBJECT_REGISTRY.json).
+
 **Stable and released in SDK v3.43**
 
 * `coordpy` SDK surface: `RunSpec`, `run`, `RunReport`,
@@ -139,8 +151,8 @@ export COORDPY_API_KEY=...
   `TEAM_RESULT_SCHEMA`, `profiles`, `ci_gate`, `import_data`,
   `extensions`, capsule primitives, schema constants,
   `OpenAICompatibleBackend`, `backend_from_env`
-* CLI surface: `coordpy-team`, `coordpy-capsule`, `coordpy`,
-  `coordpy-import`, `coordpy-ci`
+* CLI surface: `coordpy-team`, `coordpy-subject`, `coordpy-capsule`,
+  `coordpy`, `coordpy-import`, `coordpy-ci`
 * On-disk schemas: `coordpy.capsule_view.v1`,
   `coordpy.team_result.v1`, `coordpy.provenance.v1`,
   `phase45.product_report.v2`
