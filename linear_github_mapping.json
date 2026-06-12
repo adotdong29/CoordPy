@@ -1371,6 +1371,59 @@
         "W142-T-DISCOVER-THEN-AMORTIZE-FAILS-FOR-THREE-DISTINCT-REASONS-AT-THE-FRONTIER",
         "W142-L-DISCOVER-THEN-AMORTIZE-CONVERSION-IS-VERIFIER-RELIABILITY-AND-BASELINE-SATURATION-BOUND"
       ]
+    },
+    {
+      "id": "W142b",
+      "title": "discover-then-amortize §7b retirement earn (no-oracle self-tutoring; verifier v2 + accept-predicate extractor + multi-winner extraction)",
+      "outcome": "W142-L is OVERTURNED. The W142 cap's three Lane-β walls were FIXABLE engineering artifacts, not a fundamental bound: `coordpy.no_oracle_verifier_v2` fixes the count_pairs false-negative and subarrays false-positive; an additive accept-predicate extractor extension makes counting-by-condition techniques extractable; and multi-winner extraction plus a discovery-retry loop tame the per-seed stochasticity. RESULT (meta/llama-3.3-70b-instruct, K_a=4, K_d=24 one-time amortized, full M=10, two seeds): both seeds earn the §7b span with +30.0pp same-budget superiority, spanning 2 modes with NEG<=B0 and ST>NEG. This is the FIRST confirmed discover-then-amortize resistant same-budget superiority, DISTINCT from the W89/W105 multi-agent retirements. no version bump (0.5.20); no PyPI; coordpy/__init__.py untouched.",
+      "commits": [
+        "91dde67",
+        "af608e8",
+        "04fb340",
+        "075c8cb",
+        "514fe0f",
+        "743b0f1",
+        "7089321"
+      ],
+      "docs": [
+        "docs/RESULTS_W142b_DISCOVER_THEN_AMORTIZE_RETIREMENT_V1.md"
+      ],
+      "linear_issues": [
+        "COO-9",
+        "COO-6"
+      ],
+      "carry_forwards_retired": [
+        "W142-L-DISCOVER-THEN-AMORTIZE-CONVERSION-IS-VERIFIER-RELIABILITY-AND-BASELINE-SATURATION-BOUND"
+      ],
+      "carry_forwards_added": [
+        "W142b-T-V2-VERIFIER-AND-EXTRACTOR-FIX-THE-THREE-W142-WALLS",
+        "W142b-T-DISCOVER-THEN-AMORTIZE-§7b-RETIREMENT-EARNED-TWO-SEED-2-MODE",
+        "W142b-T-RELIABLE-B0-SATURATION-AND-TAMEABLE-NO-ORACLE-STOCHASTICITY"
+      ]
+    },
+    {
+      "id": "W143",
+      "title": "true multi-agent composition of the W142b discover-then-amortize win (role-diverse discovery + verifier quorum + shared-state amortize)",
+      "outcome": "W143 fused the W89/W105 team line, W128 role-diverse discovery, and the W142b no-oracle discover-then-amortize line into a genuine team mechanism. The team is real and load-bearing: at a starved discovery budget it beats the single-controller ST on subarrays discovery (3/12 vs 0/12) and raises the load-independent generation ceiling (5/12 vs 2/12). But the line closes SHARPLY with NO new multi-agent retirement: the advantage is anti-correlation-capped across the budget axis — large but unreliable at low budget, reliable but vanishing at the operating budget where the single controller catches up. So W89 (+5.56) and W105 (+7.00) remain the only two MULTI-AGENT retirements; W142b remains the distinct discover-then-amortize retirement. no version bump (0.5.20); no PyPI; coordpy/__init__.py untouched.",
+      "commits": [
+        "428609e"
+      ],
+      "docs": [
+        "docs/RUNBOOK_W143.md",
+        "docs/RESULTS_W143_MULTI_AGENT_COMPOSITION_V1.md"
+      ],
+      "linear_issues": [
+        "COO-68",
+        "COO-9",
+        "COO-6"
+      ],
+      "carry_forwards_retired": [],
+      "carry_forwards_added": [
+        "W143-T-ROLE-DIVERSE-TEAM-LIFTS-DISCOVER-THEN-AMORTIZE-DISCOVERY-AT-FRAGILE-BUDGET",
+        "W143-L-MULTI-AGENT-DISCOVER-THEN-AMORTIZE-IS-ANTI-CORRELATION-CAPPED",
+        "W143-T-DISCOVER-THEN-AMORTIZE-IS-SINGLE-CONTROLLER-COMPLETE-AT-OPERATING-BUDGET",
+        "W143-T-NO-ORACLE-EFFICIENCY-GATE-IS-WALL-CLOCK-LOAD-FRAGILE"
+      ]
     }
   ]
 }

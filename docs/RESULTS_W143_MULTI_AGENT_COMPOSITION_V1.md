@@ -1,6 +1,6 @@
 # W143 — true multi-agent COMPOSITION of the W142b discover-then-amortize win (Lane α/β/γ)
 
-**Status: IN PROGRESS (methodology + mechanism locked; empirical result sections pending the bench).**
+**Status: FINAL (no new multi-agent retirement; line closed sharply by a machine-closed structural blocker).**
 Date 2026-06-10. Builds on W142b (`7089321`). Runbook `docs/RUNBOOK_W143.md` §1–§14 LOCKED before NIM.
 No version bump (`0.5.20` / `coordpy.sdk.v3.43`); no PyPI; `coordpy/__init__.py` untouched; gate `258b6ed7`.
 
@@ -98,7 +98,7 @@ Adverse skeptical prior; three executable changes folded into the mechanism (RUN
 REAL vs FAKE_DIVERSE + positive control; transfer-ablation prompts differ; **fragile-mock load-bearing
 demo** (i.i.d. candidates wrong, sketch-guided implements right ⇒ MA discovers where ST fails ⇒ MA wins,
 ST KEEPs); budget-parity gate bites; earn-gate logic (clean earn / DPI-band fail / tie-ST / NEG>B0).
-Regression guard: W141/W142 tests (extractor + leak gate + v2 verifier unchanged). *(Result: TBD.)*
+Regression guard: W141/W142 tests (extractor + leak gate + v2 verifier unchanged). **Result: PASS (24/24).**
 
 ## 7. RESULTS
 Model `meta/llama-3.3-70b-instruct`; family `subarrays_sum_and_range` (two-deque HIDDEN_EDGE, knob 30000).
