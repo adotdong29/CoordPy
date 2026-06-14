@@ -4,7 +4,7 @@
   "provenance": {
     "milestone": "W145",
     "originated_milestone": "W144",
-    "built_from_commit": "W145 (pinned in the W145 sync-tail commit)",
+    "built_from_commit": "7ba5610 (W145 commit)",
     "version": "0.5.20",
     "sdk_version": "coordpy.sdk.v3.43",
     "census": {
@@ -17,10 +17,10 @@
     },
     "classification_rule": "Each surface lands in exactly one tier. S1 = stable (non-__experimental__) __init__ symbol / console script / schema / _internal.product / extensions / the coordpy.adk library surface, contract-test-locked. S2 = explicit-import-only but central to identity (architecture north-star lineage OR current W140..W143 load-bearing markers). S3 = benchmark/eval machinery. S4 = historical (W22..W42 dense-control + W49..W139 substrate version ladders). S5 = blocked/dead/keep-for-record (kept, not deleted). Tie-break: most-stable tier honestly met; S1 requires the contract test.",
     "graphify_evidence": {
-      "graph_commit": "aff4d70 (start) -> W145 (end)",
+      "graph_commit": "aff4d70 (start) -> 7ba5610 (end)",
       "coordpy_to_adk": "1 hop (additive re-export; coordpy.adk is a new S1 front door)",
-      "adk_to_capsule": "imports_from (the ADK Runner seals onto the stable capsule primitives)",
-      "adk_to_research_ladder": "no path (the ADK surface imports no S2..S5 research code)"
+      "adk_to_capsule": "imports_from — verified: CapsuleTrail uses CapsuleLedger/ContextCapsule/CapsuleKind/CapsuleBudget; runner.py imports verify_chain_from_view_dict",
+      "adk_to_research_ladder": "no path — verified: grep of coordpy/adk/ finds no import of any S2..S5 module"
     }
   },
   "subject": {
