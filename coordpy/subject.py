@@ -3,12 +3,14 @@
 This module answers, in **one deterministic run**, the questions a new
 operator or agent has to answer before doing anything else:
 
-  * **What is CoordPy?**  A context-capsule runtime — every piece of
-    context that crosses a role / layer / run boundary is a typed,
-    content-addressed, lifecycle-bounded, budget-bounded,
-    provenance-carrying ``ContextCapsule`` (the C1..C6 contract), wrapped
-    in a stable SDK + CLI for auditable, replayable LLM agent teams.
-  * **What is the main tool?**  ``coordpy-team`` for *using* CoordPy;
+  * **What is CoordPy?**  A Python-first agent development kit (ADK):
+    Agents, Tools, Sessions, and a Runner (``coordpy.adk``), with a
+    context-capsule runtime underneath — every piece of context that
+    crosses a role / layer / run boundary is a typed, content-addressed,
+    lifecycle-bounded, provenance-carrying ``ContextCapsule`` (the C1..C6
+    contract) you can re-verify and replay.
+  * **What is the main tool?**  ``coordpy.adk`` (import-and-code) for
+    *building* with CoordPy; ``coordpy-team`` for the secondary CLI; and
     ``coordpy-subject`` (this surface) for *understanding / verifying* it.
   * **What is stable vs experimental vs historical?**  The S1..S5 tier
     map below, mirrored in ``docs/W144_COORDPY_SUBJECT_REGISTRY.json``.
@@ -43,12 +45,16 @@ SUBJECT_REPORT_SCHEMA = "coordpy.subject.v1"
 CANONICAL_SUBJECT = {
     "name": "CoordPy",
     "one_line": (
-        "CoordPy is a context-capsule runtime: every inter-role, "
-        "inter-layer, inter-run artefact is a typed, content-addressed, "
-        "lifecycle-bounded, budget-bounded, provenance-carrying capsule — "
-        "never a raw prompt string."
+        "CoordPy is a Python-first agent development kit (ADK): you build "
+        "Agents, Tools, Sessions, and sub-agents and run them with a Runner, "
+        "while every model call, tool call, and handoff automatically seals "
+        "into a typed, content-addressed, lifecycle-bounded, provenance-"
+        "carrying capsule you can re-verify and replay."
     ),
-    "centre_of_gravity": "The Capsule Contract (C1..C6).",
+    "centre_of_gravity": (
+        "The ADK ergonomics are the front door (coordpy.adk); the Capsule "
+        "Contract (C1..C6) is the guarantee underneath."
+    ),
     "capsule_contract": {
         "C1": "Identity — SHA-256 content-address over (kind, payload, budget, parents).",
         "C2": "Typed claim — CapsuleKind in a closed vocabulary.",
@@ -58,10 +64,11 @@ CANONICAL_SUBJECT = {
         "C6": "Frozen — a sealed capsule's CID is fixed for all time.",
     },
     "programme_product_split": {
-        "Context Zero": "the research programme (the W1..W143 arc).",
-        "CoordPy": "the shipped product (this SDK/CLI). Not the whole programme; not a universal agent platform.",
+        "Context Zero": "the research programme (the W1..W144 arc).",
+        "CoordPy": "the shipped product — a Python-first ADK (library + secondary CLI). Not the whole programme; not a universal agent platform.",
     },
     "operational_surfaces": [
+        "library ADK surface (coordpy.adk: Agent / Tool / Runner / Session / State / Memory / Artifacts)",
         "team runtime (AgentTeam / coordpy-team)",
         "provenance + capsule audit (coordpy-capsule)",
         "reproducible profile runs (coordpy / RunSpec->RunReport)",
@@ -70,15 +77,19 @@ CANONICAL_SUBJECT = {
 }
 
 FRONT_DOORS = {
+    "library": {
+        "entrypoint": "coordpy.adk",
+        "why": "Import-and-code ADK surface (Agent / Tool / Runner / Session / State / Memory / Artifacts). The recommended door for BUILDING with CoordPy.",
+    },
     "usage": {
         "entrypoint": "coordpy-team",
-        "why": "Run / replay / sweep / compare an AgentTeam preset. The recommended door for USING CoordPy.",
+        "why": "Run / replay / sweep / compare an AgentTeam preset from the CLI. The secondary command-line runtime surface.",
     },
     "orientation": {
         "entrypoint": "coordpy-subject",
         "why": "Print the subject, the S1..S5 tier map, and run the hermetic harness. The door for UNDERSTANDING / VERIFYING CoordPy.",
     },
-    "secondary": ["coordpy (profile runner)", "coordpy-capsule (audit)", "coordpy-import", "coordpy-ci"],
+    "secondary": ["coordpy-team (CLI)", "coordpy (profile runner)", "coordpy-capsule (audit)", "coordpy-import", "coordpy-ci"],
 }
 
 # --------------------------------------------------------------------------
@@ -102,7 +113,7 @@ TIERS: dict[str, dict[str, Any]] = {
             "capsule_policy", "capsule_policy_bundle",
             "capsule_decoder", "capsule_decoder_v2",
             "team_coord", "team_policy", "extensions",
-            "_cli", "_version", "subject",
+            "_cli", "_version", "subject", "adk",
             "_internal.product.profiles", "_internal.product.report",
             "_internal.product.ci_gate", "_internal.product.import_data",
         ],
@@ -206,6 +217,7 @@ _STABLE_PUBLIC_SYMBOLS: tuple[str, ...] = (
     "OpenAICompatibleBackend", "OllamaBackend", "backend_from_env",
     "PROVENANCE_SCHEMA", "build_manifest",
     "__version__", "SDK_VERSION", "PRODUCT_REPORT_SCHEMA",
+    "adk",  # W145 — the library-first ADK front door
 )
 
 EXPECTED_VERSION = "0.5.20"
@@ -359,7 +371,9 @@ def render_text(report: dict[str, Any]) -> str:
     lines.append("")
     lines.append("FRONT DOORS")
     fd = report["front_doors"]
-    lines.append(f"  USE        -> {fd['usage']['entrypoint']}: {fd['usage']['why']}")
+    if "library" in fd:
+        lines.append(f"  BUILD      -> {fd['library']['entrypoint']}: {fd['library']['why']}")
+    lines.append(f"  USE (CLI)  -> {fd['usage']['entrypoint']}: {fd['usage']['why']}")
     lines.append(f"  UNDERSTAND -> {fd['orientation']['entrypoint']}: {fd['orientation']['why']}")
     lines.append(f"  secondary  -> {', '.join(fd['secondary'])}")
     lines.append("")

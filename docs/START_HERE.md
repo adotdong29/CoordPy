@@ -1,23 +1,27 @@
 # Start Here
 
-CoordPy is a Python-first SDK and CLI for building auditable AI
-agent teams with structured, content-addressed context. If you want
-the fastest path to understanding what this repo ships and how to
-use it, read this page first.
+CoordPy is a **Python-first agent development kit (ADK)** for building AI
+agents and agent teams — with the now-familiar `Agent` / `Tool` / `Runner` /
+`Session` / `State` / `Memory` / `Artifacts` model — that gives you
+content-addressed capsule audit, provenance, and replay for free underneath.
+Read this page for the fastest path to what this repo ships and how to use it.
 
 ## What CoordPy is
 
-CoordPy gives you a stable runtime contract for AI agent teamwork:
+CoordPy is an ADK whose **front door is import-and-code** (`coordpy.adk`),
+with a capsule runtime as the guarantee underneath:
 
-* **Bounded-context capsules instead of token cramming.** Prompts,
-  responses, handoffs, and reports are stored as structured,
-  content-addressed objects with provenance and budget metadata.
-* **A reproducible runtime.** One `RunSpec` in, one `RunReport` out,
-  with a sealed capsule graph you can inspect and verify.
-* **A team-coordination layer.** Agents exchange `TEAM_HANDOFF`,
-  `ROLE_VIEW`, and `TEAM_DECISION` capsules instead of ad hoc text.
-* **An audit surface.** `coordpy-capsule verify` can re-hash the
-  report and its artifacts from disk.
+* **A familiar ADK surface.** `Agent`, `Tool`, `Runner`, `Session`, `State`,
+  `Memory`, `Artifacts` — build an agent in a few lines and run it with a
+  `Runner` that streams events; gate on `is_final_response()`.
+* **Capsule audit for free.** Every model call, tool call, and handoff seals
+  into a typed, content-addressed, hash-chained capsule with provenance and a
+  budget — re-verifiable from bytes (`runner.verify_session(...)`).
+* **Replayable runs.** A run's sealed capsule view + manifest replays against
+  another model; identical inputs give an identical `root_cid`.
+* **Bounded context underneath.** The higher-level preset teams exchange
+  `TEAM_HANDOFF` / `ROLE_VIEW` / `TEAM_DECISION` capsules instead of ad hoc
+  text, and `coordpy-capsule verify` re-hashes any run from disk.
 
 This repo also includes the full experimental research ladder under
 `coordpy.__experimental__`, but the released product
@@ -66,8 +70,38 @@ heavier local setups: `coordpy[scientific]`, `coordpy[dl]`,
 
 ## Minimal quickstart
 
-The recommended front door is the `coordpy-team` CLI driving a
-curated preset against a configured backend:
+The front door is import-and-code with `coordpy.adk` — define an `Agent`,
+run it with a `Runner`, gate on `is_final_response()`:
+
+```python
+from coordpy.adk import Agent, InMemoryRunner
+from coordpy.llm_backend import backend_from_env
+
+assistant = Agent(
+    name="assistant",
+    model=backend_from_env(),
+    instruction="Answer the user; use tools when helpful.",
+)
+runner = InMemoryRunner(agent=assistant, app_name="demo")
+runner.session_service.create_session(
+    app_name="demo", user_id="u", session_id="s")
+
+for event in runner.run(user_id="u", session_id="s",
+                        new_message="What is CoordPy?"):
+    if event.is_final_response():
+        print(event.text)
+
+assert runner.verify_session("s")   # capsule audit, re-verified from bytes
+```
+
+No-network demos that need no model:
+[`examples/adk_quickstart.py`](../examples/adk_quickstart.py) and
+`python -m coordpy.adk.examples.research_assistant`.
+
+### Secondary surfaces
+
+The `coordpy-team` **CLI** drives curated preset teams (a secondary runtime
+surface):
 
 ```bash
 export COORDPY_BACKEND=ollama
@@ -83,7 +117,7 @@ coordpy-capsule verify-view \
     --view /tmp/desk-run/team_capsule_view.json
 ```
 
-Equivalent Python path:
+The higher-level **`AgentTeam`** preset path (Python):
 
 ```python
 from coordpy import AgentTeam, agent

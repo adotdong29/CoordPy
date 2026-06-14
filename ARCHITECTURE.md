@@ -44,6 +44,23 @@ do-not-overstate rule book see
 > **`coordpy-subject`** (or `python -m coordpy.subject`). The machine-
 > readable tier map is `docs/W144_COORDPY_SUBJECT_REGISTRY.json`. The
 > recommended door for *using* CoordPy remains **`coordpy-team`**.
+>
+> **Library front door (W145).** CoordPy's *product* surface is now a
+> Python-first **agent development kit (ADK)**: `coordpy.adk` exposes a
+> Google-ADK-shaped `Agent` / `Tool` / `Runner` / `Session` / `State` /
+> `Memory` / `Artifacts` surface (plus `SequentialAgent` / `ParallelAgent` /
+> `LoopAgent`), and every run automatically seals onto the capsule machinery
+> described below — `runner.session_capsule_view()` returns a re-verifiable
+> `coordpy.capsule_view.v1` chain and `runner.verify_session()` re-checks it
+> from bytes. The ADK surface is the recommended door for *building*; the CLI
+> (`coordpy-team` …) is a secondary runtime surface. This is **additive**: the
+> legacy `coordpy.Agent` / `create_team` surface is unchanged, and the capsule
+> runtime below is the guarantee underneath, not a replacement. The
+> product/programme split holds — **CoordPy = a Python-first ADK product;
+> Context Zero = the research programme** — so the "library-first" framing is
+> about the product surface only (the programme is still "not reducible to a
+> library"). See [`docs/RUNBOOK_W145.md`](docs/RUNBOOK_W145.md) and
+> [`docs/RESULTS_W145_COORDPY_ADK_RESHAPING_V1.md`](docs/RESULTS_W145_COORDPY_ADK_RESHAPING_V1.md).
 
 ## The Capsule Contract (SDK v3 centre of gravity)
 

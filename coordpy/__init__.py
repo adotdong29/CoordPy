@@ -1652,3 +1652,13 @@ __all__ = [
     "PRODUCT_REPORT_SCHEMA", "PRODUCT_REPORT_SCHEMA_V1",
     "CI_VERDICT_SCHEMA", "IMPORT_AUDIT_SCHEMA",
 ]
+
+# W145 — additive library-first ADK front door. ``coordpy.adk`` exposes a
+# Google-ADK-shaped surface (Agent / Tool / Runner / Session / State /
+# Memory / Artifacts) over the same capsule/provenance/replay machinery
+# above; every run seals a re-verifiable capsule trail automatically. It is
+# a *separate* object from the legacy product ``coordpy.Agent`` /
+# ``create_team`` (those are unchanged). Imported last so it builds on the
+# already-initialised stable submodules; it imports no research-ladder code.
+from . import adk  # noqa: E402
+__all__.append("adk")

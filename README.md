@@ -1,12 +1,15 @@
 # coordpy
 
-Python SDK and CLI for coordinating teams of LLM agents through
-**content-addressed, lifecycle-bounded context capsules** instead of
-ever-growing token-crammed prompts. Every agent handoff seals into a
-hash-chained capsule you can re-verify from disk, and every run produces
-a manifest you can replay against another model.
+A **Python-first agent development kit (ADK)** for building LLM agents and
+agent teams with a familiar `Agent` / `Tool` / `Runner` / `Session` /
+`State` / `Memory` / `Artifacts` mental model — that gives you
+**content-addressed capsule audit, provenance, and replay for free**
+underneath. You write import-and-code ADK; every model call, tool call, and
+handoff automatically seals into a hash-chained capsule you can re-verify
+from bytes and replay against another model. The CLI is a secondary runtime
+surface.
 
-PyPI: [`coordpy-ai`](https://pypi.org/project/coordpy-ai/) · import: `coordpy`
+PyPI: [`coordpy-ai`](https://pypi.org/project/coordpy-ai/) · import: `coordpy` · library front door: `coordpy.adk`
 
 ## Why CoordPy
 
@@ -63,11 +66,73 @@ The only required dependency is NumPy. Optional extras:
 | `[docker]` | `docker` | Docker-backed sandbox |
 | `[dev]` | `ruff`, `black`, `mypy`, `pytest`, `build`, `twine` | contributing |
 
-## Five-minute first run
+## Quickstart — your first agent (Python)
 
-The fastest way to see CoordPy do something useful is the bundled
-`coordpy-team` CLI driving a curated preset against a local Ollama
-endpoint or any OpenAI-compatible provider:
+The front door is import-and-code. Tools are plain typed functions (a
+trailing `tool_context` is auto-injected and hidden from the model); a turn
+is a stream of events; the answer is the one that satisfies
+`is_final_response()`:
+
+```python
+from coordpy.adk import Agent, InMemoryRunner, ToolContext
+from coordpy.llm_backend import backend_from_env
+
+def lookup_population(city: str, tool_context: ToolContext) -> dict:
+    """Return the population of a city."""
+    table = {"tokyo": 37_400_000, "paris": 11_100_000}
+    tool_context.state["last_city"] = city
+    pop = table.get(city.lower())
+    return ({"status": "success", "city": city, "population": pop}
+            if pop else {"status": "error", "error": f"unknown city {city!r}"})
+
+assistant = Agent(
+    name="geo_assistant",
+    model=backend_from_env(),          # any Ollama / OpenAI-compatible backend
+    instruction="Answer population questions; use the lookup tool.",
+    tools=[lookup_population],
+    output_key="answer",
+)
+
+runner = InMemoryRunner(agent=assistant, app_name="quickstart")
+runner.session_service.create_session(
+    app_name="quickstart", user_id="u1", session_id="s1")
+
+for event in runner.run(user_id="u1", session_id="s1",
+                        new_message="How big is Tokyo?"):
+    if event.is_final_response():
+        print(event.text)
+```
+
+Set a backend with the `COORDPY_*` environment variables (local Ollama or any
+OpenAI-compatible provider; see the env-var blocks below). For a
+**no-network** version that needs no model, run
+[`examples/adk_quickstart.py`](examples/adk_quickstart.py); for a small
+**multi-agent** app (researcher → writer, with tools + artifacts + memory),
+run `python -m coordpy.adk.examples.research_assistant`
+([source](coordpy/adk/examples/research_assistant.py)).
+
+### Capsule audit, provenance & replay — for free
+
+You wrote plain ADK code. Underneath, every step sealed into a
+content-addressed, hash-chained capsule trail you can verify from bytes:
+
+```python
+view = runner.session_capsule_view("s1")   # the coordpy.capsule_view.v1 chain
+assert runner.verify_session("s1")          # re-verified from bytes; tamper-evident
+print(runner.session_root_cid("s1"))        # deterministic for identical inputs
+```
+
+That is CoordPy's distinctive layer: an ADK that is auditable and replayable
+*by construction*. `coordpy.adk.Agent` is the primary surface; the
+higher-level preset teams and the CLI below build on the same capsule
+machinery. (`coordpy.adk.Agent` is additive and separate from the legacy
+`coordpy.Agent` / `create_team` surface, which is unchanged.)
+
+## Command-line interface (secondary)
+
+The CLI is a secondary runtime surface. The bundled `coordpy-team` command
+drives a curated preset against a local Ollama endpoint or any
+OpenAI-compatible provider:
 
 ```bash
 # Local Ollama (no API key needed)
@@ -110,7 +175,10 @@ coordpy-team compare \
 The compare report shows whether the per-turn prompt SHAs match
 and whether the synthesizer's parsed `ACTION` agrees across models.
 
-## Quickstart
+## Structured profile runs (`RunSpec` → `RunReport`)
+
+The original structured-research path is still stable and useful for
+reproducible, profile-driven evaluation runs:
 
 ```python
 import coordpy
@@ -259,6 +327,7 @@ public surface end-to-end against a real backend.
 
 | Surface | Stability |
 |---|---|
+| `coordpy.adk` ADK (library front door): `Agent`/`LlmAgent`, `Runner`, `InMemoryRunner`, `Session`, `State`, `BaseSessionService`/`InMemorySessionService`, `Artifact`/`InMemoryArtifactService`, `BaseMemoryService`/`InMemoryMemoryService`, `FunctionTool`, `ToolContext`/`CallbackContext`, `SequentialAgent`/`ParallelAgent`/`LoopAgent`, `Event`/`EventActions`, `ADK_SURFACE_SCHEMA` | Stable (v1) |
 | `coordpy` SDK: `RunSpec`, `run`, `RunReport`, `SweepSpec`, `run_sweep`, `CoordPyConfig`, `Agent`, `AgentTurn`, `ActionDecision`, `AgentTeam`, `TeamResult`, `agent`, `create_team`, `replay_team_result`, `presets`, `TEAM_RESULT_SCHEMA`, `profiles`, `report`, `ci_gate`, `import_data`, `extensions`, capsule primitives, schema constants, `OpenAICompatibleBackend`, `OllamaBackend`, `backend_from_env` | Stable |
 | Console scripts: `coordpy-team`, `coordpy-capsule`, `coordpy`, `coordpy-import`, `coordpy-ci` | Stable |
 | On-disk schemas: `coordpy.capsule_view.v1`, `coordpy.team_result.v1`, `coordpy.provenance.v1`, `phase45.product_report.v2` | Stable |
