@@ -2039,7 +2039,7 @@ combine:
   *operational* definitions, not answer hints. Mechanically
   verified by ``Phase64MagHintProtocolTests``.
 * **Live Ollama backend reachable** (R-64-LIVE-* cells). The
-  Mac-1 endpoint at ``192.168.12.191:11434`` (or operator
+  Mac-1 endpoint at ``<lan-host-A>:11434`` (or operator
   override) must be reachable with ``qwen2.5:14b-32k`` for the
   W17-1 anchor and ideally also ``qwen3.5:35b`` for the
   cross-model cell (W17-C-XMODEL). When unreachable, the live

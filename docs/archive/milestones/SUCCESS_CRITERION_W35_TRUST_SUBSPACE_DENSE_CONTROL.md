@@ -18,7 +18,7 @@ blockers are now concentrated:
   stronger magnitude axis**.  W34 showed real disagreement, not a
   systematic magnitude survey.
 - **W34-C-MULTI-HOST remains hardware-bounded**.  Mac 2
-  (`192.168.12.248`) has not joined the live topology.
+  (`<lan-host-B>`) has not joined the live topology.
 - **Old explicit capsule line + new dense-control/geometry line need
   one synthesis mechanism**, not parallel stories.
 
@@ -79,7 +79,7 @@ native latent transfer.
 | Gate | Description | Target |
 | --- | --- | --- |
 | **S1** | Stronger live trust magnitude | Bounded live probe observes at least one cross-host disagreement with a gold-correlated winner, or records honestly-null |
-| **S2** | Mac 2 | `192.168.12.248:11434/api/tags` succeeds, or the unreachable state is recorded with concrete timeout evidence |
+| **S2** | Mac 2 | `<lan-host-B>:11434/api/tags` succeeds, or the unreachable state is recorded with concrete timeout evidence |
 | **S3** | Token/context efficiency | W35 carries >= 10,000 structured bits per visible W35 token on the load-bearing R-82 bench |
 | **S4** | Stable-vs-experimental boundary | W35 remains under `__experimental__`; no stable runtime contract changes |
 | **S5** | Theory | Add at least one conditional sufficiency claim and one limitation/falsifier claim |

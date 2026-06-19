@@ -39,11 +39,11 @@ distinguish which axis (producer-side vs trust-side vs both vs
 neither) was load-bearing on each cell of each bank.
 
 This milestone also retracts the W37..W40 ``.101`` framing.
-``192.168.12.101`` is an Apple TV / AirPlay receiver
+``<lan-host-C>`` is an Apple TV / AirPlay receiver
 (``AirTunes/860.7.1`` banner on port 5000;
 locally-administered MAC ``36:1c:eb:dc:9a:04``), NOT a Mac
 running Ollama.  The honest live multi-host topology is
-``localhost`` + ``192.168.12.191`` -- two reachable Macs both
+``localhost`` + ``<lan-host-A>`` -- two reachable Macs both
 serving Ollama at ``temperature = 0`` on closed-vocabulary
 prompts.  See § 4 for the full retraction.
 
@@ -297,21 +297,21 @@ Artifact:
 ### 4.1 Lab topology retraction
 
 The W37 / W38 / W39 / W40 milestones described
-``192.168.12.101`` as a third Mac with a hung Ollama HTTP
+``<lan-host-C>`` as a third Mac with a hung Ollama HTTP
 listener ("TCP-up + HTTP-broken Ollama").  This framing is
 **retracted** at the W41 milestone.  Re-probing ``.101`` in the
 W41 milestone shows:
 
-- ``ping -c 2 -W 2 192.168.12.101``: 0% packet loss, 4-5 ms
+- ``ping -c 2 -W 2 <lan-host-C>``: 0% packet loss, 4-5 ms
   RTT.
-- ``nc -zv 192.168.12.101 22``: TCP SSH connect succeeds (auth
+- ``nc -zv <lan-host-C> 22``: TCP SSH connect succeeds (auth
   methods ``publickey``, ``password``, ``keyboard-interactive``).
-- ``nc -zv 192.168.12.101 11434``: TCP connect succeeds.
-- ``curl http://192.168.12.101:11434/``: "Empty reply from
+- ``nc -zv <lan-host-C> 11434``: TCP connect succeeds.
+- ``curl http://<lan-host-C>:11434/``: "Empty reply from
   server" (the Ollama-style empty response).
-- ``curl http://192.168.12.101:5000/``: ``HTTP/1.1 403
+- ``curl http://<lan-host-C>:5000/``: ``HTTP/1.1 403
   Forbidden`` with header ``Server: AirTunes/860.7.1``.
-- ARP entry: ``? (192.168.12.101) at 36:1c:eb:dc:9a:4 on en0``
+- ARP entry: ``? (<lan-host-C>) at 36:1c:eb:dc:9a:4 on en0``
   (locally-administered MAC: the second nibble of the first
   byte is ``6`` = locally administered; this is not an Apple
   Mac OUI).
@@ -334,7 +334,7 @@ evidence" anchors remain valid (those used ``localhost`` +
 ``.191`` directly via the W39-INFRA-1 fallback path, which
 correctly avoided ``.101``).
 
-``192.168.12.248`` is recorded as gone (per user instruction:
+``<lan-host-B>`` is recorded as gone (per user instruction:
 "ignore .248, its gone").
 
 ### 4.2 Honest live multi-host topology
@@ -343,11 +343,11 @@ The honest live multi-host topology going forward is the
 two-Mac pair:
 
 - ``localhost`` (Mac 1, ``Qunfengs-MBP.lan``,
-  ``192.168.12.157``) -- Ollama models inventoried:
+  ``<lan-host>``) -- Ollama models inventoried:
   ``gemma2:9b``, ``qwen2.5:0.5b``, ``qwen2.5-coder:7b``,
   ``deepseek-r1:7b``, ``llama3.1:8b``, ``mixtral:8x7b``
   (46.7B), ``lexi-coder``, ``llama-3-8b-lexi-uncensored``.
-- ``192.168.12.191`` (Mac 2, ``HSC136047-MAC.lan``) --
+- ``<lan-host-A>`` (Mac 2, ``HSC136047-MAC.lan``) --
   Ollama models inventoried: ``qwen2.5:14b``,
   ``qwen2.5:14b-32k``, ``qwen2.5-coder:14b``,
   ``qwen2.5-coder:14b-32k``, ``qwen3.5:35b`` (36.0B MoE).
@@ -358,7 +358,7 @@ agreed answers across architectures:
 
 - ``localhost gemma2:9b``: prompt "What is 2+2? Answer with
   one word." -> "Four".
-- ``192.168.12.191 qwen2.5:14b``: same prompt -> "Four".
+- ``<lan-host-A> qwen2.5:14b``: same prompt -> "Four".
 
 This sharpens the empirical-suggestive
 ``W37-C-LIVE-TRUNCATION-RECOVERY`` /
@@ -517,7 +517,7 @@ least one new genuinely uncompromised host pool would let the
 W40 quorum size be raised beyond ``quorum_min``, which would
 defeat the ``W41-L-COMPOSITE-COLLUSION-CAP`` collusion attack
 at the capsule layer.  Currently bounded by the lab's two-Mac
-topology (``localhost`` + ``192.168.12.191``); ``.248`` is
+topology (``localhost`` + ``<lan-host-A>``); ``.248`` is
 gone; ``.101`` is an Apple TV (not a Mac); a third genuine Mac
 is not available in this environment.
 

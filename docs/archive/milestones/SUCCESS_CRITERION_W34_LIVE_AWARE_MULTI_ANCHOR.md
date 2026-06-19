@@ -13,7 +13,7 @@ forward:
 
 * **W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE** — open; the live xLLM
   pilot was bounded by infra (the W33 milestone diagnosed
-  qwen3.5:35b on 192.168.12.191 as "model not loaded", but a fresh
+  qwen3.5:35b on <lan-host-A> as "model not loaded", but a fresh
   ``/api/tags`` curl on 2026-05-01 confirms the model IS in fact
   loaded — the real W33 infra failure was timeout-budget /
   prompt-template, NOT model availability).
@@ -137,7 +137,7 @@ multi-anchor adjudication.
 | Gate | Description | Pass iff |
 |---|---|---|
 | **S1** | Cross-architecture live trust-calibration evidence on R-81-XLLM-LIVE-MULTI-ANCHOR with the W34 preflight discipline | At least one host on at least one prompt class returns gold-correlated agreement byte-for-byte across two independent runs at temp 0; if honestly null, ``W34-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE`` is the new live-magnitude conjecture |
-| **S2** | Mac 2 returning OR honest fallback | 192.168.12.248 reachable AND fresh ``/api/tags`` succeeds (PASS), or honestly recorded as 29th milestone with explicit Mac 2 still-unavailable note (HONESTLY-NULL acceptable) |
+| **S2** | Mac 2 returning OR honest fallback | <lan-host-B> reachable AND fresh ``/api/tags`` succeeds (PASS), or honestly recorded as 29th milestone with explicit Mac 2 still-unavailable note (HONESTLY-NULL acceptable) |
 | **S3** | Trust precision = 1.000 on R-81-DOUBLE-ANCHOR-COMPROMISE across 5/5 seeds | min_trust_prec_w34 = 1.000 |
 | **S4** | Token overhead bound ≤ 2 token/cell vs W33 | max_overhead_w34 ≤ 2; mean ≤ 2 |
 | **S5** | At least one earlier conjecture sharpened OR discharged | Either ``W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE`` discharged on a corrected-infra regime, OR a new explicit limitation theorem is proved (``W34-L-MULTI-ANCHOR-CAP``: when all K anchors are simultaneously compromised, no multi-anchor mechanism can recover at the capsule layer) |

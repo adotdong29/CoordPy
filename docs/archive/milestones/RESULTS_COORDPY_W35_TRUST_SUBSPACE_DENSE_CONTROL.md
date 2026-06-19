@@ -159,8 +159,8 @@ All numbers below are mean/min/max-identical across seeds
 Mac/live status checked on 2026-05-02:
 
 - `localhost:11434` reachable; 8 Ollama model tags advertised.
-- `192.168.12.191:11434` reachable; 5 Ollama model tags advertised.
-- `192.168.12.248:11434` still timed out on `/api/tags`.
+- `<lan-host-A>:11434` reachable; 5 Ollama model tags advertised.
+- `<lan-host-B>:11434` still timed out on `/api/tags`.
 
 The full W34 xLLM pilot was started but exceeded the practical
 turn-time budget after roughly nine minutes and was stopped.  The

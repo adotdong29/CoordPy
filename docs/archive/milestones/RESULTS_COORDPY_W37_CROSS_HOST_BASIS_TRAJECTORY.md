@@ -196,10 +196,10 @@ Artifact:
 Fresh preflight on 2026-05-02:
 
 - `localhost:11434`: reachable; 8 model tags advertised.
-- `192.168.12.191:11434`: reachable; 5 model tags advertised
+- `<lan-host-A>:11434`: reachable; 5 model tags advertised
   (qwen2.5:14b, qwen2.5:14b-32k, qwen2.5-coder:14b-32k,
   qwen2.5-coder:14b, qwen3.5:35b).
-- `192.168.12.248:11434`: `/api/tags` timed out at 5 seconds
+- `<lan-host-B>:11434`: `/api/tags` timed out at 5 seconds
   (Mac 2 ARP-incomplete for the **30th milestone in a row**).
 
 `phase81_xllm_preflight_only.py` recorded 9/10 model-host
@@ -212,7 +212,7 @@ Bounded W37 cross-host trajectory probe
 (`phase84_xllm_trajectory_probe.py`):
 
 - Hosts: local `gemma2:9b` and remote `qwen2.5:14b` on
-  `192.168.12.191`.
+  `<lan-host-A>`.
 - 8 gold-verifiable one-word prompts at temperature 0.
 - 8/8 calls responsive on both hosts.
 - 8/8 cross-host **anchored agreements** (both hosts emit the

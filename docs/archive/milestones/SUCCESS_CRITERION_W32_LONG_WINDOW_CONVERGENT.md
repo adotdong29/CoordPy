@@ -367,7 +367,7 @@ tamper detection beyond the union of W31's per-component CIDs.
 
 Live LLM probes from two reachable hosts on a gold-verifiable
 disagreement-driven regime (gemma2:9b on localhost + qwen2.5:14b on
-192.168.12.191).  Status:
+<lan-host-A>).  Status:
 
 * **PASS** if the run records ``n_cross_host_probe_calls > 0`` AND
   the controller observes ≥ 1 cell with cross-architecture LLM
@@ -386,12 +386,12 @@ disagreement-driven regime (gemma2:9b on localhost + qwen2.5:14b on
 
 ### S2 — Mac 2 returning OR honest fallback
 
-* PASS if 192.168.12.248 is reachable AND a backend on it
+* PASS if <lan-host-B> is reachable AND a backend on it
   participates in the R-79-XLLM-LIVE-GOLD ensemble.
 * HONESTLY-NULL otherwise.  When null, the bench MUST honestly
   report Mac 2 ARP status (27th milestone or whichever count) and
   continue with the strongest available topology
-  (localhost + 192.168.12.191).
+  (localhost + <lan-host-A>).
 
 ### S3 — Trust precision = 1.000 on the long-window bench
 

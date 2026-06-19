@@ -104,7 +104,7 @@
     "bank": "phase61",
     "bank_replicates": 2,
     "bank_seed": 11,
-    "endpoint": "http://192.168.12.191:11434",
+    "endpoint": "http://<lan-host-A>:11434",
     "extractor": "ollama",
     "inbox_capacity": 8,
     "magnitude_hinted_schema": true,
@@ -117,7 +117,7 @@
   },
   "extractor_stats": {
     "T_decoder": 14,
-    "endpoint": "http://192.168.12.191:11434",
+    "endpoint": "http://<lan-host-A>:11434",
     "extractor": "ollama",
     "magnitude_hinted_schema": true,
     "model": "qwen3.5:35b",

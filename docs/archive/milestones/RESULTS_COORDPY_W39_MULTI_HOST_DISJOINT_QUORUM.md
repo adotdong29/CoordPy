@@ -237,9 +237,9 @@ Artifact:
 
 ### 4.1 Lab topology resolution (W38-C-MULTI-HOST partial discharge)
 
-The historical Mac-2 endpoint (``192.168.12.248``) has been
+The historical Mac-2 endpoint (``<lan-host-B>``) has been
 ARP-incomplete for the **31st milestone in a row**.  This milestone
-identified ``192.168.12.101`` as the fresh candidate for the third
+identified ``<lan-host-C>`` as the fresh candidate for the third
 physical host role and discharged the stale repo pin on ``.248``
 in the W39 live xllm probe.
 
@@ -295,7 +295,7 @@ unreachable, the probe swaps to ``localhost`` running
 trajectory's ``gemma2:9b``), so the live K=2 quorum becomes:
 
 - ``mac_off_cluster_a``: ``localhost`` running ``llama3.1:8b``;
-- ``mac_quorum_b``: ``192.168.12.191`` running
+- ``mac_quorum_b``: ``<lan-host-A>`` running
   ``qwen2.5-coder:14b-32k``.
 
 These are two **physically distinct hosts**, each running a
@@ -468,7 +468,7 @@ uncompromised host pool would let the W39 quorum size be raised
 beyond ``quorum_min``, defeating the
 ``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP`` collusion attack at
 the capsule layer.  Currently partially discharged at the topology
-layer via ``192.168.12.101`` (preflight-reachable on cold contact)
+layer via ``<lan-host-C>`` (preflight-reachable on cold contact)
 but still open at the live-inference layer (``W39-INFRA-1``).
 
 **Status**: conjectural; partially discharged at the topology
@@ -516,8 +516,8 @@ Release readiness improved because:
   symbol is exported under ``__experimental__`` and the stable
   ``RunSpec → run report`` runtime contract is byte-for-byte
   unchanged.
-- The historical Mac-2 stale repo pin (``192.168.12.248``) has been
-  discharged in favour of ``192.168.12.101`` as the reachable third
+- The historical Mac-2 stale repo pin (``<lan-host-B>``) has been
+  discharged in favour of ``<lan-host-C>`` as the reachable third
   physical host candidate; the W39 live xllm probe accepts
   ``COORDPY_OLLAMA_URL_MAC2`` env-var override and falls through a
   candidate list including ``.101`` before declaring "Mac 2

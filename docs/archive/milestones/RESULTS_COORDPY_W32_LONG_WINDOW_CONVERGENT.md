@@ -24,7 +24,7 @@ total rejection rate** across five named tampers per ratified cell
 out-of-range injections).  The R-79-XLLM-LIVE-GOLD probe records the
 **first measured live cross-architecture LLM gold-verifiable
 agreement at temperature 0 in the programme**: gemma2:9b on
-localhost vs qwen2.5:14b on 192.168.12.191 **agree on 19/20 = 0.950
+localhost vs qwen2.5:14b on <lan-host-A> **agree on 19/20 = 0.950
 of gold-verifiable structured-decision prompts at temp 0**, which is
 the honest converse of W31's R-78-XLLM-LIVE result (mostly-
 disagreement on operational-decision prompts) — together they
@@ -113,7 +113,7 @@ W32 closes:
 
 W32 does NOT close W31-C-NATIVE-LATENT (architecture-dependent; out
 of scope) or W31-C-MULTI-HOST (Mac 2 hardware-bounded; **27th
-consecutive milestone** with 192.168.12.248 ARP-incomplete; ping
+consecutive milestone** with <lan-host-B> ARP-incomplete; ping
 100 % packet loss; port 11434 unreachable).
 
 W32 does NOT claim transformer-internal KV sharing.  W32 does NOT
@@ -249,7 +249,7 @@ W32 is therefore **56 enumerated failure modes**.
 | **R-79-NO-CHANGE-POINT** | W32-Λ-no-change-point falsifier | chain_shared (no drift) | full W32 stack on stationary regime |
 | **R-79-FROZEN-EWMA** | W32-Λ-frozen-ewma falsifier (alpha=1.0) | drift_recover | EWMA reduces to "latest obs"; CUSUM disabled to isolate alpha effect |
 | **R-79-MIS-CORRELATED-GOLD** | W32-Λ-mis-correlated-gold falsifier | drift_recover | gold-correlation map points to PARTIAL partition (wrong) |
-| **R-79-XLLM-LIVE-GOLD** | S1/S2 best-effort live cross-architecture on gold-verifiable prompts | live two-host probe | gemma2:9b localhost + qwen2.5:14b 192.168.12.191; 20 gold-verifiable prompts at temp 0 |
+| **R-79-XLLM-LIVE-GOLD** | S1/S2 best-effort live cross-architecture on gold-verifiable prompts | live two-host probe | gemma2:9b localhost + qwen2.5:14b <lan-host-A>; 20 gold-verifiable prompts at temp 0 |
 
 ---
 
@@ -432,8 +432,8 @@ Topology probe (live, 2026-05-01):
 | Host | URL | Selected model | Architecture family |
 |---|---|---|---|
 | `localhost` | `http://localhost:11434` | `gemma2:9b` | Gemma2 |
-| `192.168.12.191` | `http://192.168.12.191:11434` | `qwen2.5:14b` | Qwen2.5 |
-| `192.168.12.248` | `http://192.168.12.248:11434` | (unreachable; ARP-incomplete; **27th consecutive milestone**) | — |
+| `<lan-host-A>` | `http://<lan-host-A>:11434` | `qwen2.5:14b` | Qwen2.5 |
+| `<lan-host-B>` | `http://<lan-host-B>:11434` | (unreachable; ARP-incomplete; **27th consecutive milestone**) | — |
 
 20 gold-verifiable structured-decision prompts at temperature 0,
 seed 0 on both hosts:
@@ -510,7 +510,7 @@ validated).
 | Gate | Description | Status |
 |---|---|---|
 | **S1** | Cross-architecture live gold evidence on R-79-XLLM-LIVE-GOLD | **HONESTLY-NULL** — 19/20 = 0.950 agreement at temp 0 on gold-verifiable prompts; the unique disagreement is gold-correlation null (neither host is correct on the disagreed prompt).  **First measured live cross-architecture LLM gold-verifiable agreement at temp 0 in the programme**, characterising the prompt-class-dependent cross-architecture disagreement frontier (operational prompts disagree at 0.250; gold-verifiable agree at 0.950). |
-| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — 192.168.12.248 ARP-incomplete (**27th consecutive milestone**); ping 100 % packet loss; port 11434 unreachable. Two reachable hosts (localhost + 192.168.12.191) suffice for the live gold-verifiable probe. |
+| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — <lan-host-B> ARP-incomplete (**27th consecutive milestone**); ping 100 % packet loss; port 11434 unreachable. Two reachable hosts (localhost + <lan-host-A>) suffice for the live gold-verifiable probe. |
 | **S3** | Trust precision = 1.000 on long-window bench | **PASS** — `min_trust_precision_w32 = 1.000` across all R-79 seed sweeps. |
 | **S4** | Token-overhead bound ≤ 1 token/cell vs W31 | **PASS** — `max_overhead_w32_vs_w31_per_cell = 1`, `mean_overhead_w32_vs_w31_per_cell = 0.969 ≤ 1.0` across all R-79 sub-banks; cumulative ≤ 4 tokens vs W28. |
 | **S5** | At least one earlier conjecture sharpened or discharged | **PASS** — **W31-C-LONG-WINDOW-CONVERGENCE** discharged on the scaling-stability axis (H7); **W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE** sharpened on the prompt-class-dependent agreement frontier (S1: gold-verifiable agree at 0.950, operational disagree at 0.250). |
@@ -763,9 +763,9 @@ validated).
   theorem bounds Δ ≤ 1/16 on cycle-capped dispatcher regimes.  The
   strict-gain claim is honestly retained as **W32-C-LONG-WINDOW-
   STRICT-GAIN** on a regime that exceeds the cycle-cap.
-* W32 does NOT bring up Mac 2.  192.168.12.248 remains
+* W32 does NOT bring up Mac 2.  <lan-host-B> remains
   ARP-incomplete (**27th consecutive milestone**, ping 100% packet
-  loss).  The two reachable hosts (localhost + 192.168.12.191)
+  loss).  The two reachable hosts (localhost + <lan-host-A>)
   suffice for the live gold-verifiable probe.
 * W32 does NOT close `W31-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE`
   on the gold-correlation axis.  The S1 result records 19/20 = 0.950

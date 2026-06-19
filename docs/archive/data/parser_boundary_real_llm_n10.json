@@ -1,7 +1,7 @@
 {
   "schema": "coordpy.parser_boundary_real.v1",
   "n_instances": 10,
-  "endpoint": "http://192.168.12.191:11434",
+  "endpoint": "http://<lan-host-A>:11434",
   "model_tags": [
     "qwen2.5:14b-32k",
     "qwen3.5:35b"

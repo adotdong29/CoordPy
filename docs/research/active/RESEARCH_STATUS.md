@@ -7120,7 +7120,7 @@ sharper in adversary cost).
 
 * **W42 cross-host paraphrase-invariance live probe (2026-05-03).**
   At temperature 0 on the two-Mac topology (localhost gemma2:9b
-  + 192.168.12.191 qwen2.5:14b), K=4 paraphrases of one
+  + <lan-host-A> qwen2.5:14b), K=4 paraphrases of one
   closed-vocabulary arithmetic prompt produce 4/4 paraphrase-
   invariant cross-host gold-correlated agreement on both hosts;
   cross-host normalised agreement = 1.000; within-host
@@ -7241,14 +7241,14 @@ analog of all previous capsule-layer limitation theorems).
   ``integrated_producer_only`` and preserves W40 byte-for-W39
   on the answer; delta = 0 across 5/5 seeds.
 
-* **W41-INFRA-1.**  ``192.168.12.101`` is identified as an
+* **W41-INFRA-1.**  ``<lan-host-C>`` is identified as an
   Apple TV / AirPlay receiver (``HTTP/1.1 403 Forbidden`` with
   ``Server: AirTunes/860.7.1`` on port 5000; locally-administered
   MAC ``36:1c:eb:dc:9a:04``), NOT a Mac running Ollama.  The
   W37..W40 "TCP-up + HTTP-broken Ollama Mac" framing for
   ``.101`` is **retracted** at the W41 milestone.  The honest
   live multi-host topology is the two-Mac pair (``localhost`` +
-  ``192.168.12.191``).  ``192.168.12.248`` is recorded as gone
+  ``<lan-host-A>``).  ``<lan-host-B>`` is recorded as gone
   (per user instruction).
 
 * **RC2 declared.**  H1..H12 + S3 of the W41 success criterion
@@ -7326,7 +7326,7 @@ is the new proved-conditional
   ``min_response_signature_probes`` member probes carry response
   signatures, W40 reduces to W39 byte-for-byte; delta = 0.
 
-* **W40-INFRA-1.**  ``192.168.12.101`` re-probed (2026-05-03):
+* **W40-INFRA-1.**  ``<lan-host-C>`` re-probed (2026-05-03):
   ping 0% packet loss, TCP 11434 + 22 connect; Ollama HTTP
   listener still returns "Empty reply / Connection reset"; SSH
   credentials unavailable.  Honest verdict: TCP-up + HTTP-broken;
@@ -7412,9 +7412,9 @@ W30 + W31 + W32 + W33 + W34 + W35 + W36 + W37 + W38 + W39 =
 **154 enumerated failure modes**.
 
 **Lab topology resolution / live multi-Mac status**: The
-historical Mac-2 endpoint (``192.168.12.248``) has been
+historical Mac-2 endpoint (``<lan-host-B>``) has been
 ARP-incomplete for the **31st milestone in a row**.  This
-milestone identified ``192.168.12.101`` as the reachable third
+milestone identified ``<lan-host-C>`` as the reachable third
 physical host candidate, **partially discharging
 ``W38-C-MULTI-HOST`` at the topology layer**: ``.101`` was
 preflight-OK on cold contact, ``ping`` reported ~3.5 ms RTT,
@@ -7543,8 +7543,8 @@ tested.  Cumulative enumerated trust boundary across W22 + W29 +
 W30 + W31 + W32 + W33 + W34 + W35 + W36 + W37 + W38 =
 **140 enumerated failure modes**.
 
-**Live / two-Mac status**: Local Ollama and `192.168.12.191:11434`
-are reachable.  `192.168.12.248:11434` still times out on `/api/tags`
+**Live / two-Mac status**: Local Ollama and `<lan-host-A>:11434`
+are reachable.  `<lan-host-B>:11434` still times out on `/api/tags`
 (Mac 2 ARP-incomplete for the **31st milestone in a row**; ``ping``
 reports "Host is down").  The bounded W38 cross-source consensus
 probe used local ``gemma2:9b`` and remote ``qwen2.5:14b`` as
@@ -7641,8 +7641,8 @@ trajectory state, not hidden-state transfer.
 Cumulative enumerated trust boundary across W22 + W29 + W30 + W31 +
 W32 + W33 + W34 + W35 + W36 + W37 = **126 enumerated failure modes**.
 
-**Live / two-Mac status**: Local Ollama and `192.168.12.191:11434`
-are reachable.  `192.168.12.248:11434` still times out on `/api/tags`
+**Live / two-Mac status**: Local Ollama and `<lan-host-A>:11434`
+are reachable.  `<lan-host-B>:11434` still times out on `/api/tags`
 (Mac 2 ARP-incomplete for the **30th milestone in a row**).  The
 bounded W37 cross-host trajectory probe on 2026-05-02 across local
 `gemma2:9b` and remote `qwen2.5:14b` produced **8/8 responsive
@@ -7723,8 +7723,8 @@ not hidden-state transfer.
 enumerated trust boundary across W22 + W29 + W30 + W31 + W32 + W33 +
 W34 + W35 + W36 = **112 enumerated failure modes**.
 
-**Live / two-Mac status**: Local Ollama and `192.168.12.191:11434`
-are reachable.  `192.168.12.248:11434` still times out on `/api/tags`.
+**Live / two-Mac status**: Local Ollama and `<lan-host-A>:11434`
+are reachable.  `<lan-host-B>:11434` still times out on `/api/tags`.
 The bounded W36 two-reachable-host probe on 2026-05-02 across local
 `qwen2.5:0.5b` and remote `qwen2.5:14b` yielded 10/10 responsive
 probes, 4/5 cross-host disagreements, and 4/4 gold-correlated
@@ -7803,8 +7803,8 @@ state transfer.
 Cumulative enumerated trust boundary across W22 + W29 + W30 + W31 +
 W32 + W33 + W34 + W35 = **98 enumerated failure modes**.
 
-**Live / two-Mac status**: Local Ollama and `192.168.12.191:11434`
-are reachable.  `192.168.12.248:11434` still times out on `/api/tags`
+**Live / two-Mac status**: Local Ollama and `<lan-host-A>:11434`
+are reachable.  `<lan-host-B>:11434` still times out on `/api/tags`
 despite the user reopening a Mac.  A bounded two-host fallback probe
 on 2026-05-02 across local `qwen2.5:0.5b` and remote `qwen2.5:14b`
 yielded 10/10 responsive probes, 3/5 cross-host disagreements, and
@@ -7915,10 +7915,10 @@ transplant.
 * **W33-INFRA-1 + W33-INFRA-2 closure**.  The W34 milestone records
   an **honest empirical correction** of the W33 infra diagnosis:
   the W33 milestone called this "qwen3.5:35b model not loaded on
-  192.168.12.191" but a fresh ``/api/tags`` curl on 2026-05-01
+  <lan-host-A>" but a fresh ``/api/tags`` curl on 2026-05-01
   confirms the model IS loaded (along with qwen2.5:14b,
   qwen2.5:14b-32k, qwen2.5-coder:14b-32k, qwen2.5-coder:14b on
-  192.168.12.191).  The real W33 infra failure was 120 s timeout
+  <lan-host-A>).  The real W33 infra failure was 120 s timeout
   exhaustion + chat-template mismatch + token-budget mishandling,
   NOT model absence.  W34 ships:
 
@@ -7961,9 +7961,9 @@ W22's, W29's, W30's, W31's, W32's, W33's 14-mode sets.  Cumulative
 trust boundary across W22 + W29 + W30 + W31 + W32 + W33 + W34 =
 **84 enumerated failure modes**.
 
-**Mac 2** (192.168.12.248) **still unreachable** (29th milestone
+**Mac 2** (<lan-host-B>) **still unreachable** (29th milestone
 in a row, ping 100% packet loss); the other reachable host
-(192.168.12.191) was used for the live R-81-XLLM-LIVE-PILOT probe
+(<lan-host-A>) was used for the live R-81-XLLM-LIVE-PILOT probe
 with multiple model+host pairings (gemma2:9b, llama3.1:8b,
 mixtral:8x7b on localhost; qwen2.5:14b, qwen3.5:35b on the remote)
 — a wider scale-and-architecture grid than W31/W32/W33.
@@ -8101,7 +8101,7 @@ transplant.
   non-anchor oracles' EWMAs recover after the transient.  W33 ties
   W21 (Δ=0.000); the regression did NOT materialise.
 * **R-80-XLLM-LIVE-TRUST (S1 best-effort).**  Live two-host probe
-  with mixtral:8x7b on localhost vs qwen3.5:35b on 192.168.12.191
+  with mixtral:8x7b on localhost vs qwen3.5:35b on <lan-host-A>
   at temperature 0 on 20 trust-calibration prompts (5 multi-step
   reasoning, 5 specialised factoid, 5 ambiguous syntax, 5
   trust-calibration where one host is systematically expected to
@@ -8122,9 +8122,9 @@ Trust precision = 1.000 across every R-80 sub-bank where W33
 ratifies. Backward-compat preserved byte-for-byte on the
 trivial-trust-ewma anchor: **31/31 W33 unit tests + 446/446
 phase69-80 regression + 133/133 wider coordpy suite = 610 tests pass**.
-Mac 2 (192.168.12.248) **still unreachable** (28th milestone in a
+Mac 2 (<lan-host-B>) **still unreachable** (28th milestone in a
 row, ping 100% packet loss); the other reachable host
-(192.168.12.191) was used for the live R-80-XLLM-LIVE-TRUST probe
+(<lan-host-A>) was used for the live R-80-XLLM-LIVE-TRUST probe
 with mixtral:8x7b + qwen3.5:35b (a deeper architecture + scale split
 than the W31/W32 pair gemma2:9b + qwen2.5:14b).
 Stable-vs-experimental boundary tightened: ``__experimental__``
@@ -8227,7 +8227,7 @@ runtime ground-truth oracle.
   ``n_gold_routes_fired = 0`` across 5/5 seeds.  The wrong gold map
   cannot fire ⇒ W32 ties W31.
 * **R-79-XLLM-LIVE-GOLD (S1 best-effort).**  gemma2:9b on localhost
-  vs qwen2.5:14b on 192.168.12.191 **agree on 19/20 = 0.950 of
+  vs qwen2.5:14b on <lan-host-A> **agree on 19/20 = 0.950 of
   gold-verifiable structured-decision prompts at temperature 0**
   across arithmetic (5/5), syntax (5/5), factoid (5/5),
   disambiguation (4/5; the unique disagreement D5 has neither host
@@ -8258,9 +8258,9 @@ Trust precision = 1.000 across every R-79 sub-bank where W32
 ratifies. Backward-compat preserved byte-for-byte on the
 trivial-long-window anchor: **45/45 W32 unit tests + 414/414
 phase69-79 regression + 77/77 wider coordpy suite = 536 tests pass**.
-Mac 2 (192.168.12.248) **still unreachable** (27th milestone in a
+Mac 2 (<lan-host-B>) **still unreachable** (27th milestone in a
 row, ping 100% packet loss); the other reachable host
-(192.168.12.191) was used for the live R-79-XLLM-LIVE-GOLD probe.
+(<lan-host-A>) was used for the live R-79-XLLM-LIVE-GOLD probe.
 Stable-vs-experimental boundary tightened: ``__experimental__``
 tuple extended with W32 symbols; SDK_VERSION ``coordpy.sdk.v3.33``;
 pyproject.toml ``0.5.6``.
@@ -8342,7 +8342,7 @@ runtime KV transplant.
   across 5/5 seeds.  Isolates the contribution of the adaptive
   threshold axis.
 * **R-78-XLLM-LIVE (S1 best-effort).**  gemma2:9b on localhost
-  vs qwen2.5:14b on 192.168.12.191 systematically **disagree on
+  vs qwen2.5:14b on <lan-host-A> systematically **disagree on
   2/8 = 0.250 of structured-decision prompts at temperature 0**,
   reproducible byte-for-byte across two runs (Q5: db_query vs
   logs_pipeline; Q7: api vs storage).  **First measured live
@@ -8363,9 +8363,9 @@ Trust precision = 1.000 across every R-78 sub-bank where W31
 ratifies. Backward-compat preserved byte-for-byte on the trivial-
 online anchor: **437/437 focused regression pass** (was 357 in
 v3.31; now +41 W31 unit tests + 39 unchanged + 1 unchanged).
-68/68 wider coordpy suite passes.  Mac 2 (192.168.12.248) **still
+68/68 wider coordpy suite passes.  Mac 2 (<lan-host-B>) **still
 unreachable** (26th milestone in a row, ping 100% packet loss);
-the other reachable host (192.168.12.191) was used for the live
+the other reachable host (<lan-host-A>) was used for the live
 R-78-XLLM-LIVE probe.  Stable-vs-experimental boundary tightened:
 ``__experimental__`` tuple extended with W31 symbols; SDK_VERSION
 ``coordpy.sdk.v3.32``; pyproject.toml ``0.5.5``.
@@ -8450,7 +8450,7 @@ fresh axis (no overlap with any W22..W29 verifier).
   W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE** on the
   capsule-layer-routing axis (the residual frontier is a regime
   where live LLMs systematically disagree at temperature 0; on
-  R-77-CROSS-HOST-LIVE on localhost gemma2:9b + 192.168.12.191
+  R-77-CROSS-HOST-LIVE on localhost gemma2:9b + <lan-host-A>
   qwen2.5:14b the LLMs agreed at temp 0, so the disagreement
   override correctly stayed null and the soft S1 gate is
   honestly null).
@@ -8485,9 +8485,9 @@ in basis history ⇒ no cram amplification).
 Trust precision = 1.000 across every R-77 sub-bank where W30
 ratifies. Backward-compat preserved byte-for-byte on the trivial-
 calibration anchor: **357/357 focused regression pass** (273/273
-phase69-77 + 84/84 wider coordpy suite). Mac 2 (192.168.12.248)
+phase69-77 + 84/84 wider coordpy suite). Mac 2 (<lan-host-B>)
 still unreachable (**25th milestone in a row**); the *other*
-reachable host (192.168.12.191) was used for the live
+reachable host (<lan-host-A>) was used for the live
 R-77-CROSS-HOST-LIVE bench. Stable-vs-experimental boundary
 tightened: ``__experimental__`` tuple extended with W30 symbols;
 SDK_VERSION ``coordpy.sdk.v3.31``; pyproject.toml ``0.5.4``.
@@ -8545,7 +8545,7 @@ any W22..W28 verifier.
   best (W28) makes mistakes.
 * **R-76-CROSS-HOST-LIVE (S1/S2/S3).** Same H6 +0.250 correctness
   gain holds on the live two-host LLM topology (localhost gemma2:9b
-  + 192.168.12.191 qwen2.5:14b); 16 cross-host probe calls; 710 LAN
+  + <lan-host-A> qwen2.5:14b); 16 cross-host probe calls; 710 LAN
   bytes; ``trust_precision_w29 = 1.000``. The structural partition
   signal alone drives the gain — the LLM ensemble agreed on every
   cell at temperature 0, so the cross-host variance witness was
@@ -8590,9 +8590,9 @@ Trust precision = 1.000 across every R-76 sub-bank where W29
 ratifies. Backward-compat preserved byte-for-byte: **935/935 + 6
 subtests pass** across W3 capsules / W4 team / W12-W15 packing /
 W18-W21 explicit-capsule / W22-W29 dense-control / public API /
-runtime / LLM backend. Mac 2 (192.168.12.248) still unreachable
+runtime / LLM backend. Mac 2 (<lan-host-B>) still unreachable
 (**24th milestone in a row**); the *other* reachable host
-(192.168.12.191) is the second host of the live topology. Stable-
+(<lan-host-A>) is the second host of the live topology. Stable-
 vs-experimental boundary tightened: ``__experimental__`` tuple
 extended with W29 symbols; SDK_VERSION ``coordpy.sdk.v3.30``;
 pyproject.toml ``0.5.3``.
@@ -8633,7 +8633,7 @@ tampering) — none of which existed in any W22..W27 verifier.
   ``quorum_recompute_mismatch``; correctness preserved byte-for-byte.
 * **R-75-CROSS-HOST-LIVE (FIRST CROSS-HOST EVIDENCE IN 23
   MILESTONES).** Live LLM probe table on `localhost`
-  (gemma2:9b, Gemma2 family) + `192.168.12.191` (qwen2.5:14b,
+  (gemma2:9b, Gemma2 family) + `<lan-host-A>` (qwen2.5:14b,
   Qwen2.5 family); n=16 cells; **128 cross-host probe calls**;
   **5592 LAN bytes**; ensemble ratifies 10/16 cells with **real
   LLM disagreement on 6/16**; trust precision 1.000; W28
@@ -8655,9 +8655,9 @@ W28-C-CROSS-HOST-VARIANCE — open conjecture).
 Backward-compat preserved byte-for-byte: **534/534** focused
 regression covering W3 capsules / W4 team / W12-W15 packing /
 W18-W21 explicit-capsule / W22-W28 dense-control / public API /
-runtime / LLM backend. Mac 2 (192.168.12.248) still unreachable
+runtime / LLM backend. Mac 2 (<lan-host-B>) still unreachable
 (**23rd milestone in a row**); the *other* reachable host
-(192.168.12.191) has been recharacterised as the second host of
+(<lan-host-A>) has been recharacterised as the second host of
 the topology. Stable-vs-experimental boundary tightened: explicit
 ``vision_mvp.coordpy.__experimental__`` tuple (41 symbols);
 SDK_VERSION ``coordpy.sdk.v3.29``; pyproject.toml 0.5.2.
@@ -8789,7 +8789,7 @@ cell, W25-3). Backward-compat (W25-3-A / W25-3-B) preserved
 byte-for-byte: IS-1, IS-2 theorem tests 14/14 + 31/31 new W25 tests
 = 45/45 clean.
 
-**Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+**Two-Mac infrastructure.** Mac 2 (<lan-host-B>) ARP
 ``incomplete`` — **20th consecutive milestone with Mac-2
 ARP-incomplete.** No two-host W25 execution. Honest scope: W25
 reduces multi-agent token overhead at the capsule layer on a single
@@ -8862,7 +8862,7 @@ perfectly match the deterministic IntraCellFlippingOracle pattern;
 names **W24-C-LIVE-VARIANCE-COMPLETE** as the follow-up conjecture
 (positive expected improvement bounded by drift-pattern similarity).
 
-**Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+**Two-Mac infrastructure.** Mac 2 (<lan-host-B>) ARP
 ``incomplete`` at milestone capture — same status as SDK v3.6
 through SDK v3.24 (**18th milestone in a row**). **No two-Mac
 sharded inference happened in SDK v3.25.** The W24-3
@@ -8946,7 +8946,7 @@ advantage does NOT cleanly transfer to this live n=4 probe. Names
 **W23-C-MITIGATION-LIVE-VARIANCE** as the follow-up conjecture
 (positive expected improvement, not strict per-probe).
 
-**Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+**Two-Mac infrastructure.** Mac 2 (<lan-host-B>) ARP
 ``incomplete`` at milestone capture — same status as SDK v3.6
 through SDK v3.23 (**17th milestone in a row**). **No two-Mac
 sharded inference happened in SDK v3.24.** The W23 surface is
@@ -9023,7 +9023,7 @@ partially discharged).** Two regimes:
   coalition); W22 ties W21 byte-for-byte
   (``correctness_ratified_rate = 1.000``).
 
-**Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+**Two-Mac infrastructure.** Mac 2 (<lan-host-B>) ARP
 ``incomplete`` at milestone capture — same status as SDK v3.6
 through SDK v3.22 (16th milestone in a row). **No two-Mac
 sharded inference happened in SDK v3.23.** The W22 surface is
@@ -9421,7 +9421,7 @@ on the recorded LLM bytes — a **+0.500 strict gain** over the
 strongest non-composed baseline on a real-LLM stream. This is the
 **first end-to-end real-LLM strict advance** in the programme that
 beats the strongest non-composed baseline. The Mac-1 endpoint at
-192.168.12.191:11434 was offline at milestone capture time
+<lan-host-A>:11434 was offline at milestone capture time
 (``HTTP=000``), so a fresh live LLM probe (W16-C-LIVE-OLLAMA) is
 conjectural.
 
@@ -9482,7 +9482,7 @@ milestone note.
    is **experimental infrastructure**, not product; the CoordPy
    single-run product runtime contract is byte-for-byte
    unchanged. Mac 2 remains offline at the time of SDK v3.7
-   (192.168.12.248 ARP "incomplete"); the runbook is the
+   (<lan-host-B> ARP "incomplete"); the runbook is the
    operator path when Mac 2 returns.
 7. **Cross-role cohort-coherence multi-agent coordination**
    — *active, new (SDK v3.8)*. **Phase-54** benchmark
@@ -9664,7 +9664,7 @@ milestone note.
   ``acc_full = 0.750`` (+0.750 over W19); ``qwen2.5-coder:7b``
   ties FIFO at 0.000. Cross-model split: scale + general
   knowledge correlates with W20-Λ-real escape.
-- **Two-Mac status** — Mac 2 (192.168.12.248) still ARP
+- **Two-Mac status** — Mac 2 (<lan-host-B>) still ARP
   ``incomplete``. **No two-Mac sharded inference happened in SDK
   v3.21.** The W20 ``OutsideWitnessOracle`` Protocol is
   infrastructure-ready for cross-host deployment when Mac 2
@@ -11070,7 +11070,7 @@ preserved as historical evidence.)
   qwen3.5:35b) × four capsule admission strategies + the
   Phase-31 substrate baseline on the same candidate-handoff
   stream. Real LLM calls hit Mac 1 Ollama at
-  ``192.168.12.191:11434`` (Mac 2 still offline). Wall: 14B =
+  ``<lan-host-A>:11434`` (Mac 2 still offline). Wall: 14B =
   92.6 s, 35B = 152 s.
 - **Theorem family W6.** W6-1 (audit-OK grid 60/60),
   W6-2 (backend duck-typing), W6-3 (parser robustness on the

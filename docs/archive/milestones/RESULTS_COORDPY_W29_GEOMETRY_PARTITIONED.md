@@ -13,7 +13,7 @@ mistakes — measured **+0.250 strict correctness gain** (0.500 → 0.750)
 of W29 over both W27 and W28 baselines on R-76-XHOST-DRIFT across
 **5/5 seeds** with **trust precision 1.000** and bounded overhead
 (mean 0.75 tokens/cell, max 1 token/cell — well within S4 ≤ 2). On
-the live cross-host topology (localhost gemma2:9b + 192.168.12.191
+the live cross-host topology (localhost gemma2:9b + <lan-host-A>
 qwen2.5:14b) the same gain held: W29 correctness 0.750 vs W28 0.500,
 trust precision 1.000, 16 real cross-host probe calls + 710 LAN bytes,
 0 LLM disagreements — a clean S1/S2/S3 result. **Discharges
@@ -40,7 +40,7 @@ adjudication) with the dense-control line (W27 multi-chain salience-
 keyed pool) inside one decision via an ensemble probe quorum, added
 11 enumerated trust-boundary failure modes, and produced the first
 cross-host live evidence in 23 milestones (localhost gemma2:9b +
-192.168.12.191 qwen2.5:14b; 5592 LAN bytes; 128 cross-host probe
+<lan-host-A> qwen2.5:14b; 5592 LAN bytes; 128 cross-host probe
 calls; 16/16 cells correct; 10/16 ratified, 6/16 below quorum).
 The honestly-stated remaining gaps after W28 (per
 `RESULTS_COORDPY_W28_*.md` §10 and the master plan post-W28 audit):
@@ -307,15 +307,15 @@ Topology probe (live, 2026-04-30):
 | Host | URL | Selected model | Architecture family |
 |---|---|---|---|
 | `localhost` | `http://localhost:11434` | `gemma2:9b` | Gemma2 |
-| `192.168.12.191` | `http://192.168.12.191:11434` | `qwen2.5:14b` | Qwen2.5 |
-| `192.168.12.248` | `http://192.168.12.248:11434` | (unreachable; ARP-incomplete; **24th consecutive milestone**) | — |
+| `<lan-host-A>` | `http://<lan-host-A>:11434` | `qwen2.5:14b` | Qwen2.5 |
+| `<lan-host-B>` | `http://<lan-host-B>:11434` | (unreachable; ARP-incomplete; **24th consecutive milestone**) | — |
 
 Live cross-host run on n=16 cells (seed 11), artifact at
 `vision_mvp/experiments/artifacts/phase76/cross_host_live_seed11_n16.json`:
 
 | Metric | Value |
 |---|---|
-| Hosts used | localhost (gemma2:9b) + 192.168.12.191 (qwen2.5:14b) |
+| Hosts used | localhost (gemma2:9b) + <lan-host-A> (qwen2.5:14b) |
 | n_probes (per partition) | 3 (1× deterministic local + 2× LLM cross-host) |
 | W27 visible tokens / cell | 8.50 |
 | W28 visible tokens / cell | 8.81 |
@@ -349,7 +349,7 @@ This empirically discharges:
   different model families (Gemma2 + Qwen2.5) participated in
   per-partition ratification quorums on real bytes.
 * **S2 (cross-host evidence)** — `cross_host_round_trip_bytes = 710 > 0`,
-  `n_cross_host_probe_calls = 16 > 0`. Mac 2 (192.168.12.248)
+  `n_cross_host_probe_calls = 16 > 0`. Mac 2 (<lan-host-B>)
   remains ARP-incomplete (24th consecutive milestone).
 * **S3 (trust precision = 1.000)** — every W29-ratified cell on the
   live bench was correct.
@@ -382,8 +382,8 @@ sections 2 and 3.)
 
 | Gate | Description | Status |
 |---|---|---|
-| **S1** | Cross-model live evidence on R-76-XHOST-DRIFT | **PASS** — gemma2:9b (localhost) + qwen2.5:14b (192.168.12.191) on n=16 cells; **same H6 +0.250 gain holds on live LLM topology**. |
-| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — 192.168.12.248 ARP-incomplete (24th consecutive milestone). Two reachable hosts only. |
+| **S1** | Cross-model live evidence on R-76-XHOST-DRIFT | **PASS** — gemma2:9b (localhost) + qwen2.5:14b (<lan-host-A>) on n=16 cells; **same H6 +0.250 gain holds on live LLM topology**. |
+| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — <lan-host-B> ARP-incomplete (24th consecutive milestone). Two reachable hosts only. |
 | **S3** | Trust precision = 1.000 on cross-host bench | **PASS** — trust_precision_w29 = 1.000 on R-76-CROSS-HOST-LIVE n=16. |
 | **S4** | Token-overhead bound ≤ 2 tokens/cell | **PASS** — max overhead = 1 token/cell across all sub-banks. |
 | **S5** | One earlier conjecture sharpened or discharged | **PASS** — W28-C-CROSS-HOST-VARIANCE discharged on the magnitude axis (H8 anchor); W21-C-CALIBRATED-TRUST sharpened by per-partition trust priors becoming the natural calibration target. |
@@ -545,7 +545,7 @@ sections 2 and 3.)
 * `phase76 --bank xhost_drift --seed-sweep` — 5/5 seeds; min Δ=+0.25,
   min trust_prec=1.000, max overhead=1 token/cell; all gates met.
 * `phase76 --bank topology_probe` — discovered two-host topology
-  (gemma2:9b + qwen2.5:14b across localhost + 192.168.12.191).
+  (gemma2:9b + qwen2.5:14b across localhost + <lan-host-A>).
 * `phase76 --bank cross_host_live --n-eval 16` — live LLM probes on
   two hosts; cross_host_round_trip_bytes = 710; W29 correctness
   0.750 vs W28 0.500; trust precision 1.000; H6 +0.250 gain holds
@@ -571,9 +571,9 @@ sections 2 and 3.)
 * W29 does NOT claim a learned manifold. The basis and partition
   classifier are pure functions over deterministic structural
   inputs.
-* W29 does NOT bring up Mac 2. 192.168.12.248 remains ARP-incomplete
+* W29 does NOT bring up Mac 2. <lan-host-B> remains ARP-incomplete
   (24th consecutive milestone). The two reachable hosts (localhost +
-  192.168.12.191) suffice for the live cross-host evidence.
+  <lan-host-A>) suffice for the live cross-host evidence.
 * W29's H7 cram-factor magnitude (2.30×) is below the pre-committed
   8× bar; the mechanism is real, the magnitude is not.
 * W29's H6 absolute correctness on R-76-XHOST-DRIFT is 0.750, below

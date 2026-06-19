@@ -45,7 +45,7 @@ in adversary cost.
 historical ``.101 = Mac with hung Ollama`` framing (``.101``
 is an Apple TV / AirPlay receiver).  The honest live
 multi-host topology is two reachable Macs: ``localhost`` and
-``192.168.12.191``.  Both Macs serve Ollama at temperature 0
+``<lan-host-A>``.  Both Macs serve Ollama at temperature 0
 on closed-vocabulary prompts.  The W42 milestone re-confirms
 this and adds a paraphrase-invariance live probe across a
 controller-pre-registered set of K=4 paraphrases of one
@@ -153,7 +153,7 @@ bounding**, not native latent transfer and not closure of
 | **H7** | Insufficient-invariance-policy falsifier | On R-89-INSUFFICIENT-INVARIANCE-POLICY (= R-88-BOTH-AXES wrapped by W42 with **no** policy entry registered for the cell's role-handoff signature), W42 routes through INVARIANCE_NO_POLICY (preserving W41 byte-for-W40 semantics on the answer); delta = 0 across 5/5 seeds |
 | **H8** | Old explicit capsule line preserved | Focused W22..W41 regression slices stay green; the W22..W41 inner orchestrator chain is unchanged byte-for-byte (W42 is strictly additive) |
 | **H9** | Role-handoff signature mechanical | The role-handoff-signature CID is closed-form deterministic (zero parameters); given the same canonical input handoffs, two calls produce byte-identical CIDs; permutation-invariant over handoff order via canonical sorting |
-| **H10** | Live cross-host paraphrase-invariance probe | A bounded live probe at temperature 0 on the two-Mac topology (localhost gemma2:9b + 192.168.12.191 qwen2.5:14b) records K=4 paraphrases of a gold-verifiable closed-vocabulary arithmetic prompt; the paraphrase-invariance rate is recorded honestly (not load-bearing for the W42 closed-form mechanism, but a realism anchor) |
+| **H10** | Live cross-host paraphrase-invariance probe | A bounded live probe at temperature 0 on the two-Mac topology (localhost gemma2:9b + <lan-host-A> qwen2.5:14b) records K=4 paraphrases of a gold-verifiable closed-vocabulary arithmetic prompt; the paraphrase-invariance rate is recorded honestly (not load-bearing for the W42 closed-form mechanism, but a realism anchor) |
 | **H11** | Broad regression confidence | Focused W22..W42 regression is green; broad spot checks on phase 11-39 + phase 40-51 + phase 6 ideas remain green; phase 50 collection-time hang carried forward unchanged from W41 |
 | **H12** | Release-readiness clause / RC3 final release | Versioning, changelog, success bar, results note, theorem registry, README/START_HERE/master plan markers updated; vision_mvp ``__version__`` aligned with pyproject; **RC3 declared a final release** if H1..H11 + S3 + S7 pass and the strict +0.500 trust-precision gain on R-89-ROLE-INVARIANT-RECOVER holds across 5/5 seeds; release verdict explicit and forced |
 
@@ -174,7 +174,7 @@ bounding**, not native latent transfer and not closure of
 | Gate | Description | Target |
 | --- | --- | --- |
 | **S1** | Role-handoff signature distribution measured per bank | The R-89 driver records the distinct role-handoff signature CIDs observed per bank/seed; the distribution is reproducible |
-| **S2** | Lab topology re-confirmed | ``localhost`` + ``192.168.12.191`` two-Mac live topology re-confirmed at the W42 milestone; ``.248`` recorded as gone; ``.101`` recorded as Apple TV / AirPlay (W41-INFRA-1 carry-forward) |
+| **S2** | Lab topology re-confirmed | ``localhost`` + ``<lan-host-A>`` two-Mac live topology re-confirmed at the W42 milestone; ``.248`` recorded as gone; ``.101`` recorded as Apple TV / AirPlay (W41-INFRA-1 carry-forward) |
 | **S3** | Stable-vs-experimental boundary | W42 remains under ``__experimental__``; stable RunSpec -> run report runtime contract unchanged byte-for-byte |
 | **S4** | Theory | Add one strict-gain claim (W42-3), one limitation theorem (W42-L-FULL-COMPOSITE-COLLUSION-CAP), one inherited trivial-passthrough falsifier (W42-L-TRIVIAL-PASSTHROUGH), one insufficient-policy falsifier (W42-L-INSUFFICIENT-INVARIANCE-POLICY), and one native-latent gap claim (W42-C-NATIVE-LATENT) |
 | **S5** | Paper / master-plan synthesis | Old explicit-capsule line (W21..W34), dense-control / geometry line (W35..W36), trust-axis multi-host line (W37..W40), W41 integrated-synthesis line, and W42 cross-role-invariance line read as a single coherent arc with an explicit RC3 final-release boundary |

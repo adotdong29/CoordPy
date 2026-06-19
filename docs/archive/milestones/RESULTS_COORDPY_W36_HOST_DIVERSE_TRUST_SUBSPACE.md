@@ -148,13 +148,13 @@ Artifact:
 Fresh preflight on 2026-05-02:
 
 - `localhost:11434`: reachable; 8 model tags advertised.
-- `192.168.12.191:11434`: reachable; 5 model tags advertised.
-- `192.168.12.248:11434`: `/api/tags` timed out at 5 seconds.
+- `<lan-host-A>:11434`: reachable; 5 model tags advertised.
+- `<lan-host-B>:11434`: `/api/tags` timed out at 5 seconds.
 
 `phase81_xllm_preflight_only.py` with Phase83 output recorded:
 
 - 9/10 model-host preflights passed.
-- 1 unreachable host: `192.168.12.248`.
+- 1 unreachable host: `<lan-host-B>`.
 
 Artifact:
 `vision_mvp/experiments/artifacts/phase83/xllm_preflight_only_2026_05_02.json`.
@@ -162,7 +162,7 @@ Artifact:
 Bounded W36 live topology probe:
 
 - Hosts: local `qwen2.5:0.5b` as producer candidate and remote
-  `qwen2.5:14b` on `192.168.12.191` as adjudicator candidate.
+  `qwen2.5:14b` on `<lan-host-A>` as adjudicator candidate.
 - 5 gold-verifiable prompts.
 - 10/10 calls responsive.
 - responsive accuracy: 0.600.

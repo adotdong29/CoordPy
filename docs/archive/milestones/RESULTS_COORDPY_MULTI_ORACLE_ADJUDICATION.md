@@ -83,7 +83,7 @@
        + general knowledge matter for the W21-Λ-real escape** on the
        LLM-vote-required regime. The deterministic registry remains
        the load-bearing oracle on the synthetic anchor.
-* **Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+* **Two-Mac infrastructure.** Mac 2 (<lan-host-B>) ARP
   ``incomplete`` at milestone capture — same status as SDK v3.6
   through SDK v3.21. **No two-Mac sharded inference happened in
   SDK v3.22.** The W21 mechanism is *naturally* a producer /
@@ -423,7 +423,7 @@ Mechanically verified by:
   ``qwen2.5:14b-32k`` and ``qwen3.5:35b`` model tags. The
   W21-Λ-real probe was therefore done against ``mixtral:8x7b``
   (47B-MoE) on Mac 1 only.
-* **Mac 2** (192.168.12.248): ARP ``incomplete`` at milestone
+* **Mac 2** (<lan-host-B>): ARP ``incomplete`` at milestone
   capture — same status as SDK v3.6 through SDK v3.21. **No
   two-Mac sharded inference happened in SDK v3.22.** The W21
   oracle Protocol is *infrastructure-ready* for cross-host

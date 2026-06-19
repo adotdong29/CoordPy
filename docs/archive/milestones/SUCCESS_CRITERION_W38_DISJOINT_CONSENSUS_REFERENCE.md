@@ -105,7 +105,7 @@ transfer.
 | Gate | Description | Target |
 | --- | --- | --- |
 | **S1** | Stronger live cross-source evidence | Bounded live probe observes either cross-architecture consensus-reference agreement or honest divergence, with gold-correlated labelling |
-| **S2** | Mac 2 | ``192.168.12.248:11434/api/tags`` succeeds, or timeout evidence is recorded for the 31st milestone in a row |
+| **S2** | Mac 2 | ``<lan-host-B>:11434/api/tags`` succeeds, or timeout evidence is recorded for the 31st milestone in a row |
 | **S3** | Stable-vs-experimental boundary | W38 remains under ``__experimental__``; stable runtime contract unchanged |
 | **S4** | Theory | Add one conditional sufficiency claim, one limitation/falsifier claim, and one native-latent gap claim |
 | **S5** | Paper/master-plan synthesis | Old explicit-capsule line, dense-control/geometry line, and W38 disjoint-consensus line read as a single arc with an explicit release boundary |

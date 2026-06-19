@@ -30,7 +30,7 @@ from typing import Any
 
 SCHEMA_VERSION = "phase45.profile.v1"
 
-# Trust tags. "trusted" = operator-owned inputs (bundled bank, ASPEN
+# Trust tags. "trusted" = operator-owned inputs (bundled bank, remote
 # cluster). "untrusted" = arbitrary third-party JSONL / LLM output.
 # Untrusted profiles are Docker-first by default and refuse weaker
 # sandboxes unless the operator explicitly opts in via

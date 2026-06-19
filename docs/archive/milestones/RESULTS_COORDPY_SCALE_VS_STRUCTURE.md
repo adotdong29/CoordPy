@@ -21,7 +21,7 @@
 
 ## TL;DR — what we shipped, what we found
 
-* **Mac 2 is still offline** (192.168.12.248 ARP "incomplete" at
+* **Mac 2 is still offline** (<lan-host-B> ARP "incomplete" at
   the time of this run). The two-Mac MLX-distributed sharded
   70B-class run remains the operator step described in
   ``docs/MLX_DISTRIBUTED_RUNBOOK.md`` (no fake "almost works"
@@ -70,9 +70,9 @@
 
 ## 1. Two-Mac sharded inference status — plainly
 
-* `arp -a` for 192.168.12.248: **(incomplete)** at the time of
+* `arp -a` for <lan-host-B>: **(incomplete)** at the time of
   this milestone. Mac 2 is not on the LAN.
-* `ping -c2 192.168.12.248`: **100% packet loss**.
+* `ping -c2 <lan-host-B>`: **100% packet loss**.
 * No `mpirun mlx_lm.server` was launched. **No 70B class model
   ran across both Macs.** No sharded inference happened.
 * The integration boundary (`MLXDistributedBackend`,
@@ -92,7 +92,7 @@ the cluster". That is shipped already.
 ## 2. Strongest model class actually exercised
 
 Real LLM calls in this milestone hit Mac 1's Ollama at
-`http://192.168.12.191:11434` against:
+`http://<lan-host-A>:11434` against:
 
 * **`qwen2.5:14b-32k`** — 14.8 B parameters, dense, Q4_K_M.
 * **`qwen3.5:35b`** — 36.0 B parameters, **MoE**, Q4_K_M,
@@ -268,7 +268,7 @@ not in the capsule ledger, so the audit does not apply.
 >
 > **Anchor.** ``docs/data/phase53_scale_vs_structure_K4_n5.json``.
 > Reproducible with one command on any machine that can reach
-> ``192.168.12.191:11434`` and has both Ollama models loaded:
+> ``<lan-host-A>:11434`` and has both Ollama models loaded:
 > ``python3 -m vision_mvp.experiments.phase53_scale_vs_structure``.
 
 ### 4.3 The W6-C family
@@ -477,7 +477,7 @@ $ python3 -m unittest \
 Ran 116 tests in 3.207s — OK
 
 $ python3 -m vision_mvp.experiments.phase53_scale_vs_structure \
-    --endpoint http://192.168.12.191:11434 \
+    --endpoint http://<lan-host-A>:11434 \
     --models synthetic,qwen2.5:14b-32k,qwen3.5:35b \
     --n-eval 5 --K-auditor 4 --T-auditor 128 \
     --out /tmp/coordpy-distributed/phase53_scale_vs_structure_K4.json
@@ -489,7 +489,7 @@ $ python3 -m vision_mvp.experiments.phase53_scale_vs_structure \
 ## 10. What remains open
 
 * **Mac 2 brings sharded 70 B class.** When the LAN sees
-  192.168.12.248 again, follow `docs/MLX_DISTRIBUTED_RUNBOOK.md`
+  <lan-host-B> again, follow `docs/MLX_DISTRIBUTED_RUNBOOK.md`
   and re-run Phase-53 with a third row added to the model
   regimes (e.g. `Llama-3.3-70B-Instruct-4bit`). Predicted: 70 B
   closes the same OOD gap as 35 B (W6-C5 hypothesis); maybe

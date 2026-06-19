@@ -37,7 +37,7 @@ master plan's post-W27 next-steps section):
   benchmarks were run against the synthetic `ServiceGraphOracle` /
   `ChangeHistoryOracle` ecology; the chain-pivot machinery has not been
   stressed against intermittent oracle drift driven by a real LLM.
-* G2. **Cross-host / two-Mac validation absent** — Mac 2 (192.168.12.248)
+* G2. **Cross-host / two-Mac validation absent** — Mac 2 (<lan-host-B>)
   has been ARP-incomplete for 22 consecutive milestones. Even where two
   reachable hosts exist with different model families, no W-letter
   result has yet *exercised* both hosts inside a single benchmark cell.
@@ -150,12 +150,12 @@ soft set (must report honestly, but partial pass is acceptable).
   families* (e.g. Qwen + Gemma2/Mixtral). If only one host is reachable
   the bench must still run (with one local probe + one synthetic
   control) and must say so. If both hosts are reachable the bench must
-  use both. Mac 2 (192.168.12.248) being unreachable does NOT block this
+  use both. Mac 2 (<lan-host-B>) being unreachable does NOT block this
   gate as long as the bench reports the host topology actually used.
 
 * **S2 — Cross-host evidence (best effort)**
   The bench must attempt cross-host probing using both reachable hosts
-  (`localhost` + `192.168.12.191`). If both are reachable the bench
+  (`localhost` + `<lan-host-A>`). If both are reachable the bench
   must record `n_cross_host_probe_calls > 0` and report
   `cross_host_round_trip_bytes`. If only one is reachable, the bench
   must record this fact and downgrade to single-host gracefully. This
@@ -285,9 +285,9 @@ W28 introduces:
   envelope on a typed bus, not a hidden activation.
 * W28 does NOT solve the W22-C-CACHE-AMPLIFICATION conjecture. That
   remains open.
-* W28 does NOT bring up Mac 2. Mac 2 (192.168.12.248) remains
+* W28 does NOT bring up Mac 2. Mac 2 (<lan-host-B>) remains
   ARP-incomplete; W28 documents the use of the *other* reachable host
-  (192.168.12.191) plus localhost as the two-host topology.
+  (<lan-host-A>) plus localhost as the two-host topology.
 * W28 does NOT promise live evidence beyond what its probes can
   honestly observe; `R-75-CROSS-MODEL-DRIFT-LIVE` is conditional on
   having ≥ 2 reachable models from different families.

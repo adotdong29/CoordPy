@@ -614,8 +614,8 @@ thing.
 > precondition as Phase 41.
 > (d) `core/llm_client` (EXTENDED) —
 > `LLMClient(base_url=None)` plumbs the ASPEN cluster
-> endpoints (macbook-1 `http://192.168.12.191:11434`,
-> macbook-2 `http://192.168.12.248:11434`); default
+> endpoints (macbook-1 `http://<lan-host-A>:11434`,
+> macbook-2 `http://<lan-host-B>:11434`); default
 > `None` preserves the Phase-41 localhost semantics.
 > (e) `experiments/phase42_parser_sweep` (NEW) — sweeps
 > `(parser_mode × apply_mode × n_distractors)` with an

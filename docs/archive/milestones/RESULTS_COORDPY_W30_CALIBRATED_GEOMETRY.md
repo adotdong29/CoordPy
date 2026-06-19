@@ -326,8 +326,8 @@ Topology probe (live, 2026-05-01):
 | Host | URL | Selected model | Architecture family |
 |---|---|---|---|
 | `localhost` | `http://localhost:11434` | `gemma2:9b` | Gemma2 |
-| `192.168.12.191` | `http://192.168.12.191:11434` | `qwen2.5:14b` | Qwen2.5 |
-| `192.168.12.248` | `http://192.168.12.248:11434` | (unreachable; ARP-incomplete; **25th consecutive milestone**) | — |
+| `<lan-host-A>` | `http://<lan-host-A>:11434` | `qwen2.5:14b` | Qwen2.5 |
+| `<lan-host-B>` | `http://<lan-host-B>:11434` | (unreachable; ARP-incomplete; **25th consecutive milestone**) | — |
 
 The R-77-CROSS-HOST-LIVE bank is opt-in; on the default path it is
 not run (the synthetic xhost_disagree bench is the H8 anchor).
@@ -367,7 +367,7 @@ sections 2 and 3.)
 | Gate | Description | Status |
 |---|---|---|
 | **S1** | Cross-host live evidence on R-77-XHOST-DISAGREE | **HONESTLY-NULL** — synthetic xhost_disagree is the H8 anchor; the live cross-host probe is opt-in and not in the default seed-sweep.  When invoked, the LLMs may agree at temp 0 (null witness) or disagree (witness fires).  Mechanism is identical; empirical magnitude is regime-dependent. |
-| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — 192.168.12.248 ARP-incomplete (25th consecutive milestone). Two reachable hosts (localhost + 192.168.12.191) suffice for the synthetic discharge. |
+| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — <lan-host-B> ARP-incomplete (25th consecutive milestone). Two reachable hosts (localhost + <lan-host-A>) suffice for the synthetic discharge. |
 | **S3** | Trust precision = 1.000 on cross-host bench | **PASS** — trust_precision_w30 = 1.000 on R-77-XHOST-DISAGREE n=16 across 5/5 seeds. |
 | **S4** | Token-overhead bound ≤ 2 tokens/cell (cumulative) | **PASS** — max overhead w30/w29 = 1, mean overhead w30/w28 = 2.0 ≤ 2.0 across all sub-banks. |
 | **S5** | At least one earlier conjecture sharpened or discharged | **PASS** — **W29-C-CRAM-AMPLIFICATION** discharged (H6); **W29-C-PARTITION-CALIBRATION** discharged (H7); **W29-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE** sharpened (H8); **W21-C-CALIBRATED-TRUST** sharpened (per-partition calibrated priors are the natural land for the W21 conjecture). Four conjectures touched in one milestone. |
@@ -553,9 +553,9 @@ hardware/regime-bounded).
   prove that the cells executed in a particular order, only that
   the controller's bus enforces structural commitment to the
   declared ancestor set.
-* W30 does NOT bring up Mac 2.  192.168.12.248 remains
+* W30 does NOT bring up Mac 2.  <lan-host-B> remains
   ARP-incomplete (25th consecutive milestone).  The two reachable
-  hosts (localhost + 192.168.12.191) suffice for the synthetic
+  hosts (localhost + <lan-host-A>) suffice for the synthetic
   discharge.  W30-C-MULTI-HOST is the carried-forward conjecture.
 * W30 does NOT solve full live LLM disagreement reduction.  The
   H8 strict gain is on synthetic disagreement (constructed via a

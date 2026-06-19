@@ -93,7 +93,7 @@
   below the window.
 
 * **Two-Mac infrastructure (W24-Λ-cross-host).** Mac 2
-  (192.168.12.248) ARP ``incomplete`` at milestone capture — same
+  (<lan-host-B>) ARP ``incomplete`` at milestone capture — same
   status as SDK v3.6 through SDK v3.24 (**18th milestone in a row**).
   **No two-Mac sharded inference happened in SDK v3.25.** The W24-3
   :class:`CrossProcessProducerDecoderWire` upgrades the W23

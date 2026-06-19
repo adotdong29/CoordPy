@@ -41,16 +41,16 @@ RESPONSE-CAP``.
 **Crucial release context.** The infrastructure narrative
 inherited from W37-W40 (".101 is a Mac with hung Ollama
 listener") is **retracted** at this milestone.  Re-probing
-``192.168.12.101`` in the W41 milestone confirms it is an
+``<lan-host-C>`` in the W41 milestone confirms it is an
 Apple TV / AirPlay receiver (port 5000 returns
 ``AirTunes/860.7.1``; locally-administered MAC
 ``36:1c:eb:dc:9a:04``) — NOT a Mac running Ollama.  The
 historical "TCP-up + HTTP-broken Ollama" framing was a
 mis-identification at the network layer.  The honest live
 multi-host topology is **two reachable Ollama hosts**:
-``localhost`` (Mac 1) and ``192.168.12.191`` (Mac 2 /
-``HSC136047-MAC.lan``).  ``192.168.12.248`` is gone (per user).
-``192.168.12.101`` is recorded as ``W41-INFRA-1`` (Apple TV;
+``localhost`` (Mac 1) and ``<lan-host-A>`` (Mac 2 /
+``HSC136047-MAC.lan``).  ``<lan-host-B>`` is gone (per user).
+``<lan-host-C>`` is recorded as ``W41-INFRA-1`` (Apple TV;
 not a Mac).  See § 4 below for the discharge.
 
 ---
@@ -143,7 +143,7 @@ transfer and not closure of
 | **H7** | Insufficient-response-signature falsifier inherited | On R-88-INSUFFICIENT-RESPONSE-SIGNATURE (= R-87-INSUFFICIENT-RESPONSE-SIGNATURE wrapped by W41), when fewer than ``min_response_signature_probes`` member probes carry response signatures, W41 routes through INTEGRATED_PRODUCER_ONLY (preserving W40 byte-for-W39 semantics on the answer) |
 | **H8** | Old explicit capsule line preserved | Focused W22..W40 regression slices stay green; the W22..W40 inner orchestrator chain is unchanged byte-for-byte (W41 is strictly additive) |
 | **H9** | Cross-axis classification mechanical | The integrated decision selector is zero-parameter and deterministic; given the same per-axis branches and service tuples, two calls produce byte-identical (branch, services) outputs |
-| **H10** | Live-multi-host topology recorded honestly | The lab topology is re-probed: ``192.168.12.101`` is identified as an Apple TV / AirPlay receiver (NOT a Mac with Ollama; the W37..W40 framing is retracted at this milestone), ``192.168.12.191`` is recorded as a working second Mac with Ollama, ``192.168.12.248`` is recorded as gone (per user); the milestone records the strongest live multi-host evidence available (two-Mac topology) |
+| **H10** | Live-multi-host topology recorded honestly | The lab topology is re-probed: ``<lan-host-C>`` is identified as an Apple TV / AirPlay receiver (NOT a Mac with Ollama; the W37..W40 framing is retracted at this milestone), ``<lan-host-A>`` is recorded as a working second Mac with Ollama, ``<lan-host-B>`` is recorded as gone (per user); the milestone records the strongest live multi-host evidence available (two-Mac topology) |
 | **H11** | Broad regression confidence | Focused W22..W41 regression is green; broad spot checks on phase 11-39 + phase 40-51 + phase 6 ideas remain green; phase 50 collection-time hang carried forward unchanged |
 | **H12** | Release-readiness clause / RC2 | Versioning, changelog, success bar, results note, theorem registry, README/START_HERE/master plan/paper markers updated only if H1..H11 pass and the stable runtime remains unchanged; vision_mvp ``__version__`` aligned with pyproject; **RC2 declared** if H1..H11 + S3 pass and the lab topology is recorded honestly |
 
@@ -213,13 +213,13 @@ Soft gates cannot compensate for failed trust/audit hard gates.
   references, multi-host disjoint quorum references, cross-
   host response-heterogeneity witnesses, OR the cross-axis
   classification, W41 is insufficient.
-- **W41-INFRA-1** (NEW): ``192.168.12.101`` is an Apple TV /
+- **W41-INFRA-1** (NEW): ``<lan-host-C>`` is an Apple TV /
   AirPlay receiver (port 5000 returns ``AirTunes/860.7.1``;
   locally-administered MAC ``36:1c:eb:dc:9a:04``); the W37..W40
   "TCP-up + HTTP-broken Ollama Mac" framing for ``.101`` is
-  retracted.  ``192.168.12.248`` is recorded as gone (per
+  retracted.  ``<lan-host-B>`` is recorded as gone (per
   user).  The honest live multi-host topology is the two-Mac
-  pair (``localhost`` + ``192.168.12.191``).
+  pair (``localhost`` + ``<lan-host-A>``).
 
 ---
 

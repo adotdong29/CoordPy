@@ -63,7 +63,7 @@
     "bank_replicates": 1,
     "bank_seed": 11,
     "cosmic_oov_prob": 0.0,
-    "endpoint": "http://192.168.12.191:11434",
+    "endpoint": "http://<lan-host-A>:11434",
     "inbox_capacity": 8,
     "llm_mode": "ollama",
     "llm_seed": 11,

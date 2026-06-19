@@ -1447,7 +1447,7 @@
 > visible W42 token** on the load-bearing regime at one visible
 > token overhead/cell.  **Live cross-host evidence**: the W42
 > cross-host paraphrase-invariance probe at temperature 0 on the
-> two-Mac topology (``localhost`` gemma2:9b + ``192.168.12.191``
+> two-Mac topology (``localhost`` gemma2:9b + ``<lan-host-A>``
 > qwen2.5:14b) records **4/4 paraphrase-invariant cross-host
 > gold-correlated agreement** on K=4 paraphrases of one
 > closed-vocabulary arithmetic prompt; both hosts emit "Four" on
@@ -1486,7 +1486,7 @@
 >
 > **Reader note.** Earlier milestone markers below are preserved as
 > historical records, not current release guidance.  In particular,
-> any W39/W40 wording that treated ``192.168.12.101`` as a third-host
+> any W39/W40 wording that treated ``<lan-host-C>`` as a third-host
 > Mac candidate is superseded by the W41 retraction: ``.101`` is an
 > Apple TV / AirPlay receiver, not a Mac.
 
@@ -1540,9 +1540,9 @@
 > about **14.5k structured bits per visible W40 token** on the
 > load-bearing regime at one visible token overhead/cell.
 > **Multi-host evidence broadened materially at the topology
-> layer**: the historical Mac-2 stale pin (``192.168.12.248``,
+> layer**: the historical Mac-2 stale pin (``<lan-host-B>``,
 > ARP-incomplete for the 32nd milestone in a row) remains
-> discharged in favour of ``192.168.12.101``; ``.101`` re-probed
+> discharged in favour of ``<lan-host-C>``; ``.101`` re-probed
 > on 2026-05-03 -- ping 0% packet loss (a strict improvement
 > over W39's 100% packet loss end-state), TCP port 11434
 > connects, TCP port 22 connects with auth methods advertised;
@@ -1550,7 +1550,7 @@
 > from server" / "Connection reset by peer" (the W39-INFRA-1
 > hung-listener pattern persists; SSH credentials still
 > unavailable to restart).  Honest verdict: **W40-INFRA-1**:
-> ``192.168.12.101`` is now TCP-up + HTTP-broken at the Ollama
+> ``<lan-host-C>`` is now TCP-up + HTTP-broken at the Ollama
 > layer; restoration requires SSH credentials.  Earlier loose
 > ends closed versus sharpened: W40 *bounds* (not closes) the
 > ``W39-L-FULL-DISJOINT-QUORUM-COLLUSION-CAP`` and proves a new
@@ -1611,9 +1611,9 @@
 > multi-host sense: about **24.4k structured bits per visible W39
 > token** on the load-bearing regime (vs 9.07k for W38; ~2.7x denser
 > at the audited-proxy capsule-layer).  **Multi-host evidence broadened
-> materially**: the historical Mac-2 stale pin (``192.168.12.248``,
+> materially**: the historical Mac-2 stale pin (``<lan-host-B>``,
 > ARP-incomplete for the 31st milestone in a row) was discharged in
-> favour of ``192.168.12.101`` as the reachable third physical host
+> favour of ``<lan-host-C>`` as the reachable third physical host
 > candidate (preflight-OK on cold contact with ``qwen3.5:35b`` +
 > ``qwen2.5:14b-32k`` model files visible) -- **partially discharging
 > ``W38-C-MULTI-HOST`` at the topology layer**.  The ``.101``
@@ -1690,7 +1690,7 @@
 > trajectory-pair agreements (the one disagreement is a
 > ``num_predict=4`` truncation), 7/8 cross-source consensus
 > agreements, 8/8 consensus-gold correlation** at temperature 0;
-> ``192.168.12.248`` still times out (Mac 2 ARP-incomplete for the
+> ``<lan-host-B>`` still times out (Mac 2 ARP-incomplete for the
 > **31st milestone in a row**).  Earlier loose ends closed versus
 > sharpened: W38 *bounds* (not closes) the
 > W37-L-MULTI-HOST-COLLUSION-CAP and proves a new
@@ -1731,7 +1731,7 @@
 > broadened only within the two-reachable-host topology: local
 > ``gemma2:9b`` and remote ``qwen2.5:14b`` produced 8/8 responsive
 > probes, 8/8 cross-host anchored agreements, and 8/8 gold-correlated
-> agreements at temperature 0; ``192.168.12.248`` still times out (Mac 2
+> agreements at temperature 0; ``<lan-host-B>`` still times out (Mac 2
 > ARP-incomplete for the **30th milestone in a row**).  Earlier loose
 > ends closed versus sharpened: W37 closes the W36 single-host recovery
 > case and proves a new ``W37-L-MULTI-HOST-COLLUSION-CAP`` limitation
@@ -4253,9 +4253,9 @@ Three coupled deliverables ship:
   issues LLM calls. ``--ollama-url`` forwards to
   ``LLMClient(base_url=…)`` so coding/generation runs route
   to the ASPEN cluster macbook-1 node
-  (``http://192.168.12.191:11434``) and secondary /
+  (``http://<lan-host-A>:11434``) and secondary /
   comparison runs to macbook-2
-  (``http://192.168.12.248:11434``) or localhost in
+  (``http://<lan-host-B>:11434``) or localhost in
   parallel.
 
 **Theory.** Three theorems + three conjectures:
@@ -7914,7 +7914,7 @@ the cluster. There is deliberately no
 one HTTP-client class.
 
 W5-1 was measured on a *single* Mac (Mac 1 alive at measurement
-time; Mac 2 offline / ARP "incomplete" at 192.168.12.248). The
+time; Mac 2 offline / ARP "incomplete" at <lan-host-B>). The
 two-Mac MLX-distributed path is the integration boundary, not
 the inference path used for W5-1; it is the *next-step*
 research target once Mac 2 returns. The W5-1 result is
@@ -7979,9 +7979,9 @@ the original multi-agent-context thesis?**
 
 **1. Two-Mac sharded-inference status — plainly.**
 
-* `arp -a` for 192.168.12.248: **(incomplete)** at the time of
+* `arp -a` for <lan-host-B>: **(incomplete)** at the time of
   this milestone. Mac 2 is not on the LAN.
-* `ping -c2 192.168.12.248`: 100% packet loss.
+* `ping -c2 <lan-host-B>`: 100% packet loss.
 * No `mpirun mlx_lm.server` was launched. **No sharded 70B-class
   model ran across both Macs.**
 * The integration boundary (`MLXDistributedBackend`,
@@ -12073,7 +12073,7 @@ pool)**, behind a controller-verified ratification envelope with
   per seed across 5/5 seeds.
 * **R-75-CROSS-HOST-LIVE (FIRST CROSS-HOST EVIDENCE IN 23 MILESTONES).**
   Live LLM probe table on `localhost` (gemma2:9b) +
-  `192.168.12.191` (qwen2.5:14b); **128 cross-host probe calls**;
+  `<lan-host-A>` (qwen2.5:14b); **128 cross-host probe calls**;
   **5592 LAN bytes**; ensemble ratifies 10/16 cells with real LLM
   disagreement on 6/16; trust precision 1.000; W28 correctness
   1.000.
@@ -12112,7 +12112,7 @@ for W28).**
    ``LLMSignatureProbe`` is the first programme component to
    actually use *two reachable hosts with different model
    families* inside one bench cell (`localhost` gemma2:9b +
-   `192.168.12.191` qwen2.5:14b). Mac 2 (192.168.12.248) remains
+   `<lan-host-A>` qwen2.5:14b). Mac 2 (<lan-host-B>) remains
    ARP-incomplete, but the *other* reachable host (.191) has been
    recharacterised as the second host of the topology, and the
    probe table accepts a third backend with zero code changes
@@ -12169,7 +12169,7 @@ correctness_w28 = 0.500`` and ``correctness_w29 = 0.750``,
 **Δ = +0.250 across 5/5 seeds**, ``trust_precision = 1.000``,
 ``mean_overhead = 0.75 tokens/cell``, ``max_overhead = 1 token/cell``.
 Same +0.250 gain holds on the live two-host topology (localhost
-gemma2:9b + 192.168.12.191 qwen2.5:14b); 16 cross-host probe calls;
+gemma2:9b + <lan-host-A> qwen2.5:14b); 16 cross-host probe calls;
 710 LAN bytes; ``trust_precision = 1.000``.
 
 **Empirically discharges W28-C-CROSS-HOST-VARIANCE on the magnitude
@@ -12195,7 +12195,7 @@ below bar; becomes named open conjecture
 correctness bar (≥ 0.95) was missed (measured 0.75) but the
 LOAD-BEARING Δ ≥ 0.10 axis was exceeded by 2.5×.
 
-Mac 2 (192.168.12.248) still ARP-incomplete (24th milestone in a
+Mac 2 (<lan-host-B>) still ARP-incomplete (24th milestone in a
 row). The two reachable hosts suffice for the live cross-host
 evidence.
 
@@ -12222,7 +12222,7 @@ evidence.
 4. **Did two-Mac evaluation materially broaden the evidence?**
    *PARTIAL — the live cross-host topology (gemma2 + qwen2.5)
    produced the same H6 +0.250 correctness gain on real LLM bytes
-   (710 LAN bytes, 16 probe calls), but Mac 2 (192.168.12.248)
+   (710 LAN bytes, 16 probe calls), but Mac 2 (<lan-host-B>)
    remains ARP-incomplete (24th milestone). The two-host evidence
    strictly extends W28's by demonstrating the H6 correctness gain
    on the live topology.*
@@ -12321,8 +12321,8 @@ modes (vs W29's 14, disjoint from W29's). **357/357 focused
 regression pass** (273/273 phase69-77 + 84/84 wider coordpy
 suite).
 
-Mac 2 (192.168.12.248) still ARP-incomplete (25th milestone in a
-row). The two reachable hosts (localhost gemma2:9b + 192.168.12.191
+Mac 2 (<lan-host-B>) still ARP-incomplete (25th milestone in a
+row). The two reachable hosts (localhost gemma2:9b + <lan-host-A>
 qwen2.5:14b) were used for the live cross-host bench; at
 temperature 0 the LLMs agreed on every cell, so the
 disagreement-routing override correctly stayed null and the
@@ -12356,7 +12356,7 @@ honestly null (not failure).
    qwen2.5:14b) was probed for R-77-CROSS-HOST-LIVE, but at
    temperature 0 the LLMs agreed on every cell, so the
    disagreement-routing override correctly stayed null. Mac 2
-   (192.168.12.248) remains ARP-incomplete (25th milestone).
+   (<lan-host-B>) remains ARP-incomplete (25th milestone).
    The synthetic R-77-XHOST-DISAGREE bench is the load-bearing
    evidence for the H8 axis; the live bench is honestly
    reported as null on the disagreement-routing magnitude.*
@@ -12464,7 +12464,7 @@ range, outer w31_cid byte corruption.  **65/65 = 1.000 rejection
 rate** at seed 11.
 
 On **R-78-XLLM-LIVE** (live cross-architecture probe at temp 0,
-seed 0) gemma2:9b on localhost vs qwen2.5:14b on 192.168.12.191
+seed 0) gemma2:9b on localhost vs qwen2.5:14b on <lan-host-A>
 **systematically disagree on 2/8 = 0.250 of structured-decision
 prompts**, reproducible byte-for-byte across two runs (Q5: db_query
 vs logs_pipeline; Q7: api vs storage).  **First measured live
@@ -12482,9 +12482,9 @@ Three named falsifiers all empirically confirmed
 unit tests + 39 unchanged from v3.31 + 1 unchanged).  68/68 wider
 coordpy suite passes.
 
-Mac 2 (192.168.12.248) **still ARP-incomplete (26th milestone)**;
+Mac 2 (<lan-host-B>) **still ARP-incomplete (26th milestone)**;
 ping 100% packet loss; port 11434 unreachable.  The two reachable
-hosts (localhost + 192.168.12.191) suffice for the live cross-arch
+hosts (localhost + <lan-host-A>) suffice for the live cross-arch
 probe.
 
 ### Post-W31 audit board
@@ -12520,7 +12520,7 @@ probe.
    (2/8 = 0.250 disagreement rate, reproducible byte-for-byte
    across two runs).  This sharpens W30-C-CROSS-HOST-VARIANCE-
    LIVE-MAGNITUDE-LIVE on the infrastructure-discharge axis.
-   Mac 2 (192.168.12.248) remains ARP-incomplete (26th
+   Mac 2 (<lan-host-B>) remains ARP-incomplete (26th
    milestone).*
 6. **Which earlier loose ends were closed vs only sharpened?**
    *CLOSED: W30-C-PRIOR-LEARNING on the magnitude axis (the
@@ -12633,7 +12633,7 @@ manifest_v2_cid byte corruption, ewma_prior_after out of range,
 cusum_pos out of range, outer w32_cid byte corruption.
 
 On **R-79-XLLM-LIVE-GOLD** (live cross-architecture probe at temp
-0, seed 0) gemma2:9b on localhost vs qwen2.5:14b on 192.168.12.191
+0, seed 0) gemma2:9b on localhost vs qwen2.5:14b on <lan-host-A>
 **agree on 19/20 = 0.950 of gold-verifiable structured-decision
 prompts** across arithmetic (A1-A5, 5/5 agree), syntax (S1-S5, 5/5
 agree), factoid (F1-F5, 5/5 agree), disambiguation (D1-D5, 4/5
@@ -12658,9 +12658,9 @@ failure modes (vs W31's 14, vs W30's 14, vs W29's 14; cumulative
 **45/45 W32 unit tests + 414/414 phase69-79 regression + 77/77
 wider coordpy suite = 536 tests pass**.
 
-Mac 2 (192.168.12.248) **still ARP-incomplete (27th milestone)**;
+Mac 2 (<lan-host-B>) **still ARP-incomplete (27th milestone)**;
 ping 100% packet loss; port 11434 unreachable.  The two reachable
-hosts (localhost + 192.168.12.191) suffice for the live cross-arch
+hosts (localhost + <lan-host-A>) suffice for the live cross-arch
 gold-verifiable probe.
 
 ### Post-W32 audit board
@@ -12700,7 +12700,7 @@ gold-verifiable probe.
    the programme** (19/20 = 0.950 agreement rate).  Combined with
    W31's R-78-XLLM-LIVE (0.750 agreement on operational prompts),
    the prompt-class-dependent cross-architecture disagreement
-   frontier is now characterised.  Mac 2 (192.168.12.248) remains
+   frontier is now characterised.  Mac 2 (<lan-host-B>) remains
    ARP-incomplete (27th milestone).*
 6. **Which earlier loose ends were closed vs only sharpened?**
    *CLOSED: W31-C-LONG-WINDOW-CONVERGENCE on the scaling-stability
@@ -12819,7 +12819,7 @@ rejection rate** across 5/5 seeds × 16 ratified cell-positions ×
 
 **Live cross-host trust-calibration probe (S1 best-effort,
 honestly null on infrastructure).**  mixtral:8x7b on localhost +
-qwen3.5:35b on 192.168.12.191 across 20 trust-calibration prompts
+qwen3.5:35b on <lan-host-A> across 20 trust-calibration prompts
 at temperature 0.  qwen3.5:35b returned empty / timeout on every
 prompt (model not actually loaded on the remote host); mixtral:8x7b
 ignored the "EXACTLY one word" constraint.  Two named
@@ -12982,7 +12982,7 @@ insufficient probes; W41 routes through INTEGRATED_PRODUCER
 _ONLY; W41 = W40 on the answer).
 
 **Lab topology retraction (W41-INFRA-1)**.  The W37 / W38 / W39
-/ W40 milestones described ``192.168.12.101`` as a third Mac
+/ W40 milestones described ``<lan-host-C>`` as a third Mac
 with a hung Ollama HTTP listener ("TCP-up + HTTP-broken").
 Re-probing at the W41 milestone shows that ``.101`` is an Apple
 TV / AirPlay receiver (``HTTP/1.1 403 Forbidden`` with header
@@ -12993,11 +12993,11 @@ is the device closing the connection on an unrecognised port,
 NOT a hung Ollama listener.  The framing is **retracted** at
 this milestone.  The honest live multi-host topology is the
 two-Mac pair ``localhost`` (``Qunfengs-MBP.lan``,
-``192.168.12.157``) + ``192.168.12.191`` (``HSC136047-MAC.lan``).
-``192.168.12.248`` is recorded as gone (per user instruction).
+``<lan-host>``) + ``<lan-host-A>`` (``HSC136047-MAC.lan``).
+``<lan-host-B>`` is recorded as gone (per user instruction).
 A bounded W41 sanity probe at temperature 0 + num_predict = 4
 on the two-Mac topology produced byte-agreed answers across
-architectures: ``localhost gemma2:9b`` and ``192.168.12.191
+architectures: ``localhost gemma2:9b`` and ``<lan-host-A>
 qwen2.5:14b`` both answered "Four" to "What is 2+2? Answer with
 one word."  This sharpens the closed-vocabulary one-word-prompt
 W37-C-LIVE-TRUNCATION-RECOVERY / W40-C-LIVE-RESPONSE-
@@ -13082,7 +13082,7 @@ format):
    transfer is still architecture-dependent; a third genuine
    Mac with Ollama is not available in this environment.*
 8. **Did anything previously claimed get retracted?** *YES.
-   The W37..W40 framing of ``192.168.12.101`` as "a Mac with a
+   The W37..W40 framing of ``<lan-host-C>`` as "a Mac with a
    hung Ollama HTTP listener (TCP-up + HTTP-broken)" is
    **retracted** at the W41 milestone.  ``.101`` is an Apple TV
    / AirPlay receiver, not a Mac.  The retraction is recorded
@@ -13131,7 +13131,7 @@ the W42 success criterion passes; the strict +0.500 gain on
 R-89-ROLE-INVARIANT-RECOVER is reproducible across 5/5 seeds;
 and the live two-Mac paraphrase-invariance probe (4/4
 paraphrases × 2 hosts, gemma2:9b on localhost + qwen2.5:14b on
-192.168.12.191, both emit "Four" on every paraphrase) records
+<lan-host-A>, both emit "Four" on every paraphrase) records
 the strongest live realism anchor available in this
 environment.
 
@@ -13176,7 +13176,7 @@ capsule-layer scope:
   policy registry be sourced from a true off-cluster oracle,
   defeating the W42-L-FULL-COMPOSITE-COLLUSION-CAP attack at the
   capsule layer.  The lab's two-Mac topology
-  (``localhost`` + ``192.168.12.191``) is the strongest live
+  (``localhost`` + ``<lan-host-A>``) is the strongest live
   evidence available; ``.248`` is gone, ``.101`` is Apple TV /
   AirPlay (W41-INFRA-1).
 

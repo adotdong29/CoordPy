@@ -168,7 +168,7 @@ is byte-for-byte unchanged.
 
 ### 1.3 The replay extractor — honest real-LLM measurement on recorded bytes
 
-The Mac-1 Ollama endpoint at ``192.168.12.191:11434`` was offline at
+The Mac-1 Ollama endpoint at ``<lan-host-A>:11434`` was offline at
 the time of this milestone capture (``HTTP=000`` connection refused),
 so a fresh live LLM probe was not possible. The Phase-61 milestone
 captured ``n=8 × 24 = 192`` byte-stable producer responses from

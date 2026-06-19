@@ -218,10 +218,10 @@ Artifact:
 Fresh preflight on 2026-05-02:
 
 - ``localhost:11434``: reachable; 8 model tags advertised.
-- ``192.168.12.191:11434``: reachable; 5 model tags advertised
+- ``<lan-host-A>:11434``: reachable; 5 model tags advertised
   (qwen2.5:14b, qwen2.5:14b-32k, qwen2.5-coder:14b-32k,
   qwen2.5-coder:14b, qwen3.5:35b).
-- ``192.168.12.248:11434``: ``/api/tags`` timed out at 5 seconds;
+- ``<lan-host-B>:11434``: ``/api/tags`` timed out at 5 seconds;
   ``ping`` fails with "Host is down"; ARP entry incomplete.  Mac 2
   remains ARP-incomplete for the **31st milestone in a row**.
 
@@ -229,8 +229,8 @@ Bounded W38 cross-source consensus probe
 (``phase85_xllm_consensus_probe.py``):
 
 - Trajectory hosts: ``mac1`` (localhost ``gemma2:9b``) and
-  ``mac_remote`` (192.168.12.191 ``qwen2.5:14b``).
-- Disjoint consensus host: ``mac_consensus`` (192.168.12.191
+  ``mac_remote`` (<lan-host-A> ``qwen2.5:14b``).
+- Disjoint consensus host: ``mac_consensus`` (<lan-host-A>
   ``qwen3.5:35b`` -- a different model class on the same physical
   host; defensible weak proxy for capsule-layer disjointness, *not*
   a true 3-host disjoint topology).

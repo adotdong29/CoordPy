@@ -152,7 +152,7 @@ def _mock_sweep(sweep_cfg: dict) -> dict:
 
 def _real_sweep_stub(sweep_cfg: dict) -> dict:
     """Real-LLM sweep is heavy — the runner records the resolved
-    command line for the operator to launch on the ASPEN cluster,
+    command line for the operator to launch on a remote cluster,
     rather than silently forking a multi-hour job from inside a
     product-runner invocation. This is deliberate: we preserve the
     Phase-42/44 scripts as the *execution* surface for real-model

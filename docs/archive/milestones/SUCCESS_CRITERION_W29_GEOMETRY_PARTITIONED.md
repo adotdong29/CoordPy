@@ -34,7 +34,7 @@ trust line (W21 trust-weighted multi-oracle adjudication) with the
 dense-control line (W27 multi-chain salience-keyed pool) inside one
 decision via an ensemble probe quorum, added 11 enumerated trust-
 boundary failure modes, and produced the first cross-host live
-evidence in 23 milestones (localhost gemma2:9b + 192.168.12.191
+evidence in 23 milestones (localhost gemma2:9b + <lan-host-A>
 qwen2.5:14b; 5592 LAN bytes; 128 cross-host probe calls; 16/16 cells
 correct; 10/16 ratified, 6/16 below quorum).  Its stable-vs-experimental
 boundary tightened (`__experimental__` tuple; SDK v3.29; pyproject 0.5.2).
@@ -46,7 +46,7 @@ own §10 and §6, plus the master plan post-W28 audit):
   *magnitude* on a regime where W27 alone makes correctness mistakes is
   unmeasured.  R-75 banks all have W27 correctness = 1.000 — they are
   structurally incapable of exhibiting ε > 0 cross-host variance gain.
-* **G2 — Mac 2 still not participating.**  192.168.12.248 ARP-incomplete
+* **G2 — Mac 2 still not participating.**  <lan-host-B> ARP-incomplete
   for 23 (now 24) consecutive milestones.  Two reachable hosts only.
 * **G3 — Transformer-internal KV / hidden-state sharing not
   demonstrated.**  Every dense payload is still an audited proxy at the
@@ -320,17 +320,17 @@ mistakes.  Status:
 * HONESTLY-NULL if both reachable hosts are present but the LLMs
   agree on every cell (no disagreement to witness).  Report the
   agreement rate and label the gap.
-* HONESTLY-NULL if Mac 2 (192.168.12.248) is still ARP-incomplete
+* HONESTLY-NULL if Mac 2 (<lan-host-B>) is still ARP-incomplete
   AND the live ensemble is single-host (then S1/S2 reduce to
   best-effort probes; the gap is hardware, not mechanism).
 
 ### S2 — Mac 2 returning OR honest fallback
 
-* PASS if 192.168.12.248 is reachable AND a backend on it
+* PASS if <lan-host-B> is reachable AND a backend on it
   participates in the R-76-XHOST-DRIFT ensemble.
 * HONESTLY-NULL otherwise.  When null, the bench MUST honestly
   report Mac 2 ARP status and continue with the strongest available
-  topology (localhost + 192.168.12.191).
+  topology (localhost + <lan-host-A>).
 
 ### S3 — Trust precision = 1.000 on the cross-host bench
 

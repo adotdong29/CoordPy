@@ -98,7 +98,7 @@
       Visible-tokens savings = 4.90 % — modest because most
       envelopes are skipped (NO_TRIGGER on abstention). Artifact:
       ``docs/data/phase69_live_gemma2_9b_n4.json``.
-* **Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+* **Two-Mac infrastructure.** Mac 2 (<lan-host-B>) ARP
   ``incomplete`` at milestone capture — same status as SDK v3.6
   through SDK v3.22 (16th milestone in a row). **No two-Mac
   sharded inference happened in SDK v3.23.** The W22 mechanism is

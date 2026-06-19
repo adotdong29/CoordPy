@@ -36,7 +36,7 @@ recovery-half cells (per seed) on a composite-collusion regime
 that defeats W41.
 
 Live cross-host evidence at temperature 0 on the two-Mac
-topology (localhost gemma2:9b + 192.168.12.191 qwen2.5:14b)
+topology (localhost gemma2:9b + <lan-host-A> qwen2.5:14b)
 shows **4/4 paraphrase-invariant cross-host gold agreement** on
 K=4 paraphrases of one closed-vocabulary arithmetic prompt
 ("What is 2+2?", "Compute two plus two.", "Add two and two.",
@@ -289,12 +289,12 @@ hung Ollama`` framing (``.101`` is an Apple TV / AirPlay
 receiver).  The honest live multi-host topology re-confirmed
 at the W42 milestone is two reachable Macs:
 
-- ``localhost`` (Mac 1, ``Qunfengs-MBP.lan``, ``192.168.12.157``)
-- ``192.168.12.191`` (Mac 2, ``HSC136047-MAC.lan``)
+- ``localhost`` (Mac 1, ``Qunfengs-MBP.lan``, ``<lan-host>``)
+- ``<lan-host-A>`` (Mac 2, ``HSC136047-MAC.lan``)
 
 Both serve Ollama at temperature 0 on closed-vocabulary
-prompts.  ``192.168.12.248`` is recorded as gone (per user).
-``192.168.12.101`` is recorded as Apple TV / AirPlay
+prompts.  ``<lan-host-B>`` is recorded as gone (per user).
+``<lan-host-C>`` is recorded as Apple TV / AirPlay
 (``W41-INFRA-1`` carry-forward).
 
 ### W42 cross-host paraphrase-invariance probe (2026-05-03)
@@ -316,17 +316,17 @@ prompt:
 4. ``"2+2 equals what? Answer with one word."``
 
 Models: ``gemma2:9b`` on localhost; ``qwen2.5:14b`` on
-``192.168.12.191`` (genuinely different model classes; the
+``<lan-host-A>`` (genuinely different model classes; the
 standing W37/W41 cross-architecture pair).
 
 Result:
 
 - 4/4 paraphrases responsive on localhost.
-- 4/4 paraphrases responsive on ``192.168.12.191``.
+- 4/4 paraphrases responsive on ``<lan-host-A>``.
 - 4/4 cross-host normalised agreement (both hosts emit
   ``"Four"`` on every paraphrase).
 - 4/4 gold-correct on localhost.
-- 4/4 gold-correct on ``192.168.12.191``.
+- 4/4 gold-correct on ``<lan-host-A>``.
 - 1 distinct normalised answer per host (paraphrase-invariant
   on each host).
 - ``local_paraphrase_invariant = True``.

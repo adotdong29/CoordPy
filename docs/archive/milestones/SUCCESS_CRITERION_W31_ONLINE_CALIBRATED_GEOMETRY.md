@@ -85,7 +85,7 @@ W31's job is to:
      route_audit_cid)` so cross-component swaps are detected.
 5. **Sharpen W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE** by
    constructing a small live cross-architecture probe (gemma2:9b on
-   localhost vs qwen2.5:14b on 192.168.12.191) on prompts crafted
+   localhost vs qwen2.5:14b on <lan-host-A>) on prompts crafted
    for surface-level family-specific disagreement at temperature 0.
    The bar is null-acceptable with explanation: if the two LLMs
    honestly agree on every cell at temp 0, the witness is null and
@@ -329,7 +329,7 @@ detection beyond the union of per-component CIDs.
 
 Live LLM probes from two reachable hosts on a cross-architecture
 disagreement-driven regime (gemma2:9b on localhost + qwen2.5:14b on
-192.168.12.191).  Status:
+<lan-host-A>).  Status:
 
 * **PASS** if the run records ``n_cross_host_probe_calls > 0`` AND
   the controller observes ≥ 1 cell with cross-architecture LLM
@@ -338,17 +338,17 @@ disagreement-driven regime (gemma2:9b on localhost + qwen2.5:14b on
 * **HONESTLY-NULL** if both reachable hosts are present but the LLMs
   agree on every cell at temp 0.  Report the agreement rate and label
   the gap.
-* **HONESTLY-NULL** if Mac 2 (192.168.12.248) is still ARP-incomplete
+* **HONESTLY-NULL** if Mac 2 (<lan-host-B>) is still ARP-incomplete
   AND the live ensemble is two-host (then S1 reduces to best-effort
   probes; the gap is hardware, not mechanism).
 
 ### S2 — Mac 2 returning OR honest fallback
 
-* PASS if 192.168.12.248 is reachable AND a backend on it
+* PASS if <lan-host-B> is reachable AND a backend on it
   participates in the R-78-XLLM-LIVE ensemble.
 * HONESTLY-NULL otherwise.  When null, the bench MUST honestly
   report Mac 2 ARP status and continue with the strongest available
-  topology (localhost + 192.168.12.191).
+  topology (localhost + <lan-host-A>).
 
 ### S3 — Trust precision = 1.000 on the cross-host bench
 

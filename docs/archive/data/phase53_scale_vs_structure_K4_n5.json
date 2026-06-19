@@ -28,7 +28,7 @@
     "distractors_per_role": [
       8
     ],
-    "endpoint": "http://192.168.12.191:11434",
+    "endpoint": "http://<lan-host-A>:11434",
     "max_claims": 6,
     "max_tokens": 128,
     "model_tags": [

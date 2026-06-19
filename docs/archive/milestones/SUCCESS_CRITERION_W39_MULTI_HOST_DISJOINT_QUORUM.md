@@ -54,8 +54,8 @@ close the architecture-dependent ``W38-C-NATIVE-LATENT`` /
 transformer-internal evidence outside the capsule layer.
 
 A second axis of release readiness: the lab topology stale-pin on
-``192.168.12.248`` (the historical "Mac 2") has been independently
-diagnosed as stale and replaced by ``192.168.12.101`` as the
+``<lan-host-B>`` (the historical "Mac 2") has been independently
+diagnosed as stale and replaced by ``<lan-host-C>`` as the
 reachable third physical host.  W39 must encode this honestly: the
 runtime, experiments, and live xLLM probe paths must accept an
 explicit override and fall through a candidate list including
@@ -104,7 +104,7 @@ W39 must implement a real method beyond W38:
    raises ``MutuallyDisjointTopologyError`` at construction time;
    the verifier rejects an envelope claiming an overlapping pool
    pair (``w39_quorum_mutual_disjointness_violation``).
-10. Resolve the lab topology stale-pin: ``192.168.12.101`` is
+10. Resolve the lab topology stale-pin: ``<lan-host-C>`` is
     accepted as a reachable disjoint third physical-host candidate
     in the live xLLM quorum probe; the milestone records the
     honest infra observation about ``.101``'s inference-path
@@ -129,7 +129,7 @@ and not closure of ``W38-L-CONSENSUS-COLLUSION-CAP`` in general.
 | **H7** | Insufficient-quorum falsifier | On R-86-INSUFFICIENT-QUORUM, when fewer than ``quorum_min`` registered disjoint probes are present, W39 reduces to W38 byte-for-byte (delta = 0); the W39 audit envelope still records the QUORUM_INSUFFICIENT branch |
 | **H8** | Old explicit capsule line preserved | Focused W33, W34, W35, W36, W37, W38 regression slices stay green; W39 composes W21/W33/W34/W35/W36/W37/W38 rather than bypassing them |
 | **H9** | Mutual-disjointness mechanically enforced | Building a W39 registry whose any two registered quorum host pools have non-empty intersection raises ``MutuallyDisjointTopologyError`` at construction time; the verifier additionally rejects an envelope whose registered topology claims an overlapping pool pair (``w39_quorum_mutual_disjointness_violation``) |
-| **H10** | Live/three-host evidence | Re-resolve the lab topology: confirm ``192.168.12.101`` is accepted as the reachable third physical host (Mac 2 candidate); record ``192.168.12.248`` honestly as historical/stale; run the strongest bounded live multi-host disjoint quorum cross-architecture probe practical |
+| **H10** | Live/three-host evidence | Re-resolve the lab topology: confirm ``<lan-host-C>`` is accepted as the reachable third physical host (Mac 2 candidate); record ``<lan-host-B>`` honestly as historical/stale; run the strongest bounded live multi-host disjoint quorum cross-architecture probe practical |
 | **H11** | Broad regression confidence | Full ``pytest vision_mvp/tests -q`` runs to completion at least once during the milestone with the result counted (or honestly carried forward with named exclusions); focused W22..W39 regression is green |
 | **H12** | Release-readiness clause | Versioning, changelog, success bar, results note, theorem registry, README/START_HERE/master plan/paper markers updated only if H1..H11 pass and the stable runtime remains unchanged; vision_mvp ``__version__`` aligned with pyproject |
 
@@ -147,8 +147,8 @@ and not closure of ``W38-L-CONSENSUS-COLLUSION-CAP`` in general.
 
 | Gate | Description | Target |
 | --- | --- | --- |
-| **S1** | Stronger live multi-host evidence | Bounded live xLLM quorum probe observes either cross-architecture quorum agreement or honest divergence at a 3-physical-host topology, with gold-correlated labelling, with ``192.168.12.101`` accepted as the reachable third physical host |
-| **S2** | Mac 2 stale-pin discharged | The historical ``192.168.12.248`` "Mac 2" address is honestly downgraded to historical/stale; the new ``192.168.12.101`` candidate is recorded with the diagnosed inference-path infra observation (W39-INFRA-1) if applicable |
+| **S1** | Stronger live multi-host evidence | Bounded live xLLM quorum probe observes either cross-architecture quorum agreement or honest divergence at a 3-physical-host topology, with gold-correlated labelling, with ``<lan-host-C>`` accepted as the reachable third physical host |
+| **S2** | Mac 2 stale-pin discharged | The historical ``<lan-host-B>`` "Mac 2" address is honestly downgraded to historical/stale; the new ``<lan-host-C>`` candidate is recorded with the diagnosed inference-path infra observation (W39-INFRA-1) if applicable |
 | **S3** | Stable-vs-experimental boundary | W39 remains under ``__experimental__``; stable runtime contract unchanged |
 | **S4** | Theory | Add one conditional sufficiency claim, one limitation/falsifier claim, and one native-latent gap claim |
 | **S5** | Paper/master-plan synthesis | Old explicit-capsule line, dense-control/geometry line, W38 disjoint-consensus line, and W39 multi-host quorum line read as a single arc with an explicit release boundary |
@@ -210,8 +210,8 @@ W39 may claim:
   and the mutual-disjointness-violation falsifier;
 - broader regression confidence if the full ``vision_mvp/tests``
   suite is run end-to-end during the milestone;
-- resolution of the historical ``192.168.12.248`` Mac 2 stale-pin
-  in favor of the reachable ``192.168.12.101`` third physical host
+- resolution of the historical ``<lan-host-B>`` Mac 2 stale-pin
+  in favor of the reachable ``<lan-host-C>`` third physical host
   candidate, with honest residual infra observation if the
   inference path is bounded;
 - a release-candidate declaration **only** when H1..H12 + S3 pass

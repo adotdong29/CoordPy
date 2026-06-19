@@ -51,7 +51,7 @@ class LLMClient:
     stats: LLMStats = field(default_factory=LLMStats)
     timeout: float = 300.0     # seconds — long enough for big-context 7B calls
     base_url: str | None = None  # None → localhost; Phase 42 overrides
-                                  # this with the ASPEN cluster node URL.
+                                  # this with the cluster node URL.
     think: bool | None = None    # None → omit the top-level ``think`` field
                                   # (preserves Phase 42 byte-for-byte semantics).
                                   # False → opt out of thinking mode on Qwen3

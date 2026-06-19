@@ -115,8 +115,8 @@ KV-cache / context-length headroom, not capacity.
 * OpenMPI is available via `brew install open-mpi`.
 * Model conversion to MLX format (`mlx_lm.convert`) is a
   one-time per-model operation.
-* The two Macs are `192.168.12.191` (Mac 1, alive at
-  measurement time) and `192.168.12.248` (Mac 2, offline at
+* The two Macs are `<lan-host-A>` (Mac 1, alive at
+  measurement time) and `<lan-host-B>` (Mac 2, offline at
   measurement time — ARP "incomplete"). The integration
   boundary is therefore implementable and tested; the two-Mac
   *runtime* awaits Mac 2 returning to the LAN.
@@ -194,7 +194,7 @@ All 9 pass in `< 2 s`.
 
 ### 3.1 Setup
 
-* **Endpoint:** `http://192.168.12.191:11434` (Mac 1 Ollama).
+* **Endpoint:** `http://<lan-host-A>:11434` (Mac 1 Ollama).
 * **Models:**
     * `qwen2.5:14b-32k`  — 14.8 B parameters, dense, Q4_K_M,
                             weights ≈ 9.0 GB.
@@ -297,7 +297,7 @@ We mint a small theorem family for SDK v3.6:
 > ``docs/data/parser_boundary_real_llm_n10.json`` (and a fresh
 > run lands at ``/tmp/coordpy-distributed/real_cross_model_n10.json``).
 > Reproducible with one command on any machine that can reach
-> ``192.168.12.191:11434`` and has both Ollama models loaded.
+> ``<lan-host-A>:11434`` and has both Ollama models loaded.
 
 > **W5-2 (proved, integration boundary).** The CoordPy inner-loop
 > (`_real_cells`) accepts any duck-typed

@@ -55,7 +55,7 @@
   W20 / W19 / W18 / W13 share. Artifacts:
   ``docs/data/phase67_live_qwen2_5_coder_7b_n4.json``,
   ``docs/data/phase67_live_mixtral_8x7b_n4.json``.
-* **Two-Mac infrastructure.** Mac 2 (192.168.12.248) ARP
+* **Two-Mac infrastructure.** Mac 2 (<lan-host-B>) ARP
   ``incomplete`` at milestone capture — same status as SDK v3.6
   through SDK v3.20. **No two-Mac sharded inference happened in
   SDK v3.21.** The W20 ``OutsideWitnessOracle`` Protocol is
@@ -337,7 +337,7 @@ Mechanically verified by:
   ``qwen2.5:14b-32k`` and ``qwen3.5:35b`` model tags. Cross-model
   comparison was therefore done against ``mixtral:8x7b`` (47B-MoE)
   on Mac 1 only.
-* **Mac 2** (192.168.12.248): ARP ``incomplete`` at milestone
+* **Mac 2** (<lan-host-B>): ARP ``incomplete`` at milestone
   capture — same status as SDK v3.6 through SDK v3.20. **No
   two-Mac sharded inference happened in SDK v3.21.** The
   ``MLXDistributedBackend`` adapter and the

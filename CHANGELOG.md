@@ -62,8 +62,8 @@ preview to a stable, supported public library. `SDK_VERSION` stays
 
 ### Removed
 - **Private infrastructure scrubbed from shipped package code:** the
-  `192.168.12.*` MAC1/MAC2 endpoint special-casing in `coordpy.runtime` and
-  the `aspen_mac*` profiles in `coordpy._internal.product.profiles` are gone,
+  `<lan-subnet>` MAC1/MAC2 endpoint special-casing in `coordpy.runtime` and
+  the host-specific real-LLM profiles in `coordpy._internal.product.profiles` are gone,
   replaced by generic `local_*` profiles and the single `COORDPY_OLLAMA_URL`
   override. The published wheel no longer leaks any LAN topology.
 - **Internal ops material removed from the public tree:** the Claude PR-bot

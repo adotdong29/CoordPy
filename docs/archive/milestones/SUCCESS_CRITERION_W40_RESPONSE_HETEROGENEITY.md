@@ -68,7 +68,7 @@ or by a K+1-host disjoint quorum topology with a new genuinely
 uncompromised pool.
 
 W40 also encodes the second axis of release readiness: the
-W39-INFRA-1 finding (``192.168.12.101`` Ollama HTTP listener
+W39-INFRA-1 finding (``<lan-host-C>`` Ollama HTTP listener
 hung after first model-load contact under one-word probe budget)
 must be re-probed; if not restorable in this environment, the
 release boundary records ``.101`` honestly as a TCP-up + HTTP-
@@ -152,7 +152,7 @@ W40 must implement a real method beyond W39:
     at construction time; the verifier rejects an envelope
     claiming an overlapping pool pair.
 11. Reproduce W39-INFRA-1 in the live xLLM probe path; record
-    ``192.168.12.101`` honestly as TCP-up + HTTP-broken if the
+    ``<lan-host-C>`` honestly as TCP-up + HTTP-broken if the
     Ollama HTTP listener still returns "Empty reply from server"
     after first model-load contact.
 12. Keep the W39 multi-host disjoint quorum probe-provider path
@@ -179,7 +179,7 @@ latent transfer and not closure of
 | **H7** | Insufficient-response-signature falsifier | On R-87-INSUFFICIENT-RESPONSE-SIGNATURE, when fewer than ``min_response_signature_probes`` registered probes carry response signatures (or any probe is missing them), W40 reduces to W39 byte-for-byte (delta = 0); the W40 audit envelope still records the RESPONSE_SIGNATURE_INSUFFICIENT branch |
 | **H8** | Old explicit capsule line preserved | Focused W33, W34, W35, W36, W37, W38, W39 regression slices stay green; W40 composes W21/W33/W34/W35/W36/W37/W38/W39 rather than bypassing them |
 | **H9** | Mutual-disjointness mechanically enforced | Building a W40 registry whose any two registered member host pools have non-empty intersection raises ``MutuallyDisjointTopologyError`` at construction time; the verifier additionally rejects an envelope whose registered topology claims an overlapping pool pair (``w40_response_mutual_disjointness_violation``) |
-| **H10** | W39-INFRA-1 re-probed | The lab topology is re-probed: ``192.168.12.101`` is recorded honestly (TCP-up + HTTP-broken if not restorable, or restored and used in the live xLLM probe if recoverable); ``192.168.12.248`` is recorded as still ARP-incomplete; the milestone records the strongest live multi-host evidence available |
+| **H10** | W39-INFRA-1 re-probed | The lab topology is re-probed: ``<lan-host-C>`` is recorded honestly (TCP-up + HTTP-broken if not restorable, or restored and used in the live xLLM probe if recoverable); ``<lan-host-B>`` is recorded as still ARP-incomplete; the milestone records the strongest live multi-host evidence available |
 | **H11** | Broad regression confidence | Full ``pytest vision_mvp/tests -q`` runs to completion at least once during the milestone with the result counted (or honestly carried forward with named exclusions); focused W22..W40 regression is green |
 | **H12** | Release-readiness clause / RC1 | Versioning, changelog, success bar, results note, theorem registry, README/START_HERE/master plan/paper markers updated only if H1..H11 pass and the stable runtime remains unchanged; vision_mvp ``__version__`` aligned with pyproject; **RC1 declared** if H1..H11 + S3 pass and the lab topology + W39-INFRA-1 are recorded honestly |
 
@@ -197,8 +197,8 @@ latent transfer and not closure of
 
 | Gate | Description | Target |
 | --- | --- | --- |
-| **S1** | Stronger live multi-host evidence | Bounded live xLLM response-heterogeneity probe observes either cross-architecture response heterogeneity (different model classes produce naturally diverse one-word answers) OR honest collapse (e.g. all hosts at temperature 0 + ``num_predict=4`` produce byte-identical canonical answers); ``192.168.12.101`` is re-probed |
-| **S2** | W39-INFRA-1 re-probed and bounded | The historical ``192.168.12.101`` host is re-probed; the milestone records whether it is now restorable (W39-INFRA-1 closed) or remains TCP-up + HTTP-broken (W40-INFRA-1 carries forward) |
+| **S1** | Stronger live multi-host evidence | Bounded live xLLM response-heterogeneity probe observes either cross-architecture response heterogeneity (different model classes produce naturally diverse one-word answers) OR honest collapse (e.g. all hosts at temperature 0 + ``num_predict=4`` produce byte-identical canonical answers); ``<lan-host-C>`` is re-probed |
+| **S2** | W39-INFRA-1 re-probed and bounded | The historical ``<lan-host-C>`` host is re-probed; the milestone records whether it is now restorable (W39-INFRA-1 closed) or remains TCP-up + HTTP-broken (W40-INFRA-1 carries forward) |
 | **S3** | Stable-vs-experimental boundary | W40 remains under ``__experimental__``; stable runtime contract unchanged |
 | **S4** | Theory | Add one conditional sufficiency claim (W40-3), one limitation theorem (W40-L-COORDINATED-DIVERSE-RESPONSE-CAP), one conditional discharge (W39-C-LIVE-TRUNCATION-RECOVERY -> W40-RESPONSE-HETEROGENEITY captures budget-divergent paraphrases as one instance), and one native-latent gap claim (W40-C-NATIVE-LATENT) |
 | **S5** | Paper/master-plan synthesis | Old explicit-capsule line, dense-control/geometry line, W38 disjoint-consensus line, W39 multi-host quorum line, and W40 response-heterogeneity line read as a single arc with an explicit RC1 release boundary; the paper marker is updated |
@@ -304,7 +304,7 @@ W40 may not claim:
   theorem at the capsule layer;
 - a true K+1-host live disjoint topology while only one
   off-cluster physical host is reachable for live inference
-  AND ``192.168.12.101`` Ollama HTTP listener remains hung
+  AND ``<lan-host-C>`` Ollama HTTP listener remains hung
   under the one-word probe budget;
 - solved context for multi-agent teams;
 - production release independent of the explicit RC1 gate;

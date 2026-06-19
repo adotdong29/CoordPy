@@ -9,7 +9,7 @@ capsule line) with the **W27 multi-chain salience-keyed pool** (the
 verified ensemble ratification envelope. Backward-compat at K=1 is
 byte-for-byte W27 across 5/5 seeds; H1..H8 hard gates met; 4/4 soft
 gates met or honestly-reported (S1/S2 met for the first time in 23
-milestones using the localhost+192.168.12.191 two-host topology, S3
+milestones using the localhost+<lan-host-A> two-host topology, S3
 held trivially under the synthetic drift bench, S4 max overhead = 1
 token/cell, well within the ≤2 token budget); 222/222 W23..W28
 focused regression and 534/534 wider regression (W3..W28) green; ten
@@ -43,7 +43,7 @@ G1..G5):
   not been stressed against intermittent oracle drift driven by a
   real LLM.
 * **G2 — Cross-host / two-Mac validation absent** — Mac 2
-  (192.168.12.248) had been ARP-incomplete for 22 consecutive
+  (<lan-host-B>) had been ARP-incomplete for 22 consecutive
   milestones; no W-letter result had yet exercised two reachable hosts
   inside one bench.
 * **G3 — Old explicit capsule line and the new dense-control line
@@ -240,8 +240,8 @@ Topology probe (live, 2026-04-30):
 | Host | URL | Selected model | Architecture family |
 |---|---|---|---|
 | `localhost` | `http://localhost:11434` | `gemma2:9b` | Gemma2 |
-| `192.168.12.191` | `http://192.168.12.191:11434` | `qwen2.5:14b` | Qwen2.5 |
-| `192.168.12.248` | `http://192.168.12.248:11434` | (unreachable; ARP-incomplete) | — |
+| `<lan-host-A>` | `http://<lan-host-A>:11434` | `qwen2.5:14b` | Qwen2.5 |
+| `<lan-host-B>` | `http://<lan-host-B>:11434` | (unreachable; ARP-incomplete) | — |
 
 The bench's `cross_host_live` sub-bank registers a probe table of
 1× `DeterministicSignatureProbe` (local) + 2× `LLMSignatureProbe`
@@ -266,7 +266,7 @@ artifact at
 
 | Metric | Value |
 |---|---|
-| Hosts used | localhost (gemma2:9b) + 192.168.12.191 (qwen2.5:14b) |
+| Hosts used | localhost (gemma2:9b) + <lan-host-A> (qwen2.5:14b) |
 | n_probes | 3 (1× deterministic local + 2× LLM cross-host) |
 | W26 visible tokens / cell | 5.50 |
 | W27 visible tokens / cell | 7.00 |
@@ -301,9 +301,9 @@ This empirically discharges:
   different model families (Gemma2 + Qwen2.5) participated in a
   ratification quorum on real bytes.
 * **S2 (cross-host evidence)** — `cross_host_round_trip_bytes > 0`,
-  `n_cross_host_probe_calls > 0`. Mac 2 (192.168.12.248) remains
+  `n_cross_host_probe_calls > 0`. Mac 2 (<lan-host-B>) remains
   ARP-incomplete (23rd consecutive milestone), but the two
-  reachable hosts (localhost + 192.168.12.191) suffice for the first
+  reachable hosts (localhost + <lan-host-A>) suffice for the first
   cross-host probe table the programme has ever shipped.
 
 ### 4.5 Branch distribution (R-75-CROSS-MODEL-DRIFT, seed 11)
@@ -345,7 +345,7 @@ sections 2.1 and 2.2.)
 
 | Gate | Description | Status |
 |---|---|---|
-| S1 | Cross-model live evidence with ≥ 2 different model families | **PASS** — gemma2:9b (localhost) + qwen2.5:14b (192.168.12.191), live on n=4 cells; n=16 in flight. |
+| S1 | Cross-model live evidence with ≥ 2 different model families | **PASS** — gemma2:9b (localhost) + qwen2.5:14b (<lan-host-A>), live on n=4 cells; n=16 in flight. |
 | S2 | Cross-host evidence (`cross_host_round_trip_bytes > 0`) | **PASS** — 2595 bytes on n=4 smoke run; first time in 23 milestones. |
 | S3 | Variance reduction headline | **N/A — TRIVIAL ON SYNTHETIC** — the synthetic drift bench produces no W27 correctness errors, so W28's variance reduction headline cannot fire honestly. The mechanism is in place; demonstrating ε > 0 variance reduction needs a regime where W27 alone makes mistakes, which the current synthetic bank does not provide. The live bench (S1/S2) shows real LLM-probe abstention; whether this translates to measurable variance reduction on a harder regime is an open conjecture (W28-C-CROSS-HOST-VARIANCE) for the next milestone. |
 | S4 | Token-overhead bound ≤ 2 tokens/cell | **PASS** — max overhead across all banks = 1.00 token/cell. |
@@ -489,7 +489,7 @@ are tracked in the same milestone; see the commit summary.)
   measurements; all stable, all overhead ≤ 1.00, all correctness
   ratios ≥ W27.
 * `phase75 --bank topology_probe` — discovered two-host topology
-  (gemma2:9b + qwen2.5:14b across localhost + 192.168.12.191).
+  (gemma2:9b + qwen2.5:14b across localhost + <lan-host-A>).
 * `phase75 --bank cross_host_live --n-eval 4` — live LLM probes on
   two hosts; cross_host_round_trip_bytes = 2595; 2/4 ratified;
   correctness 1.000 across W26/W27/W28; first cross-host evidence
@@ -511,9 +511,9 @@ are tracked in the same milestone; see the commit summary.)
   The same nondeterminism that makes mixtral:8x7b cache-amplify on
   W22 will affect `LLMSignatureProbe` calls; trust priors at < 1.0
   partially compensate, but full discharge is open.
-* W28 does NOT bring up Mac 2. Mac 2 (192.168.12.248) remains
+* W28 does NOT bring up Mac 2. Mac 2 (<lan-host-B>) remains
   ARP-incomplete; W28's "two-host topology" uses localhost +
-  192.168.12.191 (the previously-named "Mac 1"). When Mac 2 returns,
+  <lan-host-A> (the previously-named "Mac 1"). When Mac 2 returns,
   the same ensemble probe table will accept a third backend with
   zero code changes.
 * W28 does NOT promise variance reduction in absolute terms (S3

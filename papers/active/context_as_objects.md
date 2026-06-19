@@ -1888,7 +1888,7 @@
 > visible token overhead/cell (in the W38..W40 density range).
 > **Live cross-host paraphrase-invariance probe (2026-05-03).**  At
 > temperature 0 on the two-Mac topology (``localhost`` gemma2:9b +
-> ``192.168.12.191`` qwen2.5:14b), K=4 paraphrases of one
+> ``<lan-host-A>`` qwen2.5:14b), K=4 paraphrases of one
 > closed-vocabulary arithmetic prompt produce **4/4 paraphrase-
 > invariant cross-host gold-correlated agreement**: both hosts emit
 > "Four" on every paraphrase; cross-host normalised agreement =
@@ -1954,7 +1954,7 @@
 > byte-for-W39; 80 producer_only).  W41 carries roughly **15.5k
 > structured bits per visible W41 token** at one visible token
 > overhead/cell (in the W38..W40 density range).  **Lab topology
-> retraction -- W41-INFRA-1**: re-probing ``192.168.12.101`` at the
+> retraction -- W41-INFRA-1**: re-probing ``<lan-host-C>`` at the
 > W41 milestone identifies it as an Apple TV / AirPlay receiver
 > (``HTTP/1.1 403 Forbidden`` with header ``Server:
 > AirTunes/860.7.1`` on port 5000; locally-administered MAC
@@ -1966,12 +1966,12 @@
 > the connection on an unrecognised port, NOT a hung Ollama
 > listener.  The honest live multi-host topology going forward is
 > the two-Mac pair ``localhost`` (``Qunfengs-MBP.lan``,
-> ``192.168.12.157``) + ``192.168.12.191``
-> (``HSC136047-MAC.lan``).  ``192.168.12.248`` is recorded as gone
+> ``<lan-host>``) + ``<lan-host-A>``
+> (``HSC136047-MAC.lan``).  ``<lan-host-B>`` is recorded as gone
 > (per user instruction).  A bounded W41 sanity probe at
 > temperature 0 + ``num_predict = 4`` on the two-Mac topology
 > produced byte-agreed answers across architectures: ``localhost
-> gemma2:9b`` and ``192.168.12.191 qwen2.5:14b`` both answered
+> gemma2:9b`` and ``<lan-host-A> qwen2.5:14b`` both answered
 > "Four" to "What is 2+2? Answer with one word."  This sharpens
 > the closed-vocabulary one-word-prompt
 > ``W37-C-LIVE-TRUNCATION-RECOVERY`` /
@@ -2049,7 +2049,7 @@
 > audited capsule-layer cross-host response-text Jaccard divergence
 > proxy with two mechanically-enforced disjointness preconditions
 > inherited from W39.  **Lab topology resolution -- W40-INFRA-1**:
-> ``192.168.12.101`` re-probed (2026-05-03) -- ping 0% packet loss
+> ``<lan-host-C>`` re-probed (2026-05-03) -- ping 0% packet loss
 > (a strict improvement over W39's 100% packet loss end-state),
 > TCP port 11434 connects, TCP port 22 connects with auth methods
 > advertised; however, the Ollama HTTP listener still returns
@@ -2057,7 +2057,7 @@
 > W39-INFRA-1 hung-listener pattern persists).  SSH credentials
 > still unavailable to restart.  Honest verdict: ``.101`` is now
 > **TCP-up + HTTP-broken** at the Ollama layer; restoration
-> requires SSH credentials.  ``192.168.12.248`` remains
+> requires SSH credentials.  ``<lan-host-B>`` remains
 > ARP-incomplete (32nd milestone in a row).  **RC1 declared**:
 > H1..H12 + S3 of the W40 success criterion pass.  The SDK v3.41
 > line is the **first official release-candidate** of the CoordPy
@@ -2116,8 +2116,8 @@
 > disjointness preconditions (trajectory disjointness inherited from
 > W38 + mutual disjointness new in W39).  **Lab topology
 > resolution**: the historical Mac-2 endpoint
-> (``192.168.12.248``) has been ARP-incomplete for the 31st
-> milestone in a row; ``192.168.12.101`` was identified as the
+> (``<lan-host-B>``) has been ARP-incomplete for the 31st
+> milestone in a row; ``<lan-host-C>`` was identified as the
 > reachable third physical host candidate, **partially discharging
 > W38-C-MULTI-HOST at the topology layer** (preflight-OK on cold
 > contact with ``qwen3.5:35b`` + ``qwen2.5:14b-32k`` model files
@@ -2280,7 +2280,7 @@
 > precision = 1.000** on R-81-DOUBLE-ANCHOR-COMPROMISE.  The
 > milestone also closes two named W33 infrastructure follow-ups:
 > **W33-INFRA-1** (preflight ``/api/tags`` discipline; an honest
-> empirical correction — qwen3.5:35b on 192.168.12.191 IS in fact
+> empirical correction — qwen3.5:35b on <lan-host-A> IS in fact
 > loaded; the W33 diagnosis was wrong, the real W33 infra failure
 > was timeout + chat-template) and **W33-INFRA-2** (chat-template
 > + ``num_predict=4`` + stop tokens for one-word probes).  Trust
@@ -4304,7 +4304,7 @@ The current paper incorporates the following layers:
   probe types (`DeterministicSignatureProbe`,
   `OracleConsultationProbe`, `LLMSignatureProbe`), the first
   cross-host live LLM evidence in 23 milestones (localhost gemma2:9b
-  + 192.168.12.191 qwen2.5:14b; 5592 LAN bytes; 128 cross-host probe
+  + <lan-host-A> qwen2.5:14b; 5592 LAN bytes; 128 cross-host probe
   calls). On R-75-CROSS-HOST-LIVE the trust-weighted ensemble
   ratifies 10/16 cells with trust precision 1.000. The first
   capsule-native synthesis of the explicit-capsule trust line
@@ -4341,7 +4341,7 @@ The current paper incorporates the following layers:
   ``correctness_w29 = 0.750``, **Δ = +0.250 across 5/5 seeds**,
   ``trust_precision = 1.000``, ``mean overhead = 0.75 tokens/cell``.
   Same +0.250 gain holds on the live two-host LLM topology
-  (localhost gemma2:9b + 192.168.12.191 qwen2.5:14b); 16 cross-host
+  (localhost gemma2:9b + <lan-host-A> qwen2.5:14b); 16 cross-host
   probe calls; 710 LAN bytes; trust precision 1.000. **Empirically
   discharges W28-C-CROSS-HOST-VARIANCE on the magnitude axis** —
   the first capsule-native multi-agent-coordination method to
@@ -4359,7 +4359,7 @@ The current paper incorporates the following layers:
   priors), and **W29-C-NATIVE-LATENT** (architecture-dependent —
   true transformer-internal subspace projection vs the W29 audited
   proxy; retained as the next true wall). 38/38 W29 unit tests +
-  935/935 wider regression pass. Mac 2 (192.168.12.248) still
+  935/935 wider regression pass. Mac 2 (<lan-host-B>) still
   ARP-incomplete (24th milestone). (R-76, SDK v3.30)
 - **W30 family:** calibrated geometry-partitioned dense control +
   multi-stride basis-history + per-partition calibration prior +
@@ -4411,7 +4411,7 @@ The current paper incorporates the following layers:
   **W30-C-PRIOR-LEARNING** (true learned per-partition prior
   vs the W30 deterministic running mean — out of scope as a
   capsule-layer mechanism). 36/36 W30 unit tests + 357/357
-  focused regression pass. Mac 2 (192.168.12.248) still ARP-
+  focused regression pass. Mac 2 (<lan-host-B>) still ARP-
   incomplete (25th milestone). (R-77, SDK v3.31)
 - **W31 family:** online self-calibrated geometry-aware dense
   control + sealed prior trajectory + adaptive threshold + W31
@@ -4464,7 +4464,7 @@ The current paper incorporates the following layers:
   0.5 threshold). **First measured live cross-architecture LLM
   disagreement at temperature 0 in the programme** (28th
   milestone): gemma2:9b on localhost vs qwen2.5:14b on
-  192.168.12.191 disagree on **2/8 = 0.250 of structured-
+  <lan-host-A> disagree on **2/8 = 0.250 of structured-
   decision prompts at temp 0**, reproducible byte-for-byte
   across two runs. **Sharpens W30-C-CROSS-HOST-VARIANCE-LIVE-
   MAGNITUDE-LIVE on the infrastructure-discharge axis.** Newly
@@ -4476,7 +4476,7 @@ The current paper incorporates the following layers:
   **W31-C-MULTI-HOST** (3+ host topology, hardware-bounded),
   **W31-C-LONG-WINDOW-CONVERGENCE** (longer trajectory windows).
   41/41 W31 unit tests + 437/437 phase69-78 regression + 68/68
-  wider coordpy suite pass. Mac 2 (192.168.12.248) still ARP-
+  wider coordpy suite pass. Mac 2 (<lan-host-B>) still ARP-
   incomplete (26th milestone). (R-78, SDK v3.32)
 - **W32 family:** long-window convergent online geometry-aware
   dense control + EWMA-tracked per-partition prior + Page two-
@@ -4524,7 +4524,7 @@ The current paper incorporates the following layers:
   W32-Λ-mis-correlated-gold ⇒ gate-bounded, never opens on
   synthetic banks). Live cross-architecture LLM gold-verifiable
   pilot (gemma2:9b on localhost vs qwen2.5:14b on
-  192.168.12.191, temp 0, 20 prompts, byte-reproducible across
+  <lan-host-A>, temp 0, 20 prompts, byte-reproducible across
   two runs): **19/20 = 0.950 agreement**, sole disagreement
   D5 (TCP handshake) has neither host correct against gold —
   the first measured live cross-architecture LLM gold-verifiable
@@ -4541,7 +4541,7 @@ The current paper incorporates the following layers:
   integration; primitives ship in W32 but the W21 integration
   is not yet built). 45/45 W32 unit tests + 414/414 phase69-79
   regression + 77/77 wider coordpy suite = 536 tests pass. Mac 2
-  (192.168.12.248) still ARP-incomplete (27th milestone).
+  (<lan-host-B>) still ARP-incomplete (27th milestone).
   (R-79, SDK v3.33)
 
 The post-W21 efficiency-and-coordination ladder (W22 → W31)

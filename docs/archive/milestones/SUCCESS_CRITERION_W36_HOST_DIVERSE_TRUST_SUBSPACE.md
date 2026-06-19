@@ -68,7 +68,7 @@ guard**, not native latent transfer.
 | Gate | Description | Target |
 | --- | --- | --- |
 | **S1** | Stronger live disagreement evidence | Bounded live probe observes cross-host disagreement with gold-correlated winner, or records honestly-null |
-| **S2** | Mac 2 | `192.168.12.248:11434/api/tags` succeeds, or timeout evidence is recorded |
+| **S2** | Mac 2 | `<lan-host-B>:11434/api/tags` succeeds, or timeout evidence is recorded |
 | **S3** | Stable-vs-experimental boundary | W36 remains under `__experimental__`; stable runtime contract unchanged |
 | **S4** | Theory | Add one conditional sufficiency claim, one limitation/falsifier claim, and one native-latent gap claim |
 | **S5** | Paper/master-plan synthesis | The old explicit capsule line and dense-control/geometry line read as a single stack with a host-trust boundary |

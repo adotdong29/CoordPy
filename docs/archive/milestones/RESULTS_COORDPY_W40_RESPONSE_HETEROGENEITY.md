@@ -269,10 +269,10 @@ Artifact:
 
 ### 4.1 Lab topology resolution (W40-INFRA-1)
 
-The historical Mac-2 endpoint (``192.168.12.248``) has been
+The historical Mac-2 endpoint (``<lan-host-B>``) has been
 ARP-incomplete for the **32nd milestone in a row**.
 
-The third physical host candidate ``192.168.12.101`` has changed
+The third physical host candidate ``<lan-host-C>`` has changed
 state vs the W39 milestone:
 
 - W39 end-state: ``.101`` ping at 100% packet loss; Ollama HTTP
@@ -298,7 +298,7 @@ state vs the W39 milestone:
   unreachable) but the Ollama service still requires SSH
   credentials to restart.
 
-This is recorded as **W40-INFRA-1**: ``192.168.12.101`` is now
+This is recorded as **W40-INFRA-1**: ``<lan-host-C>`` is now
 TCP-up + HTTP-broken at the Ollama layer; the host has not been
 restored to live inference in this milestone because SSH
 credentials are still unavailable in this environment.
@@ -459,13 +459,13 @@ does not close this.
 
 **Conjecture**: A K+1-host topology with at least one new
 genuinely uncompromised host pool (specifically, restoring
-``192.168.12.101``'s Ollama HTTP listener so it can serve the
+``<lan-host-C>``'s Ollama HTTP listener so it can serve the
 disjoint third-host inference role at temperature 0 +
 ``num_predict=4``) would let the W40 quorum size be raised
 beyond ``quorum_min``, defeating the
 ``W40-L-COORDINATED-DIVERSE-RESPONSE-CAP`` collusion attack at
 the capsule layer.  Currently partially discharged at the
-topology layer via ``192.168.12.101`` (TCP-up + ping-up on cold
+topology layer via ``<lan-host-C>`` (TCP-up + ping-up on cold
 contact in the W40 milestone, a strict improvement over the W39
 end-state) but still open at the live-inference layer
 (``W40-INFRA-1``).
@@ -523,15 +523,15 @@ Release readiness improved because:
   to evaluate at the synthetic-bench layer; the W39-INFRA-1
   / W40-INFRA-1 line is bounded honestly and does not block the
   RC declaration.
-- The historical Mac-2 stale repo pin (``192.168.12.248``)
-  remains discharged in favour of ``192.168.12.101`` as the
+- The historical Mac-2 stale repo pin (``<lan-host-B>``)
+  remains discharged in favour of ``<lan-host-C>`` as the
   reachable third physical host candidate; the W39 live xllm
   probe accepts ``COORDPY_OLLAMA_URL_MAC2`` env-var override and
   falls through a candidate list including ``.101`` before
   declaring "Mac 2 unreachable"; the W39-INFRA-1 fallback path
   keeps the live K=2 quorum probe useful even when ``.101``'s
   inference path is bounded.
-- W40-INFRA-1 records ``192.168.12.101`` honestly as TCP-up +
+- W40-INFRA-1 records ``<lan-host-C>`` honestly as TCP-up +
   HTTP-broken in the W40 milestone (a strict topology-layer
   improvement over W39's 100%-packet-loss end-state); the
   live-inference layer remains bounded for lack of SSH

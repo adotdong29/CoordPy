@@ -83,7 +83,7 @@ W33 closes:
 
 W33 does NOT close `W32-C-NATIVE-LATENT` (architecture-dependent;
 the next true wall) or `W32-C-MULTI-HOST` (hardware-bounded; **28th
-consecutive milestone** with 192.168.12.248 ARP-incomplete; ping
+consecutive milestone** with <lan-host-B> ARP-incomplete; ping
 100 % packet loss; port 11434 unreachable).
 
 W33 does NOT claim transformer-internal KV sharing.  W33 does NOT
@@ -379,8 +379,8 @@ Topology probe (live, 2026-05-01):
 | Host | URL | Selected model | Architecture family | Status |
 |---|---|---|---|---|
 | `localhost` | `http://localhost:11434` | `mixtral:8x7b` | Mixtral 8x7B (47B-MoE) | **responsive** — generated text on all 20 prompts |
-| `192.168.12.191` | `http://192.168.12.191:11434` | `qwen3.5:35b` | Qwen3.5 35B | **silent** — empty body / timeout on all 20 prompts (model not actually loaded on remote host) |
-| `192.168.12.248` | `http://192.168.12.248:11434` | (unreachable; ARP-incomplete; **28th consecutive milestone**) | — | unreachable |
+| `<lan-host-A>` | `http://<lan-host-A>:11434` | `qwen3.5:35b` | Qwen3.5 35B | **silent** — empty body / timeout on all 20 prompts (model not actually loaded on remote host) |
+| `<lan-host-B>` | `http://<lan-host-B>:11434` | (unreachable; ARP-incomplete; **28th consecutive milestone**) | — | unreachable |
 
 20 trust-calibration prompts at temperature 0 (5 multi-step
 reasoning, 5 specialised factoid, 5 ambiguous syntax, 5 trust-
@@ -411,7 +411,7 @@ does not depend on this live probe.
 
 Two named infrastructure signals fall out cleanly:
 
-* **W33-INFRA-1 (qwen3.5:35b absent on 192.168.12.191)** — the model
+* **W33-INFRA-1 (qwen3.5:35b absent on <lan-host-A>)** — the model
   tag is not actually present / loaded on the remote host; either
   the model was never pulled or the daemon is not serving it on
   port 11434.  An honest live probe needs the model verified
@@ -456,7 +456,7 @@ sections 2 and 3.)
 | Gate | Description | Status |
 |---|---|---|
 | **S1** | Cross-architecture live trust-calibration evidence on R-80-XLLM-LIVE-TRUST | **best-effort** — see `xllm_live_trust_pilot.json` for raw bytes; mixtral:8x7b vs qwen3.5:35b at temp 0 on 20 trust-calibration prompts.  If gold-correlated disagreement found, registers as `W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE` discharge; otherwise honestly-null and the conjecture remains open. |
-| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — 192.168.12.248 ARP-incomplete (**28th consecutive milestone**); two reachable hosts (localhost + 192.168.12.191) suffice. |
+| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — <lan-host-B> ARP-incomplete (**28th consecutive milestone**); two reachable hosts (localhost + <lan-host-A>) suffice. |
 | **S3** | Trust precision = 1.000 on R-80-COMPROMISED-SHIFT | **PASS** — `min_trust_precision_w33 = 1.000` across all 5 seeds. |
 | **S4** | Token-overhead bound ≤ 1 token/cell vs W21 / W32 | **PASS** — `max_overhead_w33_per_cell = 1`, `mean_overhead_w33_per_cell = 1.000`. |
 | **S5** | At least one earlier conjecture sharpened or discharged | **PASS** — three discharges: **W21-C-CALIBRATED-TRUST** (online trust calibration via EWMA); **W32-C-OLD-LINE-EWMA-TRUST** (W21 EWMA-tracked-trust integration via W32 primitives); **W32-C-LONG-WINDOW-STRICT-GAIN** (single-partition regime exceeds cycle cap). |
@@ -717,7 +717,7 @@ sections 2 and 3.)
   *gain* on the same regime, W33 would need a non-FIFO substrate
   fallback that produces correct answers when both W21 and W33
   abstain.
-* W33 does NOT bring up Mac 2.  192.168.12.248 remains
+* W33 does NOT bring up Mac 2.  <lan-host-B> remains
   ARP-incomplete (**28th consecutive milestone**).
 * W33 does NOT close `W32-C-NATIVE-LATENT` (architecture-dependent;
   the next true wall) or `W32-C-MULTI-HOST` (hardware-bounded).

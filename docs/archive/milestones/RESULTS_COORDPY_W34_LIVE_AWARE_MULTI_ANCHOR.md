@@ -29,7 +29,7 @@ W34 also closes two named W33 infra follow-ups:
 
 * **W33-INFRA-1 closure** — closed-form preflight ``/api/tags``
   check.  *Honest empirical correction*: the W33 milestone diagnosed
-  qwen3.5:35b on 192.168.12.191 as "model not loaded" but a fresh
+  qwen3.5:35b on <lan-host-A> as "model not loaded" but a fresh
   ``/api/tags`` curl on 2026-05-01 confirms the model IS loaded
   along with qwen2.5:14b, qwen2.5:14b-32k, qwen2.5-coder:14b-32k,
   qwen2.5-coder:14b on the same host.  The real W33 infra failure
@@ -83,7 +83,7 @@ empty set, W34 abstains, and trust precision rises.
 
 W34 does NOT close W33-C-NATIVE-LATENT (architecture-dependent;
 the next true wall) or W33-C-MULTI-HOST (hardware-bounded; **29th
-consecutive milestone** with 192.168.12.248 ARP-incomplete; ping
+consecutive milestone** with <lan-host-B> ARP-incomplete; ping
 100 % packet loss; port 11434 unreachable).
 
 W34 does NOT claim transformer-internal KV sharing.  W34 does NOT
@@ -228,7 +228,7 @@ failure modes**.
 | **R-81-MIS-FEATURE-SIGNATURE** | W34-Λ-mis-feature-signature | phase67 outside_resolves all-honest with collision attempts | non-trivial W34; anchors=(sg, ch) |
 | **R-81-MANIFEST-V4-TAMPER** | H3 cross-component tamper detection | phase67 outside_resolves with compromised regime | non-trivial; 5 named tampers per ratified cell |
 | **R-81-RESPONSE-FEATURE-SIGNATURE** | H8 native-latent audited proxy byte-stability | 10 closed-form fixtures × 3 runs each | byte-stable signature confirmation |
-| **R-81-XLLM-LIVE-PILOT** | S1 best-effort live cross-host evidence with W34 preflight | live (gemma2:9b, llama3.1:8b, mixtral:8x7b on localhost; qwen2.5:14b, qwen3.5:35b on 192.168.12.191) at temp 0 | preflight + chat-template + num_predict=4 + stop tokens; adaptive timeout |
+| **R-81-XLLM-LIVE-PILOT** | S1 best-effort live cross-host evidence with W34 preflight | live (gemma2:9b, llama3.1:8b, mixtral:8x7b on localhost; qwen2.5:14b, qwen3.5:35b on <lan-host-A>) at temp 0 | preflight + chat-template + num_predict=4 + stop tokens; adaptive timeout |
 
 ---
 
@@ -377,14 +377,14 @@ The W34 live pilot uses the corrected infra discipline:
   | localhost | gemma2:9b | **OK** | 0.066s | 9.2B Gemma2 |
   | localhost | llama3.1:8b | **OK** | 0.004s | 8B Llama 3.1 |
   | localhost | mixtral:8x7b | **OK** | 0.004s | 47B-MoE Mixtral |
-  | 192.168.12.191 | qwen2.5:14b | **OK** | 0.058s | 14.8B Qwen2.5 |
-  | 192.168.12.191 | qwen3.5:35b | **OK** | 0.012s | 36B-MoE Qwen3.5 |
-  | 192.168.12.248 | (any) | **UNREACHABLE** | 5.000s timeout | 29th milestone ARP-incomplete |
+  | <lan-host-A> | qwen2.5:14b | **OK** | 0.058s | 14.8B Qwen2.5 |
+  | <lan-host-A> | qwen3.5:35b | **OK** | 0.012s | 36B-MoE Qwen3.5 |
+  | <lan-host-B> | (any) | **UNREACHABLE** | 5.000s timeout | 29th milestone ARP-incomplete |
 
   **5/5 hosts passed preflight; 1/1 unreachable host correctly skipped.**
   **W33-INFRA-1 closed**: every model the W34 pilot probes is
   pre-flight-confirmed loaded.  *Honest empirical correction*:
-  qwen3.5:35b on 192.168.12.191 IS in fact loaded (not "model not
+  qwen3.5:35b on <lan-host-A> IS in fact loaded (not "model not
   loaded" as the W33 milestone diagnosed).  Captured in load-bearing
   ``vision_mvp/experiments/artifacts/phase81/xllm_preflight_only.json``
   (fast preflight-only artifact).
@@ -445,10 +445,10 @@ Raw bytes:
 | Host::Model | Probes | Correct | Accuracy |
 |---|---|---|---|
 | localhost::llama3.1:8b | 13 | 11 | **0.846** |
-| 192.168.12.191::qwen2.5:14b | 13 | 10 | **0.769** |
+| <lan-host-A>::qwen2.5:14b | 13 | 10 | **0.769** |
 | localhost::gemma2:9b | 13 | 9 | **0.692** |
 | localhost::mixtral:8x7b | 13 | 6 | 0.462 |
-| 192.168.12.191::qwen3.5:35b | 13 | 0 | 0.000 |
+| <lan-host-A>::qwen3.5:35b | 13 | 0 | 0.000 |
 
 **Honest reading**: the W34 pilot's infrastructure axis is
 discharged (W33-INFRA-1 + W33-INFRA-2 both closed via load-bearing
@@ -483,7 +483,7 @@ disagreement frontier near 0.
   larger timeout window OR a different prompt template OR a
   ``options.num_ctx`` adjustment).
 
-* **Mac 2 still ARP-incomplete** (29th milestone) — 192.168.12.248
+* **Mac 2 still ARP-incomplete** (29th milestone) — <lan-host-B>
   unreachable at 5 s preflight timeout; the third-host axis remains
   hardware-bounded.
 
@@ -521,7 +521,7 @@ sections 2 and 3.)
 | Gate | Description | Status |
 |---|---|---|
 | **S1** | Cross-architecture live trust-calibration evidence on R-81-XLLM-LIVE-PILOT | **PASS** (stronger than expected) — see ``xllm_live_pilot.json`` for raw bytes (5 host+model pairs × 13 prompts = 65 probes; 44 responsive; 36 correct; 6 disagreements with gold-correlated winner on every disagreement; 0 cases of neither correct on disagreement).  Verdict ``infra_closure_AND_live_disagreement_with_gold_correlated_winner``.  This sharpens W33-C-CROSS-HOST-LIVE-TRUST-MAGNITUDE on the live-magnitude axis: real cross-host gold-correlated disagreement IS observable on the corrected-infra topology at temperature 0. |
-| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — 192.168.12.248 ARP-incomplete (**29th consecutive milestone**); two reachable hosts (localhost + 192.168.12.191) suffice for the multi-host probe within scope. |
+| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — <lan-host-B> ARP-incomplete (**29th consecutive milestone**); two reachable hosts (localhost + <lan-host-A>) suffice for the multi-host probe within scope. |
 | **S3** | Trust precision = 1.000 on R-81-DOUBLE-ANCHOR-COMPROMISE | **PASS** — ``min_trust_precision_w34 = 1.000`` across all 5 seeds. |
 | **S4** | Token-overhead bound ≤ 2 token/cell vs W33 | **PASS** — ``max_overhead_w34_per_cell = 1``, ``mean_overhead_w34_per_cell = 1.000``. |
 | **S5** | At least one earlier conjecture sharpened or discharged | **PASS** — two named infrastructure follow-ups closed (W33-INFRA-1: preflight ``/api/tags`` check; W33-INFRA-2: chat-template + ``num_predict=4`` + stop tokens).  Plus a new W34-L-MULTI-ANCHOR-CAP limitation theorem (proved by inspection: when all K anchors are simultaneously compromised, the multi-anchor consensus fails). |
@@ -603,7 +603,7 @@ sections 2 and 3.)
   ``preflight_check_tags`` confirms model availability before each
   probe and skips hosts whose model is not advertised.  Honest
   empirical correction recorded: the W33 milestone diagnosed
-  qwen3.5:35b on 192.168.12.191 as "model not loaded" but the
+  qwen3.5:35b on <lan-host-A> as "model not loaded" but the
   fresh ``/api/tags`` curl shows the model IS in fact loaded.  The
   real W33 infra failure was timeout-budget exhaustion +
   chat-template mismatch.
@@ -790,7 +790,7 @@ sections 2 and 3.)
   *gain* on the same regime, W34 would need a non-FIFO substrate
   fallback that produces correct answers when both W33 and W34
   abstain.
-* W34 does NOT bring up Mac 2.  192.168.12.248 remains
+* W34 does NOT bring up Mac 2.  <lan-host-B> remains
   ARP-incomplete (**29th consecutive milestone**).
 * W34 does NOT close ``W33-C-NATIVE-LATENT`` (architecture-
   dependent; the next true wall) or ``W33-C-MULTI-HOST``

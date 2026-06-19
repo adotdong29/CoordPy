@@ -119,7 +119,7 @@
   *measurable in expectation* but not *strict per-probe*. Artifact:
   ``docs/data/phase70_live_mixtral_8x7b_n4.json``.
 * **Two-Mac infrastructure (W23-Λ-cross-host).** Mac 2
-  (192.168.12.248) ARP ``incomplete`` at milestone capture — same
+  (<lan-host-B>) ARP ``incomplete`` at milestone capture — same
   status as SDK v3.6 through SDK v3.23 (**17th milestone in a
   row**). **No two-Mac sharded inference happened in SDK v3.24.**
   The W23 surface is *naturally* a producer / cache-controller /

@@ -24,7 +24,7 @@ the W31 manifest CID + cross-cell trajectory CID check together
 detect **65/65 = 1.000 tamper rejection rate** across five named
 tampers per ratified cell (cross-component swap + corruptions + value-
 range tampers).  On the live cross-architecture probe (gemma2:9b on
-localhost + qwen2.5:14b on 192.168.12.191), the two architecturally
+localhost + qwen2.5:14b on <lan-host-A>), the two architecturally
 diverse model families systematically disagree on **2/8 = 0.250 of
 prompts at temperature 0** — the **first measured live cross-
 architecture LLM disagreement at temp 0 in the programme** (28th
@@ -187,7 +187,7 @@ therefore **42 enumerated failure modes**.
 | **R-78-FROZEN-THRESHOLD** | W31-Λ-frozen-threshold falsifier | divergent_recover (INVERTED) | same with adaptive_threshold=False |
 | **R-78-NO-DRIFT** | W31-Λ-no-drift falsifier | chain_shared (FULL oracle for all 3 partitions) | every partition has FULL oracle; agreement = 1.0 throughout |
 | **R-78-MANIFEST-TAMPER** | H8 cross-component tamper detection | divergent_recover (INVERTED) | non-trivial registry; 5 named tampers per cell |
-| **R-78-XLLM-LIVE** | S1/S2 best-effort live cross-architecture | divergent_recover (INVERTED) | live LLM probes on two reachable Ollama hosts (gemma2:9b localhost + qwen2.5:14b 192.168.12.191) |
+| **R-78-XLLM-LIVE** | S1/S2 best-effort live cross-architecture | divergent_recover (INVERTED) | live LLM probes on two reachable Ollama hosts (gemma2:9b localhost + qwen2.5:14b <lan-host-A>) |
 
 ---
 
@@ -305,8 +305,8 @@ Topology probe (live, 2026-05-01):
 | Host | URL | Selected model | Architecture family |
 |---|---|---|---|
 | `localhost` | `http://localhost:11434` | `gemma2:9b` | Gemma2 |
-| `192.168.12.191` | `http://192.168.12.191:11434` | `qwen2.5:14b` | Qwen2.5 |
-| `192.168.12.248` | `http://192.168.12.248:11434` | (unreachable; ARP-incomplete; **26th consecutive milestone**) | — |
+| `<lan-host-A>` | `http://<lan-host-A>:11434` | `qwen2.5:14b` | Qwen2.5 |
+| `<lan-host-B>` | `http://<lan-host-B>:11434` | (unreachable; ARP-incomplete; **26th consecutive milestone**) | — |
 
 8 structured-decision prompts at temperature 0, seed 0 on both
 hosts.  Reproducible byte-for-byte across two runs:
@@ -369,7 +369,7 @@ sections 2 and 3.)
 | Gate | Description | Status |
 |---|---|---|
 | **S1** | Cross-architecture live evidence on R-78-XLLM-LIVE | **PASS** — n_cross_host_probe_calls = 16 (8 prompts × 2 hosts); 2/8 prompts surfaced systematic cross-architecture disagreement at temperature 0 (gemma2:9b "db_query"/"api" vs qwen2.5:14b "logs_pipeline"/"storage"); reproducible byte-for-byte across two runs. **First measured live cross-architecture LLM disagreement at temp 0 in the programme**. |
-| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — 192.168.12.248 ARP-incomplete (26th consecutive milestone); ping 100% packet loss; port 11434 unreachable. Two reachable hosts (localhost + 192.168.12.191) suffice for the live cross-architecture probe. |
+| **S2** | Mac 2 returning OR honest fallback | **HONESTLY-NULL** — <lan-host-B> ARP-incomplete (26th consecutive milestone); ping 100% packet loss; port 11434 unreachable. Two reachable hosts (localhost + <lan-host-A>) suffice for the live cross-architecture probe. |
 | **S3** | Trust precision = 1.000 on cross-host bench | **PASS** — trust_precision_w31 = 1.000 on R-78-NONSTATIONARY-PRIOR n=16 across 5/5 seeds. |
 | **S4** | Token-overhead bound ≤ 1 token/cell vs W30 | **PASS** — max overhead w31/w30 = 1, mean overhead w31/w30 = 0.875 ≤ 1.0 across all R-78 sub-banks; mean cumulative overhead w31/w28 ≤ 3.0. |
 | **S5** | At least one earlier conjecture sharpened or discharged | **PASS** — **W30-C-PRIOR-LEARNING** discharged (H6); **W30-C-CROSS-HOST-VARIANCE-LIVE-MAGNITUDE-LIVE** sharpened on the infrastructure-discharge axis (S1); plus **W21-C-CALIBRATED-TRUST** sharpened on the *online* axis (per-cell observed-agreement-rate driven). Three conjectures touched in one milestone. |
@@ -567,9 +567,9 @@ ARP-incomplete; hardware-bounded).
   it does prove the controller's bus saw exactly that sequence of
   online updates, not that the cells executed in any model-level
   order.
-* W31 does NOT bring up Mac 2.  192.168.12.248 remains
+* W31 does NOT bring up Mac 2.  <lan-host-B> remains
   ARP-incomplete (26th consecutive milestone, ping 100% packet loss).
-  The two reachable hosts (localhost + 192.168.12.191) suffice for
+  The two reachable hosts (localhost + <lan-host-A>) suffice for
   the live cross-architecture probe.
 * W31 does NOT close the live cross-host disagreement → strict
   correctness improvement axis.  The S1 result records 2/8 = 0.250

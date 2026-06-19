@@ -267,11 +267,11 @@ trust-calibration live axis remains open as renamed
 
 Best-effort: pair the largest reachable model on each host
 (e.g. ``mixtral:8x7b`` on localhost vs ``qwen3.5:35b`` on
-192.168.12.191) instead of the W32 pair (gemma2:9b vs qwen2.5:14b).
+<lan-host-A>) instead of the W32 pair (gemma2:9b vs qwen2.5:14b).
 
 ### S2 — Mac 2 returning OR honest fallback
 
-192.168.12.248 ARP-incomplete continues — record honest fallback
+<lan-host-B> ARP-incomplete continues — record honest fallback
 (28th milestone in a row).
 
 ### S3 — Trust precision = 1.000 on R-80-COMPROMISED-SHIFT
@@ -350,8 +350,8 @@ Topology probe at the start of the W33 milestone:
 
 1. Discover reachable hosts:
    * localhost — first, pick the largest available model.
-   * 192.168.12.191 — second, pick the largest available model.
-   * 192.168.12.248 — third, ARP-check; expected to fail (28th
+   * <lan-host-A> — second, pick the largest available model.
+   * <lan-host-B> — third, ARP-check; expected to fail (28th
      consecutive milestone).
 2. If two hosts reachable, pair the largest model on each and run
    a 20-prompt trust-calibration bench at temperature 0:

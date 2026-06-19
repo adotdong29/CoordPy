@@ -346,18 +346,18 @@ Status:
 * **HONESTLY-NULL** if both reachable hosts are present but the LLMs
   agree on every cell (no disagreement to exploit).  Report the
   agreement rate and label the gap.
-* **HONESTLY-NULL** if Mac 2 (192.168.12.248) is still ARP-incomplete
+* **HONESTLY-NULL** if Mac 2 (<lan-host-B>) is still ARP-incomplete
   AND the live ensemble is single-host (then S1/S2 reduce to
   best-effort probes; the gap is hardware, not mechanism).
 
 ### S2 — Mac 2 returning OR honest fallback
 
-* PASS if 192.168.12.248 is reachable AND a backend on it
+* PASS if <lan-host-B> is reachable AND a backend on it
   participates in the R-77-XHOST-DISAGREE / R-77-CROSS-HOST-LIVE
   ensemble.
 * HONESTLY-NULL otherwise.  When null, the bench MUST honestly
   report Mac 2 ARP status and continue with the strongest available
-  topology (localhost + 192.168.12.191).
+  topology (localhost + <lan-host-A>).
 
 ### S3 — Trust precision = 1.000 on the cross-host bench
 
