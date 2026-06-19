@@ -523,5 +523,5 @@ def test_tcc_v9_compound_arbiters():
 
 def test_no_version_bump_invariant():
     from coordpy import SDK_VERSION, __version__
-    assert str(__version__) == "1.2.0"
+    assert str(__version__) == "1.2.1"
     assert str(SDK_VERSION) == "coordpy.sdk.v3.43"

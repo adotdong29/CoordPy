@@ -515,7 +515,7 @@ def test_preflight_run_end_to_end_deferred_when_cache_absent(
 
 def test_coordpy_version_unchanged():
     import coordpy
-    assert coordpy.__version__ == "1.2.0"
+    assert coordpy.__version__ == "1.2.1"
 
 
 def test_coordpy_sdk_version_unchanged():

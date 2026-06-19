@@ -329,7 +329,7 @@ def family_h872_no_version_bump_invariant(
         "schema": R176_SCHEMA_VERSION,
         "name": "h872_no_version_bump_invariant",
         "passed": bool(
-            str(__version__) == "1.2.0"
+            str(__version__) == "1.2.1"
             and str(SDK_VERSION) == "coordpy.sdk.v3.43"),
     }
 

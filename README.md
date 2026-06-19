@@ -46,7 +46,7 @@ pip install coordpy-ai
 Verify:
 
 ```bash
-coordpy --version           # coordpy 1.2.0 (coordpy.sdk.v3.43)
+coordpy --version           # coordpy 1.2.1 (coordpy.sdk.v3.43)
 python -c "import coordpy; print(coordpy.__version__)"
 ```
 

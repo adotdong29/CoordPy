@@ -32,7 +32,7 @@ REGISTRY_DOC = os.path.join(ROOT, "docs", "reference", "W144_COORDPY_SUBJECT_REG
 # --- stable boundary invariant -------------------------------------------
 
 def test_stable_boundary_invariant():
-    assert coordpy.__version__ == "1.2.0"
+    assert coordpy.__version__ == "1.2.1"
     assert coordpy.SDK_VERSION == "coordpy.sdk.v3.43"
     assert S.SUBJECT_REPORT_SCHEMA == "coordpy.subject.v1"
     assert S.EXPECTED_VERSION == coordpy.__version__

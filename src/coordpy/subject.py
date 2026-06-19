@@ -220,7 +220,7 @@ _STABLE_PUBLIC_SYMBOLS: tuple[str, ...] = (
     "adk",  # W145 — the library-first ADK front door
 )
 
-EXPECTED_VERSION = "1.2.0"
+EXPECTED_VERSION = "1.2.1"
 EXPECTED_SDK_VERSION = "coordpy.sdk.v3.43"
 
 

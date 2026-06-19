@@ -39,7 +39,7 @@ _ON = ("import sys\nd=sys.stdin.buffer.read().split()\nn=int(d[0]);a=[int(x) for
 # ---- stable boundary -----------------------------------------------------------------
 
 def test_version_and_sdk_boundary_unchanged():
-    assert coordpy.__version__ == "1.2.0"
+    assert coordpy.__version__ == "1.2.1"
     assert coordpy.SDK_VERSION == "coordpy.sdk.v3.43"
 
 

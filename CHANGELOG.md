@@ -13,6 +13,21 @@ version. The complete milestone-by-milestone research history (W22..W145) is
 preserved verbatim in
 [`docs/research/active/milestone-log.md`](docs/research/active/milestone-log.md).
 
+## [1.2.1] - 2026-06-19
+
+Patch release fixing Python 3.10 / 3.11 compatibility.
+
+### Fixed
+- `coordpy.self_tutoring_technique_extractor_v1` used a PEP 701 multi-line
+  f-string expression that is valid on Python 3.12+ but raised
+  `SyntaxError` on the declared-supported Python 3.10 / 3.11 — breaking
+  import of that experimental module and `coordpy-subject check` on those
+  interpreters. Rewritten to 3.10-compatible f-string syntax and verified by
+  compiling the whole package and running the product smoke under real 3.10
+  and 3.11 interpreters. The core `coordpy.adk` / stable SDK surface was
+  unaffected on 3.10 / 3.11 (the module is not imported at package init).
+- **1.2.0 is yanked** in favour of 1.2.1.
+
 ## [1.2.0] - 2026-06-19
 
 First stable **public ADK release**. CoordPy is now a Python-first agent

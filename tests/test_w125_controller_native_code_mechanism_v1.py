@@ -34,7 +34,7 @@ def _synthetic():
 
 
 def test_stable_boundary_untouched():
-    assert coordpy.__version__ == "1.2.0"
+    assert coordpy.__version__ == "1.2.1"
     assert coordpy.SDK_VERSION == "coordpy.sdk.v3.43"
 
 

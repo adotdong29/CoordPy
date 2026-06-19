@@ -58,5 +58,5 @@ def test_w78_verify_detects_drift():
 def test_w78_stable_boundary():
     """coordpy.__version__ and SDK_VERSION must be unchanged."""
     import coordpy
-    assert coordpy.__version__ == "1.2.0"
+    assert coordpy.__version__ == "1.2.1"
     assert coordpy.SDK_VERSION == "coordpy.sdk.v3.43"

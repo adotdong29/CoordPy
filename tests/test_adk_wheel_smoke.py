@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import importlib.metadata as _md
 
-EXPECTED_VERSION = "1.2.0"
+EXPECTED_VERSION = "1.2.1"
 
 _failures: list[str] = []
 
@@ -50,11 +50,11 @@ def main() -> int:
     # 1. Version parity: runtime __version__ ↔ installed distribution metadata.
     import coordpy
     check("import coordpy", True, coordpy.__file__)
-    check("coordpy.__version__ == 1.2.0",
+    check(f"coordpy.__version__ == {EXPECTED_VERSION}",
           coordpy.__version__ == EXPECTED_VERSION, coordpy.__version__)
     try:
         dist_v = _md.version("coordpy-ai")
-        check("dist metadata version == 1.2.0", dist_v == EXPECTED_VERSION, dist_v)
+        check(f"dist metadata version == {EXPECTED_VERSION}", dist_v == EXPECTED_VERSION, dist_v)
     except _md.PackageNotFoundError:
         # Source/sys.path runs without an installed dist: skip parity, not a fail.
         print("  [SKIP] dist metadata version (coordpy-ai not installed as a dist)")

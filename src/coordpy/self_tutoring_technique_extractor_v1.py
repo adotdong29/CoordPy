@@ -352,8 +352,8 @@ def compile_tutor_from_winner_v1(
 
     why, needs = _parse_headroom_note(template.headroom_note)
     routes = (
-        (OBS_TIMEOUT, f"your program is too slow (times out on large inputs) — use {needs or 'the '
-                      'efficient technique'} and fill the blanked decisions."),
+        (OBS_TIMEOUT, f"your program is too slow (times out on large inputs) — use "
+                      f"{needs or 'the efficient technique'} and fill the blanked decisions."),
         (OBS_WRONG_ANSWER, "your program returns the wrong result on a hidden input — the blanked "
                            "accept/aggregation decision is where the logic is missing."),
         ("DEFAULT", f"fix your approach using {needs or 'the efficient technique'}; the skeleton's "

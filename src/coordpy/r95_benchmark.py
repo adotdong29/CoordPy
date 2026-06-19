@@ -1262,7 +1262,7 @@ def family_proxy_falsifier(
     """
     import coordpy
     version_ok = (
-        coordpy.__version__ == "1.2.0"
+        coordpy.__version__ == "1.2.1"
         and coordpy.SDK_VERSION == "coordpy.sdk.v3.43")
     n = 2
     agents_ = _make_agents(n)

@@ -34,7 +34,7 @@ FAST = [t for t in RBC_SLATE_V1 if t.mode != MODE_COMPLEXITY_BLIND]
 
 # ---------------------------------------------------------------- stable boundary
 def test_version_boundary_unchanged():
-    assert coordpy.__version__ == "1.2.0"
+    assert coordpy.__version__ == "1.2.1"
     assert coordpy.SDK_VERSION == "coordpy.sdk.v3.43"
 
 

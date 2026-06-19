@@ -730,5 +730,5 @@ def test_substrate_adapter_v18_has_v18_full_tier():
 
 def test_w73_no_version_bump():
     from coordpy import SDK_VERSION, __version__
-    assert str(__version__) == "1.2.0"
+    assert str(__version__) == "1.2.1"
     assert str(SDK_VERSION) == "coordpy.sdk.v3.43"

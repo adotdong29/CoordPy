@@ -241,7 +241,7 @@ def run_r188(*, seeds: Sequence[int]) -> dict[str, Any]:
     cells["H1161"] = bool(len(boundary.blocked_axes) >= 40)
     # H1162: no-version-bump invariant.
     cells["H1162"] = bool(
-        __version__ == "1.2.0"
+        __version__ == "1.2.1"
         and SDK_VERSION == "coordpy.sdk.v3.43")
     # H1163: frontier-blocked axes unchanged from W70.
     cells["H1163"] = bool(
