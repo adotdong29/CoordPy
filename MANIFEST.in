@@ -18,10 +18,10 @@ recursive-include tests *.py
 recursive-include examples *.py *.txt *.md *.toml
 
 # PEP 561 typing marker.
-include coordpy/py.typed
+include src/coordpy/py.typed
 
 # Data files the runtime loads at run time.
-recursive-include coordpy/_internal/tasks/data *.jsonl
+recursive-include src/coordpy/_internal/tasks/data *.jsonl
 
 # Trim build/test/dev junk that should never end up in a release.
 prune **/__pycache__

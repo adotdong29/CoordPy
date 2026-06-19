@@ -54,5 +54,5 @@ def test_w75_failure_modes_has_known_canonical_set() -> None:
 
 def test_w75_no_version_bump() -> None:
     from coordpy import SDK_VERSION, __version__
-    assert __version__ == "0.5.20"
+    assert __version__ == "1.2.0"
     assert SDK_VERSION == "coordpy.sdk.v3.43"

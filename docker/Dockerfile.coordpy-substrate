@@ -17,12 +17,12 @@ WORKDIR /opt/coordpy
 
 # Minimum runtime deps. We deliberately do NOT install the
 # coordpy package via pip (some optional metadata files reference
-# missing extras); instead we copy the bare ``coordpy/`` source
+# missing extras); instead we copy the bare ``src/coordpy/`` source
 # tree and add it to PYTHONPATH. The W84/W86 distributed-substrate
 # code is pure-Python on numpy only.
 RUN pip install --no-cache-dir numpy>=1.24
 
-COPY coordpy ./coordpy
+COPY src/coordpy ./coordpy
 ENV PYTHONPATH=/opt/coordpy
 
 # Health check probes the gateway's /healthz endpoint by default.

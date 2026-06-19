@@ -29,7 +29,7 @@ def _mint(name, seed=133_002):
 
 
 def test_version_boundary_unchanged():
-    assert coordpy.__version__ == "0.5.20"
+    assert coordpy.__version__ == "1.2.0"
     assert coordpy.SDK_VERSION == "coordpy.sdk.v3.43"
 
 

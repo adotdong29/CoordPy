@@ -46,7 +46,7 @@ pip install coordpy-ai
 Verify:
 
 ```bash
-coordpy --version           # coordpy 0.5.20 (coordpy.sdk.v3.43)
+coordpy --version           # coordpy 1.2.0 (coordpy.sdk.v3.43)
 python -c "import coordpy; print(coordpy.__version__)"
 ```
 
@@ -109,7 +109,7 @@ OpenAI-compatible provider; see the env-var blocks below). For a
 [`examples/adk_quickstart.py`](examples/adk_quickstart.py); for a small
 **multi-agent** app (researcher → writer, with tools + artifacts + memory),
 run `python -m coordpy.adk.examples.research_assistant`
-([source](coordpy/adk/examples/research_assistant.py)).
+([source](src/coordpy/adk/examples/research_assistant.py)).
 
 ### Capsule audit, provenance & replay — for free
 
@@ -221,7 +221,7 @@ New to this repo? `coordpy-subject` is the fastest way to learn what is
 stable (the SDK/CLI), what is canonical-experimental (the architecture
 north-star lineage + the most recent research chain), and what is
 historical — without reading the milestone archive. See
-[`docs/W144_COORDPY_SUBJECT_REGISTRY.json`](docs/W144_COORDPY_SUBJECT_REGISTRY.json).
+[`docs/reference/W144_COORDPY_SUBJECT_REGISTRY.json`](docs/reference/W144_COORDPY_SUBJECT_REGISTRY.json).
 
 The research-profile chain is still useful for the structured
 `RunSpec → RunReport` path:

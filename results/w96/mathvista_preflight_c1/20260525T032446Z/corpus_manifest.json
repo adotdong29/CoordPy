@@ -1,8 +1,0 @@
-{
-  "corpus_merkle_root": "dea27472fc12e697b1bb708d62dd4072662dcc7edd36bf89c9a9a3c6946101d5",
-  "n_problems": 1000,
-  "parquet_bytes": 141568126,
-  "parquet_sha256": "373f6c0b412a9be2cec36711cee724e03f4c5db6908f3c13db903aa9694d4f2d",
-  "parquet_url": "https://huggingface.co/datasets/AI4Math/MathVista/resolve/main/data/testmini-00000-of-00001-725687bf7a18d64b.parquet",
-  "schema": "coordpy.mathvista_loader_v1.v1"
-}

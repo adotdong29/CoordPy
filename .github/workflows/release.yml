@@ -60,6 +60,10 @@ jobs:
           /tmp/cp/bin/pip install --quiet --upgrade pip
           /tmp/cp/bin/pip install --quiet dist/*.whl
           /tmp/cp/bin/python tests/test_smoke_full.py
+          /tmp/cp/bin/python tests/test_adk_wheel_smoke.py
+          /tmp/cp/bin/python -m coordpy.adk.examples.research_assistant
+          /tmp/cp/bin/coordpy --version
+          /tmp/cp/bin/coordpy-team --help
           /tmp/cp/bin/coordpy --profile local_smoke --out-dir /tmp/coordpy-release-smoke
           /tmp/cp/bin/coordpy-capsule verify --report /tmp/coordpy-release-smoke/product_report.json
 

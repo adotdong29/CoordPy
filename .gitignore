@@ -51,5 +51,21 @@ TODO.md
 .private/
 .w119_scratch/
 .w119_tmp/
-results/w124/**/w124_feature_cache.npz
-results/w134/corpus/corpus_cache.pkl
+
+# ---------------------------------------------------------------------
+# Local-only artifacts kept out of the public tree (W146). Research
+# outputs, the graph cache, and internal ops material live here and
+# are never published. Keep your own copies; they stay untracked.
+# ---------------------------------------------------------------------
+/artifacts/
+graphify-out/
+.graphifyignore
+.hypothesis/
+.playwright-cli/
+.w119/
+
+# stray scratch files that must never be committed
+/data.json
+/mock_output.json
+/df_contents.txt
+/out.log

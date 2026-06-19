@@ -211,7 +211,7 @@ class TestH11CumulativeTrustBoundary:
 class TestH12SdkContractPreserved:
     def test_h12_version_unchanged(self):
         import coordpy
-        assert coordpy.__version__ == "0.5.20"
+        assert coordpy.__version__ == "1.2.0"
         assert coordpy.SDK_VERSION == "coordpy.sdk.v3.43"
 
     def test_h12_w45_module_not_in_experimental(self):

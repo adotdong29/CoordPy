@@ -6,8 +6,8 @@ Only the latest minor release receives security fixes.
 
 | Version | Supported |
 | ------- | --------- |
-| 0.5.x   | yes       |
-| < 0.5   | no        |
+| 1.2.x   | yes       |
+| < 1.2   | no        |
 
 ## Reporting
 
@@ -22,11 +22,12 @@ ship a fix or mitigation within thirty days for confirmed issues.
 
 In scope:
 
+- The `coordpy.adk` library surface and runtime.
 - The `coordpy` SDK and runtime.
-- The CLIs (`coordpy`, `coordpy-import`, `coordpy-ci`,
-  `coordpy-capsule`).
-- The on-disk schemas (capsule view, provenance manifest,
-  product report, CI verdict, import audit).
+- The CLIs (`coordpy`, `coordpy-team`, `coordpy-capsule`,
+  `coordpy-subject`, `coordpy-import`, `coordpy-ci`).
+- The on-disk schemas (capsule view, team result, provenance
+  manifest, product report, CI verdict, import audit).
 
 Out of scope:
 

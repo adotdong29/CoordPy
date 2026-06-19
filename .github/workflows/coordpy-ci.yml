@@ -27,6 +27,11 @@ jobs:
       - name: CoordPy SDK contract + provenance + extensions tests
         run: |
           python3 tests/test_smoke_full.py
+      - name: CoordPy ADK surface + product smoke
+        run: |
+          python3 -m pytest tests/test_w145_adk_surface_v1.py -q
+          python3 tests/test_adk_wheel_smoke.py
+          python3 -m coordpy.adk.examples.research_assistant
       - name: Smoke-test console scripts
         run: |
           coordpy --version
@@ -35,6 +40,7 @@ jobs:
                    --min-pass-at-1 1.0
           coordpy-team --help
           coordpy-capsule --help
+          coordpy-subject check
           coordpy-capsule verify-view \
             --view /tmp/coordpy-ci-smoke/capsule_view.json
 

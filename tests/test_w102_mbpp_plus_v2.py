@@ -351,7 +351,7 @@ def test_preflight_v2_p2_canonical_self_test_high_pass_rate():
 
 def test_coordpy_version_unchanged_w102():
     import coordpy
-    assert coordpy.__version__ == "0.5.20"
+    assert coordpy.__version__ == "1.2.0"
 
 
 def test_coordpy_sdk_version_unchanged_w102():

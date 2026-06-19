@@ -4,13 +4,13 @@ How to publish coordpy to PyPI as
 [`coordpy-ai`](https://pypi.org/project/coordpy-ai/).
 
 > Run release commands from a virtual environment.
-> `./scripts/release.sh` creates and maintains its own at
+> `./scripts/release/release.sh` creates and maintains its own at
 > `.release-venv/`; pick the interpreter with
-> `PYTHON=python3.12 ./scripts/release.sh ...`.
+> `PYTHON=python3.12 ./scripts/release/release.sh ...`.
 
 ## Cut a release
 
-1. **Bump the version** in `coordpy/_version.py`:
+1. **Bump the version** in `src/coordpy/_version.py`:
 
    ```
    __version__ = "X.Y.Z"
@@ -24,14 +24,14 @@ How to publish coordpy to PyPI as
 3. **Commit** the bump and changelog:
 
    ```bash
-   git add coordpy/_version.py CHANGELOG.md
+   git add src/coordpy/_version.py CHANGELOG.md
    git commit -m "Release X.Y.Z"
    ```
 
 4. **Verify the wheel passes the gates:**
 
    ```bash
-   ./scripts/release.sh check
+   ./scripts/release/release.sh check
    ```
 
    This builds the sdist + wheel, runs `twine check`,
@@ -47,7 +47,7 @@ How to publish coordpy to PyPI as
    git push --follow-tags
    ```
 
-   `./scripts/release.sh upload` exits 3 (without uploading)
+   `./scripts/release/release.sh upload` exits 3 (without uploading)
    unless **all three** of these hold:
    - HEAD has an exact-match git tag,
    - the tag is `v` + `coordpy._version.__version__`,
@@ -134,7 +134,7 @@ second attempt, append a `.devN` suffix (`X.Y.Z.dev1`) and
 upload that.
 
 ```bash
-./scripts/release.sh testpypi
+./scripts/release/release.sh testpypi
 ```
 
 Verify in a clean venv (the `--extra-index-url` is required,
@@ -156,7 +156,7 @@ second.)
 ### Real PyPI
 
 ```bash
-./scripts/release.sh upload
+./scripts/release/release.sh upload
 ```
 
 After upload, sanity-check from a fresh venv. The new version

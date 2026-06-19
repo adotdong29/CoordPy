@@ -30,7 +30,7 @@ keywords = [
     "auditability",
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
@@ -116,6 +116,7 @@ coordpy-subject = "coordpy._cli:main_subject"
 version = { attr = "coordpy._version.__version__" }
 
 [tool.setuptools.packages.find]
+where = ["src"]
 include = ["coordpy*"]
 exclude = ["tests*", "examples*"]
 
@@ -141,7 +142,7 @@ target-version = "py310"
 # code with no API stability promise (see ``coordpy/_internal/__init__.py``)
 # and is not held to formatter rules.
 extend-exclude = [
-    "coordpy/_internal",
+    "src/coordpy/_internal",
     "build",
     "dist",
     ".release-venv",
@@ -169,16 +170,17 @@ ignore = [
 # Re-export files: import order is significant for the public
 # API surface; ruff's import-sort / unused-import checks are
 # not the right tool.
-"coordpy/__init__.py" = ["E402", "F401", "F403", "I001"]
-"coordpy/extensions/__init__.py" = ["F401"]
+"src/coordpy/__init__.py" = ["E402", "F401", "F403", "I001"]
+"src/coordpy/adk/__init__.py" = ["F401"]
+"src/coordpy/extensions/__init__.py" = ["F401"]
 # Research modules that re-export sub-symbols and use
 # conditional imports for optional dependencies.
-"coordpy/team_coord.py" = ["E402", "F401"]
-"coordpy/integrated_synthesis.py" = ["E402", "F401"]
-"coordpy/capsule_runtime.py" = ["E402", "F401"]
-"coordpy/capsule_decoder.py" = ["F401"]
-"coordpy/capsule_decoder_v2.py" = ["F401"]
-"coordpy/role_invariant_synthesis.py" = ["E402", "F401"]
+"src/coordpy/team_coord.py" = ["E402", "F401"]
+"src/coordpy/integrated_synthesis.py" = ["E402", "F401"]
+"src/coordpy/capsule_runtime.py" = ["E402", "F401"]
+"src/coordpy/capsule_decoder.py" = ["F401"]
+"src/coordpy/capsule_decoder_v2.py" = ["F401"]
+"src/coordpy/role_invariant_synthesis.py" = ["E402", "F401"]
 # Test scripts use ad-hoc imports near where they exercise an API.
 "tests/*" = ["E402", "F401"]
 
@@ -187,7 +189,7 @@ line-length = 100
 target-version = ["py310", "py311", "py312", "py313", "py314"]
 extend-exclude = """
 /(
-    coordpy/_internal
+    src/coordpy/_internal
   | build
   | dist
   | \\.release-venv
@@ -198,9 +200,10 @@ extend-exclude = """
 python_version = "3.10"
 ignore_missing_imports = true
 warn_unused_ignores = true
-files = ["coordpy"]
-exclude = "coordpy/_internal"
+files = ["src/coordpy"]
+exclude = "src/coordpy/_internal"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 addopts = "-ra -q"

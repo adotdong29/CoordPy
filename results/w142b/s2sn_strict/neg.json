@@ -1,8 +1,0 @@
-{
-  "schema": "w142b_strict_neg",
-  "family": "subarrays_sum_and_range",
-  "strict_alien": "sum_nearest_smaller_left",
-  "members": 10,
-  "member_seed_base": 200,
-  "NEG_strict": 3
-}

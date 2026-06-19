@@ -41,7 +41,7 @@ def _arts(cx, inv=("x>=0",)):
 
 
 def test_stable_boundary():
-    check("version 0.5.20", coordpy.__version__ == "0.5.20")
+    check("version 1.2.0", coordpy.__version__ == "1.2.0")
     check("sdk v3.43", coordpy.SDK_VERSION == "coordpy.sdk.v3.43")
     check("module not in public surface", "public_signal_selection_oracle_v1"
           not in getattr(coordpy, "__all__", []))

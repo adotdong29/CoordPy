@@ -67,7 +67,7 @@ def _gen_correct_diverse(prompt, max_tokens, temperature):
 
 # ---------------------------------------------------------------- stable boundary
 def test_stable_boundary_untouched():
-    assert coordpy.__version__ == "0.5.20"
+    assert coordpy.__version__ == "1.2.0"
     assert coordpy.SDK_VERSION == "coordpy.sdk.v3.43"
     # the W128 module is explicit-import-only; it must NOT be re-exported by __init__
     assert not hasattr(coordpy, "role_diverse_algorithm_search_v1") or \
