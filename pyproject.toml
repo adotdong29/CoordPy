@@ -76,8 +76,8 @@ heavy = [
 docker = [
     "docker>=6.0",
 ]
-# Multi-node cluster (ASPEN) tooling slot; the cluster client lives
-# outside this repo.
+# Multi-node cluster tooling slot; the cluster client lives outside
+# this repo.
 cluster = []
 dev = [
     "black",
@@ -89,12 +89,12 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/adotdong29/context-zero"
-Documentation = "https://github.com/adotdong29/context-zero#readme"
-Source = "https://github.com/adotdong29/context-zero"
-Repository = "https://github.com/adotdong29/context-zero.git"
-Issues = "https://github.com/adotdong29/context-zero/issues"
-Changelog = "https://github.com/adotdong29/context-zero/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/adotdong29/CoordPy"
+Documentation = "https://github.com/adotdong29/CoordPy#readme"
+Source = "https://github.com/adotdong29/CoordPy"
+Repository = "https://github.com/adotdong29/CoordPy.git"
+Issues = "https://github.com/adotdong29/CoordPy/issues"
+Changelog = "https://github.com/adotdong29/CoordPy/blob/main/CHANGELOG.md"
 
 [project.scripts]
 # CoordPy SDK surface — stable, contract-tested entry points.

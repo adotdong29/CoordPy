@@ -5,8 +5,8 @@
 Supported Python versions: 3.10, 3.11, 3.12, 3.13, 3.14.
 
 ```bash
-git clone https://github.com/adotdong29/context-zero.git
-cd context-zero
+git clone https://github.com/adotdong29/CoordPy.git
+cd CoordPy
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 ```
